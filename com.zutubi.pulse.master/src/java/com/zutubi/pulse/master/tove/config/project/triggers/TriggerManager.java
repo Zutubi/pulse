@@ -4,35 +4,50 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.*;
+import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * 
- *
+ * Manages the relationship between trigger configuration and scheduler
+ * triggers.  Creates/syncs state, and wires config into it as required.
  */
-public class TriggerManager implements ExternalStateManager<TriggerConfiguration>, EventListener
+public class TriggerManager implements ExternalStateManager<TriggerConfiguration>, ConfigurationInjector.ConfigurationSetter<Trigger>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(TriggerManager.class);
 
+    private Map<Long, TriggerConfiguration> idToConfig = new HashMap<Long, TriggerConfiguration>();
+
+    private ConfigurationProvider configurationProvider;
     private Scheduler scheduler;
 
     public void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
         TypeListener<TriggerConfiguration> listener = new TypeAdapter<TriggerConfiguration>(TriggerConfiguration.class)
         {
+            @Override
+            public void postInsert(TriggerConfiguration instance)
+            {
+                scheduler.getTrigger(instance.getTriggerId()).setConfig(instance);
+                idToConfig.put(instance.getTriggerId(), instance);
+            }
+
             public void postDelete(TriggerConfiguration instance)
             {
+                idToConfig.remove(instance.getTriggerId());
                 TriggerManager.this.delete(instance.getTriggerId());
             }
 
             public void postSave(TriggerConfiguration instance, boolean nested)
             {
+                idToConfig.put(instance.getTriggerId(), instance);
                 try
                 {
                     Trigger trigger = scheduler.getTrigger(instance.getTriggerId());
@@ -49,6 +64,11 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
             }
         };
         listener.register(configurationProvider, true);
+
+        for (TriggerConfiguration triggerConfig: configurationProvider.getAll(TriggerConfiguration.class))
+        {
+            idToConfig.put(triggerConfig.getTriggerId(), triggerConfig);
+        }
     }
 
     private void delete(long id)
@@ -71,8 +91,11 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
     {
         try
         {
-            SpringComponentContext.autowire(instance);
+            ProjectConfiguration project = configurationProvider.getAncestorOfType(instance, ProjectConfiguration.class);
             Trigger trigger = instance.newTrigger();
+            trigger.setTaskClass(BuildProjectTask.class);
+            trigger.setProject(project.getProjectId());
+            trigger.setGroup("project:" + project.getProjectId());
             scheduler.schedule(trigger);
             return trigger.getId();
         }
@@ -103,9 +126,25 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
         return new Class[]{ ConfigurationEventSystemStartedEvent.class };
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setConfiguration(Trigger state)
     {
-        this.scheduler = scheduler;
+        state.setConfig(idToConfig.get(state.getId()));
+    }
+
+    public void setConfigurationInjector(ConfigurationInjector configurationInjector)
+    {
+        configurationInjector.registerSetter(CronTrigger.class, this);
+        configurationInjector.registerSetter(EventTrigger.class, this);
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
+
+    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    {
+        configurationStateManager.register(TriggerConfiguration.class, this);
     }
 
     public void setEventManager(EventManager eventManager)
@@ -113,8 +152,8 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
         eventManager.register(this);
     }
 
-    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    public void setScheduler(Scheduler scheduler)
     {
-        configurationStateManager.register(TriggerConfiguration.class, this);
+        this.scheduler = scheduler;
     }
 }

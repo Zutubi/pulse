@@ -249,4 +249,6 @@
     </bean>
 
     <bean id="projectDependencyGraphBuilder" class="com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder"/>
+
+    <bean id="triggerConditionFactory" class="com.zutubi.pulse.master.trigger.DefaultTriggerConditionFactory"/>
 </beans>

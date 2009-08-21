@@ -10,7 +10,7 @@ public class MockSchedulerStrategy implements SchedulerStrategy
 {
     public List<String> canHandle()
     {
-        return Arrays.asList(CronTrigger.TYPE,SimpleTrigger.TYPE,EventTrigger.TYPE,OneShotTrigger.TYPE,NoopTrigger.TYPE );
+        return Arrays.asList(CronTrigger.TYPE,SimpleTrigger.TYPE,EventTrigger.TYPE,NoopTrigger.TYPE );
     }
 
     public void init(Trigger trigger) throws SchedulingException
@@ -40,10 +40,5 @@ public class MockSchedulerStrategy implements SchedulerStrategy
     public void setTriggerHandler(TriggerHandler handler)
     {
 
-    }
-
-    public boolean dependsOnProject(Trigger trigger, long projectId)
-    {
-        return false;
     }
 }

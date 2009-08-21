@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.tove.config.api.NamedConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
@@ -12,7 +13,7 @@ import java.lang.reflect.Constructor;
  * An abstract factory for creating instances using a constructor that takes a
  * configuration instance.
  */
-public abstract class ConfiguredInstanceFactory<IType, CType extends NamedConfiguration>
+public abstract class ConfiguredInstanceFactory<IType, CType extends Configuration>
 {
     private static final Logger LOG = Logger.getLogger(ConfiguredInstanceFactory.class);
 
@@ -34,7 +35,7 @@ public abstract class ConfiguredInstanceFactory<IType, CType extends NamedConfig
 
         if (formalParameterType == null)
         {
-            throw new BuildException("Unable to create instance '" + configuration.getName() + "': No constructor of type '" + type.getName() + "' accepts configuration of type '" + configuration.getClass().getName() + "'");
+            throw new BuildException("Unable to create instance '" + getName(configuration) + "': No constructor of type '" + type.getName() + "' accepts configuration of type '" + configuration.getClass().getName() + "'");
         }
 
         try
@@ -44,7 +45,19 @@ public abstract class ConfiguredInstanceFactory<IType, CType extends NamedConfig
         catch (Exception e)
         {
             LOG.severe(e);
-            throw new BuildException("Unable to create instance '" + configuration.getName() + "': " + e.getMessage(), e);
+            throw new BuildException("Unable to create instance '" + getName(configuration) + "': " + e.getMessage(), e);
+        }
+    }
+
+    private String getName(CType configuration)
+    {
+        if (configuration instanceof AbstractNamedConfiguration)
+        {
+            return ((AbstractNamedConfiguration) configuration).getName();
+        }
+        else
+        {
+            return "<unnamed>";
         }
     }
 

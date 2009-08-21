@@ -1,17 +1,18 @@
 package com.zutubi.pulse.master;
 
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.events.Event;
-
-import static org.mockito.Mockito.*;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class DependentBuildEventFilterTest extends PulseTestCase
 {
@@ -35,6 +36,7 @@ public class DependentBuildEventFilterTest extends PulseTestCase
 
         trigger = mock(Trigger.class);
         stub(trigger.getProject()).toReturn(TRIGGERED_PROJECT_ID);
+        stub(trigger.getConfig()).toReturn(new DependentBuildTriggerConfiguration());
 
         builtProject = mock(Project.class);
 

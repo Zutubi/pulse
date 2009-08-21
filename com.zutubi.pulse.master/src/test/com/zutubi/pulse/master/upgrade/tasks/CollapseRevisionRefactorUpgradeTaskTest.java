@@ -2,11 +2,10 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.core.util.JDBCUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class CollapseRevisionRefactorUpgradeTaskTest extends BaseUpgradeTaskTest
         super.tearDown();
     }
 
-    public void testEmptyDatabaseUpgrade() throws SQLException, IOException
+    public void testEmptyDatabaseUpgrade() throws Exception
     {
         assertTableExists("REVISION");
         assertColumnExists("BUILD_CHANGELIST", "REVISION_AUTHOR");
@@ -56,7 +55,7 @@ public class CollapseRevisionRefactorUpgradeTaskTest extends BaseUpgradeTaskTest
         assertColumnNotExists("BUILD_RESULT", "REVISION_ID");
     }
 
-    public void testDataTransferFromRevisionToBuildResult() throws SQLException, IOException
+    public void testDataTransferFromRevisionToBuildResult() throws Exception
     {
         insertBuildRevision(1, 1, "rev1");
         insertBuildRevision(2, 2, "rev2");
@@ -69,7 +68,7 @@ public class CollapseRevisionRefactorUpgradeTaskTest extends BaseUpgradeTaskTest
         assertBuildResultRow(3, "rev3");
     }
 
-    public void testUnexpectedNoRevisionForBuild() throws SQLException, IOException
+    public void testUnexpectedNoRevisionForBuild() throws Exception
     {
         insertBuildResult(1);
         runUpgrade();
@@ -147,7 +146,7 @@ public class CollapseRevisionRefactorUpgradeTaskTest extends BaseUpgradeTaskTest
 
     }
 
-    private void runUpgrade() throws SQLException, IOException
+    private void runUpgrade() throws Exception
     {
         Connection con = null;
         try

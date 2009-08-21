@@ -2,11 +2,8 @@ package com.zutubi.pulse.master.tove.config.project.triggers;
 
 import com.zutubi.pulse.master.scheduling.CronTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.validation.annotations.Constraint;
 
 /**
@@ -18,8 +15,6 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
 {
     @Constraint("CronExpressionValidator")
     private String cron;
-
-    private ConfigurationProvider configurationProvider;
 
     public String getCron()
     {
@@ -33,12 +28,7 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
 
     public Trigger newTrigger()
     {
-        ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
-        Trigger trigger =  new CronTrigger(cron, getTriggerName(), getTriggerGroup(project));
-        trigger.setTaskClass(BuildProjectTask.class);
-        trigger.setProject(project.getProjectId());
-        
-        return trigger;
+        return new CronTrigger(cron, getName());
     }
 
     public void update(Trigger trigger)
@@ -46,10 +36,5 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
         super.update(trigger);
         CronTrigger cronTrigger = (CronTrigger) trigger;
         cronTrigger.setCron(cron);
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 }

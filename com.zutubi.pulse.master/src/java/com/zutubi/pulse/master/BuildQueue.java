@@ -3,13 +3,12 @@ package com.zutubi.pulse.master;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The build queue manages {@link EntityBuildQueue} instances for each
@@ -111,6 +110,35 @@ public class BuildQueue
     }
 
     /**
+     * Returns a list of all queued and active build requests for a given
+     * entity.  The latest request is first in the queue.
+     *
+     * @param entity the entity to get requests for
+     * @return all queued and active requests for the given entity
+     */
+    public List<BuildRequestEvent> getRequestsForEntity(NamedEntity entity)
+    {
+        EntityBuildQueue queue = entityQueues.get(entity);
+        if (queue == null)
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            List<BuildRequestEvent> result = new LinkedList<BuildRequestEvent>(queue.getQueuedBuildsSnapshot());
+            CollectionUtils.map(queue.getActiveBuildsSnapshot(), new Mapping<EntityBuildQueue.ActiveBuild, BuildRequestEvent>()
+            {
+                public BuildRequestEvent map(EntityBuildQueue.ActiveBuild activeBuild)
+                {
+                    return activeBuild.getEvent();
+                }
+            }, result);
+
+            return result;
+        }
+    }
+
+    /**
      * Cancels a queued build by the request event id.  If the build is already
      * active, or no longer queued, this is a no-op.
      *
@@ -167,7 +195,7 @@ public class BuildQueue
 
         /**
          * @return a map from an entity (project or user) to the active builds
-         * for that entity.  Builds activate first are last in the list.
+         * for that entity.  Builds activated first are last in the list.
          */
         public Map<Entity, List<EntityBuildQueue.ActiveBuild>> getActiveBuilds()
         {

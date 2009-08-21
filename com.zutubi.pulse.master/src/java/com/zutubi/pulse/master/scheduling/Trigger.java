@@ -1,14 +1,12 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.tove.annotations.Transient;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
+import com.zutubi.tove.annotations.Transient;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <class-comment/>
@@ -48,15 +46,15 @@ public abstract class Trigger extends Entity implements NamedEntity
      */
     private Date previousTriggerTime;
 
-    /**
-     * The datamap, contains arbitrary pieces of data. This data is later made available
-     * to the task being executed.
-     */
-    private Map<Serializable, Serializable> dataMap;
-
     private Class<? extends Task> taskClass;
 
     private long projectId;
+
+    /**
+     * Contains extra configuration.  Only project build triggers have this
+     * config so far.  Further refactoring may expand this usage.
+     */
+    private TriggerConfiguration config;
 
     /**
      * The no argument constructor should not be used directly. It is made available so
@@ -65,7 +63,6 @@ public abstract class Trigger extends Entity implements NamedEntity
      */
     public Trigger()
     {
-
     }
 
     /**
@@ -97,23 +94,6 @@ public abstract class Trigger extends Entity implements NamedEntity
      */
     @Transient
     public abstract String getType();
-
-    public Map<Serializable, Serializable> getDataMap()
-    {
-        if (dataMap == null)
-        {
-            dataMap = new HashMap<Serializable, Serializable>();
-        }
-        return dataMap;
-    }
-
-    /**
-     * Used by hibernate.
-     */
-    private void setDataMap(Map<Serializable, Serializable> map)
-    {
-        dataMap = map;
-    }
 
     public TriggerState getState()
     {
@@ -175,7 +155,7 @@ public abstract class Trigger extends Entity implements NamedEntity
     /**
      * Used by hibernate.
      */
-    void setGroup(String group)
+    public void setGroup(String group)
     {
         this.group = group;
     }
@@ -231,9 +211,23 @@ public abstract class Trigger extends Entity implements NamedEntity
         this.projectId = projectId;
     }
 
-    public boolean canEdit()
+    public long getProjectId()
     {
-        return false;
+        return projectId;
     }
 
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
+
+    public TriggerConfiguration getConfig()
+    {
+        return config;
+    }
+
+    public void setConfig(TriggerConfiguration config)
+    {
+        this.config = config;
+    }
 }

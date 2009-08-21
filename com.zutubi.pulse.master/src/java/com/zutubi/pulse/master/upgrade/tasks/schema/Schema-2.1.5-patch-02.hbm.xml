@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.master.scheduling.Trigger" table="LOCAL_TRIGGER" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TRIGGER_TYPE" type="string" length="255"/>
+
+        <subclass name="com.zutubi.pulse.master.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
+            <property name="startTime" column="START_TIME" type="date"/>
+            <property name="interval" column="INTERVAL" type="long"/>
+            <property name="repeatCount" column="REPEAT_COUNT" type="int"/>
+        </subclass>
+    </class>
+</hibernate-mapping>
+        

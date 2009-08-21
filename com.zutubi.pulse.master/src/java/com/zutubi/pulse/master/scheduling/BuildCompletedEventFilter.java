@@ -5,12 +5,10 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A filter that will only allow triggers for builds that complete in
@@ -18,33 +16,25 @@ import java.util.Map;
  */
 public class BuildCompletedEventFilter implements EventTriggerFilter
 {
-    public static final String PARAM_PROJECT            = "other.project";
-    public static final String PARAM_STATES             = "build.states";
-    public static final String PARAM_PROPAGATE_REVISION = "propagate.revision";
-    public static final String PARAM_REPLACEABLE        = "replaceable";
-    public static final String PARAM_PROPAGATE_STATUS   = "propagate.status";
-    public static final String PARAM_PROPAGATE_VERSION  = "propagate.version";
-    public static final String SEPARATOR = ",";
-
     public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
     {
         BuildCompletedEvent buildCompletedEvent = (BuildCompletedEvent) event;
-        Map<Serializable, Serializable> dataMap = trigger.getDataMap();
-        boolean accept = !buildCompletedEvent.getBuildResult().isPersonal() && checkProject(dataMap, buildCompletedEvent) && checkState(dataMap, buildCompletedEvent);
+        BuildCompletedTriggerConfiguration config = (BuildCompletedTriggerConfiguration) trigger.getConfig();
+        boolean accept = !buildCompletedEvent.getBuildResult().isPersonal() && checkProject(config, buildCompletedEvent) && checkState(config, buildCompletedEvent);
         if (accept)
         {
             // Pass some information to the task.
-            if (getBooleanParam(dataMap, PARAM_PROPAGATE_REVISION, false))
+            if (config.isPropagateRevision())
             {
                 // Copy the revision: we don't want to share the persistent instance.
                 context.put(BuildProjectTask.PARAM_REVISION, new Revision(buildCompletedEvent.getBuildResult().getRevision().getRevisionString()));
-                context.put(BuildProjectTask.PARAM_REPLACEABLE, getBooleanParam(dataMap, PARAM_REPLACEABLE, false));
+                context.put(BuildProjectTask.PARAM_REPLACEABLE, config.isSupercedeQueued());
             }
-            if (getBooleanParam(dataMap, PARAM_PROPAGATE_STATUS, false))
+            if (config.isPropagateStatus())
             {
                 context.put(BuildProjectTask.PARAM_STATUS, buildCompletedEvent.getBuildResult().getStatus());
             }
-            if (getBooleanParam(dataMap, PARAM_PROPAGATE_VERSION, false))
+            if (config.isPropagateVersion())
             {
                 context.put(BuildProjectTask.PARAM_VERSION, buildCompletedEvent.getBuildResult().getVersion());
                 context.put(BuildProjectTask.PARAM_VERSION_PROPAGATED, true);
@@ -55,51 +45,21 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
         return accept;
     }
 
-    private boolean checkProject(Map<Serializable, Serializable> dataMap, BuildCompletedEvent event)
+    private boolean checkProject(BuildCompletedTriggerConfiguration config, BuildCompletedEvent event)
     {
-        Long projectId = (Long) dataMap.get(PARAM_PROJECT);
-        return projectId == null || projectId == event.getBuildResult().getProject().getId();
+        ProjectConfiguration projectConfig = config.getProject();
+        return projectConfig == null || projectConfig.getProjectId() == event.getBuildResult().getProject().getId();
     }
 
-    private boolean checkState(Map<Serializable, Serializable> dataMap, BuildCompletedEvent event)
+    private boolean checkState(BuildCompletedTriggerConfiguration config, BuildCompletedEvent event)
     {
-        String stateString = (String) dataMap.get(PARAM_STATES);
-        if(stateString == null || stateString.trim().length() == 0)
+        List<ResultState> states = config.getStates();
+        if(states == null || states.isEmpty())
         {
             return true;
         }
 
-        try
-        {
-            List<ResultState> states = CollectionUtils.map(stateString.split(SEPARATOR), new Mapping<String, ResultState>()
-            {
-                public ResultState map(String s)
-                {
-                    return ResultState.valueOf(s);
-                }
-            });
-
-            ResultState state = event.getBuildResult().getState();
-            return states.contains(state);
-        }
-        catch (IllegalArgumentException e)
-        {
-            // Fall through to false
-        }
-
-        return false;
-    }
-
-    private boolean getBooleanParam(Map<Serializable, Serializable> dataMap, String param, boolean defaultValue)
-    {
-        Boolean value = (Boolean) dataMap.get(param);
-        if (value == null)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return value;
-        }
+        ResultState state = event.getBuildResult().getState();
+        return states.contains(state);
     }
 }

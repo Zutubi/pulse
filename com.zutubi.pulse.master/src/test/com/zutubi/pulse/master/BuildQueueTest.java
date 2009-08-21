@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -171,7 +171,7 @@ public class BuildQueueTest extends BuildQueueTestCase
 
         // The queue is in reverse order, and does not have the first (active)
         // request.
-        final List<BuildRequestEvent> queuedList = new LinkedList(Arrays.asList(requests));
+        final List<BuildRequestEvent> queuedList = new LinkedList(asList(requests));
         queuedList.remove(0);
         Collections.reverse(queuedList);
         final BuildRequestEvent[] queued = queuedList.toArray(new BuildRequestEvent[queuedList.size()]);
@@ -192,6 +192,36 @@ public class BuildQueueTest extends BuildQueueTestCase
             }
         }));
     }
+
+    public void testGetRequestsForEntityNoRequests()
+    {
+        assertEquals(0, queue.getRequestsForEntity(project1).size());
+    }
+
+    public void testGetRequestsForEntity()
+    {
+        int id1 = nextId.getAndIncrement();
+        BuildRequestEvent request1 = createRequest(project1, id1, "source", false, null);
+        BuildRequestEvent request2 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+        BuildRequestEvent request3 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+
+        queue.buildRequested(request1);
+        queue.buildRequested(request2);
+
+        List<BuildRequestEvent> requests = queue.getRequestsForEntity(project1);
+        assertEquals(asList(request2, request1), requests);
+
+        queue.buildRequested(request3);
+
+        requests = queue.getRequestsForEntity(project1);
+        assertEquals(asList(request3, request2, request1), requests);
+
+        queue.buildCompleted(project1, id1);
+
+        requests = queue.getRequestsForEntity(project1);
+        assertEquals(asList(request3, request2), requests);
+    }
+
 
     public void testStop()
     {

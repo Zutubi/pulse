@@ -233,26 +233,6 @@ public class DefaultScheduler implements Scheduler
         impl.resume(trigger);
     }
 
-    public void renameProjectTriggers(long project, String name) throws SchedulingException
-    {
-        List<Trigger> projectTriggers = getTriggers(project);
-        for(Trigger trigger: projectTriggers)
-        {
-            SchedulerStrategy impl = getStrategy(trigger);
-            boolean active = trigger.isActive();
-            if (active)
-            {
-                impl.unschedule(trigger);
-            }
-            trigger.setGroup(name);
-            triggerDao.save(trigger);
-            if (active)
-            {
-                impl.schedule(trigger);
-            }
-        }
-    }
-
     /**
      * Retrieve the first registered strategy that is able to handle this trigger.
      *

@@ -22,8 +22,6 @@
 
         <property name="previousTriggerTime" column="PREVIOUS_TRIGGER_TIME" type="timestamp"/>
 
-        <property name="dataMap" column="DATA" type="serializable" length="16383"/>
-
         <property name="triggerState" column="STATE" type="string" not-null="true" length="127"/>
 
         <subclass name="com.zutubi.pulse.master.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
@@ -39,6 +37,9 @@
         </subclass>
 
         <subclass name="com.zutubi.pulse.master.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
+            <property name="startTime" column="START_TIME" type="date"/>
+            <property name="interval" column="INTERVAL" type="long"/>
+            <property name="repeatCount" column="REPEAT_COUNT" type="int"/>
         </subclass>
 
     </class>

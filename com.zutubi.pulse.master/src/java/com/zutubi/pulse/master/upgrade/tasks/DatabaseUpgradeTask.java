@@ -28,15 +28,10 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
             connection = dataSource.getConnection();
             execute(connection);
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             LOG.error(e);
-            addError("IOException: " + e.getMessage() + ". Please see the log files for details.");
-        }
-        catch (SQLException e)
-        {
-            LOG.error(e);
-            addError("SQLException: " + e.getMessage() + ". Please see the log files for details.");
+            addError("Exception: " + e.getMessage() + ". Please see the log files for details.");
         }
         finally
         {
@@ -44,7 +39,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         }
     }
 
-    public abstract void execute(Connection con) throws IOException, SQLException;
+    public abstract void execute(Connection con) throws Exception;
 
     protected byte[] upgradeBlob(ResultSet rs, String columnName, ObjectUpgrader objectUpgrader) throws SQLException, IOException
     {

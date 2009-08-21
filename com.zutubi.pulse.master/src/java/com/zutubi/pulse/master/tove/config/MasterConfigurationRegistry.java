@@ -6,10 +6,10 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.TransientConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
@@ -141,6 +141,9 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(CronBuildTriggerConfiguration.class);
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
             registerConfigurationType(DependentBuildTriggerConfiguration.class);
+
+            registerConfigurationType(TriggerConditionConfiguration.class);
+            registerConfigurationType(OutstandingChangesTriggerConditionConfiguration.class);
 
             registerProjectMapExtension(EXTENSION_PROJECT_TRIGGERS, TriggerConfiguration.class);
 

@@ -137,10 +137,5 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         // noop.
     }
 
-    public boolean dependsOnProject(Trigger trigger, long projectId)
-    {
-        return false;
-    }
-
     protected abstract org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException;
 }

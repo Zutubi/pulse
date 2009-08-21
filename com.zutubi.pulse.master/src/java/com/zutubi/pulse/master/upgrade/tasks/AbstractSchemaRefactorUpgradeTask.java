@@ -5,9 +5,7 @@ import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.master.hibernate.SchemaRefactor;
 import org.hibernate.cfg.Environment;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -24,7 +22,7 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
         return true;
     }
 
-    public void execute(Connection con) throws IOException, SQLException
+    public void execute(Connection con) throws Exception
     {
         Properties props = new Properties();
         props.putAll(hibernateProperties);
@@ -42,7 +40,7 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
         doRefactor(con, refactor);
     }
 
-    protected abstract void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException, IOException;
+    protected abstract void doRefactor(Connection con, SchemaRefactor refactor) throws Exception;
 
     public void setHibernateProperties(Properties hibernateProperties)
     {

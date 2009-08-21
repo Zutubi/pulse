@@ -11,11 +11,9 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * An event filter that only accepts build completed events associated with a
@@ -24,9 +22,6 @@ import java.util.Map;
  */
 public class DependentBuildEventFilter implements EventTriggerFilter
 {
-    public static final String PARAM_PROPAGATE_STATUS   = "propagate.status";
-    public static final String PARAM_PROPAGATE_VERSION   = "propagate.version";
-
     private ProjectManager projectManager;
 
     public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
@@ -36,10 +31,8 @@ public class DependentBuildEventFilter implements EventTriggerFilter
             return false;
         }
 
-        Trigger sourceTrigger = context.getTrigger();
-        
         // the project in which this trigger is configured.
-        ProjectConfiguration projectConfig = projectManager.getProjectConfig(sourceTrigger.getProject(), false);
+        ProjectConfiguration projectConfig = projectManager.getProjectConfig(trigger.getProject(), false);
         if (projectConfig == null)
         {
             // This project is invalid or does not exist, hence we are not in a position to
@@ -55,14 +48,13 @@ public class DependentBuildEventFilter implements EventTriggerFilter
             return false;
         }
 
-        boolean progagateStatus = getBooleanParam(trigger.getDataMap(), PARAM_PROPAGATE_STATUS, false);
-        if (progagateStatus)
+        DependentBuildTriggerConfiguration config = (DependentBuildTriggerConfiguration) trigger.getConfig();
+        if (config.isPropagateStatus())
         {
             context.put(BuildProjectTask.PARAM_STATUS, result.getStatus());
         }
 
-        boolean propagateVersion = getBooleanParam(trigger.getDataMap(), PARAM_PROPAGATE_VERSION, false);
-        if (propagateVersion)
+        if (config.isPropagateVersion())
         {
             context.put(BuildProjectTask.PARAM_VERSION, result.getVersion());
             context.put(BuildProjectTask.PARAM_VERSION_PROPAGATED, true);
@@ -88,22 +80,8 @@ public class DependentBuildEventFilter implements EventTriggerFilter
         return (event instanceof BuildCompletedEvent);
     }
 
-    private boolean getBooleanParam(Map<Serializable, Serializable> dataMap, String param, boolean defaultValue)
-    {
-        Boolean value = (Boolean) dataMap.get(param);
-        if (value == null)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return value;
-        }
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
     }
-
 }

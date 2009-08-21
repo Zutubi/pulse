@@ -36,8 +36,6 @@ public class HibernateTriggerDaoTest extends MasterPersistenceTestCase
     public void testCreateAndLoad()
     {
         Trigger trigger = new NoopTrigger("triggerName", "triggerGroup");
-        trigger.getDataMap().put("key", "value");
-        trigger.getDataMap().put("class", com.zutubi.pulse.master.model.persistence.hibernate.HibernateTriggerDao.class);
         trigger.fire();
 
         dao.save(trigger);
@@ -46,8 +44,6 @@ public class HibernateTriggerDaoTest extends MasterPersistenceTestCase
 
         Trigger anotherTrigger = dao.findByNameAndGroup("triggerName", "triggerGroup");
         assertPropertyEquals(trigger, anotherTrigger);
-        assertEquals("value", anotherTrigger.getDataMap().get("key"));
-        assertEquals(HibernateTriggerDao.class, anotherTrigger.getDataMap().get("class"));
     }
 
     public void testFindByGroup()

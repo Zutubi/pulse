@@ -78,6 +78,8 @@
                 <ref local="addSettingsFileToMaven2UpgradeTask"/>
                 <ref local="dependencyTransitiveMode"/>
                 <ref local="updateBuildResultAndAddSequenceTableUpgradeTask"/>
+                <ref local="simpleTriggerSchema"/>
+                <ref local="triggerConditions"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -342,4 +344,11 @@
         </property>
     </bean>
 
+    <bean id="simpleTriggerSchema" class="com.zutubi.pulse.master.upgrade.tasks.RemoveTriggerDataMapRefactorUpgradeTask">
+        <property name="buildNumber" value="201004003"/>
+    </bean>
+
+    <bean id="triggerConditions" class="com.zutubi.pulse.master.upgrade.tasks.TriggerConditionsUpgradeTask">
+        <property name="buildNumber" value="201004004"/>
+    </bean>
 </beans>

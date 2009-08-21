@@ -2,20 +2,21 @@ package com.zutubi.pulse.master.scheduling.tasks;
 
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.model.TriggerOptions;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerBuildReason;
+import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scheduling.Task;
 import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConditionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
+import com.zutubi.pulse.master.trigger.TriggerCondition;
+import com.zutubi.pulse.master.trigger.TriggerConditionFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 
 /**
  * A trigger task which triggers a project build.
@@ -59,11 +60,24 @@ public class BuildProjectTask implements Task
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
     private ProjectManager projectManager;
+    private TriggerConditionFactory triggerConditionFactory;
 
     public void execute(TaskExecutionContext context)
     {
         Trigger trigger = context.getTrigger();
-        long projectId = trigger.getProject();
+        TriggerConfiguration triggerConfig = trigger.getConfig();
+        Project project = projectManager.getProject(trigger.getProjectId(), true);
+        if (project == null)
+        {
+            LOG.warning("Build project task fired for unknown project '" + trigger.getProjectId() + "' (trigger '" + trigger.getName() + "')");
+            return;
+        }
+
+        if (!conditionsSatisfied(triggerConfig, project))
+        {
+            return;
+        }
+
         Revision revision = (Revision) context.get(PARAM_REVISION);
 
         Boolean replaceableValue = (Boolean) context.get(PARAM_REPLACEABLE);
@@ -81,38 +95,41 @@ public class BuildProjectTask implements Task
         Long metaBuildIdValue = (Long) context.get(PARAM_META_BUILD_ID);
         long metaBuildId = (metaBuildIdValue != null) ? metaBuildIdValue : 0;
 
-        ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
-        if (project != null)
+        Collection<ResourcePropertyConfiguration> properties;
+        if (triggerConfig == null)
         {
-            @SuppressWarnings({"unchecked"})
-            Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getExtensions().get(MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS);
-            TriggerConfiguration triggerConfig = triggers.get(trigger.getName());
-            Collection<ResourcePropertyConfiguration> properties;
-            if (triggerConfig == null)
-            {
-                properties = Collections.emptyList();
-            }
-            else
-            {
-                properties = triggerConfig.getProperties().values();
-            }
-
-            // generate build request.
-            TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), getSource(trigger));
-            options.setReplaceable(replaceable);
-            options.setForce(false);
-            options.setProperties(properties);
-            options.setStatus(status);
-            options.setResolveVersion(!versionPropagated);
-            options.setVersion(version);
-            options.setDependent(dependent);
-            options.setMetaBuildId(metaBuildId);
-            projectManager.triggerBuild(project, options, revision);
+            properties = Collections.emptyList();
         }
         else
         {
-            LOG.warning("Build project task fired for unknown project '" + projectId + "' (trigger '" + trigger.getName() + "')");
+            properties = triggerConfig.getProperties().values();
         }
+
+        // generate build request.
+        TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), getSource(trigger));
+        options.setReplaceable(replaceable);
+        options.setForce(false);
+        options.setProperties(properties);
+        options.setStatus(status);
+        options.setResolveVersion(!versionPropagated);
+        options.setVersion(version);
+        options.setDependent(dependent);
+        options.setMetaBuildId(metaBuildId);
+        projectManager.triggerBuild(project.getConfig(), options, revision);
+    }
+
+    private boolean conditionsSatisfied(TriggerConfiguration triggerConfig, Project project)
+    {
+        for (TriggerConditionConfiguration conditionConfig: triggerConfig.getConditions())
+        {
+            TriggerCondition condition = triggerConditionFactory.create(conditionConfig);
+            if (!condition.satisfied(project))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static String getSource(Trigger trigger)
@@ -123,5 +140,10 @@ public class BuildProjectTask implements Task
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setTriggerConditionFactory(TriggerConditionFactory triggerConditionFactory)
+    {
+        this.triggerConditionFactory = triggerConditionFactory;
     }
 }

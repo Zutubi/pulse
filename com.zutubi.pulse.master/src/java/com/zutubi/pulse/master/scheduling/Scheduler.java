@@ -48,6 +48,4 @@ public interface Scheduler extends Stoppable
     void resume(String group) throws SchedulingException;
 
     void resume(Trigger trigger) throws SchedulingException;
-
-    void renameProjectTriggers(long project, String name) throws SchedulingException;
 }

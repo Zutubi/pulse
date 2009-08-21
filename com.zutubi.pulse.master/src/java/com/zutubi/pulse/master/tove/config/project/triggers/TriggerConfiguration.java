@@ -1,16 +1,17 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
-import com.zutubi.i18n.Messages;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +24,7 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
     @ExternalState
     private long triggerId;
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
+    private List<TriggerConditionConfiguration> conditions = new LinkedList<TriggerConditionConfiguration>();
 
     public long getTriggerId()
     {
@@ -44,7 +46,15 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
         this.properties = properties;
     }
 
-    public abstract Trigger newTrigger();
+    public List<TriggerConditionConfiguration> getConditions()
+    {
+        return conditions;
+    }
+
+    public void setConditions(List<TriggerConditionConfiguration> conditions)
+    {
+        this.conditions = conditions;
+    }
 
     @Transient
     public String getType()
@@ -52,18 +62,10 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
         return Messages.getInstance(this).format("type.label");
     }
 
+    public abstract Trigger newTrigger();
+
     public void update(Trigger trigger)
     {
         trigger.setName(getName());
-    }
-
-    protected String getTriggerName()
-    {
-        return getName();
-    }
-
-    protected String getTriggerGroup(ProjectConfiguration project)
-    {
-        return "project:" + project.getProjectId();
     }
 }

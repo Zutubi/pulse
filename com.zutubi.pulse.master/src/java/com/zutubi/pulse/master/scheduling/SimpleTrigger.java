@@ -3,17 +3,18 @@ package com.zutubi.pulse.master.scheduling;
 import java.util.Date;
 
 /**
- * <class-comment/>
+ * Simple triggers fire at regular time intervals for a specified (possibly
+ * infinite) number of repeats.
  */
 public class SimpleTrigger extends Trigger
 {
+    public static final int REPEAT_INDEFINITELY = org.quartz.SimpleTrigger.REPEAT_INDEFINITELY;
+
     protected static final String TYPE = "simple";
 
-    private static final String INTERVAL = "interval";
-    private static final String REPEAT = "repeat";
-    private static final String START_TIME = "start";
-
-    public static final int REPEAT_INDEFINITELY = org.quartz.SimpleTrigger.REPEAT_INDEFINITELY;
+    private Date startTime;
+    private long interval;
+    private int repeatCount;
 
     public SimpleTrigger()
     {
@@ -59,31 +60,31 @@ public class SimpleTrigger extends Trigger
 
     public Date getStartTime()
     {
-        return (Date) getDataMap().get(START_TIME);
+        return startTime;
     }
 
-    private void setStartTime(Date time)
+    private void setStartTime(Date startTime)
     {
-        getDataMap().put(START_TIME, time);
-    }
-
-    private void setInterval(long interval)
-    {
-        getDataMap().put(INTERVAL, interval);
+        this.startTime = startTime;
     }
 
     public long getInterval()
     {
-        return (Long) getDataMap().get(INTERVAL);
+        return interval;
     }
 
-    private void setRepeatCount(int repeat)
+    private void setInterval(long interval)
     {
-        getDataMap().put(REPEAT, repeat);
+        this.interval = interval;
     }
 
     public int getRepeatCount()
     {
-        return (Integer) getDataMap().get(REPEAT);
+        return repeatCount;
+    }
+
+    private void setRepeatCount(int repeatCount)
+    {
+        this.repeatCount = repeatCount;
     }
 }

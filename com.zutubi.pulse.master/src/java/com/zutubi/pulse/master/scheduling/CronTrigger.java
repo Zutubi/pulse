@@ -39,9 +39,4 @@ public class CronTrigger extends Trigger
     {
         this.cron = cron;
     }
-
-    public boolean canEdit()
-    {
-        return true;
-    }
 }

@@ -6,13 +6,14 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
-import com.zutubi.pulse.master.events.build.MetaBuildCompletedEvent;
 import static com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent.ALL_BUILDS;
+import com.zutubi.pulse.master.events.build.MetaBuildCompletedEvent;
 import com.zutubi.pulse.master.license.License;
 import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.license.events.LicenseExpiredEvent;
@@ -25,6 +26,7 @@ import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Condition;
@@ -327,6 +329,26 @@ public class FatController implements EventListener, Stoppable
         try
         {
             return buildQueue.takeSnapshot();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns a list of all queued and active build requests for a given
+     * entity.  The latest request is first in the queue.
+     *
+     * @param entity the entity to get requests for
+     * @return all queued and active requests for the given entity
+     */
+    public List<BuildRequestEvent> getRequestsForEntity(NamedEntity entity)
+    {
+        lock.lock();
+        try
+        {
+            return buildQueue.getRequestsForEntity(entity);
         }
         finally
         {

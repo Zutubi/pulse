@@ -95,9 +95,4 @@ public class EventTrigger extends Trigger
     {
         this.filterClass = filterClass;
     }
-
-    public boolean canEdit()
-    {
-        return true;
-    }
 }
