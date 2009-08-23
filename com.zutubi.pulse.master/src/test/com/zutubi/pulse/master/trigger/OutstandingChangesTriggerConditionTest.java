@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.trigger;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.stub;
 
 import static java.util.Arrays.asList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,6 +57,7 @@ public class OutstandingChangesTriggerConditionTest extends PulseTestCase
         stub(fatController.getRequestsForEntity(project)).toReturn(queuedEvents);
 
         scmClient = mock(ScmClient.class);
+        stub(scmClient.getCapabilities((ScmContext) anyObject())).toReturn(EnumSet.allOf(ScmCapability.class));
         stub(scmClient.getRevisions((ScmContext) anyObject(), eq(latestRevision), (Revision) isNull())).toReturn(Collections.<Revision>emptyList());
         stub(scmClient.getRevisions((ScmContext) anyObject(), eq(notLatestRevision), (Revision) isNull())).toReturn(asList(latestRevision));
 
