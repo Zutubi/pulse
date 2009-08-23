@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.trigger;
 
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
@@ -109,7 +106,15 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
             {
                 public Boolean process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    return client.getRevisions(context, latestBuiltRevision, null).size() > 0;
+                    if (client.getCapabilities(context).contains(ScmCapability.REVISIONS))
+                    {
+                        return client.getRevisions(context, latestBuiltRevision, null).size() > 0;
+                    }
+                    else
+                    {
+                        LOG.warning("Attempt to use outstanding changes condition with SCM that does not support revisions");
+                        return false;
+                    }
                 }
             });
         }

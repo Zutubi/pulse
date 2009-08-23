@@ -25,15 +25,9 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
         filter = new BuildCompletedEventFilter();
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        filter = null;
-    }
-
     public void testMissingStateParam()
     {
-        MockTrigger trigger = createTrigger(PROJECT);
+        Trigger trigger = createTrigger(PROJECT);
         assertTrue(filter.accept(trigger, createEvent(ResultState.SUCCESS), new TaskExecutionContext()));
     }
 
@@ -151,14 +145,14 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
         assertFalse(filter.accept(createTrigger(PROJECT, states), new BuildCompletedEvent(this, result, null), new TaskExecutionContext()));
     }
 
-    private MockTrigger createTrigger(Long id, ResultState... states)
+    private Trigger createTrigger(Long id, ResultState... states)
     {
         return createTrigger(id, false, false, states);
     }
 
-    private MockTrigger createTrigger(Long id, boolean propagateRevision, boolean supercede, ResultState... states)
+    private Trigger createTrigger(Long id, boolean propagateRevision, boolean supercede, ResultState... states)
     {
-        MockTrigger t = new MockTrigger();
+        Trigger t = new EventTrigger();
         t.setId(42);
 
         BuildCompletedTriggerConfiguration config = new BuildCompletedTriggerConfiguration();
