@@ -986,7 +986,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildControllerBootstrapEvent.class, BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
+        return new Class[]{BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
     }
 
     public Project getProject()
