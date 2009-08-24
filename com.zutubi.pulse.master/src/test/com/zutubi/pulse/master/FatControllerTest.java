@@ -20,15 +20,13 @@ import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguratio
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.Constants;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.stub;
-import org.mockito.stubbing.Answer;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -82,17 +80,20 @@ public class FatControllerTest extends PulseTestCase
                 final long buildResultId = nextBuildResultId.getAndIncrement();
                 
                 BuildController handler = mock(BuildController.class);
-                stub(handler.getBuildResultId()).toReturn(buildResultId);
-
-                // a bit hackish, but prevents the need to implement the interface.
-                doAnswer(new Answer()
+                synchronized (FatControllerTest.this)
                 {
-                    public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+                    stub(handler.getBuildResultId()).toReturn(buildResultId);
+
+                    // a bit hackish, but prevents the need to implement the interface.
+                    doAnswer(new Answer()
                     {
-                        request.createResult(projectManager, buildManager);
-                        return null;
-                    }
-                }).when(handler).start();
+                        public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+                        {
+                            request.createResult(projectManager, buildManager);
+                            return null;
+                        }
+                    }).when(handler).start();
+                }
 
                 // record enough information about the build request so that we can create
                 // an appropriate build completed event 
@@ -437,34 +438,13 @@ public class FatControllerTest extends PulseTestCase
 
     private void publishCompletedEvent(Project project, ResultState resultState) throws InterruptedException
     {
-        BuildResult buildResult = mock(BuildResult.class);
         long buildResultId = projectToControllerMap.get(project).getBuildResultId();
         long metaBuildId = projectToMetaBuildIdMap.get(project);
 
-        stub(buildResult.getProject()).toReturn(project);
-        stub(buildResult.getId()).toReturn(buildResultId);
-        stub(buildResult.isPersonal()).toReturn(false);
-        stub(buildResult.getOwner()).toReturn(project);
-        stub(buildResult.getMetaBuildId()).toReturn(metaBuildId);
-
-        switch (resultState)
-        {
-            case SUCCESS:
-                stub(buildResult.succeeded()).toReturn(true);
-                stub(buildResult.failed()).toReturn(false);
-                stub(buildResult.errored()).toReturn(false);
-                break;
-            case FAILURE:
-                stub(buildResult.succeeded()).toReturn(false);
-                stub(buildResult.failed()).toReturn(true);
-                stub(buildResult.errored()).toReturn(false);
-                break;
-            case ERROR:
-                stub(buildResult.succeeded()).toReturn(false);
-                stub(buildResult.failed()).toReturn(false);
-                stub(buildResult.errored()).toReturn(true);
-                break;
-        }
+        BuildResult buildResult = new BuildResult(new UnknownBuildReason(), project, 0, false);
+        buildResult.setId(buildResultId);
+        buildResult.setMetaBuildId(metaBuildId);
+        buildResult.setState(resultState);
 
         BuildCompletedEvent evt = new BuildCompletedEvent(this, buildResult, null);
         eventManager.publish(evt);
@@ -529,7 +509,10 @@ public class FatControllerTest extends PulseTestCase
         projectConfiguration.setHandle(nextHandle.getAndIncrement());
         project.setConfig(projectConfiguration);
 
-        stub(projectManager.getProject(project.getId(), false)).toReturn(project);
+        synchronized (this)
+        {
+            stub(projectManager.getProject(project.getId(), false)).toReturn(project);
+        }
 
         return project;
     }

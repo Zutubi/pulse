@@ -96,6 +96,7 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
             trigger.setTaskClass(BuildProjectTask.class);
             trigger.setProject(project.getProjectId());
             trigger.setGroup("project:" + project.getProjectId());
+            trigger.setConfig(instance);
             scheduler.schedule(trigger);
             return trigger.getId();
         }

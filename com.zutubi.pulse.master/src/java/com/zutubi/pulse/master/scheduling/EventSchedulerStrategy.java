@@ -127,7 +127,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
                 Class<? extends EventTriggerFilter> filterClass = eventTrigger.getFilterClass();
 
-                if(filterClass != null)
+                if (filterClass != null)
                 {
                     try
                     {
@@ -137,10 +137,11 @@ public class EventSchedulerStrategy implements SchedulerStrategy
                     catch (Exception e)
                     {
                         LOG.severe("Unable to construct event filter of type '" + filterClass.getName() + "': " + e.getMessage(), e);
+                        accept = false;
                     }
                 }
 
-                if(accept)
+                if (accept)
                 {
                     triggerHandler.fire(trigger, context);
                 }
