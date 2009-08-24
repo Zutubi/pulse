@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 {
+    private static final TriggerBuildReason TEST_REASON = new TriggerBuildReason("scm trigger");
+
     private static long time = 0;
 
     private BuildResultDao buildResultDao;
@@ -28,7 +30,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private Project projectA;
     private Project projectB;
-    private static final TriggerBuildReason TEST_REASON = new TriggerBuildReason("scm trigger");
 
     public void setUp() throws Exception
     {
@@ -37,26 +38,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao = (ProjectDao) context.getBean("projectDao");
         changelistDao = (ChangelistDao) context.getBean("changelistDao");
         userDao = (UserDao) context.getBean("userDao");
-    }
-
-    public void tearDown() throws Exception
-    {
-        projectDao = null;
-        buildResultDao = null;
-        changelistDao = null;
-        userDao = null;
-
-        projectA = null;
-        projectB = null;
-
-        try
-        {
-            super.tearDown();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
     }
 
     public void testSaveAndLoadArtifactCommand()

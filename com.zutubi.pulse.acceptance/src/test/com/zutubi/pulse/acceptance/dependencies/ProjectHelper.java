@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfigurationRevisionOptionProvider;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
@@ -286,8 +287,16 @@ public abstract class ProjectHelper
             insertRecipe(recipe, commandConfig);
             for (ArtifactHelper artifact : recipe.getArtifacts())
             {
-                insertArtifact(recipe.getName(), "build", artifact.getName(), artifact.getExtension(), artifact.getArtifactPattern());
+                insertArtifact(recipe.getName(), ProjectConfigurationWizard.DEFAULT_COMMAND, artifact.getName(), artifact.getExtension(), artifact.getArtifactPattern());
             }
+        }
+
+        String stagePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, getName(), Constants.Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE);
+        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
+        if (defaultStage != null)
+        {
+            defaultStage.put(Constants.Project.Stage.AGENT, PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+            xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
         }
 
         for (StageHelper stage : getStages())
