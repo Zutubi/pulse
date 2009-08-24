@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-/**
- */
 public class DefaultRecordSerialiserTest extends ZutubiTestCase
 {
     private File tmpDir;
@@ -31,13 +29,13 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
     public void testSimple() throws IOException
     {
         MutableRecord simple = createSimple();
-        assertRoundTrip("test", simple, true);
+        assertRoundTrip(simple, true);
     }
 
     public void testNested() throws IOException
     {
         MutableRecord nested = createNested();
-        assertRoundTrip("test", nested, true);
+        assertRoundTrip(nested, true);
     }
 
     public void testSimpleCollection() throws IOException
@@ -46,14 +44,14 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         record.put("item1", createSimple());
         record.put("item2", createSimple());
         record.put("item3", createSimple());
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testNonExistentParent() throws IOException
     {
         try
         {
-            serialiser.serialise(PathUtils.getPath("nothing", "here"), new MutableRecordImpl(), true);
+            serialiser.serialise(PathUtils.getPath("nothing", "here"), new MutableRecordImpl(), true, 2);
             fail();
         }
         catch(RecordSerialiseException e)
@@ -67,7 +65,7 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         MutableRecord record = new MutableRecordImpl();
         record.setSymbolicName("ouchy");
         record.put("<>~!@#$%^&*()`-=_+{}[]\\'\"|:;,.?/", "<>~!@#$%^&*()`-=_+{}[]\\'\"|:;,.?/");
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testUnsupportedNameNested() throws IOException
@@ -75,7 +73,7 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         MutableRecord record = new MutableRecordImpl();
         record.setSymbolicName("ouchy");
         record.put("<>~!@#%^&*()`-=_+{}[]'\"|:;,.?", createSimple());
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testUnsupportedNameMultiNested() throws IOException
@@ -87,62 +85,62 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         MutableRecord root = new MutableRecordImpl();
         root.setSymbolicName("ouchy");
         root.put("<>~!@#%^&*()`-=_+{}[]'\"|:;,.?", child);
-        assertRoundTrip("test", root, true);
+        assertRoundTrip(root, true);
     }
 
     public void testShallowSave() throws IOException
     {
         MutableRecord record = createNested();
-        record = assertRoundTrip("test", record, false);
+        record = assertRoundTrip(record, false);
         assertFalse(record.containsKey("child"));
     }
 
     public void testReSaveNewProperty() throws IOException
     {
         MutableRecord record = createSimple();
-        record = assertRoundTrip("test", record, true);
+        record = assertRoundTrip(record, true);
         record.put("another property", "another value");
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testReSaveChangeProperty() throws IOException
     {
         MutableRecord record = createSimple();
-        record = assertRoundTrip("test", record, true);
+        record = assertRoundTrip(record, true);
         record.put("property", "new value");
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testReSaveRemoveProperty() throws IOException
     {
         MutableRecord record = createSimple();
-        record = assertRoundTrip("test", record, true);
+        record = assertRoundTrip(record, true);
         record.remove("property");
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testReSaveNewNestedProperty() throws IOException
     {
         MutableRecord record = createNested();
-        record = assertRoundTrip("test", record, true);
+        record = assertRoundTrip(record, true);
         record.put("another child", createSimple());
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testReSaveChangeNestedProperty() throws IOException
     {
         MutableRecord record = createNested();
-        record = assertRoundTrip("test", record, true);
+        record = assertRoundTrip(record, true);
         ((MutableRecord) record.get("child")).put("property", "new value");
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testReSaveRemoveNestedProperty() throws IOException
     {
         MutableRecord record = createNested();
-        record = assertRoundTrip("test", record, true);
+        record = assertRoundTrip(record, true);
         record.remove("child");
-        assertRoundTrip("test", record, true);
+        assertRoundTrip(record, true);
     }
 
     public void testArray() throws IOException
@@ -150,13 +148,67 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         MutableRecord record = new MutableRecordImpl();
         String[] array = new String[]{"test", "array", "here"};
         record.put("array", array);
-        MutableRecord other = roundTrip("argh", record, false);
+        MutableRecord other = roundTrip(record, false);
         String[] otherArray = (String[]) other.get("array");
         assertEquals(array.length, otherArray.length);
         for(int i = 0; i < array.length; i++)
         {
             assertEquals(array[i], otherArray[i]);
         }
+    }
+
+    public void testMaxDepthZero()
+    {
+        MutableRecord record = createDeepRecord();
+
+        serialiser.setMaxPathDepth(0);
+        serialiser.serialise(record, true);
+
+        assertFalse(new File(tmpDir, "1").isDirectory());
+
+        MutableRecord other = serialiser.deserialise();
+        assertEquals(record, other);
+    }
+
+    public void testMaxDepthOne()
+    {
+        MutableRecord record = createDeepRecord();
+
+        serialiser.setMaxPathDepth(1);
+        serialiser.serialise(record, true);
+
+        assertTrue(new File(tmpDir, "1").isDirectory());
+        assertFalse(new File(tmpDir, "1/2").isDirectory());
+
+        MutableRecord other = serialiser.deserialise();
+        assertEquals(record, other);
+    }
+
+    public void testMaxDepthTwo()
+    {
+        MutableRecord record = createDeepRecord();
+
+        serialiser.setMaxPathDepth(2);
+        serialiser.serialise(record, true);
+
+        assertTrue(new File(tmpDir, "1").isDirectory());
+        assertTrue(new File(tmpDir, "1/2").isDirectory());
+        assertFalse(new File(tmpDir, "1/2/3").isDirectory());
+
+        MutableRecord other = serialiser.deserialise();
+        assertEquals(record, other);
+    }
+
+    private MutableRecord createDeepRecord()
+    {
+        MutableRecord record = createSimple();
+        MutableRecord one = createSimple();
+        record.put("1", one);
+        MutableRecord two = createSimple();
+        one.put("2", two);
+        MutableRecord three = createSimple();
+        two.put("3", three);
+        return record;
     }
 
     private MutableRecord createSimple()
@@ -175,9 +227,9 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         return record;
     }
 
-    private MutableRecord assertRoundTrip(String path, MutableRecord record, boolean deep) throws IOException
+    private MutableRecord assertRoundTrip(MutableRecord record, boolean deep) throws IOException
     {
-        MutableRecord other = roundTrip(path, record, deep);
+        MutableRecord other = roundTrip(record, deep);
 
         if(deep)
         {
@@ -204,9 +256,9 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
         return other;
     }
 
-    private MutableRecord roundTrip(String path, MutableRecord record, boolean deep)
+    private MutableRecord roundTrip(MutableRecord record, boolean deep)
     {
-        serialiser.serialise(path, record, deep);
-        return serialiser.deserialise(path);
+        serialiser.serialise(record, deep);
+        return serialiser.deserialise();
     }
 }

@@ -6,7 +6,22 @@ package com.zutubi.tove.type.record;
  */
 public interface RecordSerialiser
 {
-    void serialise(String path, Record record, boolean deep) throws RecordSerialiseException;
+    /**
+     * Serialise the record using this record serialiser implementation.
+     *
+     * @param record    the record to be serialised.
+     * @param deep      indicates whether or not nested records should also be serialised.
+     *
+     * @throws RecordSerialiseException on error.
+     */
+    void serialise(Record record, boolean deep) throws RecordSerialiseException;
 
-    MutableRecord deserialise(String path) throws RecordSerialiseException;
+    /**
+     * Deserialise any serialised records.
+     *
+     * @return  the deserialised records
+     *
+     * @throws RecordSerialiseException on error.
+     */
+    MutableRecord deserialise() throws RecordSerialiseException;
 }

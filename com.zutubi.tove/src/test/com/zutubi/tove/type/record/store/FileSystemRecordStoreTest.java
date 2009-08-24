@@ -14,10 +14,7 @@ import com.zutubi.util.io.IOUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- *
- *
- */
+@SuppressWarnings({"JavaDoc"})
 public class FileSystemRecordStoreTest extends RecordStoreTestCase
 {
     private FileSystemRecordStore recordStore = null;
@@ -388,7 +385,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
         MutableRecord newSample = createRandomSampleRecord();
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshot);
-        serialiser.serialise("", newSample, true);
+        serialiser.serialise(newSample, true);
 
         assertTrue(newSnapshot.exists());
 
@@ -412,7 +409,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
         MutableRecord newSample = createRandomSampleRecord();
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshot);
-        serialiser.serialise("", newSample, true);
+        serialiser.serialise(newSample, true);
 
         assertTrue(newSnapshot.exists());
         assertTrue(backupSnapshot.exists());
@@ -438,7 +435,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
         MutableRecord newSample = createRandomSampleRecord();
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);
-        serialiser.serialise("sample", newSample, true);
+        serialiser.serialise("sample", newSample, true, 1);
         IOUtils.copyFile(new File(backupSnapshot, "snapshot_id.txt"), new File(snapshot, "snapshot_id.txt"));
 
         assertTrue(backupSnapshot.exists());
@@ -460,6 +457,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         {
             public boolean mkdirs(File file)
             {
+                //noinspection SimplifiableIfStatement
                 if (file.equals(new File(persistentDirectory, "snapshot.new")))
                 {
                     return false;
@@ -493,6 +491,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         {
             public boolean createNewFile(File file) throws IOException
             {
+                //noinspection SimplifiableIfStatement
                 if (file.getName().equals("index.new"))
                 {
                     return false;

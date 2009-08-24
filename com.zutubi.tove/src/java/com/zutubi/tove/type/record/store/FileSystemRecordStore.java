@@ -199,7 +199,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         if (fileSystem.exists(snapshotDirectory))
         {
             DefaultRecordSerialiser recordSerialiser = new DefaultRecordSerialiser(snapshotDirectory);
-            latestSnapshot = recordSerialiser.deserialise("");
+            latestSnapshot = recordSerialiser.deserialise();
 
             latestSnapshotId = Long.parseLong(IOUtils.fileToString(snapshotJournalIdFile));
         }
@@ -650,7 +650,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
 
             DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshotDirectory);
-            serialiser.serialise("", newSnapshot, true);
+            serialiser.serialise(newSnapshot, true);
 
             FileWriter writer = null;
             try
