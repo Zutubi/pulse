@@ -223,13 +223,13 @@ public class ViewBuildAction extends CommandActionBase
         if(result.completed())
         {
             result.loadFailedTestResults(dataDir, getFailureLimit());
-            loadRetrievalDetails(result);
+            loadDependencyDetails(result);
         }
 
         return SUCCESS;
     }
 
-    private void loadRetrievalDetails(BuildResult result)
+    private void loadDependencyDetails(BuildResult result)
     {
         File dataDir = configurationManager.getDataDirectory();
 
@@ -255,7 +255,7 @@ public class ViewBuildAction extends CommandActionBase
                 }
                 else
                 {
-                    // The retrieval details are no longer available, most likely due to a cleanup.
+                    // The dependency details are no longer available, most likely due to a cleanup.
                     dependencyDetails.add(new StageDependencyDetails(recipe.getStageName()));
                 }
             }
@@ -352,7 +352,19 @@ public class ViewBuildAction extends CommandActionBase
 
                     ArtifactDownloadReport downloadReport = getDownloadReport(artifact);
                     stageDependency.setArtifactName(artifact.getName() + "." + artifact.getExt());
-                    stageDependency.setArtifactUrl(downloadReport.getArtifactOrigin().getLocation());
+
+                    String artifactUrl = downloadReport.getArtifactOrigin().getLocation();
+
+                    // extract the repository path portion of the artifact url so that we can access it directly
+                    // on the file system.
+                    
+                    String repositoryUrlComponent = WebManager.REPOSITORY_PATH + "/";
+                    String repositoryPath = artifactUrl.substring(artifactUrl.indexOf(repositoryUrlComponent) + repositoryUrlComponent.length());
+                    File artifactFile = new File(configurationManager.getUserPaths().getRepositoryRoot(), repositoryPath);
+                    if (artifactFile.isFile())
+                    {
+                        stageDependency.setArtifactUrl(artifactUrl);
+                    }
 
                     ModuleRevisionId mrid = artifact.getModuleRevisionId();
                     stageDependency.setProjectName(mrid.getName());

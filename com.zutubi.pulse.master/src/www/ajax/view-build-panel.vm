@@ -76,7 +76,11 @@
                     #else
                         <td class="content">#html($dependency.buildName)</td>
                     #end
-                    <td class="content"><a href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
+                    #if ($dependency.artifactUrl)
+                        <td class="content"><a id="#html($dependency.projectName)-#html($detail.stageName)-#html($dependency.artifactName)" href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
+                    #else
+                        <td class="content">#html($dependency.artifactName)</td>
+                    #end
                 </tr>
                 #end
             #else

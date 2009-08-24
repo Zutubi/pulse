@@ -44,6 +44,7 @@ public class SecurityHandler extends AbstractHttpHandler
                 try
                 {
                     // commence the basic authentication response.
+                    //noinspection ThrowableInstanceNeverThrown
                     basicEntryPoint.commence(request, response, new AuthenticationException("Authentication Required"){});
                 }
                 catch (ServletException e)

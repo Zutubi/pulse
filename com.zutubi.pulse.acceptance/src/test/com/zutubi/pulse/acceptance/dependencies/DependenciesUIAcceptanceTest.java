@@ -12,6 +12,7 @@ import static java.lang.String.valueOf;
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private SeleniumBrowser browser;
+    private Repository repository;
 
     protected void setUp() throws Exception
     {
@@ -19,7 +20,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         loginAsAdmin();
 
-        Repository repository = new Repository();
+        repository = new Repository();
         repository.clear();
 
         browser = new SeleniumBrowser();
@@ -76,6 +77,31 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(projectB.getName(), row2.getProject());
         assertEquals(valueOf(projectBBuildNumber), row2.getBuild());
         assertEquals("artifactB.jar", row2.getArtifact());
+    }
+
+    public void testBuildArtifactLinksIfAvailable() throws Exception
+    {
+        browser.loginAsAdmin();
+
+        String randomName = randomName();
+        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName + "A");
+        projectA.addArtifact("artifactA.jar");
+        projectA.createProject();
+        projectA.triggerSuccessfulBuild();
+
+        ProjectHelper dependentProject = new DepAntProjectHelper(xmlRpcHelper, randomName + "C");
+        dependentProject.addDependency(projectA);
+        dependentProject.createProject();
+        long buildNumber = dependentProject.triggerSuccessfulBuild();
+
+        browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
+        assertTrue(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
+
+        // delete the artifact from the file system
+        repository.clear();
+
+        browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
+        assertFalse(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
     }
 
     public void testProjectDependenciesTab() throws Exception
