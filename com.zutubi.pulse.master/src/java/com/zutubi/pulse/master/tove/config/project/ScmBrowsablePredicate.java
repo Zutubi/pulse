@@ -17,6 +17,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
 
         try
         {
-            AbstractPulseFileObject pfo = (AbstractPulseFileObject) fileSystemManager.resolveFile("pulse:///" + projectPath);
+            AbstractPulseFileObject pfo = (AbstractPulseFileObject) fileSystemManager.resolveFile("pulse:///" + UriParser.encode(projectPath));
             ProjectConfigProvider projectConfigProvider = pfo.getAncestor(ProjectConfigProvider.class);
             if (projectConfigProvider != null && projectConfigProvider.getProjectConfig() != null)
             {

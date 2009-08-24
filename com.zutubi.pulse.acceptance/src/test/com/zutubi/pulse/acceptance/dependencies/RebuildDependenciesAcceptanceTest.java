@@ -1,12 +1,14 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
+import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
-import static com.zutubi.pulse.master.model.Project.State.BUILDING;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -70,10 +72,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildMultipleDependencies() throws Exception
     {
         String projectName = randomName();
-        WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
+        final WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
         projectA.createProject();
 
-        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
+        final WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.createProject();
 
         WaitAntProjectHelper projectC = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "C");
@@ -85,7 +87,22 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         WaitAntProjectHelper firstDependency;
         WaitAntProjectHelper secondDependency;
-        if (projectA.getState() == BUILDING)
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    return projectA.getBuildStatus(1) == ResultState.IN_PROGRESS || projectB.getBuildStatus(1) == ResultState.IN_PROGRESS;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+        }, XmlRpcHelper.BUILD_TIMEOUT, "a dependency to start building");
+
+        if (projectA.getBuildStatus(1) == ResultState.IN_PROGRESS)
         {
             firstDependency = projectA;
             secondDependency = projectB;
@@ -96,8 +113,6 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             secondDependency = projectA;
         }
 
-        xmlRpcHelper.waitForBuildInProgress(firstDependency.getName(), 1);
-        assertEquals(ResultState.IN_PROGRESS, firstDependency.getBuildStatus(1));
         assertEquals(ResultState.PENDING, secondDependency.getBuildStatus(1));
         assertEquals(ResultState.PENDING_DEPENDENCY, projectC.getBuildStatus(1));
         firstDependency.releaseBuild();

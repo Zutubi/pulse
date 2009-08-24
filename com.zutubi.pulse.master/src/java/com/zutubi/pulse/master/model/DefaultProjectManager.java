@@ -17,9 +17,9 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
@@ -34,6 +34,7 @@ import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
@@ -59,7 +60,9 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -85,10 +88,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private AccessManager accessManager;
     private ProjectInitialisationService projectInitialisationService;
 
+    // Protects the five caches defined below.
+    private ReadWriteLock cacheLock = new ReentrantReadWriteLock();
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
+    /**
+     * Maps from a project to those projects that directly depend upon it, as
+     * this information is only indirectly available in the configuration.
+     */
+    private Map<ProjectConfiguration, List<ProjectConfiguration>> configToDownstreamConfigs;
 
     private ConcurrentMap<Long, ReentrantLock> projectStateLocks = new ConcurrentHashMap<Long, ReentrantLock>();
 
@@ -110,29 +120,58 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // config wired in manually, as it was not in idToConfig when
                 // the project was created.
                 projectDao.findById(instance.getProjectId()).setConfig(instance);
-                registerProjectConfig(instance);
+                cacheLock.writeLock().lock();
+                try
+                {
+                    registerProjectConfig(instance);
+                    refreshDownstreamCache();
+                }
+                finally
+                {
+                    cacheLock.writeLock().unlock();
+                }
             }
 
             public void postDelete(ProjectConfiguration instance)
             {
-                nameToConfig.remove(instance.getName());
-                idToConfig.remove(instance.getProjectId());
-                validConfigs.remove(instance);
-                removeFromLabelMap(instance);
+                cacheLock.writeLock().lock();
+                try
+                {
+                    nameToConfig.remove(instance.getName());
+                    idToConfig.remove(instance.getProjectId());
+                    validConfigs.remove(instance);
+                    removeFromLabelMap(instance);
+                    refreshDownstreamCache();
+                }
+                finally
+                {
+                    cacheLock.writeLock().unlock();
+                }
             }
 
             public void postSave(ProjectConfiguration instance, boolean nested)
             {
-                // Tricky: the name may have changed.
-                ProjectConfiguration old = idToConfig.remove(instance.getProjectId());
-                if(old != null)
-                {
-                    nameToConfig.remove(old.getName());
-                    validConfigs.remove(old);
-                    removeFromLabelMap(old);
-                }
+                ProjectConfiguration old;
 
-                registerProjectConfig(instance);
+                cacheLock.writeLock().lock();
+                try
+                {
+                    // Tricky: the name may have changed.
+                    old = idToConfig.remove(instance.getProjectId());
+                    if(old != null)
+                    {
+                        nameToConfig.remove(old.getName());
+                        validConfigs.remove(old);
+                        removeFromLabelMap(old);
+                    }
+
+                    registerProjectConfig(instance);
+                    refreshDownstreamCache();
+                }
+                finally
+                {
+                    cacheLock.writeLock().unlock();
+                }
 
                 // Check for addition or removal of an SCM.  Note this must
                 // come after registering the new config.  Handling this here
@@ -185,6 +224,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
         // create default project if it is required.
         ensureDefaultProjectDefined();
+
+        refreshDownstreamCache();
     }
 
     /**
@@ -562,9 +603,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             makeStateTransition(project.getId(), Project.Transition.STARTUP);
         }
 
-        for (ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))
+        cacheLock.writeLock().lock();
+        try
         {
-            registerProjectConfig(config);
+            for (ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))
+            {
+                registerProjectConfig(config);
+            }
+        }
+        finally
+        {
+            cacheLock.writeLock().unlock();
         }
     }
 
@@ -589,6 +638,43 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 projects.add(projectConfig);
             }
         }
+    }
+
+    private void refreshDownstreamCache()
+    {
+        configToDownstreamConfigs = new HashMap<ProjectConfiguration, List<ProjectConfiguration>>();
+
+        for (ProjectConfiguration config: idToConfig.values())
+        {
+            for (ProjectConfiguration upstream: getDependentProjectConfigs(config))
+            {
+                addToDownstreamCache(upstream, config);
+            }
+        }
+    }
+
+    private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
+    {
+        List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
+        return CollectionUtils.map(dependencies, new Mapping<DependencyConfiguration, ProjectConfiguration>()
+        {
+            public ProjectConfiguration map(DependencyConfiguration dependencyConfiguration)
+            {
+                return dependencyConfiguration.getProject();
+            }
+        });
+    }
+
+    private void addToDownstreamCache(ProjectConfiguration upstream, ProjectConfiguration config)
+    {
+        List<ProjectConfiguration> downstreamConfigs = configToDownstreamConfigs.get(upstream);
+        if (downstreamConfigs == null)
+        {
+            downstreamConfigs = new LinkedList<ProjectConfiguration>();
+            configToDownstreamConfigs.put(upstream, downstreamConfigs);
+        }
+
+        downstreamConfigs.add(config);
     }
 
     public void checkProjectLifecycle(ProjectConfiguration projectConfig)
@@ -651,24 +737,48 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
     {
-        if(allowInvalid)
+        cacheLock.readLock().lock();
+        try
         {
-            return Collections.unmodifiableList(new LinkedList<ProjectConfiguration>(nameToConfig.values()));
+            if(allowInvalid)
+            {
+                return Collections.unmodifiableList(new LinkedList<ProjectConfiguration>(nameToConfig.values()));
+            }
+            else
+            {
+                return Collections.unmodifiableList(validConfigs);
+            }
         }
-        else
+        finally
         {
-            return Collections.unmodifiableList(validConfigs);
+            cacheLock.readLock().unlock();
         }
     }
 
     public ProjectConfiguration getProjectConfig(String name, boolean allowInvalid)
     {
-        return checkValidity(nameToConfig.get(name), allowInvalid);
+        cacheLock.readLock().lock();
+        try
+        {
+            return checkValidity(nameToConfig.get(name), allowInvalid);
+        }
+        finally
+        {
+            cacheLock.readLock().unlock();
+        }
     }
 
     public ProjectConfiguration getProjectConfig(long id, boolean allowInvalid)
     {
-        return checkValidity(idToConfig.get(id), allowInvalid);
+        cacheLock.readLock().lock();
+        try
+        {
+            return checkValidity(idToConfig.get(id), allowInvalid);
+        }
+        finally
+        {
+            cacheLock.readLock().unlock();
+        }
     }
 
     private ProjectConfiguration checkValidity(ProjectConfiguration configuration, boolean allowInvalid)
@@ -682,8 +792,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public Project getProject(String name, boolean allowInvalid)
     {
-        ProjectConfiguration config = nameToConfig.get(name);
-        if(config == null || !allowInvalid && !configurationTemplateManager.isDeeplyValid(config.getConfigurationPath()))
+        ProjectConfiguration config = getProjectConfig(name, allowInvalid);
+        if (config == null)
         {
             return null;
         }
@@ -1004,21 +1114,39 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
         });
 
-        for(Map.Entry<String, Set<ProjectConfiguration>> entry: labelToConfigs.entrySet())
+        cacheLock.readLock().lock();
+        try
         {
-            ProjectGroup group = createProjectGroup(entry.getKey(), entry.getValue());
-            if(group.getProjects().size() > 0)
+            for(Map.Entry<String, Set<ProjectConfiguration>> entry: labelToConfigs.entrySet())
             {
-                groups.add(group);
+                ProjectGroup group = createProjectGroup(entry.getKey(), entry.getValue());
+                if(group.getProjects().size() > 0)
+                {
+                    groups.add(group);
+                }
             }
         }
-        
+        finally
+        {
+            cacheLock.readLock().unlock();
+        }
+
         return groups;
     }
 
     public ProjectGroup getProjectGroup(String name)
     {
-        Set<ProjectConfiguration> projects = labelToConfigs.get(name);
+        Set<ProjectConfiguration> projects;
+        cacheLock.readLock().lock();
+        try
+        {
+            projects = labelToConfigs.get(name);
+        }
+        finally
+        {
+            cacheLock.readLock().unlock();
+        }
+
         if(projects == null)
         {
             // Return an empty group.
@@ -1131,11 +1259,36 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         projectDao.save(project);
     }
 
+    public List<ProjectConfiguration> getDownstreamDependencies(ProjectConfiguration projectConfig)
+    {
+        cacheLock.readLock().lock();
+        try
+        {
+            List<ProjectConfiguration> result = configToDownstreamConfigs.get(projectConfig);
+            if (result == null)
+            {
+                result = Collections.emptyList();
+            }
+            return result;
+        }
+        finally
+        {
+            cacheLock.readLock().unlock();
+        }
+    }
+
     public void setConfiguration(Project state)
     {
-        long projectId = state.getId();
-        ProjectConfiguration projectConfiguration = idToConfig.get(projectId);
-        state.setConfig(projectConfiguration);
+        cacheLock.readLock().lock();
+        try
+        {
+            ProjectConfiguration projectConfiguration = idToConfig.get(state.getId());
+            state.setConfig(projectConfiguration);
+        }
+        finally
+        {
+            cacheLock.readLock().unlock();
+        }
     }
 
     private void handleBuildCompleted(BuildCompletedEvent event)
@@ -1173,7 +1326,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private void handleRecipeAssigned(RecipeAssignedEvent rde)
     {
         RecipeRequest request = rde.getRequest();
-        ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
+        ProjectConfiguration projectConfig = getProjectConfig(request.getProject(), true);
         if(projectConfig != null)
         {
             Project project = projectDao.findById(projectConfig.getProjectId());

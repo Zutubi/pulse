@@ -192,7 +192,7 @@ ZUTUBI.ConcreteProject.prototype = {
             if (this.data.canRebuild)
             {
                 items.push({
-                    id: 'rebuild',
+                    id: 'with dependencies',
                     image: 'lightning.gif',
                     onclick: 'actionPath(\'projects/' + encodeURIComponent(this.data.name) + '\', \'rebuild\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
                 });

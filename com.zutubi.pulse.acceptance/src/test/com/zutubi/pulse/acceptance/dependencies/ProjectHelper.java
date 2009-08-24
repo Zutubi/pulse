@@ -1,24 +1,25 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.Pair;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import com.zutubi.pulse.master.tove.config.project.DependencyConfigurationRevisionOptionProvider;
-import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfigurationRevisionOptionProvider;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Pair;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.StringUtils;
 
-import java.util.*;
 import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * The project model used by these tests to simplify management of the test configuration.
@@ -357,6 +358,7 @@ public abstract class ProjectHelper
             Hashtable<String, Object> stageConfig = xmlRpcHelper.createDefaultConfig(BuildStageConfiguration.class);
             stageConfig.put(Constants.Project.Stage.NAME, stage.getName());
             stageConfig.put(Constants.Project.Stage.RECIPE, stage.getRecipe().getName());
+            stageConfig.put(Constants.Project.Stage.AGENT, PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
             xmlRpcHelper.insertConfig("projects/" + getName() + "/stages", stageConfig);
         }
     }

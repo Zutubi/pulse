@@ -24,8 +24,8 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
-import com.zutubi.util.Pair;
 import com.zutubi.util.EnumUtils;
+import com.zutubi.util.Pair;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.MalformedURLException;
@@ -46,7 +46,7 @@ public class XmlRpcHelper
     protected XmlRpcClient xmlRpcClient;
     protected String token = null;
 
-    private static final long BUILD_TIMEOUT = 90000;
+    public static final long BUILD_TIMEOUT = 90000;
 
     public XmlRpcHelper() throws MalformedURLException
     {

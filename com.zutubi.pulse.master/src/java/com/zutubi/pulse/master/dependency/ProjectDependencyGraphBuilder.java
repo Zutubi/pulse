@@ -1,30 +1,20 @@
 package com.zutubi.pulse.master.dependency;
 
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
-import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
-import com.zutubi.tove.config.ConfigurationEventListener;
-import com.zutubi.tove.config.events.ConfigurationEvent;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.*;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Service to yield dependency graphs for projects.  Contains the building
  * logic and cached information to ensure building graphs is fast.
  */
-public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
+public class ProjectDependencyGraphBuilder
 {
     public enum TransitiveMode
     {
@@ -50,12 +40,6 @@ public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
         NONE
     }
 
-    /**
-     * Maps from a project to those projects that directly depend upon it, as
-     * this information is only indirectly available in the configuration.
-     */
-    private Map<ProjectConfiguration, List<ProjectConfiguration>> downstreamCache;
-    private ReadWriteLock downstreamCacheLock = new ReentrantReadWriteLock();
     private ProjectManager projectManager;
 
     /**
@@ -97,40 +81,41 @@ public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
         return node;
     }
 
+    private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
+    {
+        List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
+        return CollectionUtils.map(dependencies, new Mapping<DependencyConfiguration, ProjectConfiguration>()
+        {
+            public ProjectConfiguration map(DependencyConfiguration dependencyConfiguration)
+            {
+                return dependencyConfiguration.getProject();
+            }
+        });
+    }
+
     private TreeNode<DependencyGraphData> buildDownstream(Project project, TransitiveMode mode)
     {
-        downstreamCacheLock.readLock().lock();
-        try
+        TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
+
+        List<ProjectConfiguration> downstreamProjectConfigs = projectManager.getDownstreamDependencies(project.getConfig());
+        List<Project> downstreamProjects = projectManager.mapConfigsToProjects(downstreamProjectConfigs);
+        for (Project downstream: downstreamProjects)
         {
-            TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
-
-            List<ProjectConfiguration> downstreamProjectConfigs = downstreamCache.get(project.getConfig());
-            if (downstreamProjectConfigs != null)
+            TreeNode<DependencyGraphData> child;
+            if (mode == TransitiveMode.NONE)
             {
-                List<Project> downstreamProjects = projectManager.mapConfigsToProjects(downstreamProjectConfigs);
-                for (Project downstream: downstreamProjects)
-                {
-                    TreeNode<DependencyGraphData> child;
-                    if (mode == TransitiveMode.NONE)
-                    {
-                        child = new TreeNode<DependencyGraphData>(new DependencyGraphData(downstream));
-                    }
-                    else
-                    {
-                        child = buildDownstream(downstream, mode);
-                    }
-
-                    node.add(child);
-                }
+                child = new TreeNode<DependencyGraphData>(new DependencyGraphData(downstream));
+            }
+            else
+            {
+                child = buildDownstream(downstream, mode);
             }
 
-            processDuplicateSubtrees(node, mode);
-            return node;
+            node.add(child);
         }
-        finally
-        {
-            downstreamCacheLock.readLock().unlock();
-        }
+
+        processDuplicateSubtrees(node, mode);
+        return node;
     }
 
     private void processDuplicateSubtrees(TreeNode<DependencyGraphData> root, TransitiveMode mode)
@@ -170,83 +155,6 @@ public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
                 });
             }
         }
-    }
-
-    private void refreshDownstreamCache()
-    {
-        downstreamCacheLock.writeLock().lock();
-        try
-        {
-            downstreamCache = new HashMap<ProjectConfiguration, List<ProjectConfiguration>>();
-
-            List<ProjectConfiguration> configs = projectManager.getAllProjectConfigs(true);
-            for (ProjectConfiguration config: configs)
-            {
-                for (ProjectConfiguration upstream: getDependentProjectConfigs(config))
-                {
-                    addToDownstreamCache(upstream, config);
-                }
-            }
-        }
-        finally
-        {
-            downstreamCacheLock.writeLock().unlock();
-        }
-    }
-
-    private void addToDownstreamCache(ProjectConfiguration upstream, ProjectConfiguration config)
-    {
-        List<ProjectConfiguration> downstreamConfigs = downstreamCache.get(upstream);
-        if (downstreamConfigs == null)
-        {
-            downstreamConfigs = new LinkedList<ProjectConfiguration>();
-            downstreamCache.put(upstream, downstreamConfigs);
-        }
-
-        downstreamConfigs.add(config);
-    }
-
-    private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
-    {
-        List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
-        return CollectionUtils.map(dependencies, new Mapping<DependencyConfiguration, ProjectConfiguration>()
-        {
-            public ProjectConfiguration map(DependencyConfiguration dependencyConfiguration)
-            {
-                return dependencyConfiguration.getProject();
-            }
-        });
-    }
-
-    public void handleConfigurationEvent(ConfigurationEvent event)
-    {
-        // When any project changes, rebuild the whole cache.  No need to be
-        // smart about it - rebuilding is not that expensive.
-        refreshDownstreamCache();
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        eventManager.register(new EventListener()
-        {
-            public void handleEvent(Event event)
-            {
-                if (event instanceof ConfigurationEventSystemStartedEvent)
-                {
-                    ConfigurationEventSystemStartedEvent cesse = (ConfigurationEventSystemStartedEvent) event;
-                    cesse.getConfigurationProvider().registerEventListener(ProjectDependencyGraphBuilder.this, false, true, ProjectConfiguration.class);
-                }
-                else
-                {
-                    refreshDownstreamCache();
-                }
-            }
-
-            public Class[] getHandledEvents()
-            {
-                return new Class[]{ConfigurationEventSystemStartedEvent.class, SystemStartedEvent.class};
-            }
-        });
     }
 
     public void setProjectManager(ProjectManager projectManager)

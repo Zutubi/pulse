@@ -12,8 +12,8 @@ import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the relationship between trigger configuration and scheduler
@@ -23,7 +23,7 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
 {
     private static final Logger LOG = Logger.getLogger(TriggerManager.class);
 
-    private Map<Long, TriggerConfiguration> idToConfig = new HashMap<Long, TriggerConfiguration>();
+    private Map<Long, TriggerConfiguration> idToConfig = new ConcurrentHashMap<Long, TriggerConfiguration>();
 
     private ConfigurationProvider configurationProvider;
     private Scheduler scheduler;

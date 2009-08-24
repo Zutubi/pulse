@@ -211,4 +211,15 @@ public interface ProjectManager extends EntityManager<Project>
      */
     @SecureParameter(parameterType = Project.class, action = ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY)
     void clearResponsibility(Project project);
+
+    /**
+     * Returns all projects that are immediate downstream dependents of the
+     * given project.  That is, all returned projects depend directly on the
+     * given project.
+     *
+     * @param projectConfig project that the returned projects depend on
+     * @return all projects that depend directly on the given project
+     */
+    @SecureResult
+    List<ProjectConfiguration> getDownstreamDependencies(ProjectConfiguration projectConfig);
 }

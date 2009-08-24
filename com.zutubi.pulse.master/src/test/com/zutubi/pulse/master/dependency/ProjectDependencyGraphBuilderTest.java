@@ -1,19 +1,15 @@
 package com.zutubi.pulse.master.dependency;
 
-import com.zutubi.events.DefaultEventManager;
-import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TreeNode;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
@@ -55,6 +51,28 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
 
         ProjectManager projectManager = mock(ProjectManager.class);
         stub(projectManager.getAllProjectConfigs(anyBoolean())).toReturn(allConfigs);
+        stub(projectManager.getDownstreamDependencies((ProjectConfiguration) anyObject())).toAnswer(new Answer<List<ProjectConfiguration>>()
+        {
+            public List<ProjectConfiguration> answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ProjectConfiguration config = (ProjectConfiguration) invocationOnMock.getArguments()[0];
+                List<ProjectConfiguration> result = new LinkedList<ProjectConfiguration>();
+                for (ProjectConfiguration project: allConfigs)
+                {
+                    for (DependencyConfiguration dep: project.getDependencies().getDependencies())
+                    {
+                        if (dep.getProject().equals(config))
+                        {
+                            result.add(project);
+                            break;
+                        }
+                    }
+                }
+
+                return result;
+            }
+        });
+
         stub(projectManager.mapConfigsToProjects(anyList())).toAnswer(new Answer<List<Project>>()
         {
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
@@ -71,10 +89,6 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         });
 
         builder.setProjectManager(projectManager);
-
-        EventManager eventManager = new DefaultEventManager();
-        builder.setEventManager(eventManager);
-        eventManager.publish(new SystemStartedEvent(this));
     }
 
     public void testUtilLibraryFull()
@@ -308,6 +322,7 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
     private Project makeProject(String name, Project... dependencies)
     {
         ProjectConfiguration config = new ProjectConfiguration(name);
+        config.setHandle(nextId++);
         config.setProjectId(nextId++);
 
         config.getDependencies().getDependencies().addAll(CollectionUtils.map(dependencies, new Mapping<Project, DependencyConfiguration>()

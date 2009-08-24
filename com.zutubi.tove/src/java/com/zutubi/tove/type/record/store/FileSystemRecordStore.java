@@ -1,11 +1,11 @@
 package com.zutubi.tove.type.record.store;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.tove.transaction.Transaction;
 import com.zutubi.tove.transaction.TransactionException;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.record.*;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -650,6 +650,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
 
             DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshotDirectory);
+            serialiser.setMaxPathDepth(2);
             serialiser.serialise(newSnapshot, true);
 
             FileWriter writer = null;
