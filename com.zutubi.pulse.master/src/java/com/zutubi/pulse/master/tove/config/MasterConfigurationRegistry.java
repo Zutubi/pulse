@@ -144,6 +144,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
             registerConfigurationType(TriggerConditionConfiguration.class);
             registerConfigurationType(OutstandingChangesTriggerConditionConfiguration.class);
+            registerConfigurationType(ProjectStateTriggerConditionConfiguration.class);
 
             registerProjectMapExtension(EXTENSION_PROJECT_TRIGGERS, TriggerConfiguration.class);
 
