@@ -224,7 +224,7 @@ public enum ResultState
      */
     public static ResultState fromPrettyString(String prettyString)
     {
-        return ResultState.valueOf(EnumUtils.fromPrettyString(prettyString));
+        return EnumUtils.fromPrettyString(ResultState.class, prettyString);
     }
 
     /**

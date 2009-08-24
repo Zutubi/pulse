@@ -68,4 +68,10 @@ public class EnumUtils
     {
         return prettyString.replace(' ', '_').toUpperCase();
     }
+
+    public static <V extends Enum<V>> V fromPrettyString(Class<V> type, String prettyString)
+    {
+        String name = prettyString.replace(' ', '_').toUpperCase();
+        return Enum.valueOf(type, name);
+    }
 }

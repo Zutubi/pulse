@@ -36,10 +36,9 @@ public class EnumSqueezer implements TypeSqueezer
             return null;
         }
 
-        String converted = EnumUtils.fromPrettyString(s);
         try
         {
-            return Enum.valueOf(enumClass, converted);
+            return EnumUtils.fromPrettyString(enumClass, s);
         }
         catch (IllegalArgumentException e)
         {

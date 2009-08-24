@@ -289,7 +289,7 @@ public class XmlRpcHelper
     public Project.State getProjectState(String projectName) throws Exception
     {
         String stateString = call("getProjectState", projectName);
-        return Project.State.valueOf(EnumUtils.fromPrettyString(stateString));
+        return EnumUtils.fromPrettyString(Project.State.class, stateString);
     }
 
     @SuppressWarnings({"unchecked"})
