@@ -149,7 +149,7 @@ ZUTUBI.ConcreteProject.prototype = {
         };
     },
 
-    getMenuItems: function(menuType, menuArg) {
+    getMenuItems: function(menuType, menuArg, id) {
         var items;
 
         if (menuType == 'actions')
@@ -184,8 +184,8 @@ ZUTUBI.ConcreteProject.prototype = {
             {
                 items.push({
                     id: 'trigger',
-                    url: 'triggerBuild.action?projectName=' + encodeURIComponent(this.data.name),
-                    image: 'lightning.gif'
+                    image: 'lightning.gif',
+                    onclick: 'actionPath(\'projects/' + encodeURIComponent(this.data.name) + '\', \'trigger\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
                 });
             }
 
@@ -193,8 +193,8 @@ ZUTUBI.ConcreteProject.prototype = {
             {
                 items.push({
                     id: 'rebuild',
-                    url: 'triggerBuild.action?projectName=' + encodeURIComponent(this.data.name) + '&rebuild=true',
-                    image: 'lightning.gif'
+                    image: 'lightning.gif',
+                    onclick: 'actionPath(\'projects/' + encodeURIComponent(this.data.name) + '\', \'rebuild\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
                 });
             }
 
@@ -234,7 +234,7 @@ ZUTUBI.ConcreteProject.prototype = {
         
         var menuEl = Ext.getBody().createChild({tag: 'div',  id: id, style: 'display: none'});
         var listEl = menuEl.createChild({tag: 'ul', cls: 'actions'});
-        var items = this.getMenuItems(menuType, menuArg);
+        var items = this.getMenuItems(menuType, menuArg, id);
         for (var i = 0; i < items.length; i++)
         {
             this.appendMenuItem(listEl, id, items[i]);
@@ -249,18 +249,29 @@ ZUTUBI.ConcreteProject.prototype = {
             item.title = item.id;
         }
 
-        el.createChild({tag: 'li', children: [{
+        child = {
             tag: 'a',
             id: item.id + '-' + menuId,
-            href: window.baseUrl + '/' + item.url,
             cls: 'unadorned',
-            title: item.title,
+            href: '#',
+            title: item.title,            
             children: [{
                 tag: 'img',
                 alt: item.title,
                 src: window.baseUrl + '/images/' + item.image
             }, ' ' + item.title]
-        }]});
+        };
+        
+        if (item.url !== undefined)
+        {
+            child.href = window.baseUrl + '/' + item.url;
+        }
+        if (item.onclick !== undefined)
+        {
+            child.onclick = item.onclick;
+        }
+        
+        el.createChild({tag: 'li', children: [child]});
     },
 
     destroy: function() {
