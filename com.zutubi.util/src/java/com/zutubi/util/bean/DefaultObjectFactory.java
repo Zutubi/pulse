@@ -63,8 +63,7 @@ public class DefaultObjectFactory implements ObjectFactory
     public <T> T buildBean(String className, Class<? super T> supertype)
     {
         // javac cannot infer this type argument
-        //noinspection RedundantTypeArguments
-        Class<? extends T> clazz = this.<T>getClassInstance(className, supertype);
+        Class<? extends T> clazz = this.getClassInstance(className, supertype);
         return newInstance(clazz);
     }
 
@@ -84,8 +83,7 @@ public class DefaultObjectFactory implements ObjectFactory
     public <T> T buildBean(String className, Class<? super T> supertype, Class[] argTypes, Object[] args)
     {
         // javac cannot infer this type argument
-        //noinspection RedundantTypeArguments
-        Class<? extends T> clazz = this.<T>getClassInstance(className, supertype);
+        Class<? extends T> clazz = this.getClassInstance(className, supertype);
         return buildBean(clazz, argTypes, args);
     }
 

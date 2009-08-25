@@ -490,7 +490,6 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         {
             public boolean createNewFile(File file) throws IOException
             {
-                //noinspection SimplifiableIfStatement
                 if (file.getName().equals("index.new"))
                 {
                     return false;

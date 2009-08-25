@@ -326,7 +326,6 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
         BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
 
-        //noinspection ThrowableInstanceNeverThrown
         doThrow(new AccessDeniedException("badness")).when(accessManager).ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, queuedRequest);
 
         queue.handleRequest(activeRequest);

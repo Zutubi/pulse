@@ -246,9 +246,9 @@ public abstract class ProjectHelper
         return number;
     }
 
+    @SuppressWarnings({"unchecked"})
     protected int triggerRebuild(Pair<String, Object>... options) throws Exception
     {
-        //noinspection unchecked
         Pair<String, Object>[] args = (Pair<String, Object>[]) Array.newInstance(Pair.class, options.length + 1);
         System.arraycopy(options, 0, args, 0, options.length);
         args[args.length - 1] = asPair("rebuild", (Object)"true");

@@ -6,9 +6,6 @@ import com.zutubi.pulse.master.model.persistence.UserDao;
 
 import java.util.List;
 
-/**
- * @noinspection FieldCanBeLocal
- */
 public class HibernateUserDaoTest extends MasterPersistenceTestCase
 {
     private UserDao userDao;

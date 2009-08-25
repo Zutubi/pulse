@@ -68,7 +68,6 @@ public class ScmExtensionManager extends AbstractExtensionManager
 
             try
             {
-                //noinspection unchecked
                 clientFactory.register(configClazz, factoryClazz);
                 if (wcClazz != null)
                 {

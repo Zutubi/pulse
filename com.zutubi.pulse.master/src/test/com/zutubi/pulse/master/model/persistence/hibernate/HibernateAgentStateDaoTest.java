@@ -5,9 +5,6 @@ import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 
 import java.util.List;
 
-/**
- * @noinspection FieldCanBeLocal
- */
 public class HibernateAgentStateDaoTest extends MasterPersistenceTestCase
 {
     private AgentStateDao agentStateDao;
