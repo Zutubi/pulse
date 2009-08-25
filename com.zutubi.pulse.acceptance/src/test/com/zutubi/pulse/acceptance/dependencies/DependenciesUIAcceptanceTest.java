@@ -106,14 +106,15 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testProjectDependenciesTab() throws Exception
     {
-        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        String randomName = randomName();
+        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName + "A");
         projectA.createProject();
 
-        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName + "B");
         projectB.addDependency(new DependencyHelper(projectA, true));
         projectB.createProject();
 
-        ProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        ProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName + "C");
         projectC.addDependency(projectB);
         projectC.createProject();
 
