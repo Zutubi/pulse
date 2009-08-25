@@ -47,7 +47,7 @@ public class WiringObjectFactory implements ObjectFactory
     public <T> T buildBean(String className, Class<? super T> supertype)
     {
         // javac requires this type argument
-        T bean = delegate.buildBean(className, supertype);
+        T bean = delegate.<T>buildBean(className, supertype);
         wire(bean);
         return bean;
     }
@@ -62,7 +62,7 @@ public class WiringObjectFactory implements ObjectFactory
     public <T> T buildBean(String className, Class<? super T> supertype, Class[] argTypes, Object[] args)
     {
         // javac requires this type argument
-        T bean = delegate.buildBean(className, supertype, argTypes, args);
+        T bean = delegate.<T>buildBean(className, supertype, argTypes, args);
         wire(bean);
         return bean;
     }
@@ -70,7 +70,7 @@ public class WiringObjectFactory implements ObjectFactory
     public <T> Class<? extends T> getClassInstance(String className, Class<? super T> supertype)
     {
         // javac requires this type argument
-        return delegate.getClassInstance(className, supertype);
+        return delegate.<T>getClassInstance(className, supertype);
     }
 
     private void wire(Object bean)
