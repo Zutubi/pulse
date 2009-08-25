@@ -268,8 +268,9 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.triggerRebuild();
 
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
-
         assertEquals(ResultState.FAILURE, projectA.getBuildStatus(1));
+
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
         assertEquals(ResultState.ERROR, projectB.getBuildStatus(1));
 
         // We would normally have to release projectBs' build.  However, it did not run,
