@@ -127,6 +127,13 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // Go to a project with transitive dependencies
         page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectC.getName());
+        if (page.getTransitiveMode() != ProjectDependencyGraphBuilder.TransitiveMode.FULL)
+        {
+            ProjectDependenciesForm form = browser.createForm(ProjectDependenciesForm.class);
+            form.submitMode(ProjectDependencyGraphBuilder.TransitiveMode.FULL);
+            browser.waitForElement(page.getUpstreamId(projectA.getName(), 0, 0));
+        }
+
         assertTrue(page.isUpstreamPresent(projectA.getName(), 0, 0));
         assertTrue(page.isUpstreamPresent(projectB.getName(), 1, 0));
         

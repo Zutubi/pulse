@@ -70,7 +70,11 @@
                 #foreach($dependency in $detail.dependencies)
                 <tr>
                     <td class="content">#html($detail.stageName)</td>
-                    <td class="content"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
+                    #if ($dependency.projectUrl)
+                        <td class="content"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
+                    #else
+                        <td class="content">#html($dependency.projectName)</td>
+                    #end
                     #if($dependency.buildUrl)
                         <td class="content"><a href="$dependency.buildUrl">#html($dependency.buildName)</a></td>
                     #else

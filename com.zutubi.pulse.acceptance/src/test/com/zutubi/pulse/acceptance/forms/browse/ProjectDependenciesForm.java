@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
  */
 public class ProjectDependenciesForm extends SeleniumForm
 {
-    private static final String FIELD_MODE = "mode";
+    public static final String FIELD_MODE = "mode";
 
     public ProjectDependenciesForm(SeleniumBrowser browser)
     {

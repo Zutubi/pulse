@@ -367,15 +367,24 @@ public class ViewBuildAction extends CommandActionBase
                     }
 
                     ModuleRevisionId mrid = artifact.getModuleRevisionId();
-                    stageDependency.setProjectName(mrid.getName());
-                    stageDependency.setProjectUrl(urls.project(uriComponentEncode(mrid.getName())));
+                    
+                    String dependencyProjectName = mrid.getName();
+                    stageDependency.setProjectName(dependencyProjectName);
+                    boolean isDependencyAvailable = projectManager.getProjectConfig(mrid.getName(), false) != null;
+                    if (isDependencyAvailable)
+                    {
+                        stageDependency.setProjectUrl(urls.project(uriComponentEncode(mrid.getName())));
+                    }
 
                     String ivyPath = ivy.getIvyPath(mrid, mrid.getRevision());
                     IvyFile ivyFile = new IvyFile(repositoryRoot, ivyPath);
                     if (ivyFile.exists())
                     {
                         stageDependency.setBuildName(ivyFile.getBuildNumber());
-                        stageDependency.setBuildUrl(urls.build(uriComponentEncode(mrid.getName()), ivyFile.getBuildNumber()));
+                        if (isDependencyAvailable)
+                        {
+                            stageDependency.setBuildUrl(urls.build(uriComponentEncode(dependencyProjectName), ivyFile.getBuildNumber()));
+                        }
                     }
                     else
                     {

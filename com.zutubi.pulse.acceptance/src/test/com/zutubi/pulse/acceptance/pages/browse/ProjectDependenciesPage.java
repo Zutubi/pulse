@@ -1,9 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectDependencyGraphRenderer;
+import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.EnumUtils;
 
 /**
  * The browse project dependencies page.
@@ -44,6 +47,11 @@ public class ProjectDependenciesPage extends AbstractLogPage
     public String getDownstreamId(String project, int x, int y)
     {
         return getDependencyId(SECTION_DOWNSTREAM, project, x, y);
+    }
+
+    public ProjectDependencyGraphBuilder.TransitiveMode getTransitiveMode()
+    {
+        return EnumUtils.fromPrettyString(ProjectDependencyGraphBuilder.TransitiveMode.class, browser.getValue(ProjectDependenciesForm.FIELD_MODE));
     }
 
     private boolean isProjectPresent(String section, String project, int x, int y)
