@@ -1,68 +1,53 @@
 <?xml version="1.0"?>
 <project default-recipe="default">
     <junit.pp name="junit.pp"/>
+    <property name="pulse.package" value="com.zutubi.pulse"/>
 
     <macro name="capture-junit">
         <dir-artifact name="combined junit" base="build/reports/junit/html" fail-if-not-present="false"/>
-        <dir-artifact name="core junit" base="com.zutubi.pulse.core/build/reports/junit/html" fail-if-not-present="false"/>
-        <dir-artifact name="servercore junit" base="com.zutubi.pulse.servercore/build/reports/junit/html" fail-if-not-present="false"/>
-        <dir-artifact name="master junit" base="com.zutubi.pulse.master/build/reports/junit/html" fail-if-not-present="false"/>
-        <dir-artifact name="dev junit" base="com.zutubi.pulse.dev/build/reports/junit/html" fail-if-not-present="false"/>
+        <dir-artifact name="core junit" base="$(pulse.package).core/build/reports/junit/html" fail-if-not-present="false"/>
+        <dir-artifact name="servercore junit" base="$(pulse.package).servercore/build/reports/junit/html" fail-if-not-present="false"/>
+        <dir-artifact name="master junit" base="$(pulse.package).master/build/reports/junit/html" fail-if-not-present="false"/>
+        <dir-artifact name="dev junit" base="$(pulse.package).dev/build/reports/junit/html" fail-if-not-present="false"/>
         <dir-artifact name="junit xml reports">
             <include pattern="**/build/reports/junit/xml/*.xml"/>
-            <process processor="${junit.pp}"/>
+            <process processor="$(junit.pp)"/>
         </dir-artifact>
     </macro>
 
     <macro name="ant-build">
-        <command name="build">
-            <ant name="build" targets="${targets}"/>
-            <macro-ref macro="${capture-junit}"/>
-        </command>
+        <ant name="build" targets="$(targets)">
+            <macro-ref macro="$(capture-junit)"/>
+        </ant>
     </macro>
 
     <recipe name="default">
         <property name="targets" value="build.all"/>
-        <macro-ref macro="${ant-build}"/>
+        <macro-ref macro="$(ant-build)"/>
     </recipe>
 
     <recipe name="acceptance">
         <property name="targets" value="accept.master"/>
-        <command name="build">
-            <ant targets="accept.master"/>
-            <macro-ref macro="${capture-junit}"/>
+        <ant name="build" targets="accept.master">
+            <macro-ref macro="$(capture-junit)"/>
             <dir-artifact name="acceptance output" base="working" fail-if-not-present="false">
 	        <include pattern="**/*"/>
                 <exclude pattern="pulse-accept/pulse-*"/>
             </dir-artifact>
-        </command>
+        </ant>
     </recipe>
 
     <recipe name="release">
-        <executable name="prepare" exe="bash" args="prepare-release.sh ${pulse.version}"/>
-        <command name="build">
-            <ant targets="accept.master"/>
-            <macro-ref macro="${capture-junit}"/>
+        <executable name="prepare" exe="bash" args="prepare-release.sh $(pulse.version)"/>
+        <ant name="build" targets="accept.master">
+            <macro-ref macro="$(capture-junit)"/>
             <dir-artifact name="packages" base="build">
-                <include pattern="pulse-*${pulse.version}.*"/>
+                <include pattern="pulse-*$(pulse.version).*"/>
             </dir-artifact>
-        </command>
+        </ant>
         <ant name="dist" targets="dist.all"/>
-        <command name="javadoc">
-            <ant targets="javadoc"/>
+        <ant name="javadoc" targets="javadoc">
             <dir-artifact name="javadoc" base="build/docs/javadoc"/>
-        </command>
-    </recipe>
-
-    <recipe name="dbtest">
-        <ant name="package" args="-D=skip.tests=true" targets="package.master"/>
-        <command name="build">
-            <ant targets="accept.master.nodeps"/>
-            <dir-artifact name="junit" base="build/reports/junit/html" fail-if-not-present="false"/>
-            <dir-artifact name="junit xml reports">
-                <include pattern="**/build/reports/junit/xml/*.xml"/>
-                <process processor="${junit.pp}"/>
-            </dir-artifact>
-        </command>
+        </ant>
     </recipe>
 </project>
