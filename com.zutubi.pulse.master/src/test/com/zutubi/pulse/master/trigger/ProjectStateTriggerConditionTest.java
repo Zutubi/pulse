@@ -20,7 +20,6 @@ public class ProjectStateTriggerConditionTest extends PulseTestCase
     private static final int PROJECT_ID = 1;
     
     private Project project;
-    private List<BuildResult> buildResults = new LinkedList<BuildResult>();
     private BuildManager buildManager;
     private ProjectManager projectManager;
     private ProjectStateTriggerConditionConfiguration config;
@@ -38,7 +37,6 @@ public class ProjectStateTriggerConditionTest extends PulseTestCase
         project.setConfig(projectConfig);
 
         buildManager = mock(BuildManager.class);
-        stub(buildManager.getLatestCompletedBuildResult(project)).toReturn(buildResults.get(0));
 
         projectManager = mock(ProjectManager.class);
         stub(projectManager.getProject(PROJECT_ID, true)).toReturn(project);
@@ -61,7 +59,7 @@ public class ProjectStateTriggerConditionTest extends PulseTestCase
     {
         BuildResult result = new BuildResult();
         result.setState(ResultState.ERROR);
-        buildResults.add(result);
+        stub(buildManager.getLatestCompletedBuildResult(project)).toReturn(result);
         assertFalse(condition.satisfied(new Project()));
     }
 
@@ -69,7 +67,7 @@ public class ProjectStateTriggerConditionTest extends PulseTestCase
     {
         BuildResult result = new BuildResult();
         result.setState(ResultState.SUCCESS);
-        buildResults.add(result);
+        stub(buildManager.getLatestCompletedBuildResult(project)).toReturn(result);
         assertTrue(condition.satisfied(new Project()));
     }
 }
