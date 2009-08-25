@@ -457,7 +457,6 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         {
             public boolean mkdirs(File file)
             {
-                //noinspection SimplifiableIfStatement
                 if (file.equals(new File(persistentDirectory, "snapshot.new")))
                 {
                     return false;
