@@ -206,6 +206,8 @@ public class ZutubiTestCase extends TestCase
      * name.
      *
      * @return a File pointing to the newly-created directory
+     *
+     * @throws java.io.IOException on error
      */
     public File createTempDirectory() throws IOException
     {

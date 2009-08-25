@@ -40,13 +40,14 @@ public class RecipeControllerTest extends PulseTestCase
     private File recipeDir;
 
     private MockRecipeQueue recipeQueue;
-    private MockBuildManager buildManager;
+    private BuildManager buildManager;
     private AgentService buildService;
 
     private RecipeResult rootResult;
     private RecipeResultNode rootNode;
     private RecipeAssignmentRequest assignmentRequest;
     private RecipeController recipeController;
+    private RecipeDispatchService recipeDispatchService;
 
     protected void setUp() throws Exception
     {
@@ -55,7 +56,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         MockRecipeResultCollector resultCollector = new MockRecipeResultCollector();
         recipeQueue = new MockRecipeQueue();
-        buildManager = new MockBuildManager();
+        buildManager = mock(BuildManager.class);
         buildService = mock(AgentService.class);
         RecipeLogger logger = mock(RecipeLogger.class);
 
@@ -89,6 +90,8 @@ public class RecipeControllerTest extends PulseTestCase
             }
         };
 
+        recipeDispatchService = mock(RecipeDispatchService.class);
+
         ScmManager scmManager = mock(ScmManager.class);
         stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new MockScmClient());
         recipeController = new RecipeController(projectConfig, build, rootNode, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector);
@@ -97,7 +100,7 @@ public class RecipeControllerTest extends PulseTestCase
         recipeController.setEventManager(new DefaultEventManager());
         recipeController.setConfigurationManager(configurationManager);
         recipeController.setResourceManager(new DefaultResourceManager());
-        recipeController.setRecipeDispatchService(mock(RecipeDispatchService.class));
+        recipeController.setRecipeDispatchService(recipeDispatchService);
         recipeController.setScmManager(scmManager);
     }
 
@@ -126,7 +129,6 @@ public class RecipeControllerTest extends PulseTestCase
     public void testAssignedEvent()
     {
         testDispatchRequest();
-        buildManager.clear();
 
         Agent agent = mock(Agent.class);
         stub(agent.getService()).toReturn(buildService);
@@ -141,13 +143,13 @@ public class RecipeControllerTest extends PulseTestCase
         recipeController.handleRecipeEvent(event);
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
-        assertSame(rootNode, buildManager.getRecipeResultNode(rootNode.getId()));
+        verify(buildManager, times(1)).save(rootNode);
+        verify(recipeDispatchService, times(1)).dispatch(event);
     }
 
     public void testCommencedEvent()
     {
         testAssignedEvent();
-        buildManager.clear();
 
         // A recipe commence event should change the result state, and record
         // the start time.
@@ -155,14 +157,11 @@ public class RecipeControllerTest extends PulseTestCase
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
         assertEquals(ResultState.IN_PROGRESS, rootResult.getState());
-
-        assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
 
     public void testCommandCommencedEvent()
     {
         testCommencedEvent();
-        buildManager.clear();
 
         // A command commenced event should result in a new command result
         // with the correct name, state and start time.
@@ -176,14 +175,11 @@ public class RecipeControllerTest extends PulseTestCase
         result.setOutputDir("dummy");
         assertEquals(ResultState.IN_PROGRESS, result.getState());
         assertEquals(event.getName(), result.getCommandName());
-
-        assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
 
     public void testCommandCompletedEvent()
     {
         testCommandCommencedEvent();
-        buildManager.clear();
 
         // A command completed event should result in the command result
         // in the event being applied to the recipe result.
@@ -200,14 +196,11 @@ public class RecipeControllerTest extends PulseTestCase
         CommandResult result = commandResults.get(commandResults.size() - 1);
         assertTrue(result.completed());
         assertEquals("dummy", result.getOutputDir());
-
-        assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
 
     public void testRecipeCompletedEvent()
     {
         testCommandCompletedEvent();
-        buildManager.clear();
 
         // A recipe completed event should result in the recipe result
         // details being applied, and the controller should then be
@@ -222,14 +215,11 @@ public class RecipeControllerTest extends PulseTestCase
         recipeController.handleRecipeEvent(event);
         assertEquals(ResultState.SUCCESS, rootResult.getState());
         assertTrue(recipeController.isFinished());
-
-        assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
 
     public void testErrorBeforeDispatched()
     {
         testDispatchRequest();
-        buildManager.clear();
 
         sendError();
 
@@ -241,7 +231,6 @@ public class RecipeControllerTest extends PulseTestCase
     public void testErrorBeforeCommenced()
     {
         testAssignedEvent();
-        buildManager.clear();
 
         sendError();
 
@@ -252,7 +241,6 @@ public class RecipeControllerTest extends PulseTestCase
     public void testErrorAfterCommenced()
     {
         testCommencedEvent();
-        buildManager.clear();
 
         sendError();
 
@@ -264,7 +252,6 @@ public class RecipeControllerTest extends PulseTestCase
     public void testErrorMidCommand()
     {
         testCommandCommencedEvent();
-        buildManager.clear();
 
         sendError();
 
@@ -278,7 +265,6 @@ public class RecipeControllerTest extends PulseTestCase
     public void testErrorBetweenCommands()
     {
         testCommandCompletedEvent();
-        buildManager.clear();
 
         sendError();
 
@@ -311,7 +297,7 @@ public class RecipeControllerTest extends PulseTestCase
     {
         assertEquals(ResultState.ERROR, rootResult.getState());
         assertEquals(error.getErrorMessage(), rootResult.getFeatures(Feature.Level.ERROR).get(0).getSummary());
-        assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
+        verify(buildManager, atLeastOnce()).save(rootResult);
     }
 
     class MockRecipeResultCollector implements RecipeResultCollector

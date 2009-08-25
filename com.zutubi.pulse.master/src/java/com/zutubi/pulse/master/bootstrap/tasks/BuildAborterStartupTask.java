@@ -15,7 +15,7 @@ public class BuildAborterStartupTask implements StartupTask
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
-    private static final String ABORT_MESSAGE = "Server shut down while build in progress";
+    protected static final String ABORT_MESSAGE = "Server shut down while build in progress";
 
     public void execute()
     {

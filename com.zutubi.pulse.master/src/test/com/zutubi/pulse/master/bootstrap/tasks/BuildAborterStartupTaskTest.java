@@ -1,29 +1,28 @@
-package com.zutubi.pulse.master;
+package com.zutubi.pulse.master.bootstrap.tasks;
 
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import com.zutubi.util.RandomUtils;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class BuildAborterTest extends PulseTestCase
+public class BuildAborterStartupTaskTest extends PulseTestCase
 {
     private BuildManager buildManager;
     private DefaultProjectManager projectManager;
     private BuildAborterStartupTask aborter;
+    private UserManager userManager;
 
     protected void setUp() throws Exception
     {
-        buildManager = new MockBuildManager();
+        buildManager = mock(BuildManager.class);
 
         projectManager = new DefaultProjectManager();
         projectManager.setProjectDao(new MockProjectDao());
@@ -34,7 +33,7 @@ public class BuildAborterTest extends PulseTestCase
         aborter.setBuildManager(buildManager);
         aborter.setTransactionContext(new TransactionContext());
 
-        UserManager userManager = mock(UserManager.class);
+        userManager = mock(UserManager.class);
         doReturn(Collections.emptyList()).when(userManager).getAllUsers();
         aborter.setUserManager(userManager);
     }
@@ -53,7 +52,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testCompletedBuild()
     {
         Project project = new Project();
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 1, false);
+        BuildResult result = createResult(project);
         result.commence(10);
         result.complete();
 
@@ -68,7 +67,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testIncompleteBuild()
     {
         Project project = new Project();
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 1, false);
+        BuildResult result = createResult(project);
         result.commence(10);
 
         projectManager.save(project);
@@ -77,8 +76,7 @@ public class BuildAborterTest extends PulseTestCase
         assertTrue(result.commenced());
         assertFalse(result.completed());
         aborter.execute();
-        assertTrue(result.errored());
-        assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));
+        verify(buildManager, times(1)).abortUnfinishedBuilds(project, BuildAborterStartupTask.ABORT_MESSAGE);
     }
 
     public void testCompletePersonalBuild()
@@ -113,16 +111,19 @@ public class BuildAborterTest extends PulseTestCase
 
         wireMockUserManager(user);
         aborter.execute();
+        verify(buildManager, times(1)).abortUnfinishedBuilds(user, BuildAborterStartupTask.ABORT_MESSAGE);
+    }
 
-        assertTrue(result.errored());
-        assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));
+    private BuildResult createResult(Project project)
+    {
+        BuildResult result = new BuildResult(new TriggerBuildReason("test trigger"), project, 1, false);
+        result.setId(RandomUtils.randomInt());
+        return result;
     }
 
     private void wireMockUserManager(User... users)
     {
-        UserManager userManager = mock(UserManager.class);
         doReturn(Arrays.asList(users)).when(userManager).getAllUsers();
-        aborter.setUserManager(userManager);
     }
 
     private User newUser()
