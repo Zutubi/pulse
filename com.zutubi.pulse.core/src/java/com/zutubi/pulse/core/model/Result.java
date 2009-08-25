@@ -84,7 +84,7 @@ public abstract class Result extends Entity
 
     public boolean completed()
     {
-        return succeeded() || errored() || failed();
+        return state.isCompleted();
     }
 
     public void queue()
