@@ -80,6 +80,7 @@
                 <ref local="updateBuildResultAndAddSequenceTableUpgradeTask"/>
                 <ref local="simpleTriggerSchema"/>
                 <ref local="triggerConditions"/>
+                <ref local="buildResultDependencyFields"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -350,5 +351,9 @@
 
     <bean id="triggerConditions" class="com.zutubi.pulse.master.upgrade.tasks.TriggerConditionsUpgradeTask">
         <property name="buildNumber" value="201004004"/>
+    </bean>
+
+    <bean id="buildResultDependencyFields" class="com.zutubi.pulse.master.upgrade.tasks.BuildResultDependencyFieldsUpgradeTask">
+        <property name="buildNumber" value="201005001"/>
     </bean>
 </beans>

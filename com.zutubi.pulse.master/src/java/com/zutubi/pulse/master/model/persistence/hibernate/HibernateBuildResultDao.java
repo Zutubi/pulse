@@ -239,13 +239,14 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public int getBuildCount(final Project project, final ResultState[] states, final Boolean hasWorkDir)
+    public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses, final Boolean hasWorkDir)
     {
         return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
+                addStatusesToCriteria(statuses, criteria);
                 if (hasWorkDir != null)
                 {
                     criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
@@ -461,7 +462,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
     {
-        int total = getBuildCount(project, states, hasWorkDir);
+        int total = getBuildCount(project, states, null, hasWorkDir);
         if (total > limit)
         {
             // Clean out the difference

@@ -54,7 +54,7 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getBuildCount(Project project, ResultState[] states);
 
-    int getBuildCount(Project project, ResultState[] states, Boolean hasWorkDir);
+    int getBuildCount(Project project, ResultState[] states, String[] statuses, Boolean hasWorkDir);
 
     int getBuildCount(Project project, long after, long upTo);
 

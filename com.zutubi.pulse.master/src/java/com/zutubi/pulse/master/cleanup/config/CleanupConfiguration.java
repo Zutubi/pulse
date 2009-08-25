@@ -162,7 +162,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             // See if there are too many builds of our states.  We assume here
             // we are called from within the build manager (so these two dao
             // calls are within the same transaction).
-            int total = dao.getBuildCount(project, allowedStates, filterHasWorkDir);
+            int total = dao.getBuildCount(project, allowedStates, allowedStatuses, filterHasWorkDir);
             if(total > retain)
             {
                 // Clean out the difference
