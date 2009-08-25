@@ -176,6 +176,16 @@ public class DefaultBuildManager implements BuildManager
         page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, page.getFirst(), page.getMax()));
     }
 
+    public BuildResult getLatestCompletedBuildResult(Project project)
+    {
+        List<BuildResult> results = getLatestCompletedBuildResults(project, 1);
+        if (results.size() > 0)
+        {
+            return results.get(0);
+        }
+        return null;
+    }
+
     public List<BuildResult> getLatestCompletedBuildResults(Project project, int max)
     {
         return getLatestCompletedBuildResults(project, 0, max);

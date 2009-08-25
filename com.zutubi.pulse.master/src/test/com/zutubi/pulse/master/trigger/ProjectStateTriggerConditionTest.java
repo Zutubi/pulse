@@ -38,7 +38,7 @@ public class ProjectStateTriggerConditionTest extends PulseTestCase
         project.setConfig(projectConfig);
 
         buildManager = mock(BuildManager.class);
-        stub(buildManager.getLatestCompletedBuildResults(project, PROJECT_ID)).toReturn(buildResults);
+        stub(buildManager.getLatestCompletedBuildResult(project)).toReturn(buildResults.get(0));
 
         projectManager = mock(ProjectManager.class);
         stub(projectManager.getProject(PROJECT_ID, true)).toReturn(project);

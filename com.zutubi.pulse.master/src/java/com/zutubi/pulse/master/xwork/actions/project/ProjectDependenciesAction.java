@@ -45,7 +45,7 @@ public class ProjectDependenciesAction extends ProjectActionBase
 
     public ProjectHealth getHealth(Project project)
     {
-        return ProjectHealth.fromLatestBuilds(buildManager.getLatestCompletedBuildResults(project, 1));
+        return ProjectHealth.fromLatestBuild(buildManager.getLatestCompletedBuildResult(project));
     }
 
     public List<Pair<String, String>> getModes()

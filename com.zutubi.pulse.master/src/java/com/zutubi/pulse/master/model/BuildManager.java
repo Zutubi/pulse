@@ -64,11 +64,13 @@ public interface BuildManager
     public int getBuildCount(Project project, ResultState[] states);
 
     /**
-     * Counts the number of builds that have happened subsequent to the given
-     * build number for the given spec.
+     * Counts the number of builds that have happened between the given build numbers.
      *
-     * @param after lower number for the count range, not inclusive
-     * @param upTo  upper number of the count range, inclusive
+     * @param project   the project in question
+     * @param after     lower number for the count range, not inclusive
+     * @param upTo      upper number of the count range, inclusive
+     *
+     * @return the number of builds
      */
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     int getBuildCount(Project project, long after, long upTo);
@@ -89,6 +91,19 @@ public interface BuildManager
      * @param states if not null, restrict to results in one of these states
      */
     void fillHistoryPage(HistoryPage page, ResultState[] states);
+
+    /**
+     * Get the build result for the latest completed build for the specified
+     * project.  If no completed build is available, null is returned.
+     *
+     * Completed builds are those for which the {@link com.zutubi.pulse.core.engine.api.ResultState#isCompleted()}
+     * returns true. 
+     *
+     * @param project   the project being queried.
+     * @return  the latest completed build result, or null.
+     */
+    @SecureResult
+    BuildResult getLatestCompletedBuildResult(Project project);
 
     @SecureResult
     List<BuildResult> getLatestCompletedBuildResults(Project project, int max);

@@ -8,8 +8,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ProjectStateTriggerConditionConfiguration;
 import com.zutubi.util.logging.Logger;
 
-import java.util.List;
-
 /**
  * A trigger condition that checks the state of another project.
  */
@@ -36,8 +34,8 @@ public class ProjectStateTriggerCondition extends TriggerConditionSupport
             return false;
         }
 
-        List<BuildResult> buildResults = buildManager.getLatestCompletedBuildResults(otherProject, 1);
-        return buildResults.size() > 0 && config.getStates().contains(buildResults.get(0).getState());
+        BuildResult buildResult = buildManager.getLatestCompletedBuildResult(otherProject);
+        return buildResult != null && config.getStates().contains(buildResult.getState());
     }
 
     public void setBuildManager(BuildManager buildManager)
