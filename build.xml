@@ -545,7 +545,7 @@
     <target name="javadoc" depends="init">
         <property name="docdir" value="build/docs/javadoc"/>
         <delete dir="${docdir}"/>
-        <javadoc destdir="${docdir}">
+        <javadoc destdir="${docdir}" useexternalfile="true">
             <link href="http://java.sun.com/j2se/1.5/docs/api/"/>
             <link href="http://java.sun.com/products/javamail/javadocs/"/>
             <link href="http://www.cafeconleche.org/XOM/apidocs/"/>
