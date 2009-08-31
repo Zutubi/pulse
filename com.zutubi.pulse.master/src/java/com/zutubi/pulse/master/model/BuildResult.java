@@ -4,7 +4,9 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.CollectionUtils;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -184,6 +186,26 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public void addDependsOn(BuildResult result)
     {
         this.dependsOn.add(result);        
+    }
+
+    /**
+     * Get the build result (from the list of builds that this build depends on) that
+     * is associated with the specified project.
+     *
+     * @param projectName   the name of the project build of interest.
+     *
+     * @return a build result or null if non is found.
+     */
+    public BuildResult getDependsOn(final String projectName)
+    {
+        return CollectionUtils.find(this.dependsOn, new Predicate<BuildResult>()
+        {
+            public boolean satisfied(BuildResult buildResult)
+            {
+                ProjectConfiguration dependsOnProject = buildResult.getProject().getConfig();
+                return (dependsOnProject.getName().equals(projectName));
+            }
+        });
     }
 
     public void abortUnfinishedRecipes()

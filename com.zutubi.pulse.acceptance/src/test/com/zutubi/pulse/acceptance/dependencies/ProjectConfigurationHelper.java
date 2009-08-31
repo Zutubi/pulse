@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
-import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +84,16 @@ public abstract class ProjectConfigurationHelper
         return stage;
     }
 
+    public BuildStageConfiguration getDefaultStage()
+    {
+        return getStage(ProjectConfigurationWizard.DEFAULT_STAGE);
+    }
+
+    public BuildStageConfiguration getStage(String stageName)
+    {
+        return getConfig().getStage(stageName);
+    }
+
     public DependencyConfiguration addDependency(ProjectConfigurationHelper project)
     {
         return addDependency(project.getConfig());
@@ -131,18 +141,26 @@ public abstract class ProjectConfigurationHelper
 
     public void addTrigger(TriggerConfiguration trigger)
     {
-        ProjectConfiguration project = getConfig();
-        if (!project.getExtensions().containsKey("triggers"))
-        {
-            project.getExtensions().put("triggers", new HashMap<String, Object>());
-        }
-        HashMap<String, Object> triggers = (HashMap<String, Object>) project.getExtensions().get("triggers");
-        triggers.put(trigger.getName(), trigger);
+        getTriggers().put(trigger.getName(), trigger);
+    }
+
+    public void clearTriggers()
+    {
+        getTriggers().clear();
     }
 
     public <V> V getTrigger(String name)
     {
-        Map<String, Configuration> triggers = (Map<String, Configuration>) config.getExtensions().get("triggers");
-        return (V) triggers.get(name);
+        return (V) getTriggers().get(name);
+    }
+
+    private Map<String, Object> getTriggers()
+    {
+        ProjectConfiguration project = getConfig();
+        if (!project.getExtensions().containsKey(MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS))
+        {
+            project.getExtensions().put(MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS, new HashMap<String, Object>());
+        }
+        return (HashMap<String, Object>) project.getExtensions().get(MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS);
     }
 }

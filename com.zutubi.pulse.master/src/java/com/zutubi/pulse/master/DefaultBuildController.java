@@ -272,8 +272,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
     {
-        ModuleDescriptorFactory f = new ModuleDescriptorFactory();
-        DefaultModuleDescriptor descriptor = f.createDescriptor(project);
+        DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createRetrieveDescriptor(project, buildResult);
         descriptor.setStatus(buildResult.getStatus());
         return descriptor;
     }

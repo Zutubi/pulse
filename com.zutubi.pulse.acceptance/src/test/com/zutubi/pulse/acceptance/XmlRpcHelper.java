@@ -20,6 +20,7 @@ import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfigurat
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
@@ -316,9 +317,9 @@ public class XmlRpcHelper
         return (Integer) call("getAgentCount");
     }
 
-    public Object getAgentStatus(String name) throws Exception
+    public Status getAgentStatus(String name) throws Exception
     {
-        return call("getAgentStatus", name);
+        return EnumUtils.fromPrettyString(Status.class, (String)call("getAgentStatus", name));
     }
 
     public Vector<String> getAllAgentNames() throws Exception
@@ -462,6 +463,43 @@ public class XmlRpcHelper
                 throw new RuntimeException("Timed out waiting for project '" + name + "' to init (state is '" + state + "')");
             }
         }
+    }
+
+    /**
+     * Wait for the named agents status to be IDLE.
+     *
+     * @param agentName name of the agent being monitored.
+     */
+    public void waitForAgentToBeIdle(final String agentName)
+    {
+        waitForAgentToBeIdle(agentName, BUILD_TIMEOUT);
+    }
+    
+    /**
+     * Wait for the named agents status to be IDLE.
+     *
+     * @param agentName name of the agent being monitored.
+     * @param timeout   timeout after which the method will return an exception if the agent is not yet IDLE.
+     *
+     * @throws RuntimeException on timeout.
+     */
+    public void waitForAgentToBeIdle(final String agentName, final long timeout)
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    return getAgentStatus(agentName) == Status.IDLE;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, timeout, "agent " + agentName + " to become IDLE.");
+
     }
 
     public String insertTrivialProject(String name, boolean template) throws Exception

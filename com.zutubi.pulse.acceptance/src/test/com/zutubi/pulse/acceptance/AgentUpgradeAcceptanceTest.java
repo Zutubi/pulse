@@ -107,21 +107,12 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
         masterXmlRpc.insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agentConfig, false);
 
-        long endTime = System.currentTimeMillis() + 5 * MINUTE;
         Thread.sleep(5 * SECOND);
 
-        while (System.currentTimeMillis() < endTime)
-        {
-            String status = (String) masterXmlRpc.getAgentStatus("upgrade-agent");
-            if ("idle".equals(status))
-            {
-                // success.
-                agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
-                assertFalse(200000000 == agentBuild);
-                return;
-            }
-        }
-        fail("Failed to upgrade agent.");
+        masterXmlRpc.waitForAgentToBeIdle("upgrade-agent", 5 * MINUTE);
+
+        agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
+        assertFalse(200000000 == agentBuild);
     }
 
     private void prepareMaster() throws Exception

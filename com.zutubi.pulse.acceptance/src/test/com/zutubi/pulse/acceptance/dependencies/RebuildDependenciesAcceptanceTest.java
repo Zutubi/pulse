@@ -288,4 +288,50 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // We would normally have to release projectBs' build.  However, it did not run,
         // because projectA failed. 
     }
+
+    public void testTransitentArtifactDeliveryForMetaBuild() throws Exception
+    {
+        // require 2 agents for concurrent builds of project A and project B.
+        xmlRpcHelper.ensureAgent("localhost");
+        // Ensure that the agent is online and available for the build.  Starting the
+        // build without the agent available will result in hung builds.
+        xmlRpcHelper.waitForAgentToBeIdle("localhost");
+
+        // project A -> project B -> project C
+        DepAntProject projectA = projects.createDepAntProject(projectName + "A");
+        projectA.addArtifacts("artifact.jar");
+        projectA.addFilesToCreate("build/artifact.jar");
+        projectA.clearTriggers();                   // do not want dependency trigger firing.
+        projectA.getDefaultStage().setAgent(null);  // allow project A to run on any agent.
+        insertProject(projectA);
+
+        WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        projectB.addDependency(projectA);
+        projectB.clearTriggers();                   // do not want dependency trigger firing.
+        insertProject(projectB);
+
+        DepAntProject projectC = projects.createDepAntProject(projectName + "C");
+        projectC.addDependency(projectB);
+         // ensure we see the revision of the artifact being delivered
+        projectC.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
+        projectC.clearTriggers();                   // do not want dependency trigger firing.
+        projectC.addExpectedFiles("lib/artifact-1.jar");
+        projectC.addNotExpectedFiles("lib/artifact-2.jar");
+        insertProject(projectC);
+
+        buildRunner.triggerRebuild(projectC);
+
+        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
+        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+
+        buildRunner.triggerSuccessfulBuild(projectA);
+
+        projectB.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
+
+        // ensure that project C uses project A buid 1 artifacts.
+        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectC, 1));
+    }
+
 }

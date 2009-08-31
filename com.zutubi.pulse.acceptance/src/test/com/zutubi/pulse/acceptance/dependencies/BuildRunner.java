@@ -34,6 +34,20 @@ public class BuildRunner
      * @param project   the project for which a build is being triggered.
      * @param options   the trigger options
      * @return  the build number
+     *
+     * @throws Exception on error or if the build was not successful.
+     */
+    public int triggerSuccessfulBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    {
+        return triggerSuccessfulBuild(project.getConfig(), options);
+    }
+
+    /**
+     * Trigger a build for the specified project and asserting that it is successful.
+     *
+     * @param project   the project for which a build is being triggered.
+     * @param options   the trigger options
+     * @return  the build number
      * 
      * @throws Exception on error or if the build was not successful.
      */
@@ -91,6 +105,11 @@ public class BuildRunner
         int number = xmlRpcHelper.getNextBuildNumber(project.getName());
         xmlRpcHelper.call("triggerBuild", project.getName(), triggerOptions);
         return number;
+    }
+
+    public int triggerRebuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    {
+        return triggerRebuild(project.getConfig(), options);
     }
 
     /**

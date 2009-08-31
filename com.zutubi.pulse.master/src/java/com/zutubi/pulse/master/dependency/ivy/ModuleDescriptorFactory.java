@@ -6,17 +6,14 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId.EXTRA_ATTRIBUTE_STAGE;
-import static com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId.EXTRA_ATTRIBUTE_SOURCE_FILE;
-import static com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId.newInstance;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import static com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId.*;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -28,13 +25,13 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.MDArtifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * This factory creates an ivy module descriptor from the configuration contained by the
@@ -43,7 +40,6 @@ import java.io.IOException;
 public class ModuleDescriptorFactory
 {
     public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
-    private static final String DUMMY_NAME = "configname";
 
     /**
      * Create a descriptor based on the specified configuration.
@@ -51,20 +47,26 @@ public class ModuleDescriptorFactory
      * @param project the configuration on which to base the descriptor
      * @return the created descriptor.
      */
-    public DefaultModuleDescriptor createDescriptor(ProjectConfiguration project)
+    public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project)
     {
         return createRetrieveDescriptor(project, null);
+    }
+    
+    public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, BuildResult result)
+    {
+        return createRetrieveDescriptor(project, result, null);
     }
 
     /**
      * Create an ivy descriptor based on the specified configuration, that can be used for
      * the dependency retrieval process.
      *
-     * @param project  the configuration on which to base the descriptor.
-     * @param revision the revision of the descriptor
+     * @param project   the configuration on which to base the descriptor.
+     * @param result    the build result for the current build
+     * @param revision  the revision of the descriptor
      * @return the created descriptor.
      */
-    public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, String revision)
+    public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, BuildResult result, String revision)
     {
         ModuleRevisionId mrid = newInstance(project, revision);
 
@@ -77,7 +79,8 @@ public class ModuleDescriptorFactory
 
         for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
         {
-            ModuleRevisionId dependencyMrid = newInstance(dependency);
+            ModuleRevisionId dependencyMrid = getDependencyMRID(result, dependency);
+            
             DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
 
             String stages = DependencyConfiguration.ALL_STAGES;
@@ -98,6 +101,22 @@ public class ModuleDescriptorFactory
         }
 
         return descriptor;
+    }
+
+    private ModuleRevisionId getDependencyMRID(BuildResult result, DependencyConfiguration dependency)
+    {
+        ProjectConfiguration dependsOnProject = dependency.getProject();
+        BuildResult dependsOnResult = (result != null) ? result.getDependsOn(dependsOnProject.getName()) : null;
+        ModuleRevisionId dependencyMrid;
+        if (dependsOnResult != null)
+        {
+            dependencyMrid = newInstance(dependsOnProject, dependsOnResult.getVersion());
+        }
+        else
+        {
+            dependencyMrid = newInstance(dependency);
+        }
+        return dependencyMrid;
     }
 
     /**
@@ -124,7 +143,8 @@ public class ModuleDescriptorFactory
 
         for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
         {
-            ModuleRevisionId dependencyMrid = newInstance(dependency);
+            ModuleRevisionId dependencyMrid = getDependencyMRID(result, dependency);
+
             DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
 
             String stages = DependencyConfiguration.ALL_STAGES;
@@ -250,33 +270,5 @@ public class ModuleDescriptorFactory
             result.warning("Artifact pattern " + artifact.getArtifactPattern() + " does not match artifact file " + artifactFile.getName() + ". Skipping.");
             return false;
         }
-    }
-
-    /**
-     * Create a descriptor suitable for publishing a single file to the artifact repository.
-     *
-     * @param mrid                  the module revision id identifying the module to which the file will be published
-     * @param stage                 the name of the stage that generated this artifact
-     * @param artifactName          the name of the published artifact
-     * @param artifactExtension     the type of the published artifact
-     *
-     * @return a descriptor suitable for publishing a file to the artifact repository.
-     */
-    public DefaultModuleDescriptor createPublishDescriptor(ModuleRevisionId mrid, String stage, String artifactName, String artifactExtension, File sourceFile) throws IOException
-    {
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, "integration", null);
-        descriptor.addConfiguration(new Configuration(IvyClient.CONFIGURATION_BUILD));
-        descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
-
-        descriptor.addConfiguration(new Configuration(DUMMY_NAME));
-
-        Map<String, String> extraAttributes = new HashMap<String, String>();
-        extraAttributes.put(NAMESPACE_EXTRA_ATTRIBUTES + ":stage", IvyUtils.ivyEncodeStageName(stage));
-        extraAttributes.put(NAMESPACE_EXTRA_ATTRIBUTES + ":sourcefile", sourceFile.getCanonicalPath());
-        MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactExtension, artifactExtension, null, extraAttributes);
-        ivyArtifact.addConfiguration(DUMMY_NAME);
-        descriptor.addArtifact(DUMMY_NAME, ivyArtifact);
-
-        return descriptor;
     }
 }

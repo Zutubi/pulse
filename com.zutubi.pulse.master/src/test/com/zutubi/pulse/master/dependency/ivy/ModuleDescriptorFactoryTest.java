@@ -26,7 +26,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
     {
         ProjectConfiguration project = newProject("organisation", "project");
 
-        ModuleDescriptor descriptor = factory.createDescriptor(project);
+        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
         assertEquals(1, descriptor.getConfigurationsNames().length);
         assertEquals(0, descriptor.getAllArtifacts().length);
         assertEquals(0, descriptor.getDependencies().length);
@@ -58,7 +58,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         ProjectConfiguration project = newProject("", "project");
         project.getDependencies().getDependencies().add(dependency);
 
-        ModuleDescriptor descriptor = factory.createDescriptor(project);
+        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
         assertEquals(1, descriptor.getDependencies().length);
         DependencyDescriptor dependencyDescriptor = descriptor.getDependencies()[0];
         assertEquals(MasterIvyModuleRevisionId.newInstance(dependency), dependencyDescriptor.getDependencyRevisionId());
@@ -68,11 +68,11 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
     {
         ProjectConfiguration project = newProject("", "project");
 
-        ModuleDescriptor descriptor = factory.createDescriptor(project);
+        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
         assertEquals(IvyManager.STATUS_INTEGRATION, descriptor.getStatus());
 
         project.getDependencies().setStatus(IvyManager.STATUS_MILESTONE);
-        descriptor = factory.createDescriptor(project);
+        descriptor = factory.createRetrieveDescriptor(project);
         assertEquals(IvyManager.STATUS_MILESTONE, descriptor.getStatus());
     }
 }
