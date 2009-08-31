@@ -1,0 +1,148 @@
+package com.zutubi.pulse.acceptance.dependencies;
+
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.tove.config.api.Configuration;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * The project configuration helper is the base class for the various types
+ * of projects used by the acceptance tests. It provides a suite of utility
+ * methods that simplify the common project configuration tasks.
+ */
+public abstract class ProjectConfigurationHelper
+{
+    private ProjectConfiguration config;
+
+    public ProjectConfigurationHelper(ProjectConfiguration config)
+    {
+        this.config = config;
+    }
+
+    public String getName()
+    {
+        return config.getName();
+    }
+
+    /**
+     * Add a set of artifacts to this projects default recipe.
+     *
+     * @param filenames an array of file paths relative to the project builds base directory.
+     *
+     * @return  the list of artifact configuration instances that can be further customised.
+     */
+    public List<FileArtifactConfiguration> addArtifacts(String... filenames)
+    {
+        RecipeConfigurationHelper helper = getRecipe("default");
+        return helper.addArtifacts(filenames);
+    }
+
+    /**
+     * Get the raw project configuration instance that this configuration helper is working with.
+     *
+     * @return the project configuration instance being updated by this configuration helper.
+     */
+    public ProjectConfiguration getConfig()
+    {
+        return config;
+    }
+
+    protected ResourcePropertyConfiguration addStageProperty(BuildStageConfiguration stage, String key, String value)
+    {
+        ResourcePropertyConfiguration property = new ResourcePropertyConfiguration();
+        property.setName(key);
+        property.setValue(value);
+        stage.getProperties().put(property.getName(), property);
+        
+        return property;
+    }
+
+    /**
+     * Add a new stage with the specified name to the project.
+     *
+     * @param stageName the name of the new stage.
+     *
+     * @return  the new stage configuration instance that can be further customised.
+     */
+    public BuildStageConfiguration addStage(String stageName)
+    {
+        BuildStageConfiguration stage = new BuildStageConfiguration(stageName);
+        getConfig().getStages().put(stage.getName(), stage);
+        return stage;
+    }
+
+    public DependencyConfiguration addDependency(ProjectConfigurationHelper project)
+    {
+        return addDependency(project.getConfig());
+    }
+    
+    public DependencyConfiguration addDependency(ProjectConfiguration project)
+    {
+        DependencyConfiguration dependency = new DependencyConfiguration();
+        dependency.setProject(project);
+        getConfig().getDependencies().getDependencies().add(dependency);
+        return dependency;
+    }
+
+    public RecipeConfigurationHelper addRecipe(String recipeName)
+    {
+        MultiRecipeTypeConfiguration type = (MultiRecipeTypeConfiguration) config.getType();
+
+        RecipeConfiguration recipe = new RecipeConfiguration(recipeName);
+        type.addRecipe(recipe);
+
+        recipe.addCommand(createDefaultCommand());
+
+        return new RecipeConfigurationHelper(recipe);
+    }
+
+    public CommandConfiguration createDefaultCommand()
+    {
+        // might be better to put this in a 'addCommand' type method?
+        AntCommandConfiguration command = new AntCommandConfiguration();
+        command.setBuildFile("build.xml");
+        command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
+        return command;
+    }
+
+    public abstract ScmConfiguration createDefaultScm();
+
+    public RecipeConfigurationHelper getRecipe(String recipeName)
+    {
+        MultiRecipeTypeConfiguration type = (MultiRecipeTypeConfiguration) config.getType();
+        Map<String, RecipeConfiguration> recipies = type.getRecipes();
+        RecipeConfiguration recipe = recipies.get(recipeName);
+
+        return new RecipeConfigurationHelper(recipe);
+    }
+
+    public void addTrigger(TriggerConfiguration trigger)
+    {
+        ProjectConfiguration project = getConfig();
+        if (!project.getExtensions().containsKey("triggers"))
+        {
+            project.getExtensions().put("triggers", new HashMap<String, Object>());
+        }
+        HashMap<String, Object> triggers = (HashMap<String, Object>) project.getExtensions().get("triggers");
+        triggers.put(trigger.getName(), trigger);
+    }
+
+    public <V> V getTrigger(String name)
+    {
+        Map<String, Configuration> triggers = (Map<String, Configuration>) config.getExtensions().get("triggers");
+        return (V) triggers.get(name);
+    }
+}

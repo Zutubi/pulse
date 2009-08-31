@@ -19,6 +19,7 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
@@ -177,6 +178,11 @@ public class XmlRpcHelper
     public String getConfigHandle(String path) throws Exception
     {
         return call("getConfigHandle", path);
+    }
+
+    public String getConfigPath(String handle) throws Exception
+    {
+        return call("getConfigPath", handle);
     }
 
     public boolean isConfigPermanent(String path) throws Exception
@@ -385,7 +391,7 @@ public class XmlRpcHelper
         }
         project.put("stages", stages);
 
-        String path = call("insertTemplatedConfig", "projects/" + parent, project, template);
+        String path = insertTemplatedConfig("projects/" + parent, project, template);
         if (!template)
         {
             waitForProjectToInitialise(name);
@@ -468,7 +474,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> project = createEmptyConfig("zutubi.projectConfig");
         project.put("name", name);
 
-        return call("insertTemplatedConfig", "projects/" + parent, project, template);
+        return insertTemplatedConfig("projects/" + parent, project, template);
     }
 
     public boolean ensureProject(String name) throws Exception
@@ -585,7 +591,7 @@ public class XmlRpcHelper
         agent.put("host", host);
         agent.put("port", 8890);
 
-        return call("insertTemplatedConfig", "agents/global agent template", agent, false);
+        return insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
     }
 
     public String ensureAgent(String name) throws Exception

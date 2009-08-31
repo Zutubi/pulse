@@ -13,6 +13,10 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private SeleniumBrowser browser;
     private Repository repository;
+    private String randomName;
+    private BuildRunner buildRunner;
+    private ConfigurationHelper configurationHelper;
+    private ProjectConfigurations projects;
 
     protected void setUp() throws Exception
     {
@@ -20,11 +24,20 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         loginAsAdmin();
 
+        randomName = randomName();
+
         repository = new Repository();
         repository.clear();
 
         browser = new SeleniumBrowser();
         browser.start();
+
+        buildRunner = new BuildRunner(xmlRpcHelper);
+        configurationHelper = new ConfigurationHelper();
+        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
+        configurationHelper.init();
+
+        projects = new ProjectConfigurations(configurationHelper);
     }
 
     @Override
@@ -37,29 +50,35 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super.tearDown();
     }
 
+    private void insertProject(ProjectConfigurationHelper project) throws Exception
+    {
+        configurationHelper.insertProject(project.getConfig());
+    }
+
     public void testBuildSummaryReport() throws Exception
     {
         browser.loginAsAdmin();
 
-        String randomName = randomName();
-        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName + "A");
-        projectA.addArtifact("artifactA.jar");
-        projectA.createProject();
-        long projectABuildNumber = projectA.triggerSuccessfulBuild();
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addArtifacts("artifactA.jar");
+        projectA.addFilesToCreate("build/artifactA.jar");
+        insertProject(projectA);
+        long projectABuildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, projectA.getName(), projectABuildNumber);
         assertFalse(summaryPage.hasDependencies());
 
-        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName + "B");
-        projectB.addArtifact("artifactB.jar");
-        projectB.createProject();
-        long projectBBuildNumber = projectB.triggerSuccessfulBuild();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addArtifacts("artifactB.jar");
+        projectB.addFilesToCreate("build/artifactB.jar");
+        insertProject(projectB);
+        long projectBBuildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        ProjectHelper dependentProject = new DepAntProjectHelper(xmlRpcHelper, randomName + "C");
+        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C");
         dependentProject.addDependency(projectA);
         dependentProject.addDependency(projectB);
-        dependentProject.createProject();
-        long buildNumber = dependentProject.triggerSuccessfulBuild();
+        insertProject(dependentProject);
+        long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
         summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
         assertTrue(summaryPage.hasDependencies());
@@ -83,16 +102,16 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         browser.loginAsAdmin();
 
-        String randomName = randomName();
-        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName + "A");
-        projectA.addArtifact("artifactA.jar");
-        projectA.createProject();
-        projectA.triggerSuccessfulBuild();
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addArtifacts("artifactA.jar");
+        projectA.addFilesToCreate("build/artifactA.jar");
+        insertProject(projectA);
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        ProjectHelper dependentProject = new DepAntProjectHelper(xmlRpcHelper, randomName + "C");
+        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C");
         dependentProject.addDependency(projectA);
-        dependentProject.createProject();
-        long buildNumber = dependentProject.triggerSuccessfulBuild();
+        insertProject(dependentProject);
+        long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
         browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
         assertTrue(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
@@ -106,17 +125,16 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testProjectDependenciesTab() throws Exception
     {
-        String randomName = randomName();
-        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName + "A");
-        projectA.createProject();
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        insertProject(projectA);
 
-        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName + "B");
-        projectB.addDependency(new DependencyHelper(projectA, true));
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA).setTransitive(true);
+        insertProject(projectB);
 
-        ProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName + "C");
+        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
         projectC.addDependency(projectB);
-        projectC.createProject();
+        insertProject(projectC);
 
         browser.loginAsAdmin();
         ProjectDependenciesPage page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectB.getName());

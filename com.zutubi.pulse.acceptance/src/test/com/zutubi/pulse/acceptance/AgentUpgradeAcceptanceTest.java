@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.SupportUtils;
 import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.util.Constants.MINUTE;
 import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
@@ -104,7 +105,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         XmlRpcHelper masterXmlRpc = new XmlRpcHelper(masterUrl);
         masterXmlRpc.loginAsAdmin();
 
-        masterXmlRpc.insertTemplatedConfig("agents/global agent template", agentConfig, false);
+        masterXmlRpc.insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agentConfig, false);
 
         long endTime = System.currentTimeMillis() + 5 * MINUTE;
         Thread.sleep(5 * SECOND);

@@ -1,19 +1,24 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.SystemUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
-import java.util.List;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private Repository repository;
+    private String randomName;
+    private BuildRunner buildRunner;
+    private ProjectConfigurations projects;
+    private ConfigurationHelper configurationHelper;
 
     protected void setUp() throws Exception
     {
@@ -23,6 +28,15 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         repository = new Repository();
         repository.clear();
+
+        randomName = randomName();
+
+        buildRunner = new BuildRunner(xmlRpcHelper);
+        configurationHelper = new ConfigurationHelper();
+        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
+        configurationHelper.init();
+
+        projects = new ProjectConfigurations(configurationHelper);
     }
 
     @Override
@@ -33,91 +47,90 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super.tearDown();
     }
 
+    private void insertProject(ProjectConfigurationHelper project) throws Exception
+    {
+        configurationHelper.insertProject(project.getConfig());
+    }
+
     public void testPublish_NoArtifacts() throws Exception
     {
         // configure project.
-        ProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        project.createProject();
+        DepAntProject project = projects.createDepAntProject(randomName);
+        insertProject(project);
 
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
-        // verify existance of expected artifacts.
         assertIvyInRepository(project, buildNumber);
     }
 
     public void testPublish_SingleArtifact() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        ArtifactHelper artifact = project.getDefaultRecipe().addArtifact("artifact.jar");
-        project.createProject();
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.addArtifacts("artifact.jar");
+        project.addFilesToCreate("build/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
-        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+        assertArtifactInRepository(project, "default", buildNumber, "artifact", "jar");
     }
 
     public void testPublish_MultipleArtifacts() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        List<ArtifactHelper> artifacts = project.addArtifacts("artifact.jar", "another-artifact.jar");
-        project.createProject();
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.addArtifacts("artifact.jar", "another-artifact.jar");
+        project.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-        project.addFileToCreate("build/another-artifact.jar");
-
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
-        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifacts.get(0));
-        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifacts.get(1));
+        assertArtifactInRepository(project, "default", buildNumber, "artifact", "jar");
+        assertArtifactInRepository(project, "default", buildNumber, "another-artifact", "jar");
     }
 
     public void testPublish_MultipleStages() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        ArtifactHelper artifact = project.addArtifact("artifact.jar");
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.addArtifacts("artifact.jar");
         project.addStage("stage");
-        project.createProject();
+        project.addFilesToCreate("build/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         assertIvyInRepository(project, buildNumber);
-        assertArtifactInRepository(project, project.getStage("default"), buildNumber, artifact);
-        assertArtifactInRepository(project, project.getStage("stage"), buildNumber, artifact);
+        assertArtifactInRepository(project, "default", buildNumber, "artifact", "jar");
+        assertArtifactInRepository(project, "stage", buildNumber, "artifact", "jar");
     }
 
     public void testPublishFails_MissingArtifacts() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        ArtifactHelper artifact = project.addArtifact("artifact.jar");
-        project.createProject();
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.addArtifacts("artifact.jar");
+        project.addFilesToCreate("incorrect/path/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("incorrect/path/artifact.jar");
-
-        int buildNumber = project.triggerCompleteBuild();
-        assertEquals(ResultState.ERROR, getBuildStatus(project.getName(), buildNumber));
+        int buildNumber = buildRunner.triggerCompleteBuild(project.getConfig());
+        assertEquals(ResultState.ERROR, buildRunner.getBuildStatus(project.getConfig(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(project, buildNumber);
-        assertArtifactNotInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+        assertArtifactNotInRepository(project, "default", buildNumber, "artifact", "jar");
     }
 
     public void testPublish_StatusConfiguration() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        project.setStatus(STATUS_RELEASE);
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.getConfig().getDependencies().setStatus(STATUS_RELEASE);
         project.addArtifacts("artifact.jar");
-        project.createProject();
+        project.addFilesToCreate("build/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -126,13 +139,12 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testPublish_DefaultStatus() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject project = projects.createDepAntProject(randomName);
         project.addArtifacts("artifact.jar");
-        project.createProject();
+        project.addFilesToCreate("build/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         assertIvyStatus(STATUS_INTEGRATION, project, buildNumber);
     }
@@ -141,10 +153,10 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         try
         {
-            DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-            project.setStatus("invalid");
+            DepAntProject project = projects.createDepAntProject(randomName);
+            project.getConfig().getDependencies().setStatus("invalid");
             project.addArtifacts("artifact.jar");
-            project.createProject();
+            insertProject(project);
         }
         catch (Exception e)
         {
@@ -154,13 +166,12 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRemoteTriggerWithCustomStatus() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject project = projects.createDepAntProject(randomName);
         project.addArtifacts("artifact.jar");
-        project.createProject();
+        project.addFilesToCreate("build/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = project.triggerSuccessfulBuild(CollectionUtils.asPair("status", (Object)STATUS_MILESTONE));
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig(), CollectionUtils.asPair("status", (Object)STATUS_MILESTONE));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -169,40 +180,38 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRetrieve_SingleArtifact() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("artifact.jar");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/artifact.jar");
+        insertProject(projectA);
 
-        projectA.addFileToCreate("build/artifact.jar");
-        projectA.triggerSuccessfulBuild();
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(projectA);
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/artifact.jar");
+        insertProject(projectB);
 
-        projectB.addExpectedFile("lib/artifact.jar");
-
-        int buildNumber = projectB.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
         assertIvyInRepository(projectB, buildNumber);
     }
 
     public void testRetrieve_MultipleArtifacts() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("artifact.jar", "another-artifact.jar");
-        projectA.createProject();
-
         projectA.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
-        projectA.triggerSuccessfulBuild();
+        insertProject(projectA);
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(projectA);
-        projectB.createProject();
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar", "lib/another-artifact.jar");
+        insertProject(projectB);
 
-        int buildNumber = projectB.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
         assertIvyInRepository(projectB, buildNumber);
     }
@@ -210,147 +219,140 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_SpecificStage() throws Exception
     {
         // need different recipies that produce different artifacts.
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        ArtifactHelper recipeAArtifact = project.addRecipe("recipeA").addArtifact("artifactA.jar");
-        ArtifactHelper recipeBArtifact = project.addRecipe("recipeB").addArtifact("artifactB.jar");
-        StageHelper stageA = project.addStage("A");
-        stageA.setRecipe(project.getRecipe("recipeA"));
-        StageHelper stageB = project.addStage("B");
-        stageB.setRecipe(project.getRecipe("recipeB"));
-        project.createProject();
-
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.addRecipe("recipeA").addArtifacts("artifactA.jar");
+        project.addRecipe("recipeB").addArtifacts("artifactB.jar");
+        project.addStage("A").setRecipe("recipeA");
+        project.addStage("B").setRecipe("recipeB");
         project.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
-        int buildNumber = project.triggerSuccessfulBuild();
+        insertProject(project);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         assertIvyInRepository(project, buildNumber);
-        assertArtifactInRepository(project, stageA, buildNumber, recipeAArtifact);
-        assertArtifactNotInRepository(project, stageB, buildNumber, recipeAArtifact);
+        assertArtifactInRepository(project, "A", buildNumber, "artifactA", "jar");
+        assertArtifactNotInRepository(project, "B", buildNumber, "artifactA", "jar");
 
-        assertArtifactInRepository(project, stageB, buildNumber, recipeBArtifact);
-        assertArtifactNotInRepository(project, stageA, buildNumber, recipeBArtifact);
+        assertArtifactInRepository(project, "B", buildNumber, "artifactB", "jar");
+        assertArtifactNotInRepository(project, "A", buildNumber, "artifactB", "jar");
     }
 
     public void testRetrieve_SpeicificRevision() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("default-artifact.jar");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/default-artifact.jar");
+        insertProject(projectA);
 
-        projectA.addFileToCreate("build/default-artifact.jar");
-        
         // build twice and then depend on the first.
-        int buildNumber = projectA.triggerSuccessfulBuild();
-        projectA.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.setRetrievalPattern("lib/[artifact]-[revision].[ext]");
-        projectB.addDependency(new DependencyHelper(projectA, true, "default", "" + buildNumber));
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
+
+        DependencyConfiguration dependencyConfig = projectB.addDependency(projectA.getConfig());
+        dependencyConfig.setRevision(DependencyConfiguration.REVISION_CUSTOM);
+        dependencyConfig.setTransitive(true);
+        dependencyConfig.setCustomRevision(String.valueOf(buildNumber));
 
         projectB.addExpectedFiles("lib/default-artifact-" + buildNumber + ".jar");
-        projectB.triggerSuccessfulBuild();
+        insertProject(projectB);
+
+        buildRunner.triggerSuccessfulBuild(projectB.getConfig());
     }
 
     public void testRetrieve_MultipleProjects() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("projectA-artifact.jar");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/projectA-artifact.jar");
+        insertProject(projectA);
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        projectA.addFileToCreate("build/projectA-artifact.jar");
-        projectA.triggerSuccessfulBuild();
-
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addArtifacts("projectB-artifact.jar");
-        projectB.createProject();
+        projectB.addFilesToCreate("build/projectB-artifact.jar");
+        insertProject(projectB);
+        buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        projectB.addFileToCreate("build/projectB-artifact.jar");
-        projectB.triggerSuccessfulBuild();
+        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        projectC.addDependency(projectA.getConfig());
+        projectC.addDependency(projectB.getConfig());
+        projectC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
+        insertProject(projectC);
 
-        DepAntProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectC.addDependency(projectA);
-        projectC.addDependency(projectB);
-        projectC.createProject();
-
-        projectB.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
-
-        int buildNumber = projectC.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectC.getConfig());
         assertIvyInRepository(projectC, buildNumber);
     }
 
     public void testRetrieve_TransitiveDependencies() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("projectA-artifact.jar");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/projectA-artifact.jar");
+        insertProject(projectA);
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        projectA.addFileToCreate("build/projectA-artifact.jar");
-        projectA.triggerSuccessfulBuild();
-
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addArtifacts("projectB-artifact.jar");
-        projectB.addDependency(new DependencyHelper(projectA, true));
-        projectB.createProject();
+        projectB.addDependency(projectA.getConfig()).setTransitive(true);
+        projectB.addFilesToCreate("build/projectB-artifact.jar");
+        projectB.addExpectedFiles("lib/projectA-artifact.jar");
+        insertProject(projectB);
+        buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        projectB.addFileToCreate("build/projectB-artifact.jar");
-        projectB.addExpectedFile("lib/projectA-artifact.jar");
-        projectB.triggerSuccessfulBuild();
-
-        DepAntProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectC.addDependency(projectB);
-        projectC.createProject();
-
+        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        projectC.addDependency(projectB.getConfig());
         projectC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
+        insertProject(projectC);
 
-        int buildNumber = projectC.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectC.getConfig());
         assertIvyInRepository(projectC, buildNumber);
     }
 
     public void testRetrieve_TransitiveDependenciesDisabled() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("projectA-artifact.jar");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/projectA-artifact.jar");
+        insertProject(projectA);
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        projectA.addFileToCreate("build/projectA-artifact.jar");
-        projectA.triggerSuccessfulBuild();
-
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addArtifacts("projectB-artifact.jar");
-        projectB.addDependency(projectA);
-        projectB.createProject();
+        projectB.addDependency(projectA.getConfig());
+        projectB.addFilesToCreate("build/projectB-artifact.jar");
+        projectB.addExpectedFiles("lib/projectA-artifact.jar");
+        insertProject(projectB);
 
-        projectB.addFileToCreate("build/projectB-artifact.jar");
-        projectB.addExpectedFile("lib/projectA-artifact.jar");
-        projectB.triggerSuccessfulBuild();
+        buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        DepAntProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectC.addDependency(new DependencyHelper(projectB, false));
-        projectC.createProject();
-
+        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        projectC.addDependency(projectB.getConfig()).setTransitive(false);
         projectC.addExpectedFiles("lib/projectB-artifact.jar");
-        projectC.addNotExpectedFile("lib/projectA-artifact.jar");
+        projectC.addNotExpectedFiles("lib/projectA-artifact.jar");
+        insertProject(projectC);
 
-        int buildNumber = projectC.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectC.getConfig());
         assertIvyInRepository(projectC, buildNumber);
     }
 
     public void testRetrieveFails_MissingDependencies() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("artifact.jar");
-        projectA.createProject();
+        insertProject(projectA);
 
         // do not build projectA simulating dependency not available.
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(projectA);
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/artifact.jar");
+        insertProject(projectB);
 
-        projectB.addExpectedFile("lib/artifact.jar");
-
-        int buildNumber = projectB.triggerCompleteBuild();
-        assertEquals(ResultState.FAILURE, getBuildStatus(projectB.getName(), buildNumber));
+        int buildNumber = buildRunner.triggerCompleteBuild(projectB.getConfig());
+        assertEquals(ResultState.FAILURE, getBuildStatus(projectB.getConfig().getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(projectB, buildNumber);
@@ -358,37 +360,40 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("artifact.jar");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/artifact.jar");
+        insertProject(projectA);
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(projectA);
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        insertProject(projectB);
 
-        projectA.addFileToCreate("build/artifact.jar");
-        projectA.triggerSuccessfulBuild();
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
     }
 
     public void testDependentBuild_PropagateStatus() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("artifact.jar");
-        projectA.setStatus(STATUS_RELEASE);
-        projectA.createProject();
+        projectA.getConfig().getDependencies().setStatus(STATUS_RELEASE);
+        projectA.addFilesToCreate("build/artifact.jar");
+        insertProject(projectA);
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(projectA);
-        projectB.setStatus(STATUS_INTEGRATION);
-        projectB.setPropagateStatus(true);
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.getConfig().getDependencies().setStatus(STATUS_INTEGRATION);
+        
+        DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
+        trigger.setPropagateStatus(true);
 
-        projectA.addFileToCreate("build/artifact.jar");
-        projectA.triggerSuccessfulBuild();
+        insertProject(projectB);
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
 
         assertIvyStatus(STATUS_RELEASE, projectB, 1);
         assertIvyRevision("1", projectB, "1");
@@ -396,20 +401,22 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDependentBuild_PropagateVersion() throws Exception
     {
-        DepAntProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("artifact.jar");
-        projectA.setVersion("FIXED");
-        projectA.createProject();
+        projectA.addFilesToCreate("build/artifact.jar");
+        projectA.getConfig().getDependencies().setVersion("FIXED");
+        insertProject(projectA);
 
-        DepAntProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(projectA);
-        projectB.setPropagateVersion(true);
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
 
-        projectA.addFileToCreate("build/artifact.jar");
-        projectA.triggerSuccessfulBuild();
+        DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
+        trigger.setPropagateVersion(true);
+        insertProject(projectB);
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
 
         assertIvyInRepository(projectB, "FIXED");
         assertIvyRevision("FIXED", projectB, "FIXED");
@@ -417,32 +424,27 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName(), "org");
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.getConfig().setOrganisation("org");
         project.addArtifacts("artifact.jar");
-        project.createProject();
+        project.addFilesToCreate("build/artifact.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = project.triggerSuccessfulBuild();
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
         assertIvyInRepository(project, buildNumber);
     }
 
     public void testArtifactPattern() throws Exception
     {
-        DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        ArtifactHelper artifact = project.addArtifact("artifact-12345.jar");
-        artifact.setArtifactPattern("(.+)-[0-9]+\\.(.+)");
-        project.createProject();
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.addArtifacts("artifact-12345.jar").get(0).setArtifactPattern("(.+)-[0-9]+\\.(.+)");
+        project.addFilesToCreate("build/artifact-12345.jar");
+        insertProject(project);
 
-        project.addFileToCreate("build/artifact-12345.jar");
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
-        int buildNumber = project.triggerSuccessfulBuild();
-
-        // update the artifact details because the '-12345' should be filtered out by the artifact pattern.
-        artifact.setName("artifact");
-        artifact.setExtension("jar");
-        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+        assertArtifactInRepository(project, "default", buildNumber, "artifact", "jar");
     }
 
     public void testUnusualCharactersInArtifactName() throws Exception
@@ -463,59 +465,60 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         for (char c : testCharacters.toCharArray())
         {
-            DepAntProjectHelper project = new DepAntProjectHelper(xmlRpcHelper, randomName());
-            ArtifactHelper artifact = project.addArtifact("artifact-" + c + ".jar");
-            project.createProject();
+            DepAntProject project = projects.createDepAntProject(randomName());
+            project.addArtifacts("artifact-" + c + ".jar");
 
             // The ant script on unix evals its arguments, so we need to escape
             // these characters lest the shell choke on them.
             String resolvedChar = SystemUtils.IS_WINDOWS ? Character.toString(c) : "\\" + c;
-            project.addFileToCreate("build/artifact-" + resolvedChar + ".jar");
+            project.addFilesToCreate("build/artifact-" + resolvedChar + ".jar");
 
-            int buildNumber = project.triggerCompleteBuild();
-            assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getName(), buildNumber));
+            insertProject(project);
+
+            int buildNumber = buildRunner.triggerCompleteBuild(project.getConfig());
+            assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getConfig().getName(), buildNumber));
 
             if (expected == ResultState.SUCCESS)
             {
                 assertIvyInRepository(project, buildNumber);
-                assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+                assertArtifactInRepository(project, "default", buildNumber, "artifact-" + c, "jar");
             }
             else
             {
                 assertIvyNotInRepository(project, buildNumber);
-                assertArtifactNotInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+                assertArtifactNotInRepository(project, "default", buildNumber, "artifact-" + c, "jar");
             }
         }
     }
 
-    private void assertIvyStatus(String expectedStatus, ProjectHelper project, int buildNumber) throws IOException
+    private void assertIvyStatus(String expectedStatus, ProjectConfigurationHelper project, int buildNumber) throws IOException
     {
-        assertEquals(expectedStatus, repository.getIvyFile(project.getOrg(), project.getName(), buildNumber).getStatus());
+        assertEquals(expectedStatus, repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), buildNumber).getStatus());
     }
 
-    private void assertIvyRevision(String expectedRevision, ProjectHelper project, String version) throws IOException
+    private void assertIvyRevision(String expectedRevision, ProjectConfigurationHelper project, String version) throws IOException
     {
-        assertEquals(expectedRevision, repository.getIvyFile(project.getOrg(), project.getName(), version).getRevision());
+        assertEquals(expectedRevision, repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), version).getRevision());
     }
 
-    private void assertIvyInRepository(ProjectHelper project, Object revision) throws IOException
+    private void assertIvyInRepository(ProjectConfigurationHelper project, Object revision) throws IOException
     {
-        assertInRepository(repository.getIvyFile(project.getOrg(), project.getName(), revision).getPath());
+        assertInRepository(repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
     }
 
-    private void assertIvyNotInRepository(ProjectHelper project, Object revision) throws IOException
+    private void assertIvyNotInRepository(ProjectConfigurationHelper project, Object revision) throws IOException
     {
-        assertNotInRepository(repository.getIvyFile(project.getOrg(), project.getName(), revision).getPath());
+        assertNotInRepository(repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
     }
 
-    private void assertArtifactInRepository(ProjectHelper project, StageHelper stage, Object revision, ArtifactHelper artifact) throws IOException
+    private void assertArtifactInRepository(ProjectConfigurationHelper project, String stageName, Object revision, String artifactName, String artifactExtension) throws IOException
     {
-        assertInRepository(repository.getArtifactFile(project.getOrg(), project.getName(), stage.getName(), revision, artifact.getName(), artifact.getExtension()).getPath());
+        assertInRepository(repository.getArtifactFile(project.getConfig().getOrganisation(), project.getConfig().getName(), stageName, revision, artifactName, artifactExtension).getPath());
     }
 
-    private void assertArtifactNotInRepository(ProjectHelper project, StageHelper stage, Object revision, ArtifactHelper artifact) throws IOException
+    private void assertArtifactNotInRepository(ProjectConfigurationHelper project, String stageName, Object revision, String artifactName, String artifactExtension) throws IOException
     {
-        assertNotInRepository(repository.getArtifactFile(project.getOrg(), project.getName(), stage.getName(), revision, artifact.getName(), artifact.getExtension()).getPath());
+        assertNotInRepository(repository.getArtifactFile(project.getConfig().getOrganisation(), project.getConfig().getName(), stageName, revision, artifactName, artifactExtension).getPath());
     }
 
     private void assertInRepository(String baseArtifactName) throws IOException
@@ -530,5 +533,4 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         assertFalse(repository.waitUntilInRepository(baseArtifactName));
     }
-
 }

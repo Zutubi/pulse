@@ -22,12 +22,21 @@ import java.util.Vector;
  */
 public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 {
+    private ConfigurationHelper configurationHelper;
+    private ProjectConfigurations projects;
+
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
         xmlRpcHelper.loginAsAdmin();
+
+        configurationHelper = new ConfigurationHelper();
+        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
+        configurationHelper.init();
+
+        projects = new ProjectConfigurations(configurationHelper);
     }
 
     @Override
@@ -36,6 +45,11 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.logout();
 
         super.tearDown();
+    }
+
+    private void insertProject(ProjectConfigurationHelper project) throws Exception
+    {
+        configurationHelper.insertProject(project.getConfig());
     }
 
     public void testDependencyCanNotReferenceOwningProject() throws Exception
@@ -115,16 +129,16 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     public void testCircularDependencyCheck() throws Exception
     {
-        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectA.createProject();
+        DepAntProject projectA = projects.createDepAntProject(random + "A");
+        insertProject(projectA);
 
-        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
-        projectB.addDependency(new DependencyHelper(projectA, true));
-        projectB.createProject();
+        DepAntProject projectB = projects.createDepAntProject(random + "B");
+        projectB.addDependency(projectA).setTransitive(true);
+        insertProject(projectB);
 
-        ProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        DepAntProject projectC = projects.createDepAntProject(random + "C");
         projectC.addDependency(projectB);
-        projectC.createProject();
+        insertProject(projectC);
 
         loginAsAdmin();
 
@@ -134,7 +148,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         DependencyForm form = projectDependenciesPage.clickAdd(); // takes us to the wizard version of the dependency form.
         form.waitFor();
 
-        form.finishNamedFormElements(asPair("project", projectC.getProjectHandle()));
+        form.finishNamedFormElements(asPair("project", String.valueOf(projectC.getConfig().getHandle())));
         assertTrue(form.isFormPresent());
         assertTrue(form.getFieldErrorMessage("project").contains("circular dependency detected"));
     }

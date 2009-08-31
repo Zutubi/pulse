@@ -464,6 +464,35 @@ public class RemoteApi
     }
 
     /**
+     * Returns the configuration path for the configuration instance identified by the specified handle.
+     *
+     * @param token     authentication token (see {@link #login})
+     * @param handle    the handle that uniquely identifies the configuration instance, as a 64-bit
+     * integer in string format.
+     *
+     * @return the path that defines the configuration instance, or null if it does not exist.
+     * @access available to users with view permission for the path represented by the given handle.
+     */
+    public String getConfigPath(String token, String handle)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Configuration config = configurationProvider.get(Long.valueOf(handle), Configuration.class);
+            if (config != null)
+            {
+                configurationSecurityManager.ensurePermission(config.getConfigurationPath(), AccessManager.ACTION_VIEW);
+                return config.getConfigurationPath();
+            }
+            return null;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Retrieves the raw configuration object for the given path.  This may differ from the full
      * configuration returned by {@link #getConfig(String, String)} when the path refers to an
      * object in a templated scope.  No values inherited from template ancestors are included in the
