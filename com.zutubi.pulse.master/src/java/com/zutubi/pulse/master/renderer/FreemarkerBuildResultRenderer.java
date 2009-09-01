@@ -64,10 +64,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     {
         // Templates are stored under <root>/notifications/builds/<name>.ftl
         List<TemplateInfo> result = new ArrayList<TemplateInfo>();
-        List<File> templateRoots = new LinkedList<File>(systemPaths.getTemplateRoots());
-        templateRoots.add(userPaths.getUserTemplateRoot());
-
-        for (File root : templateRoots)
+        for (File root : getAllTemplateRoots())
         {
             File dir = new File(root, getTemplatePath(personal));
             if (dir.isDirectory())
@@ -121,8 +118,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private File findProperties(String templateName, boolean personal)
     {
-        List<File> templateRoots = systemPaths.getTemplateRoots();
-        for (File root : templateRoots)
+        for (File root : getAllTemplateRoots())
         {
             File dir = new File(root, getTemplatePath(personal));
             if (dir.isDirectory())
@@ -136,6 +132,14 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         }
 
         return null;
+    }
+
+    private List<File> getAllTemplateRoots()
+    {
+        List<File> templateRoots = new LinkedList<File>();
+        templateRoots.add(userPaths.getUserTemplateRoot());
+        templateRoots.addAll(systemPaths.getTemplateRoots());
+        return templateRoots;
     }
 
     public int getFeatureLimit()
