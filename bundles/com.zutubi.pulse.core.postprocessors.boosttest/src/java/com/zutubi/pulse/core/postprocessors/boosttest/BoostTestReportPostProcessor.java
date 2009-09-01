@@ -117,7 +117,6 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
             TestStatus status = processMessages(element, builder);
             parentSuite.addCase(new TestCaseResult(name, duration, status, builder.length() > 0 ? builder.toString() : null));
         }
-
     }
 
     private TestStatus processMessages(Element element, StringBuilder builder)
@@ -167,11 +166,14 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         }
         
         message += ": " + XMLUtils.getText(element, "");
-        if (builder.length() > 0)
+        if (builder.indexOf(message) == -1)
         {
-            builder.append("\n");
+            if (builder.length() > 0)
+            {
+                builder.append("\n");
+            }
+            builder.append(message);
         }
-        builder.append(message);
     }
 
     private long getDuration(Element element)
