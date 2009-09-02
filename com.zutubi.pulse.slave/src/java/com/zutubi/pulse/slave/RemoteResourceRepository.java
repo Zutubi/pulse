@@ -1,18 +1,16 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.ResourceRepositorySupport;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 
-import java.util.List;
-
 /**
+ * A resource repository that lives remotely on the master server.
  */
-public class RemoteResourceRepository implements ResourceRepository
+public class RemoteResourceRepository extends ResourceRepositorySupport
 {
     private static final Logger LOG = Logger.getLogger(RemoteResourceRepository.class);
 
@@ -27,25 +25,6 @@ public class RemoteResourceRepository implements ResourceRepository
         this.serviceTokenManager = serviceTokenManager;
     }
 
-    public boolean hasResource(ResourceRequirement requirement)
-    {
-        String name = requirement.getResource();
-        String version = requirement.getVersion();
-        
-        ResourceConfiguration r = getResource(name);
-        if (r == null)
-        {
-            return false;
-        }
-
-        return requirement.isDefaultVersion() || r.getVersion(version) != null;
-    }
-
-    public boolean hasResource(String name)
-    {
-        return getResource(name) != null;
-    }
-
     public ResourceConfiguration getResource(String name)
     {
         try
@@ -57,10 +36,5 @@ public class RemoteResourceRepository implements ResourceRepository
             LOG.severe(e);
             throw new BuildException("Unable to retrieve details of resource '" + name + "' from master: " + e.getMessage());
         }
-    }
-
-    public List<String> getResourceNames()
-    {
-        return masterProxy.getResourceNames(serviceTokenManager.getToken(), handle);
     }
 }

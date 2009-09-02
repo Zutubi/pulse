@@ -3,16 +3,15 @@ package com.zutubi.pulse.master.license;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
-import com.zutubi.pulse.master.bootstrap.DataResolver;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.license.authorisation.Authorisation;
 import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.events.InsertEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -26,16 +25,10 @@ public class LicenseManager
 {
     private static final Logger LOG = Logger.getLogger(LicenseManager.class);
 
-    /**
-     * Access to the event system
-     */
     private EventManager eventManager;
-
     private LicenseKeyStore keyStore;
 
     private List<Authorisation> authorisations = new LinkedList<Authorisation>();
-
-    private DataResolver dataResolver;
 
     /**
      * Update the installed license key
@@ -156,11 +149,6 @@ public class LicenseManager
     public void setLicenseKeyStore(LicenseKeyStore keyStore)
     {
         this.keyStore = keyStore;
-    }
-
-    public void setDataResolver(DataResolver dataResolver)
-    {
-        this.dataResolver = dataResolver;
     }
 
     /**

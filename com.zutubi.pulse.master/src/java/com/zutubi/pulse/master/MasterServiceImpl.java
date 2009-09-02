@@ -13,8 +13,6 @@ import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 
-import java.util.List;
-
 /**
  */
 public class MasterServiceImpl implements MasterService
@@ -53,20 +51,6 @@ public class MasterServiceImpl implements MasterService
             if (repository != null)
             {
                 return repository.getResource(name);
-            }
-        }
-
-        return null;
-    }
-
-    public List<String> getResourceNames(String token, long agentHandle) throws InvalidTokenException
-    {
-        if (validateToken(token))
-        {
-            ResourceRepository repository = resourceManager.getAgentRepository(agentHandle);
-            if (repository != null)
-            {
-                return repository.getResourceNames();
             }
         }
 

@@ -3,8 +3,9 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 
-import java.util.List;
-
+/**
+ * A resource repository with no resources.
+ */
 public class EmptyResourceRepository implements ResourceRepository
 {
     public boolean hasResource(ResourceRequirement requirement)
@@ -18,11 +19,6 @@ public class EmptyResourceRepository implements ResourceRepository
     }
 
     public ResourceConfiguration getResource(String name)
-    {
-        return null;
-    }
-
-    public List<String> getResourceNames()
     {
         return null;
     }

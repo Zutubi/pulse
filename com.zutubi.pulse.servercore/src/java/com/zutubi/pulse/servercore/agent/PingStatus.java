@@ -1,82 +1,44 @@
 package com.zutubi.pulse.servercore.agent;
 
+import com.zutubi.util.EnumUtils;
+
 /**
+ * Basic state of an agent returned by a ping.
  */
 public enum PingStatus
 {
-    OFFLINE
-            {
-                public String getPrettyString()
-                {
-                    return "offline";
-                }
+    OFFLINE(false),
+    VERSION_MISMATCH(false),
+    TOKEN_MISMATCH(false),
+    INVALID_MASTER(false),
+    BUILDING(true),
+    IDLE(true);
 
-                public boolean isOnline()
-                {
-                    return false;
-                }
-            },
-    VERSION_MISMATCH
-            {
-                public String getPrettyString()
-                {
-                    return "version mismatch";
-                }
+    private boolean online;
 
-                public boolean isOnline()
-                {
-                    return false;
-                }
-            },
-    TOKEN_MISMATCH
-            {
-                public String getPrettyString()
-                {
-                    return "token mismatch";
-                }
+    PingStatus(boolean online)
+    {
+        this.online = online;
+    }
 
-                public boolean isOnline()
-                {
-                    return false;
-                }
-            },
-    INVALID_MASTER
-            {
-                public String getPrettyString()
-                {
-                    return "invalid master";
-                }
+    /**
+     * Returns a human-readable version of this state.
+     *
+     * @return a pretty version of this state
+     */
+    public String getPrettyString()
+    {
+        return EnumUtils.toPrettyString(this);
+    }
 
-                public boolean isOnline()
-                {
-                    return false;
-                }
-            },
-    BUILDING
-            {
-                public String getPrettyString()
-                {
-                    return "building";
-                }
-
-                public boolean isOnline()
-                {
-                    return true;
-                }
-            },
-    IDLE
-            {
-                public String getPrettyString()
-                {
-                    return "idle";
-                }
-
-                public boolean isOnline()
-                {
-                    return true;
-                }
-            };
-
-    public abstract String getPrettyString();
-    public abstract boolean isOnline();
+    /**
+     * Indicates if this is an online state.
+     *
+     * @return true if this state implies the agent is online (able to build,
+     *         although possibly busy)
+     */
+    public boolean isOnline()
+    {
+        return online;
+    }
 }
