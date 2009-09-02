@@ -11,7 +11,6 @@
                 <ref local="canRunPulseAuthorisation"/>
             </list>
         </property>
-        <property name="dataResolver" ref="configurationManager"/>
     </bean>
 
     <!-- the current key store is the Data object. -->
