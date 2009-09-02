@@ -235,7 +235,7 @@ public class FatController implements EventListener, Stoppable
             {
                 // Ignore build requests while project is not able to be built
                 // (e.g. if it is pausing).
-                LOG.warning("Build request ignored. Project state '"+project.getState()+"' does not allow triggering.");
+                LOG.warning("Build request ignored. Project state '" + project.getState() + "' does not allow triggering.");
                 return;
             }
 

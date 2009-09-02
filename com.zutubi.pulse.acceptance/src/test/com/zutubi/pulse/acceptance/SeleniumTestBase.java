@@ -36,8 +36,8 @@ public class SeleniumTestBase extends PulseTestCase
      * run these tests in development environments (just manually run one
      * agent on port 8890).
      */
-    protected static final String AGENT_NAME = "localhost";
-    protected static final String SPECIAL_CHARACTERS = " #%&<>'\"()!@";
+    public static final String AGENT_NAME = "localhost";
+    public static final String SPECIAL_CHARACTERS = " #%&<>'\"()!@";
 
     protected Urls urls;
     protected String random;

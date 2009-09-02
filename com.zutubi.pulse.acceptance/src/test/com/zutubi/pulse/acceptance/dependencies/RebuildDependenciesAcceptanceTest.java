@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
@@ -292,10 +293,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testTransitentArtifactDeliveryForMetaBuild() throws Exception
     {
         // require 2 agents for concurrent builds of project A and project B.
-        xmlRpcHelper.ensureAgent("localhost");
+        xmlRpcHelper.ensureAgent(SeleniumTestBase.AGENT_NAME);
         // Ensure that the agent is online and available for the build.  Starting the
         // build without the agent available will result in hung builds.
-        xmlRpcHelper.waitForAgentToBeIdle("localhost");
+        xmlRpcHelper.waitForAgentToBeIdle(SeleniumTestBase.AGENT_NAME);
 
         // project A -> project B -> project C
         DepAntProject projectA = projects.createDepAntProject(projectName + "A");
