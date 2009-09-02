@@ -66,7 +66,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_SingleArtifact() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
 
@@ -80,7 +80,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_MultipleArtifacts() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact.jar", "another-artifact.jar");
+        project.addArtifacts("build/artifact.jar", "build/another-artifact.jar");
         project.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
         insertProject(project);
 
@@ -95,7 +95,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_MultipleStages() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addStage("stage");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
@@ -110,7 +110,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublishFails_MissingArtifacts() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("incorrect/path/artifact.jar");
         insertProject(project);
 
@@ -126,7 +126,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         DepAntProject project = projects.createDepAntProject(randomName);
         project.getConfig().getDependencies().setStatus(STATUS_RELEASE);
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
 
@@ -140,7 +140,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_DefaultStatus() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
 
@@ -155,7 +155,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             DepAntProject project = projects.createDepAntProject(randomName);
             project.getConfig().getDependencies().setStatus("invalid");
-            project.addArtifacts("artifact.jar");
+            project.addArtifacts("build/artifact.jar");
             insertProject(project);
         }
         catch (Exception e)
@@ -167,7 +167,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRemoteTriggerWithCustomStatus() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
 
@@ -181,7 +181,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_SingleArtifact() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("artifact.jar");
+        projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
@@ -200,7 +200,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_MultipleArtifacts() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("artifact.jar", "another-artifact.jar");
+        projectA.addArtifacts("build/artifact.jar", "build/another-artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
         insertProject(projectA);
 
@@ -220,8 +220,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         // need different recipies that produce different artifacts.
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addRecipe("recipeA").addArtifacts("artifactA.jar");
-        project.addRecipe("recipeB").addArtifacts("artifactB.jar");
+        project.addRecipe("recipeA").addArtifacts("build/artifactA.jar");
+        project.addRecipe("recipeB").addArtifacts("build/artifactB.jar");
         project.addStage("A").setRecipe("recipeA");
         project.addStage("B").setRecipe("recipeB");
         project.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
@@ -240,7 +240,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_SpeicificRevision() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("default-artifact.jar");
+        projectA.addArtifacts("build/default-artifact.jar");
         projectA.addFilesToCreate("build/default-artifact.jar");
         insertProject(projectA);
 
@@ -265,13 +265,13 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_MultipleProjects() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("projectA-artifact.jar");
+        projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
-        projectB.addArtifacts("projectB-artifact.jar");
+        projectB.addArtifacts("build/projectB-artifact.jar");
         projectB.addFilesToCreate("build/projectB-artifact.jar");
         insertProject(projectB);
         buildRunner.triggerSuccessfulBuild(projectB.getConfig());
@@ -289,13 +289,13 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_TransitiveDependencies() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("projectA-artifact.jar");
+        projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
-        projectB.addArtifacts("projectB-artifact.jar");
+        projectB.addArtifacts("build/projectB-artifact.jar");
         projectB.addDependency(projectA.getConfig()).setTransitive(true);
         projectB.addFilesToCreate("build/projectB-artifact.jar");
         projectB.addExpectedFiles("lib/projectA-artifact.jar");
@@ -314,13 +314,13 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_TransitiveDependenciesDisabled() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("projectA-artifact.jar");
+        projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
-        projectB.addArtifacts("projectB-artifact.jar");
+        projectB.addArtifacts("build/projectB-artifact.jar");
         projectB.addDependency(projectA.getConfig());
         projectB.addFilesToCreate("build/projectB-artifact.jar");
         projectB.addExpectedFiles("lib/projectA-artifact.jar");
@@ -341,7 +341,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieveFails_MissingDependencies() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("artifact.jar");
+        projectA.addArtifacts("build/artifact.jar");
         insertProject(projectA);
 
         // do not build projectA simulating dependency not available.
@@ -361,7 +361,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("artifact.jar");
+        projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
@@ -377,7 +377,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_PropagateStatus() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("artifact.jar");
+        projectA.addArtifacts("build/artifact.jar");
         projectA.getConfig().getDependencies().setStatus(STATUS_RELEASE);
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
@@ -402,7 +402,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_PropagateVersion() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifacts("artifact.jar");
+        projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.getConfig().getDependencies().setVersion("FIXED");
         insertProject(projectA);
@@ -426,7 +426,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         DepAntProject project = projects.createDepAntProject(randomName);
         project.getConfig().setOrganisation("org");
-        project.addArtifacts("artifact.jar");
+        project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
 
@@ -438,7 +438,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testArtifactPattern() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
-        project.addArtifacts("artifact-12345.jar").get(0).setArtifactPattern("(.+)-[0-9]+\\.(.+)");
+        project.addArtifacts("build/artifact-12345.jar").get(0).setArtifactPattern("(.+)-[0-9]+\\.(.+)");
         project.addFilesToCreate("build/artifact-12345.jar");
         insertProject(project);
 
@@ -466,7 +466,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         for (char c : testCharacters.toCharArray())
         {
             DepAntProject project = projects.createDepAntProject(randomName());
-            project.addArtifacts("artifact-" + c + ".jar");
+            project.addArtifacts("build/artifact-" + c + ".jar");
 
             // The ant script on unix evals its arguments, so we need to escape
             // these characters lest the shell choke on them.

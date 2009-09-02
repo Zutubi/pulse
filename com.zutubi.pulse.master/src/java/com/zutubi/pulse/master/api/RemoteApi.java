@@ -472,6 +472,8 @@ public class RemoteApi
      *
      * @return the path that defines the configuration instance, or null if it does not exist.
      * @access available to users with view permission for the path represented by the given handle.
+     * @throws IllegalArgumentException if the given handle is invalid
+     * @throws NumberFormatException if the given handle is not a valid 64-bit integer.
      */
     public String getConfigPath(String token, String handle)
     {
@@ -479,12 +481,12 @@ public class RemoteApi
         try
         {
             Configuration config = configurationProvider.get(Long.valueOf(handle), Configuration.class);
-            if (config != null)
+            if (config == null)
             {
-                configurationSecurityManager.ensurePermission(config.getConfigurationPath(), AccessManager.ACTION_VIEW);
-                return config.getConfigurationPath();
+                throw new IllegalArgumentException("Handle '" + handle + "' does not exist.");
             }
-            return null;
+            configurationSecurityManager.ensurePermission(config.getConfigurationPath(), AccessManager.ACTION_VIEW);
+            return config.getConfigurationPath();
         }
         finally
         {

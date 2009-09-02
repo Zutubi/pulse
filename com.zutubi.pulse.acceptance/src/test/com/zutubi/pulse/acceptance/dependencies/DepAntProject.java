@@ -63,10 +63,7 @@ public class DepAntProject extends ProjectConfigurationHelper
      */
     public void addFilesToCreate(String... paths)
     {
-        for (BuildStageConfiguration stage : getConfig().getStages().values())
-        {
-            addStageProperty(stage, PROPERTY_CREATE_LIST, StringUtils.join(",", paths));
-        }
+        addStagePathsProperty(PROPERTY_CREATE_LIST, paths);
     }
 
     /**
@@ -76,10 +73,7 @@ public class DepAntProject extends ProjectConfigurationHelper
      */
     public void addExpectedFiles(String... paths)
     {
-        for (BuildStageConfiguration stage : getConfig().getStages().values())
-        {
-            addStageProperty(stage, PROPERTY_EXPECTED_LIST, StringUtils.join(",", paths));
-        }
+        addStagePathsProperty(PROPERTY_EXPECTED_LIST, paths);
     }
 
     /**
@@ -89,9 +83,14 @@ public class DepAntProject extends ProjectConfigurationHelper
      */
     public void addNotExpectedFiles(String paths)
     {
+        addStagePathsProperty(PROPERTY_NOT_EXPECTED_LIST, paths);
+    }
+
+    private void addStagePathsProperty(String propertyName, String... paths)
+    {
         for (BuildStageConfiguration stage : getConfig().getStages().values())
         {
-            addStageProperty(stage, PROPERTY_NOT_EXPECTED_LIST, StringUtils.join(",", paths));
+            addStageProperty(stage, propertyName, StringUtils.join(",", paths));
         }
     }
 

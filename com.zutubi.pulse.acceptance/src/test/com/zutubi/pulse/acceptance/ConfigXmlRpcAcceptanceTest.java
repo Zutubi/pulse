@@ -86,6 +86,13 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         callAndExpectError("does not exist", "getConfig", "nonexistant");
     }
 
+    public void testGetConfigPathForHandle() throws Exception
+    {
+        String path = "settings/email";
+        String handle = call("getConfigHandle", path);
+        assertEquals(path, call("getConfigPath", handle));
+    }
+
     public void testGetConfig() throws Exception
     {
         Hashtable<String, Object> emailConfig = new Hashtable<String, Object>();

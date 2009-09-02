@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfigurationSupport;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,12 +34,14 @@ public class RecipeConfigurationHelper
         return config;
     }
 
-    public List<FileArtifactConfiguration> addArtifacts(String... filenames)
+    public List<FileArtifactConfiguration> addArtifacts(String... paths)
     {
         List<FileArtifactConfiguration> artifacts = new LinkedList<FileArtifactConfiguration>();
 
-        for (String filename : filenames)
+        for (String path : paths)
         {
+            String filename = PathUtils.getBaseName(path);
+
             Matcher m = artifactFilePattern.matcher(filename);
             if (!m.matches())
             {
@@ -46,11 +49,10 @@ public class RecipeConfigurationHelper
             }
 
             String name = m.group(1);
-            String extension = m.group(2);
 
             FileArtifactConfiguration artifact = new FileArtifactConfiguration();
             artifact.setName(name);
-            artifact.setFile("build/" + name + "." + extension); // refers to where the artifacts are created - see DepAntProject.addFilesToCreate usages.
+            artifact.setFile(path);
             artifact.setPublish(true);
             
             Map<String, CommandConfiguration> commands = config.getCommands();

@@ -173,8 +173,6 @@ public class ConfigurationHelper
         String insertedPath = xmlRpcHelper.insertTemplatedConfig(parentTemplatePath, data, false);
 
         // This step updates the configuration with configuration path and handle details.
-        // (Not sure how necessary this is - it comes at a potentially significant time overhead
-        //  since it potentially generates a lot of xml rpc calls.)
         updatePathsAndHandles(config, insertedPath, data);
 
         return insertedPath;

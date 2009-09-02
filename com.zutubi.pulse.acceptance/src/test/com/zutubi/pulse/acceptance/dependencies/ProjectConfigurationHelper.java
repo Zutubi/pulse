@@ -40,14 +40,14 @@ public abstract class ProjectConfigurationHelper
     /**
      * Add a set of artifacts to this projects default recipe.
      *
-     * @param filenames an array of file paths relative to the project builds base directory.
+     * @param paths an array of file paths relative to the project builds base directory.
      *
      * @return  the list of artifact configuration instances that can be further customised.
      */
-    public List<FileArtifactConfiguration> addArtifacts(String... filenames)
+    public List<FileArtifactConfiguration> addArtifacts(String... paths)
     {
         RecipeConfigurationHelper helper = getRecipe("default");
-        return helper.addArtifacts(filenames);
+        return helper.addArtifacts(paths);
     }
 
     /**

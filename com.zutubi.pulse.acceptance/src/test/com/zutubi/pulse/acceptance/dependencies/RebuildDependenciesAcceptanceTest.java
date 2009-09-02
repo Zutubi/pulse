@@ -300,7 +300,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // project A -> project B -> project C
         DepAntProject projectA = projects.createDepAntProject(projectName + "A");
-        projectA.addArtifacts("artifact.jar");
+        projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.clearTriggers();                   // do not want dependency trigger firing.
         projectA.getDefaultStage().setAgent(null);  // allow project A to run on any agent.
