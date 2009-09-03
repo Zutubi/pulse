@@ -1,0 +1,9 @@
+<root>
+    <single name="a"/>
+    <text name="b">some text</text>
+    <nested name="c">
+        <nested name="d">
+            <nested name="e"/>
+        </nested>
+    </nested>
+</root>
