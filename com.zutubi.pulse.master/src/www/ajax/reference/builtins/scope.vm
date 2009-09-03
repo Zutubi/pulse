@@ -18,8 +18,8 @@
 
 <h2>examples</h2>
 <p>
-    A basic macro for a commonly-used command.  Note that the <tt>mode</tt> property is defined
-    differently in each recipe:
+    A basic macro for a commonly-used command.  Note that the <tt>target</tt> property is defined
+    differently in each scope:
 </p>
 <div class="example-snippet">&lt;macro name="build-command"&gt;
     &lt;command name="build"&gt;
@@ -31,10 +31,10 @@
 &lt;recipe name="two targets"&gt;
     &lt;scope&gt;
         &lt;property name="target" value="t1"/&gt;
-        &lt;macro-ref macro="${build-command}"/&gt;
+        &lt;macro-ref macro="\${build-command}"/&gt;
     &lt;/scope&gt;
     &lt;scope&gt;
         &lt;property name="target" value="t2"/&gt;
-        &lt;macro-ref macro="${build-command}"/&gt;
+        &lt;macro-ref macro="\${build-command}"/&gt;
     &lt;/scope&gt;
 &lt;/recipe&gt;</div>

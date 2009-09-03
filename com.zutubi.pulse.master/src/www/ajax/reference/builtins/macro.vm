@@ -60,12 +60,12 @@
 
 &lt;recipe name="debug"&gt;
     &lt;property name="mode" value="DEBUG"/&gt;
-    &lt;macro-ref macro="${build-command}"/&gt;
+    &lt;macro-ref macro="\${build-command}"/&gt;
 &lt;/recipe&gt;
 
 &lt;recipe name="release"&gt;
     &lt;property name="mode" value="RELEASE"/&gt;
-    &lt;macro-ref macro="${build-command}"/&gt;
+    &lt;macro-ref macro="\${build-command}"/&gt;
 &lt;/recipe&gt;
 </div>
                           
