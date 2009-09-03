@@ -1,15 +1,15 @@
-package com.zutubi.pulse.master.jabber;
+package com.zutubi.pulse.master.notifications.jabber;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
+import com.zutubi.pulse.master.notifications.jabber.config.JabberConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;

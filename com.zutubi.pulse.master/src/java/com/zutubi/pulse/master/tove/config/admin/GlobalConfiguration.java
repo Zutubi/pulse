@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
-import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
+import com.zutubi.pulse.master.notifications.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.master.restore.BackupConfiguration;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.ControllingCheckbox;

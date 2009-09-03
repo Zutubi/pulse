@@ -9,5 +9,5 @@ This context exports:
 
 -->
 <beans default-autowire="byName">
-    <bean id="cacheManager" class="com.zutubi.pulse.master.cache.ehcache.EhCacheManager" init-method="init"/>
+    <bean id="cacheManager" class="com.zutubi.pulse.master.util.cache.ehcache.EhCacheManager" init-method="init"/>
 </beans>

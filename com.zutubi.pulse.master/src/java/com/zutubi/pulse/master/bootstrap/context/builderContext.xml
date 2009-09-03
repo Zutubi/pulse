@@ -184,7 +184,7 @@
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
-    <bean id="jabberManager" class="com.zutubi.pulse.master.jabber.JabberManager"/>
+    <bean id="jabberManager" class="com.zutubi.pulse.master.notifications.jabber.JabberManager"/>
 
     <bean id="licenseMonitor" class="com.zutubi.pulse.master.license.LicenseMonitor" init-method="init"/>
 

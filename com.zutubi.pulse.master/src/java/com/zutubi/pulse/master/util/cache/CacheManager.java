@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.cache;
+package com.zutubi.pulse.master.util.cache;
 
 /**
  * <class comment/>

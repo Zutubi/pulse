@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.NotificationException;
+import com.zutubi.pulse.master.notifications.jabber.JabberManager;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
-import com.zutubi.pulse.master.jabber.JabberManager;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.NotificationException;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 import org.jivesoftware.smack.Chat;

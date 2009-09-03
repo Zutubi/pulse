@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.jabber.config;
+package com.zutubi.pulse.master.notifications.jabber.config;
 
 /**
  * FIXME

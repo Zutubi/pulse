@@ -82,7 +82,9 @@ public class ResourceDiscoveryService implements EventListener
     {
         this.resourceManager = resourceManager;
     }
-public void setThreadFactory(ThreadFactory threadFactory)
+
+    public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }}
+    }
+}

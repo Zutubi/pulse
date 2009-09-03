@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.cache.ehcache;
+package com.zutubi.pulse.master.util.cache.ehcache;
 
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.io.IOUtils;
@@ -12,7 +12,7 @@ import java.io.InputStream;
 /**
  * Handles creation and maintenance of database second-level caches.
  */
-public class EhCacheManager implements com.zutubi.pulse.master.cache.CacheManager
+public class EhCacheManager implements com.zutubi.pulse.master.util.cache.CacheManager
 {
     private static final String CONFIG_FILE = "/ehcache-template.xml";
     private static final String TEMP_DIR_TOKEN = "pulse.system.temp.dir";

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.cache.ehcache;
+package com.zutubi.pulse.master.util.cache.ehcache;
 
 import com.zutubi.util.logging.Logger;
 import net.sf.ehcache.Cache;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class EhCache implements com.zutubi.pulse.master.cache.Cache
+public class EhCache implements com.zutubi.pulse.master.util.cache.Cache
 {
     private static final Logger LOG = Logger.getLogger(EhCache.class);
 
