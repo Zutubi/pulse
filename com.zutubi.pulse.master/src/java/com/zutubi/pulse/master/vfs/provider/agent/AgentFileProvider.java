@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.vfs.provider.agent;
 
-import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.SlaveProxyFactory;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.AbstractOriginatingFileProvider;

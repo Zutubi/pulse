@@ -2,10 +2,9 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.master.AgentService;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
-import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.util.logging.Logger;
@@ -23,9 +22,6 @@ public class AgentUpdater implements Runnable
     private static final Logger LOG = Logger.getLogger(AgentUpdater.class);
     
     private Agent agent;
-    private String masterUrl;
-    private EventManager eventManager;
-    private SystemPaths systemPaths;
     private ExecutorService executor;
     private LinkedBlockingQueue<UpgradeStatus> statuses = new LinkedBlockingQueue<UpgradeStatus>();
     /**
@@ -43,24 +39,27 @@ public class AgentUpdater implements Runnable
      */
     private long pingInterval = 5000;
 
-    public AgentUpdater(Agent agent, String masterUrl, EventManager eventManager, SystemPaths systemPaths, ThreadFactory threadFactory)
+    private MasterConfigurationManager configurationManager;
+    private EventManager eventManager;
+    private MasterLocationProvider masterLocationProvider;
+    private ThreadFactory threadFactory;
+
+    public AgentUpdater(Agent agent)
     {
         this.agent = agent;
-        this.masterUrl = masterUrl;
-        this.eventManager = eventManager;
-        this.systemPaths = systemPaths;
-        this.executor = Executors.newSingleThreadExecutor(threadFactory);
     }
 
     public void start()
     {
+        executor = Executors.newSingleThreadExecutor(threadFactory);
         executor.execute(this);
     }
 
     public void run()
     {
         AgentService agentService = agent.getService();
-        File packageFile = DownloadPackageServlet.getAgentZip(systemPaths);
+        String masterUrl = masterLocationProvider.getMasterUrl();
+        File packageFile = DownloadPackageServlet.getAgentZip(configurationManager.getSystemPaths());
         String packageUrl = DownloadPackageServlet.getPackagesUrl(masterUrl) + "/" + packageFile.getName();
         String masterBuild = Version.getVersion().getBuildNumber();
 
@@ -141,13 +140,16 @@ public class AgentUpdater implements Runnable
 
     public void stop(boolean force)
     {
-        if(force)
+        if (executor != null)
         {
-            executor.shutdownNow();
-        }
-        else
-        {
-            executor.shutdown();
+            if(force)
+            {
+                executor.shutdownNow();
+            }
+            else
+            {
+                executor.shutdown();
+            }
         }
     }
 
@@ -169,5 +171,25 @@ public class AgentUpdater implements Runnable
     public void setPingInterval(long pingInterval)
     {
         this.pingInterval = pingInterval;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 }

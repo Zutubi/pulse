@@ -1,11 +1,10 @@
-package com.zutubi.pulse.master;
+package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;

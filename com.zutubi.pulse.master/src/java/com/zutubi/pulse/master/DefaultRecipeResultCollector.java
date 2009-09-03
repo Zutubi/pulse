@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;

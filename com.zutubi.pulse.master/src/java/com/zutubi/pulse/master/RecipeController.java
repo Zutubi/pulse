@@ -18,6 +18,7 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.PostStageEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;

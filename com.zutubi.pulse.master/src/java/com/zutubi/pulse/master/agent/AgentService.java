@@ -1,11 +1,10 @@
-package com.zutubi.pulse.master;
+package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.RemoteService;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
@@ -15,8 +14,10 @@ import java.util.List;
 
 /**
  */
-public interface AgentService extends RemoteService
+public interface AgentService
 {
+    String getUrl();
+
     int ping();
     SlaveStatus getStatus(String masterLocation);
     boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize);

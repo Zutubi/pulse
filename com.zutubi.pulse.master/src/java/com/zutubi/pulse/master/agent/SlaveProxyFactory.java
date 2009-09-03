@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master;
+package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory;

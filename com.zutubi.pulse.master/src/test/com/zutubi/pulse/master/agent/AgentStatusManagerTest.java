@@ -10,7 +10,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;

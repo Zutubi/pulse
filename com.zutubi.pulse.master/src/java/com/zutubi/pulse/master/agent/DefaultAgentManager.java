@@ -3,12 +3,7 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.master.AgentService;
-import com.zutubi.pulse.master.MasterAgentService;
-import com.zutubi.pulse.master.SlaveAgentService;
-import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
@@ -58,14 +53,12 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private ObjectFactory objectFactory;
     private AgentStatusManager agentStatusManager;
     private AgentStateManager agentStateManager;
-    private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private TypeRegistry typeRegistry;
     private EventManager eventManager;
     private SlaveProxyFactory slaveProxyFactory;
     private ThreadFactory threadFactory;
-    private MasterLocationProvider masterLocationProvider;
     private AgentPingService agentPingService;
 
     private LicenseManager licenseManager;
@@ -326,7 +319,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         agentStateManager.save(agentState);
         agent.setAgentState(agentState);
 
-        AgentUpdater updater = new AgentUpdater(agent, masterLocationProvider.getMasterUrl(), eventManager, configurationManager.getSystemPaths(), threadFactory);
+        AgentUpdater updater = objectFactory.buildBean(AgentUpdater.class, new Class[]{Agent.class}, new Object[]{agent});
         updatersLock.lock();
 
         try
@@ -426,11 +419,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             lock.unlock();
         }
-    }
-
-    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
-    {
-        this.masterLocationProvider = masterLocationProvider;
     }
 
     public List<Agent> getOnlineAgents()
@@ -583,11 +571,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public void setAgentStateManager(AgentStateManager agentStateManager)
     {
         this.agentStateManager = agentStateManager;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
     }
 
     public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)

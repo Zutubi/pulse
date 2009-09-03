@@ -146,7 +146,7 @@
         <property name="propertyPath" value="systemPaths.configRoot"/>
     </bean>
 
-    <bean id="slaveProxyFactory" class="com.zutubi.pulse.master.SlaveProxyFactory"/>
+    <bean id="slaveProxyFactory" class="com.zutubi.pulse.master.agent.SlaveProxyFactory"/>
 
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory"/>
 

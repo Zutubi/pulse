@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.master.SlaveProxyFactory;
+import com.zutubi.pulse.master.agent.SlaveProxyFactory;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;

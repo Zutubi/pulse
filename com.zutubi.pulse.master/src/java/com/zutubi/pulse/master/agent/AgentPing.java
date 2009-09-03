@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.agent;
 
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;

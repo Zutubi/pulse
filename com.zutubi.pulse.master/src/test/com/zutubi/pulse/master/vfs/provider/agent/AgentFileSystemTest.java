@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.vfs.provider.agent;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.SlaveProxyFactory;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;

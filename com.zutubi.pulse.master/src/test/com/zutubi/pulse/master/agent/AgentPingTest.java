@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.agent;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;

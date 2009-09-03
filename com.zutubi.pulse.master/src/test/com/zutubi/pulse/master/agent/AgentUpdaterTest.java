@@ -8,7 +8,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.AgentService;
+import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
@@ -18,17 +18,16 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.util.FileSystemUtils;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/**
- */
 public class AgentUpdaterTest extends PulseTestCase implements EventListener
 {
-    private static final String TEST_TOKEN = "token";
     private static final String TEST_URL = "url";
 
     private File tempDir;
@@ -51,7 +50,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         tempDir = FileSystemUtils.createTempDir(AgentUpdaterTest.class.getName(), "");
         systemPaths = new DefaultSystemPaths(tempDir, tempDir);
         File packageDir = DownloadPackageServlet.getPackageDir(systemPaths);
-        packageDir.mkdirs();
+        assertTrue(packageDir.mkdirs());
         File packageFile = DownloadPackageServlet.getAgentZip(systemPaths);
         FileSystemUtils.createFile(packageFile, "dummy");
 
@@ -186,10 +185,19 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         }
 
         agent = new MockAgent(agentConfig, agentState, (AgentService) mockService.proxy());
-        updater = new AgentUpdater(agent, TEST_URL, eventManager, systemPaths, Executors.defaultThreadFactory());
+        updater = new AgentUpdater(agent);
         updater.setStatusTimeout(5);
         updater.setRebootTimeout(5);
         updater.setPingInterval(10);
+        
+        SimpleMasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
+        configurationManager.setSystemPaths(systemPaths);
+        updater.setConfigurationManager(configurationManager);
+        updater.setEventManager(eventManager);
+        MasterLocationProvider masterLocationProvider = mock(MasterLocationProvider.class);
+        stub(masterLocationProvider.getMasterUrl()).toReturn(TEST_URL);
+        updater.setMasterLocationProvider(masterLocationProvider);
+        updater.setThreadFactory(Executors.defaultThreadFactory());
     }
 
     private void start() throws Exception

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master;
 
+import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.model.BuildResult;
 
 import java.io.File;

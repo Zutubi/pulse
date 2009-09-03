@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.agent.AgentService;
 
 import java.util.List;
 

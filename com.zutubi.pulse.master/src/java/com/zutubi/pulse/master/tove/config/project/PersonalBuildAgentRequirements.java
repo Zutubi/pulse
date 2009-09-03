@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.agent.AgentService;
 
 /**
  * Ensures that personal build assignment requests are only fulfilled by agents

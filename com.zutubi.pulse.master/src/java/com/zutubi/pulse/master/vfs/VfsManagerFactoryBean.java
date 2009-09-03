@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.vfs;
 
-import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.SlaveProxyFactory;
 import com.zutubi.pulse.master.vfs.provider.agent.AgentFileProvider;
 import com.zutubi.pulse.master.vfs.provider.local.DefaultLocalFileProvider;
 import com.zutubi.pulse.master.vfs.provider.pulse.PulseFileProvider;

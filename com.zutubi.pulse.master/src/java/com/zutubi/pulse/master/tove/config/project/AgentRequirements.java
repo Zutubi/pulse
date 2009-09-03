@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.annotations.Transient;
-import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.agent.AgentService;
+import com.zutubi.tove.annotations.Transient;
 
 /**
  * An interface for determining if an agent satisfies the requirements to
