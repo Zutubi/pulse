@@ -41,6 +41,7 @@
         <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default"/>
         <dependency org="opensymphony" name="xwork" rev="1.2.3" conf="external,build,release->minimal"/>
         <dependency org="sun" name="javamail" rev="1.3.2" conf="external,build,release->default"/>
+        <dependency org="sun" name="sjsxp" rev="1.0.1" conf="external,build,release->default"/>
         <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>
         <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default"/>
         <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
