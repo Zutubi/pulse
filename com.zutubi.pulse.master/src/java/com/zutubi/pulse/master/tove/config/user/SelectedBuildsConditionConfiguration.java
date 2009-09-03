@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

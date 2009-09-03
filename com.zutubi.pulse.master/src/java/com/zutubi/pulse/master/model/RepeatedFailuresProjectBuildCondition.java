@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.master.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 
 /**
  * A condition that fires after repeated build failures.

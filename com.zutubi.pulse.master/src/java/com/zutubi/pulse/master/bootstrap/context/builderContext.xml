@@ -124,7 +124,7 @@
 
     <bean id="masterRecipeProcessor" class="com.zutubi.pulse.master.MasterRecipeProcessor"/>
 
-    <bean id="buildResultRenderer" class="com.zutubi.pulse.master.renderer.FreemarkerBuildResultRenderer"/>
+    <bean id="buildResultRenderer" class="com.zutubi.pulse.master.notifications.renderer.FreemarkerBuildResultRenderer"/>
 
     <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName" value="configurationManager"/>
@@ -158,7 +158,7 @@
 
     <bean id="recipeDispatchService" class="com.zutubi.pulse.master.RecipeDispatchService" init-method="init"/>
 
-    <bean id="resultNotifier" class="com.zutubi.pulse.master.ResultNotifier" init-method="init"/>
+    <bean id="resultNotifier" class="com.zutubi.pulse.master.notifications.ResultNotifier" init-method="init"/>
 
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">
@@ -180,7 +180,7 @@
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager" init-method="init"/>
 
-    <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.condition.NotifyConditionFactory">
+    <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory">
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
 

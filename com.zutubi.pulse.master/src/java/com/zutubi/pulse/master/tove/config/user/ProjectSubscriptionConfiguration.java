@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import antlr.collections.AST;
-import com.zutubi.pulse.master.condition.FalseNotifyCondition;
-import com.zutubi.pulse.master.condition.NotifyCondition;
-import com.zutubi.pulse.master.condition.NotifyConditionFactory;
-import com.zutubi.pulse.master.condition.TrueNotifyCondition;
-import com.zutubi.pulse.master.condition.antlr.NotifyConditionLexer;
-import com.zutubi.pulse.master.condition.antlr.NotifyConditionParser;
-import com.zutubi.pulse.master.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.notifications.condition.FalseNotifyCondition;
+import com.zutubi.pulse.master.notifications.condition.NotifyCondition;
+import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.notifications.condition.TrueNotifyCondition;
+import com.zutubi.pulse.master.notifications.condition.antlr.NotifyConditionLexer;
+import com.zutubi.pulse.master.notifications.condition.antlr.NotifyConditionParser;
+import com.zutubi.pulse.master.notifications.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
