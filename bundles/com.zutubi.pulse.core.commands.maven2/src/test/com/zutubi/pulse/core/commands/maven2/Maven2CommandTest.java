@@ -18,7 +18,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
 
         Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
-        successRun(command, "[compiler:compile]", "BUILD SUCCESSFUL");
+        successRun(command, "[compiler:compile", "BUILD SUCCESSFUL");
     }
 
     public void testExtractVersion() throws Exception
@@ -46,7 +46,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
         Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile test");
         successRun(command, "BUILD SUCCESSFUL", "Running com.zutubi.maven2.test.AppTest",
-                "task-segment: [compile, test]", "[compiler:compile]", "[compiler:testCompile]", "[surefire:test]",
+                "task-segment: [compile, test]", "[compiler:compile", "[compiler:testCompile", "[surefire:test",
                 "Tests run: 1, Failures: 0, Errors: 0");
     }
 
@@ -66,7 +66,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
         Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
         command.setPomFile("blah/pom.xml");
-        successRun(command, "[compiler:compile]", "BUILD SUCCESSFUL");
+        successRun(command, "[compiler:compile", "BUILD SUCCESSFUL");
     }
 
     public void testCompilerError() throws Exception
