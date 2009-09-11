@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 
@@ -42,7 +43,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
                 workDest = paths.getBaseDir(result, recipeId);
             }
 
-            agentService.collectResults(getRecipeDetails(recipeId, incremental), outputDest, workDest);
+            agentService.collectResults(getRecipeDetails(agentService.getAgentConfig(), recipeId, incremental), outputDest, workDest);
         }
     }
 
@@ -50,13 +51,13 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
     {
         if (agentService != null)
         {
-            agentService.cleanup(getRecipeDetails(recipeId, incremental));
+            agentService.cleanup(getRecipeDetails(agentService.getAgentConfig(), recipeId, incremental));
         }
     }
 
-    private AgentRecipeDetails getRecipeDetails(long recipeId, boolean incremental)
+    private AgentRecipeDetails getRecipeDetails(AgentConfiguration agent, long recipeId, boolean incremental)
     {
-        return new AgentRecipeDetails(projectConfig.getHandle(), projectConfig.getName(), recipeId, incremental, projectConfig.getOptions().getPersistentWorkDir());
+        return new AgentRecipeDetails(agent.getHandle(), agent.getName(), agent.getDataDirectory(), projectConfig.getHandle(), projectConfig.getName(), recipeId, incremental, projectConfig.getOptions().getPersistentWorkDir());
     }
 
     public File getRecipeDir(BuildResult result, long recipeId)

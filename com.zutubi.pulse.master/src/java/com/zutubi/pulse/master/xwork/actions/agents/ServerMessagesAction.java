@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.HostManager;
+import com.zutubi.pulse.master.agent.HostService;
 import com.zutubi.pulse.master.xwork.actions.PagingSupport;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.util.logging.Logger;
@@ -18,6 +20,8 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
     
     private List<CustomLogRecord> records = null;
     private PagingSupport pagingSupport = new PagingSupport(10);
+
+    private HostManager hostManager;
 
     public List<CustomLogRecord> getRecords()
     {
@@ -37,17 +41,18 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
     public String execute() throws Exception
     {
         Agent agent = getAgent();
-        if(agent == null)
+        if (agent == null)
         {
             records = serverMessagesHandler.takeSnapshot();
         }
         else
         {
-            if(agent.isOnline())
+            if (agent.isOnline())
             {
+                HostService hostService = hostManager.getServiceForHost(agent.getHost());
                 try
                 {
-                    records = agent.getService().getRecentMessages();
+                    records = hostService.getRecentMessages();
                 }
                 catch(HessianRuntimeException e)
                 {
@@ -69,5 +74,10 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
         }
 
         return SUCCESS;
+    }
+
+    public void setHostManager(HostManager hostManager)
+    {
+        this.hostManager = hostManager;
     }
 }

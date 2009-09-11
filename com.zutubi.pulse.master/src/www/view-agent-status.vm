@@ -11,46 +11,10 @@
     <table id="agent.status" class="content">
         #headingRow("agent.status" 2)
         #dynamicRow("agent.name" $agent.config.name)
-        #dynamicRow("agent.location" $agent.location)
+        #dynamicRow("agent.location" $model.location)
 
-    #if($agent.isEnabled() && $agent.hasBeenPinged())
-        #if($agent.isDisabling())
-            #dynamicRow("agent.status" "diabling on idle")
-        #else
-            #dynamicRow("agent.status" $agent.status.prettyString)
-        #end
-        #dynamicRow("agent.last.ping" $action.getPrettyDate($agent.lastPingTime))
-        #dynamicRow("agent.since.last.ping" "$agent.secondsSincePing seconds")
-        #if($agent.pingError)
-            #docRow("agent.ping.error" $agent.pingError)
-        #end
-    #elseif($agent.upgrading)
-        <tr>
-            #contentRowHeading("agent.status")
-            #contentCell("agent.upgrading")
-        </tr>
-        #dynamicRow("agent.upgrade.status" "$agent.upgradeState.toString().toLowerCase()")
-        #if($agent.upgradeProgress > 0)
-        <tr>
-            #contentRowHeading("agent.upgrade.progress")
-            <td class="content">
-                ${agent.upgradeProcess}%
-            </td>
-        </tr>
-        #end
-    #elseif($agent.failedUpgrade)
-        <tr>
-            #contentRowHeading("agent.status")
-            #contentCell("agent.failed.upgrade.verbose")
-        </tr>
-        #if($agent.upgradeMessage)
-            #docRow("agent.upgrade.message" $agent.upgradeMessage)
-        #end
-    #else
-        <tr>
-            #contentRowHeading("agent.status")
-            #contentCell("agent.disabled")
-        </tr>
+    #foreach($pair in $model.statusInfo)
+        #dynamicRow($pair.first $pair.second)    
     #end
     </table>
 

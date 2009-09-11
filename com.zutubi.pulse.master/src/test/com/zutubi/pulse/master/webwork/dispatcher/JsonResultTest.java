@@ -1,19 +1,21 @@
 package com.zutubi.pulse.master.webwork.dispatcher;
 
-import com.mockobjects.servlet.MockHttpServletResponse;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.MockActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import org.displaytag.filter.SimpleServletOutputStream;
+import static org.mockito.Mockito.mock;
+import org.mortbay.http.HttpResponse;
+import org.mortbay.jetty.servlet.ServletHttpRequest;
+import org.mortbay.jetty.servlet.ServletHttpResponse;
 
+import javax.servlet.ServletOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- * <class-comment/>
- */
 public class JsonResultTest extends PulseTestCase
 {
     private JsonResult result;
@@ -37,38 +39,10 @@ public class JsonResultTest extends PulseTestCase
         result = new JsonResult();
         result.setLocation("/");
         stack = new OgnlValueStack();
-        response = new MockHttpServletResponse()
-        {
-            private String encoding = "UTF-8";
-            public String getCharacterEncoding()
-            {
-                return encoding;
-            }
-
-            public String getContentType()
-            {
-                return "text/plain";
-            }
-
-            public void setCharacterEncoding(String str)
-            {
-                this.encoding = str;
-            }
-        };
+        response = new MockHttpServletResponse();
         ai = new MockActionInvocation();
         ai.setStack(stack);
         ServletActionContext.setResponse(response);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        result = null;
-        stack = null;
-        response = null;
-        ai = null;
-        ServletActionContext.setResponse(null);
-
-        super.tearDown();
     }
 
     public void testSinglePair() throws Exception
@@ -361,6 +335,47 @@ public class JsonResultTest extends PulseTestCase
         public InputStream load(String location)
         {
             return new ByteArrayInputStream(def.getBytes());
+        }
+    }
+
+    private static class MockHttpServletResponse extends ServletHttpResponse
+    {
+        private String encoding = "UTF-8";
+        private SimpleServletOutputStream outputStream = null;
+
+        public MockHttpServletResponse()
+        {
+            super(mock(ServletHttpRequest.class), mock(HttpResponse.class));
+        }
+
+        public String getCharacterEncoding()
+        {
+            return encoding;
+        }
+
+        public ServletOutputStream getOutputStream()
+        {
+            if (outputStream == null)
+            {
+                outputStream = new SimpleServletOutputStream();
+            }
+
+            return outputStream;
+        }
+
+        public String getOutputStreamContents()
+        {
+            return outputStream.toString();
+        }
+
+        public String getContentType()
+        {
+            return "text/plain";
+        }
+
+        public void setCharacterEncoding(String str)
+        {
+            this.encoding = str;
         }
     }
 }

@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationFormatter;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
@@ -25,14 +26,14 @@ import java.util.*;
  */
 public class ViewAgentsAction extends ActionSupport
 {
-    private List<AgentModel> models;
+    private List<AgentRowModel> models;
     private List<AgentConfiguration> invalidAgents = new LinkedList<AgentConfiguration>();
     private AgentManager agentManager;
     private ActionManager actionManager;
     private SystemPaths systemPaths;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public List<AgentModel> getModels()
+    public List<AgentRowModel> getModels()
     {
         return models;
     }
@@ -71,44 +72,27 @@ public class ViewAgentsAction extends ActionSupport
             }
         });
 
-        models = CollectionUtils.map(agents, new Mapping<Agent, AgentModel>()
+        final AgentConfigurationFormatter formatter = new AgentConfigurationFormatter();
+        models = CollectionUtils.map(agents, new Mapping<Agent, AgentRowModel>()
         {
-            public AgentModel map(Agent agent)
+            public AgentRowModel map(Agent agent)
             {
-                String status;
-                if (agent.isDisabling())
-                {
-                    status = "disabling on idle";
-                }
-                else if (agent.isUpgrading())
-                {
-                    status = "upgrading [" + agent.getUpgradeState().toString().toLowerCase() + "]";
-                }
-                else if (agent.isFailedUpgrade())
-                {
-                    status = "failed upgrade";
-                }
-                else
-                {
-                    status = agent.getStatus().getPrettyString();
-                }
-
-                AgentModel model = new AgentModel(agent, agent.getConfig().getName(), agent.getLocation(), status);
+                AgentRowModel rowModel = new AgentRowModel(agent, agent.getConfig().getName(), agent.getHost().getLocation(), formatter.getStatus(agent));
 
                 Messages messages = Messages.getInstance(AgentConfiguration.class);
                 File contentRoot = systemPaths.getContentRoot();
                 for(String actionName: actionManager.getActions(agent.getConfig(), false))
                 {
-                    model.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
+                    rowModel.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
                 }
 
-                return model;
+                return rowModel;
             }
         });
 
-        Collections.sort(models, new Comparator<AgentModel>()
+        Collections.sort(models, new Comparator<AgentRowModel>()
         {
-            public int compare(AgentModel o1, AgentModel o2)
+            public int compare(AgentRowModel o1, AgentRowModel o2)
             {
                 return c.compare(o1.getName(), o2.getName());
             }

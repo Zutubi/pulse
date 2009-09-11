@@ -53,7 +53,10 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.util.url.CredentialsStore;
-import org.quartz.*;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 
 import java.io.File;
 import java.net.URL;
@@ -825,17 +828,7 @@ public class DefaultBuildController implements EventListener, BuildController
             executingControllers.remove(node);
 
             RecipeResult result = controller.getResult();
-            if (result.succeeded())
-            {
-                initialiseNodes(new BootstrapperCreator()
-                {
-                    public Bootstrapper create()
-                    {
-                        return controller.getChildBootstrapper();
-                    }
-                }, node.getChildren());
-            }
-            else if (result.failed())
+            if (result.failed())
             {
                 buildResult.addFeature(Feature.Level.ERROR, "Recipe " + result.getRecipeNameSafe() + " failed");
             }

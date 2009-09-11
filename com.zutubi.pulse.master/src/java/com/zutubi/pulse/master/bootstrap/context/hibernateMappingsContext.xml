@@ -17,6 +17,7 @@ This context exports:
                 <value>com/zutubi/pulse/master/model/persistence/hibernate/Changelist.hbm.xml</value>
                 <value>com/zutubi/pulse/master/model/persistence/hibernate/CommandResult.hbm.xml</value>
                 <value>com/zutubi/pulse/master/model/persistence/hibernate/Feature.hbm.xml</value>
+                <value>com/zutubi/pulse/master/model/persistence/hibernate/HostState.hbm.xml</value>
                 <value>com/zutubi/pulse/master/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentState.hbm.xml</value>
                 <value>com/zutubi/pulse/master/model/persistence/hibernate/StoredArtifact.hbm.xml</value>

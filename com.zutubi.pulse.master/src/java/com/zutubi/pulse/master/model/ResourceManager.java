@@ -18,7 +18,7 @@ public interface ResourceManager
 
     ResourceRepository getAgentRepository(Agent agent);
 
-    void addDiscoveredResources(String agentPath, List<ResourceConfiguration> resources);
+    List<AgentConfiguration> addDiscoveredResources(String location, List<ResourceConfiguration> resources);
 
     Map<String, List<ResourceConfiguration>> findAll();
 }

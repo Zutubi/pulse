@@ -5,7 +5,6 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -14,12 +13,10 @@ import com.zutubi.pulse.master.agent.*;
 import com.zutubi.pulse.master.events.AgentAvailableEvent;
 import com.zutubi.pulse.master.events.AgentOfflineEvent;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
+import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.master.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.master.model.AgentState;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.UnknownBuildReason;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -28,11 +25,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
-import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.servercore.services.UpgradeStatus;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.tove.config.MockConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -492,7 +485,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     {
         Agent offAgent = createAvailableAgent(0);
         agentManager.unavailable(offAgent);
-        queue.offline(offAgent);
+        queue.offline();
         queue.enqueue(createAssignmentRequest(0, 1));
         assertFalse(buildSemaphore.tryAcquire(3, TimeUnit.SECONDS));
     }
@@ -603,7 +596,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
     private void takeOffline(Agent agent)
     {
-        agent.updateStatus(new SlaveStatus(PingStatus.OFFLINE, "oops"));
+        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.OFFLINE, "oops"));
         agentManager.offline(agent);
         queue.handleEvent(new AgentOfflineEvent(this, agent));
     }
@@ -638,8 +631,8 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         AgentConfiguration agentConfig = createAgentConfig(id);
         AgentState agentState = new AgentState();
         agentState.setId(id);
-        DefaultAgent agent = new DefaultAgent(agentConfig, agentState, new MockAgentService(type));
-        agent.updateStatus(new SlaveStatus(PingStatus.IDLE, 0, false));
+        DefaultAgent agent = new DefaultAgent(agentConfig, agentState, new MockAgentService(type), new DefaultHost(new HostState()));
+        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.IDLE, 0, false, null));
         agentManager.addAgent(agent);
         agentManager.online(agent);
         queue.handleEvent(new AgentOnlineEvent(this, agent));
@@ -779,17 +772,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void pingAgents()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
         public int getAgentCount()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void upgradeStatus(UpgradeStatus upgradeStatus)
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -797,6 +780,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public Agent getAgent(String name)
         {
             throw new RuntimeException("Method not implemented.");
+        }
+
+        public void deleteState(AgentState state)
+        {
+            throw new RuntimeException("Not implemented");
         }
 
         public void setEnableState(Agent agent, AgentState.EnableState state)
@@ -814,36 +802,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public MockAgentService(long type)
         {
             this.type = type;
-        }
-
-        public int ping()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public SlaveStatus getStatus(String masterLocation)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public List<ResourceConfiguration> discoverResources()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public SystemInfo getSystemInfo()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public List<CustomLogRecord> getRecentMessages()
-        {
-            throw new RuntimeException("Method not yet implemented.");
         }
 
         public AgentConfiguration getAgentConfig()
@@ -881,19 +839,9 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String getHostName()
-        {
-            return "[mock]";
-        }
-
         public void garbageCollect()
         {
             throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public String getUrl()
-        {
-            return null;
         }
 
         public long getType()
@@ -919,11 +867,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public MockAgentRequirements(long type)
         {
             this.type = type;
-        }
-
-        public AgentRequirements copy()
-        {
-            return new MockAgentRequirements(type);
         }
 
         public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)

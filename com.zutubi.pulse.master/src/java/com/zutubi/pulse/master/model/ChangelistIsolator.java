@@ -40,7 +40,7 @@ public class ChangelistIsolator
         {
             // We have not yet seen a request for this project. Find out what
             // the last revision built of this project was (if any).
-            latestBuiltRevision = getLatestBuiltRevision(project);
+            latestBuiltRevision = buildManager.getPreviousRevision(project);
             if (latestBuiltRevision != null)
             {
                 latestRequestedRevisions.put(projectConfig.getHandle(), latestBuiltRevision);
@@ -79,26 +79,6 @@ public class ChangelistIsolator
         }
 
         return result;
-    }
-
-    private Revision getLatestBuiltRevision(Project project)
-    {
-        for (int first = 0; /* forever */ ; first++)
-        {
-            List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, -1, -1, null, first, 1, true);
-            if (latest.size() > 0)
-            {
-                Revision revision = latest.get(0).getRevision();
-                if (revision != null)
-                {
-                    return revision;
-                }
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 
     public void setBuildManager(BuildManager buildManager)

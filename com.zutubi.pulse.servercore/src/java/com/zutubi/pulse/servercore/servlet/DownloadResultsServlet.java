@@ -24,6 +24,9 @@ public class DownloadResultsServlet extends HttpServlet
     private static final Logger LOG = Logger.getLogger(DownloadResultsServlet.class);
 
     public static final String PARAM_TOKEN = "token";
+    public static final String PARAM_AGENT_HANDLE = "agentHandle";
+    public static final String PARAM_AGENT = "agent";
+    public static final String PARAM_AGENT_DATA_PATTERN = "agentDataPattern";
     public static final String PARAM_PROJECT_HANDLE = "projectHandle";
     public static final String PARAM_PROJECT = "project";
     public static final String PARAM_RECIPE_ID = "recipeId";
@@ -36,6 +39,9 @@ public class DownloadResultsServlet extends HttpServlet
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
+        String agentHandleString = request.getParameter(PARAM_AGENT_HANDLE);
+        String agent = request.getParameter(PARAM_AGENT);
+        String agentDataPattern = request.getParameter(PARAM_AGENT_DATA_PATTERN);
         String projectHandleString = request.getParameter(PARAM_PROJECT_HANDLE);
         String project = request.getParameter(PARAM_PROJECT);
         String recipeIdString = request.getParameter(PARAM_RECIPE_ID);
@@ -54,12 +60,13 @@ public class DownloadResultsServlet extends HttpServlet
                 response.sendError(403, "Invalid token");
             }
 
+            long agentHandle = Long.parseLong(agentHandleString);
             long projectHandle = Long.parseLong(projectHandleString);
             long recipeId = Long.parseLong(recipeIdString);
             boolean output = Boolean.parseBoolean(request.getParameter(PARAM_OUTPUT));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(projectHandle, project, recipeId, incremental, persistentPattern, configurationManager.getUserPaths().getData());
+            ServerRecipePaths paths = new ServerRecipePaths(agentHandle, agent, agentDataPattern, projectHandle, project, recipeId, incremental, persistentPattern, configurationManager.getUserPaths().getData());
             File zipFile;
 
             if (output)

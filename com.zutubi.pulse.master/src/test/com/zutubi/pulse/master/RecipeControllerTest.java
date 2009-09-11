@@ -17,6 +17,8 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
+import com.zutubi.pulse.master.agent.AgentStatus;
+import com.zutubi.pulse.master.agent.Host;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
@@ -28,7 +30,6 @@ import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
-import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.*;
@@ -131,18 +132,22 @@ public class RecipeControllerTest extends PulseTestCase
     {
         testDispatchRequest();
 
+        Host host = mock(Host.class);
+
         Agent agent = mock(Agent.class);
         stub(agent.getService()).toReturn(buildService);
+        stub(agent.getName()).toReturn("testagent");
         stub(agent.isOnline()).toReturn(true);
-        stub(agent.getStatus()).toReturn(Status.IDLE);
+        stub(agent.getStatus()).toReturn(AgentStatus.IDLE);
         stub(agent.getConfig()).toReturn(new AgentConfiguration());
+        stub(agent.getHost()).toReturn(host);
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
         RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), agent);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
-        assertEquals(buildService.getHostName(), rootNode.getHost());
+        assertEquals(agent.getName(), rootNode.getHost());
 
         verify(buildManager, times(1)).save(rootNode);
         verify(recipeDispatchService, times(1)).dispatch(event);

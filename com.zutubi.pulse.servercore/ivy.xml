@@ -39,11 +39,5 @@
         <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.14" conf="external,build,release->default"/>
 
         <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default"/>
-
-        <dependency org="mockobjects" name="mockobjects-core" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-jdk1.4" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-alt-jdk1.4" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-alt-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
     </dependencies>
 </ivy-module>

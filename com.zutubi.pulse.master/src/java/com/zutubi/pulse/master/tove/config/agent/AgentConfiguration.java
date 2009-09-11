@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Configuration for an agent: a service that can execute recipes.
  */
 @Form(fieldOrder = {"name", "remote", "host", "port", "allowPersonalBuilds", "priority"})
 @Table(columns = {"name", "location", "status"})
@@ -36,6 +37,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private boolean allowPersonalBuilds = true;
     @Numeric
     private int priority = 0;
+    private String dataDirectory = "${data.dir}/agents/${agent}";
     private Map<String, ResourceConfiguration> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
 
@@ -100,6 +102,16 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void setPriority(int priority)
     {
         this.priority = priority;
+    }
+
+    public String getDataDirectory()
+    {
+        return dataDirectory;
+    }
+
+    public void setDataDirectory(String dataDirectory)
+    {
+        this.dataDirectory = dataDirectory;
     }
 
     public long getAgentStateId()

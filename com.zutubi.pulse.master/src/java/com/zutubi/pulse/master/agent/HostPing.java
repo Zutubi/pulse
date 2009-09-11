@@ -1,35 +1,35 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;
 import java.util.concurrent.Callable;
 
 /**
- * A callable task that pings an agent and returns its status.
+ * A callable task that pings a host and returns its status.
  */
-class AgentPing implements Callable<SlaveStatus>
+class HostPing implements Callable<HostStatus>
 {
-    private static final Logger LOG = Logger.getLogger(AgentPing.class);
+    private static final Logger LOG = Logger.getLogger(HostPing.class);
 
-    private Agent agent;
-    private AgentService service;
+    private Host host;
+    private HostService service;
     private int masterBuildNumber;
     private String masterLocation;
 
-    public AgentPing(Agent agent, AgentService service, int masterBuildNumber, String masterLocation)
+    public HostPing(Host host, HostService service, int masterBuildNumber, String masterLocation)
     {
-        this.agent = agent;
+        this.host = host;
         this.service = service;
         this.masterBuildNumber = masterBuildNumber;
         this.masterLocation = masterLocation;
     }
 
-    public SlaveStatus call()
+    public HostStatus call()
     {
-        SlaveStatus status;
+        HostStatus status;
 
         try
         {
@@ -40,7 +40,7 @@ class AgentPing implements Callable<SlaveStatus>
             }
             else
             {
-                status = new SlaveStatus(PingStatus.VERSION_MISMATCH);
+                status = new HostStatus(PingStatus.VERSION_MISMATCH);
             }
         }
         catch (Exception e)
@@ -51,12 +51,12 @@ class AgentPing implements Callable<SlaveStatus>
             // the most common cause of the exception is the Connect Exception.
             if (cause instanceof ConnectException)
             {
-                status = new SlaveStatus(PingStatus.OFFLINE, cause.getMessage());
+                status = new HostStatus(PingStatus.OFFLINE, cause.getMessage());
             }
             else
             {
-                LOG.warning("Exception pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage());
-                status = new SlaveStatus(PingStatus.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+                LOG.warning("Exception pinging host '" + host.getLocation() + "': " + e.getMessage());
+                status = new HostStatus(PingStatus.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
             }
         }
 

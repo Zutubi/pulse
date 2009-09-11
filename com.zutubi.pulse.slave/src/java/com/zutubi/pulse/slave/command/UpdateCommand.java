@@ -43,18 +43,18 @@ public class UpdateCommand implements Runnable
     private String build;
     private String master;
     private String token;
-    private long handle;
+    private long hostId;
     private String url;
     private ConfigurationManager configurationManager;
     private MasterProxyFactory masterProxyFactory;
     private ShutdownManager shutdownManager;
 
-    public UpdateCommand(String build, String master, String token, long handle, String url)
+    public UpdateCommand(String build, String master, String token, long hostId, String url)
     {
         this.build = build;
         this.master = master;
         this.token = token;
-        this.handle = handle;
+        this.hostId = hostId;
         this.url = url;
     }
 
@@ -128,7 +128,7 @@ public class UpdateCommand implements Runnable
     {
         try
         {
-            masterService.upgradeStatus(token, new UpgradeStatus(handle, state, progress, message));
+            masterService.upgradeStatus(token, new UpgradeStatus(hostId, state, progress, message));
         }
         catch (Exception e)
         {

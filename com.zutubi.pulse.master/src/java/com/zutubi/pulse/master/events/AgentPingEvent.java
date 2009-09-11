@@ -1,32 +1,65 @@
 package com.zutubi.pulse.master.events;
 
 import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.servercore.agent.PingStatus;
 
 /**
+ * Event raised when an agent's status should be updated as the result of a
+ * host ping.
  */
 public class AgentPingEvent extends AgentEvent
 {
-    private SlaveStatus pingStatus;
+    private PingStatus pingStatus;
+    private long recipeId;
+    private boolean first;
+    private String message;
 
-    public AgentPingEvent(Object source, Agent agent, SlaveStatus pingStatus)
+    public AgentPingEvent(Object source, Agent agent, PingStatus pingStatus)
+    {
+        this(source, agent, pingStatus, 0, false, null);
+    }
+
+    public AgentPingEvent(Object source, Agent agent, PingStatus pingStatus, String message)
+    {
+        this(source, agent, pingStatus, 0, false, message);
+    }
+
+    public AgentPingEvent(Object source, Agent agent, PingStatus pingStatus, long recipeId, boolean first, String message)
     {
         super(source, agent);
         this.pingStatus = pingStatus;
+        this.recipeId = recipeId;
+        this.first = first;
+        this.message = message;
     }
 
-    public SlaveStatus getPingStatus()
+    public PingStatus getPingStatus()
     {
         return pingStatus;
     }
 
+    public long getRecipeId()
+    {
+        return recipeId;
+    }
+
+    public boolean isFirst()
+    {
+        return first;
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Agent Ping Event");
+        StringBuilder builder = new StringBuilder("Agent Ping Event");
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getConfig().getName()).append(", ").append(pingStatus);
+            builder.append(": ").append(getAgent().getName()).append(", ").append(pingStatus);
         }
-        return buff.toString();
+        return builder.toString();
     }
 }

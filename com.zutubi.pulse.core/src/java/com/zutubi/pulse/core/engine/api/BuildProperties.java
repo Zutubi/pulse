@@ -177,6 +177,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_AGENT                   = "agent";
     /**
+     * The path pattern describing where an agent's data should be put.
+     */
+    public static final String PROPERTY_AGENT_DATA_PATTERN      = "agent.data.pattern";
+    /**
      * The unique 64-bit handle of the agent the stage is assigned to.
      */
     public static final String PROPERTY_AGENT_HANDLE            = "agent.handle";

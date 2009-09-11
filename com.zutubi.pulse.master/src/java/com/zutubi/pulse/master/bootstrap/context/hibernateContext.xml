@@ -184,6 +184,23 @@ This context requires:
         </property>
     </bean>
 
+    <bean id="hostStateDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateHostStateDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+    <bean id="hostStateDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target">
+            <ref local="hostStateDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="triggerDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref local="sessionFactory"/>

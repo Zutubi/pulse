@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
-import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -31,11 +31,10 @@ public class SlaveServiceImpl implements SlaveService
     private static final Logger LOG = Logger.getLogger(SlaveServiceImpl.class);
 
     private ServiceTokenManager serviceTokenManager;
-    private SlaveQueue slaveQueue;
+    private ServerRecipeService serverRecipeService;
     private SlaveThreadPool threadPool;
     private SlaveConfigurationManager configurationManager;
     private StartupManager startupManager;
-    private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
     private ObjectFactory objectFactory;
@@ -49,12 +48,12 @@ public class SlaveServiceImpl implements SlaveService
         return Version.getVersion().getBuildNumberAsInt();
     }
 
-    public boolean updateVersion(String token, String build, String master, long handle, String packageUrl, long packageSize)
+    public boolean updateVersion(String token, String build, String master, long hostId, String packageUrl, long packageSize)
     {
         serviceTokenManager.validateToken(token);
 
         // Currently we always accept the request
-        UpdateCommand command = new UpdateCommand(build, master, token, handle, packageUrl);
+        UpdateCommand command = new UpdateCommand(build, master, token, hostId, packageUrl);
         SpringComponentContext.autowire(command);
         threadPool.execute(command);
         return true;
@@ -72,7 +71,7 @@ public class SlaveServiceImpl implements SlaveService
         return serverMessagesHandler.takeSnapshot();
     }
 
-    public SlaveStatus getStatus(String token, String master)
+    public HostStatus getStatus(String token, String master)
     {
         try
         {
@@ -81,7 +80,7 @@ public class SlaveServiceImpl implements SlaveService
         catch (InvalidTokenException e)
         {
             // Respond as status
-            return new SlaveStatus(PingStatus.TOKEN_MISMATCH);
+            return new HostStatus(PingStatus.TOKEN_MISMATCH);
         }
 
         // Pong the master (CIB-825)
@@ -92,7 +91,7 @@ public class SlaveServiceImpl implements SlaveService
         catch(Exception e)
         {
             LOG.severe(e);
-            return new SlaveStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
+            return new HostStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
 
         boolean first = false;
@@ -102,15 +101,7 @@ public class SlaveServiceImpl implements SlaveService
             firstStatus = false;
         }
 
-        long recipe = slaveRecipeProcessor.getBuildingRecipe();
-        if (recipe != 0)
-        {
-            return new SlaveStatus(PingStatus.BUILDING, recipe, first);
-        }
-        else
-        {
-            return new SlaveStatus(PingStatus.IDLE, 0, first);
-        }
+        return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
     }
 
     private void pongMaster(String master) throws MalformedURLException
@@ -121,15 +112,16 @@ public class SlaveServiceImpl implements SlaveService
 
     //---( Build API )---
 
-    public boolean build(String token, String master, long handle, RecipeRequest request) throws InvalidTokenException
+    public boolean build(String token, String master, long agentHandle, RecipeRequest request) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
         try
         {
-            RecipeCommand command = objectFactory.buildBean(RecipeCommand.class, new Class[]{String.class, Long.TYPE, RecipeRequest.class }, new Object[] {master, handle, request });
-            ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), command);
-            return slaveQueue.enqueueExclusive(runnable);
+            SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, new Class[]{String.class}, new Object[]{master});
+            ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), delegateRunner);
+            serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
+            return true;
         }
         catch (MalformedURLException e)
         {
@@ -146,12 +138,12 @@ public class SlaveServiceImpl implements SlaveService
         threadPool.execute(command);
     }
 
-    public void terminateRecipe(String token, long recipeId) throws InvalidTokenException
+    public void terminateRecipe(String token, long agentHandle, long recipeId) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
         // Do this request synchronously
-        slaveRecipeProcessor.terminateRecipe(recipeId);
+        serverRecipeService.terminateRecipe(agentHandle, recipeId);
     }
 
     //---( Resource API )---
@@ -196,74 +188,29 @@ public class SlaveServiceImpl implements SlaveService
 
     //---( Required resources. )---
 
-    /**
-     * Required resource.
-     *  
-     * @param threadPool instance
-     */
     public void setThreadPool(SlaveThreadPool threadPool)
     {
         this.threadPool = threadPool;
     }
 
-    /**
-     * Required resource
-     *
-     * @param slaveRecipeProcessor instance
-     */
-    public void setSlaveRecipeProcessor(SlaveRecipeProcessor slaveRecipeProcessor)
-    {
-        this.slaveRecipeProcessor = slaveRecipeProcessor;
-    }
-
-    /**
-     * Required resource
-     *
-     * @param configurationManager instance
-     */
     public void setConfigurationManager(SlaveConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param startupManager instance
-     */
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param serverMessagesHandler instance
-     */
     public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
     {
         this.serverMessagesHandler = serverMessagesHandler;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param serviceTokenManager instance
-     */
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param slaveQueue instance
-     */
-    public void setSlaveQueue(SlaveQueue slaveQueue)
-    {
-        this.slaveQueue = slaveQueue;
     }
 
     public void setMasterProxyFactory(MasterProxyFactory masterProxyFactory)
@@ -274,5 +221,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setServerRecipeService(ServerRecipeService serverRecipeService)
+    {
+        this.serverRecipeService = serverRecipeService;
     }
 }

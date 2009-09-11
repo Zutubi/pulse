@@ -6,6 +6,8 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -19,8 +21,6 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
@@ -317,9 +317,9 @@ public class XmlRpcHelper
         return (Integer) call("getAgentCount");
     }
 
-    public Status getAgentStatus(String name) throws Exception
+    public AgentStatus getAgentStatus(String name) throws Exception
     {
-        return EnumUtils.fromPrettyString(Status.class, (String)call("getAgentStatus", name));
+        return EnumUtils.fromPrettyString(AgentStatus.class, (String)call("getAgentStatus", name));
     }
 
     public Vector<String> getAllAgentNames() throws Exception
@@ -491,7 +491,7 @@ public class XmlRpcHelper
             {
                 try
                 {
-                    return getAgentStatus(agentName) == Status.IDLE;
+                    return getAgentStatus(agentName) == AgentStatus.IDLE;
                 }
                 catch (Exception e)
                 {

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.api;
 
-import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.User;
@@ -15,13 +14,13 @@ import org.acegisecurity.AuthenticationManager;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
-/**
- */
 public class TokenManagerTest extends PulseTestCase
 {
     private DefaultTokenManager tokenManager;
-    private Mock mock;
+    private UserManager userManager;
 
     protected void setUp() throws Exception
     {
@@ -32,16 +31,16 @@ public class TokenManagerTest extends PulseTestCase
         dan.setId(2);
         User anon = newUser("anon", "A. Nonymous", "none");
         anon.setId(3);
-        mock = new Mock(UserManager.class);
-        mock.matchAndReturn("getUser", "jason", jason);
-        mock.matchAndReturn("getUser", "dan", dan);
-        mock.matchAndReturn("getUser", "anon", anon);
-        mock.matchAndReturn("getUser", "nosuchuser", null);
-        mock.matchAndReturn("getPrinciple", jason, new AcegiUser(jason, null));
-        mock.matchAndReturn("getPrinciple", dan, new AcegiUser(dan, null));
-        mock.matchAndReturn("getPrinciple", anon, new AcegiUser(anon, null));
 
-        final UserManager userManager = (UserManager) mock.proxy();
+        userManager = mock(UserManager.class);
+        stub(userManager.getUser("jason")).toReturn(jason);
+        stub(userManager.getUser("dan")).toReturn(dan);
+        stub(userManager.getUser("anon")).toReturn(anon);
+        stub(userManager.getUser("nosuchuser")).toReturn(null);
+        stub(userManager.getPrinciple(jason)).toReturn(new AcegiUser(jason, null));
+        stub(userManager.getPrinciple(dan)).toReturn(new AcegiUser(dan, null));
+        stub(userManager.getPrinciple(anon)).toReturn(new AcegiUser(anon, null));
+
         tokenManager = new DefaultTokenManager();
         tokenManager.setUserManager(userManager);
         tokenManager.setAuthenticationManager(new AuthenticationManager()
@@ -195,9 +194,7 @@ public class TokenManagerTest extends PulseTestCase
     public void testRemoveUser() throws Exception
     {
         String token = tokenManager.login("jason", "password");
-        mock = new Mock(UserManager.class);
-        mock.matchAndReturn("getUser", "jason", null);
-        tokenManager.setUserManager((UserManager) mock.proxy());
+        stub(userManager.getUser("jason")).toReturn(null);
         assertFalse(tokenManager.logout(token));
     }
 

@@ -32,7 +32,7 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public SlaveStatus getStatus(String token, String master)
+    public HostStatus getStatus(String token, String master)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
@@ -47,7 +47,7 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public void terminateRecipe(String token, long recipeId) throws InvalidTokenException
+    public void terminateRecipe(String token, long agentHandle, long recipeId) throws InvalidTokenException
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

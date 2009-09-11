@@ -7,7 +7,10 @@ import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.*;
+import com.zutubi.util.WebUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,25 +39,28 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     {
         PulseExecutionContext context = (PulseExecutionContext) commandContext.getExecutionContext();
         final RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
-        if (paths.getPersistentWorkDir() == null)
+        final File persistentWorkDir = paths.getPersistentWorkDir();
+        if (persistentWorkDir == null)
         {
             throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
 
+        checkForOldWorkDir(context, persistentWorkDir);
+
         // run the scm bootstrapper on the local directory,
         boolean cleanBuild = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, false);
-        childBootstrapper = selectBootstrapper(cleanBuild, paths.getPersistentWorkDir());
+        childBootstrapper = selectBootstrapper(cleanBuild, persistentWorkDir);
 
         RecipePaths mungedPaths = new RecipePaths()
         {
             public File getPersistentWorkDir()
             {
-                return paths.getPersistentWorkDir();
+                return persistentWorkDir;
             }
 
             public File getBaseDir()
             {
-                return paths.getPersistentWorkDir();
+                return persistentWorkDir;
             }
 
             public File getOutputDir()
@@ -78,21 +84,58 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
         // If the checkout and base differ, then we need to copy over to the base, this implies a CLEAN_UPDATE
         // checkout scheme.
-        if(!paths.getBaseDir().equals(paths.getPersistentWorkDir()))
+        if(!paths.getBaseDir().equals(persistentWorkDir))
         {
             try
             {
                 // log this action to the build log.
-                PrintWriter out = new PrintWriter(new OutputStreamWriter(context.getOutputStream()));
-                out.println("Copying source from " + getNormalisedAbsolutePath(paths.getPersistentWorkDir()) +
+                writeStatusMessage(context, "Copying source from " + getNormalisedAbsolutePath(persistentWorkDir) +
                         " to " + getNormalisedAbsolutePath(paths.getBaseDir()) + ".  This may take some time.");
-                out.flush();
 
-                copy(paths.getBaseDir(), paths.getPersistentWorkDir());
+                copy(paths.getBaseDir(), persistentWorkDir);
             }
             catch (IOException e)
             {
                 throw new BuildException(e);
+            }
+        }
+    }
+
+    private void writeStatusMessage(ExecutionContext context, String message)
+    {
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(context.getOutputStream()));
+        out.println(message);
+        out.flush();
+    }
+
+    /**
+     * Checks for the existance of a pre-2.1 work directory under
+     * ${data.dir}/work.  If it is found, and we have no current work
+     * directory, then we assume we have upgraded and move it across.
+     *
+     * @param persistentWorkDir the new persistent working directory location
+     */
+    private void checkForOldWorkDir(ExecutionContext context, File persistentWorkDir)
+    {
+        if (!persistentWorkDir.exists())
+        {
+            File parentDir = persistentWorkDir.getParentFile();
+            if (parentDir != null && (parentDir.isDirectory() || parentDir.mkdirs()))
+            {
+                File dataDir = context.getFile(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR);
+                File candidateOldDir = new File(dataDir, FileSystemUtils.composeFilename("work", WebUtils.formUrlEncode(projectName)));
+                if (candidateOldDir.isDirectory())
+                {
+                    writeStatusMessage(context, "Moving old working directory '" + getNormalisedAbsolutePath(candidateOldDir) + "' to new location '" + getNormalisedAbsolutePath(persistentWorkDir) + "'...");
+                    if (candidateOldDir.renameTo(persistentWorkDir))
+                    {
+                        writeStatusMessage(context, "Move succeeded.");
+                    }
+                    else
+                    {
+                        writeStatusMessage(context, "Move failed.  A new working directory will be used.");
+                    }
+                }
             }
         }
     }

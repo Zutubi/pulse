@@ -239,7 +239,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    void offline(Agent agent)
+    void offline()
     {
         List<RecipeAssignmentRequest> removedRequests = null;
 
@@ -497,7 +497,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
         else
         {
-            offline(event.getAgent());
+            offline();
         }
     }
 

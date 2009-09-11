@@ -8,13 +8,9 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
-import com.zutubi.pulse.servercore.ChainBootstrapper;
-import com.zutubi.pulse.servercore.RecipeCleanup;
-import com.zutubi.pulse.servercore.ServerBootstrapper;
-import com.zutubi.pulse.servercore.ServerRecipePaths;
+import com.zutubi.pulse.servercore.*;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.slave.repository.SlaveFileRepository;
 import com.zutubi.util.FileSystem;
 import com.zutubi.util.io.IOUtils;
@@ -22,17 +18,15 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * Runner for recipes executing on a slave service.
  */
-public class SlaveRecipeProcessor
+public class SlaveRecipeRunner implements RecipeRunner
 {
-    private static final Logger LOG = Logger.getLogger(SlaveRecipeProcessor.class);
+    private static final Logger LOG = Logger.getLogger(SlaveRecipeRunner.class);
 
-    private AtomicLong buildingRecipe = new AtomicLong(SlaveStatus.NO_RECIPE);
-
-    private RecipeProcessor recipeProcessor;
+    private String master;
     private SlaveConfigurationManager configurationManager;
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
@@ -41,8 +35,9 @@ public class SlaveRecipeProcessor
     private ScmClientFactory scmClientFactory;
     private RecipeCleanup recipeCleanup;
 
-    public SlaveRecipeProcessor()
+    public SlaveRecipeRunner(String master)
     {
+        this.master = master;
         recipeCleanup = new RecipeCleanup(new FileSystem());
     }
 
@@ -69,20 +64,22 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, long agentHandle, RecipeRequest request)
+    public void runRecipe(RecipeRequest request, RecipeProcessor recipeProcessor)
     {
         MasterService masterProxy = getMasterProxy(master);
-        if(masterProxy != null)
+        if (masterProxy != null)
         {
-            buildingRecipe.set(request.getId());
             PulseExecutionContext context = request.getContext();
+            long agentHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, 0);
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(agentHandle, masterProxy, serviceTokenManager);
+            String agentName = context.getString(NAMESPACE_INTERNAL, PROPERTY_AGENT);
+            String agentDataPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN);
             long projectHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, 0);
             boolean incremental = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false);
             File dataDir = configurationManager.getUserPaths().getData();
             String persistentPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(projectHandle, request.getProject(), request.getId(), incremental, persistentPattern, dataDir);
+            ServerRecipePaths processorPaths = new ServerRecipePaths(agentHandle, agentName, agentDataPattern, projectHandle, request.getProject(), request.getId(), incremental, persistentPattern, dataDir);
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
@@ -122,36 +119,13 @@ public class SlaveRecipeProcessor
                 IOUtils.close(outputStream);
                 context.pop();
                 eventManager.unregister(listener);
-                buildingRecipe.set(SlaveStatus.NO_RECIPE);
             }
-        }
-    }
-
-    public long getBuildingRecipe()
-    {
-        return buildingRecipe.get();
-    }
-
-    public void terminateRecipe(long id)
-    {
-        try
-        {
-            recipeProcessor.terminateRecipe(id);
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warning("Interrupted while terminating recipe", e);
         }
     }
 
     public void setConfigurationManager(SlaveConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setRecipeProcessor(RecipeProcessor recipeProcessor)
-    {
-        this.recipeProcessor = recipeProcessor;
     }
 
     public void setEventManager(EventManager eventManager)

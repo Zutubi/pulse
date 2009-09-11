@@ -1,31 +1,17 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
 import java.io.File;
-import java.util.List;
 
 /**
+ * Service for communication with agents.
  */
 public interface AgentService
 {
-    String getUrl();
-
-    int ping();
-    SlaveStatus getStatus(String masterLocation);
-    boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize);
-
-    List<ResourceConfiguration> discoverResources();
-    SystemInfo getSystemInfo();
-    List<CustomLogRecord> getRecentMessages();
-
     AgentConfiguration getAgentConfig();
 
     /**
@@ -62,8 +48,4 @@ public interface AgentService
      * @param recipeId the recipe to terminate
      */
     void terminateRecipe(long recipeId);
-
-    String getHostName();
-
-    void garbageCollect();
 }

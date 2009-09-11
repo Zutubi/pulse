@@ -3,7 +3,7 @@ package com.zutubi.pulse.servercore.agent;
 import com.zutubi.util.EnumUtils;
 
 /**
- * Basic state of an agent returned by a ping.
+ * Basic state of a host returned by a ping.
  */
 public enum PingStatus
 {

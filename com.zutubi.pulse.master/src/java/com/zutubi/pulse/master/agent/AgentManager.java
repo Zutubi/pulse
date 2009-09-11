@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.security.SecureParameter;
 import com.zutubi.pulse.master.security.SecureResult;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
-import com.zutubi.pulse.servercore.services.UpgradeStatus;
+import com.zutubi.tove.security.AccessManager;
 
 import java.util.List;
 
@@ -28,11 +29,11 @@ public interface AgentManager extends AgentPersistentStatusManager
     @SecureResult
     Agent getAgent(String name);
 
+    @SecureParameter(parameterType = AgentConfiguration.class, action = AccessManager.ACTION_DELETE)
+    void deleteState(AgentState state);
+
     @SecureParameter(parameterType = AgentConfiguration.class, action = AgentConfigurationActions.ACTION_PING)
     void pingAgent(AgentConfiguration agentConfig);
-    void pingAgents();
 
     int getAgentCount();
-
-    void upgradeStatus(UpgradeStatus upgradeStatus);
 }

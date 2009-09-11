@@ -7,19 +7,40 @@ package com.zutubi.pulse.servercore;
  */
 public class AgentRecipeDetails
 {
+    private long agentHandle;
+    private String agent;
+    private String agentDataPattern;
     private long projectHandle;
     private String project;
     private long recipeId;
     private boolean incremental;
-    private String persistentPattern;
+    private String projectPersistentPattern;
 
-    public AgentRecipeDetails(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern)
+    public AgentRecipeDetails(long agentHandle, String agent, String agentDataPattern, long projectHandle, String project, long recipeId, boolean incremental, String projectPersistentPattern)
     {
+        this.agentHandle = agentHandle;
+        this.agent = agent;
+        this.agentDataPattern = agentDataPattern;
         this.projectHandle = projectHandle;
         this.project = project;
         this.recipeId = recipeId;
         this.incremental = incremental;
-        this.persistentPattern = persistentPattern;
+        this.projectPersistentPattern = projectPersistentPattern;
+    }
+
+    public long getAgentHandle()
+    {
+        return agentHandle;
+    }
+
+    public String getAgent()
+    {
+        return agent;
+    }
+
+    public String getAgentDataPattern()
+    {
+        return agentDataPattern;
     }
 
     public long getProjectHandle()
@@ -42,8 +63,8 @@ public class AgentRecipeDetails
         return incremental;
     }
 
-    public String getPersistentPattern()
+    public String getProjectPersistentPattern()
     {
-        return persistentPattern;
+        return projectPersistentPattern;
     }
 }

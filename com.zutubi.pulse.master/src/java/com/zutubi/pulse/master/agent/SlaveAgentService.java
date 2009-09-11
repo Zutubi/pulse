@@ -1,19 +1,15 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
 import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
@@ -25,9 +21,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
 
 /**
+ * Service for communicating with agents run on slaves.  Wraps the more general
+ * slave service, taking care of providing the token and agent name where
+ * required.
  */
 public class SlaveAgentService implements AgentService
 {
@@ -43,41 +41,6 @@ public class SlaveAgentService implements AgentService
     {
         this.service = service;
         this.agentConfig = agentConfig;
-    }
-
-    public String getUrl()
-    {
-        return agentConfig.getHost() + ":" + agentConfig.getPort();
-    }
-
-    public int ping()
-    {
-        return service.ping();
-    }
-
-    public SlaveStatus getStatus(String masterLocation)
-    {
-        return service.getStatus(serviceTokenManager.getToken(), masterLocation);
-    }
-
-    public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
-    {
-        return service.updateVersion(serviceTokenManager.getToken(), masterBuild, masterUrl, handle, packageUrl, packageSize);
-    }
-
-    public List<ResourceConfiguration> discoverResources()
-    {
-        return service.discoverResources(serviceTokenManager.getToken());
-    }
-
-    public SystemInfo getSystemInfo()
-    {
-        return service.getSystemInfo(serviceTokenManager.getToken());
-    }
-
-    public List<CustomLogRecord> getRecentMessages()
-    {
-        return service.getRecentMessages(serviceTokenManager.getToken());
     }
 
     public boolean hasResource(ResourceRequirement requirement)
@@ -124,11 +87,14 @@ public class SlaveAgentService implements AgentService
             }
 
             String query = WebUtils.buildQueryString(asPair(PARAM_TOKEN, serviceTokenManager.getToken()),
+                                            asPair(PARAM_AGENT_HANDLE, Long.toString(recipeDetails.getAgentHandle())),
+                                            asPair(PARAM_AGENT, recipeDetails.getAgent()),
+                                            asPair(PARAM_AGENT_DATA_PATTERN, recipeDetails.getAgentDataPattern()),
                                             asPair(PARAM_PROJECT_HANDLE, Long.toString(recipeDetails.getProjectHandle())),
                                             asPair(PARAM_PROJECT, recipeDetails.getProject()),
                                             asPair(PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId())),
                                             asPair(PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental())),
-                                            asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getPersistentPattern()),
+                                            asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getProjectPersistentPattern()),
                                             asPair(PARAM_OUTPUT, Boolean.toString(output)));
 
             URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
@@ -195,22 +161,12 @@ public class SlaveAgentService implements AgentService
     {
         try
         {
-            service.terminateRecipe(serviceTokenManager.getToken(), recipeId);
+            service.terminateRecipe(serviceTokenManager.getToken(), agentConfig.getHandle(), recipeId);
         }
         catch (RuntimeException e)
         {
             LOG.severe("Unable to terminate recipe: " + e.getMessage(), e);
         }
-    }
-
-    public String getHostName()
-    {
-        return agentConfig.getName();
-    }
-
-    public void garbageCollect()
-    {
-        service.garbageCollect();
     }
 
     public AgentConfiguration getAgentConfig()

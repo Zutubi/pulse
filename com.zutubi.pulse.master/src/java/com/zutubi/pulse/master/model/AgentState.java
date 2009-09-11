@@ -8,17 +8,14 @@ import com.zutubi.pulse.core.model.Entity;
 public class AgentState extends Entity
 {
     /**
-     * Persistent slave states.  The minimum we need to remember even across
-     * restarts to ensure disabled slaves stay that way and failed (or
-     * interrupted) upgrades are not retried without user intervention.
+     * Persistent agents states.  The minimum we need to remember even across
+     * restarts to ensure disabled slaves stay that way.
      */
     public enum EnableState
     {
         ENABLED,
         DISABLED,
         DISABLING,
-        UPGRADING,
-        FAILED_UPGRADE
     }
 
     private EnableState enableState = EnableState.ENABLED;
@@ -30,7 +27,7 @@ public class AgentState extends Entity
 
     public boolean isDisabled()
     {
-        return enableState == EnableState.DISABLED || enableState == EnableState.FAILED_UPGRADE;
+        return enableState == EnableState.DISABLED;
     }
 
     public boolean isDisabling()
@@ -53,11 +50,13 @@ public class AgentState extends Entity
         this.enableState = enableState;
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     private String getEnableStateName()
     {
         return enableState.toString();
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     private void setEnableStateName(String name)
     {
         this.enableState = EnableState.valueOf(name);

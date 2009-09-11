@@ -1,11 +1,11 @@
 package com.zutubi.pulse.servercore.services;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
 import com.zutubi.util.FileSystemUtils;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +39,8 @@ public class ServiceTokenManagerTest extends PulseTestCase
             }
         };
 
-        Mock mockConfigurationManager = new Mock(ConfigurationManager.class);
-        mockConfigurationManager.matchAndReturn("getUserPaths", C.ANY_ARGS, paths);
-        configManager = (ConfigurationManager) mockConfigurationManager.proxy();
-
+        configManager = mock(ConfigurationManager.class);
+        stub(configManager.getUserPaths()).toReturn(paths);
         tokenManager.setConfigurationManager(configManager);
     }
 

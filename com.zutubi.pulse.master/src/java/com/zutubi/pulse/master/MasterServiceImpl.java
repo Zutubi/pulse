@@ -5,7 +5,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.HostStatusManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
@@ -20,18 +20,18 @@ public class MasterServiceImpl implements MasterService
     private ServiceTokenManager serviceTokenManager;
     private EventManager eventManager;
     private ResourceManager resourceManager;
-    private AgentManager agentManager;
+    private HostStatusManager hostStatusManager;
 
     public void pong()
     {
-        // Empty: just to test coms.
+        // Empty: just to test comms.
     }
 
     public void upgradeStatus(String token, UpgradeStatus upgradeStatus)
     {
         if (validateToken(token))
         {
-            agentManager.upgradeStatus(upgradeStatus);
+            hostStatusManager.upgradeStatus(upgradeStatus);
         }
     }
 
@@ -93,8 +93,8 @@ public class MasterServiceImpl implements MasterService
         this.serviceTokenManager = serviceTokenManager;
     }
 
-    public void setAgentManager(AgentManager agentManager)
+    public void setHostStatusManager(HostStatusManager hostStatusManager)
     {
-        this.agentManager = agentManager;
+        this.hostStatusManager = hostStatusManager;
     }
 }

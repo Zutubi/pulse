@@ -32,7 +32,6 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.pulse.servercore.CopyBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
@@ -178,7 +177,7 @@ public class RecipeController
         logger.log(event);
         Agent agent = event.getAgent();
         agentService = agent.getService();
-        recipeResultNode.setHost(agentService.getHostName());
+        recipeResultNode.setHost(agent.getName());
         buildManager.save(recipeResultNode);
 
         ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);
@@ -195,6 +194,7 @@ public class RecipeController
         addRevisionProperties(agentContext, buildRevision);
         agentContext.addString(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, agent.getConfig().getName());
         agentContext.addValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
+        agentContext.addValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
         agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
 
         addScmProperties(agentContext);
@@ -453,13 +453,6 @@ public class RecipeController
     {
         buildHookManager.handleEvent(evt, logger);
         eventManager.publish(evt);
-    }
-
-    public Bootstrapper getChildBootstrapper()
-    {
-        // use the service details to configure the copy bootstrapper.
-        String url = agentService.getUrl();
-        return new CopyBootstrapper(url, serviceTokenManager.getToken(), recipeResult.getId());
     }
 
     public String getRecipeName()

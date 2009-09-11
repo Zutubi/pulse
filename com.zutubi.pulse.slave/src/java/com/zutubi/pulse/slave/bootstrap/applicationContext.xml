@@ -56,13 +56,11 @@
 
     <bean id="tokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" init-method="init"/>
 
+    <bean id="threadFactory" class="com.zutubi.pulse.slave.SlaveThreadFactory"/>
+
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" />
 
-    <bean id="slaveQueue" class="com.zutubi.pulse.slave.SlaveQueue" init-method="start"/>
-
-    <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" />
-
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" />
+    <bean id="serverRecipeService" class="com.zutubi.pulse.servercore.ServerRecipeService" init-method="init"/>
 
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 
@@ -94,7 +92,7 @@
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">
             <list>
-                <ref bean="slaveQueue"/>
+                <ref bean="serverRecipeService"/>
                 <ref bean="jettyServerManager"/>
             </list>
         </property>

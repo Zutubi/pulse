@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.servercore.agent.Status;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.servercore.services.UpgradeState;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -19,38 +17,38 @@ public class DefaultAgent implements Agent
      * session.  For this reason it should not be exposed beyond this object.
      */
     private AgentState agentState;
-    private Status status;
+    private AgentStatus status;
+    private Host host;
     private long lastPingTime = 0;
     private long recipeId = -1;
     private AgentService agentService;
     private String pingError = null;
-    /**
-     * The upgrade state is only used when the slave enable state is UPGRADING.
-     */
-    private UpgradeState upgradeState = UpgradeState.INITIAL;
-    private int upgradeProgress = -1;
-    private String upgradeMessage = null;
 
-    public DefaultAgent(AgentConfiguration agentConfig, AgentState agentState, AgentService agentService)
+    public DefaultAgent(AgentConfiguration agentConfig, AgentState agentState, AgentService agentService, Host host)
     {
         this.agentConfig = agentConfig;
         this.agentState = agentState;
         this.agentService = agentService;
+        this.host = host;
 
         // Restore transient state based on persistent state
-        switch(agentState.getEnableState())
+        switch(host.getPersistentUpgradeState())
         {
-            case ENABLED:
-                status = Status.INITIAL;
-                break;
-            case DISABLED:
-            case DISABLING:
-            case UPGRADING:
-                status = Status.DISABLED;
+            case NONE:
+                switch(agentState.getEnableState())
+                {
+                    case ENABLED:
+                        status = AgentStatus.INITIAL;
+                        break;
+                    case DISABLED:
+                    case DISABLING:
+                        status = AgentStatus.DISABLED;
+                        break;
+                }
                 break;
             case FAILED_UPGRADE:
-                status = Status.DISABLED;
-                upgradeState = UpgradeState.FAILED;
+            case UPGRADING:
+                status = AgentStatus.VERSION_MISMATCH;
                 break;
         }
     }
@@ -65,21 +63,14 @@ public class DefaultAgent implements Agent
         return getConfig().getName();
     }
 
-    public Status getStatus()
+    public AgentStatus getStatus()
     {
         return status;
     }
 
-    public String getLocation()
+    public Host getHost()
     {
-        if(agentConfig.isRemote())
-        {
-            return agentConfig.getHost() + ":" + agentConfig.getPort();
-        }
-        else
-        {
-            return "[local]";
-        }
+        return host;
     }
 
     public long getId()
@@ -124,11 +115,6 @@ public class DefaultAgent implements Agent
         return recipeId;
     }
 
-    public void setRecipeId(long recipeId)
-    {
-        this.recipeId = recipeId;
-    }
-
     public String getPingError()
     {
         return pingError;
@@ -154,37 +140,27 @@ public class DefaultAgent implements Agent
         return agentState.isDisabled();
     }
 
-    public boolean isUpgrading()
-    {
-        return agentState.getEnableState() == AgentState.EnableState.UPGRADING;
-    }
-
-    public boolean isFailedUpgrade()
-    {
-        return agentState.getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
-    }
-
     public boolean isAvailable()
     {
-        return status == Status.IDLE;
+        return status == AgentStatus.IDLE;
     }
 
-    public void updateStatus(SlaveStatus status)
+    public void updateStatus(AgentPingEvent agentPingEvent)
     {
-        updateStatus(Status.valueOf(status.getStatus().toString()), status.getRecipeId(), status.getMessage());
+        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), agentPingEvent.getRecipeId(), agentPingEvent.getMessage());
     }
 
-    public void updateStatus(Status status)
+    public void updateStatus(AgentStatus status)
     {
         updateStatus(status, -1);
     }
 
-    public void updateStatus(Status status, long recipeId)
+    public void updateStatus(AgentStatus status, long recipeId)
     {
         updateStatus(status, recipeId, null);
     }
 
-    public void updateStatus(Status status, long recipeId, String pingError)
+    public void updateStatus(AgentStatus status, long recipeId, String pingError)
     {
         lastPingTime = System.currentTimeMillis();
         this.status = status;
@@ -199,31 +175,6 @@ public class DefaultAgent implements Agent
         lastPingTime = existingAgent.lastPingTime;
         recipeId = existingAgent.recipeId;
         pingError = existingAgent.pingError;
-        upgradeState = existingAgent.upgradeState;
-        upgradeProgress = existingAgent.upgradeProgress;
-        upgradeMessage = existingAgent.upgradeMessage;
-    }
-
-    public void upgradeStatus(UpgradeState state, int progress, String message)
-    {
-        upgradeState = state;
-        upgradeProgress = progress;
-        upgradeMessage = message;
-    }
-
-    public UpgradeState getUpgradeState()
-    {
-        return upgradeState;
-    }
-
-    public int getUpgradeProgress()
-    {
-        return upgradeProgress;
-    }
-
-    public String getUpgradeMessage()
-    {
-        return upgradeMessage;
     }
 
     public AgentState.EnableState getEnableState()

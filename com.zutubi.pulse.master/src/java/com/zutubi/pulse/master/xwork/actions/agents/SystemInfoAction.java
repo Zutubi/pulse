@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.HostManager;
+import com.zutubi.pulse.master.agent.HostService;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
@@ -22,6 +24,7 @@ public class SystemInfoAction extends AgentActionBase
     private SystemInfo info;
 
     private ConfigurationManager configurationManager;
+    private HostManager hostManager;
     private StartupManager startupManager;
 
     public String execute()
@@ -33,11 +36,12 @@ public class SystemInfoAction extends AgentActionBase
         }
         else
         {
-            if(agent.isOnline())
+            if (agent.isOnline())
             {
+                HostService hostService = hostManager.getServiceForHost(agent.getHost());
                 try
                 {
-                    info = agent.getService().getSystemInfo();
+                    info = hostService.getSystemInfo();
                 }
                 catch(RuntimeException e)
                 {
@@ -81,6 +85,11 @@ public class SystemInfoAction extends AgentActionBase
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setHostManager(HostManager hostManager)
+    {
+        this.hostManager = hostManager;
     }
 
     public void setStartupManager(StartupManager startupManager)

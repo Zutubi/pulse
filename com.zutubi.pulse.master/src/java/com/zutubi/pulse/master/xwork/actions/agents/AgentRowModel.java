@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Represents a row in the agents table.
  */
-public class AgentModel
+public class AgentRowModel
 {
     private Agent agent;
     private String name;
@@ -17,7 +17,7 @@ public class AgentModel
     private String status;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
 
-    public AgentModel(Agent agent, String name, String location, String status)
+    public AgentRowModel(Agent agent, String name, String location, String status)
     {
         this.agent = agent;
         this.name = name;

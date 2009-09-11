@@ -102,15 +102,17 @@
         </property>
     </bean>
 
+    <bean id="hostManager" class="com.zutubi.pulse.master.agent.DefaultHostManager"/>
+
+    <bean id="hostStatusManager" class="com.zutubi.pulse.master.agent.HostStatusManager"/>
+
     <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider"/>
 
-    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" init-method="init"/>
+    <bean id="hostPingService" class="com.zutubi.pulse.master.agent.HostPingService" init-method="init"/>
 
     <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" init-method="init"/>
 
     <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" init-method="init"/>
-
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.master.engine.marshal.MasterPulseFileLoaderFactory" init-method="init"/>
 
@@ -122,7 +124,7 @@
 
     <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
 
-    <bean id="masterRecipeProcessor" class="com.zutubi.pulse.master.MasterRecipeProcessor"/>
+    <bean id="serverRecipeService" class="com.zutubi.pulse.servercore.ServerRecipeService" init-method="init"/>
 
     <bean id="buildResultRenderer" class="com.zutubi.pulse.master.notifications.renderer.FreemarkerBuildResultRenderer"/>
 
@@ -166,9 +168,9 @@
                 <ref bean="scheduler"/>
                 <ref bean="fatController"/>
                 <ref bean="recipeQueue"/>
-                <ref bean="masterRecipeProcessor"/>
-                <ref bean="agentPingService"/>
-                <ref bean="agentManager"/>
+                <ref bean="serverRecipeService"/>
+                <ref bean="hostPingService"/>
+                <ref bean="hostStatusManager"/>
                 <ref bean="jabberManager"/>
                 <ref bean="jettyServerManager"/> 
                 <ref bean="projectInitialisationService"/>

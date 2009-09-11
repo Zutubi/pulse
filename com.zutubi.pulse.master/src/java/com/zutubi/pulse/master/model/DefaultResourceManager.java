@@ -6,16 +6,21 @@ import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.DefaultHost;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.logging.Logger;
+import com.zutubi.util.Predicate;
 
 import java.util.*;
 
@@ -23,12 +28,12 @@ import java.util.*;
  */
 public class DefaultResourceManager implements ResourceManager, com.zutubi.events.EventListener
 {
-    private static final Logger LOG = Logger.getLogger(DefaultResourceManager.class);
-
     private Map<Long, AgentResourceRepository> agentRepositories = new TreeMap<Long, AgentResourceRepository>();
-    private ConfigurationProvider configurationProvider;
     private Map<Long, ResourceConfiguration> resourcesByHandle = new HashMap<Long, ResourceConfiguration>();
     private Map<Long, ResourceVersionConfiguration> resourceVersionsByHandle = new HashMap<Long, ResourceVersionConfiguration>();
+
+    private ConfigurationProvider configurationProvider;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
@@ -217,33 +222,91 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         return getAgentRepository(agent.getConfig());
     }
 
-    public void addDiscoveredResources(final String agentPath, final List<ResourceConfiguration> discoveredResources)
+    public List<AgentConfiguration> addDiscoveredResources(final String hostLocation, final List<ResourceConfiguration> discoveredResources)
     {
         // Go direct to the config system.  We don't want to mess with our
         // cache here at all, because:
         //   - it may be out of date (if an event is pending); and
         //   - it will be invalidated by this change and updated by our event
         //     handler anyway
-        configurationProvider.executeInsideTransaction(new NullaryFunction<Object>()
+        return configurationProvider.executeInsideTransaction(new NullaryFunction<List<AgentConfiguration>>()
         {
-            public Object process()
+            public List<AgentConfiguration> process()
             {
-                AgentConfiguration config = configurationProvider.get(agentPath, AgentConfiguration.class);
-                if(config != null)
+                List<AgentConfiguration> agentConfigs = getAgentsThatDefineLocation(hostLocation);
+                List<AgentConfiguration> affectedAgents = new LinkedList<AgentConfiguration>();
+                for (AgentConfiguration config: agentConfigs)
                 {
-                    for (ResourceConfiguration r : discoveredResources)
+                    String agentPath = config.getConfigurationPath();
+                    for (ResourceConfiguration discoveredResource : discoveredResources)
                     {
-                        Map<String, ResourceConfiguration> agentResources = config.getResources();
-                        addResource(agentPath, r, agentResources.get(r.getName()));
+                        // Check that no descendent defines the resource, so we
+                        // don't conflict with those definitions.
+                        if (noDescendentDefinesResource(agentPath, discoveredResource.getName()))
+                        {
+                            Map<String, ResourceConfiguration> agentResources = config.getResources();
+                            addResource(agentPath, discoveredResource, agentResources.get(discoveredResource.getName()));
 
-                        // Lookup again, we just change this agent.
-                        config = configurationProvider.get(agentPath, AgentConfiguration.class);
+                            // Lookup again, we just changed this agent.
+                            config = configurationProvider.get(agentPath, AgentConfiguration.class);
+                        }
                     }
+
+                    affectedAgents.add(config);
                 }
 
-                return null;
+                return affectedAgents;
             }
         });
+    }
+
+    private List<AgentConfiguration> getAgentsThatDefineLocation(final String hostLocation)
+    {
+        Collection<AgentConfiguration> allAgents = configurationTemplateManager.getAllInstances(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AgentConfiguration.class, true);
+        return CollectionUtils.filter(allAgents, new Predicate<AgentConfiguration>()
+        {
+            public boolean satisfied(AgentConfiguration configuration)
+            {
+                return definesLocation(configuration, hostLocation);
+            }
+        });
+    }
+
+    private boolean definesLocation(AgentConfiguration config, String hostLocation)
+    {
+        if (locationMatches(config, hostLocation))
+        {
+            TemplateRecord templateParentRecord = configurationTemplateManager.getTemplateParentRecord(config.getConfigurationPath());
+            if (templateParentRecord != null)
+            {
+                AgentConfiguration templateParentConfig = configurationTemplateManager.getInstance(templateParentRecord.getHandle(), AgentConfiguration.class);
+                if (!locationMatches(templateParentConfig, hostLocation))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean locationMatches(AgentConfiguration config, String hostLocation)
+    {
+        return DefaultHost.getLocation(config.isRemote(), config.getHost(), config.getPort()).equals(hostLocation);
+    }
+
+    private boolean noDescendentDefinesResource(String agentPath, String resourceName)
+    {
+        Set<AgentConfiguration> descendents = configurationProvider.getAllDescendents(agentPath, AgentConfiguration.class, true, false);
+        for (AgentConfiguration descendent: descendents)
+        {
+            if (descendent.getResources().containsKey(resourceName))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void addResource(String agentPath, ResourceConfiguration discoveredResource, ResourceConfiguration existingResource)
@@ -303,7 +366,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
 
     public void handleEvent(Event event)
     {
-        if(event instanceof ConfigurationEventSystemStartedEvent)
+        if (event instanceof ConfigurationEventSystemStartedEvent)
         {
             registerConfigListeners(((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider());
         }
@@ -321,5 +384,10 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
     public void setEventManager(EventManager eventManager)
     {
         eventManager.register(this);
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

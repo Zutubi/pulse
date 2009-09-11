@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
+import com.zutubi.pulse.master.events.HostUpgradeCompleteEvent;
 import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
@@ -13,15 +13,16 @@ import java.io.File;
 import java.util.concurrent.*;
 
 /**
- * An active object (i.e. runs in it's own thread) that tries to update an
- * agent.  Tracks the agent progress through the update process, and tries
+ * An active object (i.e. runs in it's own thread) that tries to update a
+ * host.  Tracks the host progress through the update process, and tries
  * to detect failures and update the slave persistent status appropriately.
  */
-public class AgentUpdater implements Runnable
+public class HostUpdater implements Runnable
 {
-    private static final Logger LOG = Logger.getLogger(AgentUpdater.class);
+    private static final Logger LOG = Logger.getLogger(HostUpdater.class);
     
-    private Agent agent;
+    private DefaultHost host;
+    private HostService hostService;
     private ExecutorService executor;
     private LinkedBlockingQueue<UpgradeStatus> statuses = new LinkedBlockingQueue<UpgradeStatus>();
     /**
@@ -44,9 +45,10 @@ public class AgentUpdater implements Runnable
     private MasterLocationProvider masterLocationProvider;
     private ThreadFactory threadFactory;
 
-    public AgentUpdater(Agent agent)
+    public HostUpdater(DefaultHost host, HostService hostService)
     {
-        this.agent = agent;
+        this.host = host;
+        this.hostService = hostService;
     }
 
     public void start()
@@ -57,7 +59,6 @@ public class AgentUpdater implements Runnable
 
     public void run()
     {
-        AgentService agentService = agent.getService();
         String masterUrl = masterLocationProvider.getMasterUrl();
         File packageFile = DownloadPackageServlet.getAgentZip(configurationManager.getSystemPaths());
         String packageUrl = DownloadPackageServlet.getPackagesUrl(masterUrl) + "/" + packageFile.getName();
@@ -65,11 +66,11 @@ public class AgentUpdater implements Runnable
 
         try
         {
-            boolean accepted = agentService.updateVersion(masterBuild, masterUrl, agent.getConfig().getHandle(), packageUrl, packageFile.length());
+            boolean accepted = hostService.updateVersion(masterBuild, masterUrl, host.getId(), packageUrl, packageFile.length());
 
             if(!accepted)
             {
-                agent.upgradeStatus(UpgradeState.FAILED, -1, "Agent rejected upgrade, manual upgrade required.");
+                host.upgradeStatus(UpgradeState.FAILED, -1, "Host rejected upgrade, manual upgrade required.");
                 completed(false);
                 return;
             }
@@ -80,12 +81,12 @@ public class AgentUpdater implements Runnable
                 UpgradeStatus status = statuses.poll(statusTimeout, TimeUnit.SECONDS);
                 if(status == null)
                 {
-                    agent.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for message from agent.");
+                    host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for message from host.");
                     completed(false);
                     return;
                 }
 
-                agent.upgradeStatus(status.getState(), status.getProgress(), status.getMessage());
+                host.upgradeStatus(status.getState(), status.getProgress(), status.getMessage());
                 switch(status.getState())
                 {
                     case ERROR:
@@ -105,11 +106,11 @@ public class AgentUpdater implements Runnable
             {
                 try
                 {
-                    int build = agentService.ping();
+                    int build = hostService.ping();
                     if(build == expectedBuild)
                     {
                         // We did it!
-                        agent.upgradeStatus(UpgradeState.INITIAL, -1, null);
+                        host.upgradeStatus(UpgradeState.INITIAL, -1, null);
                         completed(true);
                         return;
                     }
@@ -121,21 +122,21 @@ public class AgentUpdater implements Runnable
                 }
             }
 
-            agent.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for agent to reboot.");
+            host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for host to reboot.");
             completed(false);
         }
         catch (Exception e)
         {
             // Something went wrong
             LOG.warning(e);
-            agent.upgradeStatus(UpgradeState.ERROR, -1, e.getMessage());
+            host.upgradeStatus(UpgradeState.ERROR, -1, e.getMessage());
             completed(false);
         }
     }
 
     private void completed(boolean succeeded)
     {
-        eventManager.publish(new AgentUpgradeCompleteEvent(this, agent, succeeded));
+        eventManager.publish(new HostUpgradeCompleteEvent(this, host, succeeded));
     }
 
     public void stop(boolean force)

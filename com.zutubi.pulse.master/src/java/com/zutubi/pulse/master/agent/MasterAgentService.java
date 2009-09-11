@@ -1,93 +1,37 @@
 package com.zutubi.pulse.master.agent;
 
-import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.resources.ResourceDiscoverer;
-import com.zutubi.pulse.master.MasterRecipeProcessor;
+import com.zutubi.pulse.master.MasterRecipeRunner;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
-import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.pulse.servercore.bootstrap.StartupManager;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
-import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
+import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.logging.Logger;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
+ * A service to communicate with agents running within the master.
  */
 public class MasterAgentService implements AgentService
 {
-    private static final Logger LOG = Logger.getLogger(MasterAgentService.class);
-
     private AgentConfiguration agentConfig;
 
-    private MasterRecipeProcessor masterRecipeProcessor;
+    private ServerRecipeService serverRecipeService;
     private MasterConfigurationManager configurationManager;
+    private ObjectFactory objectFactory;
     private ResourceManager resourceManager;
-    private StartupManager startupManager;
-    private ServerMessagesHandler serverMessagesHandler;
-    private MasterLocationProvider masterLocationProvider;
 
     public MasterAgentService(AgentConfiguration agentConfig)
     {
         this.agentConfig = agentConfig;
-    }
-
-    public String getUrl()
-    {
-        return masterLocationProvider.getMasterUrl();
-    }
-
-    public int ping()
-    {
-        return Version.getVersion().getBuildNumberAsInt();
-    }
-
-    public SlaveStatus getStatus(String masterLocation)
-    {
-        long recipeId = getMasterRecipeProcessor().getBuildingRecipe();
-        if (recipeId == 0)
-        {
-            return new SlaveStatus(PingStatus.IDLE);
-        }
-        else
-        {
-            return new SlaveStatus(PingStatus.BUILDING, recipeId, false);
-        }
-    }
-
-    public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
-    {
-        LOG.warning("Illegal request to update version of master agent.");
-        return true;
-    }
-
-    public List<ResourceConfiguration> discoverResources()
-    {
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
-        return discoverer.discover();
-    }
-
-    public SystemInfo getSystemInfo()
-    {
-        return SystemInfo.getSystemInfo(configurationManager, startupManager);
-    }
-
-    public List<CustomLogRecord> getRecentMessages()
-    {
-        return serverMessagesHandler.takeSnapshot();
     }
 
     public AgentConfiguration getAgentConfig()
@@ -97,18 +41,14 @@ public class MasterAgentService implements AgentService
 
     public boolean hasResource(ResourceRequirement requirement)
     {
-        return getResourceManager().getAgentRepository(agentConfig).hasResource(requirement);
+        return resourceManager.getAgentRepository(agentConfig).hasResource(requirement);
     }
 
     public boolean build(RecipeRequest request)
     {
-        getMasterRecipeProcessor().processRecipe(request, getResourceManager().getAgentRepository(agentConfig));
+        MasterRecipeRunner recipeRunner = objectFactory.buildBean(MasterRecipeRunner.class, new Class[]{ResourceRepository.class}, new Object[]{resourceManager.getAgentRepository(agentConfig)});
+        serverRecipeService.processRecipe(agentConfig.getHandle(), request, recipeRunner);
         return true;
-    }
-
-    public long getBuildingRecipe()
-    {
-        return getMasterRecipeProcessor().getBuildingRecipe();
     }
 
     public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
@@ -167,17 +107,7 @@ public class MasterAgentService implements AgentService
 
     public void terminateRecipe(long recipeId)
     {
-        getMasterRecipeProcessor().terminateRecipe(recipeId);
-    }
-
-    public String getHostName()
-    {
-        return "master";
-    }
-
-    public void garbageCollect()
-    {
-        Runtime.getRuntime().gc();
+        serverRecipeService.terminateRecipe(agentConfig.getHandle(), recipeId);
     }
 
     @Override
@@ -192,14 +122,9 @@ public class MasterAgentService implements AgentService
         return false;
     }
 
-    private MasterRecipeProcessor getMasterRecipeProcessor()
+    public void setServerRecipeService(ServerRecipeService serverRecipeService)
     {
-        return masterRecipeProcessor;
-    }
-
-    public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
-    {
-        this.masterRecipeProcessor = masterRecipeProcessor;
+        this.serverRecipeService = serverRecipeService;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
@@ -207,28 +132,13 @@ public class MasterAgentService implements AgentService
         this.configurationManager = configurationManager;
     }
 
-    public ResourceManager getResourceManager()
+    public void setObjectFactory(ObjectFactory objectFactory)
     {
-        return resourceManager;
+        this.objectFactory = objectFactory;
     }
-    
+
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
-    }
-
-    public void setStartupManager(StartupManager startupManager)
-    {
-        this.startupManager = startupManager;
-    }
-
-    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
-    {
-        this.serverMessagesHandler = serverMessagesHandler;
-    }
-
-    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
-    {
-        this.masterLocationProvider = masterLocationProvider;
     }
 }

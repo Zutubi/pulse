@@ -16,10 +16,14 @@ public class SlaveProxyFactory
 
     public SlaveService createProxy(AgentConfiguration agentConfig)
     {
+        return createProxy(agentConfig.getHost(), agentConfig.getPort());
+    }
+
+    public SlaveService createProxy(String host, int port)
+    {
         try
         {
-            URL url = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/hessian");
-            return (SlaveService) hessianProxyFactory.create(SlaveService.class, url.toString());
+            return unsafeCreateProxy(host, port);
         }
         catch (MalformedURLException e)
         {
@@ -29,7 +33,12 @@ public class SlaveProxyFactory
 
     public SlaveService unsafeCreateProxy(AgentConfiguration agentConfig) throws MalformedURLException
     {
-        URL url = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/hessian");
+        return unsafeCreateProxy(agentConfig.getHost(), agentConfig.getPort());
+    }
+
+    private SlaveService unsafeCreateProxy(String host, int port) throws MalformedURLException
+    {
+        URL url = new URL("http", host, port, "/hessian");
         return (SlaveService) hessianProxyFactory.create(SlaveService.class, url.toString());
     }
 

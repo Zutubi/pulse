@@ -2,6 +2,10 @@ package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.Host;
+import com.zutubi.pulse.master.agent.HostManager;
+import com.zutubi.pulse.master.model.HostState;
+import com.zutubi.util.EnumUtils;
 
 /**
  *
@@ -10,30 +14,55 @@ import com.zutubi.pulse.master.agent.AgentManager;
 public class AgentConfigurationFormatter
 {
     private AgentManager agentManager;
+    private HostManager hostManager;
 
     public String getLocation(AgentConfiguration configuration)
     {
-        Agent agentState = agentManager.getAgent(configuration);
-        return agentState.getLocation();
+        Host host = hostManager.getHostForAgent(configuration);
+        return host.getLocation();
     }
 
     public String getStatus(AgentConfiguration configuration)
     {
-        //TODO: make this I18N'ed
+        // TODO i18n
+        Agent agent = agentManager.getAgent(configuration);
+        return getStatus(agent);
+    }
 
-        Agent agentState = agentManager.getAgent(configuration);
-        if (agentState.isEnabled())
+    public String getStatus(Agent agent)
+    {
+        Host host = agent.getHost();
+        if (host.isUpgrading())
         {
-            return agentState.getStatus().getPrettyString();
+            if (host.getPersistentUpgradeState() == HostState.PersistentUpgradeState.FAILED_UPGRADE)
+            {
+                return "host upgrade failed";
+            }
+            else
+            {
+                return "host upgrading [" + EnumUtils.toPrettyString(host.getUpgradeState()) + "]";
+            }
         }
         else
         {
-            return agentState.getEnableState().toString();
+            if (agent.isEnabled())
+            {
+                return agent.getStatus().getPrettyString();
+            }
+            else
+            {
+                return EnumUtils.toPrettyString(agent.getEnableState());
+            }
         }
     }
 
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setHostManager(HostManager hostManager)
+    {
+        this.hostManager = hostManager;
     }
 }
