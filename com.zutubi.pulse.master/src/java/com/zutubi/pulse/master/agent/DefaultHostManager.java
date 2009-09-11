@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.master.model.HostState;
-import com.zutubi.pulse.master.model.persistence.HostStateDao;
+import com.zutubi.pulse.master.model.persistence.EntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.util.CollectionUtils;
@@ -24,7 +24,7 @@ public class DefaultHostManager implements HostManager
     private final Map<Host, HostService> hostToServiceMap = new HashMap<Host, HostService>();
 
     private AgentManager agentManager;
-    private HostStateDao hostStateDao;
+    private EntityDao<HostState> hostStateDao;
     private ObjectFactory objectFactory;
     private SlaveProxyFactory slaveProxyFactory;
     private HostPingService hostPingService;
@@ -218,6 +218,20 @@ public class DefaultHostManager implements HostManager
         }
     }
 
+    /**
+     * For testing: returns the host for the given location.
+     *
+     * @param location the location to get the host for
+     * @return the host for the location, or null if there is no such host
+     */
+    Host getHostForLocation(String location)
+    {
+        synchronized (locationToHostMap)
+        {
+            return locationToHostMap.get(location);
+        }
+    }
+    
     private HostService createService(Host host)
     {
         if (host.isRemote())
@@ -231,7 +245,7 @@ public class DefaultHostManager implements HostManager
         }
     }
 
-    public void setHostStateDao(HostStateDao hostStateDao)
+    public void setHostStateDao(EntityDao<HostState> hostStateDao)
     {
         this.hostStateDao = hostStateDao;
     }
