@@ -144,7 +144,10 @@
 
     <target name="common-clean">
         <delete dir="${build.dir}"/>
-        <delete dir="${user.home}/.ivy-cache/zutubi/pulse-${ivy.module}"/>
+        <delete dir="${user.home}/.ivy2/cache/zutubi/${ivy.module}" failonerror="false"/>
+        <delete failonerror="false">
+            <fileset dir="${user.home}/.ivy2/cache/" includes="*zutubi*"/>
+        </delete>
     </target>
 
     <!-- prepare for new build -->
