@@ -30,13 +30,14 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private boolean remote = true;
     @NoInherit
     private String name;
-    @Required
+    @Required @Select(optionProvider = "AgentHostOptionProvider", editable = true)
     private String host;
     @Numeric(min = 1)
     private int port = 8090;
     private boolean allowPersonalBuilds = true;
     @Numeric
     private int priority = 0;
+    @Wizard.Ignore
     private String dataDirectory = "${data.dir}/agents/${agent}";
     private Map<String, ResourceConfiguration> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();

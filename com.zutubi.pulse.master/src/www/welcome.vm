@@ -127,6 +127,16 @@
                     them directly to Pulse.
                 </td>
             </tr>
+        <tr>
+            #actionHeader("multiple.agents.per.host" "multiple agents per host" "accept" false)
+            <td>
+                Pulse now directly supports running multiple agents on the same host, including the
+                ability to run multiple master agents.  This allows you to make full use of high
+                end hardware with just a single Pulse service installed on a machine.  To make use
+                of this ability, configure multiple agents with identical host and port details.
+                Pulse will recognise agents that share a host and act accordingly.
+            </td>
+        </tr>
             <tr>
                 #actionHeader("built.in.docs" "built-in documentation" "accept" false)
                 <td>

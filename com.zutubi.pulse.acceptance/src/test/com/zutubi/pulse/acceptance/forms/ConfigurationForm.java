@@ -1,21 +1,24 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.tove.annotations.Field;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.InstanceOfPredicate;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
-import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,24 +32,30 @@ public class ConfigurationForm extends SeleniumForm
     public static final String ANNOTATION_INHERITED = "inherited";
 
     private static final Logger LOG = Logger.getLogger(ConfigurationForm.class);
+
     private Class<? extends Configuration> configurationClass;
+    private List<FieldInfo> fields = new LinkedList<FieldInfo>();
 
     public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass)
     {
-        super(browser);
-        this.configurationClass = configurationClass;
+        this(browser, configurationClass, true);
     }
 
     public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass, boolean ajax)
     {
-        super(browser, ajax);
-        this.configurationClass = configurationClass;
+        this(browser, configurationClass, ajax, false);
     }
 
     public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass, boolean ajax, boolean inherited)
     {
+        this(browser, configurationClass, ajax, inherited, false);
+    }
+
+    public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass, boolean ajax, boolean inherited, boolean wizard)
+    {
         super(browser, ajax, inherited);
         this.configurationClass = configurationClass;
+        analyzeFields(wizard);
     }
 
     public String getFormName()
@@ -56,22 +65,37 @@ public class ConfigurationForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return configurationClass.getAnnotation(Form.class).fieldOrder();
+        return CollectionUtils.mapToArray(fields, new Mapping<FieldInfo, String>()
+        {
+            public String map(FieldInfo fieldInfo)
+            {
+                return fieldInfo.name;
+            }
+        }, new String[fields.size()]);
     }
 
     public int[] getFieldTypes()
     {
-        final String[] fieldNames = getFieldNames();
-        int[] fieldTypes = new int[fieldNames.length];
+        int[] types = new int[fields.size()];
+        int i = 0;
+        for (FieldInfo fieldInfo: fields)
+        {
+            types[i++] = fieldInfo.type;
+        }
 
+        return types;
+    }
+
+    private void analyzeFields(boolean ignoreWizard)
+    {
+        final String[] fieldNames = configurationClass.getAnnotation(Form.class).fieldOrder();
         try
         {
             BeanInfo beanInfo = Introspector.getBeanInfo(configurationClass);
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-            for(int i = 0; i < fieldNames.length; i++)
+            for (final String fieldName : fieldNames)
             {
-                final String fieldName = fieldNames[i];
-                fieldTypes[i] = TEXTFIELD;
+                int fieldType = TEXTFIELD;
                 PropertyDescriptor property = CollectionUtils.find(propertyDescriptors, new Predicate<PropertyDescriptor>()
                 {
                     public boolean satisfied(PropertyDescriptor propertyDescriptor)
@@ -80,9 +104,14 @@ public class ConfigurationForm extends SeleniumForm
                     }
                 });
 
-                if(property != null)
+                if (property != null)
                 {
                     List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(property, true);
+                    if (ignoreWizard && CollectionUtils.contains(annotations, new InstanceOfPredicate<Annotation>(Wizard.Ignore.class)))
+                    {
+                        continue;
+                    }
+
                     Field field = (Field) CollectionUtils.find(annotations, new Predicate<Annotation>()
                     {
                         public boolean satisfied(Annotation annotation)
@@ -93,35 +122,35 @@ public class ConfigurationForm extends SeleniumForm
 
                     Class<?> returnType = property.getReadMethod().getReturnType();
                     boolean collection = List.class.isAssignableFrom(returnType) || Map.class.isAssignableFrom(returnType);
-                    if(field == null)
+                    if (field == null)
                     {
-                        if(returnType == Boolean.class || returnType == Boolean.TYPE)
+                        if (returnType == Boolean.class || returnType == Boolean.TYPE)
                         {
-                            fieldTypes[i] = CHECKBOX;
+                            fieldType = CHECKBOX;
                         }
-                        else if(returnType.isEnum())
+                        else if (returnType.isEnum())
                         {
-                            fieldTypes[i] = COMBOBOX;
+                            fieldType = COMBOBOX;
                         }
-                        else if(List.class.isAssignableFrom(returnType))
+                        else if (List.class.isAssignableFrom(returnType))
                         {
-                            fieldTypes[i] = MULTI_SELECT;
+                            fieldType = MULTI_SELECT;
                         }
                     }
                     else
                     {
-                        fieldTypes[i] = convertFieldType(field.type(), collection);
+                        fieldType = convertFieldType(field.type(), collection);
                     }
                 }
+
+                fields.add(new FieldInfo(fieldName, fieldType));
             }
         }
         catch (IntrospectionException e)
         {
             LOG.severe(e);
-            return super.getFieldTypes();
+            throw new RuntimeException(e);
         }
-
-        return fieldTypes;
     }
 
     private int convertFieldType(String name, boolean collection)
@@ -151,5 +180,17 @@ public class ConfigurationForm extends SeleniumForm
     public boolean isInherited(String fieldName)
     {
         return isAnnotationPresent(fieldName, ANNOTATION_INHERITED);
+    }
+
+    private static class FieldInfo
+    {
+        String name;
+        int type;
+
+        private FieldInfo(String name, int type)
+        {
+            this.name = name;
+            this.type = type;
+        }
     }
 }

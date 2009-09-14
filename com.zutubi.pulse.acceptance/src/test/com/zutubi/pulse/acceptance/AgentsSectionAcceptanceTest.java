@@ -3,6 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.dependencies.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.dependencies.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.dependencies.WaitAntProject;
+import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
+import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -13,7 +15,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.Vector;
 
 /**
@@ -79,7 +81,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
         browser.refreshUntilText(agentsPage.getStatusId(AGENT), AgentStatus.OFFLINE.getPrettyString());
-        assertEquals(Arrays.asList(ACTION_DISABLE, ACTION_PING), agentsPage.getActions(AGENT));
+        assertEquals(asList(ACTION_DISABLE, ACTION_PING), agentsPage.getActions(AGENT));
     }
 
     public void testDisableEnable() throws Exception
@@ -171,6 +173,30 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         
         project1.releaseBuild();
         browser.refreshUntilText(agentsPage.getStatusId(agent1), IDLE.getPrettyString());
+    }
+
+    public void testHostOptionProvider() throws Exception
+    {
+        final String HOST_1 = "host1";
+        final String HOST_2 = "host2";
+
+        String random = randomName();
+        String agent1 = random + "-1";
+        String agent2 = random + "-2";
+        String agent3 = random + "-3";
+
+        xmlRpcHelper.insertSimpleAgent(agent1, HOST_1);
+        xmlRpcHelper.insertSimpleAgent(agent2, HOST_2);
+        xmlRpcHelper.insertSimpleAgent(agent3, HOST_1);
+
+        loginAsAdmin();
+
+        AgentHierarchyPage globalAgentPage = browser.openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
+        globalAgentPage.clickAdd();
+
+        AgentForm agentForm = browser.createForm(AgentForm.class, true);
+        agentForm.waitFor();
+        assertEquals(asList("", HOST_1, HOST_2), asList(agentForm.getComboBoxOptions("host")));
     }
 
     private void assertBuildingStatus(String status)

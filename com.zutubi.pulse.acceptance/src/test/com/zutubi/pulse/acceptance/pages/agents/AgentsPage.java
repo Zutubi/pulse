@@ -74,5 +74,6 @@ public class AgentsPage extends SeleniumPage
     public void clickAction(String agent, String action)
     {
         browser.click(getActionId(agent, action));
+        browser.waitForPageToLoad();
     }
 }
