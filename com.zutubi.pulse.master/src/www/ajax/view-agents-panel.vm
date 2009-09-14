@@ -16,7 +16,7 @@
     </div>
 #end
 
-<table class="content">
+<table id="agents-table" class="content">
     #headingRow("agents" 5)
     <tr>
         #contentHeading("agent.name" 1)
@@ -29,8 +29,8 @@
     <tr>
         #set($h_agentName = $!webwork.htmlEncode($model.name))
         #dynamicLinkCell($model.name "$urls.agentStatus($model.agent)")
-        #staticCell($model.location)
-        #staticCell($model.status)
+        #dynamicIdCell("agent.${model.name}.location" $model.location)
+        #dynamicIdCell("agent.${model.name}.status" $model.status)
         <td class="content">
     #if($model.hasActions())
         #foreach($action in $model.actions)

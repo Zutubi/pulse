@@ -374,13 +374,13 @@ public class AgentStatusManager implements EventListener
 
     private void disableAgent(Agent agent)
     {
+        agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
+        agent.updateStatus(AgentStatus.DISABLED);
+
         if (agent.isOnline())
         {
             publishEvent(new AgentOfflineEvent(this, agent));
         }
-
-        agent.updateStatus(AgentStatus.DISABLED);
-        agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
     }
 
     private void handleEnableRequested(Agent agent)
@@ -393,11 +393,11 @@ public class AgentStatusManager implements EventListener
                 break;
 
             case DISABLED:
+                agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.ENABLED);
                 agent.updateStatus(AgentStatus.INITIAL);
 
                 // Request a ping now to save time
                 publishEvent(new AgentPingRequestedEvent(this, agent));
-                agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.ENABLED);
                 break;
         }
     }

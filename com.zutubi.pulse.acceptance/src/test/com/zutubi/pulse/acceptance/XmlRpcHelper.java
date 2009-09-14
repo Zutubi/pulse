@@ -624,10 +624,15 @@ public class XmlRpcHelper
 
     public String insertSimpleAgent(String name, String host) throws Exception
     {
+        return insertSimpleAgent(name, host, 8890);
+    }
+
+    public String insertSimpleAgent(String name, String host, int port) throws Exception
+    {
         Hashtable<String, Object> agent = createEmptyConfig("zutubi.agentConfig");
         agent.put("name", name);
         agent.put("host", host);
-        agent.put("port", 8890);
+        agent.put("port", port);
 
         return insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
     }

@@ -160,7 +160,7 @@ public class DefaultAgent implements Agent
         updateStatus(status, recipeId, null);
     }
 
-    public void updateStatus(AgentStatus status, long recipeId, String pingError)
+    public synchronized void updateStatus(AgentStatus status, long recipeId, String pingError)
     {
         lastPingTime = System.currentTimeMillis();
         this.status = status;
@@ -168,7 +168,7 @@ public class DefaultAgent implements Agent
         this.pingError = pingError;
     }
 
-    public void copyStatus(Agent agent)
+    public synchronized void copyStatus(Agent agent)
     {
         DefaultAgent existingAgent = (DefaultAgent) agent;
         status = existingAgent.status;
@@ -182,8 +182,14 @@ public class DefaultAgent implements Agent
         return agentState.getEnableState();
     }
 
-    public void setAgentState(AgentState agentState)
+    public synchronized void setAgentState(AgentState agentState)
     {
         this.agentState = agentState;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getName() + "@" + getHost().getLocation() + ": " + status;
     }
 }

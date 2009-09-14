@@ -44,6 +44,18 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     @Transient
     private SlaveProxyFactory slaveProxyFactory;
 
+    public AgentConfiguration()
+    {
+    }
+
+    public AgentConfiguration(String name, String host, int port)
+    {
+        remote = true;
+        this.name = name;
+        this.host = host;
+        this.port = port;
+    }
+
     public String getName()
     {
         return name;
