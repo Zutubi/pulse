@@ -88,14 +88,14 @@ public class ConfigurationForm extends SeleniumForm
 
     private void analyzeFields(boolean ignoreWizard)
     {
-        final String[] fieldNames = configurationClass.getAnnotation(Form.class).fieldOrder();
         try
         {
+            Form formAnnotation = configurationClass.getAnnotation(Form.class);
+            final String[] fieldNames = formAnnotation == null ? getFieldNames() : formAnnotation.fieldOrder();
             BeanInfo beanInfo = Introspector.getBeanInfo(configurationClass);
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             for (final String fieldName : fieldNames)
             {
-                int fieldType = TEXTFIELD;
                 PropertyDescriptor property = CollectionUtils.find(propertyDescriptors, new Predicate<PropertyDescriptor>()
                 {
                     public boolean satisfied(PropertyDescriptor propertyDescriptor)
@@ -104,6 +104,7 @@ public class ConfigurationForm extends SeleniumForm
                     }
                 });
 
+                int fieldType = TEXTFIELD;
                 if (property != null)
                 {
                     List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(property, true);
@@ -112,35 +113,7 @@ public class ConfigurationForm extends SeleniumForm
                         continue;
                     }
 
-                    Field field = (Field) CollectionUtils.find(annotations, new Predicate<Annotation>()
-                    {
-                        public boolean satisfied(Annotation annotation)
-                        {
-                            return annotation instanceof Field;
-                        }
-                    });
-
-                    Class<?> returnType = property.getReadMethod().getReturnType();
-                    boolean collection = List.class.isAssignableFrom(returnType) || Map.class.isAssignableFrom(returnType);
-                    if (field == null)
-                    {
-                        if (returnType == Boolean.class || returnType == Boolean.TYPE)
-                        {
-                            fieldType = CHECKBOX;
-                        }
-                        else if (returnType.isEnum())
-                        {
-                            fieldType = COMBOBOX;
-                        }
-                        else if (List.class.isAssignableFrom(returnType))
-                        {
-                            fieldType = MULTI_SELECT;
-                        }
-                    }
-                    else
-                    {
-                        fieldType = convertFieldType(field.type(), collection);
-                    }
+                    fieldType = determineFieldType(property, annotations);
                 }
 
                 fields.add(new FieldInfo(fieldName, fieldType));
@@ -151,6 +124,43 @@ public class ConfigurationForm extends SeleniumForm
             LOG.severe(e);
             throw new RuntimeException(e);
         }
+    }
+
+    private int determineFieldType(PropertyDescriptor property, List<Annotation> annotations)
+    {
+        int fieldType = TEXTFIELD;
+
+        Field field = (Field) CollectionUtils.find(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation instanceof Field;
+            }
+        });
+
+        Class<?> returnType = property.getReadMethod().getReturnType();
+        boolean collection = List.class.isAssignableFrom(returnType) || Map.class.isAssignableFrom(returnType);
+        if (field == null)
+        {
+            if (returnType == Boolean.class || returnType == Boolean.TYPE)
+            {
+                fieldType = CHECKBOX;
+            }
+            else if (returnType.isEnum())
+            {
+                fieldType = COMBOBOX;
+            }
+            else if (List.class.isAssignableFrom(returnType))
+            {
+                fieldType = MULTI_SELECT;
+            }
+        }
+        else
+        {
+            fieldType = convertFieldType(field.type(), collection);
+        }
+
+        return fieldType;
     }
 
     private int convertFieldType(String name, boolean collection)

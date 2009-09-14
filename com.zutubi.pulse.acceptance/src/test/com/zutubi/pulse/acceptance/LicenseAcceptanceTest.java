@@ -146,7 +146,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         // Adding an agent should fail
         AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         hierarchyPage.clickAdd();
-        AgentForm form = browser.createForm(AgentForm.class);
+        AgentForm form = browser.createForm(AgentForm.class, true);
         form.waitFor();
         form.finishNamedFormElements(asPair("name", random), asPair("host", "localhost"));
         form.waitFor();
