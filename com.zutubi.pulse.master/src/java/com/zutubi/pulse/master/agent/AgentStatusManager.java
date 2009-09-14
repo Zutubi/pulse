@@ -374,13 +374,13 @@ public class AgentStatusManager implements EventListener
 
     private void disableAgent(Agent agent)
     {
-        agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
-        agent.updateStatus(AgentStatus.DISABLED);
-
         if (agent.isOnline())
         {
             publishEvent(new AgentOfflineEvent(this, agent));
         }
+
+        agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
+        agent.updateStatus(AgentStatus.DISABLED);
     }
 
     private void handleEnableRequested(Agent agent)
