@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scheduling.SimpleTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.scheduling.tasks.PingHosts;
+import com.zutubi.pulse.master.scheduling.tasks.PingSlaves;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
@@ -65,7 +65,7 @@ public class HostPingService extends BackgroundServiceSupport
 
         // initialise the trigger.
         trigger = new SimpleTrigger(PING_NAME, PING_GROUP, HostPingService.getAgentPingInterval() * Constants.SECOND);
-        trigger.setTaskClass(PingHosts.class);
+        trigger.setTaskClass(PingSlaves.class);
 
         try
         {

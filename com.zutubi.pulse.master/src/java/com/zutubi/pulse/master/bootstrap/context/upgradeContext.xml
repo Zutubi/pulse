@@ -81,6 +81,10 @@
                 <ref local="simpleTriggerSchema"/>
                 <ref local="triggerConditions"/>
                 <ref local="buildResultDependencyFields"/>
+                <ref local="hostState"/>
+                <ref local="agentEnableState"/>
+                <ref local="addAgentDataDirectory"/>
+                <ref local="updatePersistentWorkDir"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -355,5 +359,26 @@
 
     <bean id="buildResultDependencyFields" class="com.zutubi.pulse.master.upgrade.tasks.BuildResultDependencyFieldsUpgradeTask">
         <property name="buildNumber" value="201005001"/>
+    </bean>
+
+    <bean id="hostState" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201006001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.6-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="agentEnableState" class="com.zutubi.pulse.master.upgrade.tasks.AgentEnableStateUpgradeTask">
+        <property name="buildNumber" value="201006002"/>
+    </bean>
+
+    <bean id="addAgentDataDirectory" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentDataDirectoryUpgradeTask">
+        <property name="buildNumber" value="201006003"/>
+    </bean>
+
+    <bean id="updatePersistentWorkDir" class="com.zutubi.pulse.master.upgrade.tasks.UpdatePersistentWorkDirUpgradeTask">
+        <property name="buildNumber" value="201006004"/>
     </bean>
 </beans>

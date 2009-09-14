@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.zutubi.util.UnaryFunction;
+
 /**
  * Static factory methods for creating {@link RecordUpgrader} instances.
  */
@@ -29,6 +31,31 @@ public class RecordUpgraders
     public static RecordUpgrader newDeleteProperty(String name)
     {
         return new DeletePropertyRecordUpgrader(name);
+    }
+
+    /**
+     * Create a new upgrader that will edit an existing simple property in
+     * records.
+     * <p/>
+     * <b>Note</b> - this upgrader does not scrub inherited values in templated
+     * scopes.  What this means in practice is that if the editing function can
+     * result in a record having the same value for the property as its
+     * template parent, then the resulting records will be invalid.  Editing
+     * functions that always produce a different answer for different inputs
+     * are safe.  Those that can produce the same output from different inputs
+     * may not be.
+     *
+     * @param name   name of the property to edit
+     * @param editFn function to edit the existing values, by returning
+     *               corresponding new values.  This function should be able to
+     *               handle a null input (no current value) and may produce a
+     *               null output to indicate that any existing value should be
+     *               removed.
+     * @return the new upgrader
+     */
+    public static RecordUpgrader newEditProperty(String name, UnaryFunction<Object, Object> editFn)
+    {
+        return new EditPropertyRecordUpgrader(name, editFn);
     }
 
     /**

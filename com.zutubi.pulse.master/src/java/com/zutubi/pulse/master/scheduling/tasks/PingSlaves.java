@@ -6,11 +6,12 @@ import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.util.logging.Logger;
 
 /**
- * Scheduler task that pings all hosts.
+ * Scheduler task that pings all hosts.  Retains the name PingSlaves as this is
+ * stored in the database.
  */
-public class PingHosts implements Task
+public class PingSlaves implements Task
 {
-    private static final Logger LOG = Logger.getLogger(PingHosts.class);
+    private static final Logger LOG = Logger.getLogger(PingSlaves.class);
 
     private HostManager hostManager;
 

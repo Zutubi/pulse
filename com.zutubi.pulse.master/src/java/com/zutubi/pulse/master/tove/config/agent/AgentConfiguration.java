@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Configuration for an agent: a service that can execute recipes.
  */
-@Form(fieldOrder = {"name", "remote", "host", "port", "allowPersonalBuilds", "priority"})
+@Form(fieldOrder = {"name", "remote", "host", "port", "allowPersonalBuilds", "priority", "dataDirectory"})
 @Table(columns = {"name", "location", "status"})
 @SymbolicName("zutubi.agentConfig")
 @Wire
