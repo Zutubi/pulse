@@ -65,7 +65,7 @@ public class DependentBuildEventFilter implements EventTriggerFilter
         
         final Project builtProject = result.getProject();
 
-        // Return true iif the triggers project contains a dependency to the built project.
+        // Return true iff the triggers project contains a dependency to the built project.
         return CollectionUtils.contains(projectConfig.getDependencies().getDependencies(), new Predicate<DependencyConfiguration>()
         {
             public boolean satisfied(DependencyConfiguration dependency)
