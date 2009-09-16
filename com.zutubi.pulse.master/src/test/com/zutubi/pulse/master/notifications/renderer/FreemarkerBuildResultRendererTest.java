@@ -11,13 +11,19 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.Constants;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import static java.util.Arrays.asList;
 import java.util.*;
 
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
@@ -47,6 +53,42 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         super.tearDown();
     }
 
+    public void testGetUserTemplate() throws IOException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), "tmp");
+        try
+        {
+            File systemTemplateDir = new File(tempDir, "system");
+            ConfigurableSystemPaths systemPaths = new ConfigurableSystemPaths();
+            systemPaths.setTemplateRootStrings(asList(systemTemplateDir.getAbsolutePath()));
+            renderer.setSystemPaths(systemPaths);
+
+            File userTemplateDir = new File(tempDir, "user");
+            MasterUserPaths userPaths = mock(MasterUserPaths.class);
+            stub(userPaths.getUserTemplateRoot()).toReturn(userTemplateDir);
+            renderer.setUserPaths(userPaths);
+
+            File notificationsDir = new File(userTemplateDir, "notifications");
+            File projectNotificationsDir = new File(notificationsDir, "project-builds");
+            assertTrue(projectNotificationsDir.mkdirs());
+
+            File customTemplate = new File(projectNotificationsDir, "custom.ftl");
+            FileSystemUtils.createFile(customTemplate, "dummy");
+            File customProperties = new File(projectNotificationsDir, "custom.properties");
+            FileSystemUtils.createFile(customProperties, "display=test display name\ntype=text/html");
+
+            List<TemplateInfo> available = renderer.getAvailableTemplates(false);
+            assertEquals(1, available.size());
+            TemplateInfo template = available.get(0);
+            assertEquals("custom", template.getTemplate());
+            assertEquals("test display name", template.getDisplay());
+            assertEquals("text/html", template.getMimeType());
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
     public void testBasicSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
