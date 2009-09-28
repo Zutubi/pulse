@@ -3,17 +3,8 @@ package com.zutubi.validation.validators;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
-/**
- *
- *
- */
 public class NameValidatorTest extends FieldValidatorTestCase
 {
-    public NameValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     protected FieldValidator createValidator()
     {
         return new NameValidator();

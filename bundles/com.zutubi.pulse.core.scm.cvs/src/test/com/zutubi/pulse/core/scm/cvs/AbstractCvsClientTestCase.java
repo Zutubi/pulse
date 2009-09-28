@@ -1,21 +1,20 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class AbstractCvsClientTestCase extends PulseTestCase
 {
-    private static final SimpleDateFormat SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-    
+    protected DateFormat dateFormat = new SimpleDateFormat(CvsRevision.DATE_AND_TIME_FORMAT_STRING);
+    protected DateFormat serverDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
     protected File tmp;
     protected ScmContextImpl scmContext;
     protected PulseExecutionContext exeContext;
@@ -85,7 +84,7 @@ public class AbstractCvsClientTestCase extends PulseTestCase
      */
     protected String localTime(String time) throws ParseException
     {
-        return CvsRevision.DATE_FORMAT.format(SERVER_DATE.parse(time));
+        return dateFormat.format(serverDate.parse(time));
     }
 
     protected void cleanWorkDir()

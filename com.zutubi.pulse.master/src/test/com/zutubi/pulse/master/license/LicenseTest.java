@@ -6,31 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * <class-comment/>
- */
 public class LicenseTest extends PulseTestCase
 {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    public LicenseTest()
-    {
-    }
-
-    public LicenseTest(String name)
-    {
-        super(name);
-    }
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public void testExpires()
     {
@@ -106,6 +84,6 @@ public class LicenseTest extends PulseTestCase
 
     private void assertRemaining(int daysRemaining, String now, String expiry) throws ParseException
     {
-        assertEquals(daysRemaining, License.calculateDaysRemaining(DATE_FORMAT.parse(now), DATE_FORMAT.parse(expiry)));
+        assertEquals(daysRemaining, License.calculateDaysRemaining(dateFormat.parse(now), dateFormat.parse(expiry)));
     }
 }

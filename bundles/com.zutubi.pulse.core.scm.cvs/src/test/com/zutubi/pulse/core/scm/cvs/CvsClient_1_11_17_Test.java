@@ -1,14 +1,13 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmFile;
 
-import java.util.Set;
-import java.util.Date;
-import java.util.List;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * This test case is to test version specific cvs features.
@@ -36,7 +35,8 @@ public class CvsClient_1_11_17_Test extends AbstractCvsClientTestCase
     public void testAttemptToUpdateToDateOnBranchFails() throws ScmException
     {
         // <author>:<branch/tag>:<date>
-        Revision rev = new Revision("author:BRANCH:" + CvsRevision.DATE_FORMAT.format(new Date()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat(CvsRevision.DATE_AND_TIME_FORMAT_STRING);
+        Revision rev = new Revision("author:BRANCH:" + dateFormat.format(new Date()));
         try
         {
             client.update(exeContext, rev, null);

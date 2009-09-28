@@ -7,14 +7,13 @@ import java.io.DataOutputStream;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class LicenseEncoder implements LicenseKeyFactory
 {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-
     /**
      * Base 64 encoded Private key
      */
@@ -71,7 +70,8 @@ public class LicenseEncoder implements LicenseKeyFactory
         // 3) expiry date.
         if (license.expires())
         {
-            writeLineTo(buffer, DATE_FORMAT.format(license.getExpiryDate()));
+            DateFormat dateFormat = new SimpleDateFormat(LicenseDecoder.DATE_FORMAT_STRING);
+            writeLineTo(buffer, dateFormat.format(license.getExpiryDate()));
         }
         else
         {

@@ -3,19 +3,18 @@ package com.zutubi.pulse.core.scm.cvs;
 import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.util.io.IOUtils;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.io.IOException;
-import java.io.File;
 
 public abstract class AbstractCvsClientIntegrationTestCase extends AbstractScmIntegrationTestCase
 {
-    public static final DateFormat SERVER_DATE = new SimpleDateFormat("yyyyMMdd-HH:mm:ss z");
+    protected DateFormat dateFormat = new SimpleDateFormat(CvsRevision.DATE_AND_TIME_FORMAT_STRING);
+    protected DateFormat serverDate = new SimpleDateFormat("yyyyMMdd-HH:mm:ss z");
 
     protected void setUp() throws Exception
     {
@@ -43,8 +42,8 @@ public abstract class AbstractCvsClientIntegrationTestCase extends AbstractScmIn
         return CvsTestUtils.getPassword(name);
     }
 
-    protected static String localTime(String time) throws ParseException
+    protected String localTime(String time) throws ParseException
     {
-        return CvsRevision.DATE_FORMAT.format(SERVER_DATE.parse(time));
+        return dateFormat.format(serverDate.parse(time));
     }
 }

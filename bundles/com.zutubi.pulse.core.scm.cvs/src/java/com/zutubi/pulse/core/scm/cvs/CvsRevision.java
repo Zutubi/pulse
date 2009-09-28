@@ -15,7 +15,11 @@ import java.util.Date;
  */
 public class CvsRevision
 {
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
+    public static final String DATE_AND_TIME_FORMAT_STRING = "yyyyMMdd-HH:mm:ss";
+    public static final String DATE_ONLY_FORMAT_STRING = "yyyyMMdd";
+
+    private static final DateFormat DATE_AND_TIME_FORMAT = new SimpleDateFormat(DATE_AND_TIME_FORMAT_STRING);
+    private static final DateFormat DATE_ONLY_FORMAT = new SimpleDateFormat(DATE_ONLY_FORMAT_STRING);
 
     private static final int MAX_COMMENT_LENGTH = 4095;
     private static final String COMMENT_TRIM_MESSAGE = "... [trimmed]";
@@ -26,7 +30,7 @@ public class CvsRevision
     private long time;
     private String revisionString;
 
-    public static final CvsRevision HEAD = null; 
+    public static final CvsRevision HEAD = null;
 
     protected CvsRevision()
     {
@@ -65,7 +69,10 @@ public class CvsRevision
         // a) date and time.
         try
         {
-            setDate(DATE_FORMAT.parse(revStr));
+            synchronized (DATE_AND_TIME_FORMAT)
+            {
+                setDate(DATE_AND_TIME_FORMAT.parse(revStr));
+            }
             setRevisionString(generateRevisionString());
             return;
         }
@@ -75,10 +82,12 @@ public class CvsRevision
         }
 
         // b) just a date, no time.
-        DateFormat format = new SimpleDateFormat("yyyyMMdd");
         try
         {
-            setDate(format.parse(revStr));
+            synchronized (DATE_ONLY_FORMAT)
+            {
+                setDate(DATE_ONLY_FORMAT.parse(revStr));
+            }
             setRevisionString(generateRevisionString());
             return;
         }
@@ -112,16 +121,22 @@ public class CvsRevision
 
         if (date.length() > 0)
         {
-            // accept two types of date format.
+            // accept two types of date dateOnlyFormat.
             try
             {
-                setDate(DATE_FORMAT.parse(date));
+                synchronized (DATE_AND_TIME_FORMAT)
+                {
+                    setDate(DATE_AND_TIME_FORMAT.parse(date));
+                }
             }
             catch (ParseException e)
             {
                 try
                 {
-                    setDate(format.parse(date));
+                    synchronized (DATE_ONLY_FORMAT)
+                    {
+                        setDate(DATE_ONLY_FORMAT.parse(date));
+                    }
                 }
                 catch (ParseException ex)
                 {
@@ -138,7 +153,13 @@ public class CvsRevision
         buffer.append(":");
         buffer.append(getBranch() != null ? getBranch() : "");
         buffer.append(":");
-        buffer.append((getDate() != null) ? DATE_FORMAT.format(getDate()) : "");
+        if (getDate() != null)
+        {
+            synchronized (DATE_AND_TIME_FORMAT)
+            {
+                buffer.append(DATE_AND_TIME_FORMAT.format(getDate()));
+            }
+        }
         return buffer.toString();
     }
 

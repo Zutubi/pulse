@@ -5,16 +5,8 @@ import com.zutubi.validation.ValidationException;
 
 import java.util.Arrays;
 
-/**
- * <class-comment/>
- */
 public class RequiredValidatorTest extends FieldValidatorTestCase
 {
-    public RequiredValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     protected FieldValidator createValidator()
     {
         return new RequiredValidator();

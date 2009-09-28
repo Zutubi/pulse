@@ -7,11 +7,6 @@ import java.util.Arrays;
 
 public class NumericValidatorTest extends FieldValidatorTestCase
 {
-    public NumericValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     public void setUp() throws Exception
     {
         super.setUp();

@@ -21,7 +21,7 @@ public class HistoryInfo
     protected String timezone;
     protected String workingpath;
 
-    static final SimpleDateFormat LOGDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
+    private SimpleDateFormat logDate = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
 
     public HistoryInfo() 
     {
@@ -131,7 +131,7 @@ public class HistoryInfo
         {
             if (getDate() != null)
             {
-                return LOGDATE.parse(getDate() + " " + getTime() + " " + getTimezone());
+                return logDate.parse(getDate() + " " + getTime() + " " + getTimezone());
             }
             return null;
         }

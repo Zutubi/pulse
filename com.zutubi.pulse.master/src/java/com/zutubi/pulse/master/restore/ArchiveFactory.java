@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,12 +25,6 @@ public class ArchiveFactory
      */
     private File tmp;
 
-    private static final SimpleDateFormat CREATED_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-
-    public ArchiveFactory()
-    {
-    }
-
     /**
      * Generate a new archive.  This archive is initially empty.
      *
@@ -44,7 +39,8 @@ public class ArchiveFactory
         // mostly for information at this stage, so that archives can be distinguished.  Will be used
         // for processing at some stage no doubt.
         Date now = Calendar.getInstance().getTime();
-        String creationDate = CREATED_FORMAT.format(now);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        String creationDate = dateFormat.format(now);
 
         // the archive format version is not currently used for anything.
         ArchiveManifest manifest = new ArchiveManifest(creationDate, "1.0");

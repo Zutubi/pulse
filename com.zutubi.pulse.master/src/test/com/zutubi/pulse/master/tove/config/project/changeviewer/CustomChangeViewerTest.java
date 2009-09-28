@@ -7,8 +7,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
+import java.util.TimeZone;
 
 public class CustomChangeViewerTest extends PulseTestCase
 {
@@ -43,8 +44,15 @@ public class CustomChangeViewerTest extends PulseTestCase
 
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
         Revision rev = new Revision("author:branch:" + DATE_STRING);
-        Date date = CustomChangeViewerConfiguration.PULSE_DATE_FORMAT.parse(DATE_STRING);
-        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(date) + " ${unknown}", viewer.getRevisionURL(rev));
+        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + convertPulseToFisheyeDate(DATE_STRING) + " ${unknown}", viewer.getRevisionURL(rev));
+    }
+
+    private String convertPulseToFisheyeDate(String dateString) throws ParseException
+    {
+        SimpleDateFormat pulseDateFormat = new SimpleDateFormat(CustomChangeViewerConfiguration.PULSE_DATE_FORMAT_STRING);
+        SimpleDateFormat fisheyeDateFormat = new SimpleDateFormat(CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT_STRING);
+        fisheyeDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return fisheyeDateFormat.format(pulseDateFormat.parse(dateString));
     }
 
     public void testGetFileViewURL() throws ScmException

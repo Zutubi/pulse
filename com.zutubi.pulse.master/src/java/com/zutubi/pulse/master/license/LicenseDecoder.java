@@ -12,16 +12,17 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * <class-comment/>
+ * Decodes base64 license strings into {@link License} objects.
  */
 public class LicenseDecoder
 {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    static final String DATE_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss z";
 
     /**
      * Base 64 encoded public key.
@@ -123,7 +124,8 @@ public class LicenseDecoder
             Date expiryDate = null;
             if (!expiryString.equals("Never"))
             {
-                expiryDate = DATE_FORMAT.parse(expiryString);
+                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_STRING);
+                expiryDate = dateFormat.parse(expiryString);
             }
 
             License license = new License(type, holder, expiryDate);

@@ -4,25 +4,8 @@ import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.validators.FieldValidatorTestCase;
 import junit.framework.Assert;
 
-/**
- */
 public class CvsRootValidatorTest extends FieldValidatorTestCase
 {
-    public CvsRootValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
-    public void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     protected FieldValidator createValidator()
     {
         return new CvsRootValidator();
