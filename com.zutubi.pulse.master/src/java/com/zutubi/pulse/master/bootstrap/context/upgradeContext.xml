@@ -64,6 +64,7 @@
                 <ref local="scmCommitterMappings"/>
                 <ref local="addIdLeader"/>
                 <ref local="addPersistentWorkDir"/>
+                <ref local="deleteOrphanedTriggers"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -245,5 +246,9 @@
 
     <bean id="addPersistentWorkDir" class="com.zutubi.pulse.master.upgrade.tasks.AddPersistentWorkDirUpgradeTask">
         <property name="buildNumber" value="200036001"/>
+    </bean>
+
+    <bean id="deleteOrphanedTriggers" class="com.zutubi.pulse.master.upgrade.tasks.DeleteOrphanedTriggersUpgradeTask">
+        <property name="buildNumber" value="200038001"/>
     </bean>
 </beans>
