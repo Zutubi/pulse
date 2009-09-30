@@ -2,8 +2,8 @@
 <project>
     <recipe name="wow">
         <ant name="test"/>
-        <ant name="test" exe="myant"/>
-        <ant name="test" targets="build test"/>
-        <ant name="test" build-file="mybuild.xml"/>
+        <ant name="test1" exe="myant"/>
+        <ant name="test2" targets="build test"/>
+        <ant name="test3" build-file="mybuild.xml"/>
     </recipe>
 </project>
