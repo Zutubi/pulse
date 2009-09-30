@@ -662,7 +662,7 @@ Ext.extend(ZUTUBI.Form, Ext.form.BasicForm, {
             var listEl = statusEl.createChild({tag: 'ul', cls: 'validation-error'});
             for(var i = 0; i < errors.length; i++)
             {
-                listEl.createChild({tag: 'li', html: errors[i]});
+                listEl.createChild({tag: 'li', html: Ext.util.Format.htmlEncode(errors[i])});
             }
         }
     }
