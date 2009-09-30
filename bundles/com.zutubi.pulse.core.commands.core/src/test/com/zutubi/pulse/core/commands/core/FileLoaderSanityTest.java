@@ -74,7 +74,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
 
     public void testArtifactMissingName() throws Exception
     {
-        errorHelper("testArtifactMissingName", "Required attribute name not specified");
+        errorHelper("testArtifactMissingName", "required attribute name not specified");
     }
 
     public void testProcessNoProcessor() throws PulseException

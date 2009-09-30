@@ -1,12 +1,11 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
+import com.zutubi.util.*;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -41,8 +40,26 @@ public class Recipe extends SelfReference
      * @param command instance
      * @param scope   scope at the point where the command is loaded
      */
-    public void add(Command command, Scope scope)
+    public void add(final Command command, Scope scope) throws FileLoadException
     {
+        try
+        {
+            if (!ReferenceResolver.containsReference(command.getName()) && CollectionUtils.contains(commands, new Predicate<Pair<Command, Scope>>()
+            {
+                public boolean satisfied(Pair<Command, Scope> commandScopePair)
+                {
+                    return commandScopePair.first.getName().equals(command.getName());
+                }
+            }))
+            {
+                throw new FileLoadException("A command with name '" + command.getName() + "' already exists in this recipe");
+            }
+        }
+        catch (ResolutionException e)
+        {
+            // Fall through - command validation should catch this.
+        }
+
         if (scope != null)
         {
             scope = scope.copyTo(scope.getAncestor(BuildProperties.SCOPE_RECIPE));
@@ -115,6 +132,6 @@ public class Recipe extends SelfReference
         // Use the command name because:
         // a) we do not have an id for the command model
         // b) for local builds, this is a lot friendlier for the developer
-        return String.format("%08d-%s", i, result.getCommandName());
+        return String.format("%08d-%s", i, StringUtils.formUrlEncode(result.getCommandName()));
     }
 }

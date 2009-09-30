@@ -37,6 +37,11 @@ public class CommandGroup extends CommandSupport implements Validateable
         {
             this.command.setName(getName());
         }
+
+        if (!TextUtils.stringSet(getName()))
+        {
+            setName(this.command.getName());
+        }
     }
 
     public boolean isForce()

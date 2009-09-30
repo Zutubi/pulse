@@ -38,7 +38,7 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
         }
         catch (Exception e)
         {
-            assertTrue(e.getMessage().contains("Required attribute name not specified"));
+            assertTrue(e.getMessage().contains("required attribute name not specified"));
         }
     }
 

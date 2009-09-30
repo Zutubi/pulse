@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.validation.annotations.Name;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public interface Command
      *
      * @return name of the command.
      */
-    @Required String getName();
+    @Required @Name String getName();
 
     /**
      * Set the name of the command.

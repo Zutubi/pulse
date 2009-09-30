@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.ResourceReference;
-import com.zutubi.pulse.core.TypeLoadPredicate;
+import com.zutubi.pulse.core.*;
 import nu.xom.Element;
 
 /**
@@ -27,6 +26,21 @@ public class CustomProjectValidationPredicate implements TypeLoadPredicate
 
     public boolean validate(Object type, Element element)
     {
+        // Special case for commands.  This is hackish - but replaced by a more
+        // sensible mechanism on later Pulse versions.
+        if (type instanceof Command)
+        {
+            Command command = (Command) type;
+            try
+            {
+                return !ReferenceResolver.containsReference(command.getName());
+            }
+            catch (ResolutionException e)
+            {
+                return true;
+            }
+        }
+
         return loadType(type, element);
     }
 }

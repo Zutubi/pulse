@@ -3,25 +3,25 @@
     <recipe name="wow">
         <executable name="test" exe="foo" args="one"/>
 
-        <executable name="test" exe="foo" args="one two"/>
+        <executable name="test1" exe="foo" args="one two"/>
 
-        <executable name="test" exe="foo">
+        <executable name="test2" exe="foo">
             <arg>here are some spaces</arg>
         </executable>
 
-        <executable name="test" exe="foo">
+        <executable name="test3" exe="foo">
             <arg>here are some spaces</arg>
             <arg>and yet more spaces</arg>
         </executable>
 
-        <executable name="test" exe="foo" args="one two">
+        <executable name="test4" exe="foo" args="one two">
             <arg>here are some spaces</arg>
             <arg>and yet more spaces</arg>
         </executable>
 
         <property name="foo" value="bar"/>
 
-        <executable name="test" exe="foo" args="${foo}">
+        <executable name="test6" exe="foo" args="${foo}">
             <arg>ref in text ${foo}</arg>
         </executable>
     </recipe>

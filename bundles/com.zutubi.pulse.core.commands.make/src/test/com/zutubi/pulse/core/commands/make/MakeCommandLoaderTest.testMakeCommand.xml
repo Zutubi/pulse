@@ -2,8 +2,8 @@
 <project>
     <recipe name="wow">
         <make name="test"/>
-        <make name="test" exe="mymake"/>
-        <make name="test" targets="build test"/>
-        <make name="test" makefile="mymakefile"/>
+        <make name="test2" exe="mymake"/>
+        <make name="test3" targets="build test"/>
+        <make name="test4" makefile="mymakefile"/>
     </recipe>
 </project>

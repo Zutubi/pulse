@@ -85,7 +85,7 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         }
         catch (PulseException e)
         {
-            assertTrue(e.getMessage().contains("Required attribute name not specified"));
+            assertTrue(e.getMessage().contains("required attribute name not specified"));
         }
     }
 

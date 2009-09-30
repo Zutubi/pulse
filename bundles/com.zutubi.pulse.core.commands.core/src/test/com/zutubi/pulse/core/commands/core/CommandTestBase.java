@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -59,6 +60,12 @@ public abstract class CommandTestBase extends PulseTestCase
     {
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
         context.setWorkingDir(baseDir);
+
+        // For convenience, supply a name if there is not one already.
+        if (!TextUtils.stringSet(command.getName()))
+        {
+            command.setName(getName());
+        }
 
         CommandResult result = new CommandResult(command.getName());
         result.commence();
