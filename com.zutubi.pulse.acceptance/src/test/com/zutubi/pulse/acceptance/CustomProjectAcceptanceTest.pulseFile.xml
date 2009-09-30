@@ -62,8 +62,8 @@
 
  <macro-ref macro="${reports}"/>
 
- <command name="copy">
- <executable name="copy" exe="/bin/sh">
+ <command name="distcopy">
+ <executable name="distcopy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.dist}</arg>
@@ -137,8 +137,8 @@
  </executable>
  </command>
 
- <command name="copy">
- <executable name="copy" exe="/bin/sh">
+ <command name="qecopy">
+ <executable name="qecopy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.qe.dist}</arg>
@@ -149,14 +149,14 @@
  <!-- START OF MAKE REPORT MACRO -->
 
  <macro name="reports">
- <command name="make">
- <executable name="make" exe="/usr/bin/make" args="reports" working-dir="${project.home}/build/${mode}">
+ <command name="makereports">
+ <executable name="makereports" exe="/usr/bin/make" args="reports" working-dir="${project.home}/build/${mode}">
  <process processor="${compile.pp}"/>
  </executable>
  </command>
 
- <command name="copy">
- <executable name="copy" exe="/bin/sh">
+ <command name="copyreports">
+ <executable name="copyreports" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/reports ${project.home}/build/${mode}/dist/app-*</arg>
