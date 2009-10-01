@@ -2,53 +2,83 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
+import com.zutubi.util.UnaryFunction;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Methods for analysing and replacing references within strings.
  */
 public class ReferenceResolver
 {
+    private static final Map<String, UnaryFunction<String, String>> FILTER_FUNCTIONS = new HashMap<String, UnaryFunction<String, String>>();
+    static
+    {
+        FILTER_FUNCTIONS.put("trim", new UnaryFunction<String, String>()
+        {
+            public String process(String s)
+            {
+                return s.trim();
+            }
+        });
+
+        FILTER_FUNCTIONS.put("lower", new UnaryFunction<String, String>()
+        {
+            public String process(String s)
+            {
+                return s.toLowerCase();
+            }
+        });
+
+        FILTER_FUNCTIONS.put("upper", new UnaryFunction<String, String>()
+        {
+            public String process(String s)
+            {
+                return s.toUpperCase();
+            }
+        });
+
+        FILTER_FUNCTIONS.put("name", new UnaryFunction<String, String>()
+        {
+            public String process(String s)
+            {
+                return s.trim().replaceAll("[\\\\/$]", ".");
+            }
+        });
+    }
+
     public enum ResolutionStrategy
     {
         /**
          * Resolve all references, throwing an error for non-existant
          * references.
          */
-        RESOLVE_STRICT
-        {
-            public boolean resolve()
-            {
-                return true;
-            }
-        },
+        RESOLVE_STRICT(true),
         /**
          * Try to resolve all references but leave non-existant references
          * as they are.
          */
-        RESOLVE_NON_STRICT
-        {
-            public boolean resolve()
-            {
-                return true;
-            }
-        },
+        RESOLVE_NON_STRICT(true),
         /**
          * Don't resolve any references, just process the input (e.g.
          * backslash escaping).
          */
-        RESOLVE_NONE
-        {
-            public boolean resolve()
-            {
-                return false;
-            }
-        },
-        ;
+        RESOLVE_NONE(false);
 
-        public abstract boolean resolve();
+        private boolean resolve;
+
+        private ResolutionStrategy(boolean resolve)
+        {
+            this.resolve = resolve;
+        }
+
+        public boolean resolve()
+        {
+            return resolve;
+        }
     }
 
     /**
@@ -59,7 +89,8 @@ public class ReferenceResolver
         SPACE,
         TEXT,
         REFERENCE,
-        DEFAULT_VALUE
+        DEFAULT_VALUE,
+        FILTER
     }
 
     /**
@@ -73,7 +104,8 @@ public class ReferenceResolver
         DOLLAR,
         REFERENCE_NAME,
         EXTENDED_REFERENCE_NAME,
-        DEFAULT_VALUE
+        DEFAULT_VALUE,
+        FILTER_NAME
     }
 
     /**
@@ -233,6 +265,7 @@ public class ReferenceResolver
                     {
                         case ')':
                         case '?':
+                        case '|':
                         {
                             if (current.length() == 0)
                             {
@@ -241,14 +274,7 @@ public class ReferenceResolver
 
                             result.add(new Token(TokenType.REFERENCE, current.toString()));
                             current.delete(0, current.length());
-                            if (inputChar == ')')
-                            {
-                                state = LexerState.INITIAL;
-                            }
-                            else
-                            {
-                                state = LexerState.DEFAULT_VALUE;
-                            }
+                            state = chooseExtendedState(inputChar);
                             break;
                         }
                         case '!':
@@ -258,7 +284,6 @@ public class ReferenceResolver
                         case '/':
                         case ':':
                         case ';':
-                        case '|':
                         {
                             throw new ResolutionException("Syntax error: '" + inputChar + "' is reserved and may not be used in an extended reference name");
                         }
@@ -279,6 +304,27 @@ public class ReferenceResolver
                             result.add(new Token(TokenType.DEFAULT_VALUE, current.toString()));
                             state = LexerState.INITIAL;
                             current.delete(0, current.length());
+                            break;
+                        }
+                        default:
+                        {
+                            current.append(inputChar);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case FILTER_NAME:
+                {
+                    switch (inputChar)
+                    {
+                        case '?':
+                        case ')':
+                        case '|':
+                        {
+                            result.add(new Token(TokenType.FILTER, current.toString()));
+                            current.delete(0, current.length());
+                            state = chooseExtendedState(inputChar);
                             break;
                         }
                         default:
@@ -318,12 +364,32 @@ public class ReferenceResolver
             }
             case EXTENDED_REFERENCE_NAME:
             case DEFAULT_VALUE:
+            case FILTER_NAME:
             {
                 throw new ResolutionException("Syntax error: unexpected end of input looking for ')'");
             }
         }
 
         return result;
+    }
+
+    private static LexerState chooseExtendedState(char inputChar)
+    {
+        switch (inputChar)
+        {
+            case ')':
+            {
+                return LexerState.INITIAL;
+            }
+            case '|':
+            {
+                return LexerState.FILTER_NAME;
+            }
+            default:
+            {
+                return LexerState.DEFAULT_VALUE;
+            }
+        }
     }
 
     private static void addCurrent(StringBuilder current, boolean haveData, List<Token> result)
@@ -370,12 +436,23 @@ public class ReferenceResolver
     private static class ReferenceElement extends ParseElement
     {
         private String name;
+        private List<String> filters = new LinkedList<String>();
         private String defaultValue;
 
         private ReferenceElement(ParseElementType type, String name)
         {
             super(type);
             this.name = name;
+        }
+
+        public List<String> getFilters()
+        {
+            return filters;
+        }
+
+        public void addFilter(String name)
+        {
+            filters.add(name);
         }
     }
 
@@ -388,18 +465,32 @@ public class ReferenceResolver
             switch (token.type)
             {
                 case TEXT:
+                {
                     parseElements.add(new SimpleElement(ParseElementType.TEXT, token.value));
                     break;
+                }
                 case SPACE:
+                {
                     parseElements.add(new SimpleElement(ParseElementType.SPACE, token.value));
                     break;
+                }
                 case REFERENCE:
+                {
                     parseElements.add(new ReferenceElement(ParseElementType.REFERENCE, token.value));
                     break;
+                }
                 case DEFAULT_VALUE:
+                {
                     ReferenceElement reference = (ReferenceElement) parseElements.get(parseElements.size() - 1);
                     reference.defaultValue = token.value;
                     break;
+                }
+                case FILTER:
+                {
+                    ReferenceElement reference = (ReferenceElement) parseElements.get(parseElements.size() - 1);
+                    reference.addFilter(token.value);
+                    break;
+                }
             }
         }
 
@@ -526,7 +617,7 @@ public class ReferenceResolver
             Reference reference = references.getReference(element.name);
             if (reference != null && reference.getValue() != null)
             {
-                return reference.getValue().toString();
+                return filter(reference.getValue().toString(), element.getFilters(), resolutionStrategy);
             }
             else if (element.defaultValue != null)
             {
@@ -541,4 +632,24 @@ public class ReferenceResolver
         return "${" + element.name + "}";
     }
 
+    private static String filter(String value, List<String> filters, ResolutionStrategy resolutionStrategy) throws ResolutionException
+    {
+        for (String filter: filters)
+        {
+            UnaryFunction<String, String> fn = FILTER_FUNCTIONS.get(filter);
+            if (fn == null)
+            {
+                if (resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
+                {
+                    throw new ResolutionException("Unknown filter '" + filter + "'");
+                }
+            }
+            else
+            {
+                value = fn.process(value);
+            }
+        }
+
+        return value;
+    }
 }

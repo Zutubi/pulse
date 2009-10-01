@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.pulse.core.marshal.FileLoadException;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.List;
 
 public class ReferenceResolverTest extends ZutubiTestCase
@@ -22,6 +22,7 @@ public class ReferenceResolverTest extends ZutubiTestCase
         scope.add(new GenericReference<String>("empty", ""));
         scope.add(new GenericReference<String>("a{b}c", "braced"));
         scope.add(new GenericReference<String>("a(b)c", "parened"));
+        scope.add(new GenericReference<String>("invalid.name", " this/is\\a$badname  "));
     }
 
     private void errorTest(String input, String expectedError)
@@ -48,7 +49,7 @@ public class ReferenceResolverTest extends ZutubiTestCase
     private void successSplitTest(String in, String... out) throws Exception
     {
         List<String> result = ReferenceResolver.splitAndResolveReferences(in, scope, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
-        assertEquals(Arrays.asList(out), result);
+        assertEquals(asList(out), result);
     }
 
     private void errorSplitTest(String input, String expectedError)
@@ -447,9 +448,39 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
     public void testReservedCharactersInExtendedName() throws Exception
     {
-        for (Character c: Arrays.asList('!', '%', '#', '&', '/', ':', ';', '/'))
+        for (Character c: asList('!', '%', '#', '&', '/', ':', ';', '/'))
         {
             errorTest("$(a" + c + "b)", "Syntax error: '" + c + "' is reserved and may not be used in an extended reference name");
         }
+    }
+
+    public void testFilter() throws Exception
+    {
+        successTest("$(invalid.name|name)", "this.is.a.badname");
+    }
+
+    public void testMultipleFilters() throws Exception
+    {
+        successTest("$(invalid.name|name|upper)", "THIS.IS.A.BADNAME");
+    }
+
+    public void testFilterAndDefault() throws Exception
+    {
+        successTest("$(foo|upper?def)", "FOO");
+    }
+
+    public void testFilterAndDefaultUndefined() throws Exception
+    {
+        successTest("$(undefined|upper?def)", "def");
+    }
+
+    public void testFilterUnknown() throws Exception
+    {
+        errorTest("$(foo|nosuchfilter)", "Unknown filter 'nosuchfilter'");
+    }
+
+    public void testFilterUnknownNonStrict() throws Exception
+    {
+        assertEquals("foo", ReferenceResolver.resolveReferences("$(foo|nosuchfilter)", scope, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
     }
 }
