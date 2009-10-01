@@ -85,6 +85,7 @@
                 <ref local="agentEnableState"/>
                 <ref local="addAgentDataDirectory"/>
                 <ref local="updatePersistentWorkDir"/>
+                <ref local="deleteOrphanedTriggers"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -380,5 +381,9 @@
 
     <bean id="updatePersistentWorkDir" class="com.zutubi.pulse.master.upgrade.tasks.UpdatePersistentWorkDirUpgradeTask">
         <property name="buildNumber" value="201006004"/>
+    </bean>
+
+    <bean id="deleteOrphanedTriggers" class="com.zutubi.pulse.master.upgrade.tasks.DeleteOrphanedTriggersUpgradeTask">
+        <property name="buildNumber" value="201007001"/>
     </bean>
 </beans>
