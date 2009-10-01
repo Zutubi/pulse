@@ -10,6 +10,8 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -21,6 +23,8 @@ import java.util.Map;
 public class FisheyeConfiguration extends BasePathChangeViewer
 {
     static final String TYPE_CVS = "cvs";
+
+    private static final DateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat(CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT_STRING);
 
     /**
      * Useful when configured against Perforce.  In this case the paths in
@@ -122,7 +126,13 @@ public class FisheyeConfiguration extends BasePathChangeViewer
                 properties.containsKey(PROPERTY_BRANCH) &&
                 properties.containsKey(PROPERTY_DATE))
             {
-                return String.format("%s:%s:%s", properties.get(PROPERTY_BRANCH), properties.get(PROPERTY_AUTHOR), CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format((Date) properties.get(PROPERTY_DATE)));
+
+                String date;
+                synchronized (FISHEYE_DATE_FORMAT)
+                {
+                    date = FISHEYE_DATE_FORMAT.format((Date) properties.get(PROPERTY_DATE));
+                }
+                return String.format("%s:%s:%s", properties.get(PROPERTY_BRANCH), properties.get(PROPERTY_AUTHOR), date);
             }
         }
 

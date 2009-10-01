@@ -14,32 +14,25 @@ import org.netbeans.lib.cvsclient.file.FileStatus;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
-import java.util.Date;
 
 public class CvsCoreTest extends PulseTestCase
 {
-    private static final SimpleDateFormat SERVER_DATE;
+    private SimpleDateFormat serverDate;
     private CvsCore cvs;
     private File workdir;
-
-    static
-    {
-        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
-    public CvsCoreTest()
-    {
-    }
 
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        serverDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        serverDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         String password = CvsTestUtils.getPassword("cvs-1.12.9");
         String cvsRoot = ":ext:cvs-1.12.9:" + password + "@zutubi.com:/cvsroots/default";
@@ -51,8 +44,6 @@ public class CvsCoreTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         removeDirectory(workdir);
-        cvs = null;
-        workdir = null;
         super.tearDown();
     }
 
@@ -338,7 +329,7 @@ public class CvsCoreTest extends PulseTestCase
 
     private Date toDate(String time) throws ParseException
     {
-        return SERVER_DATE.parse(time);
+        return serverDate.parse(time);
     }
 
     private void assertNotExists(String path)

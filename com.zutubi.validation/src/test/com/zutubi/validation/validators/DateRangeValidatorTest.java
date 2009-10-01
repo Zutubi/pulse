@@ -3,20 +3,12 @@ package com.zutubi.validation.validators;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
-/**
- * <class-comment/>
- */
 public class DateRangeValidatorTest extends FieldValidatorTestCase
 {
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
-
-    public DateRangeValidatorTest(String testName)
-    {
-        super(testName);
-    }
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     protected FieldValidator createValidator()
     {
@@ -33,31 +25,31 @@ public class DateRangeValidatorTest extends FieldValidatorTestCase
 
     public void testValidRange() throws ValidationException, ParseException
     {
-        validator.validate(new FieldProvider(DATE_FORMATTER.parse("01/01/2000")));
+        validator.validate(new FieldProvider(dateFormat.parse("01/01/2000")));
         assertFalse(validationAware.hasErrors());
     }
 
     public void testBelowRange() throws ValidationException, ParseException
     {
-        validator.validate(new FieldProvider(DATE_FORMATTER.parse("01/01/1980")));
+        validator.validate(new FieldProvider(dateFormat.parse("01/01/1980")));
         assertTrue(validationAware.hasErrors());
     }
 
     public void testAboveRange() throws ValidationException, ParseException
     {
-        validator.validate(new FieldProvider(DATE_FORMATTER.parse("01/01/2020")));
+        validator.validate(new FieldProvider(dateFormat.parse("01/01/2020")));
         assertTrue(validationAware.hasErrors());
     }
 
     public void testUpperRangeBoundry() throws ValidationException, ParseException
     {
-        validator.validate(new FieldProvider(DATE_FORMATTER.parse("01/01/2010")));
+        validator.validate(new FieldProvider(dateFormat.parse("01/01/2010")));
         assertFalse(validationAware.hasErrors());
     }
 
     public void testLowerRangeBoundry() throws ValidationException, ParseException
     {
-        validator.validate(new FieldProvider(DATE_FORMATTER.parse("01/01/1990")));
+        validator.validate(new FieldProvider(dateFormat.parse("01/01/1990")));
         assertFalse(validationAware.hasErrors());
     }
 

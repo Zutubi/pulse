@@ -20,34 +20,23 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- *
- *
- */
 public class LogInformationAnalyserTest extends PulseTestCase
 {
-    private static final SimpleDateFormat LOCAL_DATE;
-    private static final SimpleDateFormat SERVER_DATE;
-
-    static
-    {
-        LOCAL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        LOCAL_DATE.setTimeZone(TimeZone.getTimeZone("EST"));
-        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
+    private SimpleDateFormat localDate;
+    private SimpleDateFormat serverDate;
 
     private CvsCore cvs;
     private LogInformationAnalyser analyser;
-
-    public LogInformationAnalyserTest()
-    {
-    }
 
     protected void setUp() throws Exception
     {
         super.setUp();
         Logger.setLogging("system");
+
+        localDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        localDate.setTimeZone(TimeZone.getTimeZone("EST"));
+        serverDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        serverDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         String password = CvsTestUtils.getPassword("cvs-1.12.9");
         String cvsRoot = ":ext:cvs-1.12.9:" + password + "@zutubi.com:/cvsroots/default";
@@ -56,17 +45,11 @@ public class LogInformationAnalyserTest extends PulseTestCase
         analyser = new LogInformationAnalyser(CVSRoot.parse(cvsRoot));
     }
 
-    protected void tearDown() throws Exception
-    {
-        cvs = null;
-        analyser = null;
-    }
-
     public void testGetChangesBetween() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangeDetails";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-10 00:59:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-10 01:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-03-10 00:59:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-03-10 01:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(2, changes.size());
@@ -94,8 +77,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangeDetails() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangeDetails";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-02-10 00:59:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 01:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-02-10 00:59:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-04-10 01:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(4, changes.size());
@@ -141,8 +124,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangesByDifferentAuthors() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesByDifferentAuthors";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-04-10 00:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(2, changes.size());
@@ -162,8 +145,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangesByOverlappingCommits() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesByOverlappingCommits";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-04-10 00:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(3, changes.size());
@@ -190,8 +173,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangesWithRemoval() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithRemoval";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-04-10 00:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(4, changes.size());
@@ -217,8 +200,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangesWithAdd() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithAdd";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-04-10 00:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(1, changes.size());
@@ -234,8 +217,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangesWithModify() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithModify";
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-04-10 00:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(3, changes.size());
@@ -257,8 +240,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     public void testChangesWithBranch() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithBranch";
-        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, serverDate.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, serverDate.parse("2006-04-10 00:00:00 GMT"));
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, "BRANCH");
         assertEquals(2, changes.size());
@@ -280,8 +263,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
         // a) expect 2 changes on branch - the add and the edit.
         // b) expect 1 change on head - initial add
 
-        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-12-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-12-30 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, serverDate.parse("2006-12-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, serverDate.parse("2006-12-30 00:00:00 GMT"));
 
         String module = "unit-test/CvsWorkerTest/testAddToBranchDoesNotAppearOnHead";
 
@@ -302,8 +285,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
     {
         String module = "unit-test/CvsWorkerTest/testChangesOnHeadAndBranch";
 
-        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-10-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-10-18 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, null, null, serverDate.parse("2006-10-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, serverDate.parse("2006-10-18 00:00:00 GMT"));
 
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
         List<Changelist> changes = analyser.extractChangelists(infos, null);
@@ -323,16 +306,16 @@ public class LogInformationAnalyserTest extends PulseTestCase
     {
         String module = "unit-test/CvsWorkerTest/testGetLatestRevisionSince";
 
-        CvsRevision since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-01 02:00:00"));
+        CvsRevision since = new CvsRevision("", "", "", localDate.parse("2006-03-01 02:00:00"));
         Date latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null)).getDate();
-        assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(latestUpdate));
+        assertEquals("2006-03-10 04:00:00 GMT", serverDate.format(latestUpdate));
 
-        since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-12 02:00:00"));
+        since = new CvsRevision("", "", "", localDate.parse("2006-03-12 02:00:00"));
         assertNull(analyser.latestUpdate(cvs.rlog(module, since, null)));
 
-        since = new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 03:59:59 GMT"));
+        since = new CvsRevision("", "", "", serverDate.parse("2006-03-10 03:59:59 GMT"));
         latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null)).getDate();
-        assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(latestUpdate));
+        assertEquals("2006-03-10 04:00:00 GMT", serverDate.format(latestUpdate));
 
         since = new CvsRevision("", "", "", latestUpdate);
         Date otherLatest = analyser.latestUpdate(cvs.rlog(module, since, null)).getDate();

@@ -14,6 +14,7 @@ import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -28,6 +29,12 @@ import java.util.TimeZone;
 @Wire
 public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 {
+    public static final String PULSE_DATE_FORMAT_STRING = "yyyyMMdd-HH:mm:ss";
+    public static final String FISHEYE_DATE_FORMAT_STRING = "yyyyMMddHHmmss";
+
+    private static final DateFormat PULSE_DATE_FORMAT = new SimpleDateFormat(PULSE_DATE_FORMAT_STRING);
+    private static final DateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat(FISHEYE_DATE_FORMAT_STRING);
+
     private static final String PROPERTY_REVISION = "revision";
     private static final String PROPERTY_CHANGE_REVISION = "change.revision";
     private static final String PROPERTY_PREVIOUS_REVISION = "previous.revision";
@@ -39,9 +46,6 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     private static final String PROPERTY_PATH_FORM = "path.form";
     private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
     private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
-
-    public static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
-    public static final SimpleDateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private String changesetURL;
     private String fileViewURL;
@@ -171,8 +175,11 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_DATE))
             {
                 Date date = (Date) properties.get(ChangeViewerUtils.PROPERTY_DATE);
-                references.add(new GenericReference<String>(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
-                references.add(new GenericReference<String>(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
+                synchronized (PULSE_DATE_FORMAT)
+                {
+                    references.add(new GenericReference<String>(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
+                    references.add(new GenericReference<String>(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
+                }
             }
 
             try

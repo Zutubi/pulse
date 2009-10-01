@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.Constants;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -122,7 +122,10 @@ public class Version implements Comparable
     {
         try
         {
-            return DATE_FORMAT.parse(getBuildDate());
+            synchronized (DATE_FORMAT)
+            {
+                return DATE_FORMAT.parse(getBuildDate());
+            }
         }
         catch (ParseException e)
         {
@@ -130,7 +133,10 @@ public class Version implements Comparable
             // So lets try it just in case.
             try
             {
-                return OLD_DATE_FORMAT.parse(getBuildDate());
+                synchronized (OLD_DATE_FORMAT)
+                {
+                    return OLD_DATE_FORMAT.parse(getBuildDate());
+                }
             }
             catch (ParseException e1)
             {
@@ -158,7 +164,10 @@ public class Version implements Comparable
     {
         try
         {
-            return DATE_FORMAT.parse(getReleaseDate());
+            synchronized (DATE_FORMAT)
+            {
+                return DATE_FORMAT.parse(getReleaseDate());
+            }
         }
         catch (ParseException e)
         {
@@ -166,7 +175,10 @@ public class Version implements Comparable
             // So lets try it just in case.
             try
             {
-                return OLD_DATE_FORMAT.parse(getReleaseDate());
+                synchronized (OLD_DATE_FORMAT)
+                {
+                    return OLD_DATE_FORMAT.parse(getReleaseDate());
+                }
             }
             catch (ParseException e1)
             {

@@ -3,16 +3,8 @@ package com.zutubi.validation.validators;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
-/**
- * <class-comment/>
- */
 public class URLValidatorTest extends FieldValidatorTestCase
 {
-    public URLValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     protected FieldValidator createValidator()
     {
         return new URLValidator();

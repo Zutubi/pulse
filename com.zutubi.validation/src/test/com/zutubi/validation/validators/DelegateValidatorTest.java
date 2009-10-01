@@ -1,25 +1,17 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.DefaultValidationManager;
+import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.mock.MockDoor;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
-import com.zutubi.validation.mock.MockDoor;
 
 import java.util.Arrays;
 
-/**
- * <class-comment/>
- */
 public class DelegateValidatorTest extends FieldValidatorTestCase
 {
     private DefaultValidationManager validationManager;
-
-    public DelegateValidatorTest(String testName)
-    {
-        super(testName);
-    }
 
     protected FieldValidator createValidator()
     {

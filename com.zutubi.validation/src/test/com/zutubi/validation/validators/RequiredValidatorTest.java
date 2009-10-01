@@ -4,15 +4,9 @@ import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class RequiredValidatorTest extends FieldValidatorTestCase
 {
-    public RequiredValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     protected FieldValidator createValidator()
     {
         return new RequiredValidator();

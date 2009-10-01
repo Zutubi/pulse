@@ -12,20 +12,16 @@ import java.util.TimeZone;
 
 public class CvsAcceptanceTest extends ZutubiTestCase
 {
-    private static final SimpleDateFormat SERVER_DATE;
-
-    static
-    {
-        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
+    private SimpleDateFormat serverDate;
     private LogInformationAnalyser analyser;
     private CvsCore cvs;
 
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        serverDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        serverDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         Logger.setLogging("system");
 
@@ -36,12 +32,6 @@ public class CvsAcceptanceTest extends ZutubiTestCase
         cvs.setRoot(CVSRoot.parse(cvsRoot));
 
         analyser = new LogInformationAnalyser(CVSRoot.parse(cvsRoot));
-    }
-
-    protected void tearDown() throws Exception
-    {
-        cvs = null;
-        analyser = null;
     }
 
     /**
@@ -68,25 +58,25 @@ public class CvsAcceptanceTest extends ZutubiTestCase
         String module = "acceptance-test";
 
         // between 6:30 and 6:34, changes are made to head.
-        CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:30:30 GMT"));
-        CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:33:30 GMT"));
+        CvsRevision from = new CvsRevision("", "", "", serverDate.parse("2007-01-14 06:30:30 GMT"));
+        CvsRevision to = new CvsRevision("", "", "", serverDate.parse("2007-01-14 06:33:30 GMT"));
         Date latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to)).getDate();
-        assertEquals("2007-01-14 06:33:00 GMT", SERVER_DATE.format(latestUpdate)); // add.
+        assertEquals("2007-01-14 06:33:00 GMT", serverDate.format(latestUpdate)); // add.
 
         // ensure that during the same timeframe, no changes are detected on the branch.
-        from = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:30:30 GMT"));
-        to = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:33:30 GMT"));
+        from = new CvsRevision("", "BRANCH", "", serverDate.parse("2007-01-14 06:30:30 GMT"));
+        to = new CvsRevision("", "BRANCH", "", serverDate.parse("2007-01-14 06:33:30 GMT"));
         assertNull(analyser.latestUpdate(cvs.rlog(module, from, to)));
 
         // between 6:40 and 6:44, changes are made to BRANCH.
-        from = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:40:30 GMT"));
-        to = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:43:30 GMT"));
+        from = new CvsRevision("", "BRANCH", "", serverDate.parse("2007-01-14 06:40:30 GMT"));
+        to = new CvsRevision("", "BRANCH", "", serverDate.parse("2007-01-14 06:43:30 GMT"));
         latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to)).getDate();
-        assertEquals("2007-01-14 06:43:00 GMT", SERVER_DATE.format(latestUpdate)); // add.
+        assertEquals("2007-01-14 06:43:00 GMT", serverDate.format(latestUpdate)); // add.
 
         // ensure that during the same timeframe, no changes are detected on the head.
-        from = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:40:30 GMT"));
-        to = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:43:30 GMT"));
+        from = new CvsRevision("", "", "", serverDate.parse("2007-01-14 06:40:30 GMT"));
+        to = new CvsRevision("", "", "", serverDate.parse("2007-01-14 06:43:30 GMT"));
         assertNull(analyser.latestUpdate(cvs.rlog(module, from, to)));
     }
 

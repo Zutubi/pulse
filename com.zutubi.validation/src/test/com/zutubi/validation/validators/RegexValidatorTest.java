@@ -1,19 +1,10 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
-/**
- * <class-comment/>
- */
 public class RegexValidatorTest extends FieldValidatorTestCase
 {
-    public RegexValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     protected FieldValidator createValidator()
     {
         return new RegexValidator();

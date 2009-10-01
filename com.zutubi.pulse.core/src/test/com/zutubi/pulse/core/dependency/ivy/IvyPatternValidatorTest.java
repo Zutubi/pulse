@@ -6,11 +6,6 @@ import com.zutubi.validation.validators.FieldValidatorTestCase;
 
 public class IvyPatternValidatorTest extends FieldValidatorTestCase
 {
-    public IvyPatternValidatorTest(String testName)
-    {
-        super(testName);
-    }
-
     protected FieldValidator createValidator()
     {
         return new IvyPatternValidator();

@@ -10,16 +10,12 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
 {
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss Z");
-
     protected void setUp() throws Exception
     {
         super.setUp();
