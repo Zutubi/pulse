@@ -3,7 +3,9 @@ package com.zutubi.tove.config.cleanup;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -35,21 +37,27 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         TypeProperty property = ((CompositeType) parentType).getProperty(baseName);
         if(property.getType() instanceof ReferenceType)
         {
-            if (configurationTemplateManager.existsInTemplateParent(referencingPath))
+            Record referencingRecord = configurationTemplateManager.getRecord(parentPath);
+            boolean hasTemplateParent = false;
+            if (referencingRecord instanceof TemplateRecord)
             {
-                // Inherited single references cleaned in parent.
-                return null;
+                TemplateRecord templateRecord = (TemplateRecord) referencingRecord;
+                if (!templateRecord.getOwner(baseName).equals(templateRecord.getOwner()))
+                {
+                    // Inherited single references cleaned in parent.
+                    return null;
+                }
+
+                hasTemplateParent = templateRecord.getParent() != null;
+            }
+
+            if(property.getAnnotation(Required.class) != null)
+            {
+                return configurationTemplateManager.getCleanupTasks(parentPath);
             }
             else
             {
-                if(property.getAnnotation(Required.class) != null)
-                {
-                    return configurationTemplateManager.getCleanupTasks(parentPath);
-                }
-                else
-                {
-                    return new NullifyReferenceCleanupTask(referencingPath, recordManager);
-                }
+                return new NullifyReferenceCleanupTask(referencingPath, hasTemplateParent, recordManager);
             }
         }
         else

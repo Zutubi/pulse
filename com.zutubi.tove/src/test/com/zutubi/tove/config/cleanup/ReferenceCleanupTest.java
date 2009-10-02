@@ -8,6 +8,7 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.validation.annotations.Required;
 
@@ -23,6 +24,8 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
     private static final String PROJECT_REFEREE2 = "referee2";
     private static final String PROJECT_REFEREE3 = "referee3";
     private static final String PROJECT_REFEREE4 = "referee4";
+
+    private static final String PROPERTY_PROJECT_REF = "projectRef";
 
     private String globalPath;
     private String globalHandle;
@@ -76,6 +79,9 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
 
         referer = configurationTemplateManager.getInstance(referrerPath, RefProject.class);
         assertNull(referer.getProjectRef());
+
+        Record refererRecord = configurationTemplateManager.getRecord(referrerPath);
+        assertEquals("0", refererRecord.get(PROPERTY_PROJECT_REF));
     }
 
     public void testNullOutInherited()
@@ -88,7 +94,7 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
 
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(referrerPath);
-        assertEquals(PROJECT_GLOBAL, record.getOwner("projectRef"));
+        assertEquals(PROJECT_GLOBAL, record.getOwner(PROPERTY_PROJECT_REF));
 
         
         configurationTemplateManager.delete(referee1.getConfigurationPath());
@@ -100,10 +106,11 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         referer = configurationTemplateManager.getInstance(referrerPath, RefProject.class);
         assertNull(referer.getProjectRef());
         
+        record = (TemplateRecord) configurationTemplateManager.getRecord(referrerPath);
+        assertEquals("0", record.get(PROPERTY_PROJECT_REF));
         // Make sure the global template still owns the reference path -- the
         // referrer itself should just inherit its null now..
-        record = (TemplateRecord) configurationTemplateManager.getRecord(referrerPath);
-        assertEquals(PROJECT_GLOBAL, record.getOwner("projectRef"));
+        assertEquals(PROJECT_GLOBAL, record.getOwner(PROPERTY_PROJECT_REF));
     }
 
     public void testRemoveFromList()
@@ -112,7 +119,9 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         referer.getProjectRefList().add(referee1);
         String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
 
+
         configurationTemplateManager.delete(referee1.getConfigurationPath());
+
 
         referer = configurationTemplateManager.getInstance(referrerPath, RefProject.class);
         assertEquals(0, referer.getProjectRefList().size());
