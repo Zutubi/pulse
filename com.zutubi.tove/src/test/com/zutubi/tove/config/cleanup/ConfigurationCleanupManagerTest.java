@@ -204,7 +204,7 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
     {
         public RecordCleanupTask getTask(String deletedPath, String referencingPath)
         {
-            return new NullifyReferenceCleanupTask(referencingPath);
+            return new NullifyReferenceCleanupTask(referencingPath, false);
         }
     }
 

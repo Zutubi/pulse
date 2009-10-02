@@ -11,9 +11,12 @@ import com.zutubi.tove.type.record.RecordManager;
  */
 public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
 {
-    public NullifyReferenceCleanupTask(String referencingPath)
+    private boolean hasTemplateParent;
+
+    public NullifyReferenceCleanupTask(String referencingPath, boolean hasTemplateParent)
     {
         super(referencingPath);
+        this.hasTemplateParent = hasTemplateParent;
     }
 
     public void run(RecordManager recordManager)
@@ -23,7 +26,17 @@ public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
         if (parentRecord != null)
         {
             MutableRecord newValue = parentRecord.copy(false);
-            newValue.put(PathUtils.getBaseName(getAffectedPath()), "0");
+            String key = PathUtils.getBaseName(getAffectedPath());
+            if (hasTemplateParent)
+            {
+                // Remove our override.
+                newValue.remove(key);
+            }
+            else
+            {
+                newValue.put(key, "0");
+            }
+
             recordManager.update(parentPath, newValue);
         }
     }
