@@ -1,12 +1,12 @@
 package com.zutubi.pulse.servercore;
 
-import com.zutubi.pulse.core.GenericReference;
 import com.zutubi.pulse.core.RecipePaths;
-import com.zutubi.pulse.core.ReferenceResolver;
-import static com.zutubi.pulse.core.ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT;
-import com.zutubi.pulse.core.ResolutionException;
-import com.zutubi.pulse.core.engine.api.HashReferenceMap;
-import com.zutubi.pulse.core.engine.api.ReferenceMap;
+import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.HashVariableMap;
+import com.zutubi.tove.variables.VariableResolver;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
+import com.zutubi.tove.variables.api.ResolutionException;
+import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
@@ -40,14 +40,14 @@ public class ServerRecipePaths implements RecipePaths
 
     private File getAgentDataDir()
     {
-        ReferenceMap references = new HashReferenceMap();
-        references.add(new GenericReference<String>("data.dir", dataDir.getAbsolutePath()));
-        references.add(new GenericReference<String>("agent", WebUtils.formUrlEncode(recipeDetails.getAgent())));
-        references.add(new GenericReference<String>("agent.handle", Long.toString(recipeDetails.getAgentHandle())));
+        VariableMap references = new HashVariableMap();
+        references.add(new GenericVariable<String>("data.dir", dataDir.getAbsolutePath()));
+        references.add(new GenericVariable<String>("agent", WebUtils.formUrlEncode(recipeDetails.getAgent())));
+        references.add(new GenericVariable<String>("agent.handle", Long.toString(recipeDetails.getAgentHandle())));
 
         try
         {
-            String path = ReferenceResolver.resolveReferences(recipeDetails.getAgentDataPattern(), references, RESOLVE_STRICT);
+            String path = VariableResolver.resolveVariables(recipeDetails.getAgentDataPattern(), references, RESOLVE_STRICT);
             return new File(path);
         }
         catch (ResolutionException e)
@@ -69,15 +69,15 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
-        ReferenceMap references = new HashReferenceMap();
-        references.add(new GenericReference<String>("agent.data.dir", getAgentDataDir().getAbsolutePath()));
-        references.add(new GenericReference<String>("data.dir", dataDir.getAbsolutePath()));
-        references.add(new GenericReference<String>("project", WebUtils.formUrlEncode(recipeDetails.getProject())));
-        references.add(new GenericReference<String>("project.handle", Long.toString(recipeDetails.getProjectHandle())));
+        VariableMap references = new HashVariableMap();
+        references.add(new GenericVariable<String>("agent.data.dir", getAgentDataDir().getAbsolutePath()));
+        references.add(new GenericVariable<String>("data.dir", dataDir.getAbsolutePath()));
+        references.add(new GenericVariable<String>("project", WebUtils.formUrlEncode(recipeDetails.getProject())));
+        references.add(new GenericVariable<String>("project.handle", Long.toString(recipeDetails.getProjectHandle())));
 
         try
         {
-            String path = ReferenceResolver.resolveReferences(recipeDetails.getProjectPersistentPattern(), references, RESOLVE_STRICT);
+            String path = VariableResolver.resolveVariables(recipeDetails.getProjectPersistentPattern(), references, RESOLVE_STRICT);
             return new File(path);
         }
         catch (ResolutionException e)

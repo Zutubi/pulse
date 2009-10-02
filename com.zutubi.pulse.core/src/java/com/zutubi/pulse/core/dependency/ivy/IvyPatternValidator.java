@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.StringFieldValidatorSupport;
-import com.zutubi.pulse.core.ReferenceResolver;
-import com.zutubi.pulse.core.ResolutionException;
 import org.apache.ivy.core.IvyPatternHelper;
 
 import java.util.Collections;
@@ -22,7 +22,7 @@ public class IvyPatternValidator extends StringFieldValidatorSupport
     {
         try
         {
-            if (ReferenceResolver.containsReference(value))
+            if (VariableResolver.containsVariable(value))
             {
                 // do not validate strings that contain references.
                 return;

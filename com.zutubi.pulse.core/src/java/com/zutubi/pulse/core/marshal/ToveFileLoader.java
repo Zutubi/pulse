@@ -1,23 +1,23 @@
 package com.zutubi.pulse.core.marshal;
 
-import com.zutubi.pulse.core.GenericReference;
 import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.ReferenceResolver;
-import static com.zutubi.pulse.core.ReferenceResolver.ResolutionStrategy.*;
-import com.zutubi.pulse.core.ResolutionException;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.api.Referenceable;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.util.api.XMLUtils;
-import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
+import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.VariableResolver;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
+import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
@@ -142,7 +142,8 @@ public class ToveFileLoader
             }
 
             Binder binder = getBinder(parentType, name);
-            instance = binder.getInstance(e, scope, getResolutionStrategy(predicate, parent, e));
+            VariableResolver.ResolutionStrategy resolutionStrategy = getResolutionStrategy(predicate, parent, e);
+            instance = binder.getInstance(e, scope, resolutionStrategy);
             if (binder.initInstance())
             {
                 CompositeType type = binder.getType();
@@ -165,7 +166,7 @@ public class ToveFileLoader
                         {
                             value = type.getProperty(referenceable.valueProperty()).getValue(configuration);
                         }
-                        scope.addUnique(new GenericReference<Object>(referenceName, value));
+                        scope.addUnique(new GenericVariable<Object>(referenceName, value));
                     }
                 }
 
@@ -191,7 +192,7 @@ public class ToveFileLoader
                 // Apply declarative validation
                 if (predicate.validate(configuration, e))
                 {
-                    validate(configuration);
+                    validate(configuration, resolutionStrategy);
                 }
             }
             else
@@ -342,10 +343,10 @@ public class ToveFileLoader
          * @return the instance specified by the child element
          * @throws Exception on any error
          */
-        Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception;
+        Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception;
 
         /**
-         * Indicates if the instance returned by {@link #getInstance(nu.xom.Element, com.zutubi.pulse.core.engine.api.Scope, com.zutubi.pulse.core.ReferenceResolver.ResolutionStrategy)}
+         * Indicates if the instance returned by {@link #getInstance(nu.xom.Element, com.zutubi.pulse.core.engine.api.Scope, com.zutubi.tove.variables.VariableResolver.ResolutionStrategy)}
          * should be initialised.
          *
          * @return true to indicate the instance requires initialisation, false
@@ -375,7 +376,7 @@ public class ToveFileLoader
             return true;
         }
 
-        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
+        public Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             return create(getType());
         }
@@ -517,7 +518,7 @@ public class ToveFileLoader
             return type;
         }
 
-        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
+        public Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             return create(type);
         }
@@ -559,10 +560,10 @@ public class ToveFileLoader
             return referenceType.getReferencedType();
         }
 
-        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
+        public Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             String value = getAddableValue(element, attribute);
-            Object resolved = ReferenceResolver.resolveReference(value, scope);
+            Object resolved = VariableResolver.resolveVariable(value, scope);
             Class<? extends Configuration> clazz = referenceType.getReferencedType().getClazz();
             if (!clazz.isInstance(resolved))
             {
@@ -609,7 +610,7 @@ public class ToveFileLoader
             return null;
         }
 
-        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
+        public Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             return coerce(getAddableValue(element, attribute), type, resolutionStrategy, scope);
         }
@@ -651,13 +652,14 @@ public class ToveFileLoader
         return value;
     }
 
-    private void validate(Object obj) throws CommandValidationException, ValidationException
+    private void validate(Object obj, VariableResolver.ResolutionStrategy resolutionStrategy) throws FileLoadValidationException, ValidationException
     {
         ValidationContext validationContext = new PulseValidationContext(new MessagesTextProvider(obj));
+        validationContext.setProperty(VariableResolver.ResolutionStrategy.class.getName(), resolutionStrategy.toString());
         validationManager.validate(obj, validationContext);
         if (validationContext.hasErrors())
         {
-            throw new CommandValidationException(validationContext);
+            throw new FileLoadValidationException(validationContext);
         }
     }
 
@@ -694,7 +696,7 @@ public class ToveFileLoader
             TypeProperty contentProperty = findContentProperty(type);
             if (contentProperty != null)
             {
-                text = ReferenceResolver.resolveReferences(text, scope, getResolutionStrategy(predicate, instance, e));
+                text = VariableResolver.resolveVariables(text, scope, getResolutionStrategy(predicate, instance, e));
                 contentProperty.setValue(instance, text);
             }
         }
@@ -711,21 +713,9 @@ public class ToveFileLoader
         });
     }
 
-    private ReferenceResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Configuration type, Element e)
+    private VariableResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Configuration type, Element e)
     {
-        ReferenceResolver.ResolutionStrategy resolutionStrategy = RESOLVE_NONE;
-        if (predicate.resolveReferences(type, e))
-        {
-            if (predicate.allowUnresolved(type, e))
-            {
-                resolutionStrategy = RESOLVE_NON_STRICT;
-            }
-            else
-            {
-                resolutionStrategy = RESOLVE_STRICT;
-            }
-        }
-        return resolutionStrategy;
+        return predicate.allowUnresolved(type, e) ? RESOLVE_NON_STRICT : RESOLVE_STRICT;
     }
 
     private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate) throws Exception
@@ -769,10 +759,10 @@ public class ToveFileLoader
                 {
                     String macroName = attribute.getValue();
 
-                    Object o = ReferenceResolver.resolveReference(macroName, scope);
+                    Object o = VariableResolver.resolveVariable(macroName, scope);
                     if (!LocationAwareElement.class.isAssignableFrom(o.getClass()))
                     {
-                        throw new FileLoadException("Reference '" + macroName + "' does not resolve to a macro");
+                        throw new FileLoadException("Variable '" + macroName + "' does not resolve to a macro");
                     }
 
                     LocationAwareElement lae = (LocationAwareElement) o;
@@ -957,7 +947,7 @@ public class ToveFileLoader
         }
     }
 
-    private Object coerce(String value, Type type, ReferenceResolver.ResolutionStrategy resolutionStrategy, Scope scope) throws Exception
+    private Object coerce(String value, Type type, VariableResolver.ResolutionStrategy resolutionStrategy, Scope scope) throws Exception
     {
         if (type instanceof SimpleType)
         {
@@ -967,7 +957,7 @@ public class ToveFileLoader
             }
             else
             {
-                return Squeezers.findSqueezer(type.getClazz()).unsqueeze(ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
+                return Squeezers.findSqueezer(type.getClazz()).unsqueeze(VariableResolver.resolveVariables(value, scope, resolutionStrategy));
             }
         }
         else if (type instanceof CompositeType)
@@ -984,7 +974,7 @@ public class ToveFileLoader
                 try
                 {
                     Constructor c = clazz.getConstructor(new Class[]{String.class});
-                    return c.newInstance(ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
+                    return c.newInstance(VariableResolver.resolveVariables(value, scope, resolutionStrategy));
                 }
                 catch (Exception e)
                 {
@@ -1001,7 +991,7 @@ public class ToveFileLoader
                 if (squeezer != null)
                 {
                     List<Object> values = new LinkedList<Object>();
-                    for (String v: ReferenceResolver.splitAndResolveReferences(value, scope, resolutionStrategy))
+                    for (String v: VariableResolver.splitAndResolveVariable(value, scope, resolutionStrategy))
                     {
                         values.add(squeezer.unsqueeze(v));
                     }
@@ -1021,7 +1011,7 @@ public class ToveFileLoader
             return null;
         }
         
-        Object obj = ReferenceResolver.resolveReference(rawReference, scope);
+        Object obj = VariableResolver.resolveVariable(rawReference, scope);
         if (!expectedType.isInstance(obj))
         {
             throw new ResolutionException("Referenced property '" + rawReference + "' has unexpected type.  Expected '" + expectedType.getName() + "', got '" + obj.getClass().getName() + "'");

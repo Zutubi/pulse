@@ -1,6 +1,8 @@
 package com.zutubi.validation.mock;
 
-import com.zutubi.validation.annotations.*;
+import com.zutubi.validation.annotations.Email;
+import com.zutubi.validation.annotations.Regex;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * <class-comment/>
@@ -9,7 +11,7 @@ public class MockStraightJacket
 {
     private String field;
 
-    @Required @Email @Name @Regex(pattern = ".")
+    @Required @Email @Regex(pattern = ".")
     public String getField()
     {
         return field;

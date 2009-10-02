@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint({"com.zutubi.validation.validators.RequiredValidator", "com.zutubi.validation.validators.NameValidator", "com.zutubi.tove.validation.UniqueNameValidator"})
+@Constraint({"com.zutubi.validation.validators.RequiredValidator", "com.zutubi.tove.validation.NameValidator", "com.zutubi.tove.validation.UniqueNameValidator"})
 @NoOverride
 public @interface ID
 {

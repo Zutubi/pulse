@@ -1,28 +1,26 @@
-package com.zutubi.pulse.core;
+package com.zutubi.tove.variables;
 
-import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.HashReferenceMap;
-import com.zutubi.pulse.core.engine.api.ReferenceMap;
-import com.zutubi.pulse.core.marshal.FileLoadException;
+import com.zutubi.tove.variables.api.ResolutionException;
+import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import static java.util.Arrays.asList;
 import java.util.List;
 
-public class ReferenceResolverTest extends ZutubiTestCase
+public class VariableResolverTest extends ZutubiTestCase
 {
-    private ReferenceMap scope = null;
+    private VariableMap scope = null;
 
-    public void setUp() throws FileLoadException
+    public void setUp()
     {
-        scope = new HashReferenceMap();
-        scope.add(new GenericReference<String>("foo", "foo"));
-        scope.add(new GenericReference<String>("bar", "baz"));
-        scope.add(new GenericReference<String>("a\\b", "slashed"));
-        scope.add(new GenericReference<String>("empty", ""));
-        scope.add(new GenericReference<String>("a{b}c", "braced"));
-        scope.add(new GenericReference<String>("a(b)c", "parened"));
-        scope.add(new GenericReference<String>("invalid.name", " this/is\\a$badname  "));
+        scope = new HashVariableMap();
+        scope.add(new GenericVariable<String>("foo", "foo"));
+        scope.add(new GenericVariable<String>("bar", "baz"));
+        scope.add(new GenericVariable<String>("a\\b", "slashed"));
+        scope.add(new GenericVariable<String>("empty", ""));
+        scope.add(new GenericVariable<String>("a{b}c", "braced"));
+        scope.add(new GenericVariable<String>("a(b)c", "parened"));
+        scope.add(new GenericVariable<String>("invalid.name", " this/is\\a$badname  "));
     }
 
     private void errorTest(String input, String expectedError)
@@ -31,10 +29,10 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
         try
         {
-            result = ReferenceResolver.resolveReferences(input, scope);
+            result = VariableResolver.resolveVariables(input, scope);
             fail("Expected config exception, got '" + result + "'");
         }
-        catch (PulseException e)
+        catch (ResolutionException e)
         {
             assertEquals(expectedError, e.getMessage());
         }
@@ -42,13 +40,13 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
     private void successTest(String in, String out) throws Exception
     {
-        String result = ReferenceResolver.resolveReferences(in, scope);
+        String result = VariableResolver.resolveVariables(in, scope);
         assertEquals(out, result);
     }
 
     private void successSplitTest(String in, String... out) throws Exception
     {
-        List<String> result = ReferenceResolver.splitAndResolveReferences(in, scope, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
+        List<String> result = VariableResolver.splitAndResolveVariable(in, scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT);
         assertEquals(asList(out), result);
     }
 
@@ -57,10 +55,10 @@ public class ReferenceResolverTest extends ZutubiTestCase
         List<String> result;
         try
         {
-            result = ReferenceResolver.splitAndResolveReferences(input, scope, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
+            result = VariableResolver.splitAndResolveVariable(input, scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT);
             fail("Expected config exception, got '" + result + "'");
         }
-        catch (PulseException e)
+        catch (ResolutionException e)
         {
             assertEquals(expectedError, e.getMessage());
         }
@@ -91,24 +89,24 @@ public class ReferenceResolverTest extends ZutubiTestCase
         errorTest("hoorah \\", "Syntax error: unexpected end of input in escape sequence (\\)");
     }
 
-    public void testEmptyReference()
+    public void testEmptyVariable()
     {
-        errorTest("${}", "Syntax error: empty reference");
+        errorTest("${}", "Syntax error: empty variable");
     }
 
-    public void testParenEmptyReference()
+    public void testParenEmptyVariable()
     {
-        errorTest("$()", "Syntax error: empty reference");
+        errorTest("$()", "Syntax error: empty variable");
     }
 
-    public void testUnknownReference()
+    public void testUnknownVariable()
     {
-        errorTest("${greebo}", "Unknown reference 'greebo'");
+        errorTest("${greebo}", "Unknown variable 'greebo'");
     }
 
-    public void testParenUnknownReference()
+    public void testParenUnknownVariable()
     {
-        errorTest("$(greebo)", "Unknown reference 'greebo'");
+        errorTest("$(greebo)", "Unknown variable 'greebo'");
     }
 
     public void testSimpleSubstitution() throws Exception
@@ -181,19 +179,19 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successTest("\\\\\\x", "\\x");
     }
 
-    public void testSlashInReference() throws Exception
+    public void testSlashInVariable() throws Exception
     {
         successTest("${a\\b}", "slashed");
     }
 
-    public void testParenSlashInReference() throws Exception
+    public void testParenSlashInVariable() throws Exception
     {
         successTest("$(a\\b)", "slashed");
     }
 
-    public void testNestedReference() throws Exception
+    public void testNestedVariable() throws Exception
     {
-        scope.add(new GenericReference<String>("a", "${foo}"));
+        scope.add(new GenericVariable<String>("a", "${foo}"));
         successTest("${a}", "${foo}");
     }
 
@@ -277,57 +275,57 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successSplitTest("\"inside \\\" quotes\"", "inside \" quotes");
     }
 
-    public void testSplitSingleReference() throws Exception
+    public void testSplitSingleVariable() throws Exception
     {
         successSplitTest("${bar}", "baz");
     }
 
-    public void testSplitParenSingleReference() throws Exception
+    public void testSplitParenSingleVariable() throws Exception
     {
         successSplitTest("$(bar)", "baz");
     }
 
-    public void testSplitAroundMultipleReferences() throws Exception
+    public void testSplitAroundMultipleVariables() throws Exception
     {
         successSplitTest("${foo} and ${bar}", "foo", "and", "baz");
     }
 
-    public void testSplitParenAroundMultipleReferences() throws Exception
+    public void testSplitParenAroundMultipleVariables() throws Exception
     {
         successSplitTest("$(foo) and $(bar)", "foo", "and", "baz");
     }
 
-    public void testSplitReferenceInQuotes() throws Exception
+    public void testSplitVariableInQuotes() throws Exception
     {
         successSplitTest("quotes \"around ${bar}\"", "quotes", "around baz");
     }
 
-    public void testSplitParenReferenceInQuotes() throws Exception
+    public void testSplitParenVariableInQuotes() throws Exception
     {
         successSplitTest("quotes \"around $(bar)\"", "quotes", "around baz");
     }
 
-    public void testSplitQuotesInReference() throws Exception
+    public void testSplitQuotesInVariable() throws Exception
     {
-        scope.add(new GenericReference<String>("a\"b", "val"));
+        scope.add(new GenericVariable<String>("a\"b", "val"));
         successSplitTest("odd ${a\"b} ref", "odd", "val", "ref");
     }
 
-    public void testSplitParenQuotesInReference() throws Exception
+    public void testSplitParenQuotesInVariable() throws Exception
     {
-        scope.add(new GenericReference<String>("a\"b", "val"));
+        scope.add(new GenericVariable<String>("a\"b", "val"));
         successSplitTest("odd $(a\"b) ref", "odd", "val", "ref");
     }
 
-    public void testSplitSpaceInReference() throws Exception
+    public void testSplitSpaceInVariable() throws Exception
     {
-        scope.add(new GenericReference<String>("space invader", "val"));
+        scope.add(new GenericVariable<String>("space invader", "val"));
         successSplitTest("odd ${space invader} ref", "odd", "val", "ref");
     }
 
-    public void testSplitParenSpaceInReference() throws Exception
+    public void testSplitParenSpaceInVariable() throws Exception
     {
-        scope.add(new GenericReference<String>("space invader", "val"));
+        scope.add(new GenericVariable<String>("space invader", "val"));
         successSplitTest("odd $(space invader) ref", "odd", "val", "ref");
     }
 
@@ -366,32 +364,32 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successSplitTest("empty\"\" adjacent", "empty", "adjacent");
     }
 
-    public void testSplitEmptyReference() throws Exception
+    public void testSplitEmptyVariable() throws Exception
     {
         successSplitTest("${empty}");
     }
 
-    public void testSplitParenEmptyReference() throws Exception
+    public void testSplitParenEmptyVariable() throws Exception
     {
         successSplitTest("$(empty)");
     }
 
-    public void testSplitQuotedEmptyReference() throws Exception
+    public void testSplitQuotedEmptyVariable() throws Exception
     {
         successSplitTest("\"${empty}\"", "");
     }
 
-    public void testSplitParenQuotedEmptyReference() throws Exception
+    public void testSplitParenQuotedEmptyVariable() throws Exception
     {
         successSplitTest("\"$(empty)\"", "");
     }
 
-    public void testSplitEmptyReferenceAdjacent() throws Exception
+    public void testSplitEmptyVariableAdjacent() throws Exception
     {
         successSplitTest("adjacent${empty} ref", "adjacent", "ref");
     }
 
-    public void testSplitParenEmptyReferenceAdjacent() throws Exception
+    public void testSplitParenEmptyVariableAdjacent() throws Exception
     {
         successSplitTest("adjacent$(empty) ref", "adjacent", "ref");
     }
@@ -401,17 +399,17 @@ public class ReferenceResolverTest extends ZutubiTestCase
         errorSplitTest("\"unterminated", "Syntax error: unexpected end of input looking for closing quotes (\")");
     }
 
-    public void testDefaultReferenceDefined() throws Exception
+    public void testDefaultVariableDefined() throws Exception
     {
         successTest("$(bar?def)", "baz");
     }
 
-    public void testDefaultReferenceDefinedButEmpty() throws Exception
+    public void testDefaultVariableDefinedButEmpty() throws Exception
     {
         successTest("$(empty?def)", "");
     }
 
-    public void testDefaultReferenceNotDefined() throws Exception
+    public void testDefaultVariableNotDefined() throws Exception
     {
         successTest("$(undefined?def)", "def");
     }
@@ -421,9 +419,9 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successTest("$(undefined?)", "");
     }
 
-    public void testDefaultSingleReference() throws Exception
+    public void testDefaultSingleVariable() throws Exception
     {
-        assertEquals("def", ReferenceResolver.resolveReference("$(undefined?def)", scope));
+        assertEquals("def", VariableResolver.resolveVariable("$(undefined?def)", scope));
     }
 
     public void testMixedBracketsBraceParen()
@@ -450,7 +448,7 @@ public class ReferenceResolverTest extends ZutubiTestCase
     {
         for (Character c: asList('!', '%', '#', '&', '/', ':', ';', '/'))
         {
-            errorTest("$(a" + c + "b)", "Syntax error: '" + c + "' is reserved and may not be used in an extended reference name");
+            errorTest("$(a" + c + "b)", "Syntax error: '" + c + "' is reserved and may not be used in an extended variable name");
         }
     }
 
@@ -481,6 +479,6 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
     public void testFilterUnknownNonStrict() throws Exception
     {
-        assertEquals("foo", ReferenceResolver.resolveReferences("$(foo|nosuchfilter)", scope, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
+        assertEquals("foo", VariableResolver.resolveVariables("$(foo|nosuchfilter)", scope, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
     }
 }

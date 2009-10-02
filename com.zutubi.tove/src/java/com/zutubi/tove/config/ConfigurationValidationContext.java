@@ -1,8 +1,10 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.i18n.TextProvider;
-import com.zutubi.tove.config.api.Configuration;
 
 import java.util.*;
 
@@ -20,6 +22,7 @@ public class ConfigurationValidationContext implements ValidationContext
     private boolean checkEssential;
     private boolean ignoreAllFields = false;
     private Set<String> ignoredFields = new HashSet<String>();
+    private Config config = new PropertiesConfig();
 
     private ConfigurationTemplateManager configurationTemplateManager;
 
@@ -164,5 +167,30 @@ public class ConfigurationValidationContext implements ValidationContext
     public TextProvider getTextProvider(Object context)
     {
         return textProvider.getTextProvider(context);
+    }
+
+    public String getProperty(String key)
+    {
+        return config.getProperty(key);
+    }
+
+    public void setProperty(String key, String value)
+    {
+        config.setProperty(key, value);
+    }
+
+    public boolean hasProperty(String key)
+    {
+        return config.hasProperty(key);
+    }
+
+    public void removeProperty(String key)
+    {
+        config.removeProperty(key);
+    }
+
+    public boolean isWriteable()
+    {
+        return config.isWriteable();
     }
 }

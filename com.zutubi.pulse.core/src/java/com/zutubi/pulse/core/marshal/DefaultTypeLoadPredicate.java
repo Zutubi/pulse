@@ -12,11 +12,6 @@ public class DefaultTypeLoadPredicate implements TypeLoadPredicate
         return true;
     }
 
-    public boolean resolveReferences(Configuration type, Element element)
-    {
-        return true;
-    }
-
     public boolean allowUnresolved(Configuration type, Element element)
     {
         return false;

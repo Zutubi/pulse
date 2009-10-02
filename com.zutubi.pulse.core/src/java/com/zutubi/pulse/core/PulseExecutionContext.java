@@ -3,8 +3,11 @@ package com.zutubi.pulse.core;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_USER;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.ResolutionException;
+import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
@@ -152,22 +155,22 @@ public class PulseExecutionContext implements ExecutionContext
 
     public <T> T getValue(String namespace, String name, Class<T> type)
     {
-        return scopeStack.getScope(namespace).getReferenceValue(name, type);
+        return scopeStack.getScope(namespace).getVariableValue(name, type);
     }
 
     public <T> T getValue(String name, Class<T> type)
     {
-        return scopeStack.getScope().getReferenceValue(name, type);
+        return scopeStack.getScope().getVariableValue(name, type);
     }
 
-    public void add(String namespace, Reference reference)
+    public void add(String namespace, Variable variable)
     {
-        scopeStack.getScope(namespace).add(reference);
+        scopeStack.getScope(namespace).add(variable);
     }
 
-    public void add(Reference reference)
+    public void add(Variable variable)
     {
-        scopeStack.getScope().add(reference);
+        scopeStack.getScope().add(variable);
     }
 
     public void add(String namespace, ResourceProperty resourceProperty)
@@ -182,29 +185,29 @@ public class PulseExecutionContext implements ExecutionContext
 
     public void addString(String namespace, String name, String value)
     {
-        scopeStack.getScope(namespace).add(new GenericReference<String>(name, value));
+        scopeStack.getScope(namespace).add(new GenericVariable<String>(name, value));
     }
 
     public void addString(String name, String value)
     {
-        scopeStack.getScope().add(new GenericReference<String>(name, value));
+        scopeStack.getScope().add(new GenericVariable<String>(name, value));
     }
 
     public void addValue(String namespace, String name, Object value)
     {
-        scopeStack.getScope(namespace).add(new GenericReference<Object>(name, value));
+        scopeStack.getScope(namespace).add(new GenericVariable<Object>(name, value));
     }
 
     public void addValue(String name, Object value)
     {
-        scopeStack.getScope().add(new GenericReference<Object>(name, value));
+        scopeStack.getScope().add(new GenericVariable<Object>(name, value));
     }
 
-    public String resolveReferences(String input)
+    public String resolveVariables(String input)
     {
         try
         {
-            return ReferenceResolver.resolveReferences(input, getScope(), ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+            return VariableResolver.resolveVariables(input, getScope(), VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
         }
         catch (ResolutionException e)
         {
@@ -213,11 +216,11 @@ public class PulseExecutionContext implements ExecutionContext
         }
     }
 
-    public List<String> splitAndResolveReferences(String input)
+    public List<String> splitAndResolveVariables(String input)
     {
         try
         {
-            return ReferenceResolver.splitAndResolveReferences(input, getScope(), ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+            return VariableResolver.splitAndResolveVariable(input, getScope(), VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
         }
         catch (ResolutionException e)
         {

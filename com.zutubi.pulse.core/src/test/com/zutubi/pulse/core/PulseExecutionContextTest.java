@@ -8,8 +8,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-/**
- */
 public class PulseExecutionContextTest extends PulseTestCase
 {
     public void testInternalProperty()
@@ -153,10 +151,10 @@ public class PulseExecutionContextTest extends PulseTestCase
         PulseExecutionContext context = makeNonTrivialContext();
 
         PulseScope scope = context.getScope();
-        assertEquals("ip", scope.getReferenceValue("iparent", String.class));
-        assertEquals("ic", scope.getReferenceValue("ichild", String.class));
-        assertEquals("p", scope.getReferenceValue("parent", String.class));
-        assertEquals("c", scope.getReferenceValue("child", String.class));
+        assertEquals("ip", scope.getVariableValue("iparent", String.class));
+        assertEquals("ic", scope.getVariableValue("ichild", String.class));
+        assertEquals("p", scope.getVariableValue("parent", String.class));
+        assertEquals("c", scope.getVariableValue("child", String.class));
     }
 
     private PulseExecutionContext makeNonTrivialContext()

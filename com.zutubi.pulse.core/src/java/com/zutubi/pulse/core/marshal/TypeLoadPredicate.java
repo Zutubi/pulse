@@ -8,7 +8,6 @@ import nu.xom.Element;
 public interface TypeLoadPredicate
 {
     boolean loadType(Configuration type, Element element);
-    boolean resolveReferences(Configuration type, Element element);
     boolean allowUnresolved(Configuration type, Element element);
     boolean validate(Configuration type, Element element);
 }

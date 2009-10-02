@@ -52,7 +52,7 @@ public class RetrieveDependenciesCommand implements Command
                 {
                     ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
                     ModuleRevisionId mrid = descriptor.getModuleRevisionId();
-                    String retrievalPattern = context.resolveReferences(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
+                    String retrievalPattern = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
 
                     if (!ivy.isResolved(mrid))
                     {

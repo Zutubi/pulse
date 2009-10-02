@@ -1,17 +1,17 @@
-package com.zutubi.pulse.core.validation;
+package com.zutubi.pulse.core.marshal;
 
-import com.zutubi.pulse.core.marshal.FileLoadException;
 import com.zutubi.validation.ValidationContext;
 
 import java.util.List;
 
 /**
+ * Raised for validation errors during file loading.
  */
-public class CommandValidationException extends FileLoadException
+public class FileLoadValidationException extends FileLoadException
 {
     private ValidationContext context;
 
-    public CommandValidationException(ValidationContext context)
+    public FileLoadValidationException(ValidationContext context)
     {
         this.context = context;
     }

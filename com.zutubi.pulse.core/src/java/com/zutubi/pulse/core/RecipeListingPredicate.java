@@ -15,11 +15,6 @@ public class RecipeListingPredicate implements TypeLoadPredicate
         return !(type instanceof RecipeConfiguration);
     }
 
-    public boolean resolveReferences(Configuration type, Element element)
-    {
-        return true;
-    }
-
     public boolean allowUnresolved(Configuration type, Element element)
     {
         return true;

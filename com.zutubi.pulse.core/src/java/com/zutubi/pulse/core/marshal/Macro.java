@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.marshal;
 
-import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.tove.variables.api.Variable;
 import nu.xom.Element;
 
 /**
@@ -8,7 +8,7 @@ import nu.xom.Element;
  * This allows the same fragment to be referenced using macro-ref an
  * arbitrary number of times in the file.
  */
-public class Macro implements Reference
+public class Macro implements Variable
 {
     private String name;
     private Element element;

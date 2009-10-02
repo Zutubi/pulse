@@ -139,12 +139,12 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testMacroRefNotMacro() throws Exception
     {
-        errorHelper("Reference '${not-macro}' does not resolve to a macro");
+        errorHelper("Variable '${not-macro}' does not resolve to a macro");
     }
 
     public void testMacroRefNotFound() throws Exception
     {
-        errorHelper("Unknown reference 'not-found'");
+        errorHelper("Unknown variable 'not-found'");
     }
 
     public void testMacroRefUnknownAttribute() throws Exception

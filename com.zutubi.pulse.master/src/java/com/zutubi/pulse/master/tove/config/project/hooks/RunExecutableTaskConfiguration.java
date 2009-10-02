@@ -91,7 +91,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         AsyncProcess asyncProcess = null;
         try
         {
-            List<String> resolvedArguments = context.splitAndResolveReferences(arguments);
+            List<String> resolvedArguments = context.splitAndResolveVariables(arguments);
             List<String> commandLine = new LinkedList<String>();
             commandLine.add(command);
             commandLine.addAll(resolvedArguments);

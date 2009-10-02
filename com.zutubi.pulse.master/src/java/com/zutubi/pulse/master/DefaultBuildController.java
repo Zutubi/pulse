@@ -175,7 +175,7 @@ public class DefaultBuildController implements EventListener, BuildController
         }
         if (options.isResolveVersion())
         {
-            version = buildContext.resolveReferences(version);
+            version = buildContext.resolveVariables(version);
         }
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, version);
         buildResult.setVersion(version);

@@ -1,4 +1,6 @@
-package com.zutubi.validation.annotations;
+package com.zutubi.tove.annotations;
+
+import com.zutubi.validation.annotations.Constraint;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +15,7 @@ import java.lang.annotation.Target;
  * </ul>
  *
  */
-@Constraint("com.zutubi.validation.validators.NameValidator")
+@Constraint("com.zutubi.tove.validation.NameValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Name

@@ -4,7 +4,6 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.GenericReference;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
@@ -17,6 +16,7 @@ import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
+import com.zutubi.tove.variables.GenericVariable;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
@@ -1064,7 +1064,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void sendRecipeAssigned(Agent agent, int recipeId)
     {
         PulseExecutionContext context = new PulseExecutionContext();
-        context.add(BuildProperties.NAMESPACE_INTERNAL, new GenericReference<String>(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
+        context.add(BuildProperties.NAMESPACE_INTERNAL, new GenericVariable<String>(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
         eventManager.publish(new RecipeAssignedEvent(this, new RecipeRequest(context), agent));
     }
 

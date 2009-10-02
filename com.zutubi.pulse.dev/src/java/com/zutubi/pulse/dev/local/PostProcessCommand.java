@@ -3,7 +3,10 @@ package com.zutubi.pulse.dev.local;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.InMemoryResourceRepository;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.cli.HelpCommand;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -27,6 +30,7 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import org.apache.commons.cli.*;
 
@@ -128,7 +132,7 @@ public class PostProcessCommand implements Command
             CommandResult result = new CommandResult("dummy");
             PulseExecutionContext executionContext = new PulseExecutionContext();
             PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
-            executionContext.add(NAMESPACE_INTERNAL, new GenericReference<PersistentTestSuiteResult>(PROPERTY_TEST_RESULTS, testResults));
+            executionContext.add(NAMESPACE_INTERNAL, new GenericVariable<PersistentTestSuiteResult>(PROPERTY_TEST_RESULTS, testResults));
 
             PostProcessorContext context = new DefaultPostProcessorContext(artifact, result, executionContext);
 
@@ -226,7 +230,7 @@ public class PostProcessCommand implements Command
         try
         {
             PulseScope pulseScope = new PulseScope();
-            pulseScope.add(new GenericReference<ResourceRepository>(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository));
+            pulseScope.add(new GenericVariable<ResourceRepository>(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository));
             loader.load(new FileInputStream(f), result, pulseScope, new LocalFileResolver(f.getParentFile()), new DefaultTypeLoadPredicate());
             return result;
         }

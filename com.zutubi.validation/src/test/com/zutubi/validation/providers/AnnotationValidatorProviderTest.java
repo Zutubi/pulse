@@ -88,17 +88,17 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testValidatorOrdering()
     {
-        typedValidatorHelper(new MockStraightJacket(), RequiredValidator.class, EmailValidator.class, NameValidator.class, RegexValidator.class);
+        typedValidatorHelper(new MockStraightJacket(), RequiredValidator.class, EmailValidator.class, RegexValidator.class);
     }
 
     public void testIndirectConstraintsOnField()
     {
-        typedValidatorHelper(new IndirectConstraintsOnField(), RequiredValidator.class, EmailValidator.class, NameValidator.class, RegexValidator.class);
+        typedValidatorHelper(new IndirectConstraintsOnField(), RequiredValidator.class, EmailValidator.class, RegexValidator.class);
     }
 
     public static class IndirectConstraintsOnField
     {
-        @Required @Email @Name @Regex(pattern = ".")
+        @Required @Email @Regex(pattern = ".")
         private String field;
 
         public String getField()

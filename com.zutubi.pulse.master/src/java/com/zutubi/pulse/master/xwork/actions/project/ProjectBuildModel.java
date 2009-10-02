@@ -3,11 +3,6 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.opensymphony.util.TextUtils;
 import static com.opensymphony.util.TextUtils.htmlEncode;
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.core.GenericReference;
-import com.zutubi.pulse.core.ReferenceResolver;
-import com.zutubi.pulse.core.ResolutionException;
-import com.zutubi.pulse.core.engine.api.HashReferenceMap;
-import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -18,6 +13,11 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConf
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.HashVariableMap;
+import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.ResolutionException;
+import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
@@ -287,15 +287,15 @@ public class ProjectBuildModel
 
     private String merge(String template, Pair<String, String>... properties)
     {
-        ReferenceMap referenceMap = new HashReferenceMap();
+        VariableMap variableMap = new HashVariableMap();
         for (Pair<String, String> p: properties)
         {
-            referenceMap.add(new GenericReference<String>(p.first, p.second));
+            variableMap.add(new GenericVariable<String>(p.first, p.second));
         }
 
         try
         {
-            return ReferenceResolver.resolveReferences(template, referenceMap, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+            return VariableResolver.resolveVariables(template, variableMap, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
         }
         catch (ResolutionException e)
         {

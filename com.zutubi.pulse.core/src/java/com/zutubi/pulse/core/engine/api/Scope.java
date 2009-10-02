@@ -1,12 +1,15 @@
 package com.zutubi.pulse.core.engine.api;
 
+import com.zutubi.tove.variables.api.Variable;
+import com.zutubi.tove.variables.api.VariableMap;
+
 import java.util.Collection;
 
 /**
- * A hierarchy of reference containers.  If a reference is not found in a
+ * A hierarchy of variable containers.  If a variable is not found in a
  * scope, the request is deferred to the parent.
  */
-public interface Scope extends ReferenceMap
+public interface Scope extends VariableMap
 {
     /**
      * @see #getAncestor(String)
@@ -54,24 +57,24 @@ public interface Scope extends ReferenceMap
     Scope getAncestor(String label);
 
     /**
-     * Adds a reference which must have a unique name directly in this scope
-     * (i.e. it may override an ancestor but may not replace a reference in
+     * Adds a variable which must have a unique name directly in this scope
+     * (i.e. it may override an ancestor but may not replace a variable in
      * this scope itself).
      *
-     * @param reference the reference to add
-     * @throws IllegalArgumentException if a reference of the same name
+     * @param variable the variable to add
+     * @throws IllegalArgumentException if a variable of the same name
      *         already exists directly in this scope
      */
-    void addUnique(Reference reference) throws IllegalArgumentException;
+    void addUnique(Variable variable) throws IllegalArgumentException;
 
     /**
      * Bulk version of {@link #addUnique}.
      *
-     * @param references references to add
-     * @throws IllegalArgumentException if any reference clashes names with
-     *         an existing reference directly in this scope
+     * @param variables variables to add
+     * @throws IllegalArgumentException if any variable clashes names with
+     *         an existing variable directly in this scope
      */
-    void addAllUnique(Collection<? extends Reference> references) throws IllegalArgumentException;
+    void addAllUnique(Collection<? extends Variable> variables) throws IllegalArgumentException;
 
     /**
      * Copies a chain of scopes up to but not including the passed in scope.

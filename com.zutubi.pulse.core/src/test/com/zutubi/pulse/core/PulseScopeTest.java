@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Mapping;
@@ -12,8 +13,6 @@ import com.zutubi.util.StringUtils;
 import java.io.File;
 import java.util.*;
 
-/**
- */
 public class PulseScopeTest extends PulseTestCase
 {
     private PulseScope scope;
@@ -25,8 +24,8 @@ public class PulseScopeTest extends PulseTestCase
         parent.setLabel("parent");
         scope = new PulseScope(parent);
         scope.setLabel("child");
-        parent.add(new GenericReference<String>("parent only", "parent"));
-        parent.add(new GenericReference<String>("parent and child", "parent"));
+        parent.add(new GenericVariable<String>("parent only", "parent"));
+        parent.add(new GenericVariable<String>("parent and child", "parent"));
         parent.add(new ResourceProperty("parent only resource", "parent resource", true, true, false));
         parent.add(new ResourceProperty("parent and child resource", "parent resource", true, true, false));
 
@@ -36,8 +35,8 @@ public class PulseScopeTest extends PulseTestCase
             parent.addEnvironmentProperty(var.getKey(), var.getValue());
         }
 
-        scope.add(new GenericReference<String>("child only", "child"));
-        scope.add(new GenericReference<String>("parent and child", "child"));
+        scope.add(new GenericVariable<String>("child only", "child"));
+        scope.add(new GenericVariable<String>("parent and child", "child"));
         scope.add(new ResourceProperty("child only resource", "child resource", true, true, false));
         scope.add(new ResourceProperty("parent and child resource", "child resource", true, true, false));
 
@@ -77,7 +76,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addUnique(new GenericReference<String>("child only", ""));
+            scope.addUnique(new GenericVariable<String>("child only", ""));
             fail();
         }
         catch(IllegalArgumentException e)
@@ -88,22 +87,22 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testAddUniqueOverride()
     {
-        scope.addUnique(new GenericReference<String>("parent only", "override"));
-        assertEquals("override", scope.getReferenceValue("parent only", String.class));
+        scope.addUnique(new GenericVariable<String>("parent only", "override"));
+        assertEquals("override", scope.getVariableValue("parent only", String.class));
     }
 
     public void testAddAll()
     {
-        scope.addAll(Arrays.asList(new GenericReference<String>("p1", "v1"), new GenericReference<String>("p2", "v2")));
-        assertEquals("v1", scope.getReferenceValue("p1", String.class));
-        assertEquals("v2", scope.getReferenceValue("p2", String.class));
+        scope.addAll(Arrays.asList(new GenericVariable<String>("p1", "v1"), new GenericVariable<String>("p2", "v2")));
+        assertEquals("v1", scope.getVariableValue("p1", String.class));
+        assertEquals("v2", scope.getVariableValue("p2", String.class));
     }
 
     public void testAddAllUnique()
     {
         try
         {
-            scope.addAllUnique(Arrays.asList(new GenericReference<String>("child only", "")));
+            scope.addAllUnique(Arrays.asList(new GenericVariable<String>("child only", "")));
             fail();
         }
         catch (IllegalArgumentException e)
@@ -112,60 +111,60 @@ public class PulseScopeTest extends PulseTestCase
         }
     }
 
-    public void testGetReferences()
+    public void testGetVariables()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<String>("parent", "pv"));
-        parent.add(new GenericReference<String>("both", "bv"));
+        parent.add(new GenericVariable<String>("parent", "pv"));
+        parent.add(new GenericVariable<String>("both", "bv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericReference<String>("child", "cv"));
-        child.add(new GenericReference<String>("both", "bv"));
+        child.add(new GenericVariable<String>("child", "cv"));
+        child.add(new GenericVariable<String>("both", "bv"));
 
-        Collection<Reference> references = child.getReferences();
-        assertEquals(3, references.size());
-        EqualityAssertions.assertEquals(Arrays.asList("parent", "child", "both"), CollectionUtils.map(references, new Mapping<Reference, String>()
+        Collection<Variable> variables = child.getVariables();
+        assertEquals(3, variables.size());
+        EqualityAssertions.assertEquals(Arrays.asList("parent", "child", "both"), CollectionUtils.map(variables, new Mapping<Variable, String>()
         {
-            public String map(Reference reference)
+            public String map(Variable variable)
             {
-                return reference.getName();
+                return variable.getName();
             }
         }));
     }
 
-    public void testGetReferencesOfType()
+    public void testGetVariablesOfType()
     {
         PulseScope scope = new PulseScope();
-        scope.add(new GenericReference<Long>("long", 1L));
-        scope.add(new GenericReference<String>("string", "s"));
+        scope.add(new GenericVariable<Long>("long", 1L));
+        scope.add(new GenericVariable<String>("string", "s"));
 
-        Collection<Reference> references = scope.getReferences(String.class);
-        assertEquals(1, references.size());
-        assertEquals("string", references.iterator().next().getName());
+        Collection<Variable> variables = scope.getVariables(String.class);
+        assertEquals(1, variables.size());
+        assertEquals("string", variables.iterator().next().getName());
     }
 
-    public void testGetReferencesOfTypeOverrideType()
+    public void testGetVariablesOfTypeOverrideType()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<Long>("long then string", 1L));
-        parent.add(new GenericReference<String>("string then long", "s"));
+        parent.add(new GenericVariable<Long>("long then string", 1L));
+        parent.add(new GenericVariable<String>("string then long", "s"));
 
         PulseScope child = new PulseScope(parent);
-        parent.add(new GenericReference<String>("long then string", "s"));
-        parent.add(new GenericReference<Long>("string then long", 1L));
+        parent.add(new GenericVariable<String>("long then string", "s"));
+        parent.add(new GenericVariable<Long>("string then long", 1L));
         
-        Collection<Reference> references = child.getReferences(String.class);
-        assertEquals(1, references.size());
-        assertEquals("long then string", references.iterator().next().getName());
+        Collection<Variable> variables = child.getVariables(String.class);
+        assertEquals(1, variables.size());
+        assertEquals("long then string", variables.iterator().next().getName());
     }
 
-    public void testGetReferenceValue()
+    public void testGetVariableValue()
     {
-        assertEquals("child", scope.getReferenceValue("child only", String.class));
+        assertEquals("child", scope.getVariableValue("child only", String.class));
     }
 
-    public void testGetReferenceValueWrongType()
+    public void testGetVariableValueWrongType()
     {
-        assertNull(scope.getReferenceValue("child only", Long.class));
+        assertNull(scope.getVariableValue("child only", Long.class));
     }
 
     public void testEnvironment()
@@ -271,29 +270,29 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testEnvPath()
     {
-        Reference reference = scope.getReference("env.PATH");
-        assertNotNull(reference);
-        assertEquals(scope.getPathPrefix() + System.getenv("PATH"), reference.getValue());
+        Variable variable = scope.getVariable("env.PATH");
+        assertNotNull(variable);
+        assertEquals(scope.getPathPrefix() + System.getenv("PATH"), variable.getValue());
     }
 
     public void testEnvPathNoPathOrPrefix()
     {
         PulseScope s = new PulseScope();
-        assertNull(s.getReference("env.PATH"));
+        assertNull(s.getVariable("env.PATH"));
     }
 
     public void testEnvPathPrefixButNoPath()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("foo", "foo", false, true, false));
-        assertEquals("foo", s.getReferenceValue("env.PATH", String.class));
+        assertEquals("foo", s.getVariableValue("env.PATH", String.class));
     }
 
     public void testEnvPathPathButNoPrefix()
     {
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "foo");
-        assertEquals("foo", s.getReferenceValue("env.PATH", String.class));
+        assertEquals("foo", s.getVariableValue("env.PATH", String.class));
     }
 
     public void testEnvPathMixedCase()
@@ -301,7 +300,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PatH", "base");
         s.add(new ResourceProperty("foo", "prefix", false, true, false));
-        assertEquals("prefix" + File.pathSeparator + "base", s.getReferenceValue("env.PATH", String.class));
+        assertEquals("prefix" + File.pathSeparator + "base", s.getVariableValue("env.PATH", String.class));
     }
 
     public void testReferToEarlierProperty()
@@ -309,7 +308,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("test", "value", false, false, false));
         s.add(new ResourceProperty("test2", "${test}2", false, false, true));
-        assertEquals("value2", s.getReference("test2").getValue());
+        assertEquals("value2", s.getVariable("test2").getValue());
     }
 
     public void testDontResolve()
@@ -317,14 +316,14 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("test", "value", false, false, false));
         s.add(new ResourceProperty("test2", "${test}2", false, false, false));
-        assertEquals("${test}2", s.getReference("test2").getValue());
+        assertEquals("${test}2", s.getVariable("test2").getValue());
     }
 
-    public void testSelfReference()
+    public void testSelfVariable()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "${testvar}", false, false, true));
-        assertEquals("${testvar}", s.getReference("testvar").getValue());
+        assertEquals("${testvar}", s.getVariable("testvar").getValue());
     }
 
     public void testReferToParentProperty()
@@ -333,7 +332,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("test", "value", false, false, false));
         c.add(new ResourceProperty("test2", "${test}2", false, false, true));
-        assertEquals("value2", c.getReference("test2").getValue());
+        assertEquals("value2", c.getVariable("test2").getValue());
     }
 
     public void testAddToPathPreservesOrder()
@@ -361,14 +360,14 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("priceless", "parent", true, false, false));
         c.add(new ResourceProperty("priceless", "child", false, false, false));
-        assertFalse(c.containsReference("env.PRICELESS"));
+        assertFalse(c.containsVariable("env.PRICELESS"));
     }
 
     public void testAddToEnvironmentAddsEnvVar()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "value", true, false, false));
-        assertEquals("value", s.getReference("env.testvar").getValue());
+        assertEquals("value", s.getVariable("env.testvar").getValue());
     }
 
     public void testAddToParentEnvAddsEnvVar()
@@ -376,107 +375,107 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "value", true, false, false));
-        assertEquals("value", c.getReference("env.testvar").getValue());
+        assertEquals("value", c.getVariable("env.testvar").getValue());
     }
 
-    public void testAddToEnvReferenceEnvVar()
+    public void testAddToEnvVariableEnvVar()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "value", true, false, false));
         s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
-        assertEquals("value2", s.getReference("testvar2").getValue());
+        assertEquals("value2", s.getVariable("testvar2").getValue());
     }
 
-    public void testAddToParentEnvReferenceEnvVar()
+    public void testAddToParentEnvVariableEnvVar()
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "value", true, false, false));
         c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
-        assertEquals("value2", c.getReference("testvar2").getValue());
+        assertEquals("value2", c.getVariable("testvar2").getValue());
     }
 
-    public void testReferenceEnvPath()
+    public void testVariableEnvPath()
     {
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
         s.add(new ResourceProperty("somevar", "someval", false, true, false));
         s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false, true));
-        assertEquals("someval" + File.pathSeparatorChar + "dummypath?", s.getReference("refvar").getValue());
+        assertEquals("someval" + File.pathSeparatorChar + "dummypath?", s.getVariable("refvar").getValue());
     }
 
-    public void testSelfReferenceEnvVar()
+    public void testSelfVariableEnvVar()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false, true));
-        assertEquals("${env.refvar}?", s.getReference("refvar").getValue());
+        assertEquals("${env.refvar}?", s.getVariable("refvar").getValue());
     }
 
-    public void testSelfReferenceEnvPath()
+    public void testSelfVariableEnvPath()
     {
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
         s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true, true));
-        assertEquals("dummypath?", s.getReference("refvar").getValue());
+        assertEquals("dummypath?", s.getVariable("refvar").getValue());
     }
 
     public void testBackslash()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "\\", false, true, true));
-        assertEquals("\\", s.getReference("myvar").getValue());
+        assertEquals("\\", s.getVariable("myvar").getValue());
     }
 
     public void testBadSyntax()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
-        assertEquals("this ${ is invalid", s.getReference("myvar").getValue());
+        assertEquals("this ${ is invalid", s.getVariable("myvar").getValue());
     }
 
-    public void testGetReferencesIncludesParents()
+    public void testGetVariablesIncludesParents()
     {
         PulseScope parent = new PulseScope();
         PulseScope child = new PulseScope(parent);
 
         parent.add(new ResourceProperty("name", "value"));
 
-        Collection<Reference> references = child.getReferences();
-        assertEquals(1, references.size());
-        Reference reference = references.iterator().next();
-        assertEquals("name", reference.getName());
-        assertEquals("value", reference.getValue());
+        Collection<Variable> variables = child.getVariables();
+        assertEquals(1, variables.size());
+        Variable variable = variables.iterator().next();
+        assertEquals("name", variable.getName());
+        assertEquals("value", variable.getValue());
     }
 
     public void testCopy()
     {
         PulseScope original = new PulseScope();
-        original.add(new GenericReference<String>("foo", "bar"));
+        original.add(new GenericVariable<String>("foo", "bar"));
 
         PulseScope copy = original.copy();
-        assertEquals("bar", original.getReferenceValue("foo", String.class));
-        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+        assertEquals("bar", original.getVariableValue("foo", String.class));
+        assertEquals("bar", copy.getVariableValue("foo", String.class));
         
-        original.add(new GenericReference<String>("foo", "baz"));
-        assertEquals("baz", original.getReferenceValue("foo", String.class));
-        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+        original.add(new GenericVariable<String>("foo", "baz"));
+        assertEquals("baz", original.getVariableValue("foo", String.class));
+        assertEquals("bar", copy.getVariableValue("foo", String.class));
     }
 
     public void testCopyWithParent()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<String>("foo", "bar"));
+        parent.add(new GenericVariable<String>("foo", "bar"));
         PulseScope original = new PulseScope(parent);
 
         PulseScope copy = original.copy();
-        assertEquals("bar", parent.getReferenceValue("foo", String.class));
-        assertEquals("bar", original.getReferenceValue("foo", String.class));
-        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+        assertEquals("bar", parent.getVariableValue("foo", String.class));
+        assertEquals("bar", original.getVariableValue("foo", String.class));
+        assertEquals("bar", copy.getVariableValue("foo", String.class));
 
-        parent.add(new GenericReference<String>("foo", "baz"));
-        assertEquals("baz", parent.getReferenceValue("foo", String.class));
-        assertEquals("baz", original.getReferenceValue("foo", String.class));
-        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+        parent.add(new GenericVariable<String>("foo", "baz"));
+        assertEquals("baz", parent.getVariableValue("foo", String.class));
+        assertEquals("baz", original.getVariableValue("foo", String.class));
+        assertEquals("bar", copy.getVariableValue("foo", String.class));
     }
 
     public void testCopyPreservesLabels()
@@ -489,23 +488,23 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyTo()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<String>("pp", "pv"));
+        parent.add(new GenericVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericReference<String>("cp", "cv"));
+        child.add(new GenericVariable<String>("cp", "cv"));
 
         PulseScope copy = child.copyTo(parent);
         assertNull(copy.getParent());
-        assertEquals(1, copy.getReferences().size());
-        assertEquals("cv", copy.getReferenceValue("cp", String.class));
-        assertNull(copy.getReference("pp"));
+        assertEquals(1, copy.getVariables().size());
+        assertEquals("cv", copy.getVariableValue("cp", String.class));
+        assertNull(copy.getVariable("pp"));
     }
 
     public void testCopyToNull()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<String>("pp", "pv"));
+        parent.add(new GenericVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericReference<String>("cp", "cv"));
+        child.add(new GenericVariable<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(null));
     }
@@ -513,9 +512,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToScopeNotInChain()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<String>("pp", "pv"));
+        parent.add(new GenericVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericReference<String>("cp", "cv"));
+        child.add(new GenericVariable<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(new PulseScope()));
     }
@@ -523,9 +522,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToSelf()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericReference<String>("pp", "pv"));
+        parent.add(new GenericVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericReference<String>("cp", "cv"));
+        child.add(new GenericVariable<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(child));
     }
@@ -540,10 +539,10 @@ public class PulseScopeTest extends PulseTestCase
     private void assertFullCopy(PulseScope copy)
     {
         assertNotNull(copy.getParent());
-        assertEquals(2, copy.getReferences().size());
-        assertEquals("cv", copy.getReferenceValue("cp", String.class));
-        assertEquals("pv", copy.getReferenceValue("pp", String.class));
-        assertEquals("pv", copy.getParent().getReferenceValue("pp", String.class));
+        assertEquals(2, copy.getVariables().size());
+        assertEquals("cv", copy.getVariableValue("cp", String.class));
+        assertEquals("pv", copy.getVariableValue("pp", String.class));
+        assertEquals("pv", copy.getParent().getVariableValue("pp", String.class));
     }
 
     public void testGetAncestor()
@@ -581,17 +580,17 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope scope = new PulseScope();
         scope.addEnvironmentProperty(name, "1");
 
-        assertEquals("1", scope.getReferenceValue("env." + name, String.class));
+        assertEquals("1", scope.getVariableValue("env." + name, String.class));
 
         ResourceProperty prop = new ResourceProperty(name, "3", true, false, false);
         scope.add(prop);
 
-        assertEquals("3", scope.getReferenceValue("env." + name, String.class));
+        assertEquals("3", scope.getVariableValue("env." + name, String.class));
     }
 
     private String getValue(String name)
     {
-        Reference reference = scope.getReference(name);
-        return (String) reference.getValue();
+        Variable variable = scope.getVariable(name);
+        return (String) variable.getValue();
     }
 }

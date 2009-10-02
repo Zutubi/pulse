@@ -1,7 +1,8 @@
-package com.zutubi.validation.validators;
+package com.zutubi.tove.validation;
 
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.validators.FieldValidatorTestCase;
 
 public class NameValidatorTest extends FieldValidatorTestCase
 {

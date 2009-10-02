@@ -1,16 +1,16 @@
-package com.zutubi.pulse.core;
+package com.zutubi.tove.variables;
 
-import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.tove.variables.api.Variable;
 
 /**
- * A simple reference that can have any type as its value.
+ * A simple variable that can have any type as its value.
  */
-public class GenericReference<T> implements Reference
+public class GenericVariable<T> implements Variable
 {
     private String name;
     private T value;
 
-    public GenericReference(String name, T value)
+    public GenericVariable(String name, T value)
     {
         this.name = name;
         this.value = value;

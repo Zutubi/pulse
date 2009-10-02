@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.ReferenceMap;
+import com.zutubi.tove.variables.api.Variable;
+import com.zutubi.tove.variables.api.VariableMap;
 
 import java.util.Collection;
 
@@ -11,7 +11,7 @@ import java.util.Collection;
  * used as a single scope.  When a specific scope is required, it can be
  * looked up by name.
  */
-public class MultiScopeStack implements ReferenceMap
+public class MultiScopeStack implements VariableMap
 {
     private String[] names;
     private PulseScope[] roots;
@@ -136,28 +136,28 @@ public class MultiScopeStack implements ReferenceMap
         throw new IllegalArgumentException("No such scope '" + name + "'");
     }
 
-    public boolean containsReference(String name)
+    public boolean containsVariable(String name)
     {
-        return getScope().containsReference(name);
+        return getScope().containsVariable(name);
     }
 
-    public Reference getReference(String name)
+    public Variable getVariable(String name)
     {
-        return getScope().getReference(name);
+        return getScope().getVariable(name);
     }
 
-    public Collection<Reference> getReferences()
+    public Collection<Variable> getVariables()
     {
-        return getScope().getReferences();
+        return getScope().getVariables();
     }
 
-    public void add(Reference reference)
+    public void add(Variable variable)
     {
-        getScope().add(reference);
+        getScope().add(variable);
     }
 
-    public void addAll(Collection<? extends Reference> references)
+    public void addAll(Collection<? extends Variable> variables)
     {
-        getScope().addAll(references);
+        getScope().addAll(variables);
     }
 }

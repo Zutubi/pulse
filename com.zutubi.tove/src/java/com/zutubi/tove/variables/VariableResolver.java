@@ -1,7 +1,8 @@
-package com.zutubi.pulse.core;
+package com.zutubi.tove.variables;
 
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.ReferenceMap;
+import com.zutubi.tove.variables.api.ResolutionException;
+import com.zutubi.tove.variables.api.Variable;
+import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.UnaryFunction;
 
 import java.util.HashMap;
@@ -10,11 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Methods for analysing and replacing references within strings.
+ * Methods for analysing and replacing variables within strings.
  */
-public class ReferenceResolver
+public class VariableResolver
 {
     private static final Map<String, UnaryFunction<String, String>> FILTER_FUNCTIONS = new HashMap<String, UnaryFunction<String, String>>();
+
     static
     {
         FILTER_FUNCTIONS.put("trim", new UnaryFunction<String, String>()
@@ -53,17 +55,16 @@ public class ReferenceResolver
     public enum ResolutionStrategy
     {
         /**
-         * Resolve all references, throwing an error for non-existant
-         * references.
+         * Resolve all variables, throwing an error for non-existant variables.
          */
         RESOLVE_STRICT(true),
         /**
-         * Try to resolve all references but leave non-existant references
-         * as they are.
+         * Try to resolve all variables but leave non-existant variables as
+         * they are.
          */
         RESOLVE_NON_STRICT(true),
         /**
-         * Don't resolve any references, just process the input (e.g.
+         * Don't resolve any variables, just process the input (e.g.
          * backslash escaping).
          */
         RESOLVE_NONE(false);
@@ -88,7 +89,7 @@ public class ReferenceResolver
     {
         SPACE,
         TEXT,
-        REFERENCE,
+        VARIABLE,
         DEFAULT_VALUE,
         FILTER
     }
@@ -102,8 +103,8 @@ public class ReferenceResolver
         INITIAL,
         ESCAPED,
         DOLLAR,
-        REFERENCE_NAME,
-        EXTENDED_REFERENCE_NAME,
+        VARIABLE_NAME,
+        EXTENDED_VARIABLE_NAME,
         DEFAULT_VALUE,
         FILTER_NAME
     }
@@ -220,12 +221,12 @@ public class ReferenceResolver
                     {
                         case '{':
                         {
-                            state = LexerState.REFERENCE_NAME;
+                            state = LexerState.VARIABLE_NAME;
                             break;
                         }
                         case '(':
                         {
-                            state = LexerState.EXTENDED_REFERENCE_NAME;
+                            state = LexerState.EXTENDED_VARIABLE_NAME;
                             break;
                         }
                         default:
@@ -235,7 +236,7 @@ public class ReferenceResolver
                     }
                     break;
                 }
-                case REFERENCE_NAME:
+                case VARIABLE_NAME:
                 {
                     switch (inputChar)
                     {
@@ -243,10 +244,10 @@ public class ReferenceResolver
                         {
                             if (current.length() == 0)
                             {
-                                throw new ResolutionException("Syntax error: empty reference");
+                                throw new ResolutionException("Syntax error: empty variable");
                             }
 
-                            result.add(new Token(TokenType.REFERENCE, current.toString()));
+                            result.add(new Token(TokenType.VARIABLE, current.toString()));
                             state = LexerState.INITIAL;
                             current.delete(0, current.length());
                             break;
@@ -259,7 +260,7 @@ public class ReferenceResolver
                     }
                     break;
                 }
-                case EXTENDED_REFERENCE_NAME:
+                case EXTENDED_VARIABLE_NAME:
                 {
                     switch (inputChar)
                     {
@@ -269,10 +270,10 @@ public class ReferenceResolver
                         {
                             if (current.length() == 0)
                             {
-                                throw new ResolutionException("Syntax error: empty reference");
+                                throw new ResolutionException("Syntax error: empty variable");
                             }
 
-                            result.add(new Token(TokenType.REFERENCE, current.toString()));
+                            result.add(new Token(TokenType.VARIABLE, current.toString()));
                             current.delete(0, current.length());
                             state = chooseExtendedState(inputChar);
                             break;
@@ -285,7 +286,7 @@ public class ReferenceResolver
                         case ':':
                         case ';':
                         {
-                            throw new ResolutionException("Syntax error: '" + inputChar + "' is reserved and may not be used in an extended reference name");
+                            throw new ResolutionException("Syntax error: '" + inputChar + "' is reserved and may not be used in an extended variable name");
                         }
                         default:
                         {
@@ -358,11 +359,11 @@ public class ReferenceResolver
             {
                 throw new ResolutionException("Syntax error: unexpected end of input looking for '{' or '('");
             }
-            case REFERENCE_NAME:
+            case VARIABLE_NAME:
             {
                 throw new ResolutionException("Syntax error: unexpected end of input looking for '}'");
             }
-            case EXTENDED_REFERENCE_NAME:
+            case EXTENDED_VARIABLE_NAME:
             case DEFAULT_VALUE:
             case FILTER_NAME:
             {
@@ -405,7 +406,7 @@ public class ReferenceResolver
     {
         TEXT,
         SPACE,
-        REFERENCE
+        VARIABLE
     }
 
     /**
@@ -433,13 +434,13 @@ public class ReferenceResolver
         }
     }
 
-    private static class ReferenceElement extends ParseElement
+    private static class VariableElement extends ParseElement
     {
         private String name;
         private List<String> filters = new LinkedList<String>();
         private String defaultValue;
 
-        private ReferenceElement(ParseElementType type, String name)
+        private VariableElement(ParseElementType type, String name)
         {
             super(type);
             this.name = name;
@@ -474,21 +475,21 @@ public class ReferenceResolver
                     parseElements.add(new SimpleElement(ParseElementType.SPACE, token.value));
                     break;
                 }
-                case REFERENCE:
+                case VARIABLE:
                 {
-                    parseElements.add(new ReferenceElement(ParseElementType.REFERENCE, token.value));
+                    parseElements.add(new VariableElement(ParseElementType.VARIABLE, token.value));
                     break;
                 }
                 case DEFAULT_VALUE:
                 {
-                    ReferenceElement reference = (ReferenceElement) parseElements.get(parseElements.size() - 1);
-                    reference.defaultValue = token.value;
+                    VariableElement variable = (VariableElement) parseElements.get(parseElements.size() - 1);
+                    variable.defaultValue = token.value;
                     break;
                 }
                 case FILTER:
                 {
-                    ReferenceElement reference = (ReferenceElement) parseElements.get(parseElements.size() - 1);
-                    reference.addFilter(token.value);
+                    VariableElement variable = (VariableElement) parseElements.get(parseElements.size() - 1);
+                    variable.addFilter(token.value);
                     break;
                 }
             }
@@ -497,29 +498,29 @@ public class ReferenceResolver
         return parseElements;
     }
 
-    public static boolean containsReference(String input) throws ResolutionException
+    public static boolean containsVariable(String input) throws ResolutionException
     {
         List<Token> tokens = tokenise(input, false);
         for (Token token : tokens)
         {
             switch (token.type)
             {
-                case REFERENCE:
+                case VARIABLE:
                     return true;
             }
         }
         return false;
     }
 
-    public static Object resolveReference(String input, ReferenceMap references) throws ResolutionException
+    public static Object resolveVariable(String input, VariableMap variables) throws ResolutionException
     {
         List<ParseElement> elements = parse(input, false);
-        if (elements.size() != 1 || elements.get(0).type != ParseElementType.REFERENCE)
+        if (elements.size() != 1 || elements.get(0).type != ParseElementType.VARIABLE)
         {
-            throw new ResolutionException("Expected single reference. Instead found '" + input + "'");
+            throw new ResolutionException("Expected single variable. Instead found '" + input + "'");
         }
-        ReferenceElement element = (ReferenceElement) elements.get(0);
-        Reference ref = references.getReference(element.name);
+        VariableElement element = (VariableElement) elements.get(0);
+        Variable ref = variables.getVariable(element.name);
         if (ref != null)
         {
             return ref.getValue();
@@ -529,15 +530,15 @@ public class ReferenceResolver
             return element.defaultValue;
         }
 
-        throw new ResolutionException("Unknown reference '" + element.name + "'");
+        throw new ResolutionException("Unknown variable '" + element.name + "'");
     }
 
-    public static String resolveReferences(String input, ReferenceMap references) throws ResolutionException
+    public static String resolveVariables(String input, VariableMap variables) throws ResolutionException
     {
-        return resolveReferences(input, references, ResolutionStrategy.RESOLVE_STRICT);
+        return resolveVariables(input, variables, ResolutionStrategy.RESOLVE_STRICT);
     }
 
-    public static String resolveReferences(String input, ReferenceMap references, ResolutionStrategy resolutionStrategy) throws ResolutionException
+    public static String resolveVariables(String input, VariableMap variables, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         StringBuilder result = new StringBuilder();
 
@@ -551,9 +552,9 @@ public class ReferenceResolver
                     result.append(((SimpleElement) element).value);
                     break;
                 }
-                case REFERENCE:
+                case VARIABLE:
                 {
-                    result.append(resolveReference(references, (ReferenceElement) element, resolutionStrategy));
+                    result.append(resolveVariable(variables, (VariableElement) element, resolutionStrategy));
                     break;
                 }
             }
@@ -561,7 +562,7 @@ public class ReferenceResolver
         return result.toString();
     }
 
-    public static List<String> splitAndResolveReferences(String input, ReferenceMap references, ResolutionStrategy resolutionStrategy) throws ResolutionException
+    public static List<String> splitAndResolveVariable(String input, VariableMap variables, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         List<String> result = new LinkedList<String>();
         StringBuilder current = new StringBuilder();
@@ -589,9 +590,9 @@ public class ReferenceResolver
                     haveData = true;
                     break;
                 }
-                case REFERENCE:
+                case VARIABLE:
                 {
-                    String value = resolveReference(references, (ReferenceElement) element, resolutionStrategy);
+                    String value = resolveVariable(variables, (VariableElement) element, resolutionStrategy);
                     if(value.length() > 0)
                     {
                         current.append(value);
@@ -610,14 +611,14 @@ public class ReferenceResolver
         return result;
     }
 
-    private static String resolveReference(ReferenceMap references, ReferenceElement element, ResolutionStrategy resolutionStrategy) throws ResolutionException
+    private static String resolveVariable(VariableMap variables, VariableElement element, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         if (resolutionStrategy.resolve())
         {
-            Reference reference = references.getReference(element.name);
-            if (reference != null && reference.getValue() != null)
+            Variable variable = variables.getVariable(element.name);
+            if (variable != null && variable.getValue() != null)
             {
-                return filter(reference.getValue().toString(), element.getFilters(), resolutionStrategy);
+                return filter(variable.getValue().toString(), element.getFilters(), resolutionStrategy);
             }
             else if (element.defaultValue != null)
             {
@@ -625,7 +626,7 @@ public class ReferenceResolver
             }
             else if(resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
             {
-                throw new ResolutionException("Unknown reference '" + element.name + "'");
+                throw new ResolutionException("Unknown variable '" + element.name + "'");
             }
         }
 

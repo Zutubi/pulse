@@ -1,5 +1,6 @@
 package com.zutubi.validation;
 
+import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.validation.i18n.DefaultTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
 import com.zutubi.validation.xwork.XWorkValidationAdapter;
@@ -16,6 +17,7 @@ public class DelegatingValidationContext implements ValidationContext
 {
     protected ValidationAware validationAware;
     protected TextProvider textProvider;
+    protected PropertiesConfig config = new PropertiesConfig();
 
     public DelegatingValidationContext(ValidationAware validationAware, TextProvider textProvider)
     {
@@ -134,5 +136,30 @@ public class DelegatingValidationContext implements ValidationContext
     public String getText(String key, Object... args)
     {
         return textProvider.getText(key, args);
+    }
+
+    public String getProperty(String key)
+    {
+        return config.getProperty(key);
+    }
+
+    public void setProperty(String key, String value)
+    {
+        config.setProperty(key, value);
+    }
+
+    public boolean hasProperty(String key)
+    {
+        return config.hasProperty(key);
+    }
+
+    public void removeProperty(String key)
+    {
+        config.removeProperty(key);
+    }
+
+    public boolean isWriteable()
+    {
+        return config.isWriteable();
     }
 }

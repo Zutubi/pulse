@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<project>
+    <recipe name="with ${project} variable">
+    </recipe>
+</project>

@@ -6,9 +6,9 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.util.process.ProcessControl;
+import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
@@ -429,11 +429,11 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         // Implicit PULSE_* varialbes come first: anything explicit
         // should override them.
         PulseScope scope = ((PulseExecutionContext) context).getScope();
-        for(Reference reference: scope.getReferences(String.class))
+        for(Variable variable : scope.getVariables(String.class))
         {
-            if(acceptableName(reference.getName()))
+            if(acceptableName(variable.getName()))
             {
-                childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
+                childEnvironment.put(convertName(variable.getName()), (String) variable.getValue());
             }
         }
 

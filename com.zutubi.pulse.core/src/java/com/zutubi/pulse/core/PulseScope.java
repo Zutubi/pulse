@@ -1,8 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.ResolutionException;
+import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -12,8 +15,8 @@ import java.io.File;
 import java.util.*;
 
 /**
- * A scope holds named references and has a parent.  When looking up a
- * reference by name, if it is not found in this scope the lookup is
+ * A scope holds named variables and has a parent.  When looking up a
+ * variable by name, if it is not found in this scope the lookup is
  * deferred to the parent.
  *
  * The PulseScope is an implementation of a scope that recognises 2 special
@@ -32,7 +35,7 @@ public class PulseScope implements Scope
     private PulseScope parent;
     // Optional label that can be used to marking and finding specific scopes
     private String label;
-    private Map<String, ReferenceInfo> references = new LinkedHashMap<String, ReferenceInfo>();
+    private Map<String, VariableInfo> variables = new LinkedHashMap<String, VariableInfo>();
 
     public PulseScope()
     {
@@ -94,9 +97,9 @@ public class PulseScope implements Scope
         return null;
     }
 
-    private Map<String, ReferenceInfo> merge()
+    private Map<String, VariableInfo> merge()
     {
-        Map<String, ReferenceInfo> merged = new LinkedHashMap<String, ReferenceInfo>();
+        Map<String, VariableInfo> merged = new LinkedHashMap<String, VariableInfo>();
         if(parent != null)
         {
             merged.putAll(parent.merge());
@@ -106,7 +109,7 @@ public class PulseScope implements Scope
         // ordering for re-entries (i.e. putting on top of an existing key)
         // whereas we want to preserve ordering.  Hence re-entries are
         // avoided by removing existing keys.
-        for(Map.Entry<String, ReferenceInfo> entry: references.entrySet())
+        for(Map.Entry<String, VariableInfo> entry: variables.entrySet())
         {
             if(merged.containsKey(entry.getKey()))
             {
@@ -119,48 +122,48 @@ public class PulseScope implements Scope
         return merged;
     }
     
-    public Collection<Reference> getReferences()
+    public Collection<Variable> getVariables()
     {
-        return CollectionUtils.map(merge().values(), new Mapping<ReferenceInfo, Reference>()
+        return CollectionUtils.map(merge().values(), new Mapping<VariableInfo, Variable>()
         {
-            public Reference map(ReferenceInfo referenceInfo)
+            public Variable map(VariableInfo variableInfo)
             {
-                return referenceInfo.reference;
+                return variableInfo.variable;
             }
         });
     }
 
-    private List<Reference> getReferencesSatisfyingPredicate(Predicate<ReferenceInfo> p)
+    private List<Variable> getVariablesSatisfyingPredicate(Predicate<VariableInfo> p)
     {
-        return CollectionUtils.map(CollectionUtils.filter(merge().values(), p), new Mapping<ReferenceInfo, Reference>()
+        return CollectionUtils.map(CollectionUtils.filter(merge().values(), p), new Mapping<VariableInfo, Variable>()
         {
-            public Reference map(ReferenceInfo referenceInfo)
+            public Variable map(VariableInfo variableInfo)
             {
-                return referenceInfo.reference;
+                return variableInfo.variable;
             }
         });
     }
 
-    public List<Reference> getReferences(final Class type)
+    public List<Variable> getVariables(final Class type)
     {
-        return getReferencesSatisfyingPredicate(new Predicate<ReferenceInfo>()
+        return getVariablesSatisfyingPredicate(new Predicate<VariableInfo>()
         {
-            public boolean satisfied(ReferenceInfo referenceInfo)
+            public boolean satisfied(VariableInfo variableInfo)
             {
-                return type.isInstance(referenceInfo.reference.getValue());
+                return type.isInstance(variableInfo.variable.getValue());
             }
         });
     }
 
-    public boolean containsReference(String name)
+    public boolean containsVariable(String name)
     {
-        return getReference(name) != null;
+        return getVariable(name) != null;
     }
 
-    public Reference getReference(String name)
+    public Variable getVariable(String name)
     {
-        ReferenceInfo info = merge().get(name);
-        Reference result = info == null ? null : info.reference;
+        VariableInfo info = merge().get(name);
+        Variable result = info == null ? null : info.variable;
 
         if(name.startsWith("env."))
         {
@@ -171,7 +174,7 @@ public class PulseScope implements Scope
             String value = environment.get(envName);
             if(value != null)
             {
-                result = new GenericReference<String>(name, value);
+                result = new GenericVariable<String>(name, value);
             }
 
             // Special case PATH to add the prefix
@@ -182,11 +185,11 @@ public class PulseScope implements Scope
                 {
                     if(result == null)
                     {
-                        result = new GenericReference<String>(name, pathPrefix.substring(0, pathPrefix.length() - 1));
+                        result = new GenericVariable<String>(name, pathPrefix.substring(0, pathPrefix.length() - 1));
                     }
                     else if((result.getValue() instanceof String))
                     {
-                        result = new GenericReference<String>(name, pathPrefix + result.getValue());
+                        result = new GenericVariable<String>(name, pathPrefix + result.getValue());
                     }
                 }
             }
@@ -195,9 +198,9 @@ public class PulseScope implements Scope
         return result;
     }
 
-    public <T> T getReferenceValue(String name, Class<T> type)
+    public <T> T getVariableValue(String name, Class<T> type)
     {
-        Reference r = getReference(name);
+        Variable r = getVariable(name);
         if (r == null || !type.isInstance(r.getValue()))
         {
             return null;
@@ -206,40 +209,40 @@ public class PulseScope implements Scope
         return type.cast(r.getValue());
     }
 
-    public void addUnique(Reference reference) throws IllegalArgumentException
+    public void addUnique(Variable variable) throws IllegalArgumentException
     {
-        if (references.containsKey(reference.getName()))
+        if (variables.containsKey(variable.getName()))
         {
-            throw new IllegalArgumentException("'" + reference.getName() + "' is already defined in this scope.");
+            throw new IllegalArgumentException("'" + variable.getName() + "' is already defined in this scope.");
         }
 
-        add(reference);
+        add(variable);
     }
 
     public void add(PulseScope other)
     {
-        for (ReferenceInfo info: other.merge().values())
+        for (VariableInfo info: other.merge().values())
         {
-            references.put(info.reference.getName(), info);
+            variables.put(info.variable.getName(), info);
         }
     }
 
-    public void add(Reference reference)
+    public void add(Variable variable)
     {
-        references.put(reference.getName(), new ReferenceInfo(reference));
+        variables.put(variable.getName(), new VariableInfo(variable));
     }
 
-    public void addAll(Collection<? extends Reference> references)
+    public void addAll(Collection<? extends Variable> variables)
     {
-        for (Reference r : references)
+        for (Variable r : variables)
         {
             add(r);
         }
     }
 
-    public void addAllUnique(Collection<? extends Reference> references) throws IllegalArgumentException
+    public void addAllUnique(Collection<? extends Variable> variables) throws IllegalArgumentException
     {
-        for (Reference r : references)
+        for (Variable r : variables)
         {
             addUnique(r);
         }
@@ -257,16 +260,16 @@ public class PulseScope implements Scope
      */
     public Map<String, String> getEnvironment()
     {
-        Collection<Reference> references = getReferencesSatisfyingPredicate(new Predicate<ReferenceInfo>()
+        Collection<Variable> variables = getVariablesSatisfyingPredicate(new Predicate<VariableInfo>()
         {
-            public boolean satisfied(ReferenceInfo referenceInfo)
+            public boolean satisfied(VariableInfo variableInfo)
             {
-                return referenceInfo.addToEnvironment && (referenceInfo.reference.getValue() instanceof String);
+                return variableInfo.addToEnvironment && (variableInfo.variable.getValue() instanceof String);
             }
         });
 
-        Map<String, String> result = new HashMap<String, String>(references.size());
-        for(Reference r: references)
+        Map<String, String> result = new HashMap<String, String>(variables.size());
+        for(Variable r: variables)
         {
             result.put(r.getName(), (String) r.getValue());
         }
@@ -311,19 +314,19 @@ public class PulseScope implements Scope
 
     public List<String> getPathDirectories()
     {
-        Collection<Reference> references = getReferencesSatisfyingPredicate(new Predicate<ReferenceInfo>()
+        Collection<Variable> variables = getVariablesSatisfyingPredicate(new Predicate<VariableInfo>()
         {
-            public boolean satisfied(ReferenceInfo referenceInfo)
+            public boolean satisfied(VariableInfo variableInfo)
             {
-                return referenceInfo.addToPath && referenceInfo.reference.getValue() instanceof String;
+                return variableInfo.addToPath && variableInfo.variable.getValue() instanceof String;
             }
         });
         
-        List<String> result = CollectionUtils.map(references, new Mapping<Reference, String>()
+        List<String> result = CollectionUtils.map(variables, new Mapping<Variable, String>()
         {
-            public String map(Reference reference)
+            public String map(Variable variable)
             {
-                return (String) reference.getValue();
+                return (String) variable.getValue();
             }
         });
 
@@ -361,7 +364,7 @@ public class PulseScope implements Scope
         {
             try
             {
-                value = ReferenceResolver.resolveReferences(value, this, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+                value = VariableResolver.resolveVariables(value, this, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
             catch (ResolutionException e)
             {
@@ -370,7 +373,7 @@ public class PulseScope implements Scope
         }
 
         String name = resourceProperty.getName();
-        references.put(name, new ReferenceInfo(new GenericReference<String>(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
+        variables.put(name, new VariableInfo(new GenericVariable<String>(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
     }
 
     /**
@@ -388,7 +391,7 @@ public class PulseScope implements Scope
             name = name.toUpperCase();
         }
 
-        add(new GenericReference<String>("env." + name, value));
+        add(new GenericVariable<String>("env." + name, value));
     }
 
     public PulseScope copyTo(Scope scope)
@@ -401,7 +404,7 @@ public class PulseScope implements Scope
 
         PulseScope copy = new PulseScope(parentCopy);
         copy.label = label;
-        copy.references = new LinkedHashMap<String, ReferenceInfo>(references);
+        copy.variables = new LinkedHashMap<String, VariableInfo>(variables);
         return copy;
     }
 
@@ -410,20 +413,20 @@ public class PulseScope implements Scope
         return copyTo(null);
     }
 
-    private static class ReferenceInfo
+    private static class VariableInfo
     {
-        private Reference reference;
+        private Variable variable;
         private boolean addToEnvironment = false;
         private boolean addToPath = false;
 
-        public ReferenceInfo(Reference reference)
+        public VariableInfo(Variable variable)
         {
-            this.reference = reference;
+            this.variable = variable;
         }
 
-        public ReferenceInfo(Reference reference, boolean addToEnvironment, boolean addToPath)
+        public VariableInfo(Variable variable, boolean addToEnvironment, boolean addToPath)
         {
-            this.reference = reference;
+            this.variable = variable;
             this.addToEnvironment = addToEnvironment;
             this.addToPath = addToPath;
         }
