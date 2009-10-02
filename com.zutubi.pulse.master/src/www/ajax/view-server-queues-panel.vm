@@ -32,7 +32,7 @@
             #else
                 #contentCell("build.id.unknown")
             #end
-                #dynamicLinkCell($buildRequest.projectConfig.name "$urls.projectHome($buildRequest.project)")
+                #dynamicLinkCell($buildRequest.projectConfig.name "$urls.projectHome($buildRequest.projectConfig)")
             #if($buildRequest.revision.revision)
             <td class="content">
                 #revisionValue($buildRequest.revision.revision) #if($buildRequest.replaceable) [replaceable] #end

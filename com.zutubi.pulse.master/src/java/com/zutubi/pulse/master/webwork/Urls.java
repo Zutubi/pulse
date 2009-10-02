@@ -8,9 +8,10 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * Helper object that computes consistent URLs for use in velocity templates
@@ -88,7 +89,7 @@ public class Urls
 
     public String dashboardMyStageLog(String number, String stage)
     {
-        return dashboardMyBuild(number) + "logs/" + WebUtils.uriComponentEncode(stage) + "/";
+        return dashboardMyBuild(number) + "logs/" + uriComponentEncode(stage) + "/";
     }
 
     public String dashboardMyBuildFile(String number)
@@ -103,7 +104,7 @@ public class Urls
 
     public String dashboardMyCommandArtifacts(String number, String stage, String command)
     {
-        return dashboardMyBuildArtifacts(number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/";
+        return dashboardMyBuildArtifacts(number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
     public String dashboardMyBuildWorkingCopy(String number)
@@ -129,14 +130,18 @@ public class Urls
     private String getEncodedProjectName(Object project)
     {
         String encodedName = null;
-        if(project instanceof String)
+        if (project instanceof String)
         {
             // Should be pre-encoded name.
             encodedName = (String) project;
         }
-        else if(project instanceof Project)
+        else if (project instanceof Project)
         {
-            encodedName = WebUtils.uriComponentEncode(((Project)project).getName());
+            encodedName = uriComponentEncode(((Project)project).getName());
+        }
+        else if (project instanceof ProjectConfiguration)
+        {
+            encodedName = uriComponentEncode(((ProjectConfiguration)project).getName());
         }
 
         return encodedName;
@@ -267,7 +272,7 @@ public class Urls
 
     public String commandDetails(BuildResult build, RecipeResultNode node, CommandResult command)
     {
-        return stageDetails(build, node) + WebUtils.uriComponentEncode(command.getCommandName()) + "/";
+        return stageDetails(build, node) + uriComponentEncode(command.getCommandName()) + "/";
     }
 
     public String buildLogs(BuildResult build)
@@ -332,7 +337,7 @@ public class Urls
 
     public String stageTests(Object project, String number, String stage)
     {
-        return buildTests(project, number) + WebUtils.uriComponentEncode(stage) + "/";
+        return buildTests(project, number) + uriComponentEncode(stage) + "/";
     }
 
     public String buildFile(BuildResult build)
@@ -368,12 +373,12 @@ public class Urls
     public String commandArtifacts(BuildResult build, CommandResult commandResult)
     {
         RecipeResultNode recipeResultNode = build.findResultNode(commandResult);
-        return buildArtifacts(build) + getStageComponent(recipeResultNode) + WebUtils.uriComponentEncode(commandResult.getCommandName()) + "/";
+        return buildArtifacts(build) + getStageComponent(recipeResultNode) + uriComponentEncode(commandResult.getCommandName()) + "/";
     }
 
     public String commandArtifacts(Object project, String number, String stage, String command)
     {
-        return buildArtifacts(project, number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/";
+        return buildArtifacts(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
     public String buildDownloads(BuildResult build)
@@ -394,17 +399,17 @@ public class Urls
     public String commandDownloads(BuildResult build, CommandResult commandResult)
     {
         RecipeResultNode recipeResultNode = build.findResultNode(commandResult);
-        return buildDownloads(build) + getStageComponent(recipeResultNode) + WebUtils.uriComponentEncode(commandResult.getCommandName()) + "/";
+        return buildDownloads(build) + getStageComponent(recipeResultNode) + uriComponentEncode(commandResult.getCommandName()) + "/";
     }
 
     public String commandDownloads(Object project, String number, String stage, String command)
     {
-        return buildDownloads(project, number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/";
+        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
     public String commandDownload(Object project, String number, String stage, String command, String artifact)
     {
-        return buildDownloads(project, number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/" + WebUtils.uriComponentEncode(artifact) + "/";
+        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/" + uriComponentEncode(artifact) + "/";
     }
 
     public String buildWorkingCopy(BuildResult build)
@@ -421,11 +426,11 @@ public class Urls
     {
         if (stage instanceof RecipeResultNode)
         {
-            return WebUtils.uriComponentEncode(((RecipeResultNode)stage).getStageName()) + "/";
+            return uriComponentEncode(((RecipeResultNode)stage).getStageName()) + "/";
         }
         else if (stage instanceof String)
         {
-            return WebUtils.uriComponentEncode((String)stage) + "/";
+            return uriComponentEncode((String)stage) + "/";
         }
         return null;
     }
@@ -465,11 +470,11 @@ public class Urls
         }
         else if(agent instanceof Agent)
         {
-            encodedName = WebUtils.uriComponentEncode(((Agent)agent).getConfig().getName());
+            encodedName = uriComponentEncode(((Agent)agent).getConfig().getName());
         }
         else if (agent instanceof AgentConfiguration)
         {
-            encodedName = WebUtils.uriComponentEncode(((AgentConfiguration) agent).getName());
+            encodedName = uriComponentEncode(((AgentConfiguration) agent).getName());
         }
         return encodedName;
     }
