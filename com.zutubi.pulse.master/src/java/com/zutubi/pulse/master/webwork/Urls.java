@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.StringUtils.uriComponentEncode;
@@ -129,14 +130,18 @@ public class Urls
     private String getEncodedProjectName(Object project)
     {
         String encodedName = null;
-        if(project instanceof String)
+        if (project instanceof String)
         {
             // Should be pre-encoded name.
             encodedName = (String) project;
         }
-        else if(project instanceof Project)
+        else if (project instanceof Project)
         {
             encodedName = uriComponentEncode(((Project)project).getName());
+        }
+        else if (project instanceof ProjectConfiguration)
+        {
+            encodedName = uriComponentEncode(((ProjectConfiguration)project).getName());
         }
 
         return encodedName;
