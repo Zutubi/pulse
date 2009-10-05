@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -188,6 +189,19 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         logger.writePostRule();
 
         assertEndOfOutput();
+    }
+
+    public void testReopenSameLogFile() throws IOException
+    {
+        logger.logMarker("First line");
+        logger.close();
+        logger = new DefaultRecipeLogger(logFile);
+        logger.prepare();
+        logger.logMarker("Second line");
+
+        String content = IOUtils.fileToString(logFile);
+        assertThat(content, containsString("First line"));
+        assertThat(content, containsString("Second line"));
     }
 
     private void assertEndOfOutput() throws IOException

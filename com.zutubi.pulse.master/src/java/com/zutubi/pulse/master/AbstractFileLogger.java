@@ -4,7 +4,8 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.Date;
@@ -33,11 +34,11 @@ public abstract class AbstractFileLogger implements OutputLogger
     {
         try
         {
-            writer = new PrintWriter(logFile);
+            writer = new PrintWriter(new FileWriter(logFile, true));
         }
-        catch (FileNotFoundException e)
+        catch (IOException e)
         {
-            throw new BuildException("Unable to create build log file '" + logFile.getAbsolutePath() + "': " + e.getMessage(), e);
+            throw new BuildException("Unable to open build log file '" + logFile.getAbsolutePath() + "': " + e.getMessage(), e);
         }
     }
 

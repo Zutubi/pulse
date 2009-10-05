@@ -4,11 +4,10 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.master.HookLogger;
-import com.zutubi.pulse.master.MasterBuildProperties;
-import com.zutubi.pulse.master.OutputLoggerOutputStream;
+import com.zutubi.pulse.master.*;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.BuildEvent;
@@ -20,6 +19,7 @@ import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultD
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,7 +40,6 @@ public class BuildHookManager
         final BuildEvent be = (BuildEvent) event;
         BuildResult buildResult = be.getBuildResult();
 
-        // generate the execution context.
         PulseExecutionContext context = new PulseExecutionContext(be.getContext());
         Project project = buildResult.getProject();
         for (BuildHookConfiguration hook : project.getConfig().getBuildHooks().values())
@@ -53,20 +52,7 @@ public class BuildHookManager
                     resultNode = ((StageEvent) be).getStageNode();
                 }
 
-                logger.hookCommenced(hook.getName());
-                OutputStream out = null;
-                try
-                {
-                    // stream the output to whoever is listening.
-                    out = new OutputLoggerOutputStream(logger);
-                    context.setOutputStream(out);
-                    executeTask(hook, context, be.getBuildResult(), resultNode, false);
-                }
-                finally
-                {
-                    IOUtils.close(out);
-                }
-                logger.hookCompleted(hook.getName());
+                logAndExecuteTask(hook, context, logger, buildResult, resultNode, false);
             }
         }
     }
@@ -84,7 +70,15 @@ public class BuildHookManager
                     MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
                     if (hook.appliesTo(result))
                     {
-                        executeTask(hook, context, result, null, true);
+                        HookLogger buildLogger = createBuildLogger(result);
+                        try
+                        {
+                            logAndExecuteTask(hook, context, buildLogger, result, null, true);
+                        }
+                        finally
+                        {
+                            IOUtils.close(buildLogger);
+                        }
                     }
 
                     result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
@@ -94,13 +88,15 @@ public class BuildHookManager
                             if (hook.appliesTo(recipeResultNode))
                             {
                                 context.push();
+                                HookLogger recipeLogger = createRecipeLogger(result, recipeResultNode);
                                 try
                                 {
                                     MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
-                                    executeTask(hook, context, result, recipeResultNode, true);
+                                    logAndExecuteTask(hook, context, recipeLogger, result, recipeResultNode, true);
                                 }
                                 finally
                                 {
+                                    IOUtils.close(recipeLogger);
                                     context.pop();
                                 }
                             }
@@ -109,6 +105,40 @@ public class BuildHookManager
                 }
             });
         }
+    }
+
+    private DefaultBuildLogger createBuildLogger(BuildResult result)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        DefaultBuildLogger logger = new DefaultBuildLogger(new File(paths.getBuildDir(result), BuildResult.BUILD_LOG));
+        logger.prepare();
+        return logger;
+    }
+
+    private DefaultRecipeLogger createRecipeLogger(BuildResult buildResult, RecipeResultNode recipeResultNode)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResultNode.getResult().getId()), RecipeResult.RECIPE_LOG));
+        logger.prepare();
+        return logger;
+    }
+
+    private void logAndExecuteTask(BuildHookConfiguration hook, PulseExecutionContext context, HookLogger logger, BuildResult buildResult, RecipeResultNode resultNode, boolean manual)
+    {
+        logger.hookCommenced(hook.getName());
+        OutputStream out = null;
+        try
+        {
+            // stream the output to whoever is listening.
+            out = new OutputLoggerOutputStream(logger);
+            context.setOutputStream(out);
+            executeTask(hook, context, buildResult, resultNode, manual);
+        }
+        finally
+        {
+            IOUtils.close(out);
+        }
+        logger.hookCompleted(hook.getName());
     }
 
     private void executeTask(BuildHookConfiguration hook, ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean manual)

@@ -167,7 +167,7 @@ public class SlaveAgentService implements AgentService
         {
             String message = e.getMessage();
             message = message.replaceAll("token=[0-9a-zA-Z]+&", "token=[scrubbed]&");
-            throw new BuildException("Error downloading results from agent '" + agentConfig.getName() + ": " + message, e);
+            throw new BuildException("Error downloading results from agent '" + agentConfig.getName() + "': " + message, e);
         }
         finally
         {
