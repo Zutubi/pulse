@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.util.config.PropertiesConfig;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
         String pulseHome = envConfig.getPulseHome();
         if(pulseHome != null)
         {
-            result.put(CORE_PROPERTY_PULSE_HOME_DIR, new File(pulseHome).getAbsolutePath());
+            result.put(CORE_PROPERTY_PULSE_HOME_DIR, getHomeDir(pulseHome, EnvConfig.PULSE_HOME).getAbsolutePath());
         }
 
         SystemConfiguration systemConfig = getSystemConfig();
@@ -77,6 +78,15 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
             // fatal error, PULSE_HOME property needs to reference pulse's home directory
             throw new StartupException("Property '" + property + "' does not refer to a " +
                     "directory ('" + home + ")");
+        }
+
+        try
+        {
+            homeDir = homeDir.getCanonicalFile();
+        }
+        catch (IOException e)
+        {
+            // Not fatal, carry on.
         }
 
         return homeDir;

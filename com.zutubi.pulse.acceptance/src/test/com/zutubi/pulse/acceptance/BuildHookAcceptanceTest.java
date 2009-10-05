@@ -303,7 +303,6 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     private void waitForHookOutput(AbstractLogPage logPage)
     {
         logPage.clickDownloadLink();
-        browser.waitForPageToLoad();
         browser.refreshUntil(TASK_TIMEOUT, new Condition()
         {
             public boolean satisfied()
