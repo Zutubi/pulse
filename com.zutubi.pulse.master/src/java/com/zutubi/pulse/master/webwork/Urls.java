@@ -280,6 +280,11 @@ public class Urls
         return build(build) + "logs/";
     }
 
+    public String buildLogs(Object project, String number)
+    {
+        return build(project, number) + "logs/";
+    }
+
     public String buildLog(BuildResult build)
     {
         return build(build) + "log/";
@@ -297,7 +302,7 @@ public class Urls
 
     public String stageLogs(Object project, String number, Object stage)
     {
-        return buildLog(project, number) + getStageComponent(stage);
+        return buildLogs(project, number) + getStageComponent(stage);
     }
 
     public String buildChanges(BuildResult build)

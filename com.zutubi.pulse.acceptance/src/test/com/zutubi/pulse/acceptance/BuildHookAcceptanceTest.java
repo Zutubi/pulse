@@ -4,14 +4,19 @@ import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
+import com.zutubi.pulse.acceptance.pages.browse.AbstractLogPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -33,6 +38,8 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     private static final String PROJECT_PATH = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
     private static final String HOOKS_BASENAME = "buildHooks";
     private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, HOOKS_BASENAME);
+
+    private static final String HELLO_MESSAGE = "Hello, hook output.";
 
     private File tempDir;
     private File dumpEnv;
@@ -64,7 +71,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.waitFor();
         hookForm.nextNamedFormElements(asPair("name", random));
 
-        addTask("${project} ${status}");
+        addDumpEnvTask("${project} ${status}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "${status}");
@@ -73,7 +80,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     public void testPostBuildHook() throws Exception
     {
         postBuildHelper();
-        addTask("${project} ${status}");
+        addDumpEnvTask("${project} ${status}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "success");
@@ -82,7 +89,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     public void testBuildDirProperty() throws Exception
     {
         postBuildHelper();
-        addTask("${build.dir}");
+        addDumpEnvTask("${build.dir}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME);
         List<String> args = getArgs();
@@ -104,7 +111,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
-        addTask(random, "${project} ${some.property}");
+        addDumpEnvTask(random, "${project} ${some.property}");
 
         xmlRpcHelper.runBuild(random);
         assertArgs(random, "some.value");
@@ -124,7 +131,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
-        addTask(random, "${some.property}");
+        addDumpEnvTask(random, "${some.property}");
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("some.property", "trigger.value");
@@ -137,7 +144,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     public void testPostStageHook() throws Exception
     {
         postStageHelper();
-        addTask("${project} ${stage} ${recipe} ${status}");
+        addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
@@ -146,7 +153,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     public void testStageDirProperty() throws Exception
     {
         postStageHelper();
-        addTask("${stage.dir}");
+        addDumpEnvTask("${stage.dir}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME);
         List<String> args = getArgs();
@@ -158,17 +165,11 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     public void testManualHook() throws Exception
     {
-        chooseHookType("zutubi.manualBuildHookConfig");
+        manualHookHelper();
 
-        ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, ManualBuildHookConfiguration.class);
-        hookForm.waitFor();
-        hookForm.nextNamedFormElements(asPair("name", random));
-
-        selectFromAllTasks();
-
-        CompositePage hookPage = addTask("${build.number} ${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("${build.number} ${project} ${status}");
         int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
-        triggerHook(hookPage, buildNumber);
+        triggerHookAndWait(hookPage, buildNumber);
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");
     }
 
@@ -182,8 +183,8 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.waitFor();
         hookForm.nextNamedFormElements(asPair("name", random));
 
-        CompositePage hookPage = addTask("${project} ${status}");
-        triggerHook(hookPage, buildNumber);
+        CompositePage hookPage = addDumpEnvTask("${project} ${status}");
+        triggerHookAndWait(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "success");
     }
 
@@ -197,7 +198,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.waitFor();
         hookForm.nextNamedFormElements(asPair("name", random), asPair("allowManualTrigger", "false"));
 
-        CompositePage hookPage = addTask("${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("${project} ${status}");
         assertFalse(hookPage.isActionPresent(BuildHookConfigurationActions.ACTION_TRIGGER));
 
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, PROJECT_NAME, buildNumber);
@@ -209,8 +210,8 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
 
         postStageHelper();
-        CompositePage hookPage = addTask("${project} ${stage} ${recipe} ${status}");
-        triggerHook(hookPage, buildNumber);
+        CompositePage hookPage = addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
+        triggerHookAndWait(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
     }
 
@@ -242,7 +243,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.nextNamedFormElements(asPair("name", random), asPair("runForAll", "false"), asPair("runForStates", "error"));
 
         selectFromAllTasks();
-        addTask("${project}");
+        addDumpEnvTask("${project}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME);
         assertFalse(new File(tempDir, "args.txt").exists());
@@ -251,7 +252,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     public void testDisable() throws Exception
     {
         postBuildHelper();
-        CompositePage hookPage = addTask("${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("${project} ${status}");
         hookPage.clickActionAndWait("disable");
         assertEquals("disabled", hookPage.getStateField("state"));
 
@@ -261,16 +262,10 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     public void testTriggerFromBuildPage() throws Exception
     {
-        chooseHookType("zutubi.manualBuildHookConfig");
-
-        ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, ManualBuildHookConfiguration.class);
-        hookForm.waitFor();
-        hookForm.nextNamedFormElements(asPair("name", random));
-
-        selectFromAllTasks();
-
-        addTask("${build.number} ${project} ${status}");
         long buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+
+        manualHookHelper();
+        addDumpEnvTask("${build.number} ${project} ${status}");
 
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, PROJECT_NAME, buildNumber);
         summaryPage.clickHook(random);
@@ -279,6 +274,43 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         waitForTask();
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");
+    }
+
+    public void testManualTriggerOutput() throws Exception
+    {
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+
+        manualHookHelper();
+        File hello = copyInputToDirectory("hello", "jar", tempDir);
+        CompositePage hookPage = addJavaTask(PROJECT_NAME, "-jar " + hello.getAbsolutePath().replace('\\', '/'));
+        triggerHook(hookPage, buildNumber);
+
+        waitForHookOutput(browser.openAndWaitFor(BuildLogPage.class, PROJECT_NAME, (long) buildNumber));
+    }
+
+    public void testManualTriggerPostStageOutput() throws Exception
+    {
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+
+        postStageHelper();
+        File hello = copyInputToDirectory("hello", "jar", tempDir);
+        CompositePage hookPage = addJavaTask(PROJECT_NAME, "-jar " + hello.getAbsolutePath().replace('\\', '/'));
+        triggerHook(hookPage, buildNumber);
+        
+        waitForHookOutput(browser.openAndWaitFor(StageLogPage.class, PROJECT_NAME, (long) buildNumber, ProjectConfigurationWizard.DEFAULT_STAGE));
+    }
+
+    private void waitForHookOutput(AbstractLogPage logPage)
+    {
+        logPage.clickDownloadLink();
+        browser.waitForPageToLoad();
+        browser.refreshUntil(TASK_TIMEOUT, new Condition()
+        {
+            public boolean satisfied()
+            {
+                return browser.isTextPresent(HELLO_MESSAGE);
+            }
+        }, "hook output to appear in log");
     }
 
     private void postBuildHelper()
@@ -303,7 +335,24 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         selectFromStageTasks();
     }
 
-    private void triggerHook(CompositePage hookPage, int buildNumber) throws InterruptedException
+    private void manualHookHelper()
+    {
+        chooseHookType("zutubi.manualBuildHookConfig");
+
+        ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, ManualBuildHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextNamedFormElements(asPair("name", random));
+
+        selectFromAllTasks();
+    }
+
+    private void triggerHookAndWait(CompositePage hookPage, int buildNumber) throws InterruptedException
+    {
+        triggerHook(hookPage, buildNumber);
+        waitForTask();
+    }
+
+    private void triggerHook(CompositePage hookPage, int buildNumber)
     {
         File envFile = new File(tempDir, "env.txt");
         assertFalse(envFile.exists());
@@ -314,8 +363,6 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         buildForm.waitFor();
         String number = Long.toString(buildNumber);
         buildForm.saveFormElements(number);
-
-        waitForTask();
     }
 
     private void waitForTask() throws InterruptedException
@@ -367,16 +414,21 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         taskType.nextFormElements("zutubi.runExecutableTaskConfig");
     }
 
-    private CompositePage addTask(String arguments)
+    private CompositePage addDumpEnvTask(String arguments)
     {
-        return addTask(PROJECT_NAME, arguments);
+        return addDumpEnvTask(PROJECT_NAME, arguments);
     }
 
-    private CompositePage addTask(String projectName, String arguments)
+    private CompositePage addDumpEnvTask(String projectName, String arguments)
+    {
+        return addJavaTask(projectName, "-jar \"" + dumpEnv.getAbsolutePath().replace('\\', '/') + "\" " + arguments);
+    }
+
+    private CompositePage addJavaTask(String projectName, String arguments)
     {
         ConfigurationForm taskForm = browser.createForm(ConfigurationForm.class, RunExecutableTaskConfiguration.class);
         taskForm.waitFor();
-        taskForm.finishFormElements("java", "-jar \"" + dumpEnv.getAbsolutePath().replace('\\', '/') + "\" " + arguments, tempDir.getAbsolutePath(), null, null);
+        taskForm.finishFormElements("java", arguments, tempDir.getAbsolutePath(), null, null);
         return waitForHook(projectName);
     }
 

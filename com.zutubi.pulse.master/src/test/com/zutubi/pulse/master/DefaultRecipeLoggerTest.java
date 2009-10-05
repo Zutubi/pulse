@@ -4,6 +4,7 @@ import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -188,6 +189,55 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
 
         assertEndOfOutput();
     }
+
+    public void testReopenSameLogFile() throws IOException
+    {
+        logger.logMarker("First line");
+        logger.close();
+        logger = new DefaultRecipeLogger(logFile);
+        logger.prepare();
+        logger.logMarker("Second line");
+
+        String content = IOUtils.fileToString(logFile);
+        assertThat(content, containsString("First line"));
+        assertThat(content, containsString("Second line"));
+    }
+
+    public void testConcurrentWritesSameLogFile() throws IOException, InterruptedException
+    {
+        final int LIMIT = 100;
+
+        Runnable runner = new Runnable()
+        {
+            public void run()
+            {
+                DefaultRecipeLogger otherLogger = new DefaultRecipeLogger(logFile);
+                otherLogger.prepare();
+                for (int i = 0; i < LIMIT; i++)
+                {
+                    otherLogger.logMarker("Background logger: " + i);
+                }
+            }
+        };
+
+        Thread background = new Thread(runner);
+        background.start();
+
+        for (int i = 0; i < LIMIT; i++)
+        {
+            logger.logMarker("Foreground logger: " + i);
+        }
+
+        background.join();
+        
+        String content = IOUtils.fileToString(logFile);
+        for (int i = 0; i < LIMIT; i++)
+        {
+            assertThat(content, containsString("Background logger: " + i));
+            assertThat(content, containsString("Foreground logger: " + i));
+        }
+    }
+
 
     private void assertEndOfOutput() throws IOException
     {
