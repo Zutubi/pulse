@@ -203,42 +203,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         assertThat(content, containsString("Second line"));
     }
 
-    public void testConcurrentWritesSameLogFile() throws IOException, InterruptedException
-    {
-        final int LIMIT = 100;
-
-        Runnable runner = new Runnable()
-        {
-            public void run()
-            {
-                DefaultRecipeLogger otherLogger = new DefaultRecipeLogger(logFile);
-                otherLogger.prepare();
-                for (int i = 0; i < LIMIT; i++)
-                {
-                    otherLogger.logMarker("Background logger: " + i);
-                }
-            }
-        };
-
-        Thread background = new Thread(runner);
-        background.start();
-
-        for (int i = 0; i < LIMIT; i++)
-        {
-            logger.logMarker("Foreground logger: " + i);
-        }
-
-        background.join();
-        
-        String content = IOUtils.fileToString(logFile);
-        for (int i = 0; i < LIMIT; i++)
-        {
-            assertThat(content, containsString("Background logger: " + i));
-            assertThat(content, containsString("Foreground logger: " + i));
-        }
-    }
-
-
     private void assertEndOfOutput() throws IOException
     {
         BufferedReader reader = null;
