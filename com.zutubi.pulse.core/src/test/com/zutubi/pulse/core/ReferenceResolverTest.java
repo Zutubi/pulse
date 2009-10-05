@@ -5,8 +5,10 @@ import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.HashReferenceMap;
 import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
+import java.io.File;
 import static java.util.Arrays.asList;
 import java.util.List;
 
@@ -483,5 +485,11 @@ public class ReferenceResolverTest extends ZutubiTestCase
     public void testFilterUnknownNonStrict() throws Exception
     {
         assertEquals("foo", ReferenceResolver.resolveReferences("$(foo|nosuchfilter)", scope, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
+    }
+
+    public void testNormalise() throws Exception
+    {
+        scope.add(new Property("path", "slash/this\\way/and\\that"));
+        successTest("$(path|normalise)", StringUtils.join(File.separator, asList("slash", "this", "way", "and", "that")));
     }
 }

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.util.UnaryFunction;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +47,14 @@ public class ReferenceResolver
             public String process(String s)
             {
                 return s.trim().replaceAll("[\\\\/$]", ".");
+            }
+        });
+
+        FILTER_FUNCTIONS.put("normalise", new UnaryFunction<String, String>()
+        {
+            public String process(String s)
+            {
+                return s.trim().replaceAll("[\\\\/]", File.separator);
             }
         });
     }
