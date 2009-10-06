@@ -19,7 +19,6 @@
     <publications>
         <artifact name="com.zutubi.pulse.core.scm.noop" type="jar" conf="bundle,build"/>
         <artifact name="com.zutubi.pulse.core.scm.noop-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.core.scm.noop-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
