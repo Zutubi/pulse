@@ -2,8 +2,10 @@ package com.zutubi.tove.variables;
 
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
+import java.io.File;
 import static java.util.Arrays.asList;
 import java.util.List;
 
@@ -480,5 +482,11 @@ public class VariableResolverTest extends ZutubiTestCase
     public void testFilterUnknownNonStrict() throws Exception
     {
         assertEquals("foo", VariableResolver.resolveVariables("$(foo|nosuchfilter)", scope, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
+    }
+
+    public void testNormalise() throws Exception
+    {
+        scope.add(new GenericVariable<String>("path", "slash/this\\way/and\\that"));
+        successTest("$(path|normalise)", StringUtils.join(File.separator, asList("slash", "this", "way", "and", "that")));
     }
 }

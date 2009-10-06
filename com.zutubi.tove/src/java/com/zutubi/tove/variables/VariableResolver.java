@@ -5,10 +5,12 @@ import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.UnaryFunction;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * Methods for analysing and replacing variables within strings.
@@ -48,6 +50,14 @@ public class VariableResolver
             public String process(String s)
             {
                 return s.trim().replaceAll("[\\\\/$]", ".");
+            }
+        });
+
+        FILTER_FUNCTIONS.put("normalise", new UnaryFunction<String, String>()
+        {
+            public String process(String s)
+            {
+                return s.trim().replaceAll("[\\\\/]", Matcher.quoteReplacement(File.separator));
             }
         });
     }
