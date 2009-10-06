@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * Methods for analysing and replacing references within strings.
@@ -54,7 +55,7 @@ public class ReferenceResolver
         {
             public String process(String s)
             {
-                return s.trim().replaceAll("[\\\\/]", File.separator);
+                return s.trim().replaceAll("[\\\\/]", Matcher.quoteReplacement(File.separator));
             }
         });
     }
