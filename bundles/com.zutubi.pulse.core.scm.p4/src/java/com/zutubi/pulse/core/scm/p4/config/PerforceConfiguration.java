@@ -26,7 +26,7 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private String spec;
     private boolean useTicketAuth = false;
     @Wizard.Ignore
-    private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "-$(project.handle)-$(agent.handle)";
+    private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(agent.handle)";
 
     public PerforceConfiguration()
     {

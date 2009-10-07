@@ -11,7 +11,7 @@ import java.util.List;
 public class AddPerforceSyncWorkspacePatternUpgradeTask extends AbstractRecordPropertiesUpgradeTask
 {
     private static final String PROPERTY = "syncWorkspacePattern";
-    private static final String DEFAULT_VALUE = System.getProperty("pulse.p4.client.prefix", "pulse") + "-$(project.handle)-$(agent.handle)";
+    private static final String DEFAULT_VALUE = System.getProperty("pulse.p4.client.prefix", "pulse-") + "$(project.handle)-$(agent.handle)";
 
     protected RecordLocator getRecordLocator()
     {

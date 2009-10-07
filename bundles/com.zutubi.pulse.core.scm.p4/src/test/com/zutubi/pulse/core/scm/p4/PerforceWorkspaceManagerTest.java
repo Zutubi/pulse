@@ -206,7 +206,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     public void testCleanupPersistentWorkspacesNoneToFree() throws ScmException
     {
         stub(core.getAllWorkspaceNames()).toReturn(Collections.<String>emptyList());
-        workspaceManager.cleanupPersistentWorkspaces(core, createScmContext(1), new RecordingScmFeedbackHandler());
+        workspaceManager.cleanupPersistentWorkspaces(core, configuration, createScmContext(1), new RecordingScmFeedbackHandler());
         verify(core).getAllWorkspaceNames();
         verifyNoMoreInteractions(core);
     }
@@ -215,7 +215,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     {
         final String WORKSPACE_NAME = "pulse-1-free-me";
         stub(core.getAllWorkspaceNames()).toReturn(Arrays.asList(WORKSPACE_NAME));
-        workspaceManager.cleanupPersistentWorkspaces(core, createScmContext(1), new RecordingScmFeedbackHandler());
+        workspaceManager.cleanupPersistentWorkspaces(core, configuration, createScmContext(1), new RecordingScmFeedbackHandler());
         verify(core).getAllWorkspaceNames();
         verify(core).deleteWorkspace(WORKSPACE_NAME);
         verifyNoMoreInteractions(core);
@@ -229,7 +229,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         final String NON_MATCHING_WORKSPACE_NAME2 = "pulse-and-keep-me";
 
         stub(core.getAllWorkspaceNames()).toReturn(Arrays.asList(MATCHING_WORKSPACE_NAME1, NON_MATCHING_WORKSPACE_NAME1, NON_MATCHING_WORKSPACE_NAME2, MATCHING_WORKSPACE_NAME2));
-        workspaceManager.cleanupPersistentWorkspaces(core, createScmContext(1), new RecordingScmFeedbackHandler());
+        workspaceManager.cleanupPersistentWorkspaces(core, configuration, createScmContext(1), new RecordingScmFeedbackHandler());
         verify(core).getAllWorkspaceNames();
         verify(core).deleteWorkspace(MATCHING_WORKSPACE_NAME1);
         verify(core).deleteWorkspace(MATCHING_WORKSPACE_NAME2);
