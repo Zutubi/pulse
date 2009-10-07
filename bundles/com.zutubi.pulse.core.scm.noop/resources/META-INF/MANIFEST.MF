@@ -1,0 +1,6 @@
+Bundle-Name: No-op SCM Support
+Bundle-SymbolicName: com.zutubi.pulse.core.scm.noop; singleton:=true
+Bundle-Description: Stub "no-op" SCM implementation.
+Bundle-Vendor: Zutubi
+Bundle-Version: 2.0.0
+Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.0.0,3.0.0)"
