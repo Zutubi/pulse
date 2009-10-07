@@ -86,6 +86,7 @@
                 <ref local="addAgentDataDirectory"/>
                 <ref local="updatePersistentWorkDir"/>
                 <ref local="deleteOrphanedTriggers"/>
+                <ref local="addPerforceSyncWorkspacePattern"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -385,5 +386,9 @@
 
     <bean id="deleteOrphanedTriggers" class="com.zutubi.pulse.master.upgrade.tasks.DeleteOrphanedTriggersUpgradeTask">
         <property name="buildNumber" value="201007001"/>
+    </bean>
+
+    <bean id="addPerforceSyncWorkspacePattern" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceSyncWorkspacePatternUpgradeTask">
+        <property name="buildNumber" value="201007002"/>
     </bean>
 </beans>

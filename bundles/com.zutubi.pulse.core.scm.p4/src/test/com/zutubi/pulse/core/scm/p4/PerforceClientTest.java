@@ -159,7 +159,7 @@ public class PerforceClientTest extends PerforceTestBase
 
         ExecutionContext context = createExecutionContext(workDir, false);
         client.checkout(context, createRevision(1), null);
-        assertTrue(core.workspaceExists(PerforceWorkspaceManager.getSyncWorkspaceName(context)));
+        assertTrue(core.workspaceExists(PerforceWorkspaceManager.getSyncWorkspaceName(new PerforceConfiguration(), context)));
     }
 
     public void testSyncWorkspaceCleanedOnDestroy() throws ScmException, IOException
@@ -168,7 +168,7 @@ public class PerforceClientTest extends PerforceTestBase
 
         ExecutionContext context = createExecutionContext(workDir, false);
         client.checkout(context, createRevision(1), null);
-        String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(context);
+        String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(new PerforceConfiguration(), context);
         assertTrue(core.workspaceExists(workspaceName));
 
         client.destroy(createScmContext(), new RecordingScmFeedbackHandler());

@@ -58,17 +58,17 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
     public void testGetSyncWorkspaceNameConsistent()
     {
-        assertEquals(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(1, 1)), PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(1, 1)));
+        assertEquals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 1)), PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 1)));
     }
 
     public void testGetSyncWorkspaceNameDependsOnProject()
     {
-        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(1, 0)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(2, 0))));
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 0)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(2, 0))));
     }
 
     public void testGetSyncWorkspaceNameDependsOnAgent()
     {
-        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(0, 1)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(0, 2))));
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 1)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 2))));
     }
 
     public void testGetSyncWorkspaceDescriptionIncludesAgent()
@@ -94,7 +94,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     public void testGetSyncWorkspaceBasicProperties() throws ScmException
     {
         ExecutionContext context = createExecutionContext(1, 1);
-        String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(context);
+        String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, context);
 
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
         assertEquals(workspaceName, workspace.getName());

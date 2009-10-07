@@ -63,7 +63,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         return workspace;
     }
 
-    static String getWorkspacePrefix()
+    public static String getWorkspacePrefix()
     {
         return System.getProperty(PROPERTY_WORKSPACE_PREFIX, DEFAULT_WORKSPACE_PREFIX);
     }
@@ -73,11 +73,9 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         return getWorkspacePrefix() + projectHandle;
     }
 
-    static String getSyncWorkspaceName(ExecutionContext context)
+    static String getSyncWorkspaceName(PerforceConfiguration configuration, ExecutionContext context)
     {
-        return getWorkspacePrefix(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE, 0)) +
-                WORKSPACE_NAME_SEPARATOR +
-                Long.toString(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, 0));
+        return context.resolveVariables(configuration.getSyncWorkspacePattern());
     }
 
     static String getSyncWorkspaceDescription(ExecutionContext context)
@@ -103,7 +101,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
      */
     public PerforceWorkspace getSyncWorkspace(PerforceCore core, PerforceConfiguration configuration, ExecutionContext context) throws ScmException
     {
-        return updateWorkspace(core, configuration, getSyncWorkspaceName(context), context.getWorkingDir(), getSyncWorkspaceDescription(context), false);
+        return updateWorkspace(core, configuration, getSyncWorkspaceName(configuration, context), context.getWorkingDir(), getSyncWorkspaceDescription(context), false);
     }
 
     static String getTemporaryWorkspaceDescription()

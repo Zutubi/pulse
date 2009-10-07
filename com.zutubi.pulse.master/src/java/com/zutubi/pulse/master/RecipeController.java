@@ -5,7 +5,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -192,9 +191,10 @@ public class RecipeController
 
         final ExecutionContext agentContext = recipeRequest.getContext();
         addRevisionProperties(agentContext, buildRevision);
-        agentContext.addString(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, agent.getConfig().getName());
-        agentContext.addValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
-        agentContext.addValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
+        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_AGENT, agent.getConfig().getName());
+        agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
+        agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
+        agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HOST_ID, agent.getHost().getId());
         agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
 
         addScmProperties(agentContext);

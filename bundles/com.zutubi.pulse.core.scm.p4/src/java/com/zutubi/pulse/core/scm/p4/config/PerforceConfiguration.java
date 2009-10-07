@@ -2,15 +2,17 @@ package com.zutubi.pulse.core.scm.p4.config;
 
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
+import com.zutubi.pulse.core.scm.p4.PerforceWorkspaceManager;
 import com.zutubi.tove.annotations.ConfigurationCheck;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.validation.annotations.Required;
 
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -23,6 +25,8 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @Required
     private String spec;
     private boolean useTicketAuth = false;
+    @Wizard.Ignore
+    private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "-$(project.handle)-$(agent.handle)";
 
     public PerforceConfiguration()
     {
@@ -89,5 +93,15 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setUseTicketAuth(boolean useTicketAuth)
     {
         this.useTicketAuth = useTicketAuth;
+    }
+
+    public String getSyncWorkspacePattern()
+    {
+        return syncWorkspacePattern;
+    }
+
+    public void setSyncWorkspacePattern(String syncWorkspacePattern)
+    {
+        this.syncWorkspacePattern = syncWorkspacePattern;
     }
 }

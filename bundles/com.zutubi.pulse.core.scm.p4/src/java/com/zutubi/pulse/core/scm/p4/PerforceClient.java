@@ -355,7 +355,7 @@ public class PerforceClient extends CachingScmClient
             result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
         }
 
-        result.add(new ResourceProperty("P4CLIENT", PerforceWorkspaceManager.getSyncWorkspaceName(context), true, false, false));
+        result.add(new ResourceProperty("P4CLIENT", PerforceWorkspaceManager.getSyncWorkspaceName(configuration, context), true, false, false));
         return result;
     }
 
@@ -535,7 +535,7 @@ public class PerforceClient extends CachingScmClient
 
     public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
-        String clientName = PerforceWorkspaceManager.getSyncWorkspaceName(context);
+        String clientName = PerforceWorkspaceManager.getSyncWorkspaceName(configuration, context);
         PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, clientName, COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 

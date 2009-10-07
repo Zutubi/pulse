@@ -204,6 +204,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_FILE_REPOSITORY         = "file.repository";
     /**
+     * The unique 64-bit id of the host the stage is assigned to.
+     */
+    public static final String PROPERTY_HOST_ID                 = "host.id";
+    /**
      * An internal property used to create patch formats.
      */
     public static final String PROPERTY_PATCH_FORMAT_FACTORY    = "patch.format.factory";
