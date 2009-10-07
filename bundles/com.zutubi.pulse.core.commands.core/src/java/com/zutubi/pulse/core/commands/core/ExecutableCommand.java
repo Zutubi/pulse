@@ -397,13 +397,10 @@ public class ExecutableCommand extends OutputProducingCommandSupport
      */
     protected File getWorkingDir(File baseDir)
     {
-        File workingDir = getConfig().getWorkingDir();
-        if (workingDir == null)
+        File workingDir;
+        if (StringUtils.stringSet(getConfig().getWorkingDir()))
         {
-            workingDir = baseDir;
-        }
-        else
-        {
+            workingDir = new File(getConfig().getWorkingDir());
             if (!workingDir.isAbsolute())
             {
                 workingDir = new File(baseDir, workingDir.getPath());
@@ -411,13 +408,17 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
             if (!workingDir.exists())
             {
-                throw new BuildException("Working directory '" + getConfig().getWorkingDir().getPath() + "' does not exist");
+                throw new BuildException("Working directory '" + getConfig().getWorkingDir() + "' does not exist");
             }
 
             if (!workingDir.isDirectory())
             {
-                throw new BuildException("Working directory '" + getConfig().getWorkingDir().getPath() + "' exists, but is not a directory");
+                throw new BuildException("Working directory '" + getConfig().getWorkingDir() + "' exists, but is not a directory");
             }
+        }
+        else
+        {
+            workingDir = baseDir;
         }
 
         return workingDir;

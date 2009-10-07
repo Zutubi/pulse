@@ -22,7 +22,6 @@ public class MavenCommandTest extends ExecutableCommandTestCase
     {
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
-        command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "build target", "_Apache_", "v. 1.0.2");
     }
 
@@ -39,7 +38,6 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mytest");
-        command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "test target", "_Apache_", "v. 1.0.2");
     }
 
@@ -48,7 +46,6 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mybuild mytest");
-        command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.0.2");
     }
 
@@ -57,7 +54,6 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("missingTarget");
-        command.setWorkingDir(baseDir);
 
         TestCommandContext context = runCommand(new MavenCommand(command));
         // Windows batch files have unreliable exit codes, so we don't confirm
@@ -75,7 +71,6 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mybuild");
-        command.setWorkingDir(baseDir);
         command.setArgs("-X");
         successRun(command, "Loading plugin", "'maven-j2ee-plugin-1.5.1'", "build target", "_Apache_", "v. 1.0.2");
     }

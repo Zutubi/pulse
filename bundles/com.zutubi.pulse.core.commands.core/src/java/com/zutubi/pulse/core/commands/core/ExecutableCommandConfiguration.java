@@ -10,7 +10,6 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     private String defaultExe;
 
     @BrowseScmDirAction
-    private File workingDir;
+    private String workingDir;
     private String exe;
     private String args;
     @Addable(value = "arg", attribute = "") @Wizard.Ignore @StringList
@@ -124,12 +123,12 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
         });
     }
 
-    public File getWorkingDir()
+    public String getWorkingDir()
     {
         return workingDir;
     }
 
-    public void setWorkingDir(File workingDir)
+    public void setWorkingDir(String workingDir)
     {
         this.workingDir = workingDir;
     }

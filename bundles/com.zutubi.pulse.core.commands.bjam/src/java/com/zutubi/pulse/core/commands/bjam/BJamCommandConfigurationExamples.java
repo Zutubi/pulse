@@ -3,8 +3,6 @@ package com.zutubi.pulse.core.commands.bjam;
 import com.zutubi.pulse.core.commands.core.ExamplesBuilder;
 import com.zutubi.tove.config.api.ConfigurationExample;
 
-import java.io.File;
-
 /**
  * Example configurations for the bjam command.
  */
@@ -22,7 +20,7 @@ public class BJamCommandConfigurationExamples
     {
         BJamCommandConfiguration command = new BJamCommandConfiguration();
         command.setName("test");
-        command.setWorkingDir(new File("src"));
+        command.setWorkingDir("src");
         command.setJamfile("MyJamfile");
         command.setTargets("test");
         return ExamplesBuilder.buildProject(command);

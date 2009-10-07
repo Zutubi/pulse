@@ -95,7 +95,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         }
 
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
-        config.setWorkingDir(new File("nested"));
+        config.setWorkingDir("nested");
         config.setExe(file.getPath());
 
         successRun(new ExecutableCommand(config));
@@ -124,7 +124,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         }
 
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
-        config.setWorkingDir(new File("nested"));
+        config.setWorkingDir("nested");
         config.setExe(exe);
 
         successRun(new ExecutableCommand(config));
@@ -222,7 +222,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     {
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("dir");
-        config.setWorkingDir(new File("nosuchworkdir"));
+        config.setWorkingDir("nosuchworkdir");
 
         ExecutableCommand command = new ExecutableCommand(config);
         try
@@ -243,7 +243,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
 
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("dir");
-        config.setWorkingDir(new File("f"));
+        config.setWorkingDir("f");
 
         ExecutableCommand command = new ExecutableCommand(config);
         try
