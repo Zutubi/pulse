@@ -4,12 +4,14 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.List;
+
 /**
  * Configuration for LDAP auth integration.
  */
 @SymbolicName("zutubi.ldapConfig")
 @Form(fieldOrder = {"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
-        "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
+        "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDns", "groupSearchFilter",
         "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
 @ConfigurationCheck("LDAPConfigurationCheckHandler")
 @Classification(single = "security")
@@ -32,7 +34,8 @@ public class LDAPConfiguration extends AbstractConfiguration
     private boolean autoAddUsers;
     private String emailAttribute;
 
-    private String groupBaseDn;
+    @StringList
+    private List<String> groupBaseDns;
     private String groupSearchFilter;
     private String groupRoleAttribute;
     private boolean searchGroupSubtree;
@@ -135,14 +138,14 @@ public class LDAPConfiguration extends AbstractConfiguration
         this.emailAttribute = emailAttribute;
     }
 
-    public String getGroupBaseDn()
+    public List<String> getGroupBaseDns()
     {
-        return groupBaseDn;
+        return groupBaseDns;
     }
 
-    public void setGroupBaseDn(String groupBaseDn)
+    public void setGroupBaseDns(List<String> groupBaseDns)
     {
-        this.groupBaseDn = groupBaseDn;
+        this.groupBaseDns = groupBaseDns;
     }
 
     public String getGroupSearchFilter()

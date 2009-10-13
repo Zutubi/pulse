@@ -50,7 +50,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private boolean enabled = false;
     private DefaultInitialDirContextFactory contextFactory;
     private BindAuthenticator authenticator;
-    private DefaultLdapAuthoritiesPopulator populator = null;
+    private List<DefaultLdapAuthoritiesPopulator> populators = new LinkedList<DefaultLdapAuthoritiesPopulator>();
     private boolean autoAdd = false;
     private String statusMessage = null;
     private String emailAttribute = null;
@@ -96,16 +96,16 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                 return;
             }
 
-            if (StringUtils.stringSet(ldapConfiguration.getGroupBaseDn()))
+            if (!ldapConfiguration.getGroupBaseDns().isEmpty())
             {
-                populator = createPopulator(ldapConfiguration.getGroupBaseDn(), ldapConfiguration.getGroupSearchFilter(), ldapConfiguration.getGroupRoleAttribute(), ldapConfiguration.getSearchGroupSubtree(), escapeSpaces, contextFactory);
+                populators = createPopulators(ldapConfiguration.getGroupBaseDns(), ldapConfiguration.getGroupSearchFilter(), ldapConfiguration.getGroupRoleAttribute(), ldapConfiguration.getSearchGroupSubtree(), escapeSpaces, contextFactory);
             }
         }
         else
         {
             contextFactory = null;
             authenticator = null;
-            populator = null;
+            populators.clear();
         }
 
         initialised = true;
@@ -157,28 +157,34 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return authenticator;
     }
 
-    private DefaultLdapAuthoritiesPopulator createPopulator(String groupDn, String groupFilter, String groupRoleAttribute, boolean searchSubtree, boolean escapeSpaces, DefaultInitialDirContextFactory contextFactory)
+    private List<DefaultLdapAuthoritiesPopulator> createPopulators(List<String> groupDns, String groupFilter, String groupRoleAttribute, boolean searchSubtree, boolean escapeSpaces, DefaultInitialDirContextFactory contextFactory)
     {
-        if (escapeSpaces)
+        List<DefaultLdapAuthoritiesPopulator> populators = new LinkedList<DefaultLdapAuthoritiesPopulator>();
+        for (String groupDn: groupDns)
         {
-            groupDn = escapeSpaces(groupDn);
+            if (escapeSpaces)
+            {
+                groupDn = escapeSpaces(groupDn);
+            }
+
+            DefaultLdapAuthoritiesPopulator populator = new DefaultLdapAuthoritiesPopulator(contextFactory, groupDn);
+            if (StringUtils.stringSet(groupFilter))
+            {
+                populator.setGroupSearchFilter(convertGroupFilter(groupFilter));
+            }
+
+            if (StringUtils.stringSet(groupRoleAttribute))
+            {
+                populator.setGroupRoleAttribute(groupRoleAttribute);
+            }
+
+            populator.setSearchSubtree(searchSubtree);
+            populator.setRolePrefix("");
+            populator.setConvertToUpperCase(false);
+            populators.add(populator);
         }
 
-        DefaultLdapAuthoritiesPopulator populator = new DefaultLdapAuthoritiesPopulator(contextFactory, groupDn);
-        if (StringUtils.stringSet(groupFilter))
-        {
-            populator.setGroupSearchFilter(convertGroupFilter(groupFilter));
-        }
-
-        if (StringUtils.stringSet(groupRoleAttribute))
-        {
-            populator.setGroupRoleAttribute(groupRoleAttribute);
-        }
-
-        populator.setSearchSubtree(searchSubtree);
-        populator.setRolePrefix("");
-        populator.setConvertToUpperCase(false);
-        return populator;
+        return populators;
     }
 
     private String convertUserFilter(String userFilter)
@@ -264,38 +270,38 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     public synchronized void addLdapRoles(AcegiUser user)
     {
-        if (populator != null)
+        LdapUserDetails details = detailsMap.get(user.getUsername());
+        if (details != null)
         {
-            LdapUserDetails details = detailsMap.get(user.getUsername());
-            if (details != null)
+            try
             {
-                try
+                List<UserGroupConfiguration> groups = getLdapGroups(details, populators);
+                for(UserGroupConfiguration group: groups)
                 {
-                    List<UserGroupConfiguration> groups = getLdapGroups(details, populator);
-                    for(UserGroupConfiguration group: groups)
-                    {
-                        LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
-                        user.addGroup(group);
-                    }
+                    LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
+                    user.addGroup(group);
                 }
-                catch (Exception e)
-                {
-                    LOG.severe("Error retrieving group roles from LDAP server: " + e.getMessage(), e);
-                }
+            }
+            catch (Exception e)
+            {
+                LOG.severe("Error retrieving group roles from LDAP server: " + e.getMessage(), e);
             }
         }
     }
 
-    private List<UserGroupConfiguration> getLdapGroups(LdapUserDetails details, DefaultLdapAuthoritiesPopulator populator)
+    private List<UserGroupConfiguration> getLdapGroups(LdapUserDetails details, List<DefaultLdapAuthoritiesPopulator> populators)
     {
         List<UserGroupConfiguration> groups = new LinkedList<UserGroupConfiguration>();
-        GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details);
-        for (GrantedAuthority authority : ldapAuthorities)
+        for (DefaultLdapAuthoritiesPopulator populator: populators)
         {
-            UserGroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
-            if (group != null)
+            GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details);
+            for (GrantedAuthority authority : ldapAuthorities)
             {
-                groups.add(group);
+                UserGroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
+                if (group != null)
+                {
+                    groups.add(group);
+                }
             }
         }
 
@@ -365,10 +371,10 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         BindAuthenticator authenticator = createAuthenticator(configuration.getUserBaseDn(), configuration.getUserFilter(), contextFactory);
         LdapUserDetails details = ldapAuthenticate(authenticator, testLogin, testPassword);
 
-        if(StringUtils.stringSet(configuration.getGroupBaseDn()))
+        if (!configuration.getGroupBaseDns().isEmpty())
         {
-            DefaultLdapAuthoritiesPopulator populator = createPopulator(configuration.getGroupBaseDn(), configuration.getGroupSearchFilter(), configuration.getGroupRoleAttribute(), configuration.getSearchGroupSubtree(), configuration.getEscapeSpaceCharacters(), contextFactory);
-            return getLdapGroups(details, populator);
+            List<DefaultLdapAuthoritiesPopulator> populators = createPopulators(configuration.getGroupBaseDns(), configuration.getGroupSearchFilter(), configuration.getGroupRoleAttribute(), configuration.getSearchGroupSubtree(), configuration.getEscapeSpaceCharacters(), contextFactory);
+            return getLdapGroups(details, populators);
         }
         else
         {

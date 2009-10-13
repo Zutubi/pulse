@@ -87,6 +87,7 @@
                 <ref local="updatePersistentWorkDir"/>
                 <ref local="deleteOrphanedTriggers"/>
                 <ref local="addPerforceSyncWorkspacePattern"/>
+                <ref local="ldapGroupDns"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -390,5 +391,9 @@
 
     <bean id="addPerforceSyncWorkspacePattern" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceSyncWorkspacePatternUpgradeTask">
         <property name="buildNumber" value="201007002"/>
+    </bean>
+
+    <bean id="ldapGroupDns" class="com.zutubi.pulse.master.upgrade.tasks.LdapGroupDnsUpgradeTask">
+        <property name="buildNumber" value="201008001"/>
     </bean>
 </beans>
