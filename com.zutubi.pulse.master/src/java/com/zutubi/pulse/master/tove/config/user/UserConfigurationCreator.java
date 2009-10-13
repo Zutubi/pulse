@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.user;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.ConfigurationCreator;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
@@ -36,6 +37,7 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
         if(authenticatedViaLdap)
         {
             user.setAuthenticatedViaLdap(true);
+            user.setPassword(passwordEncoder.encodePassword(RandomUtils.randomToken(10), null));
         }
         else
         {

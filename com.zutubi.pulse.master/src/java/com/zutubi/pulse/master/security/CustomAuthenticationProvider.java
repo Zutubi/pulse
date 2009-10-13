@@ -49,36 +49,32 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
         // Just check for non-existent user auto-adding.
-        if (ldapManager.canAutoAdd())
+        final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
+        final String login = token.getName();
+        if (StringUtils.stringSet(login))
         {
-            final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
-
-            final String login = token.getName();
-            if (StringUtils.stringSet(login))
+            final UserConfiguration user = userManager.getUserConfig(login);
+            if (ldapManager.canAutoAdd() && user == null)
             {
-                // has this user been added yet?.
-                final UserConfiguration user = userManager.getUserConfig(login);
-                if (user == null)
+                LOG.debug("User '" + login + "' does not exist, asking LDAP manager");
+                AcegiUtils.runAsSystem(new Runnable()
                 {
-                    LOG.debug("User '" + login + "' does not exist, asking LDAP manager");
-                    AcegiUtils.runAsSystem(new Runnable()
+                    public void run()
                     {
-                        public void run()
-                        {
-                            tryAutoAdd(login, (String) token.getCredentials());
-                        }
-                    });
-                }
-                else if (user.isAuthenticatedViaLdap())
+                        tryAutoAdd(login, (String) token.getCredentials());
+                    }
+                });
+            }
+
+            if (user != null)
+            {
+                AcegiUtils.runAsSystem(new Runnable()
                 {
-                    AcegiUtils.runAsSystem(new Runnable()
+                    public void run()
                     {
-                        public void run()
-                        {
-                            setRandomPassword(user);
-                        }
-                    });
-                }
+                        setRandomPassword(user);
+                    }
+                });
             }
         }
 
@@ -95,7 +91,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         {
             LOG.debug("User '" + username + "' found via LDAP, adding.");
             user = userManager.insert(user);
-
             setRandomPassword(user);
         }
         else
