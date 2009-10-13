@@ -1,8 +1,11 @@
 package com.zutubi.pulse.master.security;
 
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -49,21 +52,38 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
         // Just check for non-existent user auto-adding.
-        final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
+        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
         final String login = token.getName();
         if (StringUtils.stringSet(login))
         {
             final UserConfiguration user = userManager.getUserConfig(login);
             if (ldapManager.canAutoAdd() && user == null)
             {
-                LOG.debug("User '" + login + "' does not exist, asking LDAP manager");
-                AcegiUtils.runAsSystem(new Runnable()
+                // LDAP servers tend to be case-insensitive for logins, so we
+                // do so too (lest we add multiple users with only case
+                // differences - CIB-1950).
+                User insensitiveUser = findUserCaseInsensitive(login);
+                if (insensitiveUser == null)
                 {
-                    public void run()
+                    LOG.debug("User '" + login + "' does not exist, asking LDAP manager");
+                    token = new UsernamePasswordAuthenticationToken(login, token.getCredentials());
+
+                    final String password = (String) token.getCredentials();
+                    AcegiUtils.runAsSystem(new Runnable()
                     {
-                        tryAutoAdd(login, (String) token.getCredentials());
-                    }
-                });
+                        public void run()
+                        {
+                            tryAutoAdd(login, password);
+                        }
+                    });
+                }
+                else
+                {
+                    // Update the authentication token to match the existing
+                    // user's login for case.
+                    LOG.debug("Case insensitive match for login '" + login + "': existing login '" + insensitiveUser.getLogin() + "'");
+                    token = new UsernamePasswordAuthenticationToken(insensitiveUser.getLogin(), token.getCredentials());
+                }
             }
 
             if (user != null && user.isAuthenticatedViaLdap())
@@ -78,7 +98,19 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
             }
         }
 
-        return super.authenticate(authentication);
+        return super.authenticate(token);
+    }
+
+    private User findUserCaseInsensitive(final String login)
+    {
+        return CollectionUtils.find(userManager.getAllUsers(), new Predicate<User>()
+        {
+            public boolean satisfied(User user)
+            {
+                UserConfiguration userConfig = user.getConfig();
+                return userConfig.isAuthenticatedViaLdap() && userConfig.getLogin().equalsIgnoreCase(login);
+            }
+        });
     }
 
     private void tryAutoAdd(String username, String password)

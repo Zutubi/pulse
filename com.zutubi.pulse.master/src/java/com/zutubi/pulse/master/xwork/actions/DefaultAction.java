@@ -48,7 +48,14 @@ public class DefaultAction extends ActionSupport
         else
         {
             User user = userManager.getUser(login);
-            return user.getPreferences().getDefaultAction();
+            if (user == null)
+            {
+                return BROWSE_ACTION;
+            }
+            else
+            {
+                return user.getPreferences().getDefaultAction();
+            }
         }
     }
 }
