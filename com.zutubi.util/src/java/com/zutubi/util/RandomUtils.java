@@ -43,4 +43,24 @@ public class RandomUtils
         }
         return buffer.toString();
     }
+
+    /**
+     * Generate a random token of the specified length.  If possible, this token will use a
+     * secure algorithm to generate the token, otherwise just the random number generated.
+     * This method is most useful for those processes for which security is not critical.
+     *
+     * @param length    of the generated token
+     * @return the generated token string.
+     */
+    public static String randomToken(int length)
+    {
+        try
+        {
+            return secureRandomString(length);
+        }
+        catch (GeneralSecurityException e)
+        {
+            return randomString(length);
+        }
+    }
 }

@@ -331,6 +331,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public void setPassword(UserConfiguration user, String rawPassword)
     {
         String encodedPassword = passwordEncoder.encodePassword(rawPassword, null);
+        user = configurationProvider.deepClone(user);
         user.setPassword(encodedPassword);
         configurationProvider.save(user);
     }
