@@ -58,7 +58,7 @@ public class RecipeController
     /**
      * An explicit flag set on receipt of the recipe commenced event.  We don't
      * user {@link com.zutubi.pulse.core.model.RecipeResult#commenced()} as it
-     * my be true without us ever having received the event (e.g. for a recipe
+     * may be true without us ever having received the event (e.g. for a recipe
      * that errored out before commencing).
      */
     private boolean commencedEventReceived = false;
