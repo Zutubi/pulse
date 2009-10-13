@@ -66,7 +66,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
                 });
             }
 
-            if (user != null)
+            if (user != null && user.isAuthenticatedViaLdap())
             {
                 AcegiUtils.runAsSystem(new Runnable()
                 {
