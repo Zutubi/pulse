@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="nant plugin" basedir="." default="build.module">
+    <import file="../../common-build.xml"/>
+
+    <target name="module-pre-init">
+        <dirname property="project.root.dir" file="../../common-build.xml"/>
+    </target>
+
+    <target name="module-post-init">
+        <property name="${ivy.module}.bundle" value="true"/>
+    </target>
+</project>
+

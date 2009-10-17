@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <extension point="com.zutubi.pulse.core.commands">
+        <command name="nant" class="com.zutubi.pulse.core.commands.nant.NAntCommandConfiguration">
+            <resource name="nant" optional="true"/>
+        </command>
+    </extension>
+    <extension point="com.zutubi.pulse.core.postprocessors">
+        <post-processor name="nant.pp" display-name="nant output processor"
+                        default-processor="true" class="com.zutubi.pulse.core.commands.nant.NAntPostProcessorConfiguration"/>
+    </extension>
+</plugin>

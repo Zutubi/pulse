@@ -197,7 +197,7 @@ public class ZutubiTestCase extends TestCase
     public File copyInputToDirectory(String name, String extension, File directory) throws IOException
     {
         File destinationFile = new File(directory, name + "." + extension);
-        IOUtils.joinStreams(getInput(name, extension), new FileOutputStream(destinationFile));
+        IOUtils.joinStreams(getInput(name, extension), new FileOutputStream(destinationFile), true);
         return destinationFile;
     }
 

@@ -1,0 +1,16 @@
+NAnt 0.85 (Build 0.85.2478.0; release; 14/10/2006)
+Copyright (C) 2001-2006 Gerry Shaw
+http://nant.sourceforge.net
+
+Buildfile: file:///C:/tools/cygwin/home/jsankey/repo/nant/hello/nant.build
+Target framework: Microsoft .NET Framework 2.0
+Target(s) specified: build 
+
+
+build:
+
+
+BUILD SUCCEEDED
+
+Total time: 0.1 seconds.
+

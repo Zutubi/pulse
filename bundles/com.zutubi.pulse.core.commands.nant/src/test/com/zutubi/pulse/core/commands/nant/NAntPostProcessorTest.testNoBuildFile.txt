@@ -1,0 +1,12 @@
+NAnt 0.85 (Build 0.85.2478.0; release; 14/10/2006)
+Copyright (C) 2001-2006 Gerry Shaw
+http://nant.sourceforge.net
+
+
+BUILD FAILED
+
+Could not find a '*.build' file in 'C:\tools\cygwin\home\jsankey'
+
+For more information regarding the cause of the build failure, run the build again in debug mode.
+
+Try 'nant -help' for more information

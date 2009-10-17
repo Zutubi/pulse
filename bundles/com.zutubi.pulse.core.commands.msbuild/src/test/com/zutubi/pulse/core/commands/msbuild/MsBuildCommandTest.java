@@ -108,18 +108,6 @@ public class MsBuildCommandTest extends ExecutableCommandTestCase
                 "}");
     }
 
-    private void createSourceFileWithError() throws IOException
-    {
-        File sourceFile = new File(baseDir, "Test.cs");
-        FileSystemUtils.createFile(sourceFile, "public class Test\n" +
-                "{\n" +
-                "    static int Main(string[] argv)\n" +
-                "    {\n" +
-                "        return i;\n" +
-                "    }\n" +
-                "}");
-    }
-
     private TestCommandContext successRun(MsBuildCommandConfiguration commandConfiguration, String... contents) throws Exception
     {
         return successRun(new NamedArgumentCommand(commandConfiguration), contents);

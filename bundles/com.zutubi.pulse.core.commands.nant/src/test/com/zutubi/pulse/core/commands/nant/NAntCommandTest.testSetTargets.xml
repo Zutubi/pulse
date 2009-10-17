@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+    <project name="Multiball" default="notrun" basedir=".">
+    <target name="notrun">
+        <echo message="notrun"/>
+    </target>
+    <target name="run1">
+        <echo message="run1"/>
+    </target>
+    <target name="run2">
+        <echo message="run2"/>
+    </target>
+</project>

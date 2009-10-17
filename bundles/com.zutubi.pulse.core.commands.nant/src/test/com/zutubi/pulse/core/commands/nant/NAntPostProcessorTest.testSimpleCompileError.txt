@@ -1,0 +1,21 @@
+NAnt 0.85 (Build 0.85.2478.0; release; 14/10/2006)
+Copyright (C) 2001-2006 Gerry Shaw
+http://nant.sourceforge.net
+
+Buildfile: file:///C:/tools/cygwin/home/jsankey/repo/nant/hello/nant.build
+Target framework: Microsoft .NET Framework 2.0
+Target(s) specified: build 
+
+
+build:
+
+      [csc] Compiling 1 files to 'C:\tools\cygwin\home\jsankey\repo\nant\hello\HelloWorld.exe'.
+      [csc] c:\tools\cygwin\home\jsankey\repo\nant\hello\HelloWorld.cs(3,24): error CS0117: 'System.Console' does not contain a definition for 'WriteLin'
+
+BUILD FAILED
+
+C:\tools\cygwin\home\jsankey\repo\nant\hello\nant.build(10,10):
+External Program Failed: C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe (return code was 1)
+
+Total time: 0.2 seconds.
+

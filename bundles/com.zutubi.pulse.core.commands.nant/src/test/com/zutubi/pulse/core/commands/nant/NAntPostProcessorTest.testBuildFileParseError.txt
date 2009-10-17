@@ -1,0 +1,14 @@
+NAnt 0.85 (Build 0.85.2478.0; release; 14/10/2006)
+Copyright (C) 2001-2006 Gerry Shaw
+http://nant.sourceforge.net
+
+
+BUILD FAILED
+
+C:\tools\cygwin\home\jsankey\repo\nant\hello\nant.build(12,17):
+Error loading buildfile.
+    Name cannot begin with the '<' character, hexadecimal value 0x3C. Line 12, position 17.
+
+For more information regarding the cause of the build failure, run the build again in debug mode.
+
+Try 'nant -help' for more information
