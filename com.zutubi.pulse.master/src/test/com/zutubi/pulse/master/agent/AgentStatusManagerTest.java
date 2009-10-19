@@ -14,13 +14,16 @@ import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 {
     private EventManager eventManager;
     private AgentStatusManager agentStatusManager;
+    private AgentPingConfiguration agentPingConfiguration = new AgentPingConfiguration();
     private List<Event> receivedEvents = new LinkedList<Event>();
     private List<Pair<Long, AgentState.EnableState>> enableStates = new LinkedList<Pair<Long, AgentState.EnableState>>();
 
@@ -60,6 +64,10 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
                 command.run();
             }
         }, eventManager);
+
+        ConfigurationProvider configurationProvider = mock(ConfigurationProvider.class);
+        stub(configurationProvider.get(AgentPingConfiguration.class)).toReturn(agentPingConfiguration);
+        agentStatusManager.setConfigurationProvider(configurationProvider);
 
         // For a little realism, create a "master" agent.
         Agent a = addAgent(0);
@@ -1012,9 +1020,9 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         }
     }
 
-    private void setTimeout(long seconds)
+    private void setTimeout(int seconds)
     {
-        System.setProperty(AgentStatusManager.PROPERTY_AGENT_OFFLINE_TIMEOUT, Long.toString(seconds));
+        agentPingConfiguration.setOfflineTimeout(seconds);
     }
 
     private List<Agent> getOnlineAgents()

@@ -11,7 +11,9 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentPingEvent;
+import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
@@ -58,6 +60,7 @@ public class AgentPingServiceTest extends PulseTestCase
 
         agentPingService = new AgentPingService();
         agentPingService.setEventManager(eventManager);
+        agentPingService.setScheduler(mock(Scheduler.class));
         agentPingService.setThreadFactory(new PulseThreadFactory());
         agentPingService.setMasterLocationProvider(new MasterLocationProvider()
         {
@@ -73,6 +76,7 @@ public class AgentPingServiceTest extends PulseTestCase
         });
 
         agentPingService.init();
+        agentPingService.refreshSettings(new AgentPingConfiguration());
     }
 
     public void testSimplePing()
@@ -136,8 +140,10 @@ public class AgentPingServiceTest extends PulseTestCase
 
     public void testTimeout() throws InterruptedException
     {
-        System.setProperty(AgentPingService.PROPERTY_AGENT_PING_TIMEOUT, "1");
-
+        AgentPingConfiguration config = new AgentPingConfiguration();
+        config.setPingTimeout(1);
+        agentPingService.refreshSettings(config);
+        
         Agent agent = createAgent(1);
 
         WaitingAgentService service = new WaitingAgentService();

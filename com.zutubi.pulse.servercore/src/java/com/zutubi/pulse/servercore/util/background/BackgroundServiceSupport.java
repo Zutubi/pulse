@@ -24,6 +24,8 @@ public class BackgroundServiceSupport implements Stoppable
     private ThreadPoolExecutor executorService;
     private AtomicInteger nextId = new AtomicInteger(1);
     private String serviceName;
+    private int corePoolSize;
+    private int maxPoolSize;
 
     private ThreadFactory threadFactory;
 
@@ -35,7 +37,14 @@ public class BackgroundServiceSupport implements Stoppable
      */
     public BackgroundServiceSupport(String serviceName)
     {
+        this(serviceName, 0, Integer.MAX_VALUE);
+    }
+
+    public BackgroundServiceSupport(String serviceName, int corePoolSize, int maxPoolSize)
+    {
         this.serviceName = serviceName;
+        this.corePoolSize = corePoolSize;
+        this.maxPoolSize = maxPoolSize;
     }
 
     /**
@@ -45,8 +54,8 @@ public class BackgroundServiceSupport implements Stoppable
     public void init()
     {
         executorService = new ThreadPoolExecutor(
-                0,
-                Integer.MAX_VALUE,
+                corePoolSize,
+                maxPoolSize,
                 60L,
                 TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(),
@@ -88,6 +97,16 @@ public class BackgroundServiceSupport implements Stoppable
         {
             executorService.shutdown();
         }
+    }
+
+    public void setCorePoolSize(int corePoolSize)
+    {
+        executorService.setCorePoolSize(corePoolSize);
+    }
+
+    public void setMaximumPoolSize(int maximumPoolSize)
+    {
+        executorService.setMaximumPoolSize(maximumPoolSize);
     }
 
     public void setThreadFactory(ThreadFactory threadFactory)

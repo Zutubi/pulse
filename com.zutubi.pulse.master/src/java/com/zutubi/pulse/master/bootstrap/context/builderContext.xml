@@ -56,8 +56,7 @@
         </property>
     </bean>
 
-    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"
-          init-method="init"/>
+    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"/>
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref local="agentStateManagerTarget"/>
@@ -95,7 +94,7 @@
 
     <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider" autowire="byName"/>
 
-    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" autowire="byName" init-method="init"/>
+    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" autowire="byName"/>
 
     <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" autowire="byName" init-method="init"/>
 

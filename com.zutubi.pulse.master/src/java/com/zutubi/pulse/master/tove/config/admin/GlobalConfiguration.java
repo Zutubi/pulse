@@ -38,6 +38,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private JabberConfiguration jabber = new JabberConfiguration();
     private LicenseConfiguration license = new LicenseConfiguration();
     private BackupConfiguration backup = new BackupConfiguration();
+    private AgentPingConfiguration agentPing = new AgentPingConfiguration();
 
     public String getBaseUrl()
     {
@@ -192,5 +193,15 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setLicense(LicenseConfiguration license)
     {
         this.license = license;
+    }
+
+    public AgentPingConfiguration getAgentPing()
+    {
+        return agentPing;
+    }
+
+    public void setAgentPing(AgentPingConfiguration agentPing)
+    {
+        this.agentPing = agentPing;
     }
 }

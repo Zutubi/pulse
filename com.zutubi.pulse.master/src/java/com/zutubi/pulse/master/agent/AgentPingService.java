@@ -1,12 +1,24 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentPingEvent;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.SimpleTrigger;
+import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.tasks.PingSlaves;
+import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashSet;
@@ -24,32 +36,24 @@ import java.util.concurrent.locks.ReentrantLock;
  * results are sent by the timeout even if the pinging thread is still
  * awaiting a response from a remote agent).
  */
-public class AgentPingService extends BackgroundServiceSupport
+public class AgentPingService extends BackgroundServiceSupport implements EventListener
 {
-    public static final String PROPERTY_AGENT_PING_INTERVAL = "pulse.agent.ping.interval";
-    public static final String PROPERTY_AGENT_PING_TIMEOUT = "pulse.agent.ping.timeout";
-    public static final String PROPERTY_AGENT_LOG_TIMEOUTS = "pulse.agent.log.timeouts";
-
     private static final Logger LOG = Logger.getLogger(AgentPingService.class);
+
+    private static final String PING_NAME = "ping";
+    private static final String PING_GROUP = "services";
+
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
+    private AgentPingConfiguration configuration;
     private Lock inProgressLock = new ReentrantLock();
     private Set<Long> inProgress = new HashSet<Long>();
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
+    private Scheduler scheduler;
 
     public AgentPingService()
     {
         super("Agent Ping");
-    }
-
-    public static int getAgentPingInterval()
-    {
-        return Integer.getInteger(PROPERTY_AGENT_PING_INTERVAL, 60);
-    }
-
-    public static int getAgentPingTimeout()
-    {
-        return Integer.getInteger(PROPERTY_AGENT_PING_TIMEOUT, 45);
     }
 
     /**
@@ -130,11 +134,11 @@ public class AgentPingService extends BackgroundServiceSupport
                 SlaveStatus status;
                 try
                 {
-                    status = future.get(getAgentPingTimeout(), TimeUnit.SECONDS);
+                    status = future.get(configuration.getPingTimeout(), TimeUnit.SECONDS);
                 }
                 catch (TimeoutException e)
                 {
-                    if (Boolean.getBoolean(PROPERTY_AGENT_LOG_TIMEOUTS))
+                    if (configuration.isTimeoutLoggingEnabled())
                     {
                         LOG.warning("Timed out pinging agent '" + agent.getConfig().getName() + "'", e);
                     }
@@ -156,6 +160,54 @@ public class AgentPingService extends BackgroundServiceSupport
         });
     }
 
+    void refreshSettings(AgentPingConfiguration agentPingConfig)
+    {
+        configuration = agentPingConfig;
+        int poolSize = agentPingConfig.getMaxConcurrent() * 2;
+        setCorePoolSize(poolSize);
+        setMaximumPoolSize(poolSize);
+
+        try
+        {
+            Trigger trigger = scheduler.getTrigger(PING_NAME, PING_GROUP);
+            if (trigger != null)
+            {
+                scheduler.unschedule(trigger);
+            }
+
+            trigger = new SimpleTrigger(PING_NAME, PING_GROUP, agentPingConfig.getPingInterval() * Constants.SECOND);
+            trigger.setTaskClass(PingSlaves.class);
+            scheduler.schedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
+        }
+
+    }
+
+    public void handleEvent(Event event)
+    {
+        ConfigurationEventSystemStartedEvent eventSystemStartedEvent = (ConfigurationEventSystemStartedEvent) event;
+        TypeListener typeListener = new TypeAdapter<AgentPingConfiguration>(AgentPingConfiguration.class)
+        {
+            @Override
+            public void postSave(AgentPingConfiguration instance, boolean nested)
+            {
+                refreshSettings(instance);
+            }
+        };
+
+        typeListener.register(eventSystemStartedEvent.getConfigurationProvider(), false);
+        init();
+        refreshSettings(eventSystemStartedEvent.getConfigurationProvider().get(AgentPingConfiguration.class));
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
+    }
+    
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
@@ -164,5 +216,11 @@ public class AgentPingService extends BackgroundServiceSupport
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+        eventManager.register(this);
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
     }
 }

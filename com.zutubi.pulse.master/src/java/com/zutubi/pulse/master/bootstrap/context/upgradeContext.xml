@@ -65,6 +65,7 @@
                 <ref local="addIdLeader"/>
                 <ref local="addPersistentWorkDir"/>
                 <ref local="deleteOrphanedTriggers"/>
+                <ref local="addAgentPing"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -250,5 +251,9 @@
 
     <bean id="deleteOrphanedTriggers" class="com.zutubi.pulse.master.upgrade.tasks.DeleteOrphanedTriggersUpgradeTask">
         <property name="buildNumber" value="200038001"/>
+    </bean>
+
+    <bean id="addAgentPing" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentPingConfigurationUpgradeTask">
+        <property name="buildNumber" value="200039001"/>
     </bean>
 </beans>
