@@ -10,21 +10,21 @@ import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.*;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentStateManager;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.tove.config.*;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
@@ -74,6 +74,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private void handleConfigurationEventSystemStarted(ConfigurationEventSystemStartedEvent event)
     {
         // Create prior to any AgentAddedEvents being fired.
+        configurationProvider = event.getConfigurationProvider();
         agentStatusManager = new AgentStatusManager(this, Executors.newSingleThreadExecutor(new ThreadFactory()
         {
             public Thread newThread(Runnable r)
@@ -82,9 +83,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 t.setName("Agent Status Manager Event Pump");
                 return t;
             }
-        }), eventManager);
+        }), eventManager, configurationProvider);
 
-        configurationProvider = event.getConfigurationProvider();
         TypeListener<AgentConfiguration> listener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
             public void postInsert(AgentConfiguration instance)

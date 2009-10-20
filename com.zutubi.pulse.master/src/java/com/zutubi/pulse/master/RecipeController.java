@@ -426,6 +426,7 @@ public class RecipeController
     public void terminateRecipe(String message)
     {
         recipeResult.terminate(message);
+        buildManager.save(recipeResult);
         if (commencedEventReceived)
         {
             // Tell the agent service that it can stop trying to execute this

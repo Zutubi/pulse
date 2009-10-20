@@ -54,6 +54,9 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
             }
         };
 
+        ConfigurationProvider configurationProvider = mock(ConfigurationProvider.class);
+        stub(configurationProvider.get(AgentPingConfiguration.class)).toReturn(agentPingConfiguration);
+        
         agentStatusManager = new AgentStatusManager(agentPersistentStatusManager, new Executor()
         {
             public void execute(Runnable command)
@@ -63,11 +66,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
                 // accuracy of the tests.
                 command.run();
             }
-        }, eventManager);
-
-        ConfigurationProvider configurationProvider = mock(ConfigurationProvider.class);
-        stub(configurationProvider.get(AgentPingConfiguration.class)).toReturn(agentPingConfiguration);
-        agentStatusManager.setConfigurationProvider(configurationProvider);
+        }, eventManager, configurationProvider);
 
         // For a little realism, create a "master" agent.
         Agent a = addAgent(0);

@@ -45,17 +45,18 @@ public class AgentStatusManager implements EventListener
     private EventManager eventManager;
     private ConfigurationProvider configurationProvider;
 
-    public long getAgentOfflineTimeout()
-    {
-        return configurationProvider.get(AgentPingConfiguration.class).getOfflineTimeout();
-    }
-
-    public AgentStatusManager(AgentPersistentStatusManager agentPersistentStatusManager, Executor eventPump, EventManager eventManager)
+    public AgentStatusManager(AgentPersistentStatusManager agentPersistentStatusManager, Executor eventPump, EventManager eventManager, ConfigurationProvider configurationProvider)
     {
         this.agentPersistentStatusManager = agentPersistentStatusManager;
         this.eventPump = eventPump;
         this.eventManager = eventManager;
         eventManager.register(this);
+        this.configurationProvider = configurationProvider;
+    }
+
+    public long getAgentOfflineTimeout()
+    {
+        return configurationProvider.get(AgentPingConfiguration.class).getOfflineTimeout();
     }
 
     public List<Agent> getAllAgents()
@@ -565,10 +566,5 @@ public class AgentStatusManager implements EventListener
                 RecipeCompletedEvent.class,
                 RecipeAssignedEvent.class,
         };
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 }
