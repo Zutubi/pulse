@@ -112,7 +112,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
     {
         CommandResult result = new CommandResult("test");
         result.commence();
-        ((JUnitReportPostProcessorConfiguration) pp.getConfig()).setFailOnFailure(false);
+        pp.getConfig().setFailOnFailure(false);
         failOnFailureHelper(result);
 
         assertFalse(result.failed());
@@ -150,6 +150,12 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         checkSuite(nested, "Nested", 2, 0, 0);
         checkPassCase(nested, "test1");
         checkPassCase(nested, "test2");
+    }
+
+    public void testNoSuiteName() throws Exception
+    {
+        PersistentTestSuiteResult tests = runProcessor("nonamesuite");
+        assertEquals(0, tests.getSuites().size());
     }
 
     private void checkWarning(PersistentTestResult testResult, String name, long duration, String contents)

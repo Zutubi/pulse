@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="CUnit-Run.xsl" ?>
+<root>
+    <a name="a">some text</a>
+    <b name="b"/>
+    <c name="c">
+        <ca name="ca"/>
+    </c>
+    <d name="d">some text</d>
+</root>

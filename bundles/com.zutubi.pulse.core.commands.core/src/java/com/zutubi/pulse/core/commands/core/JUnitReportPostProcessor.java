@@ -1,12 +1,21 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import nu.xom.*;
+import com.zutubi.pulse.core.util.api.XMLStreamUtils;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
+import java.util.Map;
 
 /**
+ * Post-processor for junit (and compatible) XML reports.
  */
 public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
+    private static final String ELEMENT_SUITES = "testsuites";
+
     public JUnitReportPostProcessor(JUnitReportPostProcessorConfiguration config)
     {
         super(config);
@@ -18,152 +27,178 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         return (JUnitReportPostProcessorConfiguration) super.getConfig();
     }
 
-    protected void processDocument(Document doc, TestSuiteResult tests)
+    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
-        String suiteElement = getConfig().getSuiteElement();
-        Element root = doc.getRootElement();
-        if(root.getLocalName().equals(suiteElement))
+        process(file, ppContext, tests, new XMLStreamCallback()
         {
-            // A single suite
-            processSuite(root, tests);
-        }
-        else
-        {
-            // Looks like a full report, search for suites
-            Elements suiteElements = root.getChildElements(suiteElement);
-            for(int i = 0; i < suiteElements.size(); i++)
+            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
             {
-                processSuite(suiteElements.get(i), tests);
+                if (nextElement(reader))
+                {
+                    if (isElement(getConfig().getSuiteElement(), reader))
+                    {
+                        processSuite(reader, tests);
+                    }
+                    else if (isElement(ELEMENT_SUITES, reader))
+                    {
+                        processSuites(reader, tests);
+                    }
+                }
             }
-        }
+        });
     }
 
-    private void processSuite(Element element, TestSuiteResult tests)
+    protected void processSuites(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        JUnitReportPostProcessorConfiguration config = getConfig();
-        String name = "";
+        expectStartElement(ELEMENT_SUITES, reader);
+        reader.nextTag();
 
-        String attr = element.getAttributeValue(config.getPackageAttribute());
-        if(attr != null)
+        while (reader.isStartElement())
+        {
+            if (isElement(getConfig().getSuiteElement(), reader))
+            {
+                processSuite(reader, tests);
+            }
+            else
+            {
+                nextElement(reader);
+            }
+        }
+
+        expectEndElement(ELEMENT_SUITES, reader);
+    }
+
+    private void processSuite(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
+    {
+        expectStartElement(getConfig().getSuiteElement(), reader);
+        Map<String, String> attributes = XMLStreamUtils.getAttributes(reader);
+
+        String name = getTestSuiteName(attributes);
+        if (name.length() == 0)
+        {
+            nextElement(reader);
+            return;
+        }
+
+        long duration = getDuration(attributes);
+        TestSuiteResult suite = new TestSuiteResult(name, duration);
+        tests.addSuite(suite);
+
+        reader.nextTag();
+
+        while (reader.isStartElement())
+        {
+            if (isElement(getConfig().getSuiteElement(), reader))
+            {
+                processSuite(reader, suite);
+            }
+            else if (isElement(getConfig().getCaseElement(), reader))
+            {
+                processCase(reader, suite);
+            }
+            else
+            {
+                nextElement(reader);
+            }
+        }
+
+        expectEndElement(getConfig().getSuiteElement(), reader);
+        reader.nextTag();
+    }
+
+    private String getTestSuiteName(Map<String, String> attributes)
+    {
+        String name = "";
+        String attr = attributes.get(getConfig().getPackageAttribute());
+        if (attr != null)
         {
             name += attr + '.';
         }
 
-        attr = element.getAttributeValue(config.getNameAttribute());
-        if(attr != null)
+        attr = attributes.get(getConfig().getNameAttribute());
+        if (attr != null)
         {
             name += attr;
         }
-
-        if(name.length() == 0)
-        {
-            // No name?? No dice...
-            return;
-        }
-
-        long duration = getDuration(element);
-
-        TestSuiteResult suite = new TestSuiteResult(name, duration);
-        Elements nested = element.getChildElements(config.getSuiteElement());
-        for(int i = 0; i < nested.size(); i++)
-        {
-            processSuite(nested.get(i), suite);
-        }
-
-        Elements cases = element.getChildElements(config.getCaseElement());
-        for(int i = 0; i < cases.size(); i++)
-        {
-            processCase(cases.get(i), suite);
-        }
-
-        tests.addSuite(suite);
+        return name;
     }
 
-    private void processCase(Element element, TestSuiteResult suite)
+    private void processCase(XMLStreamReader reader, TestSuiteResult suite) throws XMLStreamException
     {
-        JUnitReportPostProcessorConfiguration config = getConfig();
-        String name = element.getAttributeValue(config.getNameAttribute());
-        if(name == null)
+        expectStartElement(getConfig().getCaseElement(), reader);
+
+        Map<String, String> attributes = XMLStreamUtils.getAttributes(reader);
+        String name = attributes.get(getConfig().getNameAttribute());
+        if (name == null)
         {
-            // Ignore nameless tests
+            nextElement(reader);
             return;
         }
 
-        String className = element.getAttributeValue(config.getClassAttribute());
-        if(className != null && !suite.getName().equals(className))
+        String className = attributes.get(getConfig().getClassAttribute());
+        if (className != null && !suite.getName().equals(className))
         {
             name = className + "." + name;
         }
 
-        long duration = getDuration(element);
+        long duration = getDuration(attributes);
         TestCaseResult caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
         suite.addCase(caseResult);
+        reader.nextTag();
 
-        Element child = element.getFirstChildElement(config.getErrorElement());
-        if(child != null)
+        String tagName = reader.getLocalName();
+        if (tagName.equals(getConfig().getErrorElement()))
         {
             caseResult.setStatus(TestStatus.ERROR);
-
-            getMessage(child, caseResult);
-
-            // Prefer error over failure (we *should* not get both, but just
-            // in case).
-            return;
+            caseResult.setMessage(getMessage(reader));
+            reader.nextTag();
         }
-
-        child = element.getFirstChildElement(config.getFailureElement());
-        if(child != null)
+        else if (tagName.equals(getConfig().getFailureElement()))
         {
             caseResult.setStatus(TestStatus.FAILURE);
-            getMessage(child, caseResult);
-            return;
+            caseResult.setMessage(getMessage(reader));
+            reader.nextTag();
         }
-
-        child = element.getFirstChildElement(config.getSkippedElement());
-        if (child != null)
+        else if (tagName.equals(getConfig().getSkippedElement()))
         {
             caseResult.setStatus(TestStatus.SKIPPED);
+            nextElement(reader);
         }
+
+        expectEndElement(getConfig().getCaseElement(), reader);
+        reader.nextTag();
     }
 
-    private void getMessage(Element element, TestCaseResult caseResult)
+    private String getMessage(XMLStreamReader reader) throws XMLStreamException
     {
-        if (element.getChildCount() > 0)
+        Map<String, String> attributes = XMLStreamUtils.getAttributes(reader);
+        String message = attributes.get(getConfig().getMessageAttribute());
+
+        String elementText = reader.getElementText();
+        if (elementText != null && elementText.length() > 0)
         {
-            Node node = element.getChild(0);
-            if(node != null && node instanceof Text)
-            {
-                caseResult.setMessage(node.getValue().trim());
-            }
+            message = elementText.trim();
         }
-        else
-        {
-            String message = element.getAttributeValue(getConfig().getMessageAttribute());
-            if(message != null)
-            {
-                caseResult.setMessage(message);
-            }
-        }
+
+        return (message != null && message.length() == 0) ? null : message;
     }
 
-    private long getDuration(Element element)
+    private long getDuration(Map<String, String> attributes)
     {
         long duration = TestResult.DURATION_UNKNOWN;
-        String attr = element.getAttributeValue(getConfig().getTimeAttribute());
-
-        if(attr != null)
+        String attr = attributes.get(getConfig().getTimeAttribute());
+        if (attr != null)
         {
             try
             {
                 double time = Double.parseDouble(attr);
-                duration = (long)(time * 1000);
+                duration = (long) (time * 1000);
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
                 // No matter, leave time out
             }
         }
-
         return duration;
     }
 }

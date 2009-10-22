@@ -1,18 +1,21 @@
 package com.zutubi.pulse.core.postprocessors.cppunit;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import com.zutubi.pulse.core.util.api.XMLUtils;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Elements;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * Post-processor for cppunit (and compatible) XML reports.  See:
+ * http://sourceforge.net/apps/mediawiki/cppunit/index.php
  */
 public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
+    private static final String ELEMENT_TEST_RUN = "TestRun";
     private static final String ELEMENT_SUCCESSFUL_TESTS = "SuccessfulTests";
     private static final String ELEMENT_TEST = "Test";
     private static final String ELEMENT_FAILED_TESTS = "FailedTests";
@@ -26,71 +29,186 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
 
     private static final String FAILURE_TYPE_ERROR = "Error";
 
-    private Map<String, TestSuiteResult> suites;
-
     public CppUnitReportPostProcessor(CppUnitReportPostProcessorConfiguration config)
     {
         super(config);
     }
 
-    protected void processDocument(Document doc, TestSuiteResult tests)
+    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
-        Element root = doc.getRootElement();
-
-        // CIB-755: the post processor must be stateless, as it can be used
-        // to process multiple reports.  Recreate this map each time.
-        suites = new TreeMap<String, TestSuiteResult>();
-
-        // We should get FailedTests and SuccessfulTests sections
-        Elements testElements = root.getChildElements(ELEMENT_FAILED_TESTS);
-        for(int i = 0; i < testElements.size(); i++)
+        process(file, ppContext, tests, new XMLStreamCallback()
         {
-            processFailedTests(testElements.get(i));
-        }
-
-        testElements = root.getChildElements(ELEMENT_SUCCESSFUL_TESTS);
-        for(int i = 0; i < testElements.size(); i++)
-        {
-            processSuccessfulTests(testElements.get(i));
-        }
-
-        addSuites(tests);
+            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
+            {
+                if (nextElement(reader))
+                {
+                    handleTestRun(tests, reader);
+                }
+            }
+        });
     }
 
-    private void processFailedTests(Element element)
+    private void handleTestRun(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
     {
-        Elements elements = element.getChildElements(ELEMENT_FAILED_TEST);
-        for(int i = 0; i < elements.size(); i++)
+        expectStartElement(ELEMENT_TEST_RUN, reader);
+        reader.nextTag();
+
+        Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
+
+        while (reader.isStartElement())
         {
-            // We expect name, failure type, location and message child elements
-            Element testElement = elements.get(i);
-            String[] name = getTestName(testElement);
-
-            TestStatus status = getStatus(testElement);
-            String message = getMessage(testElement);
-
-            TestSuiteResult suite = getSuite(name[0]);
-            TestCaseResult result = new TestCaseResult(name[1], TestResult.DURATION_UNKNOWN, status, message);
-            suite.addCase(result);
+            if (reader.getLocalName().equals(ELEMENT_FAILED_TESTS))
+            {
+                handleFailedTests(suites, reader);
+            }
+            else if (reader.getLocalName().equals(ELEMENT_SUCCESSFUL_TESTS))
+            {
+                handleSuccessfulTests(suites, reader);
+            }
+            else
+            {
+                nextElement(reader);
+            }
         }
+
+        addSuites(tests, suites);
+
+        expectEndElement(ELEMENT_TEST_RUN, reader);
     }
 
-    private void processSuccessfulTests(Element element)
+    private void handleSuccessfulTests(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
-        // We expect a bunch of Test's with Name subelements
-        Elements elements = element.getChildElements(ELEMENT_TEST);
-        for(int i = 0; i < elements.size(); i++)
-        {
-            Element testElement = elements.get(i);
-            String[] name = getTestName(testElement);
+        expectStartElement(ELEMENT_SUCCESSFUL_TESTS, reader);
+        reader.nextTag();
 
-            TestSuiteResult suite = getSuite(name[0]);
-            TestCaseResult result = new TestCaseResult(name[1]);
-            suite.addCase(result);
+        while (reader.isStartElement())
+        {
+            handleSuccessfulTest(suites, reader);
         }
+
+        expectEndElement(ELEMENT_SUCCESSFUL_TESTS, reader);
+        reader.nextTag();
     }
 
-    private void addSuites(TestSuiteResult tests)
+    private void handleSuccessfulTest(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
+    {
+        expectStartElement(ELEMENT_TEST, reader);
+        reader.nextTag();
+
+        String[] name = handleGetTestName(reader);
+
+        TestSuiteResult suite = getSuite(name[0], suites);
+        TestCaseResult result = new TestCaseResult(name[1]);
+        suite.addCase(result);
+
+        expectEndElement(ELEMENT_TEST, reader);
+        reader.nextTag();
+    }
+
+    private void handleFailedTests(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
+    {
+        expectStartElement(ELEMENT_FAILED_TESTS, reader);
+        reader.nextTag();
+
+        while (reader.isStartElement())
+        {
+            handleFailedTest(suites, reader);
+        }
+
+        expectEndElement(ELEMENT_FAILED_TESTS, reader);
+        reader.nextTag();
+    }
+
+    private void handleFailedTest(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
+    {
+        expectStartElement(ELEMENT_FAILED_TEST, reader);
+        reader.nextTag();
+
+        // warning: this assumes the ordering of the tags in the xml report.  Is this a reasonable
+        // assumption to be made?
+        String[] name = handleGetTestName(reader);
+        TestStatus status = handleGetFailedTestStatus(reader);
+        String message = handleGetFailedTestMessage(reader);
+
+        TestSuiteResult suite = getSuite(name[0], suites);
+        TestCaseResult result = new TestCaseResult(name[1], TestResult.DURATION_UNKNOWN, status, message);
+        suite.addCase(result);
+
+        expectEndElement(ELEMENT_FAILED_TEST, reader);
+        reader.nextTag();
+    }
+
+    private String handleGetFailedTestMessage(XMLStreamReader reader) throws XMLStreamException
+    {
+        Map<String, String> location = null;
+        if (reader.getLocalName().equals(ELEMENT_LOCATION))
+        {
+            expectStartElement(ELEMENT_LOCATION, reader);
+            reader.nextTag();
+
+            location = readElements(reader);
+
+            expectEndElement(ELEMENT_LOCATION, reader);
+            reader.nextTag();
+        }
+
+        String messageText = null;
+        if (reader.getLocalName().equals(ELEMENT_MESSAGE))
+        {
+            expectStartElement(ELEMENT_MESSAGE, reader);
+            messageText = getElementText(reader, "").trim();
+
+            expectEndElement(ELEMENT_MESSAGE, reader);
+            reader.nextTag();
+        }
+
+        String message = "";
+        if (location != null)
+        {
+            String locationText = "At";
+            if (location.containsKey(ELEMENT_FILE))
+            {
+                locationText += " file " + location.get(ELEMENT_FILE).trim();
+            }
+
+            if (location.containsKey(ELEMENT_LINE))
+            {
+                locationText += " line " + location.get(ELEMENT_LINE).trim();
+            }
+            message += locationText + "\n";
+        }
+
+        if (messageText != null)
+        {
+            message += messageText.trim();
+        }
+        return message;
+    }
+
+    private TestStatus handleGetFailedTestStatus(XMLStreamReader reader) throws XMLStreamException
+    {
+        expectStartElement(ELEMENT_FAILURE_TYPE, reader);
+        String typeText = getElementText(reader, "").trim();
+        TestStatus status = typeText.equals(FAILURE_TYPE_ERROR) ? TestStatus.ERROR : TestStatus.FAILURE;
+        expectEndElement(ELEMENT_FAILURE_TYPE, reader);
+        reader.nextTag();
+
+        return status;
+    }
+
+    private String[] handleGetTestName(XMLStreamReader reader) throws XMLStreamException
+    {
+        expectStartElement(ELEMENT_NAME, reader);
+        String nameText = getElementText(reader, "").trim();
+        String[] bits = nameText.split("::", 2);
+        String[] name = (bits.length == 1) ? new String[]{ "[unknown]", bits[0] } : bits;
+        expectEndElement(ELEMENT_NAME, reader);
+        reader.nextTag();
+
+        return name;
+    }
+
+    private void addSuites(TestSuiteResult tests, Map<String, TestSuiteResult> suites)
     {
         for(TestSuiteResult suite: suites.values())
         {
@@ -98,7 +216,7 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         }
     }
 
-    private TestSuiteResult getSuite(String name)
+    private TestSuiteResult getSuite(String name, Map<String, TestSuiteResult> suites)
     {
         if(suites.containsKey(name))
         {
@@ -110,92 +228,5 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
             suites.put(name, suite);
             return suite;
         }
-    }
-
-    private String[] getTestName(Element testElement)
-    {
-        Element nameElement = testElement.getFirstChildElement(ELEMENT_NAME);
-        if(nameElement == null)
-        {
-            return null;
-        }
-
-        String name = XMLUtils.getText(nameElement);
-        if(name == null)
-        {
-            return null;
-        }
-
-        String[] bits = name.split("::", 2);
-        if(bits.length == 1)
-        {
-            return new String[]{ "[unknown]", bits[0] };
-        }
-        else
-        {
-            return bits;
-        }
-    }
-
-    private TestStatus getStatus(Element element)
-    {
-        TestStatus status = TestStatus.FAILURE;
-
-        Element typeElement = element.getFirstChildElement(ELEMENT_FAILURE_TYPE);
-        if(typeElement != null)
-        {
-            String type = XMLUtils.getText(typeElement);
-            if(type != null && type.equals(FAILURE_TYPE_ERROR))
-            {
-                status = TestStatus.ERROR;
-            }
-        }
-
-        return status;
-    }
-
-    private String getMessage(Element element)
-    {
-        String message = "";
-
-        // Include the location if available.
-        Element locationElement = element.getFirstChildElement(ELEMENT_LOCATION);
-        if(locationElement != null)
-        {
-            String location = "At";
-            Element fileElement = locationElement.getFirstChildElement(ELEMENT_FILE);
-            if(fileElement != null)
-            {
-                String file = XMLUtils.getText(fileElement);
-                if(file != null)
-                {
-                    location += " file " + file;
-                }
-            }
-
-            Element lineElement = locationElement.getFirstChildElement(ELEMENT_LINE);
-            if(lineElement != null)
-            {
-                String line = XMLUtils.getText(lineElement);
-                if(line != null)
-                {
-                    location += " line " + line;
-                }
-            }
-
-            message += location + "\n";
-        }
-
-        Element messageElement = element.getFirstChildElement(ELEMENT_MESSAGE);
-        if(messageElement != null)
-        {
-            String text = XMLUtils.getText(messageElement);
-            if(text != null)
-            {
-                message += text;
-            }
-        }
-
-        return message;
     }
 }

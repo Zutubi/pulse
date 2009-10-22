@@ -1,20 +1,21 @@
 package com.zutubi.pulse.core.postprocessors.unittestpp;
 
-import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
-import com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Elements;
+import com.zutubi.pulse.core.postprocessors.api.*;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * Post-processor for UnitTest++ (and compatible) XML reports.  See:
+ * http://unittest-cpp.sourceforge.net/
  */
 public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
+    private static final String ELEMENT_RESULTS = "unittest-results";
     private static final String ELEMENT_TEST = "test";
     private static final String ELEMENT_FAILURE = "failure";
 
@@ -23,55 +24,97 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
     private static final String ATTRIBUTE_TIME = "time";
     private static final String ATTRIBUTE_SUITE = "suite";
 
-    private Map<String, TestSuiteResult> suites;
-
     public UnitTestPlusPlusReportPostProcessor(UnitTestPlusPlusReportPostProcessorConfiguration config)
     {
         super(config);
     }
 
-    protected void processDocument(Document doc, TestSuiteResult tests)
+    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
-        Element root = doc.getRootElement();
-
-        suites = new TreeMap<String, TestSuiteResult>();
-
-        // We should get FailedTests and SuccessfulTests sections
-        Elements testElements = root.getChildElements(ELEMENT_TEST);
-        for(int i = 0; i < testElements.size(); i++)
+        process(file, ppContext, tests, new XMLStreamCallback()
         {
-            processTest(testElements.get(i));
-        }
-
-        addSuites(tests);
+            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
+            {
+                if (nextElement(reader))
+                {
+                    processTestResults(reader, tests);
+                }
+            }
+        });
     }
 
-    private void processTest(Element element)
+    private void processTestResults(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        String suite = element.getAttributeValue(ATTRIBUTE_SUITE);
-        String name = element.getAttributeValue(ATTRIBUTE_NAME);
-        long duration = getDuration(element);
+        expectStartElement(ELEMENT_RESULTS, reader);
+        reader.nextTag();
 
-        if(suite != null && name != null)
+        Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
+
+        while (reader.isStartElement())
         {
-            TestSuiteResult suiteResult = getSuite(suite);
-            Element failure = element.getFirstChildElement(ELEMENT_FAILURE);
-            TestCaseResult caseResult;
-            if(failure == null)
+            if (isElement(ELEMENT_TEST, reader))
             {
-                caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
+                processTest(reader, suites);
             }
             else
             {
-                caseResult = new TestCaseResult(name, duration, TestStatus.FAILURE, failure.getAttributeValue(ATTRIBUTE_MESSAGE));
+                nextElement(reader);
             }
-            suiteResult.addCase(caseResult);
         }
+
+        addSuites(tests, suites);
+
+        expectEndElement(ELEMENT_RESULTS, reader);
     }
 
-    private long getDuration(Element element)
+    private void processTest(XMLStreamReader reader, Map<String, TestSuiteResult> suites) throws XMLStreamException
     {
-        String value = element.getAttributeValue(ATTRIBUTE_TIME);
+        expectStartElement(ELEMENT_TEST, reader);
+        Map<String, String> attributes = getAttributes(reader);
+
+        String suite = attributes.get(ATTRIBUTE_SUITE);
+        String name = attributes.get(ATTRIBUTE_NAME);
+        long duration = getDuration(attributes);
+
+        if(suite != null && name != null)
+        {
+            reader.nextTag();
+
+            TestSuiteResult suiteResult = getSuite(suite, suites);
+
+            TestCaseResult caseResult = null;
+            while (reader.isStartElement())
+            {
+                if (caseResult == null)
+                {
+                    if (isElement(ELEMENT_FAILURE, reader))
+                    {
+                        attributes = getAttributes(reader);
+                        caseResult = new TestCaseResult(name, duration, TestStatus.FAILURE, attributes.get(ATTRIBUTE_MESSAGE));
+                    }
+                }
+                nextElement(reader);
+            }
+
+            if (caseResult == null)
+            {
+                caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
+            }
+
+            suiteResult.addCase(caseResult);
+        }
+        else
+        {
+            skipElement(reader, false);
+        }
+
+        expectEndElement(ELEMENT_TEST, reader);
+        reader.nextTag();
+    }
+
+    private long getDuration(Map<String, String> attributes)
+    {
+        String value = attributes.get(ATTRIBUTE_TIME);
         if(value != null)
         {
             try
@@ -84,10 +127,10 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
             }
         }
 
-        return -1;
+        return TestResult.DURATION_UNKNOWN;
     }
 
-    private void addSuites(TestSuiteResult tests)
+    private void addSuites(TestSuiteResult tests, Map<String, TestSuiteResult> suites)
     {
         for(TestSuiteResult suite: suites.values())
         {
@@ -95,7 +138,7 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
         }
     }
 
-    private TestSuiteResult getSuite(String name)
+    private TestSuiteResult getSuite(String name, Map<String, TestSuiteResult> suites)
     {
         if(suites.containsKey(name))
         {

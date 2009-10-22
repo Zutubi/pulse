@@ -20,11 +20,6 @@ public class CUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         return new File(resource.toURI()).getParentFile();
     }
 
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testBasic() throws Exception
     {
         PersistentTestSuiteResult tests = runProcessor("basic");

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite time="0.391">
+  <properties>
+    <property name="ivy.dep.file" value="ivy.xml"></property>
+  </properties>
+  <testcase classname="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest" name="testSimple" time="0.291"></testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

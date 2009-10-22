@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.postprocessors.boosttest;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import com.zutubi.pulse.core.util.api.XMLUtils;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Elements;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
+    private static final String ELEMENT_TEST_LOG = "TestLog";
     private static final String ELEMENT_TEST_SUITE = "TestSuite";
     private static final String ELEMENT_TEST_CASE = "TestCase";
     private static final String ELEMENT_TESTING_TIME = "TestingTime";
@@ -52,31 +53,168 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         super(config);
     }
 
-    protected void processDocument(Document doc, TestSuiteResult tests)
+    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
-        processSuites(doc.getRootElement(), tests);
+        process(file, ppContext, tests, new XMLStreamCallback()
+        {
+            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
+            {
+                if (nextElement(reader))
+                {
+                    processSuties(reader, tests);
+                }
+            }
+        });
     }
 
-    private void processSuites(Element containingElement, TestSuiteResult parentSuite)
+    private void processSuties(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        Elements suiteElements = containingElement.getChildElements(ELEMENT_TEST_SUITE);
-        for (int i = 0; i < suiteElements.size(); i++)
+        expectStartElement(ELEMENT_TEST_LOG, reader);
+        reader.nextTag();
+
+        while (reader.isStartElement())
         {
-            processSuite(suiteElements.get(i), parentSuite);
+            if (isElement(ELEMENT_TEST_SUITE, reader))
+            {
+                processSuite(reader, tests);
+            }
+            else
+            {
+                nextElement(reader);
+            }
         }
+        expectEndElement(ELEMENT_TEST_LOG, reader);
     }
 
-    private void processSuite(Element element, TestSuiteResult parentSuite)
+    private void processSuite(XMLStreamReader reader, TestSuiteResult parentSuite) throws XMLStreamException
     {
-        String name = element.getAttributeValue(ATTRIBUTE_NAME);
-        if (name != null)
+        expectStartElement(ELEMENT_TEST_SUITE, reader);
+
+        Map<String, String> attributes = getAttributes(reader);
+        if (!attributes.containsKey(ATTRIBUTE_NAME))
         {
-            TestSuiteResult suiteResult = new TestSuiteResult(name);
-            processSuites(element, suiteResult);
-            processCases(element, suiteResult);
-            suiteResult.setDuration(getTotalDuration(suiteResult));
-            parentSuite.addSuite(suiteResult);
+            // We can not process a suite without a name.  Skip to the next element.
+            nextElement(reader);
+            return;
         }
+
+        TestSuiteResult suiteResult = new TestSuiteResult(attributes.get(ATTRIBUTE_NAME));
+        reader.nextTag();
+
+        while (reader.isStartElement())
+        {
+            if (isElement(ELEMENT_TEST_SUITE, reader))
+            {
+                processSuite(reader, suiteResult);
+            }
+            else if (isElement(ELEMENT_TEST_CASE, reader))
+            {
+                processCase(reader, suiteResult);
+            }
+            else
+            {
+                nextElement(reader);
+            }
+        }
+
+        suiteResult.setDuration(getTotalDuration(suiteResult));
+        parentSuite.addSuite(suiteResult);
+
+        expectEndElement(ELEMENT_TEST_SUITE, reader);
+        reader.nextTag();
+    }
+
+    private void processCase(XMLStreamReader reader, TestSuiteResult parentSuite) throws XMLStreamException
+    {
+        expectStartElement(ELEMENT_TEST_CASE, reader);
+
+        Map<String, String> attributes = getAttributes(reader);
+        if (!attributes.containsKey(ATTRIBUTE_NAME))
+        {
+            nextElement(reader);
+            return;
+        }
+        reader.nextTag();
+
+        long duration = TestResult.DURATION_UNKNOWN;
+        TestStatus status = TestStatus.PASS;
+        BoostTestReportPostProcessorConfiguration config = (BoostTestReportPostProcessorConfiguration) getConfig();
+        StringBuilder builder = new StringBuilder();
+
+        while (reader.isStartElement())
+        {
+            if (isElement(ELEMENT_TESTING_TIME, reader))
+            {
+                try
+                {
+                    duration = (long) (Double.parseDouble(getElementText(reader, "").trim()) / 1000);
+                }
+                catch (NumberFormatException e)
+                {
+                    // the default value will have to do.
+                }
+                reader.nextTag();
+            }
+            else
+            {
+                String name = reader.getLocalName();
+
+                TestStatus brokenStatus = ELEMENT_TO_STATUS.get(name);
+                if (brokenStatus == null)
+                {
+                    if (config.isProcessMessages() && name.equals(ELEMENT_MESSAGE) || config.isProcessInfo() && name.equals(ELEMENT_INFO))
+                    {
+                        appendMessage(reader, builder);
+                        expectEndElement(name, reader);
+                        reader.nextTag();
+                    }
+                    else
+                    {
+                        nextElement(reader);
+                    }
+                }
+                else
+                {
+                    if (brokenStatus.compareTo(status) > 0)
+                    {
+                        status = brokenStatus;
+                    }
+
+                    appendMessage(reader, builder);
+                    expectEndElement(name, reader);
+                    reader.nextTag();
+                }
+            }
+        }
+
+        parentSuite.addCase(new TestCaseResult(attributes.get(ATTRIBUTE_NAME), duration, status, builder.length() > 0 ? builder.toString() : null));
+
+        expectEndElement(ELEMENT_TEST_CASE, reader);
+        reader.nextTag();
+    }
+
+    private void appendMessage(XMLStreamReader reader, StringBuilder builder) throws XMLStreamException
+    {
+        String message = ELEMENT_TO_MESSAGE.get(reader.getLocalName());
+        Map<String, String> attributes = getAttributes(reader);
+        String file = attributes.get(ATTRIBUTE_FILE);
+        if (file != null)
+        {
+            message += ": " + file;
+
+            String line = attributes.get(ATTRIBUTE_LINE);
+            if (line != null)
+            {
+                message += ":" + line;
+            }
+        }
+
+        message += ": " + getElementText(reader, "").trim();
+        if (builder.length() > 0)
+        {
+            builder.append("\n");
+        }
+        builder.append(message);
     }
 
     private long getTotalDuration(TestSuiteResult suiteResult)
@@ -93,98 +231,5 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         }
 
         return totalDuration;
-    }
-
-    private void processCases(Element containingElement, TestSuiteResult parentSuite)
-    {
-        Elements caseElements = containingElement.getChildElements(ELEMENT_TEST_CASE);
-        for (int i = 0; i < caseElements.size(); i++)
-        {
-            processCase(caseElements.get(i), parentSuite);
-        }
-    }
-
-    private void processCase(Element element, TestSuiteResult parentSuite)
-    {
-        String name = element.getAttributeValue(ATTRIBUTE_NAME);
-        if (name != null)
-        {
-            long duration = getDuration(element);
-            StringBuilder builder = new StringBuilder();
-            TestStatus status = processMessages(element, builder);
-            parentSuite.addCase(new TestCaseResult(name, duration, status, builder.length() > 0 ? builder.toString() : null));
-        }
-
-    }
-
-    private TestStatus processMessages(Element element, StringBuilder builder)
-    {
-        TestStatus status = TestStatus.PASS;
-        Elements children = element.getChildElements();
-        for (int i = 0; i < children.size(); i++)
-        {
-            Element child = children.get(i);
-            String name = child.getLocalName();
-
-            TestStatus brokenStatus = ELEMENT_TO_STATUS.get(name);
-            if (brokenStatus == null)
-            {
-                BoostTestReportPostProcessorConfiguration config = (BoostTestReportPostProcessorConfiguration) getConfig();
-                if (config.isProcessMessages() && name.equals(ELEMENT_MESSAGE) || config.isProcessInfo() && name.equals(ELEMENT_INFO))
-                {
-                    appendMessage(child, builder);
-                }
-            }
-            else
-            {
-                if (brokenStatus.compareTo(status) > 0)
-                {
-                    status = brokenStatus;
-                }
-
-                appendMessage(child, builder);
-            }
-        }
-
-        return status;
-    }
-
-    private void appendMessage(Element element, StringBuilder builder)
-    {
-        String message = ELEMENT_TO_MESSAGE.get(element.getLocalName());
-        String file = element.getAttributeValue(ATTRIBUTE_FILE);
-        if (file != null)
-        {
-            message += ": " + file;
-
-            String line = element.getAttributeValue(ATTRIBUTE_LINE);
-            if (line != null)
-            {
-                message += ":" + line;
-            }
-        }
-        
-        message += ": " + XMLUtils.getText(element, "");
-        if (builder.length() > 0)
-        {
-            builder.append("\n");
-        }
-        builder.append(message);
-    }
-
-    private long getDuration(Element element)
-    {
-        String durationText = XMLUtils.getChildText(element, ELEMENT_TESTING_TIME,
-                                                    Long.toString(TestResult.DURATION_UNKNOWN));
-        try
-        {
-            return (long) (Double.parseDouble(durationText) / 1000);
-        }
-        catch (NumberFormatException e)
-        {
-            // Fall through
-        }
-
-        return TestResult.DURATION_UNKNOWN;
     }
 }
