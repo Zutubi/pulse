@@ -2,7 +2,10 @@ package com.zutubi.pulse.servercore.util.background;
 
 import com.zutubi.pulse.core.Stoppable;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -24,50 +27,53 @@ public class BackgroundServiceSupport implements Stoppable
     private ThreadPoolExecutor executorService;
     private AtomicInteger nextId = new AtomicInteger(1);
     private String serviceName;
-    private int corePoolSize;
-    private int maxPoolSize;
+    private boolean fixed = false;
 
     private ThreadFactory threadFactory;
 
     /**
-     * Creates a new service with the given descriptive name.
+     * Creates a new service with the given descriptive name.  The service will
+     * be backed by an uncapped thread pool.
      *
      * @param serviceName name of the service, used to tag threads which are
      *                    created by it for easy identification
      */
     public BackgroundServiceSupport(String serviceName)
     {
-        this(serviceName, 0, Integer.MAX_VALUE);
-    }
-
-    public BackgroundServiceSupport(String serviceName, int corePoolSize, int maxPoolSize)
-    {
         this.serviceName = serviceName;
-        this.corePoolSize = corePoolSize;
-        this.maxPoolSize = maxPoolSize;
+        this.executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
     }
 
     /**
-     * Initialises the service, creating the executor that will be used to
+     * Creates a new service with the given descriptive name.  The service will
+     * be backed by a thread pool with the given, fixed number of threads.
+     *
+     * @param serviceName name of the service, used to tag threads which are
+     *                    created by it for easy identification
+     * @param poolSize    the size of the thread pool to use
+     */
+    public BackgroundServiceSupport(String serviceName, int poolSize)
+    {
+        this.serviceName = serviceName;
+        this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize);
+        fixed = true;
+    }
+
+    /**
+     * Initialises the service, completing the executor that will be used to
      * process tasks.
      */
     public void init()
     {
-        executorService = new ThreadPoolExecutor(
-                corePoolSize,
-                maxPoolSize,
-                60L,
-                TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>(),
-                new ThreadFactory()
-                {
-                    public Thread newThread(Runnable r)
-                    {
-                        Thread thread = threadFactory.newThread(r);
-                        thread.setName(serviceName + " Service Worker " + nextId.getAndIncrement());
-                        return thread;
-                    }
-                });
+        executorService.setThreadFactory(new ThreadFactory()
+        {
+            public Thread newThread(Runnable r)
+            {
+                Thread thread = threadFactory.newThread(r);
+                thread.setName(serviceName + " Service Worker " + nextId.getAndIncrement());
+                return thread;
+            }
+        });
     }
 
     /**
@@ -99,14 +105,21 @@ public class BackgroundServiceSupport implements Stoppable
         }
     }
 
-    public void setCorePoolSize(int corePoolSize)
+    /**
+     * Sets the size of the thread pool backing this service.  Note that the
+     * service must have been created with a fixed size in the first place.
+     *
+     * @param poolSize the new size for the thread pool
+     */
+    public void setPoolSize(int poolSize)
     {
-        executorService.setCorePoolSize(corePoolSize);
-    }
+        if (!fixed)
+        {
+            throw new IllegalStateException("Pool size can only be set for fixed thread pools.");
+        }
 
-    public void setMaximumPoolSize(int maximumPoolSize)
-    {
-        executorService.setMaximumPoolSize(maximumPoolSize);
+        executorService.setCorePoolSize(poolSize);
+        executorService.setMaximumPoolSize(poolSize);
     }
 
     public void setThreadFactory(ThreadFactory threadFactory)

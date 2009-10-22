@@ -40,6 +40,7 @@ public class AgentPingService extends BackgroundServiceSupport implements EventL
 {
     private static final Logger LOG = Logger.getLogger(AgentPingService.class);
 
+    private static final int DEFAULT_POOL_SIZE = 24;
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
 
@@ -53,7 +54,8 @@ public class AgentPingService extends BackgroundServiceSupport implements EventL
 
     public AgentPingService()
     {
-        super("Agent Ping");
+        // Establish a default pool size as the config is not yet available
+        super("Agent Ping", DEFAULT_POOL_SIZE);
     }
 
     /**
@@ -164,8 +166,7 @@ public class AgentPingService extends BackgroundServiceSupport implements EventL
     {
         configuration = agentPingConfig;
         int poolSize = agentPingConfig.getMaxConcurrent() * 2;
-        setCorePoolSize(poolSize);
-        setMaximumPoolSize(poolSize);
+        setPoolSize(poolSize);
 
         try
         {

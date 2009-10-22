@@ -60,9 +60,9 @@ public class PersonalBuildCommand implements Command
         addPropertyOption(options, 'p', "password", PersonalBuildConfig.PROPERTY_PULSE_PASSWORD);
         addPropertyOption(options, 'r', "project", PersonalBuildConfig.PROPERTY_PROJECT);
 
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new GnuParser();
 
-        CommandLine commandLine = parser.parse(options, argv, true);
+        CommandLine commandLine = parser.parse(options, argv, false);
         Properties defines = new Properties();
 
         if (commandLine.hasOption('d'))
