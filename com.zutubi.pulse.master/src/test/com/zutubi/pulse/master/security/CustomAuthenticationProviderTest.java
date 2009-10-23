@@ -27,15 +27,6 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         authenticationProvider.setUserManager(userManager);
     }
 
-    protected void tearDown() throws Exception
-    {
-        ldapManager = null;
-        userManager = null;
-        authenticationProvider = null;
-        
-        super.tearDown();
-    }
-
     public void testUnknownUser()
     {
         String username = "unknown-user";

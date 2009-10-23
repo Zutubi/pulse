@@ -162,6 +162,7 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
     {
         configureService(true, 2, 6);
         updater.setPingInterval(250);
+        updater.setRebootTimeout(1);
         updater.start();
         start();
         download();

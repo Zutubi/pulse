@@ -20,13 +20,6 @@ public class HibernateFileArtifactDaoTest extends MasterPersistenceTestCase
         fileArtifactDao = (FileArtifactDao) SpringComponentContext.getBean("fileArtifactDao");
     }
 
-    protected void tearDown() throws Exception
-    {
-        fileArtifactDao = null;
-        artifactDao = null;
-        super.tearDown();
-    }
-
     public void testSaveAndLoad()
     {
         StoredArtifact parent = new StoredArtifact();

@@ -19,12 +19,6 @@ public class HibernateTestCaseIndexDaoTest extends MasterPersistenceTestCase
         testCaseIndexDao = (TestCaseIndexDao) context.getBean("testCaseIndexDao");
     }
 
-    public void tearDown() throws Exception
-    {
-        testCaseIndexDao = null;
-        super.tearDown();
-    }
-
     public void testLoadSave() throws Exception
     {
         TestCaseIndex index = new TestCaseIndex(101, 123, "some/test/case");

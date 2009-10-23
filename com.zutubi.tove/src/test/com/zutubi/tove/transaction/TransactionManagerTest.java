@@ -200,26 +200,39 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
         final TransactionalResource e = new TransactionalResource(transactionManager);
 
+        final UserTransaction[] internalTransaction = new UserTransaction[1];
         executeOnSeparateThread(new Runnable()
         {
             public void run()
             {
                 UserTransaction userTransaction = new UserTransaction(transactionManager);
+                internalTransaction[0] = userTransaction;
+
                 userTransaction.begin();
 
                 e.interactWithMe();
 
                 userTransaction.commit();
+                internalTransaction[0] = null;
             }
         });
 
-        pause();
+        // Pause this thread whilst the separate thread is doing what it needs to.
+        // A semaphore is awkward here since the userTransaction.begin is a blocking call.
+        while (internalTransaction[0] == null || internalTransaction[0].getStatus() != TransactionStatus.ACTIVE)
+        {
+            Thread.yield();
+        }
 
         assertFalse(e.isInteractionOccured());
 
         userTransaction.commit();
 
-        pause();
+        // Pause while the separate thread completes.
+        while (internalTransaction[0] != null)
+        {
+            Thread.yield();
+        }
 
         assertTrue(e.isInteractionOccured());
     }

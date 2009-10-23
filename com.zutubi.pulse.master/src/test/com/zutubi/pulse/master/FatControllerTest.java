@@ -21,7 +21,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
 import static org.mockito.Mockito.*;
@@ -452,7 +451,7 @@ public class FatControllerTest extends PulseTestCase
         // wait for the build to be finished by monitoring the active builds.
         while (isBuildActive(project, buildResultId))
         {
-            Thread.sleep(Constants.SECOND);
+            Thread.yield();
         }
 
         assertNull(evt.getExceptions());

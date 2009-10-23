@@ -416,7 +416,12 @@ public class CollectionUtils
         }
         return result;
     }
-    
+
+    public static <T> List<T> asList(Collection<T> collection)
+    {
+        return asList(collection.iterator());
+    }
+
     /**
      * Collapses a collection down to a single value by successive applications
      * of the given binary function.  The function is applied to the current

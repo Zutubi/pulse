@@ -201,7 +201,6 @@ public class TokenManagerTest extends PulseTestCase
     public void testDetectsStaleTokens() throws Exception
     {
         String firstToken = tokenManager.login("jason", "password", Constants.MINUTE * -1);
-        Thread.sleep(10);
 
         for (int i = 0; i < 1000; i++)
         {

@@ -30,6 +30,7 @@ import com.zutubi.tove.config.MockConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.util.junit.ZutubiTestCase;
+import com.zutubi.util.Constants;
 
 import java.io.File;
 import java.util.*;
@@ -112,15 +113,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         queue.enqueue(createAssignmentRequest(0));
         assertEquals(1, queue.length());
 
-        Thread.sleep(100);
-
         assertEquals(1, queue.length());
         assertTrue(queue.isRunning());
         assertFalse(queue.isStopped());
 
         queue.enqueue(createAssignmentRequest(1));
-
-        Thread.sleep(100);
 
         assertEquals(2, queue.length());
         assertTrue(queue.isRunning());
@@ -135,9 +132,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         awaitBuild();
         awaitBuild();
 
-        Thread.sleep(100);
         assertEquals(0, queue.length());
-
     }
 
     public void testStartAgain() throws InterruptedException
@@ -160,7 +155,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
     public void testStopStart() throws Exception
     {
-        Thread.sleep(100);
         queue.stop();
         while(queue.isRunning())
         {
@@ -220,7 +214,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         queue.handleEvent(new AgentOnlineEvent(this, agent));
 
         awaitBuild();
-        assertFalse(buildSemaphore.tryAcquire(1, TimeUnit.SECONDS));
+        assertFalse(buildSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
         assertEquals(1, queue.length());
 
         sendAvailable(agent);
@@ -307,12 +301,23 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
         createAvailableAgent(0);
         awaitBuild();
-
-        Thread.sleep(500);
+        // There is a little processing to be done between the build being triggered and the snapshot reflecting this.
+        awaitSnapshotSize(1);
 
         List<RecipeAssignmentRequest> snapshot = queue.takeSnapshot();
         assertEquals(1, snapshot.size());
         assertEquals(request2, snapshot.get(0));
+    }
+
+    private void awaitSnapshotSize(int size)
+    {
+        long timeout = System.currentTimeMillis() + Constants.SECOND;
+        List<RecipeAssignmentRequest> snapshot = queue.takeSnapshot();
+        while (snapshot.size() != size && System.currentTimeMillis() < timeout)
+        {
+            Thread.yield();
+            snapshot = queue.takeSnapshot();
+        }
     }
 
     public void testCancel() throws Exception
@@ -326,7 +331,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     {
         RecipeAssignmentRequest request = createAssignmentRequest(0, 1);
         queue.enqueue(request);
-        Thread.sleep(1000);
+        Thread.sleep(500);
         assertTrue(queue.cancelRequest(1));
     }
 
@@ -487,12 +492,12 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         agentManager.unavailable(offAgent);
         queue.offline();
         queue.enqueue(createAssignmentRequest(0, 1));
-        assertFalse(buildSemaphore.tryAcquire(3, TimeUnit.SECONDS));
+        assertFalse(buildSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
     }
 
     public void testTimedOutRequest() throws Exception
     {
-        queue.setSleepInterval(1);
+        queue.setSleepInterval(100);
         queue.setUnsatisfiableTimeout(1);
         queue.enqueue(createAssignmentRequest(0, 111));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -501,16 +506,16 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
     public void testNoTimeout() throws Exception
     {
-        queue.setSleepInterval(1);
+        queue.setSleepInterval(100);
         queue.setUnsatisfiableTimeout(-1);
         queue.enqueue(createAssignmentRequest(0, 111));
-        assertFalse(errorSemaphore.tryAcquire(3, TimeUnit.SECONDS));
+        assertFalse(errorSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
     }
 
     public void testTimedOutAfterAgentOffline() throws Exception
     {
         queue.setUnsatisfiableTimeout(1);
-        queue.setSleepInterval(1);
+        queue.setSleepInterval(100);
         queue.enqueue(createAssignmentRequest(1000, 1000));
         queue.enqueue(createAssignmentRequest(1000, 1001));
         awaitBuild();
@@ -523,13 +528,13 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     public void testNoTimeoutAgentOffline() throws Exception
     {
         queue.setUnsatisfiableTimeout(-1);
-        queue.setSleepInterval(1);
+        queue.setSleepInterval(100);
         queue.enqueue(createAssignmentRequest(1000, 1000));
         queue.enqueue(createAssignmentRequest(1000, 1001));
         awaitBuild();
 
         takeOffline(slave1000);
-        assertFalse(errorSemaphore.tryAcquire(3, TimeUnit.SECONDS));
+        assertFalse(errorSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
         assertNoError(1001);
     }
 
@@ -540,7 +545,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
         queue.enqueue(queuedRequest);
 
-        queue.setSleepInterval(1);
+        queue.setSleepInterval(100);
         createAvailableAgent(0);
         awaitBuild();
 

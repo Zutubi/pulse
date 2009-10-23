@@ -21,7 +21,9 @@ public class ToggleRecipeQueueAction extends ActionSupport
             recipeQueue.start();
         }
 
+        // pause for effect.
         Thread.sleep(500);
+        
         return SUCCESS;
     }
 

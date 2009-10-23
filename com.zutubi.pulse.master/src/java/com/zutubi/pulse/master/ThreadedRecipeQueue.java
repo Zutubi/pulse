@@ -57,13 +57,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private boolean stopRequested = false;
     private boolean isRunning = false;
     /**
-     * Maximum number of seconds between checks of the queue.  Usually
+     * Maximum number of milliseconds between checks of the queue.  Usually
      * checks occur due to the condition being flagged, but we need to
      * wake up periodically to enforce timeouts.
      */
-    private int sleepInterval = 60;
+    private long sleepInterval = 60 * Constants.SECOND;
     /**
-     * Maximum number of millis to leave a request that cannot be satisfied
+     * Maximum number of milliseconds to leave a request that cannot be satisfied
      * in the queue.  This is based on how long there has been no capable
      * agent available (not on how long the request has been queued).  If the
      * timeout is 0, unsatisfiable requests will be rejected immediately.  If
@@ -382,7 +382,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     // Wake up when there is something to do, and also
                     // periodically to check for timed-out requests.
                     LOG.debug("lockCondition.await();");
-                    lockCondition.await(sleepInterval, TimeUnit.SECONDS);
+                    lockCondition.await(sleepInterval, TimeUnit.MILLISECONDS);
                     LOG.debug("lockCondition.unawait();");
                 }
                 catch (InterruptedException e)
@@ -606,14 +606,14 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.unsatisfiableTimeout = timeout;
     }
 
-    public void setUnsatisfiableTimeout(int timeout)
+    public void setUnsatisfiableTimeout(int milliseconds)
     {
-        this.unsatisfiableTimeout = timeout;
+        this.unsatisfiableTimeout = milliseconds;
     }
 
-    public void setSleepInterval(int sleepInterval)
+    public void setSleepInterval(long milliseconds)
     {
-        this.sleepInterval = sleepInterval;
+        this.sleepInterval = milliseconds;
     }
 
     public void setEventManager(EventManager eventManager)

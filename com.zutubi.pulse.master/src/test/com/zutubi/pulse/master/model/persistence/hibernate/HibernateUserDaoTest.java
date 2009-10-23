@@ -16,12 +16,6 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         userDao = (UserDao) context.getBean("userDao");
     }
 
-    public void tearDown() throws Exception
-    {
-        userDao = null;
-        super.tearDown();
-    }
-
     public void testSaveAndLoad()
     {
         User user = new User();

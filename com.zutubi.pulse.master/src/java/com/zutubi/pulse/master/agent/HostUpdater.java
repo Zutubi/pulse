@@ -105,23 +105,19 @@ public class HostUpdater implements Runnable
             // Now the agent is rebooting, ping it until it is back up.
             long endTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(rebootTimeout);
             int expectedBuild = Version.getVersion().getBuildNumberAsInt();
+            int foundBuild = 0;
             while(System.currentTimeMillis() < endTime)
             {
                 try
                 {
-                    int build = hostService.ping();
-                    if(build == expectedBuild)
+                    foundBuild = hostService.ping();
+                    if(foundBuild == expectedBuild)
                     {
                         // We did it!
                         host.upgradeStatus(UpgradeState.INITIAL, -1, null);
                         completed(true);
                         return;
                     }
-                    
-                    // ping returned but the build was not the expected build.
-                    host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.");
-                    completed(false);
-                    return;
                 }
                 catch(Exception e)
                 {
@@ -130,8 +126,17 @@ public class HostUpdater implements Runnable
                 }
             }
 
-            host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for host to reboot.");
-            completed(false);
+            if (foundBuild != 0)
+            {
+                // ping returned but the build was not the expected build.
+                host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.");
+                completed(false);
+            }
+            else
+            {
+                host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for host to reboot.");
+                completed(false);
+            }
         }
         catch (Exception e)
         {

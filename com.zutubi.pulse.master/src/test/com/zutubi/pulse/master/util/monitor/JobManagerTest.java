@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.util.monitor;
 
-import com.zutubi.pulse.core.test.TestUtils;
+import static com.zutubi.pulse.core.test.TestUtils.executeOnSeparateThread;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 public class JobManagerTest extends PulseTestCase
 {
@@ -74,7 +74,7 @@ public class JobManagerTest extends PulseTestCase
         NeverEndingJob job = new NeverEndingJob();
         jobManager.register("test", job);
 
-        Thread thread = TestUtils.executeOnSeparateThread(new Runnable()
+        executeOnSeparateThread(new Runnable()
         {
             public void run()
             {
@@ -85,14 +85,7 @@ public class JobManagerTest extends PulseTestCase
         Monitor monitor = jobManager.getMonitor("test");
         while (!monitor.isStarted())
         {
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                // noop.s
-            }
+            Thread.yield();
         }
         
         assertTrue(monitor.isStarted());
@@ -107,7 +100,7 @@ public class JobManagerTest extends PulseTestCase
             // expected
         }
 
-        thread.interrupt();
+        job.endNow();
     }
 
     private class NoopJob implements Job<Task>
@@ -120,16 +113,23 @@ public class JobManagerTest extends PulseTestCase
 
     private class NeverEndingJob implements Job<Task>
     {
+        private NeverEndingTask task = new NeverEndingTask("yawn");
+
+        public void endNow()
+        {
+            task.endNow();
+        }
+
         public Iterator<Task> getTasks()
         {
-            List<Task> tasks = new LinkedList<Task>();
-            tasks.add(new NeverEndingTask("yawn"));
-            return tasks.iterator();
+            return Arrays.asList((Task)task).iterator();
         }
     }
 
     private class NeverEndingTask extends AbstractTask
     {
+        private boolean running = true;
+
         public NeverEndingTask(String name)
         {
             super(name);
@@ -137,17 +137,15 @@ public class JobManagerTest extends PulseTestCase
 
         public void execute()
         {
-            while (true)
+            while (running)
             {
-                try
-                {
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e)
-                {
-                    return;
-                }
+                Thread.yield();
             }
+        }
+
+        public void endNow()
+        {
+            this.running = false;            
         }
     }
 }

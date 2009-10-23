@@ -300,16 +300,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             return ERROR;
         }
 
-        try
-        {
-            // Pause for dramatic effect
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException e)
-        {
-            // Empty
-        }
-
+        pauseForDramaticEffect();
         setupResponse();
         return SUCCESS;
     }

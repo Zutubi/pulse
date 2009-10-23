@@ -4,9 +4,6 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.master.model.persistence.hibernate.PersistenceTestCase;
 
-/**
- * <class-comment/>
- */
 public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
 {
     private TriggerHandler handler;
@@ -27,14 +24,6 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
 
         handler = (TriggerHandler) SpringComponentContext.getBean("triggerHandler");
         triggerDao = (TriggerDao) SpringComponentContext.getBean("triggerDao");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        handler = null;
-        triggerDao = null;
-        
-        super.tearDown();
     }
 
     protected String[] getConfigLocations()

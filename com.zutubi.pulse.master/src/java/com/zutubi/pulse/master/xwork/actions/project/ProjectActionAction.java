@@ -44,16 +44,7 @@ public class ProjectActionAction extends ProjectActionBase
         {
             actionManager.execute(action, config, null);
 
-            try
-            {
-                // Pause for dramatic effect
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e)
-            {
-                // Empty
-            }
-
+            pauseForDramaticEffect();
             return SUCCESS;
         }
         catch (Exception e)

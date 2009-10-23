@@ -714,16 +714,6 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertNull(configurationTemplateManager.getRecord(PATH_CHILD_DEFAULT_STAGE));
     }
 
-    public void testInsertPerformance()
-    {
-        insertGlobal();
-        long globalHandle = configurationTemplateManager.getRecord("project/global").getHandle();
-        for(int i = 0; i < 10; i++)
-        {
-            insertLargeProject("project" + i, globalHandle, 5, 5);
-        }
-    }
-
     public void testDeepClonePreservesInherited()
     {
         insertGlobal();
@@ -1626,18 +1616,6 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         Record parentRecord = configurationTemplateManager.getRecord(getPath(SCOPE_PROJECT, parentName));
         configurationTemplateManager.setParentTemplate(projectRecord, parentRecord.getHandle());
-    }
-
-    private void insertLargeProject(String name, long parent, int stages, int propertiesPerStage)
-    {
-        MutableRecord project = createProject(name, "fake");
-        configurationTemplateManager.setParentTemplate(project, parent);
-        configurationTemplateManager.insertRecord(SCOPE_PROJECT, project);
-        String stagePath = getPath(SCOPE_PROJECT, name, "stages");
-        for(int i = 0; i < stages; i++)
-        {
-            insertStage(stagePath, "stage " + i, propertiesPerStage);
-        }
     }
 
     private void insertStage(String path, String name, int properties)

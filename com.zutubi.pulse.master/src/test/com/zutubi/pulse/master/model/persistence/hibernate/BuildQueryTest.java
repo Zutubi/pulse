@@ -96,24 +96,6 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         allResults.add(0, result);
     }
 
-    public void tearDown() throws Exception
-    {
-        projectDao = null;
-        buildResultDao = null;
-        p1 = null;
-        p2 = null;
-        allResults = null;
-
-        try
-        {
-            super.tearDown();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     public void testQueryAll()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, -1, -1, true);

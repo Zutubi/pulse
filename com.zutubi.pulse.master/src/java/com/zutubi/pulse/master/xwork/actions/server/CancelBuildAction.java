@@ -56,7 +56,7 @@ public class CancelBuildAction extends ActionSupport
 
         String user = getPrinciple();
         fatController.terminateBuild(build, user == null ? null : "requested by '" + user + "'");
-        Thread.sleep(500);
+        pauseForDramaticEffect();
         return SUCCESS;
     }
 

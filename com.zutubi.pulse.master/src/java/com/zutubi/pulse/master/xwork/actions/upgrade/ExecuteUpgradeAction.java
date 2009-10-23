@@ -36,14 +36,7 @@ public class ExecuteUpgradeAction extends UpgradeActionSupport
         // of the upgrade status page being rendered BEFORE the upgrade system is properly initialised.
         while (!progress.isStarted())
         {
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                // noop.
-            }
+            Thread.yield();
         }
 
         // go to the progress monitor screen.

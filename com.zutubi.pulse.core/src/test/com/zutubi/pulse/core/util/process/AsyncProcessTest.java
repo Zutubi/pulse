@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.util.process;
 
-import com.zutubi.pulse.core.test.EqualityAssertions;
+import static com.zutubi.pulse.core.test.EqualityAssertions.assertListEquals;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
@@ -32,8 +32,8 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            EqualityAssertions.assertListEquals(lineHandler.getStdout(), "line 1", "line 2", "line 3");
-            EqualityAssertions.assertListEquals(lineHandler.getStderr());
+            assertListEquals(lineHandler.getStdout(), "line 1", "line 2", "line 3");
+            assertListEquals(lineHandler.getStderr());
         }
     }
 
@@ -45,8 +45,8 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            EqualityAssertions.assertListEquals(lineHandler.getStdout());
-            EqualityAssertions.assertListEquals(lineHandler.getStderr(), "line 1", "line 2", "line 3");
+            assertListEquals(lineHandler.getStdout());
+            assertListEquals(lineHandler.getStderr(), "line 1", "line 2", "line 3");
         }
     }
 
@@ -65,7 +65,7 @@ public class AsyncProcessTest extends PulseTestCase
                 }
             }, true);
 
-            Integer exit = ap.waitFor(5, TimeUnit.SECONDS);
+            Integer exit = ap.waitFor(2, TimeUnit.SECONDS);
             assertNull(exit);
             assertTrue(called[0]);
             ap.destroy();
@@ -83,7 +83,7 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            EqualityAssertions.assertListEquals(lineHandler.getStdout(), genArray(1000));
+            assertListEquals(lineHandler.getStdout(), genArray(1000));
         }
     }
 
@@ -95,8 +95,9 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            EqualityAssertions.assertListEquals(lineHandler.getStdout(), multiplyArray(genArray(1000), 4));
-            EqualityAssertions.assertListEquals(lineHandler.getStderr(), multiplyArray(genArray(1000), 4));
+            String[] expectedOutput = multiplyArray(genArray(1000), 4);
+            assertListEquals(lineHandler.getStdout(), expectedOutput);
+            assertListEquals(lineHandler.getStderr(), expectedOutput);
         }
     }
 
@@ -123,7 +124,7 @@ public class AsyncProcessTest extends PulseTestCase
 
     private void joinThread(Thread thread) throws InterruptedException
     {
-        thread.join(5000);
+        thread.join(2000);
         assertFalse(thread.isAlive());
     }
 

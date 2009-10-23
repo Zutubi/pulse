@@ -141,7 +141,10 @@ public class HostPingServiceTest extends PulseTestCase
         HostService service = createHostService(waitFlag);
         
         hostPingService.requestPing(host, service);
-        Thread.sleep(2000);
+        while (hostPingService.isPingInProgress(host))
+        {
+            Thread.yield();
+        }
         waitFlag.release();
 
         assertEvent(host, PingStatus.OFFLINE, "Host ping timed out");

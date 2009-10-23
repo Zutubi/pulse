@@ -26,13 +26,6 @@ public class HibernateTriggerDaoTest extends MasterPersistenceTestCase
         dao = (TriggerDao) context.getBean("triggerDao");
     }
 
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-        dao = null;
-        super.tearDown();
-    }
-
     public void testCreateAndLoad()
     {
         Trigger trigger = new NoopTrigger("triggerName", "triggerGroup");

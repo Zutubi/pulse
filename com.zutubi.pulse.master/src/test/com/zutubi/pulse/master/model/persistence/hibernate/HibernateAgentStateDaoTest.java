@@ -15,12 +15,6 @@ public class HibernateAgentStateDaoTest extends MasterPersistenceTestCase
         agentStateDao = (AgentStateDao) context.getBean("agentStateDao");
     }
 
-    public void tearDown() throws Exception
-    {
-        agentStateDao = null;
-        super.tearDown();
-    }
-
     public void testSaveAndLoad()
     {
         AgentState agentState = new AgentState();

@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.Constants;
 
 import java.util.Arrays;
 import java.util.Collections;

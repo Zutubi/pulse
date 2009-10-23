@@ -26,10 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- *
- *
- */
 public class MigrationManagerTest extends PulseTestCase
 {
     private MigrationManager migrationManager;
@@ -91,12 +87,7 @@ public class MigrationManagerTest extends PulseTestCase
         sourceDatabase.shutdown();
         targetDatabase.shutdown();
 
-        configurationManager = null;
-
         removeDirectory(tmp);
-        tmp = null;
-
-        jobManager = null;
 
         super.tearDown();
     }

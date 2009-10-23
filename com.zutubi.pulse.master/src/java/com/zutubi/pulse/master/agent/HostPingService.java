@@ -124,7 +124,7 @@ public class HostPingService extends BackgroundServiceSupport
         }
     }
 
-    private boolean isPingInProgress(Host host)
+    public boolean isPingInProgress(Host host)
     {
         return inProgress.contains(host.getId());
     }

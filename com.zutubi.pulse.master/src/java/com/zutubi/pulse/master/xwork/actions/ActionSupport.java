@@ -23,6 +23,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
 
@@ -303,6 +304,18 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         }
 
         return loggedInUser;
+    }
+
+    protected void pauseForDramaticEffect()
+    {
+        try
+        {
+            Thread.sleep(Constants.SECOND);
+        }
+        catch (InterruptedException e)
+        {
+            // noop.
+        }
     }
 
     public String execute() throws Exception

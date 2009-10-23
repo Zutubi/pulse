@@ -14,6 +14,7 @@ public class ProcessControlTest extends PulseTestCase
     @Override
     protected void setUp() throws Exception
     {
+        super.setUp();
         tempDir = FileSystemUtils.createTempDir(getName(), "");
     }
 
@@ -21,6 +22,7 @@ public class ProcessControlTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         removeDirectory(tempDir);
+        super.tearDown();
     }
 
     public void testDestroyTree() throws Exception
@@ -39,7 +41,7 @@ public class ProcessControlTest extends PulseTestCase
                 {
                     try
                     {
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                     }
                     catch (InterruptedException e)
                     {

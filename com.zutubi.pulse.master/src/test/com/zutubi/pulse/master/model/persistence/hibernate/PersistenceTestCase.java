@@ -86,7 +86,6 @@ public abstract class PersistenceTestCase extends PulseTestCase
     protected void tearDown() throws Exception
     {
         sessionFactory.close();
-        sessionFactory = null;
         try
         {
             transactionManager.commit(transactionStatus);
@@ -98,14 +97,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
         }
 
         console.stop(false);
-
-        dataSource = null;
-        console = null;
-        transactionStatus = null;
-        transactionDefinition = null;
-        transactionManager = null;
         SpringComponentContext.closeAll();
-        context = null;
 
         super.tearDown();
     }
@@ -123,12 +115,12 @@ public abstract class PersistenceTestCase extends PulseTestCase
         if (a == null)
         {
             assertNull(b);
-        } else
-        {
-            assertNotNull(b);
+            return;
         }
 
-        BeanInfo beanInfo = null;
+        assertNotNull(b);
+
+        BeanInfo beanInfo;
         try
         {
             beanInfo = Introspector.getBeanInfo(a.getClass());

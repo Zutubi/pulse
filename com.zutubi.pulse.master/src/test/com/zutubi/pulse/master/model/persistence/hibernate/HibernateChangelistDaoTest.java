@@ -24,12 +24,6 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         changelistDao = (ChangelistDao) context.getBean("changelistDao");
     }
 
-    public void tearDown() throws Exception
-    {
-        changelistDao = null;
-        super.tearDown();
-    }
-
     public void testLoadSave() throws Exception
     {
         Revision revision = new Revision("wow");

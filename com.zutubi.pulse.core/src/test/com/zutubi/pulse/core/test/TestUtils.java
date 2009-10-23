@@ -36,15 +36,7 @@ public class TestUtils
             {
                 throw new RuntimeException("Timed out waiting for " + description);
             }
-
-            try
-            {
-                Thread.sleep(200);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException("Interrupted waiting for " + description);
-            }
+            Thread.yield();
         }
     }
 
@@ -192,7 +184,7 @@ public class TestUtils
             {
                 if (retries++ < 10)
                 {
-                    Thread.sleep(100);
+                    Thread.yield();
                 }
                 else
                 {

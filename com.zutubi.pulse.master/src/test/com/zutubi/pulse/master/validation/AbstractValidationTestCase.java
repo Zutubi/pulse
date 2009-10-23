@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.validation;
 
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.TypeException;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.validation.MockValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
 
 import java.util.List;
 
@@ -14,45 +15,6 @@ import java.util.List;
  */
 public abstract class AbstractValidationTestCase extends AbstractConfigurationSystemTestCase
 {
-    private MasterConfigurationRegistry configurationRegistry;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        configurationRegistry = new MasterConfigurationRegistry();
-        configurationRegistry.setConfigurationPersistenceManager(configurationPersistenceManager);
-        configurationRegistry.setConfigurationSecurityManager(configurationSecurityManager);
-        configurationRegistry.setTypeRegistry(typeRegistry);
-        configurationRegistry.setActionManager(new ActionManager());
-        configurationRegistry.initSetup();
-        configurationRegistry.init();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        configurationRegistry = null;
-        super.tearDown();
-    }
-
-    protected void validatedAndAssertValid(String parentPath, String baseName, Configuration instance) throws TypeException
-    {
-        instance = doValidation(parentPath, baseName, instance);
-        assertTrue(instance.isValid());
-    }
-
-    protected void validateAndAssertInstanceErrors(String parentPath, String baseName, Configuration instance, String... expectedErrors) throws TypeException
-    {
-        instance = doValidation(parentPath, baseName, instance);
-        assertInstanceErrors(instance, expectedErrors);
-    }
-
-
-    protected void validateAndAssertFieldErrors(String parentPath, String baseName, Configuration instance, String field, String... expectedErrors) throws TypeException
-    {
-        instance = doValidation(parentPath, baseName, instance);
-        assertFieldErrors(instance, field, expectedErrors);
-    }
-
     protected void assertErrors(List<String> gotErrors, String... expectedErrors)
     {
         assertEquals(expectedErrors.length, gotErrors.size());
@@ -62,19 +24,26 @@ public abstract class AbstractValidationTestCase extends AbstractConfigurationSy
         }
     }
 
-    protected void assertInstanceErrors(Configuration instance, String... expectedErrors)
+    protected void validateAndAssertValid(Configuration instance) throws ValidationException
     {
-        assertErrors(instance.getInstanceErrors(), expectedErrors);
+        ValidationContext context = new MockValidationContext();
+        validationManager.validate(instance, context);
+        assertFalse(context.hasErrors());
     }
 
-    protected void assertFieldErrors(Configuration instance, String field, String... expectedErrors)
+    protected void validateAndAssertFieldErrors(Configuration instance, String field, String... expectedErrors) throws ValidationException
     {
-        assertErrors(instance.getFieldErrors(field), expectedErrors);
+        ValidationContext context = new MockValidationContext();
+        validationManager.validate(instance, context);
+        assertTrue(context.hasErrors());
+        assertErrors(context.getFieldErrors(field), expectedErrors);
     }
 
-    protected Configuration doValidation(String parentPath, String baseName, Configuration instance) throws TypeException
+    protected void validateAndAssertInstanceErrors(Configuration instance, String... expectedErrors) throws ValidationException
     {
-        instance = configurationTemplateManager.validate(parentPath, baseName, unstantiate(instance), true, false);
-        return instance;
+        ValidationContext context = new MockValidationContext();
+        validationManager.validate(instance, context);
+        assertTrue(context.hasErrors());
+        assertErrors(CollectionUtils.asList(context.getActionErrors()), expectedErrors);
     }
 }

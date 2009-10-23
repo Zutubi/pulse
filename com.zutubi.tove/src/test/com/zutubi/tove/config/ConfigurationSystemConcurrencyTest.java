@@ -31,17 +31,17 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
 
     public void testConcurrentInsertsAndDeletes() throws InterruptedException
     {
-        runFor(3000, new Inserter(), new Deleter());
+        runFor(500, new Inserter(), new Deleter());
     }
 
     public void testConcurrentInsertsAndGets() throws InterruptedException
     {
-        runFor(3000, new Inserter(), new Getter());
+        runFor(500, new Inserter(), new Getter());
     }
 
     public void testConcurrentInsertsDeletesAndGets() throws InterruptedException
     {
-        runFor(3000, new Inserter(), new Deleter(), new Getter());
+        runFor(500, new Inserter(), new Deleter(), new Getter());
     }
 
     private void runFor(long millis, Worker... workers) throws InterruptedException

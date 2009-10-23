@@ -17,7 +17,6 @@ public class LongRunningNoopTask extends AbstractTask implements FeedbackAware
 
     public void execute() throws TaskException
     {
-
         long startTime = System.currentTimeMillis();
 
         long projectedEndTime = startTime + duration;
@@ -26,7 +25,6 @@ public class LongRunningNoopTask extends AbstractTask implements FeedbackAware
         while (currentTime < projectedEndTime )
         {
             feedback.setPercetageComplete( (int)((currentTime - startTime) * 100 / duration) );
-
             try
             {
                 Thread.sleep(Constants.SECOND);
@@ -35,10 +33,8 @@ public class LongRunningNoopTask extends AbstractTask implements FeedbackAware
             {
                 // noop - ignore interruptions.
             }
-
             currentTime = System.currentTimeMillis();
         }
-
         feedback.setPercetageComplete(100);
     }
 

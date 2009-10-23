@@ -1,6 +1,7 @@
 package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
+import static com.zutubi.util.io.IOUtils.joinStreams;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,16 +51,10 @@ public class ZipUtils
     private static void unzip(InputStream zin, File file) throws IOException
     {
         FileOutputStream out = null;
-
         try
         {
             out = new FileOutputStream(file);
-            byte[] b = new byte[512];
-            int len;
-            while ((len = zin.read(b)) != -1)
-            {
-                out.write(b, 0, len);
-            }
+            joinStreams(zin, out);
         }
         finally
         {

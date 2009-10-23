@@ -5,14 +5,12 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
-import com.zutubi.pulse.master.scheduling.CronTrigger;
-import com.zutubi.pulse.master.scheduling.DefaultScheduler;
-import com.zutubi.pulse.master.scheduling.MockSchedulerStrategy;
-import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValidator;
 import com.zutubi.tove.config.MockConfigurationProvider;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.validation.MockValidationContext;
 import com.zutubi.validation.ValidationException;
 
@@ -58,16 +56,8 @@ public class BackupManagerTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        restoreManager = null;
-        configurationProvider = null;
         scheduler.stop(true);
-        scheduler = null;
-        
         removeDirectory(tmp);
-        tmp = null;
-        backupDir = null;
-        backupTmpDir = null;
-
         super.tearDown();
     }
 
@@ -93,6 +83,7 @@ public class BackupManagerTest extends PulseTestCase
         createAndStartBackupManager();
 
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
+        assertEquals(TriggerState.SCHEDULED, trigger.getState());
     }
 
     public void testDefaultCronScheduleIsValid() throws ValidationException
@@ -126,8 +117,9 @@ public class BackupManagerTest extends PulseTestCase
 
         File firstBackup = backupDir.listFiles()[0];
         assertTrue(firstBackup.isFile());
-        // We need to ensure this first file is the oldest.
-        Thread.sleep(1000);
+        // We need to ensure this first file is the oldest.  The granularity of the
+        // timestamp is seconds, so wait for a second.
+        Thread.sleep(Constants.SECOND);
 
         for (int i = 0; i < 10; i++)
         {

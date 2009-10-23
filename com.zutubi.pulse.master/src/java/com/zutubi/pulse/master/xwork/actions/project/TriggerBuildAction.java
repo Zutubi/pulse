@@ -48,15 +48,7 @@ public class TriggerBuildAction extends ProjectActionBase
             actionManager.execute(ProjectConfigurationActions.ACTION_TRIGGER, projectConfig, null);
         }
 
-        try
-        {
-            // Pause for dramatic effect
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException e)
-        {
-            // Empty
-        }
+        pauseForDramaticEffect();
 
         return SUCCESS;
     }

@@ -60,28 +60,4 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
         assertEquals("Uncaught exception: Blah", features.get(1).getSummary());
         assertEquals("There was an Assertion failure", features.get(2).getSummary());
     }
-
-    public void testPerformance() throws Exception
-    {
-        File f = new File(tempDir, "f");
-        FileWriter writer = new FileWriter(f);
-        for(int i = 0; i < 10000; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                writer.write("0123456789");
-            }
-            writer.write('\n');
-        }
-        writer.close();
-        artifact = new StoredFileArtifact(f.getName());
-
-        long startTime = System.currentTimeMillis();
-        CommandResult result = processArtifact(pp);
-        long duration = System.currentTimeMillis() - startTime;
-        System.out.printf("Processing took %.02f seconds\n", duration / 1000.0);
-        assertTrue(duration < Constants.SECOND * 20);
-        assertTrue(result.succeeded());
-        assertEquals(0, artifact.getFeatures().size());
-    }
 }
