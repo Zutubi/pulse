@@ -25,16 +25,19 @@ public class HostUpdater implements Runnable
     private HostService hostService;
     private ExecutorService executor;
     private LinkedBlockingQueue<UpgradeStatus> statuses = new LinkedBlockingQueue<UpgradeStatus>();
+
     /**
      * Maximum number of seconds to wait between status events before timing
      * out the upgrade.
      */
     private long statusTimeout = 600;
+
     /**
      * Maximum number of seconds to wait between receiving the reboot status and
      * a successful ping.
      */
     private long rebootTimeout = 300;
+
     /**
      * Number of milliseconds between pings while waiting for reboot.
      */
@@ -114,6 +117,11 @@ public class HostUpdater implements Runnable
                         completed(true);
                         return;
                     }
+                    
+                    // ping returned but the build was not the expected build.
+                    host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.");
+                    completed(false);
+                    return;
                 }
                 catch(Exception e)
                 {
@@ -154,24 +162,50 @@ public class HostUpdater implements Runnable
         }
     }
 
+    /**
+     * Notify the host updater of a upgrade status event.
+     *
+     * @param upgradeStatus     the new upgrade status from the agent being upgraded.
+     */
     public void upgradeStatus(UpgradeStatus upgradeStatus)
     {
+        // only accept upgrade status events from the host we are dealing with.
+        if (host.getId() != upgradeStatus.getHandle())
+        {
+            throw new IllegalArgumentException("Upgrade status received from incorrect host.");
+        }
         statuses.add(upgradeStatus);
     }
 
-    public void setStatusTimeout(long statusTimeout)
+    /**
+     * The time in seconds that the updater will wait between receiving status updates
+     * from the agent.
+     *
+     * @param seconds   time in seconds
+     */
+    public void setStatusTimeout(long seconds)
     {
-        this.statusTimeout = statusTimeout;
+        this.statusTimeout = seconds;
     }
 
-    public void setRebootTimeout(long rebootTimeout)
+    /**
+     * The time in seconds that the updater will wait for the remote agent to reboot.
+     *
+     * @param seconds   time in seconds
+     */
+    public void setRebootTimeout(long seconds)
     {
-        this.rebootTimeout = rebootTimeout;
+        this.rebootTimeout = seconds;
     }
 
-    public void setPingInterval(long pingInterval)
+    /**
+     * The approximate interval in milliseconds between successive pings.
+     *
+     * @param milliseconds  time in milliseconds
+     */
+    public void setPingInterval(long milliseconds)
     {
-        this.pingInterval = pingInterval;
+        this.pingInterval = milliseconds;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

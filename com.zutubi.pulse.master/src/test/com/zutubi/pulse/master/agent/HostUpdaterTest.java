@@ -147,7 +147,8 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
     public void testRebootTimeout() throws Exception
     {
         configureService(true, 10);
-        updater.setPingInterval(1000);
+        updater.setRebootTimeout(1);
+        updater.setPingInterval(250);
         updater.start();
         start();
         download();
@@ -160,14 +161,14 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
     public void testRebootWrongBuild() throws Exception
     {
         configureService(true, 2, 6);
-        updater.setPingInterval(6000);
+        updater.setPingInterval(250);
         updater.start();
         start();
         download();
         apply();
         reboot();
         assertCompleted(false);
-        assertStatus(UpgradeState.FAILED, -1, "Timed out waiting for host to reboot.");
+        assertStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.");
     }
 
     private void configureService(boolean accept, int successfulPing)
