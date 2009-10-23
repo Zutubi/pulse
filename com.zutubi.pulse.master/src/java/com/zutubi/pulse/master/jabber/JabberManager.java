@@ -4,13 +4,14 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -93,17 +94,19 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
     {
         XMPPConnection connection;
 
-        if (config.getServer().endsWith("google.com"))
+        String serviceName = config.getServiceName();
+        if (!TextUtils.stringSet(serviceName))
         {
-            connection = new GoogleTalkConnection();
+            serviceName = config.getServer();
         }
-        else if(config.isSsl())
+
+        if(config.isSsl())
         {
-            connection = new SSLXMPPConnection(config.getServer(), config.getPort());
+            connection = new SSLXMPPConnection(config.getServer(), config.getPort(), serviceName);
         }
         else
         {
-            connection = new XMPPConnection(config.getServer(), config.getPort());
+            connection = new XMPPConnection(config.getServer(), config.getPort(), serviceName);
         }
 
         connection.login(config.getUsername(), config.getPassword());

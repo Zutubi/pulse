@@ -66,6 +66,7 @@
                 <ref local="addPersistentWorkDir"/>
                 <ref local="deleteOrphanedTriggers"/>
                 <ref local="addAgentPing"/>
+                <ref local="addJabberServiceName"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -255,5 +256,9 @@
 
     <bean id="addAgentPing" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentPingConfigurationUpgradeTask">
         <property name="buildNumber" value="200039001"/>
+    </bean>
+
+    <bean id="addJabberServiceName" class="com.zutubi.pulse.master.upgrade.tasks.AddJabberServiceNameUpgradeTask">
+        <property name="buildNumber" value="200041001"/>
     </bean>
 </beans>

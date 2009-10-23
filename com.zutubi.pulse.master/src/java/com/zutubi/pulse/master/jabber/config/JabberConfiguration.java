@@ -6,11 +6,11 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**
- *
- *
+ * Configuration for the Pulse master's connection and account on a Jabber
+ * server.
  */
 @SymbolicName("zutubi.jabberConfig")
-@Form(fieldOrder = {"enabled", "server", "port", "username", "password", "ssl"})
+@Form(fieldOrder = {"enabled", "server", "serviceName", "port", "username", "password", "ssl"})
 @ConfigurationCheck("JabberConfigurationCheckHandler")
 @Classification(single = "jabber")
 public class JabberConfiguration extends AbstractConfiguration
@@ -20,6 +20,7 @@ public class JabberConfiguration extends AbstractConfiguration
     
     @Required
     private String server;
+    private String serviceName;
     @Required
     private int port = JabberManager.DEFAULT_PORT;
     @Required
@@ -50,6 +51,16 @@ public class JabberConfiguration extends AbstractConfiguration
     public void setServer(String server)
     {
         this.server = server;
+    }
+
+    public String getServiceName()
+    {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName)
+    {
+        this.serviceName = serviceName;
     }
 
     public int getPort()
