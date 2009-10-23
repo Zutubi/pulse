@@ -410,6 +410,11 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             return buildNumber;
         }
 
+        public boolean isDebugEnabled()
+        {
+            return true;
+        }
+
         public void debug(String message)
         {
             debugs.add(message);

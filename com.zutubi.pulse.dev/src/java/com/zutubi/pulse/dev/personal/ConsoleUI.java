@@ -42,6 +42,11 @@ public class ConsoleUI implements PersonalBuildUI
         this.verbosity = verbosity;
     }
 
+    public boolean isDebugEnabled()
+    {
+        return verbosity == Verbosity.VERBOSE;
+    }
+
     public void debug(String message)
     {
         if (verbosity == Verbosity.VERBOSE)

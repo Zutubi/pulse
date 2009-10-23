@@ -200,7 +200,7 @@ public class PersonalBuildCommand implements Command
         try
         {
             CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
-            PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
+            PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig, console);
             PersonalBuildClient client = new PersonalBuildClient(config);
             client.setUI(console);
 

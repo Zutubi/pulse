@@ -1,9 +1,14 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Sort;
 import com.zutubi.util.config.*;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -27,28 +32,36 @@ public class PersonalBuildConfig implements Config
     private ConfigSupport localConfig;
     private ConfigSupport userConfig;
 
-    public PersonalBuildConfig(File base)
+    public PersonalBuildConfig(File base, PersonalBuildUI ui)
     {
-        this(base, null);    
+        this(base, null, ui);
     }
 
-    public PersonalBuildConfig(File base, Config ui)
+    public PersonalBuildConfig(File base, Config uiConfig, PersonalBuildUI ui)
     {
         this.base = base;
         CompositeConfig composite = new CompositeConfig();
 
+        ui.debug("Assembling configuration...");
+        ui.enterContext();
+        
         // First, properties defined by the UI that is invoking us (e.g.
         // the command line)
-        if (ui != null)
+        if (uiConfig != null)
         {
-            composite.append(ui);
+            ui.debug("UI configuration.");
+            composite.append(uiConfig);
         }
 
         // Next: system properties
+        ui.debug("System properties.");
         composite.append(new PropertiesConfig(System.getProperties()));
 
-        localConfig = new ConfigSupport(new FileConfig(getLocalConfigFile()));
-        composite.append(localConfig);
+        File localConfigFile = getLocalConfigFile();
+        FileConfig fileConfig = new FileConfig(localConfigFile);
+        showFileConfig(ui, localConfigFile, fileConfig);
+        this.localConfig = new ConfigSupport(fileConfig);
+        composite.append(this.localConfig);
 
         // Now all properties files in the parent directories
         base = base.getParentFile();
@@ -57,7 +70,9 @@ public class PersonalBuildConfig implements Config
             File properties = new File(base, PROPERTIES_FILENAME);
             if(properties.isFile())
             {
-                composite.append(new FileConfig(properties));
+                fileConfig = new FileConfig(properties);
+                showFileConfig(ui, properties, fileConfig);
+                composite.append(fileConfig);
             }
             base = base.getParentFile();
         }
@@ -66,14 +81,43 @@ public class PersonalBuildConfig implements Config
         File userFile = getUserConfigFile();
         if(userFile != null)
         {
-            userConfig = new ConfigSupport(new FileConfig(userFile));
+            fileConfig = new FileConfig(userFile);
+            userConfig = new ConfigSupport(fileConfig);
             composite.append(userConfig);
+            showFileConfig(ui, userFile, fileConfig);
         }
 
         // Lowest priority: defaults
+        ui.debug("Defaults.");
         composite.append(getDefaults());
 
         config = new ConfigSupport(composite);
+        ui.exitContext();
+        ui.debug("Configuration assembled.");
+    }
+
+    private void showFileConfig(PersonalBuildUI ui, File file, FileConfig config)
+    {
+        if (ui.isDebugEnabled() && file.isFile())
+        {
+            ui.debug("File '" + file.getAbsolutePath() + "'.");
+            ui.enterContext();
+
+            List<String> properties = new LinkedList<String>();
+            for (Object key: config.getProperties().keySet())
+            {
+                properties.add((String) key);
+            }
+            
+            Collections.sort(properties, new Sort.StringComparator());
+            for (String property: properties)
+            {
+                String value = property.contains("password") ? "[suppressed]" : config.getProperty(property);
+                ui.debug(property + " -> " + value);
+            }
+
+            ui.exitContext();
+        }
     }
 
     private Config getDefaults()
