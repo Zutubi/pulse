@@ -53,7 +53,7 @@ public class DefaultContextCache implements ContextCache
         try
         {
             lock.readLock().lock();
-            return (List<ResourceBundle>) contextCache.get(ContextKey.generate(context, locale));
+            return contextCache.get(ContextKey.generate(context, locale));
         }
         finally
         {

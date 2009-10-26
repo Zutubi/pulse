@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
 import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Extension manager for managing post-processors (e.g. JUnit report
@@ -21,7 +22,12 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
 {
     private static final Logger LOG = Logger.getLogger(PostProcessorExtensionManager.class);
 
-    private Map<String, PostProcessorDescriptor> info = new HashMap<String, PostProcessorDescriptor>();
+    /**
+     * Lock to control multiple thread access to the info map.
+     */
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private Map<String, PostProcessorDescriptor> descriptors = new HashMap<String, PostProcessorDescriptor>();
     private PulseFileLoaderFactory fileLoaderFactory;
     private ConfigurationRegistry configurationRegistry;
 
@@ -66,29 +72,58 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         {
             System.out.printf("Adding Post-Processor: %s -> %s\n", name, cls);
         }
-        info.put(name, descriptor);
 
-        fileLoaderFactory.register(name, clazz);
+        lock.writeLock().lock();
+        try
+        {
+            descriptors.put(name, descriptor);
+            fileLoaderFactory.register(name, clazz);
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+
         tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
     }
 
     public void removeExtension(IExtension extension, Object[] objects)
     {
-        for (Object o : objects)
+        lock.writeLock().lock();
+        try
         {
-            fileLoaderFactory.unregister((String) o);
+            for (Object o : objects)
+            {
+                String name = (String) o;
+                fileLoaderFactory.unregister(name);
+                descriptors.remove(name);
+                // ... Support unregistration in the configuration registry
+            }
+        }
+        finally
+        {
+            lock.writeLock().unlock();
         }
     }
 
     public String getDefaultProcessorName(final Class<? extends PostProcessorConfiguration> type)
     {
-        PostProcessorDescriptor descriptor = CollectionUtils.find(info.values(), new Predicate<PostProcessorDescriptor>()
+        PostProcessorDescriptor descriptor;
+        lock.readLock().lock();
+        try
         {
-            public boolean satisfied(PostProcessorDescriptor postProcessorDescriptor)
+            descriptor = CollectionUtils.find(descriptors.values(), new Predicate<PostProcessorDescriptor>()
             {
-                return postProcessorDescriptor.getClazz() == type;
-            }
-        });
+                public boolean satisfied(PostProcessorDescriptor postProcessorDescriptor)
+                {
+                    return postProcessorDescriptor.getClazz() == type;
+                }
+            });
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
 
         if (descriptor == null)
         {
@@ -100,20 +135,31 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
 
     public PostProcessorDescriptor getPostProcessor(String name)
     {
-        List<PostProcessorDescriptor> descriptors = new LinkedList<PostProcessorDescriptor>(getPostProcessors());
-        for (PostProcessorDescriptor descriptor : descriptors)
+        lock.readLock().lock();
+        try
         {
-            if (descriptor.getName().equals(name))
-            {
-                return descriptor;
-            }
+            return descriptors.get(name);
         }
-        return null;
+        finally
+        {
+            lock.readLock().unlock();
+        }
     }
 
     public Collection<PostProcessorDescriptor> getPostProcessors()
     {
-        return Collections.unmodifiableCollection(info.values());
+        LinkedList<PostProcessorDescriptor> copy;
+        lock.readLock().lock();
+        try
+        {
+            copy = new LinkedList<PostProcessorDescriptor>(descriptors.values());
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
+        // to the outside world, we want this list to be unmodifiable.
+        return Collections.unmodifiableCollection(copy);
     }
 
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
