@@ -319,9 +319,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private TestPersonalBuildUI requestPersonalBuild()
     {
-        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir, null);
-        PersonalBuildClient client = new PersonalBuildClient(config);
         TestPersonalBuildUI ui = new TestPersonalBuildUI();
+        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir, ui);
+        PersonalBuildClient client = new PersonalBuildClient(config);
         client.setUI(ui);
 
         PersonalBuildCommand command = new PersonalBuildCommand();
