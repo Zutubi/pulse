@@ -12,6 +12,9 @@ import java.util.Map;
  */
 public class HostStatus
 {
+    /**
+     * Recipe id used to mean there is no recipe running.
+     */
     public static final long NO_RECIPE = 0;
 
     /**

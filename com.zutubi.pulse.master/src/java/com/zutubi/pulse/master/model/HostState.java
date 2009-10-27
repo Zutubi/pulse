@@ -1,14 +1,13 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.master.agent.HostLocationFormatter;
 
 /**
  * Stores persistent state for a host.  Hosts may be shared by multiple agents.
  */
 public class HostState extends Entity
 {
-    public static final String LOCATION_MASTER = "[master]";
-
     public enum PersistentUpgradeState
     {
         /**
@@ -35,7 +34,7 @@ public class HostState extends Entity
     public HostState()
     {
         remote = false;
-        hostName = LOCATION_MASTER;
+        hostName = HostLocationFormatter.LOCATION_MASTER;
     }
 
     public HostState(String hostName, int port)

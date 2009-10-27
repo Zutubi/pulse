@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.pulse.master.agent.DefaultHost;
+import com.zutubi.pulse.master.agent.HostLocationFormatter;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
@@ -292,7 +292,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
 
     private boolean locationMatches(AgentConfiguration config, String hostLocation)
     {
-        return DefaultHost.getLocation(config.isRemote(), config.getHost(), config.getPort()).equals(hostLocation);
+        return HostLocationFormatter.format(config).equals(hostLocation);
     }
 
     private boolean noDescendentDefinesResource(String agentPath, String resourceName)

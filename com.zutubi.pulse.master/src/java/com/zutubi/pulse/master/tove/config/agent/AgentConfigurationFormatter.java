@@ -24,7 +24,6 @@ public class AgentConfigurationFormatter
 
     public String getStatus(AgentConfiguration configuration)
     {
-        // TODO i18n
         Agent agent = agentManager.getAgent(configuration);
         return getStatus(agent);
     }

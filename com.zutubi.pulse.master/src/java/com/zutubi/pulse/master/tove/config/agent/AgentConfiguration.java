@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.master.agent.HostLocation;
 import com.zutubi.pulse.master.agent.SlaveProxyFactory;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Table(columns = {"name", "location", "status"})
 @SymbolicName("zutubi.agentConfig")
 @Wire
-public class AgentConfiguration extends AbstractConfiguration implements NamedConfiguration, Validateable
+public class AgentConfiguration extends AbstractConfiguration implements NamedConfiguration, Validateable, HostLocation
 {
     @ExternalState
     private long agentStateId;
@@ -75,6 +76,12 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void setRemote(boolean remote)
     {
         this.remote = remote;
+    }
+
+    @Transient
+    public String getHostName()
+    {
+        return getHost();
     }
 
     public String getHost()

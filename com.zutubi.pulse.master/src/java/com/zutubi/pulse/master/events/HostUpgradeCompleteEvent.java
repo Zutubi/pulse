@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.events;
 import com.zutubi.pulse.master.agent.Host;
 
 /**
+ * Event raised with a host upgrade completes, indicating if it succeeded.
  */
 public class HostUpgradeCompleteEvent extends HostEvent
 {
@@ -22,6 +23,6 @@ public class HostUpgradeCompleteEvent extends HostEvent
     @Override
     public String toString()
     {
-        return "Host Upgrade Complete Event: " + getHost().getLocation();
+        return "Host Upgrade Complete Event: " + getHost().getLocation() + ": " + successful;
     }
 }

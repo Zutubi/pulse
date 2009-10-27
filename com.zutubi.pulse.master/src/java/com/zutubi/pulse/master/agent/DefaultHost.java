@@ -6,7 +6,7 @@ import com.zutubi.pulse.servercore.services.UpgradeState;
 /**
  * Default implementation of {@link Host}.
  */
-public class DefaultHost implements Host
+public class DefaultHost implements Host, HostLocation
 {
     /**
      * This is a detached entity that should be treated as read-only and not
@@ -47,19 +47,7 @@ public class DefaultHost implements Host
 
     public String getLocation()
     {
-        return getLocation(isRemote(), getHostName(), getPort());
-    }
-
-    public static String getLocation(boolean remote, String hostName, int port)
-    {
-        if (remote)
-        {
-            return (hostName == null ? "" : hostName) + ":" + port;
-        }
-        else
-        {
-            return HostState.LOCATION_MASTER;
-        }
+        return HostLocationFormatter.format(this);
     }
 
     public HostState.PersistentUpgradeState getPersistentUpgradeState()

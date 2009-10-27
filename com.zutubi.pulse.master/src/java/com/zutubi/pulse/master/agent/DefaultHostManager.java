@@ -48,7 +48,7 @@ public class DefaultHostManager implements HostManager
 
     public Host agentAdded(AgentConfiguration agentConfig)
     {
-        String location = getHostLocationForAgent(agentConfig);
+        String location = HostLocationFormatter.format(agentConfig);
         synchronized (locationToHostMap)
         {
             Host host = locationToHostMap.get(location);
@@ -93,11 +93,6 @@ public class DefaultHostManager implements HostManager
         return objectFactory.buildBean(DefaultHost.class, new Class[]{HostState.class}, new Object[]{hostState});
     }
 
-    private String getHostLocationForAgent(AgentConfiguration agentConfig)
-    {
-        return DefaultHost.getLocation(agentConfig.isRemote(), agentConfig.getHost(), agentConfig.getPort());
-    }
-
     private HostState createState(AgentConfiguration agentConfig)
     {
         HostState newState = agentConfig.isRemote() ? new HostState(agentConfig.getHost(), agentConfig.getPort()) : new HostState();
@@ -110,7 +105,7 @@ public class DefaultHostManager implements HostManager
         synchronized (locationToHostMap)
         {
             Host host = getHostForAgent(agentConfig);
-            if (!host.getLocation().equals(getHostLocationForAgent(agentConfig)))
+            if (!host.getLocation().equals(HostLocationFormatter.format(agentConfig)))
             {
                 // Agent now requires a different host, remove and add it.
                 agentDeleted(agentConfig.getHandle());
