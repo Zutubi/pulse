@@ -129,7 +129,7 @@ public class HostUpdater implements Runnable
             if (foundBuild != 0)
             {
                 // ping returned but the build was not the expected build.
-                host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.");
+                host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.  Expected build " + expectedBuild + " but found " + foundBuild);
                 completed(false);
             }
             else
