@@ -146,6 +146,11 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         }
     }
 
+    /**
+     * Retrieve a copy of the currently registered post processors.  
+     *
+     * @return a copy of the registered list post processors.
+     */
     public Collection<PostProcessorDescriptor> getPostProcessors()
     {
         LinkedList<PostProcessorDescriptor> copy;
@@ -158,8 +163,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         {
             lock.readLock().unlock();
         }
-        // to the outside world, we want this list to be unmodifiable.
-        return Collections.unmodifiableCollection(copy);
+        return copy;
     }
 
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
