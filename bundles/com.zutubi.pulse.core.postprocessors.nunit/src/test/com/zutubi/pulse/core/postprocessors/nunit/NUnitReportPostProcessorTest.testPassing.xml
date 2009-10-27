@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\tools\cygwin\home\jsankey\repo\nant\hello\PassingTests.dll" total="3" failures="0" not-run="0" date="2009-10-27" time="09:52:10">
+  <environment nunit-version="2.2.8.0" clr-version="2.0.50727.4200" os-version="Microsoft Windows NT 6.0.6002 Service Pack 2" platform="Win32NT" cwd="C:\tools\cygwin\home\jsankey\repo\nant\hello" machine-name="CAESER" user="jsankey" user-domain="caeser" />
+  <culture-info current-culture="en-AU" current-uiculture="en-US" />
+  <test-suite name="C:\tools\cygwin\home\jsankey\repo\nant\hello\PassingTests.dll" success="True" time="0.016" asserts="0">
+    <results>
+      <test-suite name="NUnit" success="True" time="0.014" asserts="0">
+        <results>
+          <test-suite name="NUnit.Tests" success="True" time="0.012" asserts="0">
+            <results>
+              <test-suite name="NUnit.Tests.PassingTest" success="True" time="0.012" asserts="0">
+                <results>
+                  <test-case name="NUnit.Tests.PassingTest.Empty" executed="True" success="True" time="0.003" asserts="0" />
+                  <test-case name="NUnit.Tests.PassingTest.Equals" executed="True" success="True" time="0.003" asserts="4" />
+                  <test-case name="NUnit.Tests.PassingTest.ExpectAnException" executed="True" success="True" time="0.001" asserts="0" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

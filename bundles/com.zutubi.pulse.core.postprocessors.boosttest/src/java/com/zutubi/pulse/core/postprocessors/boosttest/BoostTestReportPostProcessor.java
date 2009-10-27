@@ -61,13 +61,13 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
             {
                 if (nextElement(reader))
                 {
-                    processSuties(reader, tests);
+                    processSuites(reader, tests);
                 }
             }
         });
     }
 
-    private void processSuties(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
+    private void processSuites(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
         expectStartElement(ELEMENT_TEST_LOG, reader);
         reader.nextTag();

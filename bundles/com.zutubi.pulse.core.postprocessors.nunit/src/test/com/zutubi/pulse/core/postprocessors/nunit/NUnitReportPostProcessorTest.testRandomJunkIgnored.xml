@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.dll" total="4" failures="4" not-run="1" date="2009-10-17" time="09:26:01">
+  <environment nunit-version="2.2.8.0" clr-version="2.0.50727.4016" os-version="Microsoft Windows NT 6.0.6002 Service Pack 2" platform="Win32NT" cwd="C:\tools\cygwin\home\jsankey\repo\nant\hello" machine-name="CAESER" user="jsankey" user-domain="caeser" />
+  <culture-info current-culture="en-AU" current-uiculture="en-US" />
+  <test-suite name="C:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.dll" success="False" time="0.058" asserts="0">
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+    <results>
+      <test-suite name="NUnit" success="False" time="0.057" asserts="0">
+        <results>
+          <test-suite name="NUnit.Samples" success="False" time="0.055" asserts="0">
+            <results>
+              <test-suite name="NUnit.Samples.SimpleCSharpTest" success="False" time="0.054" asserts="0">
+                <results>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.Add" executed="True" success="False" time="0.034" asserts="1">
+                    <junk>
+                      <nested-junk>textual junk</nested-junk>
+                    </junk>
+                    <failure>
+                      <junk>
+                        <nested-junk>textual junk</nested-junk>
+                      </junk>
+                      <message><![CDATA[Expected Failure.
+	expected: <6>
+	 but was: <5>]]></message>
+                      <junk>
+                        <nested-junk>textual junk</nested-junk>
+                      </junk>
+                      <stack-trace><![CDATA[   at NUnit.Samples.SimpleCSharpTest.Add() in c:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.cs:line 66
+]]></stack-trace>
+                      <junk>
+                        <nested-junk>textual junk</nested-junk>
+                      </junk>
+                    </failure>
+                    <junk>
+                      <nested-junk>textual junk</nested-junk>
+                    </junk>
+                  </test-case>
+                  <junk>
+                    <nested-junk>textual junk</nested-junk>
+                  </junk>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.IgnoredTest" executed="False">
+                    <junk>
+                      <nested-junk>textual junk</nested-junk>
+                    </junk>
+                    <reason>
+                      <message><![CDATA[ignored test]]></message>
+                    </reason>
+                    <junk>
+                      <nested-junk>textual junk</nested-junk>
+                    </junk>
+                  </test-case>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.Empty" executed="True" success="True" time="0.003" asserts="0">
+                    <junk>
+                      <nested-junk>textual junk</nested-junk>
+                    </junk>
+                  </test-case>
+                  <junk>
+                    <nested-junk>textual junk</nested-junk>
+                  </junk>
+                </results>
+                <junk>
+                  <nested-junk>textual junk</nested-junk>
+                </junk>
+              </test-suite>
+              <junk>
+                <nested-junk>textual junk</nested-junk>
+              </junk>
+              <test-suite name="NUnit.Samples.SecondTest" success="False" time="0.004" asserts="0">
+                <results>
+                    <test-case name="NUnit.Samples.SecondTest.Passing" executed="True" success="True" time="0.003" asserts="0"/>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.dll" total="4" failures="4" not-run="1" date="2009-10-17" time="09:26:01">
+  <environment nunit-version="2.2.8.0" clr-version="2.0.50727.4016" os-version="Microsoft Windows NT 6.0.6002 Service Pack 2" platform="Win32NT" cwd="C:\tools\cygwin\home\jsankey\repo\nant\hello" machine-name="CAESER" user="jsankey" user-domain="caeser" />
+  <culture-info current-culture="en-AU" current-uiculture="en-US" />
+  <test-suite name="C:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.dll" success="False" time="0.058" asserts="0">
+    <results>
+      <test-suite name="NUnit" success="False" time="0.057" asserts="0">
+        <results>
+          <test-suite name="NUnit.Samples" success="False" time="0.055" asserts="0">
+            <results>
+              <test-suite name="NUnit.Samples.SimpleCSharpTest" success="False" time="0.054" asserts="0">
+                <results>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.Add" executed="True" success="False" time="0.034" asserts="1">
+                    <failure>
+                      <message><![CDATA[Expected Failure.
+	expected: <6>
+	 but was: <5>]]></message>
+                      <stack-trace><![CDATA[   at NUnit.Samples.SimpleCSharpTest.Add() in c:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.cs:line 66
+]]></stack-trace>
+                    </failure>
+                  </test-case>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.DivideByZero" executed="True" success="False" time="0.003" asserts="0">
+                    <failure>
+                      <message><![CDATA[System.DivideByZeroException : Attempted to divide by zero.]]></message>
+                      <stack-trace><![CDATA[   at NUnit.Samples.SimpleCSharpTest.DivideByZero() in c:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.cs:line 76
+]]></stack-trace>
+                    </failure>
+                  </test-case>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.Equals" executed="True" success="False" time="0.002" asserts="5">
+                    <failure>
+                      <message><![CDATA[Expected Failure (Integer)
+	expected: <12>
+	 but was: <13>]]></message>
+                      <stack-trace><![CDATA[   at NUnit.Samples.SimpleCSharpTest.Equals() in c:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.cs:line 90
+]]></stack-trace>
+                    </failure>
+                  </test-case>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.ExpectAnException" executed="True" success="False" time="0.000" asserts="0">
+                    <failure>
+                      <message><![CDATA[Expected: System.InvalidOperationException but was System.InvalidCastException]]></message>
+                      <stack-trace><![CDATA[   at NUnit.Samples.SimpleCSharpTest.ExpectAnException() in c:\tools\cygwin\home\jsankey\repo\nant\hello\AssertSyntaxTests.cs:line 98
+]]></stack-trace>
+                    </failure>
+                  </test-case>
+                  <test-case name="NUnit.Samples.SimpleCSharpTest.IgnoredTest" executed="False">
+                    <reason>
+                      <message><![CDATA[ignored test]]></message>
+                    </reason>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
