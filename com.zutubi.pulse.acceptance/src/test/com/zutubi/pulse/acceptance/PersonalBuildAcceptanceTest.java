@@ -435,8 +435,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private AcceptancePersonalBuildUI requestPersonalBuild()
     {
-        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir);
         AcceptancePersonalBuildUI ui = new AcceptancePersonalBuildUI();
+        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir, ui);
 
         DefaultPatchFormatFactory patchFormatFactory = new DefaultPatchFormatFactory();
         patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);

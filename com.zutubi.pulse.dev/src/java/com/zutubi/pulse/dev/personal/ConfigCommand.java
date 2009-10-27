@@ -44,7 +44,7 @@ public class ConfigCommand implements Command
         }
 
         ConsoleUI ui = new ConsoleUI();
-        PersonalBuildConfig config = new PersonalBuildConfig(new File(System.getProperty("user.dir")), new PropertiesConfig());
+        PersonalBuildConfig config = new PersonalBuildConfig(new File(System.getProperty("user.dir")), new PropertiesConfig(), ui);
         if(!projectOnly)
         {
             setupPulseConfig(ui, config);

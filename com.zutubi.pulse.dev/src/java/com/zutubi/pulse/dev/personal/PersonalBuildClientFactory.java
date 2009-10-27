@@ -34,8 +34,8 @@ public class PersonalBuildClientFactory
         PropertiesConfig defineConfig = processDefines(commandLine);
         CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
 
-        PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig, commandLine.getArgs());
         ConsoleUI ui = configureConsole(commandLine);
+        PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig, ui, commandLine.getArgs());
         return new PersonalBuildClient(config, ui);
     }
 

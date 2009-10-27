@@ -12,6 +12,14 @@ public interface PersonalBuildUI
 {
 
     /**
+     * Indicates if debug messages will be used by this interface.  If not, and
+     * they are expensive to calculate, their calculation can be skipped.
+     *
+     * @return true iff debug messages will be used by this ui
+     */
+    boolean isDebugEnabled();
+
+    /**
      * Reports a line of debugging-level feedback to the user.  The user will
      * not typically see this unless they request extra verbosity of feedback.
      *

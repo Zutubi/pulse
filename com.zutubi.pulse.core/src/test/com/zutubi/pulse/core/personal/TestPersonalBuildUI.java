@@ -42,6 +42,11 @@ public class TestPersonalBuildUI implements PersonalBuildUI
         return errorMessages;
     }
 
+    public boolean isDebugEnabled()
+    {
+        return true;
+    }
+
     public void debug(String message)
     {
         debugMessages.add(message);

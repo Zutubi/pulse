@@ -67,7 +67,7 @@ public class FileConfig implements Config
         writeToFile();
     }
 
-    private Properties getProperties()
+    public Properties getProperties()
     {
         if (props == null)
         {

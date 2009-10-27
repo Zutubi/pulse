@@ -31,7 +31,9 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        config = new PersonalBuildConfig(baseDir);
+        // Use a separate UI for the config to just ignore its interactions.
+        config = new PersonalBuildConfig(baseDir, mock(PersonalBuildUI.class));
+        
         ui = mock(PersonalBuildUI.class);
         WorkingCopy workingCopy = mock(WorkingCopy.class);
         stub(workingCopy.getCapabilities()).toReturn(EnumSet.allOf(WorkingCopyCapability.class));
