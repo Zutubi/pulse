@@ -410,7 +410,6 @@ public class GitClient implements ScmClient
             String remote = REMOTE_ORIGIN + "/" + branch;
             if (localBranchExists)
             {
-                git.checkout(handler, LOCAL_BRANCH_NAME);
                 git.fetch(handler);
                 String headSha = git.revisionParse(REVISION_HEAD);
                 String mergeBaseSha = git.mergeBase(REVISION_HEAD, remote);

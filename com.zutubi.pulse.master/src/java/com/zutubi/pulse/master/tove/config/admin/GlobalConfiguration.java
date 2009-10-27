@@ -39,6 +39,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private LicenseConfiguration license = new LicenseConfiguration();
     private BackupConfiguration backup = new BackupConfiguration();
     private RepositoryConfiguration repository = new RepositoryConfiguration();
+    private AgentPingConfiguration agentPing = new AgentPingConfiguration();
 
     public String getBaseUrl()
     {
@@ -203,5 +204,15 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setRepository(RepositoryConfiguration repository)
     {
         this.repository = repository;
+    }
+
+    public AgentPingConfiguration getAgentPing()
+    {
+        return agentPing;
+    }
+
+    public void setAgentPing(AgentPingConfiguration agentPing)
+    {
+        this.agentPing = agentPing;
     }
 }

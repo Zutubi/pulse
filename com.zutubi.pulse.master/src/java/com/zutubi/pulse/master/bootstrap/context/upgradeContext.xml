@@ -88,6 +88,7 @@
                 <ref local="deleteOrphanedTriggers"/>
                 <ref local="addPerforceSyncWorkspacePattern"/>
                 <ref local="ldapGroupDns"/>
+                <ref local="addAgentPing"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -395,5 +396,9 @@
 
     <bean id="ldapGroupDns" class="com.zutubi.pulse.master.upgrade.tasks.LdapGroupDnsUpgradeTask">
         <property name="buildNumber" value="201008001"/>
+    </bean>
+
+    <bean id="addAgentPing" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentPingConfigurationUpgradeTask">
+        <property name="buildNumber" value="201008002"/>
     </bean>
 </beans>

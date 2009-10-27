@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.scheduling.quartz;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.events.build.RecipeTimeoutEvent;
+import com.zutubi.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -15,6 +15,8 @@ import org.quartz.JobExecutionException;
  */
 public class TimeoutRecipeJob implements Job
 {
+    private static final Logger LOG = Logger.getLogger(TimeoutRecipeJob.class);
+
     /**
      * The job data map parameter used to access the build id this job relates.
      */
@@ -30,7 +32,7 @@ public class TimeoutRecipeJob implements Job
     {
         long buildId = (Long) context.getTrigger().getJobDataMap().get(PARAM_BUILD_ID);
         long recipeId = (Long) context.getTrigger().getJobDataMap().get(PARAM_RECIPE_ID);
-
+        LOG.debug("Timeout job fired for build " + buildId + ", recipe " + recipeId);
         eventManager.publish(new RecipeTimeoutEvent(this, buildId, recipeId));
     }
 

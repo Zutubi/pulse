@@ -576,6 +576,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void handleRecipeTimeout(RecipeTimeoutEvent event)
     {
+        LOG.debug("Recipe timeout event received for build " + event.getBuildId() + ", recipe " + event.getRecipeId());
         TreeNode<RecipeController> found = null;
         for (TreeNode<RecipeController> controllerNode : executingControllers)
         {
@@ -589,6 +590,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
         if (found != null)
         {
+            LOG.debug("Terminating recipe for build " + event.getBuildId() + ", recipe " + event.getRecipeId());
             RecipeController controller = found.getData();
             controller.terminateRecipe("Timed out");
             if (checkControllerStatus(controller, false))
@@ -791,6 +793,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
         try
         {
+            LOG.debug("Scheduling timeout for build " + buildResult.getId() + ", recipe " + recipeId + " at " + time.toString());
             quartzScheduler.scheduleJob(timeoutTrigger);
         }
         catch (SchedulerException e)

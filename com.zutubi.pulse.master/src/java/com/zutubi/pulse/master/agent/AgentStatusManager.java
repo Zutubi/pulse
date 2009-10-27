@@ -9,7 +9,9 @@ import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
@@ -31,8 +33,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class AgentStatusManager implements EventListener
 {
-    public static final String PROPERTY_AGENT_OFFLINE_TIMEOUT = "pulse.agent.offline.timeout";
-
     private static final Logger LOG = Logger.getLogger(AgentStatusManager.class);
 
     private Map<Long, Agent> agentsById = new HashMap<Long, Agent>();
@@ -41,18 +41,20 @@ public class AgentStatusManager implements EventListener
     private Executor eventPump;
     private AgentPersistentStatusManager agentPersistentStatusManager;
     private EventManager eventManager;
+    private ConfigurationProvider configurationProvider;
 
-    public static long getAgentOfflineTimeout()
-    {
-        return Long.getLong(PROPERTY_AGENT_OFFLINE_TIMEOUT, (long) (HostPingService.getAgentPingInterval() * 4));
-    }
-
-    public AgentStatusManager(AgentPersistentStatusManager agentPersistentStatusManager, Executor eventPump, EventManager eventManager)
+    public AgentStatusManager(AgentPersistentStatusManager agentPersistentStatusManager, Executor eventPump, EventManager eventManager, ConfigurationProvider configurationProvider)
     {
         this.agentPersistentStatusManager = agentPersistentStatusManager;
         this.eventPump = eventPump;
         this.eventManager = eventManager;
         eventManager.register(this);
+        this.configurationProvider = configurationProvider;
+    }
+
+    public long getAgentOfflineTimeout()
+    {
+        return configurationProvider.get(AgentPingConfiguration.class).getOfflineTimeout();
     }
 
     public List<Agent> getAllAgents()

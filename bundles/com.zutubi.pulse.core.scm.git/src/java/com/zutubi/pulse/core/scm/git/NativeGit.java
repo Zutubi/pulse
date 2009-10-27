@@ -11,9 +11,13 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +37,7 @@ public class NativeGit
 
     private ProcessBuilder git;
     private int inactivityTimeout;
+    private DateFormat timeFormat = SimpleDateFormat.getDateTimeInstance();
 
     /**
      * Creates a git command line wrapper with no inactivity timeout.
@@ -311,6 +316,8 @@ public class NativeGit
 
         git.command(commands);
 
+        long startTime = System.currentTimeMillis();
+        final AtomicLong lineCount = new AtomicLong(0);
         try
         {
             child = git.start();
@@ -341,6 +348,7 @@ public class NativeGit
         {
             public void handle(String line, boolean error)
             {
+                lineCount.incrementAndGet();
                 activity.set(true);
                 if (error)
                 {
@@ -410,6 +418,12 @@ public class NativeGit
         finally
         {
             async.destroy();
+
+            if (LOG.isLoggable(Level.FINEST))
+            {
+                long currentTime = System.currentTimeMillis();
+                LOG.finest(timeFormat.format(new Date(currentTime)) + "\t" + commandLine + "\t" + git.directory().getAbsolutePath() + "\t" + (currentTime - startTime) + "\t" + lineCount + "\n");
+            }
         }
     }
 

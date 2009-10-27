@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.events.HostPingEvent;
 import com.zutubi.pulse.master.scheduling.NoopTrigger;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import static org.mockito.Matchers.anyString;
@@ -71,6 +72,7 @@ public class HostPingServiceTest extends PulseTestCase
         hostPingService.setScheduler(scheduler);
 
         hostPingService.init();
+        hostPingService.refreshSettings(new AgentPingConfiguration());
     }
 
     public void testSimplePing()
@@ -134,8 +136,10 @@ public class HostPingServiceTest extends PulseTestCase
 
     public void testTimeout() throws InterruptedException
     {
-        System.setProperty(HostPingService.PROPERTY_AGENT_PING_TIMEOUT, "1");
-
+        AgentPingConfiguration config = new AgentPingConfiguration();
+        config.setPingTimeout(1);
+        hostPingService.refreshSettings(config);
+        
         Semaphore waitFlag = new Semaphore(0);
         Host host = createHost(1);
         HostService service = createHostService(waitFlag);

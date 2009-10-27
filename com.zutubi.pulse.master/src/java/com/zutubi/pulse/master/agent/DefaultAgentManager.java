@@ -68,6 +68,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private void handleConfigurationEventSystemStarted(ConfigurationEventSystemStartedEvent event)
     {
         // Create prior to any AgentAddedEvents being fired.
+        configurationProvider = event.getConfigurationProvider();
         agentStatusManager = new AgentStatusManager(this, Executors.newSingleThreadExecutor(new ThreadFactory()
         {
             public Thread newThread(Runnable r)
@@ -76,9 +77,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 t.setName("Agent Status Manager Event Pump");
                 return t;
             }
-        }), eventManager);
+        }), eventManager, configurationProvider);
 
-        configurationProvider = event.getConfigurationProvider();
         TypeListener<AgentConfiguration> listener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
             public void postInsert(AgentConfiguration instance)
