@@ -42,7 +42,7 @@
         #end
     #end
         </td>
-        #editCellSpan("$base/admin/#uce(${model.agent.config.configurationPath})/" "edit_$h_agentName" 1)
+        #editCellSpan("$base/admin/agents/#uce(${model.name})/" "edit_$h_agentName" 1)
     </tr>
 #end
 </table>

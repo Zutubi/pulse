@@ -89,6 +89,7 @@
                 <ref local="addPerforceSyncWorkspacePattern"/>
                 <ref local="ldapGroupDns"/>
                 <ref local="addAgentPing"/>
+                <ref local="addJabberServiceName"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -400,5 +401,9 @@
 
     <bean id="addAgentPing" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentPingConfigurationUpgradeTask">
         <property name="buildNumber" value="201008002"/>
+    </bean>
+
+    <bean id="addJabberServiceName" class="com.zutubi.pulse.master.upgrade.tasks.AddJabberServiceNameUpgradeTask">
+        <property name="buildNumber" value="201008003"/>
     </bean>
 </beans>

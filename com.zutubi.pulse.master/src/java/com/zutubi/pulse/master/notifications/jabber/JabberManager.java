@@ -11,6 +11,7 @@ import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -93,17 +94,19 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
     {
         XMPPConnection connection;
 
-        if (config.getServer().endsWith("google.com"))
+        String serviceName = config.getServiceName();
+        if (!StringUtils.stringSet(serviceName))
         {
-            connection = new GoogleTalkConnection();
+            serviceName = config.getServer();
         }
-        else if(config.isSsl())
+
+        if(config.isSsl())
         {
-            connection = new SSLXMPPConnection(config.getServer(), config.getPort());
+            connection = new SSLXMPPConnection(config.getServer(), config.getPort(), serviceName);
         }
         else
         {
-            connection = new XMPPConnection(config.getServer(), config.getPort());
+            connection = new XMPPConnection(config.getServer(), config.getPort(), serviceName);
         }
 
         connection.login(config.getUsername(), config.getPassword());
