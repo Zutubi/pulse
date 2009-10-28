@@ -8,6 +8,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.Constants;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
 {
     private static final String NORMAL_SCOPE = "normal";
 
+    private static final long TEST_RUN_TIME = 3 * Constants.SECOND;
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -31,17 +34,17 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
 
     public void testConcurrentInsertsAndDeletes() throws InterruptedException
     {
-        runFor(500, new Inserter(), new Deleter());
+        runFor(TEST_RUN_TIME, new Inserter(), new Deleter());
     }
 
     public void testConcurrentInsertsAndGets() throws InterruptedException
     {
-        runFor(500, new Inserter(), new Getter());
+        runFor(TEST_RUN_TIME, new Inserter(), new Getter());
     }
 
     public void testConcurrentInsertsDeletesAndGets() throws InterruptedException
     {
-        runFor(500, new Inserter(), new Deleter(), new Getter());
+        runFor(TEST_RUN_TIME, new Inserter(), new Deleter(), new Getter());
     }
 
     private void runFor(long millis, Worker... workers) throws InterruptedException

@@ -36,7 +36,14 @@ public class TestUtils
             {
                 throw new RuntimeException("Timed out waiting for " + description);
             }
-            Thread.yield();
+            try
+            {
+                Thread.sleep(20);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException("Thread was interrupted.", e);
+            }
         }
     }
 

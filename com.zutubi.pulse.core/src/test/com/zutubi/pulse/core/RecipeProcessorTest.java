@@ -276,13 +276,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         semaphore.release();
         assertNoMoreEvents();
         thread.join();
-
-/*
-        // there are some file resources that are not being cleaned up in time for the
-        // remove directory call in the tearDown. So, we sleep briefly here to give the
-        // terminated child process (?) a chance to release its resources.
-        Thread.sleep(100);
-*/
     }
 
     public void testTerminateDuringCommand() throws Exception
@@ -308,13 +301,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         semaphore.release();
         assertNoMoreEvents();
         thread.join();
-
-/*
-        // there are some file resources that are not being cleaned up in time for the
-        // remove directory call in the tearDown. So, we sleep briefly here to give the
-        // terminated child process (?) a chance to release its resources.
-        Thread.sleep(100);
-*/
     }
 
     public void testCommandBackwardsCompatibility() throws Exception

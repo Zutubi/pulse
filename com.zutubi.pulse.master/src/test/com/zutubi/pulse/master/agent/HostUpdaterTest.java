@@ -169,7 +169,8 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         apply();
         reboot();
         assertCompleted(false);
-        assertStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.  Expected build -1 but found 6");
+        int expectedVersion = Version.getVersion().getBuildNumberAsInt();
+        assertStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.  Expected build "+expectedVersion+" but found 6");
     }
 
     private void configureService(boolean accept, int successfulPing)

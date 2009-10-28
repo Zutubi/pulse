@@ -417,6 +417,14 @@ public class CollectionUtils
         return result;
     }
 
+    /**
+     * Return a list of the items contained by the specified collection.
+     * The ordering of the list is determines by the ordering presented by
+     * an iterator over the collection
+     *
+     * @param collection    containing the items to turn into a list.
+     * @return a list that is equivalent to the contents of the collection.
+     */
     public static <T> List<T> asList(Collection<T> collection)
     {
         return asList(collection.iterator());

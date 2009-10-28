@@ -128,7 +128,7 @@ public class JobManagerTest extends PulseTestCase
 
     private class NeverEndingTask extends AbstractTask
     {
-        private boolean running = true;
+        private volatile boolean running = true;
 
         public NeverEndingTask(String name)
         {
@@ -137,15 +137,25 @@ public class JobManagerTest extends PulseTestCase
 
         public void execute()
         {
-            while (running)
+            while (true)
             {
+                synchronized (this)
+                {
+                    if (!running)
+                    {
+                        break;
+                    }
+                }
                 Thread.yield();
             }
         }
 
         public void endNow()
         {
-            this.running = false;            
+            synchronized (this)
+            {
+                this.running = false;            
+            }
         }
     }
 }

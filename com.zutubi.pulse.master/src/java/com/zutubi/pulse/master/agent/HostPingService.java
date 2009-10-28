@@ -95,6 +95,12 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
         }
     }
 
+    /**
+     * Check to see if a ping is currently in progress for the specified host.
+     *
+     * @param host  the host for which we are checking for a ping.
+     * @return  true if a ping is currently in progress to the specified host, false otherwise.
+     */
     public boolean isPingInProgress(Host host)
     {
         return inProgress.contains(host.getId());

@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.upgrade;
 
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.upgrade.UpgradeTaskGroup;
+import com.zutubi.util.Constants;
 
 import java.util.List;
 
@@ -36,7 +37,14 @@ public class ExecuteUpgradeAction extends UpgradeActionSupport
         // of the upgrade status page being rendered BEFORE the upgrade system is properly initialised.
         while (!progress.isStarted())
         {
-            Thread.yield();
+            try
+            {
+                Thread.sleep(Constants.SECOND);
+            }
+            catch (InterruptedException e)
+            {
+                // noop.
+            }
         }
 
         // go to the progress monitor screen.
