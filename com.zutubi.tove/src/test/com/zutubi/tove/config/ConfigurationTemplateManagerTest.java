@@ -20,7 +20,10 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.FalsePredicate;
 import com.zutubi.util.Pair;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.TruePredicate;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
@@ -32,6 +35,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     private static final String SCOPE_REFERER = "referer";
     private static final String SCOPE_REFEREE = "referee";
 
+    private static final String GRANDPARENT_NAME = "gp";
+    private static final String CHILD_NAME = "c";
+    private static final String GRANDCHILD_NAME = "gc";
+    
     private CompositeType typeA;
     private CompositeType typeB;
 
@@ -1677,6 +1684,65 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertNotSame(child.getCs(), newChild.getCs());
         assertNotSame(child.getCs().get("c1"), newChild.getCs().get("c1"));
         assertSame(child.getCs().get("c2"), newChild.getCs().get("c2"));
+    }
+
+    public void testGetHighestNoneSatisfy() throws TypeException
+    {
+        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
+        assertEquals(0, configurationTemplateManager.getHighestInstancesSatisfying(new FalsePredicate<MockA>(), MockA.class).size());
+    }
+
+    public void testGetHighestAllSatisfy() throws TypeException
+    {
+        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
+        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new TruePredicate<MockA>(), MockA.class);
+        assertEquals(1, results.size());
+        assertEquals(GRANDPARENT_NAME, results.get(0).getName());
+    }
+
+    public void testGetHighestGranchildSatisfies() throws TypeException
+    {
+        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
+        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<MockA>()
+        {
+            public boolean satisfied(MockA mockA)
+            {
+                return mockA.getName().equals(GRANDCHILD_NAME);
+            }
+        }, MockA.class);
+        
+        assertEquals(1, results.size());
+        assertEquals(GRANDCHILD_NAME, results.get(0).getName());
+    }
+
+    public void testGetHighestChildSatisfies() throws TypeException
+    {
+        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
+        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<MockA>()
+        {
+            public boolean satisfied(MockA mockA)
+            {
+                return mockA.getName().equals(CHILD_NAME);
+            }
+        }, MockA.class);
+
+        assertEquals(1, results.size());
+        assertEquals(CHILD_NAME, results.get(0).getName());
+    }
+
+    public void testGetHighestChildAndGrandchildSatisfies() throws TypeException
+    {
+        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
+        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<MockA>()
+        {
+            public boolean satisfied(MockA mockA)
+            {
+                return !mockA.getName().equals(GRANDPARENT_NAME);
+            }
+        }, MockA.class);
+
+        assertEquals(1, results.size());
+        assertEquals(CHILD_NAME, results.get(0).getName());
     }
 
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException

@@ -2332,7 +2332,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         state.instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
     }
 
-    public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
+    public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz, boolean allowIncomplete)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
@@ -2347,7 +2347,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             State state = getState();
             for (String path : paths)
             {
-                state.instances.getAllMatchingPathPattern(path, clazz, result, false);
+                state.instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
             }
         }
 
@@ -2403,6 +2403,48 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         
         String rootId = templateHierarchy.getRoot().getId();
         return getInstance(PathUtils.getPath(scope, rootId), clazz);
+    }
+
+    /**
+     * Finds all configuration instances of a type that are the highest in the
+     * hierarchy to satisfy the given predicate.  These are the instances that
+     * satisfy the predicate and either have no template parent, or a parent
+     * that does not satisfy the predicate.
+     *
+     * @param predicate predicate to be satisfied by instances
+     * @param clazz     class of the instances to be found
+     * @return the highest configuration instances in the heirarchy that
+     *         satisfy the given predicate
+     */
+    public <T extends Configuration> List<T> getHighestInstancesSatisfying(final Predicate<T> predicate, final Class<T> clazz)
+    {
+        Collection<T> allConfigs = getAllInstances(clazz, true);
+        return CollectionUtils.filter(allConfigs, new Predicate<T>()
+        {
+            public boolean satisfied(T configuration)
+            {
+                return isHighestSatisfying(configuration, clazz, predicate);
+            }
+        });
+    }
+
+    private <T extends Configuration> boolean isHighestSatisfying(T config, Class<T> clazz, final Predicate<T> predicate)
+    {
+        if (predicate.satisfied(config))
+        {
+            TemplateRecord templateParentRecord = getTemplateParentRecord(config.getConfigurationPath());
+            if (templateParentRecord == null)
+            {
+                return true;
+            }
+            else
+            {
+                T templateParentConfig = getInstance(templateParentRecord.getHandle(), clazz);
+                return !predicate.satisfied(templateParentConfig);
+            }
+        }
+
+        return false;
     }
 
     public void markAsTemplate(MutableRecord record)

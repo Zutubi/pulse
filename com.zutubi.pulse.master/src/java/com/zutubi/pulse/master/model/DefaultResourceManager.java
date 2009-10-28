@@ -7,7 +7,6 @@ import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.HostLocationFormatter;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -17,8 +16,6 @@ import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 
@@ -233,7 +230,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         {
             public List<AgentConfiguration> process()
             {
-                List<AgentConfiguration> agentConfigs = getAgentsThatDefineLocation(hostLocation);
+                List<AgentConfiguration> agentConfigs = configurationTemplateManager.getHighestInstancesSatisfying(new DefinesLocation(hostLocation), AgentConfiguration.class);
                 List<AgentConfiguration> affectedAgents = new LinkedList<AgentConfiguration>();
                 for (AgentConfiguration config: agentConfigs)
                 {
@@ -258,41 +255,6 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 return affectedAgents;
             }
         });
-    }
-
-    private List<AgentConfiguration> getAgentsThatDefineLocation(final String hostLocation)
-    {
-        Collection<AgentConfiguration> allAgents = configurationTemplateManager.getAllInstances(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AgentConfiguration.class, true);
-        return CollectionUtils.filter(allAgents, new Predicate<AgentConfiguration>()
-        {
-            public boolean satisfied(AgentConfiguration configuration)
-            {
-                return definesLocation(configuration, hostLocation);
-            }
-        });
-    }
-
-    private boolean definesLocation(AgentConfiguration config, String hostLocation)
-    {
-        if (locationMatches(config, hostLocation))
-        {
-            TemplateRecord templateParentRecord = configurationTemplateManager.getTemplateParentRecord(config.getConfigurationPath());
-            if (templateParentRecord != null)
-            {
-                AgentConfiguration templateParentConfig = configurationTemplateManager.getInstance(templateParentRecord.getHandle(), AgentConfiguration.class);
-                if (!locationMatches(templateParentConfig, hostLocation))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean locationMatches(AgentConfiguration config, String hostLocation)
-    {
-        return HostLocationFormatter.format(config).equals(hostLocation);
     }
 
     private boolean noDescendentDefinesResource(String agentPath, String resourceName)
@@ -389,5 +351,21 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    private static class DefinesLocation implements Predicate<AgentConfiguration>
+    {
+        private String location;
+
+        public DefinesLocation(String location)
+        {
+            this.location = location;
+        }
+
+
+        public boolean satisfied(AgentConfiguration configuration)
+        {
+            return HostLocationFormatter.format(configuration).equals(location);
+        }
     }
 }

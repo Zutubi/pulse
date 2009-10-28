@@ -69,7 +69,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         for (Class<? extends Configuration> clazz : statefulTypes)
         {
             // configuration provider is not available at this state of proceedings, so go directly to the ctm.
-            Collection<? extends Configuration> configs = configurationTemplateManager.getAllInstances(clazz);
+            Collection<? extends Configuration> configs = configurationTemplateManager.getAllInstances(clazz, false);
             for (Configuration config : configs)
             {
                 Object externalState = configurationStateManager.getExternalState(config);
@@ -109,7 +109,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public <T extends Configuration> Collection<T> getAll(Class<T> clazz)
     {
-        return configurationTemplateManager.getAllInstances(clazz);
+        return configurationTemplateManager.getAllInstances(clazz, false);
     }
 
     public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)

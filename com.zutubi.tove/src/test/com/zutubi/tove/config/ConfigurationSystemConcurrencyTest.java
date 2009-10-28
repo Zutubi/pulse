@@ -6,9 +6,9 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.Constants;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -263,7 +263,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
     {
         public void doWorkUnit()
         {
-            Collection<MockA> instances = configurationTemplateManager.getAllInstances(MockA.class);
+            Collection<MockA> instances = configurationTemplateManager.getAllInstances(MockA.class, false);
             for (MockA a : instances)
             {
                 assertNotNull(a);
