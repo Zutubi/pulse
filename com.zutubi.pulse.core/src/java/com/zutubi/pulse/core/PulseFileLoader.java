@@ -27,22 +27,25 @@ public class PulseFileLoader extends FileLoader
     {
         List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
 
-        PulseFile file = new PulseFile();
-        ResourceRequirementsPredicate predicate = new ResourceRequirementsPredicate(file, recipe);
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), fileResolver, new FileResourceRepository(), predicate);
-
-        for(ResourceReference reference: predicate.getReferences())
+        if (!Boolean.getBoolean("pulse.ignore.resource.element"))
         {
-            if(reference.isRequired())
+            PulseFile file = new PulseFile();
+            ResourceRequirementsPredicate predicate = new ResourceRequirementsPredicate(file, recipe);
+            load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), fileResolver, new FileResourceRepository(), predicate);
+
+            for(ResourceReference reference: predicate.getReferences())
             {
-                // if a version is specified, then we want that version, otherwise the default is fine.
-                if (TextUtils.stringSet(reference.getVersion()))
+                if(reference.isRequired())
                 {
-                    requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), false));
-                }
-                else
-                {
-                    requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), true));
+                    // if a version is specified, then we want that version, otherwise the default is fine.
+                    if (TextUtils.stringSet(reference.getVersion()))
+                    {
+                        requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), false));
+                    }
+                    else
+                    {
+                        requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), true));
+                    }
                 }
             }
         }
