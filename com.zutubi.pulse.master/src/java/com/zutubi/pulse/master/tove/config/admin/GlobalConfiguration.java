@@ -131,9 +131,9 @@ public class GlobalConfiguration extends AbstractConfiguration
         return recipeTimeout;
     }
 
-    public void setRecipeTimeout(int recipeTimeout)
+    public void setRecipeTimeout(int minutes)
     {
-        this.recipeTimeout = recipeTimeout;
+        this.recipeTimeout = minutes;
     }
 
     public LoggingConfiguration getLogging()
