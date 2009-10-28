@@ -15,36 +15,32 @@ public class RecipeUtils
     {
         if (resourceRequirements != null)
         {
-            for(ResourceRequirement requirement: resourceRequirements)
+            for (ResourceRequirement requirement : resourceRequirements)
             {
                 ResourceConfiguration resource = resourceRepository.getResource(requirement.getResource());
-                if(resource == null)
+                if (resource != null)
                 {
-                    return;
-                }
-
-                for(ResourcePropertyConfiguration property: resource.getProperties().values())
-                {
-                    context.add(property.asResourceProperty());
-                }
-
-                String importVersion = requirement.getVersion();
-                if(requirement.isDefaultVersion())
-                {
-                    importVersion = resource.getDefaultVersion();
-                }
-
-                if(StringUtils.stringSet(importVersion))
-                {
-                    ResourceVersionConfiguration version = resource.getVersion(importVersion);
-                    if(version == null)
-                    {
-                        return;
-                    }
-
-                    for(ResourcePropertyConfiguration property: version.getProperties().values())
+                    for (ResourcePropertyConfiguration property : resource.getProperties().values())
                     {
                         context.add(property.asResourceProperty());
+                    }
+
+                    String importVersion = requirement.getVersion();
+                    if (requirement.isDefaultVersion())
+                    {
+                        importVersion = resource.getDefaultVersion();
+                    }
+
+                    if (StringUtils.stringSet(importVersion))
+                    {
+                        ResourceVersionConfiguration version = resource.getVersion(importVersion);
+                        if (version != null)
+                        {
+                            for (ResourcePropertyConfiguration property : version.getProperties().values())
+                            {
+                                context.add(property.asResourceProperty());
+                            }
+                        }
                     }
                 }
             }
