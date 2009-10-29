@@ -125,7 +125,7 @@ public class LocalBuild
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, options.getRecipe());
             Bootstrapper bootstrapper = new LocalBootstrapper();
-            RecipeRequest request = new RecipeRequest(bootstrapper, new ExternalPulseFileProvider(options.getPulseFile()), context);
+            RecipeRequest request = new RecipeRequest(bootstrapper, buildPulseFileProvider(baseDir, options), context);
             request.addAllResourceRequirements(resourceRequirements);
             recipeProcessor.build(request);
         }
@@ -139,6 +139,18 @@ public class LocalBuild
         }
 
         printEpilogue(logFile);
+    }
+
+    private ExternalPulseFileProvider buildPulseFileProvider(File baseDir, LocalBuildOptions options)
+    {
+        String pulseFileString = options.getPulseFile();
+        File pulseFile = new File(pulseFileString);
+        if (!pulseFile.isAbsolute())
+        {
+            pulseFile = new File(baseDir, pulseFileString);
+        }
+
+        return new ExternalPulseFileProvider(pulseFile.getName(), pulseFile.getParentFile());
     }
 
     private void printPrologue(LocalBuildOptions options)

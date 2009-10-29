@@ -287,12 +287,17 @@ public class RecipeProcessor
         context.setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());
 
-        LocalFileResolver localResolver = new LocalFileResolver(context.getWorkingDir());
+        PulseFileProvider pulseFileProvider = request.getPulseFileSource();
+        File importRoot = pulseFileProvider.getImportRoot();
+        if (importRoot == null)
+        {
+            importRoot = context.getWorkingDir();
+        }
 
+        LocalFileResolver localResolver = new LocalFileResolver(importRoot);
         try
         {
             // CIB-286: special case empty file for better reporting
-            PulseFileProvider pulseFileProvider = request.getPulseFileSource();
             String pulseFileContent = pulseFileProvider.getFileContent(localResolver);
             storePulseFile(pulseFileContent, context);
             if (!StringUtils.stringSet(pulseFileContent))

@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.engine;
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.util.io.IOUtils;
 
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -13,10 +14,17 @@ import java.io.InputStream;
 public class ExternalPulseFileProvider implements PulseFileProvider
 {
     private String path;
+    private File importRoot;
 
     public ExternalPulseFileProvider(String path)
     {
+        this(path, null);
+    }
+
+    public ExternalPulseFileProvider(String path, File importRoot)
+    {
         this.path = path;
+        this.importRoot = importRoot;
     }
 
     public String getPath()
@@ -28,5 +36,10 @@ public class ExternalPulseFileProvider implements PulseFileProvider
     {
         InputStream is = resolver.resolve(path);
         return IOUtils.inputStreamToString(is);
+    }
+
+    public File getImportRoot()
+    {
+        return importRoot;
     }
 }

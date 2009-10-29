@@ -202,7 +202,7 @@ public class GitClientTest extends GitClientTestBase
     {
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
-        assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/master."));
+        assertThat(handler.getStatusMessages(), hasItem(startsWith("Branch local set up")));
         assertThat(handler.getStatusMessages(), not(hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT))));
 
         handler.reset();
@@ -228,7 +228,7 @@ public class GitClientTest extends GitClientTestBase
         client.setBranch(BRANCH_SIMPLE);
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
-        assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/branch."));
+        assertThat(handler.getStatusMessages(), hasItem(startsWith("Branch local set up")));
 
         handler.reset();
 
