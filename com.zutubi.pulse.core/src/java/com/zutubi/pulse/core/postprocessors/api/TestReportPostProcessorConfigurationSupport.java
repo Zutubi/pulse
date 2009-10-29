@@ -12,11 +12,13 @@ import com.zutubi.validation.annotations.Required;
  * to a custom child suite.
  * </p>
  * <p>
- * Note that it is common for reports to be in XML format, for which a more
- * specific support class ({@link com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport}) exists.
+ * Note that it is common for reports to be in XML format, for which more
+ * specific support classes ({@link com.zutubi.pulse.core.postprocessors.api.DomTestReportPostProcessorSupport} and
+ * {@link com.zutubi.pulse.core.postprocessors.api.StAXTestReportPostProcessorSupport}) are available.
  * </p>
  *
- * @see com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport
+ * @see com.zutubi.pulse.core.postprocessors.api.StAXTestReportPostProcessorSupport
+ * @see com.zutubi.pulse.core.postprocessors.api.DomTestReportPostProcessorSupport
  */
 @SymbolicName("zutubi.testPostProcessorConfigSupport")
 @Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts"})

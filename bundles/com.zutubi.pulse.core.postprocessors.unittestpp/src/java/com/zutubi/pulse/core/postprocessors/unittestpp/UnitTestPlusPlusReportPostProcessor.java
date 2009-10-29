@@ -5,7 +5,6 @@ import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -13,7 +12,7 @@ import java.util.TreeMap;
  * Post-processor for UnitTest++ (and compatible) XML reports.  See:
  * http://unittest-cpp.sourceforge.net/
  */
-public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProcessorSupport
+public class UnitTestPlusPlusReportPostProcessor extends StAXTestReportPostProcessorSupport
 {
     private static final String ELEMENT_RESULTS = "unittest-results";
     private static final String ELEMENT_TEST = "test";
@@ -29,23 +28,9 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
         super(config);
     }
 
-    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
+    protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        process(file, ppContext, tests, new XMLStreamCallback()
-        {
-            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-            {
-                if (nextElement(reader))
-                {
-                    processTestResults(reader, tests);
-                }
-            }
-        });
-    }
-
-    private void processTestResults(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-    {
-        expectStartElement(ELEMENT_RESULTS, reader);
+        expectStartTag(ELEMENT_RESULTS, reader);
         reader.nextTag();
 
         Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
@@ -64,12 +49,12 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
 
         addSuites(tests, suites);
 
-        expectEndElement(ELEMENT_RESULTS, reader);
+        expectEndTag(ELEMENT_RESULTS, reader);
     }
 
     private void processTest(XMLStreamReader reader, Map<String, TestSuiteResult> suites) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_TEST, reader);
+        expectStartTag(ELEMENT_TEST, reader);
         Map<String, String> attributes = getAttributes(reader);
 
         String suite = attributes.get(ATTRIBUTE_SUITE);
@@ -105,10 +90,10 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
         }
         else
         {
-            skipElement(reader, false);
+            skipElement(reader);
         }
 
-        expectEndElement(ELEMENT_TEST, reader);
+        expectEndTag(ELEMENT_TEST, reader);
         reader.nextTag();
     }
 

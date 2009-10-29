@@ -5,7 +5,6 @@ import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -13,7 +12,7 @@ import java.util.TreeMap;
  * Post-processor for cppunit (and compatible) XML reports.  See:
  * http://sourceforge.net/apps/mediawiki/cppunit/index.php
  */
-public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
+public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
 {
     private static final String ELEMENT_TEST_RUN = "TestRun";
     private static final String ELEMENT_SUCCESSFUL_TESTS = "SuccessfulTests";
@@ -34,23 +33,9 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         super(config);
     }
 
-    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
+    protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        process(file, ppContext, tests, new XMLStreamCallback()
-        {
-            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-            {
-                if (nextElement(reader))
-                {
-                    handleTestRun(tests, reader);
-                }
-            }
-        });
-    }
-
-    private void handleTestRun(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
-    {
-        expectStartElement(ELEMENT_TEST_RUN, reader);
+        expectStartTag(ELEMENT_TEST_RUN, reader);
         reader.nextTag();
 
         Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
@@ -73,12 +58,12 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
 
         addSuites(tests, suites);
 
-        expectEndElement(ELEMENT_TEST_RUN, reader);
+        expectEndTag(ELEMENT_TEST_RUN, reader);
     }
 
     private void handleSuccessfulTests(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_SUCCESSFUL_TESTS, reader);
+        expectStartTag(ELEMENT_SUCCESSFUL_TESTS, reader);
         reader.nextTag();
 
         while (reader.isStartElement())
@@ -86,13 +71,13 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
             handleSuccessfulTest(suites, reader);
         }
 
-        expectEndElement(ELEMENT_SUCCESSFUL_TESTS, reader);
+        expectEndTag(ELEMENT_SUCCESSFUL_TESTS, reader);
         reader.nextTag();
     }
 
     private void handleSuccessfulTest(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_TEST, reader);
+        expectStartTag(ELEMENT_TEST, reader);
         reader.nextTag();
 
         String[] name = handleGetTestName(reader);
@@ -101,13 +86,13 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         TestCaseResult result = new TestCaseResult(name[1]);
         suite.addCase(result);
 
-        expectEndElement(ELEMENT_TEST, reader);
+        expectEndTag(ELEMENT_TEST, reader);
         reader.nextTag();
     }
 
     private void handleFailedTests(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_FAILED_TESTS, reader);
+        expectStartTag(ELEMENT_FAILED_TESTS, reader);
         reader.nextTag();
 
         while (reader.isStartElement())
@@ -115,13 +100,13 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
             handleFailedTest(suites, reader);
         }
 
-        expectEndElement(ELEMENT_FAILED_TESTS, reader);
+        expectEndTag(ELEMENT_FAILED_TESTS, reader);
         reader.nextTag();
     }
 
     private void handleFailedTest(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_FAILED_TEST, reader);
+        expectStartTag(ELEMENT_FAILED_TEST, reader);
         reader.nextTag();
 
         // warning: this assumes the ordering of the tags in the xml report.  Is this a reasonable
@@ -134,7 +119,7 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         TestCaseResult result = new TestCaseResult(name[1], TestResult.DURATION_UNKNOWN, status, message);
         suite.addCase(result);
 
-        expectEndElement(ELEMENT_FAILED_TEST, reader);
+        expectEndTag(ELEMENT_FAILED_TEST, reader);
         reader.nextTag();
     }
 
@@ -143,22 +128,22 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         Map<String, String> location = null;
         if (reader.getLocalName().equals(ELEMENT_LOCATION))
         {
-            expectStartElement(ELEMENT_LOCATION, reader);
+            expectStartTag(ELEMENT_LOCATION, reader);
             reader.nextTag();
 
             location = readElements(reader);
 
-            expectEndElement(ELEMENT_LOCATION, reader);
+            expectEndTag(ELEMENT_LOCATION, reader);
             reader.nextTag();
         }
 
         String messageText = null;
         if (reader.getLocalName().equals(ELEMENT_MESSAGE))
         {
-            expectStartElement(ELEMENT_MESSAGE, reader);
-            messageText = getElementText(reader, "").trim();
+            expectStartTag(ELEMENT_MESSAGE, reader);
+            messageText = reader.getElementText().trim();
 
-            expectEndElement(ELEMENT_MESSAGE, reader);
+            expectEndTag(ELEMENT_MESSAGE, reader);
             reader.nextTag();
         }
 
@@ -187,10 +172,10 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
 
     private TestStatus handleGetFailedTestStatus(XMLStreamReader reader) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_FAILURE_TYPE, reader);
-        String typeText = getElementText(reader, "").trim();
+        expectStartTag(ELEMENT_FAILURE_TYPE, reader);
+        String typeText = reader.getElementText().trim();
         TestStatus status = typeText.equals(FAILURE_TYPE_ERROR) ? TestStatus.ERROR : TestStatus.FAILURE;
-        expectEndElement(ELEMENT_FAILURE_TYPE, reader);
+        expectEndTag(ELEMENT_FAILURE_TYPE, reader);
         reader.nextTag();
 
         return status;
@@ -198,11 +183,11 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
 
     private String[] handleGetTestName(XMLStreamReader reader) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_NAME, reader);
-        String nameText = getElementText(reader, "").trim();
+        expectStartTag(ELEMENT_NAME, reader);
+        String nameText = reader.getElementText().trim();
         String[] bits = nameText.split("::", 2);
         String[] name = (bits.length == 1) ? new String[]{ "[unknown]", bits[0] } : bits;
-        expectEndElement(ELEMENT_NAME, reader);
+        expectEndTag(ELEMENT_NAME, reader);
         reader.nextTag();
 
         return name;

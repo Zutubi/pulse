@@ -26,7 +26,8 @@ import java.io.File;
  *
  * @see OutputPostProcessorSupport
  * @see TestReportPostProcessorSupport
- * @see XMLTestReportPostProcessorSupport
+ * @see StAXTestReportPostProcessorSupport
+ * @see DomTestReportPostProcessorSupport
  * @see TextFilePostProcessorSupport
  * @see LineBasedPostProcessorSupport
  */

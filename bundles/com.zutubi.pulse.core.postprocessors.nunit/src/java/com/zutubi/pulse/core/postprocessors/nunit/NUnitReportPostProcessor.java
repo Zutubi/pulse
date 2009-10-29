@@ -1,20 +1,22 @@
 package com.zutubi.pulse.core.postprocessors.nunit;
 
-import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.pulse.core.postprocessors.api.StAXTestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.File;
 import java.util.Map;
 
 /**
  * Post-processor for NUnit version 2 (and compatible) XML reports.  See:
  * http://www.nunit.org/.
  */
-public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
+public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
 {
     private static final String ELEMENT_ROOT        = "test-results";
     private static final String ELEMENT_SUITE       = "test-suite";
@@ -35,23 +37,9 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         super(config);
     }
 
-    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
+    protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        process(file, ppContext, tests, new XMLStreamCallback()
-        {
-            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-            {
-                if (nextElement(reader))
-                {
-                    handleTestRun(tests, reader);
-                }
-            }
-        });
-    }
-
-    private void handleTestRun(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
-    {
-        expectStartElement(ELEMENT_ROOT, reader);
+        expectStartTag(ELEMENT_ROOT, reader);
         reader.nextTag();
         while (reader.isStartElement())
         {
@@ -78,7 +66,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             }
         }
 
-        expectEndElement(ELEMENT_ROOT, reader);
+        expectEndTag(ELEMENT_ROOT, reader);
     }
 
     private void processTopSuiteResults(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
@@ -108,7 +96,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             {
                 processSuiteResults(parentSuite, parentPath, reader, attributes);
 
-                expectEndElement(ELEMENT_RESULTS, reader);
+                expectEndTag(ELEMENT_RESULTS, reader);
                 reader.nextTag();
             }
             else
@@ -117,7 +105,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             }
         }
 
-        expectEndElement(ELEMENT_SUITE, reader);
+        expectEndTag(ELEMENT_SUITE, reader);
         reader.nextTag();
     }
 
@@ -127,6 +115,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         if (name == null)
         {
             nextElement(reader);
+            return;
         }
 
         name = StringUtils.stripPrefix(name, parentPath);
@@ -209,7 +198,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
         suite.addCase(caseResult);
 
-        expectEndElement(ELEMENT_CASE, reader);
+        expectEndTag(ELEMENT_CASE, reader);
         reader.nextTag();
     }
 
@@ -237,7 +226,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
                     }
                 }
 
-                expectEndElement(ELEMENT_FAILURE, reader);
+                expectEndTag(ELEMENT_FAILURE, reader);
                 reader.nextTag();
             }
             else
@@ -273,7 +262,7 @@ public class NUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
                     }
                 }
 
-                expectEndElement(ELEMENT_REASON, reader);
+                expectEndTag(ELEMENT_REASON, reader);
                 reader.nextTag();
             }
             else

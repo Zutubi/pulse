@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
@@ -12,11 +13,13 @@ import java.io.File;
  * to a custom child suite.
  * </p>
  * <p>
- * Note that it is common for reports to be in XML format, for which a more
- * specific support class ({@link XMLTestReportPostProcessorSupport}) exists.
+ * Note that it is common for reports to be in XML format, for which more
+ * specific support classes ({@link DomTestReportPostProcessorSupport} and
+ * {@link StAXTestReportPostProcessorSupport}) exist.
  * </p>
  *
- * @see XMLTestReportPostProcessorSupport
+ * @see StAXTestReportPostProcessorSupport
+ * @see DomTestReportPostProcessorSupport
  */
 public abstract class TestReportPostProcessorSupport extends PostProcessorSupport
 {
@@ -78,6 +81,21 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
         }
 
         return false;
+    }
+
+    protected void handleException(File file, PostProcessorContext ppContext, Exception e)
+    {
+        String message = e.getClass().getName() + " processing report '" + file.getAbsolutePath() + "'";
+        handleException(message, ppContext, e);
+    }
+
+    protected void handleException(String message, PostProcessorContext ppContext, Exception e)
+    {
+        if(e.getMessage() != null)
+        {
+            message += ": " + e.getMessage();
+        }
+        ppContext.addFeatureToCommand(new Feature(Feature.Level.WARNING, message));
     }
 
     /**

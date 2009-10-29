@@ -22,7 +22,7 @@ public abstract class XMLTestReportPostProcessorConfigurationSupport extends Tes
      * @param reportType human-readable name of the type of report being
      *                   processed (e.g. JUnit)
      */
-    protected XMLTestReportPostProcessorConfigurationSupport(Class<? extends XMLTestReportPostProcessorSupport> postProcessorType, String reportType)
+    protected XMLTestReportPostProcessorConfigurationSupport(Class<? extends TestReportPostProcessorSupport> postProcessorType, String reportType)
     {
         super(postProcessorType);
         this.reportType = reportType;

@@ -5,7 +5,6 @@ import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ import java.util.Map;
  * --output_format=XML --log_level=test_suite
  * 
  */
-public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupport
+public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSupport
 {
     private static final String ELEMENT_TEST_LOG = "TestLog";
     private static final String ELEMENT_TEST_SUITE = "TestSuite";
@@ -53,23 +52,9 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         super(config);
     }
 
-    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
+    protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        process(file, ppContext, tests, new XMLStreamCallback()
-        {
-            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-            {
-                if (nextElement(reader))
-                {
-                    processSuites(reader, tests);
-                }
-            }
-        });
-    }
-
-    private void processSuites(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-    {
-        expectStartElement(ELEMENT_TEST_LOG, reader);
+        expectStartTag(ELEMENT_TEST_LOG, reader);
         reader.nextTag();
 
         while (reader.isStartElement())
@@ -83,12 +68,12 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
                 nextElement(reader);
             }
         }
-        expectEndElement(ELEMENT_TEST_LOG, reader);
+        expectEndTag(ELEMENT_TEST_LOG, reader);
     }
 
     private void processSuite(XMLStreamReader reader, TestSuiteResult parentSuite) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_TEST_SUITE, reader);
+        expectStartTag(ELEMENT_TEST_SUITE, reader);
 
         Map<String, String> attributes = getAttributes(reader);
         if (!attributes.containsKey(ATTRIBUTE_NAME))
@@ -120,13 +105,13 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         suiteResult.setDuration(getTotalDuration(suiteResult));
         parentSuite.addSuite(suiteResult);
 
-        expectEndElement(ELEMENT_TEST_SUITE, reader);
+        expectEndTag(ELEMENT_TEST_SUITE, reader);
         reader.nextTag();
     }
 
     private void processCase(XMLStreamReader reader, TestSuiteResult parentSuite) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_TEST_CASE, reader);
+        expectStartTag(ELEMENT_TEST_CASE, reader);
 
         Map<String, String> attributes = getAttributes(reader);
         if (!attributes.containsKey(ATTRIBUTE_NAME))
@@ -147,7 +132,7 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
             {
                 try
                 {
-                    duration = (long) (Double.parseDouble(getElementText(reader, "").trim()) / 1000);
+                    duration = (long) (Double.parseDouble(reader.getElementText().trim()) / 1000);
                 }
                 catch (NumberFormatException e)
                 {
@@ -165,7 +150,7 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
                     if (config.isProcessMessages() && name.equals(ELEMENT_MESSAGE) || config.isProcessInfo() && name.equals(ELEMENT_INFO))
                     {
                         appendMessage(reader, builder);
-                        expectEndElement(name, reader);
+                        expectEndTag(name, reader);
                         reader.nextTag();
                     }
                     else
@@ -181,7 +166,7 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
                     }
 
                     appendMessage(reader, builder);
-                    expectEndElement(name, reader);
+                    expectEndTag(name, reader);
                     reader.nextTag();
                 }
             }
@@ -189,7 +174,7 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
 
         parentSuite.addCase(new TestCaseResult(attributes.get(ATTRIBUTE_NAME), duration, status, builder.length() > 0 ? builder.toString() : null));
 
-        expectEndElement(ELEMENT_TEST_CASE, reader);
+        expectEndTag(ELEMENT_TEST_CASE, reader);
         reader.nextTag();
     }
 
@@ -209,7 +194,7 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
             }
         }
 
-        message += ": " + getElementText(reader, "").trim();
+        message += ": " + reader.getElementText().trim();
         if (builder.length() > 0)
         {
             builder.append("\n");

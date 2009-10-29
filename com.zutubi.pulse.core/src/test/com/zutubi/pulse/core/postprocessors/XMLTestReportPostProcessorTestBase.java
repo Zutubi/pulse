@@ -7,10 +7,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestCaseResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
-import com.zutubi.pulse.core.postprocessors.api.TestResult;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
-import com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.File;
@@ -19,9 +16,9 @@ import java.io.File;
  */
 public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
 {
-    protected XMLTestReportPostProcessorSupport pp;
+    protected TestReportPostProcessorSupport pp;
 
-    protected XMLTestReportPostProcessorTestBase(XMLTestReportPostProcessorSupport pp)
+    protected XMLTestReportPostProcessorTestBase(TestReportPostProcessorSupport pp)
     {
         this.pp = pp;
     }

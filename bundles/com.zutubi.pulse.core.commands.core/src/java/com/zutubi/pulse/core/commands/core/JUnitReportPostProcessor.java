@@ -6,13 +6,12 @@ import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.File;
 import java.util.Map;
 
 /**
  * Post-processor for junit (and compatible) XML reports.
  */
-public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
+public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
 {
     private static final String ELEMENT_SUITES = "testsuites";
 
@@ -27,30 +26,21 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         return (JUnitReportPostProcessorConfiguration) super.getConfig();
     }
 
-    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
+    protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        process(file, ppContext, tests, new XMLStreamCallback()
+        if (isElement(getConfig().getSuiteElement(), reader))
         {
-            public void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
-            {
-                if (nextElement(reader))
-                {
-                    if (isElement(getConfig().getSuiteElement(), reader))
-                    {
-                        processSuite(reader, tests);
-                    }
-                    else if (isElement(ELEMENT_SUITES, reader))
-                    {
-                        processSuites(reader, tests);
-                    }
-                }
-            }
-        });
+            processSuite(reader, tests);
+        }
+        else if (isElement(ELEMENT_SUITES, reader))
+        {
+            processSuites(reader, tests);
+        }
     }
 
     protected void processSuites(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        expectStartElement(ELEMENT_SUITES, reader);
+        expectStartTag(ELEMENT_SUITES, reader);
         reader.nextTag();
 
         while (reader.isStartElement())
@@ -65,12 +55,12 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             }
         }
 
-        expectEndElement(ELEMENT_SUITES, reader);
+        expectEndTag(ELEMENT_SUITES, reader);
     }
 
     private void processSuite(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        expectStartElement(getConfig().getSuiteElement(), reader);
+        expectStartTag(getConfig().getSuiteElement(), reader);
         Map<String, String> attributes = XMLStreamUtils.getAttributes(reader);
 
         String name = getTestSuiteName(attributes);
@@ -102,7 +92,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             }
         }
 
-        expectEndElement(getConfig().getSuiteElement(), reader);
+        expectEndTag(getConfig().getSuiteElement(), reader);
         reader.nextTag();
     }
 
@@ -125,7 +115,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
     private void processCase(XMLStreamReader reader, TestSuiteResult suite) throws XMLStreamException
     {
-        expectStartElement(getConfig().getCaseElement(), reader);
+        expectStartTag(getConfig().getCaseElement(), reader);
 
         Map<String, String> attributes = XMLStreamUtils.getAttributes(reader);
         String name = attributes.get(getConfig().getNameAttribute());
@@ -165,7 +155,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             nextElement(reader);
         }
 
-        expectEndElement(getConfig().getCaseElement(), reader);
+        expectEndTag(getConfig().getCaseElement(), reader);
         reader.nextTag();
     }
 

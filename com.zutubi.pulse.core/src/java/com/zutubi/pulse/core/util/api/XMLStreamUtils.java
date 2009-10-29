@@ -63,38 +63,18 @@ public class XMLStreamUtils
     }
 
     /**
-     * Move the xml stream readers cursor to the first element after the end tag that matches the
-     * current start tag (ie: effectively skip the current element).
+     * Move the xml stream readers cursor to the end tag that matches the
+     * current start tag, skipping the contents of the element.
      *
-     * This is equivalent to calling {@link #skipElement(javax.xml.stream.XMLStreamReader, boolean)}
-     * with consumeEndTag set to true.
+     * This requires that the reader is currently at a start element. That is,
+     * reader.getEventType() == XMLStreamConstants.START_ELEMENT
      *
-     * @param reader    the reader
+     * @param reader            the reader
      * @throws javax.xml.stream.XMLStreamException on error
      */
     public static void skipElement(XMLStreamReader reader) throws XMLStreamException
     {
-        skipElement(reader, true);
-    }
-
-    /**
-     * Move the xml stream readers cursor to the end tag that matches the
-     * current start tag (ie: effectively skip the current element), optionally
-     * consuming the end tag.
-     *
-     * @param reader            the reader
-     * @param consumeEndTag     indicates whether or not the state of the reader should be
-     *                          moved past the end tag or not.
-     * @throws javax.xml.stream.XMLStreamException on error
-     */
-    public static void skipElement(XMLStreamReader reader, boolean consumeEndTag) throws XMLStreamException
-    {
-        // special case - already at an end tag.
         int eventType = reader.getEventType();
-        if (eventType == END_ELEMENT)
-        {
-            return;
-        }
         if (eventType != START_ELEMENT)
         {
             throw new IllegalStateException("Expected reader to be at a start element, but instead found " + reader.getEventType());
@@ -105,8 +85,10 @@ public class XMLStreamUtils
 
         while (!tags.isEmpty())
         {
+            // Unless the xml document is invalid, we can safely assume that tags.isEmpty()
+            // will be true before reader.hasNext is false.
             eventType = reader.next();
-            
+
             if (eventType == START_ELEMENT)
             {
                 tags.push(reader.getLocalName());
@@ -116,56 +98,6 @@ public class XMLStreamUtils
                 tags.pop();
             }
         }
-        if (consumeEndTag && reader.getEventType() == END_ELEMENT)
-        {
-            // consume nodes until we reach the first tag after the end element.
-            while (reader.hasNext())
-            {
-                reader.next();
-                if (reader.isStartElement() || reader.isEndElement())
-                {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Find and move the cursor to the start element with the specified tag name.
-     *
-     * If the readers cursor is sitting on a start element of the required name, no change
-     * in state is made.
-     *
-     * @param reader    the reader being shifted
-     * @param tagName   the name of the tag whose starting tag is being searched for
-     * @return  true if the start tag is found, false otherwise.
-     *
-     * @throws XMLStreamException on error.
-     */
-    public static boolean findNextStartTag(XMLStreamReader reader, String tagName) throws XMLStreamException
-    {
-        return findNextTag(reader, tagName, START_ELEMENT);
-    }
-
-    private static boolean findNextTag(XMLStreamReader reader, String tagName, int tagType) throws XMLStreamException
-    {
-        int eventType = reader.getEventType();
-        String localName = reader.getLocalName();
-        if (eventType == tagType && localName.equals(tagName))
-        {
-            return true;
-        }
-
-        while (reader.hasNext())
-        {
-            eventType = reader.next();
-            localName = reader.getLocalName();
-            if (eventType == tagType && localName.equals(tagName))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -189,23 +121,17 @@ public class XMLStreamUtils
         }
         catch (Exception e)
         {
-            //
+            // noop
         }
         return "<unknown>";
     }
 
     /**
      * Move the readers cursor to the start tag of the next element, returning true if
-     * a new element is located, false otherwise.
+     * a new element is encountered, false otherwise.
      *
      * Note that this operation will skip over any nested elements, but not 'skip out of'
      * the current element depth within the xml document.
-     *
-     * SPECIAL CASE: If we are within the text of an element, this method will step outside
-     * of the current element and then on to the next element.
-     *
-     * SPECIAL CASE 2: If we are at the start of the document, this method will step to
-     * the first element in the document.
      *
      * @param reader    the reader being shifted.
      * @return true if a new element is encountered, false otherwise.
@@ -214,81 +140,63 @@ public class XMLStreamUtils
      */
     public static boolean nextElement(XMLStreamReader reader) throws XMLStreamException
     {
-        if (reader.isStartElement())
-        {
-            skipElement(reader, false);
+        skipElement(reader);
 
-            reader.nextTag();
-        }
-        else if (reader.isEndElement())
-        {
-            reader.nextTag();
-        }
-        else if (reader.isCharacters())
-        {
-            reader.nextTag();
-
-            if (reader.isEndElement())
-            {
-                reader.nextTag();
-            }
-        }
-        else if (reader.getEventType() == XMLStreamConstants.PROCESSING_INSTRUCTION ||
-                reader.getEventType() == XMLStreamConstants.START_DOCUMENT ||
-                reader.getEventType() == XMLStreamConstants.DTD)
-        {
-            while (!reader.isStartElement())
-            {
-                reader.next();
-            }
-        }
+        reader.nextTag();
 
         return (reader.isStartElement());
     }
 
     /**
-     * Throws an XMLStreamException if the element at the current cursor location
-     * of the stream reader is not a start element and if the name does not match
-     * the specified element name.
+     * Throws an XMLStreamException if the tag at the current cursor location
+     * of the stream reader is not a start tag and if the name does not match
+     * the specified name.
      *
-     * @param elementName   the expected element name
+     * @param localName     the expected element name
      * @param reader        the xml stream reader whose cursor location is to be checked.
      *
      * @throws XMLStreamException if either of the expected conditions are not satisfied.
      */
-    public static void expectStartElement(String elementName, XMLStreamReader reader) throws XMLStreamException
+    public static void expectStartTag(String localName, XMLStreamReader reader) throws XMLStreamException
     {
-        if (!reader.getLocalName().equals(elementName) || !reader.isStartElement())
+        if (!reader.getLocalName().equals(localName) || !reader.isStartElement())
         {
             throw new XMLStreamException("Expected " + toString(XMLStreamConstants.START_ELEMENT) + ":" +
-                    elementName + ", instead found " + toString(reader.getEventType()) + ":" +
+                    localName + ", instead found " + toString(reader.getEventType()) + ":" +
                     reader.getLocalName() + " at " + reader.getLocation());
         }
     }
 
     /**
-     * Throws an XMLStreamException if the element at the current cursor location
-     * of the stream reader is not an end element and if the name does not match
-     * the specified element name.
+     * Throws an XMLStreamException if the tag at the current cursor location
+     * of the stream reader is not an end tag and if the name does not match
+     * the specified name.
      *
-     * @param elementName   the expected element name
+     * @param localName     the expected element name
      * @param reader        the xml stream reader whose cursor location is to be checked.
      *
      * @throws XMLStreamException if either of the expected conditions are not satisfied.
      */
-    public static void expectEndElement(String elementName, XMLStreamReader reader) throws XMLStreamException
+    public static void expectEndTag(String localName, XMLStreamReader reader) throws XMLStreamException
     {
-        if (!isElement(elementName, reader) || !reader.isEndElement())
+        if (!isElement(localName, reader) || !reader.isEndElement())
         {
             throw new XMLStreamException("Expected " + toString(XMLStreamConstants.END_ELEMENT) + ":" +
-                    elementName + ", instead found " + toString(reader.getEventType()) + ":" +
+                    localName + ", instead found " + toString(reader.getEventType()) + ":" +
                     reader.getLocalName() + " at " + reader.getLocation());
         }
     }
 
     /**
+     * This method reads through all of the elements at the current level of the xml document,
+     * converting them into a map by using the elements localname as the key, and the elementText
+     * as the value.
+     *
+     * This method requires that all of the elements encountered as plain text elements.  No nested
+     * elements are supported.
      *
      * @param reader    the xml stream reader that provides the element data.
+     *
      * @return a map of keys that represent the element names, and values that represent
      * the elements text value.
      *
@@ -307,7 +215,6 @@ public class XMLStreamUtils
 
             reader.nextTag();
         }
-
         return elements;
     }
 
@@ -323,24 +230,5 @@ public class XMLStreamUtils
     public static boolean isElement(String elementName, XMLStreamReader reader)
     {
         return reader.getLocalName().equals(elementName);
-    }
-
-    /**
-     * Returns the trimmed element text, or the default value if no text is available.
-     *
-     * @param reader        the reader from which we are reading the element text.
-     * @param defaultValue  the default value to be returned if no element text is available.
-     * @return the element text, or the default value if no text is available.
-     * @throws XMLStreamException on error
-     * @see javax.xml.stream.XMLStreamReader#getElementText()
-     */
-    public static String getElementText(XMLStreamReader reader, String defaultValue) throws XMLStreamException
-    {
-        String text = reader.getElementText();
-        if (text == null)
-        {
-            return defaultValue;
-        }
-        return text.trim();
     }
 }
