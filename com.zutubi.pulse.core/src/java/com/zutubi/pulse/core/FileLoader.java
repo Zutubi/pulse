@@ -366,7 +366,7 @@ public class FileLoader
                     }
                     catch (Exception e)
                     {
-                        throw new FileLoadException("\nWhile expanding macro defined at line " + lae.getLineNumber() + " column " + lae.getColumnNumber() + ": " + e.getMessage(), e);
+                        throw new FileLoadException("While expanding macro defined at line " + lae.getLineNumber() + " column " + lae.getColumnNumber() + ": " + e.getMessage(), e);
                     }
                     found = true;
                 }
