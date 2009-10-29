@@ -266,7 +266,12 @@ public class LocalBuild
 
     private PulseFileSource loadPulseFile(File baseDir, String pulseFileName) throws PulseException
     {
-        File pulseFile = new File(baseDir, pulseFileName);
+        File pulseFile = new File(pulseFileName);
+        if (!pulseFile.isAbsolute())
+        {
+            pulseFile = new File(baseDir, pulseFileName);
+        }
+
         FileInputStream pulseFileInputStream = null;
         String content;
 
@@ -284,7 +289,7 @@ public class LocalBuild
             IOUtils.close(pulseFileInputStream);
         }
 
-        return new PulseFileSource(pulseFileName, content);
+        return new PulseFileSource(pulseFile.getName(), content, pulseFile.getParentFile());
     }
 
     private void printPrologue(String pulseFile, String resourcesFile, String outputDir)

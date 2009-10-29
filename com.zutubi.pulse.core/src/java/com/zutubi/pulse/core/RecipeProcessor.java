@@ -417,7 +417,12 @@ public class RecipeProcessor
             ResourceRepository resourceRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
             PulseFile result = new PulseFile();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new LocalFileResolver(context.getWorkingDir()));
+            File importRoot = pulseFileSource.getImportRoot();
+            if (importRoot == null)
+            {
+                importRoot = context.getWorkingDir();
+            }
+            FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new LocalFileResolver(importRoot));
             fileLoader.load(stream, result, globalScope, fileResolver, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
