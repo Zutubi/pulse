@@ -181,19 +181,15 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         TestCaseResult caseResult = new TestCaseResult(name, getDuration(attributes), status);
         if (status == TestStatus.FAILURE)
         {
-            caseResult.setMessage(getFailure(reader));
+            caseResult.setMessage(getMessage(reader, ELEMENT_FAILURE));
         }
         else if (status == TestStatus.SKIPPED)
         {
-            caseResult.setMessage(getReason(reader));
+            caseResult.setMessage(getMessage(reader, ELEMENT_REASON));
         }
         else
         {
-            reader.nextTag();
-            while (reader.isStartElement())
-            {
-                nextElement(reader);
-            }
+            skipElement(reader);
         }
 
         suite.addCase(caseResult);
@@ -202,14 +198,14 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         reader.nextTag();
     }
 
-    private String getFailure(XMLStreamReader reader) throws XMLStreamException
+    private String getMessage(XMLStreamReader reader, String tagName) throws XMLStreamException
     {
         StringBuilder message = new StringBuilder();
 
         reader.nextTag();
         while (reader.isStartElement())
         {
-            if (reader.getLocalName().equals(ELEMENT_FAILURE))
+            if (reader.getLocalName().equals(tagName))
             {
                 reader.nextTag();
 
@@ -226,43 +222,7 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
                     }
                 }
 
-                expectEndTag(ELEMENT_FAILURE, reader);
-                reader.nextTag();
-            }
-            else
-            {
-                nextElement(reader);
-            }
-        }
-
-        return message.toString().trim();
-    }
-
-    private String getReason(XMLStreamReader reader) throws XMLStreamException
-    {
-        StringBuilder message = new StringBuilder();
-
-        reader.nextTag();
-        while (reader.isStartElement())
-        {
-            if (reader.getLocalName().equals(ELEMENT_REASON))
-            {
-                reader.nextTag();
-
-                while (reader.isStartElement())
-                {
-                    if (reader.getLocalName().equals(ELEMENT_MESSAGE))
-                    {
-                        appendToMessage(reader, message);
-                        reader.nextTag();
-                    }
-                    else
-                    {
-                        nextElement(reader);
-                    }
-                }
-
-                expectEndTag(ELEMENT_REASON, reader);
+                expectEndTag(tagName, reader);
                 reader.nextTag();
             }
             else
