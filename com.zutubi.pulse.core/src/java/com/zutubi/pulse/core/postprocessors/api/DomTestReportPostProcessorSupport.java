@@ -71,11 +71,19 @@ public abstract class DomTestReportPostProcessorSupport extends TestReportPostPr
     }
 
     /**
-     * Implementations of this class need to implement there processing logic through this method.  The
+     * Implementations of this class need to implement their processing logic through this method.  The
      * xml test report has already been parsed and is available in the form of a dom tree.
      *
+     * The extracted test data is persisted in the TestSuiteResult.  This suite is the root, and therefore
+     * should not have test cases associated directly with it.  Instead, first create your own TestSuiteResult
+     * that is added to the root TestSuiteResult via the {@link TestSuiteResult#addSuite(TestSuiteResult)} method,
+     * and then register any test cases or nested test suites to your own TestSuiteResult instance.
+     *
      * @param doc   the dom tree of the parsed xml report
-     * @param tests the test result instance in which the extracted test details are persisted.
+     * @param tests     the test result instance in which the extracted test details are persisted.
+     *
+     * @see com.zutubi.pulse.core.postprocessors.api.TestSuiteResult
+     * @see com.zutubi.pulse.core.postprocessors.api.TestCaseResult
      */
     protected abstract void process(Document doc, TestSuiteResult tests);
 }

@@ -1,0 +1,5 @@
+<root>
+    <empty/>
+    <simple>blah</simple>
+    <nested><element> blah </element></nested>
+</root>

@@ -192,14 +192,13 @@ public class XMLStreamUtils
      * converting them into a map by using the elements localname as the key, and the elementText
      * as the value.
      *
-     * This method requires that all of the elements encountered as plain text elements.  No nested
-     * elements are supported.
-     *
      * @param reader    the xml stream reader that provides the element data.
      *
      * @return a map of keys that represent the element names, and values that represent
      * the elements text value.
      *
+     * @see #getElementText(javax.xml.stream.XMLStreamReader)
+     * 
      * @throws XMLStreamException on error or if a nested element is encountered.
      */
     public static Map<String, String> readElements(XMLStreamReader reader) throws XMLStreamException
@@ -209,13 +208,72 @@ public class XMLStreamUtils
         while (reader.isStartElement())
         {
             String name = reader.getLocalName();
-            String text = reader.getElementText();
+            String text = getElementText(reader);
 
             elements.put(name, text);
 
             reader.nextTag();
         }
         return elements;
+    }
+
+    /**
+     * Get the text contents of the element at the current cursor in the reader.  This varies from the
+     * default implementation of getElementText in that if nested elements are encountered, they are
+     * converted into text and returned as part of the string.
+     *
+     * Only the nested elements names are included in the returned string, not their attributes.
+     *
+     * The reader is expected to be positioned at the start of an element.  Anything else will result
+     * in an exception being thrown.
+     *
+     * @param reader    the reader from which we are reading the text.
+     * @return  the content of the current element as text.
+     *
+     * @throws XMLStreamException on error.
+     */
+    public static String getElementText(XMLStreamReader reader) throws XMLStreamException
+    {
+        int eventType = reader.getEventType();
+        if (eventType != START_ELEMENT)
+        {
+            throw new IllegalStateException("Expected reader to be at a start element, but instead found " + reader.getEventType());
+        }
+
+        Stack<String> tags = new Stack<String>();
+        tags.push(reader.getLocalName());
+
+        StringBuffer buffer = new StringBuffer();
+
+        while (!tags.isEmpty())
+        {
+            // Unless the xml document is invalid, we can safely assume that tags.isEmpty()
+            // will be true before reader.hasNext is false.
+            eventType = reader.next();
+
+            if (eventType == START_ELEMENT)
+            {
+                tags.push(reader.getLocalName());
+                buffer.append("<").append(reader.getLocalName()).append(">");
+            }
+            else if (eventType == END_ELEMENT)
+            {
+                tags.pop();
+                if (!tags.isEmpty())
+                {
+                    buffer.append("</").append(reader.getLocalName()).append(">");
+                }
+            }
+            else
+            {
+                if (reader.isCharacters())
+                {
+                    buffer.append(reader.getText());
+                }
+            }
+        }
+
+        return buffer.toString();
     }
 
     /**

@@ -13,19 +13,22 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
 import java.util.Map;
 
-public class XMLStreamUtilsTest extends PulseTestCase {
+public class XMLStreamUtilsTest extends PulseTestCase
+{
     private XMLStreamReader reader;
     private InputStream input;
 
     @Override
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         XMLStreamUtils.close(reader);
         IOUtils.close(input);
 
         super.tearDown();
     }
 
-    public void testGetAttributes() throws XMLStreamException {
+    public void testGetAttributes() throws XMLStreamException
+    {
         XMLStreamReader reader = getXMLStreamReader("testGetAttributes");
         assertEquals(START_ELEMENT, reader.nextTag());
 
@@ -43,7 +46,8 @@ public class XMLStreamUtilsTest extends PulseTestCase {
         assertEquals(0, attributes.size());
     }
 
-    public void testSkipElement() throws XMLStreamException {
+    public void testSkipElement() throws XMLStreamException
+    {
         XMLStreamReader reader = getXMLStreamReader("testSkipElement");
         assertEquals("root", reader.getLocalName());
         assertEquals(START_ELEMENT, reader.nextTag());
@@ -73,14 +77,16 @@ public class XMLStreamUtilsTest extends PulseTestCase {
         assertEquals("root", reader.getLocalName());
     }
 
-    public void testToString() throws IllegalAccessException {
+    public void testToString() throws IllegalAccessException
+    {
         assertEquals("START_ELEMENT", XMLStreamUtils.toString(START_ELEMENT));
         assertEquals("ATTRIBUTE", XMLStreamUtils.toString(ATTRIBUTE));
         assertEquals("DTD", XMLStreamUtils.toString(DTD));
         assertEquals("NAMESPACE", XMLStreamUtils.toString(NAMESPACE));
     }
 
-    public void testNextElement() throws XMLStreamException {
+    public void testNextElement() throws XMLStreamException
+    {
         XMLStreamReader reader = getXMLStreamReader("testNextElement");
         assertEquals("root", reader.getLocalName());
         reader.nextTag(); // ensure that we are 'inside' the root element.
@@ -96,7 +102,8 @@ public class XMLStreamUtilsTest extends PulseTestCase {
         assertFalse(nextElement(reader));
     }
 
-    public void testExpectTag() throws XMLStreamException {
+    public void testExpectTag() throws XMLStreamException
+    {
         XMLStreamReader reader = getXMLStreamReader("testExpect");
         assertEquals("root", reader.getLocalName());
 
@@ -117,11 +124,12 @@ public class XMLStreamUtilsTest extends PulseTestCase {
         XMLStreamUtils.expectEndTag("b", reader);
     }
 
-    public void testReadElements() throws XMLStreamException {
+    public void testReadElements() throws XMLStreamException
+    {
         XMLStreamReader reader = getXMLStreamReader("testReadElements");
         assertEquals("root", reader.getLocalName());
         reader.nextTag();
-        
+
         Map<String, String> elements = XMLStreamUtils.readElements(reader);
 
         assertEquals(3, elements.size());
@@ -133,7 +141,21 @@ public class XMLStreamUtilsTest extends PulseTestCase {
         assertEquals("", elements.get("c"));
     }
 
-    private XMLStreamReader getXMLStreamReader(String testName) throws XMLStreamException {
+    public void testGetElementText() throws XMLStreamException
+    {
+        XMLStreamReader reader = getXMLStreamReader("testGetElementText");
+        assertEquals("root", reader.getLocalName());
+        reader.nextTag();
+
+        assertEquals("", XMLStreamUtils.getElementText(reader));
+        reader.nextTag();
+        assertEquals("blah", XMLStreamUtils.getElementText(reader));
+        reader.nextTag();
+        assertEquals("<element> blah </element>", XMLStreamUtils.getElementText(reader));
+    }
+
+    private XMLStreamReader getXMLStreamReader(String testName) throws XMLStreamException
+    {
         input = getInput(testName, "xml");
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         reader = inputFactory.createXMLStreamReader(input);
