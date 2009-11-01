@@ -14,6 +14,17 @@ public class OptionFieldDescriptor extends FieldDescriptor
     public static final String PARAMETER_MULTIPLE = "multiple";
     public static final String PARAMETER_SIZE = "size";
 
+    /**
+     * Indicates if the options for the field are provided lazily (i.e. only
+     * when the user expands the field).
+     *
+     * @return true if the options for this field are provided lazily
+     */
+    public boolean isLazy()
+    {
+        return false;
+    }
+    
     public boolean isEditable()
     {
         return getParameter(PARAMETER_EDITABLE, false);

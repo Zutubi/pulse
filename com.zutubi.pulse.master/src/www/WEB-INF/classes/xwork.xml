@@ -593,6 +593,11 @@
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
         </action>
+
+        <action name="options" class="com.zutubi.pulse.master.tove.webwork.OptionsAction">
+            <result name="success" type="flexjson">options</result>
+            <result name="error" type="velocity">error.vm</result>
+        </action>
     </package>
 
     <package name="helpAjax" namespace="/ahelp" extends="configAjax">

@@ -1,61 +1,37 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.pulse.master.tove.config.EmptyOptionProvider;
-import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.model.Descriptor;
-import com.zutubi.pulse.master.tove.handler.OptionProvider;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
- *
+ * Handles annotations for field types that present a list of options to the
+ * user.  Uses an {@link com.zutubi.pulse.master.tove.handler.OptionProvider}
+ * to get the list of options.
  */
 public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 {
-    /**
-     * Object factory provides access to object instantiation services.
-     */
     private ObjectFactory objectFactory;
     private ConfigurationProvider configurationProvider;
 
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
-        // do everything that the standard field annotation handler does,
         super.process(annotatedType, annotation, descriptor);
 
         OptionFieldDescriptor field = (OptionFieldDescriptor) descriptor;
-        OptionProvider optionProvider;
-
-        //  and then a little bit extra.
-        String className = getOptionProviderClass(annotation);
-        if(!TextUtils.stringSet(className))
+        if (!field.isLazy())
         {
-            if(field.getProperty().getType() instanceof EnumType)
-            {
-                optionProvider = new EnumOptionProvider();
-            }
-            else
-            {
-                optionProvider = new EmptyOptionProvider();
-            }
+            OptionProvider optionProvider = OptionProviderFactory.build(annotatedType, field.getProperty().getType(), annotation, objectFactory);
+            process(configurationProvider, optionProvider, field.getParentPath(), field.getBaseName(), field);
         }
-        else
-        {
-            optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
-        }
-
-        process(configurationProvider, optionProvider, field.getParentPath(), field.getBaseName(), field);
     }
 
     public static void process(ConfigurationProvider configurationProvider, OptionProvider optionProvider, String parentPath, String baseName, OptionFieldDescriptor field)
@@ -88,8 +64,6 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
             field.setListValue(value);
         }
     }
-
-    protected abstract String getOptionProviderClass(Annotation annotation);
 
     public void setObjectFactory(ObjectFactory objectFactory)
     {

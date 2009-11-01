@@ -27,11 +27,14 @@ public @interface Select
      * rendered default (as defined by the html form spec) and the default value here are the same.
      */
     public static final int DEFAULT_size = 1;
-
     /**
      * By default, users are restricted to the presented options.
      */
     public static final boolean DEFAULT_editable = false;
+    /**
+     * Options are loaded eagerly by default.
+     */
+    public static final boolean DEFAULT_lazy = false;
 
     /**
      * The size property defined the number of options that will be visible in the select widget at the same
@@ -48,4 +51,12 @@ public @interface Select
      * @return whether the field is editable by the user
      */
     public boolean editable() default DEFAULT_editable;
+
+    /**
+     * If true, options will be loaded lazily when the user drops down the
+     * list.
+     *
+     * @return whether the field options are lazily loaded
+     */
+    public boolean lazy() default DEFAULT_lazy;
 }

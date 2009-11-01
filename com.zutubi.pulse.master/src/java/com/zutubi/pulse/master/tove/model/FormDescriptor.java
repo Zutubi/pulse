@@ -13,17 +13,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * Describes a form.  Can be instantiated with data (a record) to create the
+ * form instance.
  */
 public class FormDescriptor extends AbstractParameterised implements Descriptor
 {
-    private static final String DEFAULT_ACTION = "save";
+    public static final String PARAMETER_FIELD_ORDER = "fieldOrder";
+    public static final String PARAMETER_SYMBOLIC_NAME = "symbolicName";
 
+    private static final String DEFAULT_ACTION = "save";
     private static final String ACTION_NEXT = "next";
     private static final String ACTION_FINISH = "finish";
-
-    private static final String PARAMETER_FIELD_ORDER = "fieldOrder";
 
     private String name;
     private String id;

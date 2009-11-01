@@ -1,12 +1,15 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.annotations.Handler;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
-import com.zutubi.tove.config.*;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.handler.OptionAnnotationHandler;
+import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.annotations.Handler;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.ConfigurationValidationContext;
+import com.zutubi.tove.config.ConfigurationValidatorProvider;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -76,6 +79,7 @@ public class FormDescriptorFactory
         FormDescriptor descriptor = new FormDescriptor();
         descriptor.setName(name);
         descriptor.setActions("save", "cancel");
+        descriptor.addParameter(FormDescriptor.PARAMETER_SYMBOLIC_NAME, type.getSymbolicName());
 
         // The symbolic name uniquely identifies the type, and so will uniquely identify this form.
         // (we are not planning to have multiple forms on a single page at this stage...)
