@@ -1,0 +1,6 @@
+<?xml version = "1.0"?>
+<project>
+    <import path="testErrorInImportedMacro.macros.xml"/>
+
+    <macro-ref macro="$(bad)"/>
+</project>

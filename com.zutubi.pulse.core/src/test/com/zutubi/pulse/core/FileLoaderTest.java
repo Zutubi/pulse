@@ -112,7 +112,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
         catch (PulseException e)
         {
-            assertThat(e.getMessage(), matchesRegex("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6): Processing element 'no-such-type': starting at line 5 column (9|10): Undefined type 'no-such-type'"));
+            assertThat(e.getMessage(), matchesRegex("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6):\\n  Processing element 'no-such-type': starting at line 5 column (9|10): Undefined type 'no-such-type'"));
         }
     }
 
@@ -376,6 +376,28 @@ public class FileLoaderTest extends FileLoaderTestBase
         catch (PulseException e)
         {
             assertThat(e.getMessage(), containsString("Required attribute 'path' not set"));
+        }
+    }
+
+    public void testErrorInImportedMacro() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+            copyInputToDirectory(getName() + ".macros", EXTENSION_XML, tempDir);
+
+            loader.load(getInput(EXTENSION_XML), new FakePulseFile(), new LocalFileResolver(tempDir));
+            fail("Cannot reference a macro containing an unknown element");
+        }
+        catch (ParseException e)
+        {
+            assertThat(e.getMessage(), matchesRegex("(?s).*While expanding macro defined at line 3 column [0-9]+ of file testErrorInImportedMacro\\.macros\\.xml.*"));
+            assertThat(e.getMessage(), matchesRegex("(?s).*  Processing element 'unknown': starting at line 4 column [0-9]+ of file testErrorInImportedMacro\\.macros\\.xml: Undefined type 'unknown'.*"));
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
         }
     }
 

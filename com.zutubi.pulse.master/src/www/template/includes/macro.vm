@@ -923,7 +923,7 @@
                         <td class="error" colspan="$span">
                             <ul>
         #foreach($feature in $result.getFeatures($errorLevel))
-                                <li class="error">$!webwork.htmlEncode($feature.summary)</li>
+                                <li class="error">$action.plainToHtml($feature.summary)</li>
         #end
                             </ul>
                         </td>
@@ -934,7 +934,7 @@
                         <td class="warning" colspan="$span">
                             <ul>
         #foreach($feature in $result.getFeatures($warningLevel))
-                                <li class="warning">$!webwork.htmlEncode($feature.summary)</li>
+                                <li class="warning">$action.plainToHtml($feature.summary)</li>
         #end
                             </ul>
                         </td>
@@ -1022,7 +1022,7 @@
     #if($result.hasDirectMessages($level))
         #foreach($feature in $result.getFeatures($level))
     <li class="$level.toString().toLowerCase()">
-            $!webwork.htmlEncode($feature.summary)
+        $action.plainToHtml($feature.summary)</pre>
     </li>
         #end
     #end

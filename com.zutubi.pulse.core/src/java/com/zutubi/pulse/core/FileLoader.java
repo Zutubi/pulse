@@ -75,7 +75,7 @@ public class FileLoader
 
         try
         {
-            Builder builder = new Builder(new LocationAwareNodeFactory());
+            Builder builder = new Builder(new LocationAwareNodeFactory(null));
 
             Document doc;
             try
@@ -113,7 +113,7 @@ public class FileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, globalScope, 1, fileResolver, resourceRepository, predicate);
+                loadType((Element) node, root, globalScope, 1, new ImportResolver(fileResolver), resourceRepository, predicate);
             }
         }
         finally
@@ -122,7 +122,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, Scope scope, int depth, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
+    private void loadType(Element e, Object parent, Scope scope, int depth, ImportResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -257,7 +257,7 @@ public class FileLoader
         }
     }
 
-    private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
+    private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ImportResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
             throws Exception
     {
         String text = null;
@@ -269,7 +269,6 @@ public class FileLoader
             if (node instanceof Element)
             {
                 Element element = (Element) node;
-                // process type.
                 loadType(element, type, scope, depth + 1, fileResolver, resourceRepository, predicate);
             }
             else if (node instanceof Text)
@@ -311,7 +310,7 @@ public class FileLoader
         return resolutionStrategy;
     }
 
-    private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
+    private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ImportResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
     {
         String localName = element.getLocalName();
         if (localName.equals("macro"))
@@ -366,7 +365,7 @@ public class FileLoader
                     }
                     catch (Exception e)
                     {
-                        throw new FileLoadException("While expanding macro defined at line " + lae.getLineNumber() + " column " + lae.getColumnNumber() + ": " + e.getMessage(), e);
+                        throw new FileLoadException("While expanding macro defined at " + lae.formatLocation() + ":\n" + indentMessage(e.getMessage()), e);
                     }
                     found = true;
                 }
@@ -421,9 +420,9 @@ public class FileLoader
             {
                 try
                 {
-                    input = fileResolver.resolve(path);
+                    input = fileResolver.pushImport(path);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     // Ignore for optional includes.
                     return true;
@@ -431,32 +430,44 @@ public class FileLoader
             }
             else
             {
-                input = fileResolver.resolve(path);
+                input = fileResolver.pushImport(path);
             }
             
             try
             {
-                Document doc;
-                try
-                {
-                    Builder builder = new Builder(new LocationAwareNodeFactory());
-                    doc = builder.build(input);
-                }
-                finally
-                {
-                    IOUtils.close(input);
-                }
-
-                loadSubElements(doc.getRootElement(), type, scope, typeHelper, depth, new RelativeFileResolver(path, fileResolver), resourceRepository, predicate);
+                Document doc = loadDocument(input, fileResolver.getCurrentPath());
+                loadSubElements(doc.getRootElement(), type, scope, typeHelper, depth, fileResolver, resourceRepository, predicate);
                 return true;
             }
             catch (Exception e)
             {
-                throw new FileLoadException("While importing file '" + path + "': " + e.getMessage(), e);
+                throw new FileLoadException("While importing file '" + path + "':\n" + indentMessage(e.getMessage()), e);
+            }
+            finally
+            {
+                fileResolver.popImport();
             }
         }
 
         return false;
+    }
+
+    private Document loadDocument(InputStream input, String file) throws ParsingException, IOException
+    {
+        try
+        {
+            Builder builder = new Builder(new LocationAwareNodeFactory(file));
+            return builder.build(input);
+        }
+        finally
+        {
+            IOUtils.close(input);
+        }
+    }
+
+    private String indentMessage(String message)
+    {
+        return "  " + message.replaceAll("\\n", "\n  ");
     }
 
     private ParseException createParseException(String name, Element element, Throwable t)
@@ -473,12 +484,8 @@ public class FileLoader
         if (element instanceof LocationAwareElement)
         {
             LocationAwareElement location = (LocationAwareElement) element;
-            message.append("starting at line ");
-            line = location.getLineNumber();
-            message.append(line);
-            message.append(" column ");
-            column = location.getColumnNumber();
-            message.append(column);
+            message.append("starting at ");
+            message.append(location.formatLocation());
             message.append(": ");
         }
 

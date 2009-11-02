@@ -51,6 +51,8 @@ public class FileSystemUtils
     public static final boolean LN_AVAILABLE;
     public static final boolean STAT_AVAILABLE;
     public static final boolean ZIP_AVAILABLE;
+    public static final String THIS_DIRECTORY = ".";
+    public static final String PARENT_DIRECTORY = "..";
 
     static
     {
@@ -1214,5 +1216,81 @@ public class FileSystemUtils
             }
             IOUtils.copyFile(src, dest);
         }
+    }
+
+    /**
+     * Joins a path to a base, canonicalising any separators and occurences of
+     * '.' or '..'.  The base path, if given, should already be an a canonical
+     * form.  If the path is absolute (begins with a separator) it is returned
+     * unchanged.
+     *
+     * @param basePath base to append to, should be in canonical form already
+     * @param path     path to append - may include current '.' and parent '..'
+     *                 directory references
+     * @return the appended path, or null if appending results in no more path
+     *         remaining (happens when a parent reference '..' takes the result
+     *         to or above the root)
+     */
+    public static String appendAndCanonicalise(String basePath, String path)
+    {
+        path = nullSafeNormalise(path);
+        if (path != null && path.startsWith(NORMAL_SEPARATOR))
+        {
+            return path;
+        }
+        else
+        {
+            String result = nullSafeNormalise(basePath);
+            if (path != null)
+            {
+                for (String element: StringUtils.split(path, NORMAL_SEPARATOR_CHAR))
+                {
+                    if (element.equals(THIS_DIRECTORY))
+                    {
+                        // Skip.
+                    }
+                    else if (element.equals(PARENT_DIRECTORY))
+                    {
+                        result = up(result);
+                    }
+                    else
+                    {
+                        if (result == null)
+                        {
+                            result = element;
+                        }
+                        else
+                        {
+                            result = StringUtils.join(NORMAL_SEPARATOR, true, true, result, element);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+    }
+
+    private static String up(String result)
+    {
+        if (result != null)
+        {
+            int i = result.lastIndexOf(NORMAL_SEPARATOR_CHAR);
+            if (i != -1)
+            {
+                result = result.substring(0, i);
+            }
+            else
+            {
+                result = null;
+            }
+        }
+        
+        return result;
+    }
+
+    private static String nullSafeNormalise(String path)
+    {
+        return path == null ? null : normaliseSeparators(path);
     }
 }

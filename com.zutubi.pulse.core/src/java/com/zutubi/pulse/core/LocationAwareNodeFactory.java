@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
-import nu.xom.NodeFactory;
 import nu.xom.Element;
-import org.xml.sax.Locator;
+import nu.xom.NodeFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
 
 
 /**
@@ -13,13 +13,15 @@ import org.xml.sax.Attributes;
  */
 public class LocationAwareNodeFactory extends NodeFactory
 {
+    private String file;
     private Locator locator;
     private Location startLocation;
     private Location endLocation;
-    
-    public LocationAwareNodeFactory()
+
+    public LocationAwareNodeFactory(String file)
     {
         super();
+        this.file = file;
     }
 
     public Element startMakingElement(String name, String namespace)
@@ -28,6 +30,7 @@ public class LocationAwareNodeFactory extends NodeFactory
         
         if (startLocation != null)
         {
+            newElement.setFile(file);
             newElement.setLineNumber(startLocation.line);
             newElement.setColumnNumber(startLocation.column);
         }

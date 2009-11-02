@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
@@ -13,6 +14,20 @@ import java.util.List;
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
     private static final String TEST_FILE_CONTENT = "content";
+
+    private static final String DIRNAME_NESTED = "d1";
+    private static final String DIRNAME_NESTED_NESTED = "d2";
+
+    private static final String DIR_NESTED = DIRNAME_NESTED;
+    private static final String DIR_NESTED_NESTED = StringUtils.join(NORMAL_SEPARATOR, DIRNAME_NESTED, DIRNAME_NESTED_NESTED);
+
+    private static final String FILENAME_TOP = "top.xml";
+    private static final String FILENAME_NESTED = "nested.xml";
+    private static final String FILENAME_NESTED_NESTED = "nestednested.xml";
+
+    private static final String PATH_TOP = FILENAME_TOP;
+    private static final String PATH_NESTED = StringUtils.join(NORMAL_SEPARATOR, DIR_NESTED, FILENAME_NESTED);
+    private static final String PATH_NESTED_NESTED = StringUtils.join(NORMAL_SEPARATOR, DIR_NESTED_NESTED, FILENAME_NESTED_NESTED);
 
     private File tmpDir;
     private Copier[] copiers;
@@ -1159,6 +1174,66 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
         }
 
+    }
+
+    public void testTopRelativeToNull() throws Exception
+    {
+        assertEquals(PATH_TOP, FileSystemUtils.appendAndCanonicalise(null, PATH_TOP));
+    }
+
+    public void testNestedRelativeToNull() throws Exception
+    {
+        assertEquals(PATH_NESTED, FileSystemUtils.appendAndCanonicalise(null, PATH_NESTED));
+    }
+
+    public void testNestedNestedRelativeToNull() throws Exception
+    {
+        assertEquals(PATH_NESTED_NESTED, FileSystemUtils.appendAndCanonicalise(null, PATH_NESTED_NESTED));
+    }
+
+    public void testTopRelativeToNested() throws Exception
+    {
+        assertEquals(PATH_TOP, FileSystemUtils.appendAndCanonicalise(DIR_NESTED, "../" + FILENAME_TOP));
+    }
+
+    public void testNestedRelativeToNested() throws Exception
+    {
+        assertEquals(PATH_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED, FILENAME_NESTED));
+    }
+
+    public void testNestedNestedRelativeToNested() throws Exception
+    {
+        assertEquals(PATH_NESTED_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED, DIRNAME_NESTED_NESTED + NORMAL_SEPARATOR + FILENAME_NESTED_NESTED));
+    }
+
+    public void testTopRelativeToNestedNested() throws Exception
+    {
+        assertEquals(PATH_TOP, FileSystemUtils.appendAndCanonicalise(DIR_NESTED_NESTED, "../../" + FILENAME_TOP));
+    }
+
+    public void testNestedRelativeToNestedNested() throws Exception
+    {
+        assertEquals(PATH_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED_NESTED, "../" + FILENAME_NESTED));
+    }
+
+    public void testNestedNestedRelativeToNestedNested() throws Exception
+    {
+        assertEquals(PATH_NESTED_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED_NESTED, FILENAME_NESTED_NESTED));
+    }
+
+    public void testSameDirectoryNormalised() throws Exception
+    {
+        assertEquals(PATH_NESTED_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED_NESTED, "././" + FILENAME_NESTED_NESTED));
+    }
+
+    public void testAbsolutePathToTop() throws Exception
+    {
+        assertEquals("/" + PATH_TOP, FileSystemUtils.appendAndCanonicalise(DIR_NESTED_NESTED, "/" + FILENAME_TOP));
+    }
+
+    public void testAbsolutePathToNestedNested() throws Exception
+    {
+        assertEquals("/" + PATH_NESTED_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED, "/" + PATH_NESTED_NESTED));
     }
 
     private boolean notRoot()
