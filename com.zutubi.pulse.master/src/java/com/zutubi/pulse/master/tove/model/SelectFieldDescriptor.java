@@ -11,6 +11,7 @@ public class SelectFieldDescriptor extends OptionFieldDescriptor
     public SelectFieldDescriptor()
     {
         setType("select");
+        setLazy(false);
     }
 
     public boolean isLazy()
