@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.admin;
 
-import com.zutubi.pulse.master.RecipeQueue;
+import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 /**

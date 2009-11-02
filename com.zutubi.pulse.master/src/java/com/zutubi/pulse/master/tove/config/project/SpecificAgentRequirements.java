@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 

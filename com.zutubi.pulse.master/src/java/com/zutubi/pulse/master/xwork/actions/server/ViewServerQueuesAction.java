@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.master.*;
+import com.zutubi.pulse.master.build.control.BuildController;
+import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;

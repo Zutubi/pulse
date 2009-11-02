@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
-import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 
 import java.util.Collection;
 

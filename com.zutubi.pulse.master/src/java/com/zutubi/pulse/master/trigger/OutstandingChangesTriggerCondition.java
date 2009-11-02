@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.trigger;
 
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.master.FatController;
+import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;

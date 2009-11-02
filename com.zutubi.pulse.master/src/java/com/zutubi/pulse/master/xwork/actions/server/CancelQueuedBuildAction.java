@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
-import com.zutubi.pulse.master.FatController;
+import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 /**

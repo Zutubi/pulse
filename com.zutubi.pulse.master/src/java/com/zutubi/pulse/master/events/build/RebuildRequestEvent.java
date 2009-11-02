@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.pulse.master.DependencyMetaBuildHandler;
+import com.zutubi.pulse.master.build.queue.DependencyMetaBuildHandler;
 import com.zutubi.util.CollectionUtils;
 
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.List;
  * A build request event that is used when multiple dependent projects
  * are being 'rebuilt'.
  *
- * @see com.zutubi.pulse.master.DependencyMetaBuildHandler
+ * @see com.zutubi.pulse.master.build.queue.DependencyMetaBuildHandler
  */
 public class RebuildRequestEvent extends BuildRequestEvent
 {
