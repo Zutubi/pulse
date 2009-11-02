@@ -31,11 +31,12 @@ public class CleanupConfigurationFormatter
 
     public String getAfter(CleanupConfiguration config)
     {
-        if (config.getRetain() < 1)
+        CleanupUnit unit = config.getUnit();
+        if (unit == null || config.getRetain() < 1)
         {
             return "never";
         }
 
-        return I18N.format("retain." + config.getUnit().toString(), config.getRetain());
+        return I18N.format("retain." + unit.toString(), config.getRetain());
     }
 }

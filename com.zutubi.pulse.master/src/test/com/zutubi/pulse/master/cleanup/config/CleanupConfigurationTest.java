@@ -18,8 +18,6 @@ import static org.mockito.Mockito.stub;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- */
 public class CleanupConfigurationTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;

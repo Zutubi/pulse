@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.zutubi.util.StringUtils;
 import nu.xom.Element;
 
 /**
@@ -10,6 +11,7 @@ import nu.xom.Element;
  */
 public class LocationAwareElement extends Element
 {
+    private String file;
     /**
      * Original document line number.
      */
@@ -35,6 +37,22 @@ public class LocationAwareElement extends Element
     public LocationAwareElement(String name, String namespace)
     {
         super(name, namespace);
+    }
+
+    /**
+     * Get the file within which this element was found, if it is known.
+     *
+     * @return the path of the file in which this element was found, or null
+     *         if the file is not known
+     */
+    public String getFile()
+    {
+        return file;
+    }
+
+    protected void setFile(String file)
+    {
+        this.file = file;
     }
 
     /**
@@ -68,10 +86,27 @@ public class LocationAwareElement extends Element
     {
         this.columnNumber = columnNumber;
     }
-    
+
+    /**
+     * Formats the location of this element in a string that is suitable for
+     * human consumption.
+     * 
+     * @return the location of this element in a human-readable form
+     */
+    public String formatLocation()
+    {
+        String location = "line " + lineNumber + " column " + columnNumber;
+        if (StringUtils.stringSet(file))
+        {
+            location += " of file " + file;
+        }
+        
+        return location;
+    }
+
     public String toString()
     {
-        return "[" + getQualifiedName() + " @ " + getLineNumber() + 
-                ":" + getColumnNumber() + "]";        
+        return "[" + getQualifiedName() + " @ " + getLineNumber() +
+                ":" + getColumnNumber() + "]";
     }
 }

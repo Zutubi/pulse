@@ -82,7 +82,7 @@ public class ToveFileLoader
         CompositeType type = lookupType(root.getClass());
         try
         {
-            Builder builder = new Builder(new LocationAwareNodeFactory());
+            Builder builder = new Builder(new LocationAwareNodeFactory(null));
 
             Document doc;
             try
@@ -115,7 +115,7 @@ public class ToveFileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, type, globalScope, 1, fileResolver, predicate);
+                loadType((Element) node, root, type, globalScope, 1, new ToveFileResolver(fileResolver), predicate);
             }
         }
         finally
@@ -124,7 +124,7 @@ public class ToveFileLoader
         }
     }
 
-    private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate) throws PulseException
+    private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, ToveFileResolver fileResolver, TypeLoadPredicate predicate) throws PulseException
     {
         String name = e.getLocalName();
         Object instance;
@@ -663,7 +663,7 @@ public class ToveFileLoader
         }
     }
 
-    private void loadSubElements(Element e, Configuration instance, CompositeType type, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate)
+    private void loadSubElements(Element e, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, TypeLoadPredicate predicate)
             throws Exception
     {
         String text = null;
@@ -675,7 +675,6 @@ public class ToveFileLoader
             if (node instanceof Element)
             {
                 Element element = (Element) node;
-                // process type.
                 loadType(element, instance, type, scope, depth + 1, fileResolver, predicate);
             }
             else if (node instanceof Text)
@@ -718,7 +717,7 @@ public class ToveFileLoader
         return predicate.allowUnresolved(type, e) ? RESOLVE_NON_STRICT : RESOLVE_STRICT;
     }
 
-    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate) throws Exception
+    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, TypeLoadPredicate predicate) throws Exception
     {
         String localName = element.getLocalName();
         if (localName.equals("macro"))
@@ -773,7 +772,7 @@ public class ToveFileLoader
                     }
                     catch (Exception e)
                     {
-                        throw new FileLoadException("While expanding macro defined at line " + lae.getLineNumber() + " column " + lae.getColumnNumber() + ": " + e.getMessage(), e);
+                        throw new FileLoadException("While expanding macro defined at " + lae.formatLocation() + ":\n" + indentMessage(e.getMessage()), e);
                     }
                     found = true;
                 }
@@ -828,9 +827,9 @@ public class ToveFileLoader
             {
                 try
                 {
-                    input = fileResolver.resolve(path);
+                    input = fileResolver.pushImport(path);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     // Ignore for optional includes.
                     return true;
@@ -838,32 +837,44 @@ public class ToveFileLoader
             }
             else
             {
-                input = fileResolver.resolve(path);
+                input = fileResolver.pushImport(path);
             }
 
             try
             {
-                Document doc;
-                try
-                {
-                    Builder builder = new Builder(new LocationAwareNodeFactory());
-                    doc = builder.build(input);
-                }
-                finally
-                {
-                    IOUtils.close(input);
-                }
-
-                loadSubElements(doc.getRootElement(), instance, type, scope, depth, new RelativeFileResolver(path, fileResolver), predicate);
+                Document doc = loadDocument(input, fileResolver.getCurrentPath());
+                loadSubElements(doc.getRootElement(), instance, type, scope, depth, fileResolver, predicate);
                 return true;
             }
             catch (Exception e)
             {
-                throw new FileLoadException("While importing file '" + path + "': " + e.getMessage(), e);
+                throw new FileLoadException("While importing file '" + path + "':\n" + indentMessage(e.getMessage()), e);
+            }
+            finally
+            {
+                fileResolver.popImport();
             }
         }
 
         return false;
+    }
+
+    private Document loadDocument(InputStream input, String file) throws ParsingException, IOException
+    {
+        try
+        {
+            Builder builder = new Builder(new LocationAwareNodeFactory(file));
+            return builder.build(input);
+        }
+        finally
+        {
+            IOUtils.close(input);
+        }
+    }
+
+    private String indentMessage(String message)
+    {
+        return "  " + message.replaceAll("\\n", "\n  ");
     }
 
     private ParseException createParseException(String name, Element element, Throwable t)
@@ -880,12 +891,8 @@ public class ToveFileLoader
         if (element instanceof LocationAwareElement)
         {
             LocationAwareElement location = (LocationAwareElement) element;
-            message.append("starting at line ");
-            line = location.getLineNumber();
-            message.append(line);
-            message.append(" column ");
-            column = location.getColumnNumber();
-            message.append(column);
+            message.append("starting at ");
+            message.append(location.formatLocation());
             message.append(": ");
         }
 

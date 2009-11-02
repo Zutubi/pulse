@@ -165,7 +165,7 @@ public class TestUtils
     }
 
     /**
-     * Waits for about a second for a TCP server to start listening on the
+     * Waits for about 10 seconds for a TCP server to start listening on the
      * given port on this host.  A successful socket connection will be deemed
      * as indication that the server has started.
      *
@@ -173,7 +173,7 @@ public class TestUtils
      *
      * @throws InterruptedException if this thread is interrupted while
      *         sleeping
-     * @throws RuntimeException if no server starts within about 1 second
+     * @throws RuntimeException if no server starts within about 10 seconds
      */
     public static void waitForServer(int port) throws InterruptedException
     {
@@ -189,9 +189,9 @@ public class TestUtils
             }
             catch (IOException e)
             {
-                if (retries++ < 10)
+                if (retries++ < 100)
                 {
-                    Thread.yield();
+                    Thread.sleep(100);
                 }
                 else
                 {

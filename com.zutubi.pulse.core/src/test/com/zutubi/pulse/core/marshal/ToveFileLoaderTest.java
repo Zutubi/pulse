@@ -12,7 +12,6 @@ import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
-import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -29,17 +28,15 @@ public class ToveFileLoaderTest extends PulseTestCase
 {
     private static final String EXTENSION_XML = "xml";
 
-    private TypeRegistry registry;
     private ToveFileLoader loader;
-    private CompositeType rootType;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        registry = new TypeRegistry();
-        rootType = registry.register(SimpleRoot.class);
+        TypeRegistry registry = new TypeRegistry();
+        registry.register(SimpleRoot.class);
 
         TypeDefinitions definitions = new TypeDefinitions();
         definitions.register("reference", registry.getType(SimpleReference.class));
@@ -118,7 +115,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         catch (PulseException e)
         {
-            assertThat(e.getMessage(), matchesRegex("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6): Processing element 'no-such-type': starting at line 5 column (9|10): Unknown child element 'no-such-type'"));
+            assertThat(e.getMessage(), matchesRegex("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6):\n  Processing element 'no-such-type': starting at line 5 column (9|10): Unknown child element 'no-such-type'"));
         }
     }
 
@@ -375,6 +372,28 @@ public class ToveFileLoaderTest extends PulseTestCase
         catch (PulseException e)
         {
             assertThat(e.getMessage(), containsString("Required attribute 'path' not set"));
+        }
+    }
+
+    public void testErrorInImportedMacro() throws IOException, PulseException
+    {
+        File tempDir = createTempDirectory();
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+            copyInputToDirectory(getName() + ".macros", EXTENSION_XML, tempDir);
+
+            loader.load(getInput(EXTENSION_XML), new FakePulseFile(), new LocalFileResolver(tempDir));
+            fail("Cannot reference a macro containing an unknown element");
+        }
+        catch (ParseException e)
+        {
+            assertThat(e.getMessage(), matchesRegex("(?s).*While expanding macro defined at line 3 column [0-9]+ of file testErrorInImportedMacro\\.macros\\.xml.*"));
+            assertThat(e.getMessage(), matchesRegex("(?s).*  Processing element 'unknown': starting at line 4 column [0-9]+ of file testErrorInImportedMacro\\.macros\\.xml: Unknown child element 'unknown'.*"));
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
         }
     }
 

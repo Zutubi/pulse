@@ -169,7 +169,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
                 results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, 0, filterHasWorkDir, 0, total - retain, false));
             }
         }
-        else
+        else if (unit == CleanupUnit.DAYS)
         {
             long startTime = System.currentTimeMillis() - retain * Constants.DAY;
             results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, filterHasWorkDir, -1, -1, false));
