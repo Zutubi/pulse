@@ -12,7 +12,6 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ConcurrentUtils;
-import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -21,13 +20,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An option provider for the recipe field of a build stage.
+ * An option provider for the recipe field of a build stage.  Designed to be
+ * used lazily as it could take a long time to load the Pulse file from the
+ * SCM.  This may even time out.
  */
 public class BuildStageRecipeOptionProvider extends ListOptionProvider
 {
-    private static final Logger LOG = Logger.getLogger(BuildStageRecipeOptionProvider.class);
-
-    private static final int TIMEOUT_SECONDS = 10;
+    private static final int TIMEOUT_SECONDS = 30;
     
     private ConfigurationProvider configurationProvider;
     private PulseFileLoaderFactory fileLoaderFactory;
@@ -43,9 +42,10 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
         List<String> recipes = new LinkedList<String>();
         recipes.add("");
 
+        List<String> recipeNames;
         try
         {
-            List<String> recipeNames = ConcurrentUtils.runWithTimeout(new Callable<List<String>>()
+            recipeNames = ConcurrentUtils.runWithTimeout(new Callable<List<String>>()
             {
                 public List<String> call() throws Exception
                 {
@@ -61,16 +61,21 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
 
                     return Collections.emptyList();
                 }
-            }, TIMEOUT_SECONDS, TimeUnit.SECONDS, Collections.<String>emptyList());
-
-            for (String recipe: recipeNames)
-            {
-                recipes.add(recipe);
-            }
+            }, TIMEOUT_SECONDS, TimeUnit.SECONDS, null);
         }
         catch (Exception e)
         {
-            LOG.warning("Unable to load Pulse file to load available recipes: " + e.getMessage(), e);
+            throw new RuntimeException("Unable to load Pulse file to load available recipes: " + e.getMessage(), e);
+        }
+
+        if (recipeNames == null)
+        {
+            throw new RuntimeException("Timed out listing recipes in Pulse file.");
+        }
+
+        for (String recipe: recipeNames)
+        {
+            recipes.add(recipe);
         }
 
         return recipes;

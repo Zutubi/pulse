@@ -1,10 +1,9 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.tove.annotations.Reference;
-import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
-import com.zutubi.util.bean.BeanUtils;
+import com.zutubi.tove.annotations.Reference;
 import com.zutubi.util.bean.BeanException;
+import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
@@ -18,7 +17,7 @@ public class ReferenceAnnotationHandler extends OptionAnnotationHandler
     private static final Logger LOG = Logger.getLogger(ReferenceAnnotationHandler.class);
 
     @Override
-    protected void process(OptionFieldDescriptor field, OptionProvider optionProvider, String parentPath, Object instance, TypeProperty fieldTypeProperty)
+    protected void process(OptionFieldDescriptor field, OptionProvider optionProvider, Object instance)
     {
         // In the case of the @Reference annotation, the presence of the 'dependentOn' field is used to
         // replace the default 'instance' for use by the OptionProvider.  Note that the configured OptionProvider
@@ -41,7 +40,7 @@ public class ReferenceAnnotationHandler extends OptionAnnotationHandler
             }
         }
 
-        super.process(field, optionProvider, parentPath, instance, fieldTypeProperty);
+        super.process(field, optionProvider, instance);
     }
 
     protected String getOptionProviderClass(Annotation annotation)

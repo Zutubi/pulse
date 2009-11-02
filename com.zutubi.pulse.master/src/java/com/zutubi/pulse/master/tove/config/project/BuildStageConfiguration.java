@@ -25,7 +25,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 {
     @Reference(optionProvider = "BuildStageAgentOptionProvider")
     private AgentConfiguration agent;
-    @Select(optionProvider = "BuildStageRecipeOptionProvider", editable = true)
+    @Select(optionProvider = "BuildStageRecipeOptionProvider", editable = true, lazy = true)
     private String recipe;
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();

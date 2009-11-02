@@ -904,6 +904,15 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         BuildStageForm stageForm = browser.createForm(BuildStageForm.class, false);
         stageForm.waitFor();
+
+        // Lazily-loaded options require some effort: simulate a click and
+        // ensure we wait for the load to complete.
+        browser.evalExpression("var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid.recipe');" +
+                               "combo.store.on('load', function() { combo.loaded = true; });" +
+                               "combo.store.on('loadexception', function() { combo.loaded = true; });" +
+                               "combo.onTriggerClick();");
+        browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid.recipe').loaded", 30000);
+        
         String[] stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
         assertEquals(asList(expectedRecipes), asList(stages));
     }

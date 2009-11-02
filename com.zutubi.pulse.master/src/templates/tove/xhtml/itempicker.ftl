@@ -69,7 +69,7 @@
             window.actionInProgress = true;
             picker.clear();
             Ext.Ajax.request({
-                url: window.baseUrl + '/aconfig/${path}?options',
+                url: window.baseUrl + '/aconfig/${path}?dependentOptions',
                 method: 'POST',
                 params: {field:'${parameters.name}', dependency:dependentField.getValue()},
                 success: function(result, request){

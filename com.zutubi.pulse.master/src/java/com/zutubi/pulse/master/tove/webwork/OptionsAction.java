@@ -1,58 +1,50 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.opensymphony.webwork.ServletActionContext;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
+import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.tove.annotations.Reference;
-import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
-import flexjson.JSON;
 
-import java.util.Arrays;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Map;
 
 /**
- * The options action is used to dynamically load list options.
- *
- * The primary scenario where this is used if when the options presented
- * in one field depend on the configuration of another field that itself
- * has changed since the form was originally rendered.
+ * Action for listing options for a combobox lazily.
  */
-//NOTE: This implementaiton is currently very specific to the situation of the @Reference(dependentOn)
-//      configuraiton.  Generalising the implementation may be an option in the future. 
 public class OptionsAction extends ActionSupport
 {
-    private ConfigurationProvider configurationProvider;
+    private static final Messages I18N = Messages.getInstance(OptionsAction.class);
+    
+    private String parentPath;
+    private String baseName;
+    private String field;
+    private String symbolicName;
+    private String errorMessage;
+    private String[][] options;
+
     private ConfigurationTemplateManager configurationTemplateManager;
+    private TypeRegistry typeRegistry;
     private ObjectFactory objectFactory;
 
-    /**
-     * The path to the object that contains the field whose options
-     * are being re-evaluated.
-     */
-    private String path;
-
-    /**
-     * The name of the fields whose options are being re-evaluated.
-     */
-    private String field;
-
-    /**
-     * The current value of the dependent field.
-     */
-    private long dependency = 0;
-
-    private List options;
-
-    public void setPath(String path)
+    public void setParentPath(String parentPath)
     {
-        this.path = path;
+        this.parentPath = parentPath;
+    }
+
+    public void setBaseName(String baseName)
+    {
+        this.baseName = baseName;
     }
 
     public void setField(String field)
@@ -60,52 +52,115 @@ public class OptionsAction extends ActionSupport
         this.field = field;
     }
 
-    public void setDependency(long dependency)
+    public void setSymbolicName(String symbolicName)
     {
-        this.dependency = dependency;
+        this.symbolicName = symbolicName;
     }
 
-    @JSON
-    public List getOptions()
+    public String getErrorMessage()
+    {
+        return errorMessage;
+    }
+
+    public String[][] getOptions() throws InterruptedException
     {
         return options;
     }
 
-    @SuppressWarnings("unchecked")
-    public String execute() throws Exception
+    public List<String> getListing() throws Exception
     {
-        CompositeType type = (CompositeType) configurationTemplateManager.getType(path).getTargetType();
-        if (type == null)
+        CompositeType type = getType();
+        TypeProperty property = getFieldProperty(type);
+        Configuration instance = getInstance();
+
+        OptionProvider optionProvider = OptionProviderFactory.build(type, property.getType(), getOptionAnnotation(property), objectFactory);
+
+         @SuppressWarnings({"unchecked"})
+         List<String> list = (List<String>) optionProvider.getOptions(instance, parentPath, property);
+        if (configurationTemplateManager.isTemplatedPath(parentPath))
         {
-            return ERROR;
-        }
-
-        TypeProperty property = type.getProperty(field);
-        Reference annotation = property.getAnnotation(Reference.class);
-        TypeProperty dependencyProperty = type.getProperty(annotation.dependentOn());
-
-        OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(type.getClazz(), annotation.optionProvider()));
-
-        Object instance = configurationProvider.get(this.dependency, dependencyProperty.getClazz());
-
-        List mapOptions = optionProvider.getOptions(instance, path, property);
-
-        // convert the map options to a list of lists for easy consumption by the javascript.
-        options = CollectionUtils.map(mapOptions, new Mapping<Object, Object>()
-        {
-            public Object map(Object o)
+            Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, property);
+            if (emptyOption != null)
             {
-                Map.Entry<String, String> entry = (Map.Entry<String, String>) o;
-                return Arrays.asList(entry.getKey(), entry.getValue());
+                list.add(0, (String) emptyOption);
             }
-        });
-
-        return SUCCESS;
+        }
+        
+        return list;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    private CompositeType getType()
     {
-        this.configurationProvider = configurationProvider;
+        CompositeType type = typeRegistry.getType(symbolicName);
+        if (type == null)
+        {
+            throw new RuntimeException("Unknown type '" + symbolicName + "'");
+        }
+        return type;
+    }
+
+    private TypeProperty getFieldProperty(CompositeType type)
+    {
+        TypeProperty property = type.getProperty(field);
+        if (property == null)
+        {
+            throw new RuntimeException("Invalid field '" + field + "'");
+        }
+        return property;
+    }
+
+    private Configuration getInstance()
+    {
+        Configuration instance = null;
+        if (StringUtils.stringSet(baseName))
+        {
+            String path = PathUtils.getPath(parentPath, baseName);
+            instance = configurationTemplateManager.getInstance(path, Configuration.class);
+            if (instance == null)
+            {
+                throw new RuntimeException("Invalid path '" + path + "'");
+            }
+        }
+        return instance;
+    }
+
+    private Annotation getOptionAnnotation(TypeProperty property)
+    {
+        Select annotation = property.getAnnotation(Select.class);
+        if (annotation == null)
+        {
+            throw new RuntimeException("Invalid property: no select annotation");
+        }
+        
+        return annotation;
+    }
+
+    private String[][] convertListing(List<String> listing)
+    {
+        String[][] result = new String[listing.size()][];
+        int i = 0;
+        for (String option: listing)
+        {
+            result[i++] = new String[]{option};
+        }
+
+        return result;
+    }
+
+    public String execute() throws Exception
+    {
+        try
+        {
+            options = convertListing(getListing());
+            return SUCCESS;
+        }
+        catch (Exception e)
+        {
+            HttpServletResponse response = ServletActionContext.getResponse();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            errorMessage = I18N.format("unable.to.load", new Object[]{e.getMessage()});
+            return ERROR;
+        }
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
@@ -113,9 +168,13 @@ public class OptionsAction extends ActionSupport
         this.configurationTemplateManager = configurationTemplateManager;
     }
 
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
+    }
+
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
     }
-
 }
