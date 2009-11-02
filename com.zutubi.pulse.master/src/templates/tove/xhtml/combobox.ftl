@@ -2,7 +2,7 @@
 
 (function()
 {
-<#if parameters.lazy?exists && parameters.lazy>
+<#if parameters.lazy>
     fc.mode = 'remote';
     fc.store = new Ext.data.SimpleStore({
         url: '${base}/aconfig/?options',

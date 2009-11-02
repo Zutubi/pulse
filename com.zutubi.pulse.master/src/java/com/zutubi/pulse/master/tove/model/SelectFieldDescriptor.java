@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
 /**
- *
- *
+ * Field used for rendering comboboxes and dropdowns.
  */
 public class SelectFieldDescriptor extends OptionFieldDescriptor
 {
@@ -11,6 +10,7 @@ public class SelectFieldDescriptor extends OptionFieldDescriptor
     public SelectFieldDescriptor()
     {
         setType("select");
+        setLazy(false);
     }
 
     public boolean isLazy()
