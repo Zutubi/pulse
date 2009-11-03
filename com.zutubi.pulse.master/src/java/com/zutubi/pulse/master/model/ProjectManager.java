@@ -113,7 +113,7 @@ public interface ProjectManager extends EntityManager<Project>
      * so.  In cases where the caller needs to inspect the state first or
      * perform other operations atomically with the transition, however, the
      * caller should increase the scope of the locking as required using
-     * {@link #lockProjectStates(long)}.  State locks are reentrant to allow
+     * {@link #lockProjectStates(long...)}.  State locks are reentrant to allow
      * this pattern.
      * <p/>
      * If the project transitions into a state which requires further action,
@@ -152,13 +152,16 @@ public interface ProjectManager extends EntityManager<Project>
      *                      effect if isolating changelists)
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
+     * @return the ids of the build requests, used to track the requests via
+     *         the {@link com.zutubi.pulse.master.BuildRequestRegistry}, may
+     *         be empty if no request was made
      */
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
-    void triggerBuild(ProjectConfiguration project, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
+    List<Long> triggerBuild(ProjectConfiguration project, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
 
     // Personal builds are shielded by their own permission, not the trigger
     // authority.
-    void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
+    long triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     long getNextBuildNumber(Project project, boolean allocate);

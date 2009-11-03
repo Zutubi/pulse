@@ -4,11 +4,13 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.master.BuildRequestRegistry;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.util.Constants;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
@@ -22,11 +24,14 @@ public class PersonalBuildAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(PersonalBuildAction.class);
 
+    private static final long TIMEOUT = 30 * Constants.SECOND;
+
     private String project;
     private String version;
     private long number;
     private String errorMessage;
     private MasterConfigurationManager configurationManager;
+    private BuildRequestRegistry buildRequestRegistry;
 
     public void setProject(String project)
     {
@@ -117,6 +122,7 @@ public class PersonalBuildAction extends ActionSupport
         if(patchFile.exists())
         {
             errorMessage = "Patch file '" + patchFile.getAbsolutePath() + "' already exists.  Retry the build.";
+            return ERROR;
         }
 
         PatchArchive archive = null;
@@ -126,7 +132,26 @@ public class PersonalBuildAction extends ActionSupport
             uploadedPatch.delete();
             
             archive = new PatchArchive(patchFile);
-            projectManager.triggerBuild(number, p, user, archive);
+            long requestId = projectManager.triggerBuild(number, p, user, archive);
+            BuildRequestRegistry.RequestStatus requestStatus = buildRequestRegistry.waitForRequestToBeHandled(requestId, TIMEOUT);
+            switch (requestStatus)
+            {
+                case CANCELLED:
+                    errorMessage = "Request cancelled";
+                    return ERROR;
+                case ACTIVATED:
+                case QUEUED:
+                    return SUCCESS;
+                case REJECTED:
+                    errorMessage = "Request rejected: " + buildRequestRegistry.getRejectionReason(requestId);
+                    return ERROR;
+                case UNHANDLED:
+                    errorMessage = "Timed out waiting for request to queue";
+                    return ERROR;
+                default:
+                    errorMessage = "Unexpected request status '" + requestStatus + "'";
+                    return ERROR;
+            }
         }
         catch (Exception e)
         {
@@ -134,12 +159,15 @@ public class PersonalBuildAction extends ActionSupport
             errorMessage = e.getClass().getName() + ": " + e.getMessage();
             return ERROR;
         }
-
-        return SUCCESS;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 }

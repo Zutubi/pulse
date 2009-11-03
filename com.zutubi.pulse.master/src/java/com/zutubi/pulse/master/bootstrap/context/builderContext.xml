@@ -190,6 +190,8 @@
 
     <bean id="buildHookManager" class="com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager" autowire="byName"/>
 
+    <bean id="buildRequestRegistry" class="com.zutubi.pulse.master.BuildRequestRegistry" autowire="byName"/>
+
     <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">

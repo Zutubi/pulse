@@ -14,14 +14,12 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.BuildRequestRegistry;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
-import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
-import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
@@ -82,6 +80,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ScmManager scmManager;
     private LicenseManager licenseManager;
     private AgentStateDao agentStateDao;
+    private BuildRequestRegistry buildRequestRegistry;
 
     private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
@@ -806,7 +805,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         licenseManager.refreshAuthorisations();
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
+    public List<Long> triggerBuild(ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -814,6 +813,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         // to the persistent version (e.g. it could have additional properties).
         project.setConfig(projectConfig);
 
+        List<Long> requestIds = new LinkedList<Long>();
         if(revision == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())
@@ -829,14 +829,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                             for(Revision r: revisions)
                             {
                                 // Note when isolating changelists we never replace existing requests
-                                requestBuildOfRevision(reason, project, properties, r, source, false);
+                                requestBuildOfRevision(reason, project, properties, r, source, false, requestIds);
                             }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
                                 "' as the SCM does not support revisions");
-                        requestBuildFloating(reason, project, properties, source, replaceable);
+                        requestBuildFloating(reason, project, properties, source, replaceable, requestIds);
                     }
                 }
                 catch (ScmException e)
@@ -846,29 +846,31 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                requestBuildFloating(reason, project, properties, source, replaceable);
+                requestBuildFloating(reason, project, properties, source, replaceable, requestIds);
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, properties, revision, source, replaceable);
+            requestBuildOfRevision(reason, project, properties, revision, source, replaceable, requestIds);
         }
+
+        return requestIds;
     }
 
-    public void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException
+    public long triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
         {
-            return;
+            throw new PulseException("Unknown or invalid project configuration '" + project.getName() + "'");
         }
 
         Revision revision = archive.getMetadata().getRevision();
         try
         {
             PulseFileSource pulseFile = projectConfig.getType().getPulseFile(projectConfig, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig));
+            return requestBuild(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig));
         }
         catch (Exception e)
         {
@@ -908,23 +910,30 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void requestBuildFloating(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, String category, boolean replaceable)
+    private void requestBuildFloating(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, String category, boolean replaceable, List<Long> requestIds)
     {
-        eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(), category, replaceable));
+        requestIds.add(requestBuild(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(), category, replaceable)));
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, Revision revision, String source, boolean replaceable)
+    private void requestBuildOfRevision(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, Revision revision, String source, boolean replaceable, List<Long> requestIds)
     {
         try
         {
             ProjectConfiguration projectConfig = project.getConfig();
             PulseFileSource pulseFile = projectConfig.getType().getPulseFile(projectConfig, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
+            requestIds.add(requestBuild(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable)));
         }
         catch (Exception e)
         {
             LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
+    }
+
+    private long requestBuild(AbstractBuildRequestEvent request)
+    {
+        buildRequestRegistry.register(request);
+        eventManager.publish(request);
+        return request.getId();
     }
 
     private void ensureTransitionPermission(Project project, Project.Transition transition)
@@ -1305,5 +1314,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)
     {
         this.projectInitialisationService = projectInitialisationService;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 }

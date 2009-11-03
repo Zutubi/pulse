@@ -73,6 +73,15 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @Ordered
     private Map<String, ReportGroupConfiguration> reportGroups = new LinkedHashMap<String, ReportGroupConfiguration>();
 
+    public ProjectConfiguration()
+    {
+    }
+
+    public ProjectConfiguration(String name)
+    {
+        this.name = name;
+    }
+
     public long getProjectId()
     {
         return projectId;

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
@@ -19,7 +20,8 @@ import java.util.Map;
 public class BuildQueue
 {
     private static final Logger LOG = Logger.getLogger(BuildQueue.class);
-
+    private static final Messages I18N = Messages.getInstance(BuildQueue.class);
+    
     /**
      * Map from entity to a specific queue for that entity.  The entity is
      * either a project or a user (for personal builds).
@@ -28,6 +30,7 @@ public class BuildQueue
     private boolean stopped = false;
 
     private ObjectFactory objectFactory;
+    private BuildRequestRegistry buildRequestRegistry;
 
     /**
      * Adds the request to the queue.  The request will be activated if the
@@ -40,6 +43,10 @@ public class BuildQueue
         if (!stopped)
         {
             lookupQueueForOwner(event.getOwner()).handleRequest(event);
+        }
+        else
+        {
+            buildRequestRegistry.requestRejected(event, I18N.format("rejected.queue.stopped"));
         }
     }
 
@@ -157,6 +164,11 @@ public class BuildQueue
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 
     /**

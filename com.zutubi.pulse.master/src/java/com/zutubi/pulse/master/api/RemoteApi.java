@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.BuildQueue;
+import com.zutubi.pulse.master.BuildRequestRegistry;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -78,6 +79,7 @@ public class RemoteApi
     private ScmManager scmManager;
     private FatController fatController;
     private BuildResultDao buildResultDao;
+    private BuildRequestRegistry buildRequestRegistry;
 
     public RemoteApi()
     {
@@ -1757,7 +1759,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
+            Project[] projects = internalGetProjectSet(projectName);
 
             List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, null, firstResult, maxResults, mostRecentFirst);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
@@ -1981,7 +1983,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
+            Project[] projects = internalGetProjectSet(projectName);
 
             ResultState[] states = null;
             if (completedOnly)
@@ -2056,7 +2058,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
+            Project[] projects = internalGetProjectSet(projectName);
             List<BuildResult> builds = buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
             for (BuildResult build : builds)
@@ -2879,19 +2881,65 @@ public class RemoteApi
     }
 
     /**
-     * Triggers a build of the given project at a floating revision.  The revision will be fixed as
-     * laate as possible.  This function returns as soon as the request has been made.
+     * Superceded by {@link #triggerProjectBuild(String, String)}.
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger
      * @return true
      * @access requires trigger permission for the given project
-     * @see #triggerBuild(String, String, String) 
-     * @see #triggerBuild(String, String, String, Hashtable)
      */
     public boolean triggerBuild(String token, String projectName)
     {
         return triggerBuild(token, projectName, null);
+    }
+
+    /**
+     * Superceded by {@link #triggerProjectBuild(String, String, String)}.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be the empty string to indicate the latest revision should be used
+     * @return true
+     * @access requires trigger permission for the given project
+     */
+    public boolean triggerBuild(String token, String projectName, String revision)
+    {
+        return triggerBuild(token, projectName, revision, null);
+    }
+
+    /**
+     * Superceded by {@link #triggerProjectBuild(String, String, String, java.util.Hashtable)}.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be empty to indicate the latest revision should be used
+     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
+     * @return true
+     * @access requires trigger permission for the given project
+     */
+    public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
+    {
+        triggerProjectBuild(token, projectName, revision, properties);
+        return true;
+    }
+
+    /**
+     * Triggers a build of the given project at a floating revision.  The revision will be fixed as
+     * laate as possible.  This function returns as soon as the request has been made.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @return a list of ids for build requests raised by this trigger, can be used to track the
+     *         status of the requests via {@link #getBuildRequestStatus(String, String)}.
+     * @access requires trigger permission for the given project
+     * @see #triggerBuild(String, String, String) 
+     * @see #triggerBuild(String, String, String, Hashtable)
+     */
+    public Vector<String> triggerProjectBuild(String token, String projectName)
+    {
+        return triggerProjectBuild(token, projectName, null);
     }
 
     /**
@@ -2902,14 +2950,15 @@ public class RemoteApi
      * @param projectName the name of the project to trigger
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be the empty string to indicate the latest revision should be used
-     * @return true
+     * @return a list of ids for build requests raised by this trigger, can be used to track the
+     *         status of the requests via {@link #getBuildRequestStatus(String, String)}.
      * @access requires trigger permission for the given project
-     * @see #triggerBuild(String, String) 
-     * @see #triggerBuild(String, String, String, Hashtable)
+     * @see #triggerProjectBuild(String, String)
+     * @see #triggerProjectBuild(String, String, String, Hashtable)
      */
-    public boolean triggerBuild(String token, String projectName, String revision)
+    public Vector<String> triggerProjectBuild(String token, String projectName, String revision)
     {
-        return triggerBuild(token, projectName, revision, null);
+        return triggerProjectBuild(token, projectName, revision, null);
     }
 
     /**
@@ -2923,12 +2972,13 @@ public class RemoteApi
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be empty to indicate the latest revision should be used
      * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
-     * @return true
+     * @return a list of ids for build requests raised by this trigger, can be used to track the
+     *         status of the requests via {@link #getBuildRequestStatus(String, String)}.
      * @access requires trigger permission for the given project
-     * @see #triggerBuild(String, String)
-     * @see #triggerBuild(String, String, String)
+     * @see #triggerProjectBuild(String, String)
+     * @see #triggerProjectBuild(String, String, String)
      */
-    public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
+    public Vector<String> triggerProjectBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -2971,15 +3021,139 @@ public class RemoteApi
                 }
             }
 
-            projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
-            return true;
+            List<Long> requestIds = projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            Vector<String> result = new Vector<String>(requestIds.size());
+            for (Long id: requestIds)
+            {
+                result.add(Long.toString(id));
+            }
+            
+            return result;
         }
         finally
         {
             tokenManager.logoutUser();
         }
     }
-    
+
+    /**
+     * Waits for a given length of time for a build request to be handled.  A handled request is one
+     * that has either made its way into the queue, or will never do so (e.g. if it is rejected).
+     * If the timeout is reached before the request is handled, this method will return as normal
+     * but the returned status will be UNHANDLED.
+     *
+     * @param token         authentication token, see {@link #login(String, String)}
+     * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
+     * @param timeoutMillis number of milliseconds to wait for the request to be handled
+     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @access requires view permission for the corresponding project
+     * @see #triggerProjectBuild(String, String)
+     * @see #waitForBuildRequestToBeActivated(String, String, int)
+     * @see #getBuildRequestStatus(String, String)
+     */
+    public Hashtable<String, Object> waitForBuildRequestToBeHandled(String token, String requestId, int timeoutMillis)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id = Long.parseLong(requestId);
+            return convertBuildRequestStatus(id, buildRequestRegistry.waitForRequestToBeHandled(id, timeoutMillis));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid request id '" + requestId + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Waits for a given length of time for a build request to be activated.  An activated request
+     * is one that has an associated build id (also returned), or will never have one (e.g. if it is
+     * cancelled).  If the timeout is reached before the request is activated, this method will
+     * return as normal but the returned status will be UNHANDLED or QUEUED.
+     *
+     * @param token         authentication token, see {@link #login(String, String)}
+     * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
+     * @param timeoutMillis number of milliseconds to wait for the request to be handled
+     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @access requires view permission for the corresponding project
+     * @see #triggerProjectBuild(String, String)
+     * @see #waitForBuildRequestToBeHandled(String, String, int)
+     * @see #getBuildRequestStatus(String, String)
+     */
+    public Hashtable<String, Object> waitForBuildRequestToBeActivated(String token, String requestId, int timeoutMillis)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id = Long.parseLong(requestId);
+            return convertBuildRequestStatus(id, buildRequestRegistry.waitForRequestToBeActivated(id, timeoutMillis));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid request id '" + requestId + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Gets the current status of the given build request.  Request status are tracked for all
+     * recent requests, but only transiently (i.e. this information is not preserved across a
+     * reboot of the master).  This status can be used to determine if the request has or will
+     * indeed ever become queued and/or activated. 
+     *
+     * @param token     authentication token, see {@link #login(String, String)}
+     * @param requestId id of the build request, as returned by the triggerProjectBuild methods
+     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @access requires view permission for the corresponding project
+     * @see #triggerProjectBuild(String, String)
+     * @see #waitForBuildRequestToBeHandled(String, String, int)
+     * @see #waitForBuildRequestToBeActivated(String, String, int)
+     */
+    public Hashtable<String, Object> getBuildRequestStatus(String token, String requestId)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id = Long.parseLong(requestId);
+            return convertBuildRequestStatus(id, buildRequestRegistry.getStatus(id));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid request id '" + requestId + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> convertBuildRequestStatus(long id, BuildRequestRegistry.RequestStatus status)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("status", status.toString());
+        switch (status)
+        {
+            case ACTIVATED:
+                result.put("buildId", Long.toString(buildRequestRegistry.getBuildNumber(id)));
+                break;
+            case ASSIMILATED:
+                result.put("assimilatedId", Long.toString(buildRequestRegistry.getAssimilatedId(id)));
+                break;
+            case REJECTED:
+                result.put("rejectionReason", buildRequestRegistry.getRejectionReason(id));
+                break;
+        }
+        
+        return result;
+    }
+
     /**
      * Request that the given active build is cancelled.  This function returns when the request is
      * made, which is likely to be before the build is cancelled (if indeed it is cancelled).
@@ -3308,7 +3482,7 @@ public class RemoteApi
         return project;
     }
 
-    private Project[] internalGetProjectSet(String projectName, boolean allowInvalid)
+    private Project[] internalGetProjectSet(String projectName)
     {
         String path = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName);
         ProjectConfiguration projectConfiguration = configurationProvider.get(path, ProjectConfiguration.class);
@@ -3435,5 +3609,10 @@ public class RemoteApi
     public void setBuildResultDao(BuildResultDao buildResultDao)
     {
         this.buildResultDao = buildResultDao;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 }

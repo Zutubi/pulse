@@ -98,7 +98,7 @@ public class BuildController implements EventListener
         projectConfig = request.getProjectConfig();
     }
 
-    public void run()
+    public long run()
     {
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
@@ -122,6 +122,7 @@ public class BuildController implements EventListener
         // *only* use that thread after we have registered the listener.
         eventManager.register(asyncListener);
         publishEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
+        return buildResult.getNumber();
     }
 
     public BuildTree createBuildTree()

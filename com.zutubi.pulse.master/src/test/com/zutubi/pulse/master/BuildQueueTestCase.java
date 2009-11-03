@@ -47,6 +47,7 @@ public class BuildQueueTestCase extends PulseTestCase
     protected File tempDir;
     protected AtomicInteger nextId = new AtomicInteger(1);
     protected AccessManager accessManager;
+    protected BuildRequestRegistry buildRequestRegistry;
 
     protected void setUp() throws Exception
     {
@@ -70,6 +71,9 @@ public class BuildQueueTestCase extends PulseTestCase
         objectFactory = new WiringObjectFactory();
         testManager = mock(TestManager.class);
         accessManager = mock(AccessManager.class);
+
+        buildRequestRegistry = new BuildRequestRegistry();
+        buildRequestRegistry.setAccessManager(accessManager);
     }
 
     protected void tearDown() throws Exception
@@ -92,7 +96,9 @@ public class BuildQueueTestCase extends PulseTestCase
             assertEquals(events.length, activeSnapshot.size());
             for (int i = 0; i < events.length; i++)
             {
-                assertSame(events[i], activeSnapshot.get(i).getEvent());
+                AbstractBuildRequestEvent event = events[i];
+                assertSame(event, activeSnapshot.get(i).getEvent());
+                assertEquals(BuildRequestRegistry.RequestStatus.ACTIVATED, buildRequestRegistry.getStatus(event.getId()));
             }
         }
     }
@@ -111,8 +117,33 @@ public class BuildQueueTestCase extends PulseTestCase
             assertEquals(events.length, queuedSnapshot.size());
             for (int i = 0; i < events.length; i++)
             {
-                assertSame(events[i], queuedSnapshot.get(i));
+                AbstractBuildRequestEvent event = events[i];
+                assertSame(event, queuedSnapshot.get(i));
+                assertEquals(BuildRequestRegistry.RequestStatus.QUEUED, buildRequestRegistry.getStatus(event.getId()));
             }
+        }
+    }
+
+    protected void assertRejected(AbstractBuildRequestEvent... events)
+    {
+        assertStatus(BuildRequestRegistry.RequestStatus.REJECTED, events);
+    }
+
+    protected void assertAssimilated(AbstractBuildRequestEvent... events)
+    {
+        assertStatus(BuildRequestRegistry.RequestStatus.ASSIMILATED, events);
+    }
+
+    protected void assertCancelled(AbstractBuildRequestEvent... events)
+    {
+        assertStatus(BuildRequestRegistry.RequestStatus.CANCELLED, events);
+    }
+
+    private void assertStatus(BuildRequestRegistry.RequestStatus expectedStatus, AbstractBuildRequestEvent... events)
+    {
+        for (AbstractBuildRequestEvent event: events)
+        {
+            assertEquals(expectedStatus, buildRequestRegistry.getStatus(event.getId()));
         }
     }
 
@@ -130,7 +161,7 @@ public class BuildQueueTestCase extends PulseTestCase
     protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
         BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, new PulseFileSource("pulse file"), false);
-        return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), Collections.<ResourcePropertyConfiguration>emptyList(), null, source, replaceable)
+        AbstractBuildRequestEvent requestEvent = new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), Collections.<ResourcePropertyConfiguration>emptyList(), null, source, replaceable)
         {
             public NamedEntity getOwner()
             {
@@ -149,5 +180,7 @@ public class BuildQueueTestCase extends PulseTestCase
                 return buildResult;
             }
         };
+        buildRequestRegistry.register(requestEvent);
+        return requestEvent;
     }
 }

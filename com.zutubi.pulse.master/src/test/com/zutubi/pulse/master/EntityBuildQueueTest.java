@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import org.acegisecurity.AccessDeniedException;
 import static org.mockito.Mockito.*;
@@ -33,12 +34,13 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         owner = createProject();
         doReturn(owner).when(projectManager).getProject(eq(owner.getId()), anyBoolean());
-        
+
         queue = new EntityBuildQueue(owner, 1);
         queue.setAccessManager(accessManager);
         queue.setConfigurationManager(configurationManager);
         queue.setObjectFactory(objectFactory);
         queue.setEventManager(eventManager);
+        queue.setBuildRequestRegistry(buildRequestRegistry);
 
         objectFactory.initProperties(this);
     }
@@ -143,9 +145,11 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
     public void testStoppedNoLongerAcceptsRequests()
     {
         queue.stop();
-        queue.handleRequest(createRequest(1, "test", false));
+        AbstractBuildRequestEvent requestEvent = createRequest(1, "test", false);
+        queue.handleRequest(requestEvent);
         assertActive();
         assertQueued();
+        assertRejected(requestEvent);
     }
 
     public void testStoppedDoesNotActivateQueuedRequest()
@@ -166,6 +170,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         assertActive();
         assertQueued();
+        assertRejected(queuedRequest);
     }
 
     public void testReplaceExistingActive()
@@ -188,6 +193,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         assertQueued();
 
         assertSame(activeRequest.getRevision().getRevision(), revision2);
+        assertAssimilated(replacementRequest);
     }
 
     public void testDifferentSourceNotReplaced()
@@ -280,6 +286,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         assertActive(activeRequest);
         assertQueued();
+        assertCancelled(queuedRequest);
     }
 
     public void testCancelActiveBuild()
@@ -352,7 +359,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
     {
         try
         {
-            AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(null, null, null, null, null, null, false)
+            AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(null, null, new ProjectConfiguration(), null, null, null, false)
             {
                 public NamedEntity getOwner()
                 {

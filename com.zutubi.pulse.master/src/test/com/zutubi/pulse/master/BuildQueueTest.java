@@ -32,17 +32,9 @@ public class BuildQueueTest extends BuildQueueTestCase
 
         queue = new BuildQueue();
         queue.setObjectFactory(objectFactory);
+        queue.setBuildRequestRegistry(buildRequestRegistry);
 
         objectFactory.initProperties(this);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        queue = null;
-        project1 = null;
-        project2 = null;
-
-        super.tearDown();
     }
 
     public void testSimpleQueue()
@@ -194,7 +186,8 @@ public class BuildQueueTest extends BuildQueueTestCase
         assertActive(project1, requests[0]);
         assertQueued(project1, queued);
 
-        queue.cancelBuild(requests[indexToCancel].getId());
+        final AbstractBuildRequestEvent cancelledRequest = requests[indexToCancel];
+        queue.cancelBuild(cancelledRequest.getId());
 
         assertActive(project1, requests[0]);
         
@@ -203,18 +196,22 @@ public class BuildQueueTest extends BuildQueueTestCase
         {
             public boolean satisfied(AbstractBuildRequestEvent event)
             {
-                return event.getId() != requests[indexToCancel].getId();
+                return event.getId() != cancelledRequest.getId();
             }
         }));
+
+        assertCancelled(cancelledRequest);
     }
 
     public void testStop()
     {
         queue.stop();
-        queue.buildRequested(createRequest(project1, nextId.getAndIncrement(), "source", false, null));
+        AbstractBuildRequestEvent requestEvent = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+        queue.buildRequested(requestEvent);
         assertEquals(0, queue.getActiveBuildCount());
         assertActive(project1);
         assertQueued(project1);
+        assertRejected(requestEvent);
     }
 
     private void assertActive(Project project, AbstractBuildRequestEvent... events)

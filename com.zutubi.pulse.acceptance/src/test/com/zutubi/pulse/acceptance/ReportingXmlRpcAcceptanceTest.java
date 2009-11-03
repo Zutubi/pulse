@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
@@ -32,6 +33,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String PROJECT_HIERARCHY_CHILD2 = PROJECT_HIERARCHY_PREFIX + "-child2";
 
     private static final int BUILD_TIMEOUT = 90000;
+    private static final int REQUEST_TIMEOUT = 5000;
 
     protected void setUp() throws Exception
     {
@@ -515,6 +517,66 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             assertThat(e.getMessage(), containsString("build '1' stage 'default' command 'build' does not have an artifact named 'nosuchartifact'"));
         }
+    }
+
+    public void testWaitForBuildRequestToBeHandled() throws Exception
+    {
+        String projectName = randomName();
+        Vector<String> ids = insertAndTriggerProject(projectName);
+
+        Hashtable<String, Object> status = xmlRpcHelper.waitForBuildRequestToBeHandled(ids.get(0), REQUEST_TIMEOUT);
+        assertFirstActivatedBuild(status);
+        xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
+    }
+
+    public void testWaitForBuildRequestToBeActivated() throws Exception
+    {
+        String projectName = randomName();
+        Vector<String> ids = insertAndTriggerProject(projectName);
+
+        Hashtable<String, Object> status = xmlRpcHelper.waitForBuildRequestToBeActivated(ids.get(0), REQUEST_TIMEOUT);
+        assertFirstActivatedBuild(status);
+        xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
+    }
+
+    public void testGetBuildRequestStatus() throws Exception
+    {
+        String projectName = randomName();
+        Vector<String> ids = insertAndTriggerProject(projectName);
+
+        String id = ids.get(0);
+        xmlRpcHelper.waitForBuildRequestToBeActivated(id, REQUEST_TIMEOUT);
+        Hashtable<String, Object> status = xmlRpcHelper.getBuildRequestStatus(id);
+        assertFirstActivatedBuild(status);
+        xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
+    }
+
+    public void testGetBuildRequestStatusPaused() throws Exception
+    {
+        String projectName = randomName();
+        insertSimpleProject(projectName);
+        xmlRpcHelper.doConfigAction(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName), ProjectConfigurationActions.ACTION_PAUSE);
+
+        Vector<String> ids = xmlRpcHelper.triggerProjectBuild(projectName);
+        String id = ids.get(0);
+        xmlRpcHelper.waitForBuildRequestToBeHandled(id, REQUEST_TIMEOUT);
+        Hashtable<String, Object> status = xmlRpcHelper.getBuildRequestStatus(id);
+        assertEquals("REJECTED", status.get("status"));
+        assertEquals("project state (paused) does not allow building", status.get("rejectionReason"));
+    }
+
+    private Vector<String> insertAndTriggerProject(String projectName) throws Exception
+    {
+        insertSimpleProject(projectName);
+        Vector<String> ids = xmlRpcHelper.triggerProjectBuild(projectName);
+        assertEquals(1, ids.size());
+        return ids;
+    }
+
+    private void assertFirstActivatedBuild(Hashtable<String, Object> status)
+    {
+        assertEquals("ACTIVATED", status.get("status"));
+        assertEquals("1", status.get("buildId"));
     }
 
     private void ensureProjectHierarchy() throws Exception
