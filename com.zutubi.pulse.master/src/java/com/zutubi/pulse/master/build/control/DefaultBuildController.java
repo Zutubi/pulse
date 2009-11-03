@@ -29,9 +29,15 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.MasterBuildPaths;
+import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
+import com.zutubi.pulse.master.build.log.DefaultBuildLogger;
+import com.zutubi.pulse.master.build.log.DefaultRecipeLogger;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
@@ -41,11 +47,6 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.pulse.master.*;
-import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
-import com.zutubi.pulse.master.build.queue.RecipeQueue;
-import com.zutubi.pulse.master.build.log.DefaultBuildLogger;
-import com.zutubi.pulse.master.build.log.DefaultRecipeLogger;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
@@ -122,7 +123,7 @@ public class DefaultBuildController implements EventListener, BuildController
         projectConfig = request.getProjectConfig();
     }
 
-    public void start()
+    public long start()
     {
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
@@ -147,6 +148,8 @@ public class DefaultBuildController implements EventListener, BuildController
         eventManager.register(asyncListener);
         // handle the event directly, there is no need to expose this event to the wider audience.
         asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
+
+        return buildResult.getNumber();
     }
 
     public BuildTree createBuildTree()

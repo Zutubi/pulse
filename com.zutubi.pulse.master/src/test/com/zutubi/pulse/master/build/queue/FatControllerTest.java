@@ -56,6 +56,7 @@ public class FatControllerTest extends PulseTestCase
     private AtomicLong nextBuildId = new AtomicLong(1);
 
     private SequenceManager sequenceManager;
+    private BuildRequestRegistry buildRequestRegistry;
 
     // NOTE: This map can only store a single handler at a time, so only functions while a single
     // build per owner is possible.
@@ -114,6 +115,9 @@ public class FatControllerTest extends PulseTestCase
         };
         sequenceManager = mock(SequenceManager.class);
         stub(sequenceManager.getSequence(FatController.SEQUENCE_BUILD_ID)).toReturn(buildIdSequence);
+
+        buildRequestRegistry = new BuildRequestRegistry();
+        buildRequestRegistry.setAccessManager(accessManager);
 
         dependencyManager = mock(DependencyManager.class);
         stub(dependencyManager.getPriority(STATUS_RELEASE)).toReturn(1);
@@ -517,6 +521,4 @@ public class FatControllerTest extends PulseTestCase
 
         return project;
     }
-
-
 }

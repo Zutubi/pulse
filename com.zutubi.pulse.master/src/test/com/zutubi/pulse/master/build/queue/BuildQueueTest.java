@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.build.queue.BuildQueue;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -27,6 +26,7 @@ public class BuildQueueTest extends BuildQueueTestCase
 
         queue = new BuildQueue();
         queue.setObjectFactory(objectFactory);
+        queue.setBuildRequestRegistry(buildRequestRegistry);
 
         objectFactory.initProperties(this);
     }
@@ -172,7 +172,7 @@ public class BuildQueueTest extends BuildQueueTestCase
 
         // The queue is in reverse order, and does not have the first (active)
         // request.
-        final List<BuildRequestEvent> queuedList = new LinkedList(asList(requests));
+        final List<BuildRequestEvent> queuedList = new LinkedList<BuildRequestEvent>(asList(requests));
         queuedList.remove(0);
         Collections.reverse(queuedList);
         final BuildRequestEvent[] queued = queuedList.toArray(new BuildRequestEvent[queuedList.size()]);
@@ -180,7 +180,8 @@ public class BuildQueueTest extends BuildQueueTestCase
         assertActive(project1, requests[0]);
         assertQueued(project1, queued);
 
-        queue.cancelBuild(requests[indexToCancel].getId());
+        final BuildRequestEvent cancelledRequest = requests[indexToCancel];
+        queue.cancelBuild(cancelledRequest.getId());
 
         assertActive(project1, requests[0]);
         
@@ -189,9 +190,11 @@ public class BuildQueueTest extends BuildQueueTestCase
         {
             public boolean satisfied(BuildRequestEvent event)
             {
-                return event.getId() != requests[indexToCancel].getId();
+                return event.getId() != cancelledRequest.getId();
             }
         }));
+
+        assertCancelled(cancelledRequest);
     }
 
     public void testGetRequestsForEntityNoRequests()
@@ -227,10 +230,12 @@ public class BuildQueueTest extends BuildQueueTestCase
     public void testStop()
     {
         queue.stop();
-        queue.buildRequested(createRequest(project1, nextId.getAndIncrement(), "source", false, null));
+        BuildRequestEvent requestEvent = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+        queue.buildRequested(requestEvent);
         assertEquals(0, queue.getActiveBuildCount());
         assertActive(project1);
         assertQueued(project1);
+        assertRejected(requestEvent);
     }
 
     private void assertActive(Project project, BuildRequestEvent... events)

@@ -13,13 +13,11 @@ import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
+import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
-import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
-import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
@@ -87,6 +85,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ConfigurationTemplateManager configurationTemplateManager;
     private AccessManager accessManager;
     private ProjectInitialisationService projectInitialisationService;
+    private BuildRequestRegistry buildRequestRegistry;
 
     // Protects the five caches defined below.
     private ReadWriteLock cacheLock = new ReentrantReadWriteLock();
@@ -912,7 +911,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         licenseManager.refreshAuthorisations();
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, TriggerOptions options, Revision revision)
+    public List<Long> triggerBuild(ProjectConfiguration projectConfig, TriggerOptions options, Revision revision)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -920,6 +919,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         // to the persistent version (e.g. it could have additional properties).
         project.setConfig(projectConfig);
 
+        List<Long> requestIds = new LinkedList<Long>();
         if(revision == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())
@@ -937,14 +937,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                                 // Note when isolating changelists we never replace existing requests
                                 TriggerOptions copy = new TriggerOptions(options);
                                 options.setReplaceable(false);
-                                requestBuildOfRevision(project, copy, r);
+                                requestBuildOfRevision(project, copy, r, requestIds);
                             }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
                                 "' as the SCM does not support revisions");
-                        requestBuildFloating(project, options);
+                        requestBuildFloating(project, options, requestIds);
                     }
                 }
                 catch (ScmException e)
@@ -954,34 +954,43 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                requestBuildFloating(project, options);
+                requestBuildFloating(project, options, requestIds);
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(project, options, revision);
+            requestBuildOfRevision(project, options, revision, requestIds);
         }
+
+        return requestIds;
     }
 
-    public void triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException
+    public long triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
         {
-            return;
+            throw new PulseException("Unknown or invalid project configuration '" + project.getName() + "'");
         }
 
         try
         {
             BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, false);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig));
+            return requestBuild(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig));
         }
         catch (Exception e)
         {
             throw new PulseException(e.getMessage(), e);
         }
     }
+
+    private long requestBuild(BuildRequestEvent request)
+ 	{
+ 	    buildRequestRegistry.register(request);
+ 	 	eventManager.publish(request);
+ 	 	return request.getId();
+ 	}
 
     public long getNextBuildNumber(Project project, boolean allocate)
     {
@@ -1015,16 +1024,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void requestBuildFloating(Project project, TriggerOptions options)
+    private void requestBuildFloating(Project project, TriggerOptions options, List<Long> requestIds)
     {
-        eventManager.publish(new SingleBuildRequestEvent(this, project, new BuildRevision(), options));
+        requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, new BuildRevision(), options)));
     }
 
-    private void requestBuildOfRevision(Project project, TriggerOptions options, Revision revision)
+    private void requestBuildOfRevision(Project project, TriggerOptions options, Revision revision, List<Long> requestIds)
     {
         try
         {
-            eventManager.publish(new SingleBuildRequestEvent(this, project, new BuildRevision(revision, options.getReason().isUser()), options));
+            requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, new BuildRevision(revision, options.getReason().isUser()), options)));
         }
         catch (Exception e)
         {
@@ -1448,5 +1457,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)
     {
         this.projectInitialisationService = projectInitialisationService;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 }

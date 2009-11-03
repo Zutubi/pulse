@@ -9,11 +9,12 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.build.queue.BuildQueue;
-import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.queue.BuildQueue;
+import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
+import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
 import com.zutubi.pulse.master.charting.model.DataPoint;
@@ -79,6 +80,7 @@ public class RemoteApi
     private ScmManager scmManager;
     private FatController fatController;
     private BuildResultDao buildResultDao;
+    private BuildRequestRegistry buildRequestRegistry;
 
     public RemoteApi()
     {
@@ -3022,7 +3024,9 @@ public class RemoteApi
         {
             triggerOptions.put("properties", properties);
         }
-        return triggerBuild(token, projectName, triggerOptions);
+
+        triggerBuild(token, projectName, triggerOptions);
+        return true;
     }
 
     /**
@@ -3049,7 +3053,7 @@ public class RemoteApi
      * @param triggerOptions the set of options to be used to configure this build request
      * @return true
      */
-    public boolean triggerBuild(String token, String projectName, Hashtable<String, Object> triggerOptions)
+    public Vector<String> triggerBuild(String token, String projectName, Hashtable<String, Object> triggerOptions)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -3102,8 +3106,14 @@ public class RemoteApi
                 options.setRebuild(Boolean.valueOf((String) triggerOptions.get("rebuild")));
             }
 
-            projectManager.triggerBuild(project.getConfig(), options, revision);
-            return true;
+            List<Long> requestIds = projectManager.triggerBuild(project.getConfig(), options, revision);
+            Vector<String> result = new Vector<String>(requestIds.size());
+            for (Long id: requestIds)
+            {
+                result.add(Long.toString(id));
+            }
+
+            return result;
         }
         finally
         {
@@ -3135,6 +3145,124 @@ public class RemoteApi
         {
             throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
         }
+    }
+
+    /**
+     * Waits for a given length of time for a build request to be handled.  A handled request is one
+     * that has either made its way into the queue, or will never do so (e.g. if it is rejected).
+     * If the timeout is reached before the request is handled, this method will return as normal
+     * but the returned status will be UNHANDLED.
+     *
+     * @param token         authentication token, see {@link #login(String, String)}
+     * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
+     * @param timeoutMillis number of milliseconds to wait for the request to be handled
+     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @access requires view permission for the corresponding project
+     * @see #triggerBuild(String, String, java.util.Hashtable)
+     * @see #waitForBuildRequestToBeActivated(String, String, int)
+     * @see #getBuildRequestStatus(String, String)
+     */
+    public Hashtable<String, Object> waitForBuildRequestToBeHandled(String token, String requestId, int timeoutMillis)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id = Long.parseLong(requestId);
+            return convertBuildRequestStatus(id, buildRequestRegistry.waitForRequestToBeHandled(id, timeoutMillis));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid request id '" + requestId + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Waits for a given length of time for a build request to be activated.  An activated request
+     * is one that has an associated build id (also returned), or will never have one (e.g. if it is
+     * cancelled).  If the timeout is reached before the request is activated, this method will
+     * return as normal but the returned status will be UNHANDLED or QUEUED.
+     *
+     * @param token         authentication token, see {@link #login(String, String)}
+     * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
+     * @param timeoutMillis number of milliseconds to wait for the request to be handled
+     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @access requires view permission for the corresponding project
+     * @see #triggerBuild(String, String, java.util.Hashtable)
+     * @see #waitForBuildRequestToBeHandled(String, String, int)
+     * @see #getBuildRequestStatus(String, String)
+     */
+    public Hashtable<String, Object> waitForBuildRequestToBeActivated(String token, String requestId, int timeoutMillis)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id = Long.parseLong(requestId);
+            return convertBuildRequestStatus(id, buildRequestRegistry.waitForRequestToBeActivated(id, timeoutMillis));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid request id '" + requestId + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Gets the current status of the given build request.  Request status are tracked for all
+     * recent requests, but only transiently (i.e. this information is not preserved across a
+     * reboot of the master).  This status can be used to determine if the request has or will
+     * indeed ever become queued and/or activated. 
+     *
+     * @param token     authentication token, see {@link #login(String, String)}
+     * @param requestId id of the build request, as returned by the triggerProjectBuild methods
+     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @access requires view permission for the corresponding project
+     * @see #triggerBuild(String, String, java.util.Hashtable)
+     * @see #waitForBuildRequestToBeHandled(String, String, int)
+     * @see #waitForBuildRequestToBeActivated(String, String, int)
+     */
+    public Hashtable<String, Object> getBuildRequestStatus(String token, String requestId)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id = Long.parseLong(requestId);
+            return convertBuildRequestStatus(id, buildRequestRegistry.getStatus(id));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid request id '" + requestId + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> convertBuildRequestStatus(long id, BuildRequestRegistry.RequestStatus status)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("status", status.toString());
+        switch (status)
+        {
+            case ACTIVATED:
+                result.put("buildId", Long.toString(buildRequestRegistry.getBuildNumber(id)));
+                break;
+            case ASSIMILATED:
+                result.put("assimilatedId", Long.toString(buildRequestRegistry.getAssimilatedId(id)));
+                break;
+            case REJECTED:
+                result.put("rejectionReason", buildRequestRegistry.getRejectionReason(id));
+                break;
+        }
+        
+        return result;
     }
 
     /**
@@ -3617,5 +3745,10 @@ public class RemoteApi
     public void setBuildResultDao(BuildResultDao buildResultDao)
     {
         this.buildResultDao = buildResultDao;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 }

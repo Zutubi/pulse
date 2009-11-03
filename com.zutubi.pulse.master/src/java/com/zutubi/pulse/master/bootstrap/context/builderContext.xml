@@ -212,7 +212,9 @@
 
     <bean id="buildHookManager" class="com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager"/>
 
-    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider"/>
+    <bean id="buildRequestRegistry" class="com.zutubi.pulse.master.build.queue.BuildRequestRegistry" autowire="byName"/>
+
+    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
         <property name="projectsDir">

@@ -141,15 +141,18 @@ public interface ProjectManager extends EntityManager<Project>
      * @param options       the options for the build being triggered.
      * @param revision      the revision to build, or null if the revision is not fixed
      * (in which case changelist isolation may result in multiple build requests).
+     * @return the ids of the build requests, used to track the requests via
+     *         the {@link com.zutubi.pulse.master.build.queue.BuildRequestRegistry}, may
+     *         be empty if no request was made
      *
      * @see TriggerOptions
      */
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
-    void triggerBuild(ProjectConfiguration project, TriggerOptions options, Revision revision);
+    List<Long> triggerBuild(ProjectConfiguration project, TriggerOptions options, Revision revision);
 
     // Personal builds are shielded by their own permission, not the trigger
     // authority.
-    void triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException;
+    long triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     long getNextBuildNumber(Project project, boolean allocate);

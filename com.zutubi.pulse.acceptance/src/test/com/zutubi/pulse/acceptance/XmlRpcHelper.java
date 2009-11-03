@@ -716,6 +716,26 @@ public class XmlRpcHelper
         call("triggerBuild", projectName, revision, status, properties);
     }
 
+    public Vector<String> triggerBuild(String projectName, Hashtable<String, Object> triggerOptions) throws Exception
+    {
+        return call("triggerBuild", projectName, triggerOptions);
+    }
+
+    public Hashtable<String, Object> waitForBuildRequestToBeHandled(String requestId, int timeoutMillis) throws Exception
+    {
+        return call("waitForBuildRequestToBeHandled", requestId, timeoutMillis);
+    }
+
+    public Hashtable<String, Object> waitForBuildRequestToBeActivated(String requestId, int timeoutMillis) throws Exception
+    {
+        return call("waitForBuildRequestToBeActivated", requestId, timeoutMillis);
+    }
+
+    public Hashtable<String, Object> getBuildRequestStatus(String requestId) throws Exception
+    {
+        return call("getBuildRequestStatus", requestId);
+    }
+
     /**
      * Requests the given build be terminated.
      *

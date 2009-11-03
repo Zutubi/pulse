@@ -8,13 +8,12 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.build.control.BuildController;
+import com.zutubi.pulse.master.build.control.BuildControllerFactory;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
-import com.zutubi.pulse.master.build.control.BuildController;
-import com.zutubi.pulse.master.build.control.BuildControllerFactory;
-import com.zutubi.pulse.master.build.queue.EntityBuildQueue;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.WiringObjectFactory;
 import static org.mockito.Mockito.doReturn;
@@ -36,6 +35,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
     protected AtomicInteger nextId = new AtomicInteger(1);
     protected AccessManager accessManager;
     protected BuildControllerFactory buildControllerFactory;
+    protected BuildRequestRegistry buildRequestRegistry;
 
     protected Map<BuildRequestEvent, BuildController> controllers = new HashMap<BuildRequestEvent, BuildController>();
 
@@ -47,6 +47,9 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         objectFactory = new WiringObjectFactory();
         buildControllerFactory = mock(BuildControllerFactory.class);
         accessManager = mock(AccessManager.class);
+
+        buildRequestRegistry = new BuildRequestRegistry();
+        buildRequestRegistry.setAccessManager(accessManager);
     }
 
     protected void assertActive(List<EntityBuildQueue.ActiveBuild> activeSnapshot, BuildRequestEvent... events)
@@ -63,7 +66,9 @@ public abstract class BuildQueueTestCase extends PulseTestCase
             assertEquals(events.length, activeSnapshot.size());
             for (int i = 0; i < events.length; i++)
             {
-                assertSame(events[i], activeSnapshot.get(i).getEvent());
+                BuildRequestEvent event = events[i];
+                assertSame(event, activeSnapshot.get(i).getEvent());
+                assertEquals(BuildRequestRegistry.RequestStatus.ACTIVATED, buildRequestRegistry.getStatus(event.getId()));
             }
         }
     }
@@ -82,8 +87,33 @@ public abstract class BuildQueueTestCase extends PulseTestCase
             assertEquals(events.length, queuedSnapshot.size());
             for (int i = 0; i < events.length; i++)
             {
-                assertSame(events[i], queuedSnapshot.get(i));
+                BuildRequestEvent event = events[i];
+                assertSame(event, queuedSnapshot.get(i));
+                assertEquals(BuildRequestRegistry.RequestStatus.QUEUED, buildRequestRegistry.getStatus(event.getId()));
             }
+        }
+    }
+
+    protected void assertRejected(BuildRequestEvent... events)
+    {
+        assertStatus(BuildRequestRegistry.RequestStatus.REJECTED, events);
+    }
+
+    protected void assertAssimilated(BuildRequestEvent... events)
+    {
+        assertStatus(BuildRequestRegistry.RequestStatus.ASSIMILATED, events);
+    }
+
+    protected void assertCancelled(BuildRequestEvent... events)
+    {
+        assertStatus(BuildRequestRegistry.RequestStatus.CANCELLED, events);
+    }
+
+    private void assertStatus(BuildRequestRegistry.RequestStatus expectedStatus, BuildRequestEvent... events)
+    {
+        for (BuildRequestEvent event: events)
+        {
+            assertEquals(expectedStatus, buildRequestRegistry.getStatus(event.getId()));
         }
     }
 
@@ -138,7 +168,8 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         doReturn(buildId).when(controller).getBuildResultId();
 
         controllers.put(request, controller);
-        
+
+        buildRequestRegistry.register(request);
         return request;
     }
 }

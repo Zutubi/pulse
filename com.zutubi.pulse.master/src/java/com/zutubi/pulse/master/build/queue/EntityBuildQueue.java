@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.events.PublishFlag;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.model.Entity;
@@ -31,6 +32,7 @@ import java.util.List;
 public class EntityBuildQueue
 {
     private static final Logger LOG = Logger.getLogger(EntityBuildQueue.class);
+    private static final Messages I18N = Messages.getInstance(EntityBuildQueue.class);
 
     /**
      * Owner of all builds in this queue, a project or a user (the latter for
@@ -56,6 +58,7 @@ public class EntityBuildQueue
     private BuildControllerFactory buildControllerFactory;
     private AccessManager accessManager;
     private EventManager eventManager;
+    private BuildRequestRegistry buildRequestRegistry;
 
     /**
      * Creates a new queue for the given owner.
@@ -86,6 +89,7 @@ public class EntityBuildQueue
     {
         if (!event.getOwner().equals(owner))
         {
+            buildRequestRegistry.requestRejected(event, I18N.format("rejected.illegal.request"));
             throw new IllegalArgumentException("Attempt to enqueue a build request for a different owner");
         }
 
@@ -150,6 +154,7 @@ public class EntityBuildQueue
             {
                 accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, event);
                 it.remove();
+                buildRequestRegistry.requestCancelled(event);
                 return true;
             }
         }
@@ -166,6 +171,7 @@ public class EntityBuildQueue
             if (eventCanReplaceRequest(event, existing))
             {
                 existing.setRevision(event.getRevision());
+                buildRequestRegistry.requestAssimilated(event, existing.getId());
                 return true;
             }
         }
@@ -180,6 +186,7 @@ public class EntityBuildQueue
                     BuildRevision buildRevision = event.getRevision();
                     if (activeBuild.getController().updateRevisionIfNotFixed(buildRevision.getRevision()))
                     {
+                        buildRequestRegistry.requestAssimilated(event, activeBuild.getEvent().getId());
                         return true;
                     }
                 }
@@ -207,6 +214,7 @@ public class EntityBuildQueue
         else
         {
             queuedBuilds.add(0, event);
+            buildRequestRegistry.requestQueued(event);
         }
     }
 
@@ -215,11 +223,13 @@ public class EntityBuildQueue
         if (stopped)
         {
             // Do not activate any more builds.
+            buildRequestRegistry.requestRejected(event, I18N.format("rejected.queue.stopped"));
             return;
         }
 
         BuildController controller = buildControllerFactory.create(event);
-        controller.start();
+        long buildNumber = controller.start();
+        buildRequestRegistry.requestActivated(event, buildNumber);
 
         activeBuilds.add(0, new ActiveBuild(event, controller));
 
@@ -290,6 +300,11 @@ public class EntityBuildQueue
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 
     /**

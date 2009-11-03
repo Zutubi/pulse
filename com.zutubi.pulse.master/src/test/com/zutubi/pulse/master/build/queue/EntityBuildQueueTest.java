@@ -4,13 +4,13 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.pulse.master.build.control.BuildController;
-import com.zutubi.pulse.master.build.queue.EntityBuildQueue;
 import org.acegisecurity.AccessDeniedException;
 import static org.mockito.Mockito.*;
 
@@ -34,6 +34,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         queue.setAccessManager(accessManager);
         queue.setBuildControllerFactory(buildControllerFactory);
         queue.setEventManager(eventManager);
+        queue.setBuildRequestRegistry(buildRequestRegistry);
 
         objectFactory.initProperties(this);
     }
@@ -138,9 +139,11 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
     public void testStoppedNoLongerAcceptsRequests()
     {
         queue.stop();
-        queue.handleRequest(createRequest(1, "test", false));
+        BuildRequestEvent requestEvent = createRequest(1, "test", false);
+        queue.handleRequest(requestEvent);
         assertActive();
         assertQueued();
+        assertRejected(requestEvent);
     }
 
     public void testStoppedDoesNotActivateQueuedRequest()
@@ -161,6 +164,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         assertActive();
         assertQueued();
+        assertRejected(queuedRequest);
     }
 
     public void testReplaceExistingActive()
@@ -188,6 +192,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         // The actual updating of the request is handled externally by the BuildController which is
         // currently mocked out.  Instead we verify that the expected method was called.
         verify(controller, times(1)).updateRevisionIfNotFixed(revision2);
+        assertAssimilated(replacementRequest);
     }
 
     public void testDifferentSourceNotReplaced()
@@ -280,6 +285,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         assertActive(activeRequest);
         assertQueued();
+        assertCancelled(queuedRequest);
     }
 
     public void testCancelActiveBuild()
@@ -354,6 +360,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         {
             SingleBuildRequestEvent request = mock(SingleBuildRequestEvent.class);
             stub(request.getOwner()).toReturn(new Project());
+            stub(request.getProjectConfig()).toReturn(new ProjectConfiguration());
 
             queue.handleRequest(request);
             fail("Queue accepted build for another owner");

@@ -4,6 +4,7 @@ import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.NamedEntity;
@@ -43,6 +44,7 @@ public class FatController implements EventListener, Stoppable
     protected static final String SEQUENCE_BUILD_ID = "BUILD_ID";
 
     private static final Logger LOG = Logger.getLogger(FatController.class);
+    private static final Messages I18N = Messages.getInstance(FatController.class);
 
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
@@ -55,6 +57,7 @@ public class FatController implements EventListener, Stoppable
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
     private SequenceManager sequenceManager;
+    private BuildRequestRegistry buildRequestRegistry;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -222,6 +225,7 @@ public class FatController implements EventListener, Stoppable
         // if we are disabled, we ignore incoming build requests.
         if (isDisabled())
         {
+            buildRequestRegistry.requestRejected(request, I18N.format("rejected.license.exceeded"));
             LOG.warning("Build request ignored as license is expired or exceeded.");
             return;
         }
@@ -236,6 +240,7 @@ public class FatController implements EventListener, Stoppable
                 // Ignore build requests while project is not able to be built
                 // (e.g. if it is pausing).
                 LOG.warning("Build request ignored. Project state '" + project.getState() + "' does not allow triggering.");
+                buildRequestRegistry.requestRejected(request, I18N.format("rejected.project.state", new Object[]{project.getState().toString()}));
                 return;
             }
 
@@ -405,6 +410,11 @@ public class FatController implements EventListener, Stoppable
     public void setSequenceManager(SequenceManager sequenceManager)
     {
         this.sequenceManager = sequenceManager;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 
     /**

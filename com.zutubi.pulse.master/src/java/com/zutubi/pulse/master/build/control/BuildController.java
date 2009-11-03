@@ -33,6 +33,8 @@ public interface BuildController
      *
      * Note that the actual build execution should not occur on the callers
      * thread else the scheduling will be blocked whilst the build is running.
+     *
+     * @return the build number for the controlled build
      */
-    void start();
+    long start();
 }

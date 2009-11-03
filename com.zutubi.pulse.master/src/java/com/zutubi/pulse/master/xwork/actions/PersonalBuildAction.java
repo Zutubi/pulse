@@ -9,11 +9,13 @@ import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.core.scm.patch.PatchProperties;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -32,6 +34,8 @@ public class PersonalBuildAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(PersonalBuildAction.class);
 
+    private static final long TIMEOUT = 30 * Constants.SECOND;
+
     private String project;
     private String patchFormat;
     private String revision;
@@ -42,6 +46,7 @@ public class PersonalBuildAction extends ActionSupport
     private MasterConfigurationManager configurationManager;
     private BuildManager buildManager;
     private PatchFormatFactory patchFormatFactory;
+    private BuildRequestRegistry buildRequestRegistry;
 
     public void setProject(String project)
     {
@@ -172,7 +177,26 @@ public class PersonalBuildAction extends ActionSupport
             PatchProperties properties = new PatchProperties(paths.getUserPatchPropertiesFile(user.getId(), number));
             properties.setPatchFormat(patchFormat);
             
-            projectManager.triggerBuild(number, p, user, convertRevision(p), patchFile, patchFormat);
+            long requestId = projectManager.triggerBuild(number, p, user, convertRevision(p), patchFile, patchFormat);
+            BuildRequestRegistry.RequestStatus requestStatus = buildRequestRegistry.waitForRequestToBeHandled(requestId, TIMEOUT);
+            switch (requestStatus)
+            {
+                case CANCELLED:
+                    responseErrors.add("Request cancelled");
+                    return ERROR;
+                case ACTIVATED:
+                case QUEUED:
+                    return SUCCESS;
+                case REJECTED:
+                    responseErrors.add("Request rejected: " + buildRequestRegistry.getRejectionReason(requestId));
+                    return ERROR;
+                case UNHANDLED:
+                    responseErrors.add("Timed out waiting for request to queue");
+                    return ERROR;
+                default:
+                    responseErrors.add("Unexpected request status '" + requestStatus + "'");
+                    return ERROR;
+            }
         }
         catch (Exception e)
         {
@@ -180,8 +204,6 @@ public class PersonalBuildAction extends ActionSupport
             responseErrors.add(e.getClass().getName() + ": " + e.getMessage());
             return ERROR;
         }
-
-        return SUCCESS;
     }
 
     private Revision convertRevision(Project project)
@@ -224,5 +246,10 @@ public class PersonalBuildAction extends ActionSupport
     public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
     {
         this.patchFormatFactory = patchFormatFactory;
+    }
+
+    public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
+    {
+        this.buildRequestRegistry = buildRequestRegistry;
     }
 }
