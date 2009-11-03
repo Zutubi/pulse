@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
+import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -12,6 +13,7 @@ import com.zutubi.validation.annotations.Constraint;
  */
 @SymbolicName("zutubi.backupConfig")
 @Form(fieldOrder = {"enabled", "cronSchedule"})
+@Classification(single = "backup")
 public class BackupConfiguration extends AbstractConfiguration
 {
     public static final String DEFAULT_CRON_SCHEDULE = "0 0 5 * * ?";

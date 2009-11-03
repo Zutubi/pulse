@@ -90,6 +90,7 @@
                 <ref local="ldapGroupDns"/>
                 <ref local="addAgentPing"/>
                 <ref local="addJabberServiceName"/>
+                <ref local="ensureAgentPingConfigPermanent"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -405,5 +406,9 @@
 
     <bean id="addJabberServiceName" class="com.zutubi.pulse.master.upgrade.tasks.AddJabberServiceNameUpgradeTask">
         <property name="buildNumber" value="201008003"/>
+    </bean>
+
+    <bean id="ensureAgentPingConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureAgentPingConfigPermanentUpgradeTask">
+        <property name="buildNumber" value="201008004"/>
     </bean>
 </beans>

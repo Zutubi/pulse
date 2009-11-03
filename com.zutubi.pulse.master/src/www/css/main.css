@@ -1185,6 +1185,18 @@ table.template-actions
     width: 20px;
 }
 
+.x-tree-node-collapsed .config-backup-icon, .x-tree-node-expanded .config-backup-icon, .x-tree-node-leaf .config-backup-icon
+{
+	background-image: url(../images/backup.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-ping-icon, .x-tree-node-expanded .config-ping-icon, .x-tree-node-leaf .config-ping-icon
+{
+	background-image: url(../images/ping.gif);
+    width: 20px;
+}
+
 .x-tree-node-collapsed .config-logging-icon, .x-tree-node-expanded .config-logging-icon, .x-tree-node-leaf .config-logging-icon
 {
 	background-image: url(../images/script.gif);

@@ -32,7 +32,7 @@
         <tr><th>operations</th></tr>
         #helpRow("configure" "configure" "Switches to the configuration view." false)
         #helpRow("clone" "clone" "Create a copy of the configuration with a unique name." "Allows duplication of the current configuration and optionally its descendents.  Consider using a smart clone where available for more maintainable copies.")
-        #helpRow("smartclone" "smart clone" "Create a maintainable copy by using the template system." "Duplicatie the current configuration and optionally its descendents by leveraging the template system.  A smart clone involves extracting the configuration into a parent template and then adding a trivial sibling.  This keeps the common configuration in a shared template.")
+        #helpRow("smartclone" "smart clone" "Create a maintainable copy by using the template system." "Duplicate the current configuration and optionally its descendents by leveraging the template system.  A smart clone involves extracting the configuration into a parent template and then adding a trivial sibling.  This keeps the common configuration in a shared template.")
         #helpRow("add.new" "add new" "Add a new concrete configuration." "Add a new concrete configuration as a child of this configuration.  The child will inherit details from this template.")
         #helpRow("add.template" "add new template" "Add a new templated configuration." "Add a new template configuration as a child of this configuration.  The child will inherit details from this template, and will support children of its own.")
         #helpRow("delete" "delete" "Delete the configuration." false)
