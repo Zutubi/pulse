@@ -231,15 +231,6 @@ public class SubversionClient implements ScmClient
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         // noop
-        try
-        {
-            Thread.sleep(10000);
-        }
-        catch (InterruptedException e)
-        {
-// FIXME
-            e.printStackTrace();
-        }
     }
 
     public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
