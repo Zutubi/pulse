@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
+import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -9,6 +10,7 @@ import com.zutubi.validation.annotations.Min;
  */
 @SymbolicName("zutubi.agentPingConfig")
 @Form(fieldOrder={"pingInterval", "pingTimeout", "offlineTimeout", "timeoutLoggingEnabled"})
+@Classification(single = "ping")
 public class AgentPingConfiguration extends AbstractConfiguration
 {
     @Min(1)
@@ -20,6 +22,11 @@ public class AgentPingConfiguration extends AbstractConfiguration
     @Min(1)
     private int offlineTimeout = 240;
     private boolean timeoutLoggingEnabled = true;
+
+    public AgentPingConfiguration()
+    {
+        setPermanent(true);
+    }
 
     public int getMaxConcurrent()
     {
