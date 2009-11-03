@@ -557,7 +557,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertSimpleProject(projectName);
         xmlRpcHelper.doConfigAction(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName), ProjectConfigurationActions.ACTION_PAUSE);
 
-        Vector<String> ids = xmlRpcHelper.triggerProjectBuild(projectName);
+        Vector<String> ids = xmlRpcHelper.triggerBuild(projectName, new Hashtable<String, Object>());
         String id = ids.get(0);
         xmlRpcHelper.waitForBuildRequestToBeHandled(id, REQUEST_TIMEOUT);
         Hashtable<String, Object> status = xmlRpcHelper.getBuildRequestStatus(id);
@@ -568,7 +568,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private Vector<String> insertAndTriggerProject(String projectName) throws Exception
     {
         insertSimpleProject(projectName);
-        Vector<String> ids = xmlRpcHelper.triggerProjectBuild(projectName);
+        Vector<String> ids = xmlRpcHelper.triggerBuild(projectName, new Hashtable<String, Object>());
         assertEquals(1, ids.size());
         return ids;
     }

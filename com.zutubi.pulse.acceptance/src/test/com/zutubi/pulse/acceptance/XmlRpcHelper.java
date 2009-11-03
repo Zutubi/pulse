@@ -556,9 +556,9 @@ public class XmlRpcHelper
         call("triggerBuild", projectName, revision, properties);
     }
 
-    public Vector<String> triggerProjectBuild(String projectName) throws Exception
+    public Vector<String> triggerBuild(String projectName, Hashtable<String, Object> options) throws Exception
     {
-        return call("triggerProjectBuild", projectName);
+        return call("triggerBuild", projectName, options);
     }
 
     public Hashtable<String, Object> waitForBuildRequestToBeHandled(String requestId, int timeoutMillis) throws Exception

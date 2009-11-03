@@ -2881,65 +2881,19 @@ public class RemoteApi
     }
 
     /**
-     * Superceded by {@link #triggerProjectBuild(String, String)}.
-     *
-     * @param token       authentication token, see {@link #login(String, String)}
-     * @param projectName the name of the project to trigger
-     * @return true
-     * @access requires trigger permission for the given project
-     */
-    public boolean triggerBuild(String token, String projectName)
-    {
-        return triggerBuild(token, projectName, null);
-    }
-
-    /**
-     * Superceded by {@link #triggerProjectBuild(String, String, String)}.
-     *
-     * @param token       authentication token, see {@link #login(String, String)}
-     * @param projectName the name of the project to trigger
-     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
-     *                    may be the empty string to indicate the latest revision should be used
-     * @return true
-     * @access requires trigger permission for the given project
-     */
-    public boolean triggerBuild(String token, String projectName, String revision)
-    {
-        return triggerBuild(token, projectName, revision, null);
-    }
-
-    /**
-     * Superceded by {@link #triggerProjectBuild(String, String, String, java.util.Hashtable)}.
-     *
-     * @param token       authentication token, see {@link #login(String, String)}
-     * @param projectName the name of the project to trigger
-     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
-     *                    may be empty to indicate the latest revision should be used
-     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
-     * @return true
-     * @access requires trigger permission for the given project
-     */
-    public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
-    {
-        triggerProjectBuild(token, projectName, revision, properties);
-        return true;
-    }
-
-    /**
      * Triggers a build of the given project at a floating revision.  The revision will be fixed as
      * laate as possible.  This function returns as soon as the request has been made.
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger
-     * @return a list of ids for build requests raised by this trigger, can be used to track the
-     *         status of the requests via {@link #getBuildRequestStatus(String, String)}.
+     * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String, String) 
      * @see #triggerBuild(String, String, String, Hashtable)
      */
-    public Vector<String> triggerProjectBuild(String token, String projectName)
+    public boolean triggerBuild(String token, String projectName)
     {
-        return triggerProjectBuild(token, projectName, null);
+        return triggerBuild(token, projectName, (String) null);
     }
 
     /**
@@ -2950,15 +2904,14 @@ public class RemoteApi
      * @param projectName the name of the project to trigger
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be the empty string to indicate the latest revision should be used
-     * @return a list of ids for build requests raised by this trigger, can be used to track the
-     *         status of the requests via {@link #getBuildRequestStatus(String, String)}.
+     * @return true
      * @access requires trigger permission for the given project
-     * @see #triggerProjectBuild(String, String)
-     * @see #triggerProjectBuild(String, String, String, Hashtable)
+     * @see #triggerBuild(String, String) 
+     * @see #triggerBuild(String, String, String, Hashtable)
      */
-    public Vector<String> triggerProjectBuild(String token, String projectName, String revision)
+    public boolean triggerBuild(String token, String projectName, String revision)
     {
-        return triggerProjectBuild(token, projectName, revision, null);
+        return triggerBuild(token, projectName, revision, null);
     }
 
     /**
@@ -2972,13 +2925,12 @@ public class RemoteApi
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be empty to indicate the latest revision should be used
      * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
-     * @return a list of ids for build requests raised by this trigger, can be used to track the
-     *         status of the requests via {@link #getBuildRequestStatus(String, String)}.
+     * @return true
      * @access requires trigger permission for the given project
-     * @see #triggerProjectBuild(String, String)
-     * @see #triggerProjectBuild(String, String, String)
+     * @see #triggerBuild(String, String)
+     * @see #triggerBuild(String, String, String)
      */
-    public Vector<String> triggerProjectBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
+    public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -3021,18 +2973,107 @@ public class RemoteApi
                 }
             }
 
-            List<Long> requestIds = projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Triggers a build of the given project using the specified options.  The following options are supported:
+     * <ul>
+     * <li>revision (optional), the revision to build, in the SCM-specific format.  If not specified,
+     * the latest revision will be used.</li>
+     * <li>properties (optional), {@xtype struct<string>} a mapping of property names to property values</li>
+     * <li>force (optional), indicates that a build should be triggered even if no unbuilt revision is
+     * available and changelist isolation is active for this project.</li>
+     * <li>replaceable (optional), indicates that this build can be replaced by a subsequent build in the
+     * build queue.  This allows multiple builds for a single project to be triggered, but ensures that only
+     * the latest revision available at the start of the build is actually built.</li>
+     * </ul>
+     *
+     * @param token          authentication token, see {@link #login(String, String)}
+     * @param projectName    the name of the project to trigger
+     * @param triggerOptions the set of options to be used to configure this build request
+     * @return true
+     */
+    public Vector<String> triggerBuild(String token, String projectName, Hashtable<String, Object> triggerOptions)
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            final Project project = internalGetProject(projectName, false);
+
+            Revision revision = null;
+            if (triggerOptions.containsKey("revision"))
+            {
+                revision = parseRevision((String) triggerOptions.get("revision"), project);
+            }
+
+            boolean replaceable = false;
+            if (triggerOptions.containsKey("replaceable"))
+            {
+                replaceable = Boolean.valueOf((String) triggerOptions.get("replaceable"));
+            }
+
+            boolean force = false;
+            if (triggerOptions.containsKey("force"))
+            {
+                force = Boolean.valueOf((String) triggerOptions.get("force"));
+            }
+
+            List<ResourcePropertyConfiguration> resourceProperties = new LinkedList<ResourcePropertyConfiguration>();
+            if (triggerOptions.containsKey("properties"))
+            {
+                @SuppressWarnings({"unchecked"})
+                Hashtable<String, String> properties = (Hashtable<String, String>) triggerOptions.get("properties");
+                for (Map.Entry<String, String> property : properties.entrySet())
+                {
+                    resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
+                }
+            }
+
+            List<Long> requestIds = projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), revision, "remote api", replaceable, force);
             Vector<String> result = new Vector<String>(requestIds.size());
             for (Long id: requestIds)
             {
                 result.add(Long.toString(id));
             }
-            
+
             return result;
         }
         finally
         {
             tokenManager.logoutUser();
+        }
+    }
+
+    private Revision parseRevision(final String revision, final Project project)
+    {
+        try
+        {
+            return withScmClient(project.getConfig(), scmManager, new ScmContextualAction<Revision>()
+            {
+                public Revision process(ScmClient client, ScmContext context) throws ScmException
+                {
+                    ScmContext c = (project.isInitialised()) ? context : null;
+                    if (client.getCapabilities(c).contains(ScmCapability.REVISIONS))
+                    {
+                        return client.parseRevision(context, revision);
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Attempt to specify a revision to build when SCM does not support revisions");
+                    }
+                }
+            });
+        }
+        catch (ScmException e)
+        {
+            throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
         }
     }
 
@@ -3043,11 +3084,11 @@ public class RemoteApi
      * but the returned status will be UNHANDLED.
      *
      * @param token         authentication token, see {@link #login(String, String)}
-     * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
+     * @param requestId     id of the build request, as returned by {@link #triggerBuild(String, String, java.util.Hashtable)}
      * @param timeoutMillis number of milliseconds to wait for the request to be handled
      * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
      * @access requires view permission for the corresponding project
-     * @see #triggerProjectBuild(String, String)
+     * @see #triggerBuild(String, String, java.util.Hashtable)
      * @see #waitForBuildRequestToBeActivated(String, String, int)
      * @see #getBuildRequestStatus(String, String)
      */
@@ -3076,11 +3117,11 @@ public class RemoteApi
      * return as normal but the returned status will be UNHANDLED or QUEUED.
      *
      * @param token         authentication token, see {@link #login(String, String)}
-     * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
+     * @param requestId     id of the build request, as returned by {@link #triggerBuild(String, String, java.util.Hashtable)}
      * @param timeoutMillis number of milliseconds to wait for the request to be handled
      * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
      * @access requires view permission for the corresponding project
-     * @see #triggerProjectBuild(String, String)
+     * @see #triggerBuild(String, String, java.util.Hashtable)
      * @see #waitForBuildRequestToBeHandled(String, String, int)
      * @see #getBuildRequestStatus(String, String)
      */
@@ -3106,13 +3147,13 @@ public class RemoteApi
      * Gets the current status of the given build request.  Request status are tracked for all
      * recent requests, but only transiently (i.e. this information is not preserved across a
      * reboot of the master).  This status can be used to determine if the request has or will
-     * indeed ever become queued and/or activated. 
+     * indeed ever become queued and/or activated.
      *
      * @param token     authentication token, see {@link #login(String, String)}
-     * @param requestId id of the build request, as returned by the triggerProjectBuild methods
+     * @param requestId id of the build request, as returned by {@link #triggerBuild(String, String, java.util.Hashtable)}
      * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
      * @access requires view permission for the corresponding project
-     * @see #triggerProjectBuild(String, String)
+     * @see #triggerBuild(String, String, java.util.Hashtable)
      * @see #waitForBuildRequestToBeHandled(String, String, int)
      * @see #waitForBuildRequestToBeActivated(String, String, int)
      */
@@ -3150,7 +3191,7 @@ public class RemoteApi
                 result.put("rejectionReason", buildRequestRegistry.getRejectionReason(id));
                 break;
         }
-        
+
         return result;
     }
 
