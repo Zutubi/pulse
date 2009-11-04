@@ -3,7 +3,11 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.DefaultAgent;
 import com.zutubi.pulse.master.agent.Host;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.HostState;
+import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.TimeStamps;
 
@@ -15,6 +19,7 @@ public class ViewAgentStatusAction extends AgentActionBase
     private static final Messages I18N = Messages.getInstance(ViewAgentStatusAction.class);
 
     private AgentStatusModel model;
+    private BuildManager buildManager;
 
     public AgentStatusModel getModel()
     {
@@ -70,6 +75,20 @@ public class ViewAgentStatusAction extends AgentActionBase
                 {
                     model.addStatusInfo("agent.ping.error", agent.getPingError());
                 }
+
+                long recipeId = agent.getRecipeId();
+                if (recipeId != HostStatus.NO_RECIPE)
+                {
+                    BuildResult buildResult = buildManager.getByRecipeId(recipeId);
+                    if (buildResult != null)
+                    {
+                        RecipeResultNode node = buildResult.findResultNodeByRecipeId(recipeId);
+                        if (node != null)
+                        {
+                            model.addExecutingInfo(buildResult, node);
+                        }
+                    }
+                }
             }
         }
         else
@@ -78,5 +97,10 @@ public class ViewAgentStatusAction extends AgentActionBase
         }
 
         return SUCCESS;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

@@ -14,10 +14,39 @@
         #dynamicRow("agent.location" $model.location)
 
     #foreach($pair in $model.statusInfo)
-        #dynamicRow($pair.first $pair.second)    
+        #dynamicRow($pair.first $pair.second)
     #end
     </table>
 
-    <a href="$urls.serverActivity()">#wwtext("name=server.activity")</a>
+#if($model.executingBuild)
+    <table id="executing.build.stage" class="content"/>
+        #headingRow("executing.build.stage" 2)
+        <tr>
+            <th class="content-row">#wwtext("name=build.project")</th>
+            #dynamicLinkCell($model.executingBuild.project.name $urls.projectHome($model.executingBuild.project))
+        </tr>
+        <tr>
+            <th class="content-row">#wwtext("name=build.owner")</th>
+            #ownerCell($model.executingBuild "content")
+        </tr>
+        <tr>
+            <th class="content-row">#wwtext("name=build.id")</th>
+            #dynamicRightLinkCell($model.executingBuild.number $urls.build($model.executingBuild))
+        </tr>
+        <tr>
+            <th class="content-row">#wwtext("name=build.elapsed")</th>
+            #elapsedCell($model.executingBuild)
+        </tr>
+        <tr>
+            <th class="content-row">#wwtext("name=build.stage")</th>
+            #dynamicLinkCell($model.executingNode.stageName $urls.stageDetails($model.executingBuild, $model.executingNode))
+        </tr>
+        #dynamicRow("build.recipe" $model.executingNode.result.recipeNameSafe)
+        <tr>
+            <th class="content-row">#wwtext("name=stage.elapsed")</th>
+            #elapsedCell($model.executingNode.result)
+        </tr>
+    </table>
+#end
 </body>
 </html>

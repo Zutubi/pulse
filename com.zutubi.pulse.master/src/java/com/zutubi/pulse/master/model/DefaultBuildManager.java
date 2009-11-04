@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.model;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
@@ -143,6 +143,11 @@ public class DefaultBuildManager implements BuildManager
     public RecipeResultNode getResultNodeByResultId(long id)
     {
         return buildResultDao.findResultNodeByResultId(id);
+    }
+
+    public BuildResult getByRecipeId(long id)
+    {
+        return buildResultDao.findByRecipeId(id);
     }
 
     public RecipeResult getRecipeResult(long id)

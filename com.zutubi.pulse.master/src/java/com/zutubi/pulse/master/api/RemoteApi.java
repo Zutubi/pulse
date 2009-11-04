@@ -3215,7 +3215,7 @@ public class RemoteApi
     }
 
     /**
-     * Gets the current status of the given build request.  Request status are tracked for all
+     * Gets the current status of the given build request.  The status is tracked for all
      * recent requests, but only transiently (i.e. this information is not preserved across a
      * reboot of the master).  This status can be used to determine if the request has or will
      * indeed ever become queued and/or activated. 

@@ -524,6 +524,27 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (BuildResult) findFirstByNamedQuery("findLatestSuccessful", false);
     }
 
+    public BuildResult findByRecipeId(long id)
+    {
+        final RecipeResultNode node = findResultNodeByResultId(id);
+        if (node == null)
+        {
+            return null;
+        }
+
+        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("select result from BuildResult result join result.root.children child where child = :node");
+                queryObject.setMaxResults(1);
+                queryObject.setEntity("node", node);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
     public static void initialise(final BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());

@@ -4,7 +4,6 @@
 <html>
 <head>
     <title>#wwtext("name=agents")</title>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         #updater("$base/ajax/viewAgentsPanel.action" "panel" $principle)
     </script>

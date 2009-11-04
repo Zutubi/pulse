@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.dependencies.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.dependencies.WaitAntProject;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -197,6 +198,30 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         AgentForm agentForm = browser.createForm(AgentForm.class, true);
         agentForm.waitFor();
         assertEquals(asList("", HOST_1, HOST_2), asList(agentForm.getComboBoxOptions("host")));
+    }
+
+    public void testAgentStatusExecutingBuild() throws Exception
+    {
+        loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
+        assertFalse(statusPage.isExecutingBuildPresent());
+
+        WaitAntProject project = projects.createWaitAntProject(tempDir, random);
+        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
+        configurationHelper.insertProject(project.getConfig());
+        xmlRpcHelper.waitForProjectToInitialise(project.getName());
+        xmlRpcHelper.triggerBuild(project.getName());
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+
+        browser.refreshUntilElement(AgentStatusPage.ID_BUILD_TABLE);
+        assertEquals(project.getName(), statusPage.getExecutingProject());
+        assertEquals(project.getName(), statusPage.getExecutingOwner());
+        assertEquals("1", statusPage.getExecutingId());
+        assertEquals("default", statusPage.getExecutingStage());
+        assertEquals("[default]", statusPage.getExecutingRecipe());
+
+        project.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
     }
 
     private void assertBuildingStatus(String status)

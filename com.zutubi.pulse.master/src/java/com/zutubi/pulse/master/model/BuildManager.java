@@ -31,6 +31,15 @@ public interface BuildManager
 
     RecipeResultNode getResultNodeByResultId(long id);
 
+    /**
+     * Finds the build that contains a specified recipe result, if any.
+     *
+     * @param id id of the recipe result to find the containing build for
+     * @return the build containing the recipe, or null if not found
+     */
+    @SecureResult
+    BuildResult getByRecipeId(long id);
+
     RecipeResult getRecipeResult(long id);
 
     CommandResult getCommandResult(long id);

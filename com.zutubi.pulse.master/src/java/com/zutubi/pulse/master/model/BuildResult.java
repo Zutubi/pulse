@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -319,6 +319,25 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
             public boolean satisfied(RecipeResultNode recipeResultNode)
             {
                 return stageName.equals(recipeResultNode.getStageName());
+            }
+        });
+    }
+
+    /**
+     * Finds the recipe result node holding the recipe with the given id, if
+     * any.
+     *
+     * @param recipeId the recipe id to search for
+     * @return the result node holding the given recipe, or null if not found
+     */
+    public RecipeResultNode findResultNodeByRecipeId(final long recipeId)
+    {
+        return root.findNode(new Predicate<RecipeResultNode>()
+        {
+            public boolean satisfied(RecipeResultNode recipeResultNode)
+            {
+                RecipeResult recipeResult = recipeResultNode.getResult();
+                return recipeResult != null && recipeResult.getId() == recipeId;
             }
         });
     }

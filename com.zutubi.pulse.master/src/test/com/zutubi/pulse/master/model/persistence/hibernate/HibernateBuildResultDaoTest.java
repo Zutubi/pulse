@@ -976,6 +976,38 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(p2, results.get(1).getProject());
     }
 
+    public void testFindByRecipeId()
+    {
+        BuildResult result1 = createResultWithRecipes();
+        BuildResult result2 = createResultWithRecipes();
+        buildResultDao.save(result1);
+        buildResultDao.save(result2);
+
+        BuildResult found = buildResultDao.findByRecipeId(getRecipeId(result1, 0));
+        assertEquals(result1, found);
+
+        found = buildResultDao.findByRecipeId(getRecipeId(result1, 1));
+        assertEquals(result1, found);
+
+        found = buildResultDao.findByRecipeId(getRecipeId(result2, 0));
+        assertEquals(result2, found);
+
+        assertNull(buildResultDao.findByRecipeId(11223344L));
+    }
+
+    private BuildResult createResultWithRecipes()
+    {
+        BuildResult result = createCompletedBuild(projectA, 1);
+        result.getRoot().addChild(new RecipeResultNode("stage1", 1, new RecipeResult("test1")));
+        result.getRoot().addChild(new RecipeResultNode("stage2", 2, new RecipeResult("test2")));
+        return result;
+    }
+
+    private long getRecipeId(BuildResult result, int recipeIndex)
+    {
+        return result.getRoot().getChildren().get(recipeIndex).getResult().getId();
+    }
+
     private void addMessageBuild(Project p1, Feature.Level level, int number)
     {
         BuildResult result = createCompletedBuild(p1, number);

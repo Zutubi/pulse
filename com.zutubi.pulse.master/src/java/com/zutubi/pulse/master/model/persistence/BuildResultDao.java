@@ -91,4 +91,12 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     BuildResult findLatestSuccessfulByProject(Project project);
 
     BuildResult findLatestSuccessful();
+
+    /**
+     * Finds the build result that contains the recipe with the given id.
+     *
+     * @param id id of the recipe result to find the build for
+     * @return the build containing the recipe, or null if not found
+     */
+    BuildResult findByRecipeId(long id);
 }
