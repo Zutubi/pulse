@@ -1,23 +1,18 @@
 package com.zutubi.pulse.master.tove.table;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.pulse.master.tove.model.*;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.pulse.master.tove.model.AbstractParameterised;
-import com.zutubi.pulse.master.tove.model.Descriptor;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.pulse.master.tove.model.ActionLink;
-import com.zutubi.pulse.master.tove.model.Cell;
-import com.zutubi.pulse.master.tove.model.Row;
-import com.zutubi.pulse.master.tove.model.Table;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.tove.ConventionSupport;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
@@ -122,7 +117,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                             // we are dealing with a unknown hidden entry.  Provide feedback to the user of this situation and continue.
                             List<ActionLink> actions = new LinkedList<ActionLink>();
                             Row row = new Row(PathUtils.getPath(path, hidden), true, actions);
-                            row.addCell(new Cell(columns.size(), messages.format("unknown.hidden.reference", (Object)new String[]{parentItemPath})));
+                            row.addCell(new Cell(columns.size(), messages.format("unknown.hidden.reference", new Object[]{parentItemPath})));
                             row.addParameter("cls", "item-hidden");
                             table.addRow(row);
                         }
