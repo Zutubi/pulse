@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.ConventionSupport;
 
 /**
  * Units that may be used on the domain (horizontal) axis of a chart.
@@ -24,6 +25,6 @@ public enum DomainUnit
      */
     public String getLabel()
     {
-        return I18N.format(name() + ".label");
+        return I18N.format(name() + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
     }
 }

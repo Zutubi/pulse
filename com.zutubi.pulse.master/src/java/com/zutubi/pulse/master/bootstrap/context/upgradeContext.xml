@@ -68,6 +68,7 @@
                 <ref local="addAgentPing"/>
                 <ref local="addJabberServiceName"/>
                 <ref local="ensureAgentPingConfigPermanent"/>
+                <ref local="deleteUnknownHiddenReferences"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -266,4 +267,9 @@
     <bean id="ensureAgentPingConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureAgentPingConfigPermanentUpgradeTask">
         <property name="buildNumber" value="200041002"/>
     </bean>
+
+    <bean id="deleteUnknownHiddenReferences" class="com.zutubi.pulse.master.upgrade.tasks.DeleteUnknownHiddenReferencesUpgradeTask">
+        <property name="buildNumber" value="200041003"/>
+    </bean>
+
 </beans>
