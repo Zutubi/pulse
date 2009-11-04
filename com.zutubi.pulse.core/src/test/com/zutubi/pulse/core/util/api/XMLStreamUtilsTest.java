@@ -30,7 +30,7 @@ public class XMLStreamUtilsTest extends PulseTestCase
     public void testGetAttributes() throws XMLStreamException
     {
         XMLStreamReader reader = getXMLStreamReader("testGetAttributes");
-        assertEquals(START_ELEMENT, reader.nextTag());
+        assertEquals(START_ELEMENT, reader.getEventType());
 
         Map<String, String> attributes = getAttributes(reader);
         assertEquals(3, attributes.size());
@@ -49,8 +49,6 @@ public class XMLStreamUtilsTest extends PulseTestCase
     public void testSkipElement() throws XMLStreamException
     {
         XMLStreamReader reader = getXMLStreamReader("testSkipElement");
-        assertEquals("root", reader.getLocalName());
-        assertEquals(START_ELEMENT, reader.nextTag());
 
         assertEquals("single", reader.getLocalName());
         assertEquals(START_ELEMENT, reader.getEventType());
@@ -88,10 +86,8 @@ public class XMLStreamUtilsTest extends PulseTestCase
     public void testNextElement() throws XMLStreamException
     {
         XMLStreamReader reader = getXMLStreamReader("testNextElement");
-        assertEquals("root", reader.getLocalName());
-        reader.nextTag(); // ensure that we are 'inside' the root element.
-        assertEquals(START_ELEMENT, reader.getEventType());
 
+        assertEquals(START_ELEMENT, reader.getEventType());
         assertEquals("a", reader.getLocalName());
         assertTrue(nextElement(reader));
         assertEquals("b", reader.getLocalName());
@@ -105,9 +101,8 @@ public class XMLStreamUtilsTest extends PulseTestCase
     public void testExpectTag() throws XMLStreamException
     {
         XMLStreamReader reader = getXMLStreamReader("testExpect");
-        assertEquals("root", reader.getLocalName());
 
-        assertEquals(START_ELEMENT, reader.nextTag());
+        assertEquals(START_ELEMENT, reader.getEventType());
         XMLStreamUtils.expectStartTag("a", reader);
 
         skipElement(reader);
@@ -127,8 +122,6 @@ public class XMLStreamUtilsTest extends PulseTestCase
     public void testReadElements() throws XMLStreamException
     {
         XMLStreamReader reader = getXMLStreamReader("testReadElements");
-        assertEquals("root", reader.getLocalName());
-        reader.nextTag();
 
         Map<String, String> elements = XMLStreamUtils.readElements(reader);
 
@@ -144,8 +137,6 @@ public class XMLStreamUtilsTest extends PulseTestCase
     public void testGetElementText() throws XMLStreamException
     {
         XMLStreamReader reader = getXMLStreamReader("testGetElementText");
-        assertEquals("root", reader.getLocalName());
-        reader.nextTag();
 
         assertEquals("", XMLStreamUtils.getElementText(reader));
         reader.nextTag();
@@ -154,13 +145,41 @@ public class XMLStreamUtilsTest extends PulseTestCase
         assertEquals("<element> blah </element>", XMLStreamUtils.getElementText(reader));
     }
 
+    public void testNextSiblingTag() throws XMLStreamException
+    {
+        XMLStreamReader reader = getXMLStreamReader("testNextSiblingTag");
+        assertFalse(XMLStreamUtils.nextSiblingTag(reader));
+        assertTrue(reader.isEndElement());
+
+        reader = getXMLStreamReader("testNextSiblingTag");
+        assertFalse(XMLStreamUtils.nextSiblingTag(reader, "unknown", "tag"));
+        assertTrue(reader.isEndElement());
+
+        reader = getXMLStreamReader("testNextSiblingTag");
+        assertTrue(XMLStreamUtils.nextSiblingTag(reader, "a"));
+        assertTrue(XMLStreamUtils.isElement("a", reader));
+
+        // need to manually move the cursor forwards now (simulating the processing of the loop)
+        XMLStreamUtils.nextElement(reader);
+
+        assertTrue(reader.isStartElement());
+        assertFalse(XMLStreamUtils.nextSiblingTag(reader, "a"));
+        assertTrue(reader.isEndElement());
+    }
+
     private XMLStreamReader getXMLStreamReader(String testName) throws XMLStreamException
     {
+        // close open readers before overwriting.
+        XMLStreamUtils.close(reader);
+        IOUtils.close(input);
+
         input = getInput(testName, "xml");
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         reader = inputFactory.createXMLStreamReader(input);
 
         // start at the root node.
+        reader.nextTag();
+        assertEquals("root", reader.getLocalName());
         reader.nextTag();
 
         return reader;

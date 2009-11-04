@@ -1,0 +1,150 @@
+<?xml version="1.0" ?> 
+<?xml-stylesheet type="text/xsl" href="CUnit-Run.xsl" ?> 
+<!DOCTYPE CUNIT_TEST_RUN_REPORT SYSTEM "CUnit-Run.dtd"> 
+<CUNIT_TEST_RUN_REPORT> 
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+  <CUNIT_HEADER/>
+  <CUNIT_RESULT_LISTING> 
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+    <CUNIT_RUN_SUITE>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <CUNIT_RUN_SUITE_SUCCESS>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <SUITE_NAME> First Suite </SUITE_NAME>
+        <CUNIT_RUN_TEST_RECORD> 
+            <junk>
+              <nested-junk>textual junk</nested-junk>
+            </junk>
+          <CUNIT_RUN_TEST_SUCCESS>
+              <junk>
+                <nested-junk>textual junk</nested-junk>
+              </junk>
+            <TEST_NAME> Test Pass </TEST_NAME>
+          </CUNIT_RUN_TEST_SUCCESS> 
+        </CUNIT_RUN_TEST_RECORD> 
+        <CUNIT_RUN_TEST_RECORD> 
+          <CUNIT_RUN_TEST_FAILURE> 
+              <junk>
+                <nested-junk>textual junk</nested-junk>
+              </junk>
+            <TEST_NAME> Test Fail </TEST_NAME>
+            <FILE_NAME> c:\users\jsankey\documents\visual studio 2008\projects\cunitplay\firsttest\main.cpp </FILE_NAME> 
+            <LINE_NUMBER> 35 </LINE_NUMBER> 
+            <CONDITION> CU_ASSERT_STRING_EQUAL(gFoo,"no soup for you!") </CONDITION> 
+          </CUNIT_RUN_TEST_FAILURE> 
+        </CUNIT_RUN_TEST_RECORD> 
+      </CUNIT_RUN_SUITE_SUCCESS> 
+    </CUNIT_RUN_SUITE> 
+    <CUNIT_RUN_SUITE> 
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <CUNIT_RUN_SUITE_FAILURE>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <SUITE_NAME> Borked Suite </SUITE_NAME>
+        <FAILURE_REASON> Suite Initialization Failed </FAILURE_REASON> 
+      </CUNIT_RUN_SUITE_FAILURE> 
+    </CUNIT_RUN_SUITE>  
+    <CUNIT_RUN_SUITE> 
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <CUNIT_RUN_SUITE_SUCCESS>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <SUITE_NAME> Last Suite </SUITE_NAME>
+        <CUNIT_RUN_TEST_RECORD> 
+            <junk>
+              <nested-junk>textual junk</nested-junk>
+            </junk>
+          <CUNIT_RUN_TEST_SUCCESS>
+              <junk>
+                <nested-junk>textual junk</nested-junk>
+              </junk>
+            <TEST_NAME> Test Two Pass </TEST_NAME>
+          </CUNIT_RUN_TEST_SUCCESS> 
+        </CUNIT_RUN_TEST_RECORD> 
+        <CUNIT_RUN_TEST_RECORD> 
+            <junk>
+              <nested-junk>textual junk</nested-junk>
+            </junk>
+          <CUNIT_RUN_TEST_FAILURE>
+              <junk>
+                <nested-junk>textual junk</nested-junk>
+              </junk>
+            <TEST_NAME> Test Two Fail </TEST_NAME>
+            <FILE_NAME> c:\users\jsankey\documents\visual studio 2008\projects\cunitplay\firsttest\main.cpp </FILE_NAME> 
+            <LINE_NUMBER> 46 </LINE_NUMBER> 
+            <CONDITION> CU_ASSERT_FALSE(1) </CONDITION> 
+          </CUNIT_RUN_TEST_FAILURE> 
+        </CUNIT_RUN_TEST_RECORD> 
+        <CUNIT_RUN_TEST_RECORD> 
+          <CUNIT_RUN_TEST_FAILURE> 
+            <TEST_NAME> Test Two Fail </TEST_NAME> 
+            <FILE_NAME> c:\users\jsankey\documents\visual studio 2008\projects\cunitplay\firsttest\main.cpp </FILE_NAME> 
+            <LINE_NUMBER> 47 </LINE_NUMBER> 
+            <CONDITION> CU_ASSERT_TRUE(0) </CONDITION> 
+          </CUNIT_RUN_TEST_FAILURE> 
+        </CUNIT_RUN_TEST_RECORD> 
+        <CUNIT_RUN_TEST_RECORD> 
+          <CUNIT_RUN_TEST_FAILURE> 
+            <TEST_NAME> Test Pass Fail </TEST_NAME> 
+            <FILE_NAME> c:\users\jsankey\documents\visual studio 2008\projects\cunitplay\firsttest\main.cpp </FILE_NAME> 
+            <LINE_NUMBER> 53 </LINE_NUMBER> 
+            <CONDITION> CU_ASSERT_TRUE(0) </CONDITION> 
+          </CUNIT_RUN_TEST_FAILURE> 
+        </CUNIT_RUN_TEST_RECORD> 
+        <CUNIT_RUN_TEST_RECORD> 
+          <CUNIT_RUN_TEST_FAILURE> 
+            <TEST_NAME> Test Fatal </TEST_NAME> 
+            <FILE_NAME> c:\users\jsankey\documents\visual studio 2008\projects\cunitplay\firsttest\main.cpp </FILE_NAME> 
+            <LINE_NUMBER> 58 </LINE_NUMBER> 
+            <CONDITION> 0 </CONDITION> 
+          </CUNIT_RUN_TEST_FAILURE> 
+        </CUNIT_RUN_TEST_RECORD> 
+      </CUNIT_RUN_SUITE_SUCCESS> 
+    </CUNIT_RUN_SUITE> 
+  </CUNIT_RESULT_LISTING>
+  <CUNIT_RUN_SUMMARY> 
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+    <CUNIT_RUN_SUMMARY_RECORD>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <TYPE> Suites </TYPE> 
+      <TOTAL> 3 </TOTAL> 
+      <RUN> 2 </RUN> 
+      <SUCCEEDED> - NA - </SUCCEEDED> 
+      <FAILED> 1 </FAILED> 
+    </CUNIT_RUN_SUMMARY_RECORD> 
+    <CUNIT_RUN_SUMMARY_RECORD> 
+      <TYPE> Test Cases </TYPE> 
+      <TOTAL> 7 </TOTAL> 
+      <RUN> 6 </RUN> 
+      <SUCCEEDED> 2 </SUCCEEDED> 
+      <FAILED> 4 </FAILED> 
+    </CUNIT_RUN_SUMMARY_RECORD> 
+    <CUNIT_RUN_SUMMARY_RECORD> 
+      <TYPE> Assertions </TYPE> 
+      <TOTAL> 9 </TOTAL> 
+      <RUN> 9 </RUN> 
+      <SUCCEEDED> 4 </SUCCEEDED> 
+      <FAILED> 5 </FAILED> 
+    </CUNIT_RUN_SUMMARY_RECORD> 
+  </CUNIT_RUN_SUMMARY> 
+  <CUNIT_FOOTER> File Generated By CUnit v2.1-0 at Fri Mar 14 19:44:03 2008
+ </CUNIT_FOOTER> 
+</CUNIT_TEST_RUN_REPORT>

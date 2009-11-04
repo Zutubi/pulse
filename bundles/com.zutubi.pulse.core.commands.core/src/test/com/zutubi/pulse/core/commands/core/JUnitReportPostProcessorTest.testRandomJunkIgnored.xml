@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+  <testsuite errors="0" failures="1" id="0" name="EmptyTest" package="com.zutubi.pulse.junit" tests="1" time="0.091">
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+
+    <properties>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+
+      <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+          <property name="sun.cpu.isalist" value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86"></property>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      </properties>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+
+      <testcase classname="com.zutubi.pulse.junit.EmptyTest" name="warning" time="0.01">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      <failure message="No tests found in com.zutubi.pulse.junit.EmptyTest" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: No tests found in com.zutubi.pulse.junit.EmptyTest
+</failure>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      </testcase>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+
+      <system-out></system-out>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+      <system-err></system-err>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+
+  </testsuite>
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+  <testsuite errors="1" failures="1" id="2" name="SimpleTest" package="com.zutubi.pulse.junit" tests="3" time="0.09">
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+
+    <properties>
+    
+      <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+          <property name="sun.cpu.isalist" value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86"></property>
+      </properties>
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testSimple" time="0.0">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      </testcase>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testAssertionFailure" time="0.01">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;1&gt; but was:&lt;2&gt;
+	at com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)
+</failure>
+      </testcase>
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testThrowException" time="0.01">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      <error message="random message" type="java.lang.RuntimeException">java.lang.RuntimeException: random message
+	at com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)
+</error>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      </testcase>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+      <system-out></system-out>
+      <system-err></system-err>
+  </testsuite>
+</testsuites>

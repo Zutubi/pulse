@@ -39,20 +39,12 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         expectStartTag(ELEMENT_REPORT, reader);
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_RESULT_LISTING))
         {
-            if (reader.getLocalName().equals(ELEMENT_RESULT_LISTING))
-            {
-                handleResultListing(tests, reader);
-            }
-            else
-            {
-                nextElement(reader);
-            }
+            handleResultListing(tests, reader);
         }
 
         expectEndTag(ELEMENT_REPORT, reader);
-        reader.nextTag();
     }
 
     private void handleResultListing(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
@@ -60,16 +52,9 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         expectStartTag(ELEMENT_RESULT_LISTING, reader);
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_RUN_SUITE))
         {
-            if (reader.getLocalName().equals(ELEMENT_RUN_SUITE))
-            {
-                handleRunSuite(tests, reader);
-            }
-            else
-            {
-                nextElement(reader);
-            }
+            handleRunSuite(tests, reader);
         }
 
         expectEndTag(ELEMENT_RESULT_LISTING, reader);
@@ -81,19 +66,15 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         expectStartTag(ELEMENT_RUN_SUITE, reader);
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_RUN_SUITE_SUCCESS, ELEMENT_RUN_SUITE_FAILURE))
         {
-            if (reader.getLocalName().equals(ELEMENT_RUN_SUITE_SUCCESS))
+            if (isElement(ELEMENT_RUN_SUITE_SUCCESS, reader))
             {
                 handleSuiteSuccess(tests, reader);
             }
-            else if (reader.getLocalName().equals(ELEMENT_RUN_SUITE_FAILURE))
+            else if (isElement(ELEMENT_RUN_SUITE_FAILURE, reader))
             {
                 handleSuiteFailure(tests, reader);
-            }
-            else
-            {
-                nextElement(reader);
             }
         }
 
@@ -106,21 +87,25 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         expectStartTag(ELEMENT_RUN_SUITE_SUCCESS, reader);
         reader.nextTag();
 
-        expectStartTag(ELEMENT_SUITE_NAME, reader);
-        String suiteName = reader.getElementText().trim();
-        expectEndTag(ELEMENT_SUITE_NAME, reader);
-        reader.nextTag();
-
-        TestSuiteResult suite = new TestSuiteResult(suiteName);
-        tests.addSuite(suite);
-
-        while (reader.isStartElement())
+        if (nextSiblingTag(reader, ELEMENT_SUITE_NAME))
         {
-            if (reader.getLocalName().equals(ELEMENT_RUN_TEST))
+            expectStartTag(ELEMENT_SUITE_NAME, reader);
+            String suiteName = reader.getElementText().trim();
+            expectEndTag(ELEMENT_SUITE_NAME, reader);
+            reader.nextTag();
+
+            TestSuiteResult suite = new TestSuiteResult(suiteName);
+            tests.addSuite(suite);
+
+            while (nextSiblingTag(reader, ELEMENT_RUN_TEST))
             {
                 handleTestRecord(suite, reader);
             }
-            else
+        }
+        else
+        {
+            // No suite name means skipping the entire suite.
+            while (reader.isStartElement())
             {
                 nextElement(reader);
             }
@@ -133,15 +118,18 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
     private void handleTestRecord(TestSuiteResult suite, XMLStreamReader reader) throws XMLStreamException
     {
         expectStartTag(ELEMENT_RUN_TEST, reader);
-        reader.nextTag(); 
+        reader.nextTag();
 
-        if (reader.getLocalName().equals(ELEMENT_RUN_TEST_SUCCESS))
+        while (nextSiblingTag(reader, ELEMENT_RUN_TEST_SUCCESS, ELEMENT_RUN_TEST_FAILURE))
         {
-            handleTestSuccess(suite, reader);
-        }
-        else if (reader.getLocalName().equals(ELEMENT_RUN_TEST_FAILURE))
-        {
-            handleTestFailure(suite, reader);
+            if (isElement(ELEMENT_RUN_TEST_SUCCESS, reader))
+            {
+                handleTestSuccess(suite, reader);
+            }
+            else if (isElement(ELEMENT_RUN_TEST_FAILURE, reader))
+            {
+                handleTestFailure(suite, reader);
+            }
         }
 
         expectEndTag(ELEMENT_RUN_TEST, reader);
@@ -152,14 +140,14 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
     {
         expectStartTag(ELEMENT_RUN_TEST_SUCCESS, reader);
         reader.nextTag();
-        
-        expectStartTag(ELEMENT_TEST_NAME, reader);
-        String name = reader.getElementText().trim();
-        suite.addCase(new TestCaseResult(name));
-        
-        expectEndTag(ELEMENT_TEST_NAME, reader);
-        reader.nextTag();
-        
+
+        Map<String, String> elements = readElements(reader);
+        if (elements.containsKey(ELEMENT_TEST_NAME))
+        {
+            String name = elements.get(ELEMENT_TEST_NAME).trim();
+            suite.addCase(new TestCaseResult(name));
+        }
+
         expectEndTag(ELEMENT_RUN_TEST_SUCCESS, reader);
         reader.nextTag();
     }
@@ -171,22 +159,25 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
 
         Map<String, String> elements = readElements(reader);
 
-        String name = getTrimmedValue(elements, ELEMENT_TEST_NAME, "");
-        String filename = getTrimmedValue(elements, ELEMENT_TEST_FILE_NAME, "<unknown>");
-        String linenumber = getTrimmedValue(elements, ELEMENT_TEST_LINE_NUMBER, "-1");
-        String condition = getTrimmedValue(elements, ELEMENT_TEST_CONDITION, "");
-
-        String message = String.format("%s: %s: %s", filename, linenumber, condition);
-
-        TestCaseResult caseResult = suite.findCase(name);
-        if (caseResult == null)
+        if (elements.containsKey(ELEMENT_TEST_NAME))
         {
-            suite.addCase(new TestCaseResult(name, TestResult.DURATION_UNKNOWN, TestStatus.FAILURE, message));
-        }
-        else
-        {
-            // Another failed assertion already - tag this one on.
-            caseResult.setMessage(caseResult.getMessage() + '\n' + message);
+            String name = getTrimmedValue(elements, ELEMENT_TEST_NAME, "");
+            String filename = getTrimmedValue(elements, ELEMENT_TEST_FILE_NAME, "<unknown>");
+            String linenumber = getTrimmedValue(elements, ELEMENT_TEST_LINE_NUMBER, "-1");
+            String condition = getTrimmedValue(elements, ELEMENT_TEST_CONDITION, "");
+
+            String message = String.format("%s: %s: %s", filename, linenumber, condition);
+
+            TestCaseResult caseResult = suite.findCase(name);
+            if (caseResult == null)
+            {
+                suite.addCase(new TestCaseResult(name, TestResult.DURATION_UNKNOWN, TestStatus.FAILURE, message));
+            }
+            else
+            {
+                // Another failed assertion already - tag this one on.
+                caseResult.setMessage(caseResult.getMessage() + '\n' + message);
+            }
         }
 
         expectEndTag(ELEMENT_RUN_TEST_FAILURE, reader);
@@ -198,19 +189,34 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         expectStartTag(ELEMENT_RUN_SUITE_FAILURE, reader);
         reader.nextTag();
 
-        expectStartTag(ELEMENT_SUITE_NAME, reader);
-        String name = reader.getElementText().trim();
-        expectEndTag(ELEMENT_SUITE_NAME, reader);
-        reader.nextTag();
+        if (nextSiblingTag(reader, ELEMENT_SUITE_NAME))
+        {
+            expectStartTag(ELEMENT_SUITE_NAME, reader);
+            String name = reader.getElementText().trim();
+            expectEndTag(ELEMENT_SUITE_NAME, reader);
+            reader.nextTag();
 
-        expectStartTag(ELEMENT_SUITE_FAILURE_REASON, reader);
-        String failureReason = reader.getElementText().trim();
-        expectEndTag(ELEMENT_SUITE_FAILURE_REASON, reader);
-        reader.nextTag();
+            String failureReason = "unknown";
+            if (nextSiblingTag(reader, ELEMENT_SUITE_FAILURE_REASON))
+            {
+                expectStartTag(ELEMENT_SUITE_FAILURE_REASON, reader);
+                failureReason = reader.getElementText().trim();
+                expectEndTag(ELEMENT_SUITE_FAILURE_REASON, reader);
+                reader.nextTag();
+            }
 
-        TestSuiteResult suite = new TestSuiteResult(name);
-        suite.addCase(new TestCaseResult("Suite Failure Notification", TestResult.DURATION_UNKNOWN, TestStatus.ERROR, failureReason));
-        tests.addSuite(suite);
+            TestSuiteResult suite = new TestSuiteResult(name);
+            suite.addCase(new TestCaseResult("Suite Failure Notification", TestResult.DURATION_UNKNOWN, TestStatus.ERROR, failureReason));
+            tests.addSuite(suite);
+        }
+        else
+        {
+            // no suite name, so we skip it.
+            while (reader.isStartElement())
+            {
+                nextElement(reader);
+            }
+        }
 
         expectEndTag(ELEMENT_RUN_SUITE_FAILURE, reader);
         reader.nextTag();
@@ -221,7 +227,7 @@ public class CUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         return data.containsKey(name) ? (data.get(name)).trim() : defaultValue;
     }
 
-    protected XMLInputFactory createFactory() 
+    protected XMLInputFactory createFactory()
     {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.supportDTD", false);

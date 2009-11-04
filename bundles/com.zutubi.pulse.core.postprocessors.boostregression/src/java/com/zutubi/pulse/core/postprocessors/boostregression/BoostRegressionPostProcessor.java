@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.boostregression;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.pulse.core.util.api.XMLStreamUtils;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
-import com.zutubi.util.CollectionUtils;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.nextSiblingTag;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -57,29 +58,22 @@ public class BoostRegressionPostProcessor extends StAXTestReportPostProcessorSup
             TestStatus status = TestStatus.PASS;
             StringBuilder detailsBuilder = new StringBuilder();
 
-            while (reader.isStartElement())
+            while (nextSiblingTag(reader, ACTION_ELEMENTS))
             {
                 String localname = reader.getLocalName();
-                if (isAction(localname))
+                attributes = getAttributes(reader);
+                if (attributes.containsKey(ATTRIBUTE_RESULT) && RESULT_FAILURE.equals(attributes.get(ATTRIBUTE_RESULT)))
                 {
-                    attributes = getAttributes(reader);
-                    if (attributes.containsKey(ATTRIBUTE_RESULT) && RESULT_FAILURE.equals(attributes.get(ATTRIBUTE_RESULT)))
-                    {
-                        status = TestStatus.FAILURE;
-                    }
-                    String content = reader.getElementText();
-                    if(content != null && content.trim().length() > 0)
-                    {
-                        detailsBuilder.append(String.format(ACTION_CONTENT_PREFIX, localname));
-                        detailsBuilder.append(content);
-                        detailsBuilder.append(String.format(ACTION_CONTENT_SUFFIX, localname));
-                    }
-                    reader.nextTag();
+                    status = TestStatus.FAILURE;
                 }
-                else
+                String content = XMLStreamUtils.getElementText(reader);
+                if(content != null && content.trim().length() > 0)
                 {
-                    nextElement(reader);
+                    detailsBuilder.append(String.format(ACTION_CONTENT_PREFIX, localname));
+                    detailsBuilder.append(content);
+                    detailsBuilder.append(String.format(ACTION_CONTENT_SUFFIX, localname));
                 }
+                reader.nextTag();
             }
 
             String details = (status != TestStatus.PASS) ? detailsBuilder.toString() : null;
@@ -91,11 +85,6 @@ public class BoostRegressionPostProcessor extends StAXTestReportPostProcessorSup
         }
 
         expectEndTag(ELEMENT_TEST_LOG, reader);
-    }
-
-    private boolean isAction(String name)
-    {
-        return CollectionUtils.contains(ACTION_ELEMENTS, name);
     }
 
     private TestSuiteResult getSuite(String suitePath, TestSuiteResult parentSuite)

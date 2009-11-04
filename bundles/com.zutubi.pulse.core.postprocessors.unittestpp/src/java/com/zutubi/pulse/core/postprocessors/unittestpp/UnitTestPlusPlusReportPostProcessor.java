@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.postprocessors.unittestpp;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
+import com.zutubi.pulse.core.util.api.XMLStreamUtils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -35,16 +36,9 @@ public class UnitTestPlusPlusReportPostProcessor extends StAXTestReportPostProce
 
         Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
 
-        while (reader.isStartElement())
+        while (XMLStreamUtils.nextSiblingTag(reader, ELEMENT_TEST))
         {
-            if (isElement(ELEMENT_TEST, reader))
-            {
-                processTest(reader, suites);
-            }
-            else
-            {
-                nextElement(reader);
-            }
+            processTest(reader, suites);
         }
 
         addSuites(tests, suites);
@@ -68,17 +62,14 @@ public class UnitTestPlusPlusReportPostProcessor extends StAXTestReportPostProce
             TestSuiteResult suiteResult = getSuite(suite, suites);
 
             TestCaseResult caseResult = null;
-            while (reader.isStartElement())
+            if (XMLStreamUtils.nextSiblingTag(reader, ELEMENT_FAILURE))
             {
-                if (caseResult == null)
+                attributes = getAttributes(reader);
+                caseResult = new TestCaseResult(name, duration, TestStatus.FAILURE, attributes.get(ATTRIBUTE_MESSAGE));
+                while (reader.isStartElement())
                 {
-                    if (isElement(ELEMENT_FAILURE, reader))
-                    {
-                        attributes = getAttributes(reader);
-                        caseResult = new TestCaseResult(name, duration, TestStatus.FAILURE, attributes.get(ATTRIBUTE_MESSAGE));
-                    }
+                    nextElement(reader);
                 }
-                nextElement(reader);
             }
 
             if (caseResult == null)

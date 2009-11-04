@@ -57,16 +57,9 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
         expectStartTag(ELEMENT_TEST_LOG, reader);
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_TEST_SUITE))
         {
-            if (isElement(ELEMENT_TEST_SUITE, reader))
-            {
-                processSuite(reader, tests);
-            }
-            else
-            {
-                nextElement(reader);
-            }
+            processSuite(reader, tests);
         }
         expectEndTag(ELEMENT_TEST_LOG, reader);
     }
@@ -86,7 +79,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
         TestSuiteResult suiteResult = new TestSuiteResult(attributes.get(ATTRIBUTE_NAME));
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_TEST_SUITE, ELEMENT_TEST_CASE))
         {
             if (isElement(ELEMENT_TEST_SUITE, reader))
             {
@@ -95,10 +88,6 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
             else if (isElement(ELEMENT_TEST_CASE, reader))
             {
                 processCase(reader, suiteResult);
-            }
-            else
-            {
-                nextElement(reader);
             }
         }
 

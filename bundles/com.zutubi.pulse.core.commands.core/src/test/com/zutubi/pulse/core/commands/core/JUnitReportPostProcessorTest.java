@@ -48,6 +48,28 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
                 "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
     }
 
+    public void testRandomJunkIgnored() throws Exception
+    {
+        PersistentTestSuiteResult tests = runProcessor("testRandomJunkIgnored");
+
+        assertEquals(2, tests.getSuites().size());
+        checkWarning(tests.getSuites().get(0), "com.zutubi.pulse.junit.EmptyTest", 91, "No tests found");
+
+        PersistentTestSuiteResult suite = tests.getSuites().get(1);
+        assertEquals("com.zutubi.pulse.junit.SimpleTest", suite.getName());
+        assertEquals(90, suite.getDuration());
+
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
+        assertEquals(3, children.length);
+        checkCase(children[0], "testSimple", PASS, 0, null);
+        checkCase(children[1], "testAssertionFailure", FAILURE, 10,
+                "junit.framework.AssertionFailedError: expected:<1> but was:<2>\n" +
+                "\tat com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)");
+        checkCase(children[2], "testThrowException", ERROR, 10,
+                "java.lang.RuntimeException: random message\n" +
+                "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
+    }
+
     public void testSingle() throws Exception
     {
         PersistentTestSuiteResult tests = runProcessor("single");

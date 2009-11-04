@@ -40,7 +40,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
 
         Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_FAILED_TESTS, ELEMENT_SUCCESSFUL_TESTS))
         {
             if (reader.getLocalName().equals(ELEMENT_FAILED_TESTS))
             {
@@ -49,10 +49,6 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
             else if (reader.getLocalName().equals(ELEMENT_SUCCESSFUL_TESTS))
             {
                 handleSuccessfulTests(suites, reader);
-            }
-            else
-            {
-                nextElement(reader);
             }
         }
 
@@ -66,7 +62,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         expectStartTag(ELEMENT_SUCCESSFUL_TESTS, reader);
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_TEST))
         {
             handleSuccessfulTest(suites, reader);
         }
@@ -80,11 +76,18 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         expectStartTag(ELEMENT_TEST, reader);
         reader.nextTag();
 
-        String[] name = handleGetTestName(reader);
+        String[] name = new String[0];
+        while (nextSiblingTag(reader, ELEMENT_NAME))
+        {
+            name = handleGetTestName(reader);
+        }
 
-        TestSuiteResult suite = getSuite(name[0], suites);
-        TestCaseResult result = new TestCaseResult(name[1]);
-        suite.addCase(result);
+        if (name.length != 0)
+        {
+            TestSuiteResult suite = getSuite(name[0], suites);
+            TestCaseResult result = new TestCaseResult(name[1]);
+            suite.addCase(result);
+        }
 
         expectEndTag(ELEMENT_TEST, reader);
         reader.nextTag();
@@ -95,7 +98,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         expectStartTag(ELEMENT_FAILED_TESTS, reader);
         reader.nextTag();
 
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_FAILED_TEST))
         {
             handleFailedTest(suites, reader);
         }
@@ -109,44 +112,70 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         expectStartTag(ELEMENT_FAILED_TEST, reader);
         reader.nextTag();
 
-        // warning: this assumes the ordering of the tags in the xml report.  Is this a reasonable
-        // assumption to be made?
-        String[] name = handleGetTestName(reader);
-        TestStatus status = handleGetFailedTestStatus(reader);
-        String message = handleGetFailedTestMessage(reader);
+        String[] name = new String[0];
+        Map<String, String> location = null;
+        TestStatus status = null;
+        String messageText = null;
 
-        TestSuiteResult suite = getSuite(name[0], suites);
-        TestCaseResult result = new TestCaseResult(name[1], TestResult.DURATION_UNKNOWN, status, message);
-        suite.addCase(result);
+        while (nextSiblingTag(reader, ELEMENT_NAME, ELEMENT_FAILURE_TYPE, ELEMENT_LOCATION, ELEMENT_MESSAGE))
+        {
+            if (isElement(ELEMENT_NAME, reader))
+            {
+                name = handleGetTestName(reader);
+            }
+            else if (isElement(ELEMENT_FAILURE_TYPE, reader))
+            {
+                status = handleGetFailedTestStatus(reader);
+            }
+            else if (isElement(ELEMENT_LOCATION, reader))
+            {
+                location = handleGetLocation(reader);
+            }
+            else if (isElement(ELEMENT_MESSAGE, reader))
+            {
+                messageText = handleGetMessage(reader);
+            }
+        }
+
+        if (name.length != 0)
+        {
+            String message = formatMessage(location, messageText);
+
+            TestSuiteResult suite = getSuite(name[0], suites);
+            TestCaseResult result = new TestCaseResult(name[1], TestResult.DURATION_UNKNOWN, status, message);
+            suite.addCase(result);
+        }
 
         expectEndTag(ELEMENT_FAILED_TEST, reader);
         reader.nextTag();
     }
 
-    private String handleGetFailedTestMessage(XMLStreamReader reader) throws XMLStreamException
+    private Map<String, String> handleGetLocation(XMLStreamReader reader) throws XMLStreamException
     {
-        Map<String, String> location = null;
-        if (reader.getLocalName().equals(ELEMENT_LOCATION))
-        {
-            expectStartTag(ELEMENT_LOCATION, reader);
-            reader.nextTag();
+        expectStartTag(ELEMENT_LOCATION, reader);
+        reader.nextTag();
 
-            location = readElements(reader);
+        Map<String, String> location = readElements(reader);
 
-            expectEndTag(ELEMENT_LOCATION, reader);
-            reader.nextTag();
-        }
+        expectEndTag(ELEMENT_LOCATION, reader);
+        reader.nextTag();
 
-        String messageText = null;
-        if (reader.getLocalName().equals(ELEMENT_MESSAGE))
-        {
-            expectStartTag(ELEMENT_MESSAGE, reader);
-            messageText = reader.getElementText().trim();
+        return location;
+    }
 
-            expectEndTag(ELEMENT_MESSAGE, reader);
-            reader.nextTag();
-        }
+    private String handleGetMessage(XMLStreamReader reader) throws XMLStreamException
+    {
+        expectStartTag(ELEMENT_MESSAGE, reader);
+        String messageText = reader.getElementText().trim();
 
+        expectEndTag(ELEMENT_MESSAGE, reader);
+        reader.nextTag();
+
+        return messageText;
+    }
+
+    private String formatMessage(Map<String, String> location, String messageText)
+    {
         String message = "";
         if (location != null)
         {

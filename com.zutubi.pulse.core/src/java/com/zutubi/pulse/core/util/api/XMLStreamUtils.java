@@ -289,4 +289,47 @@ public class XMLStreamUtils
     {
         return reader.getLocalName().equals(elementName);
     }
+
+    /**
+     * This method moves the cursor over the current elements siblings, returning true when
+     * an element with one of the specificed tag names is encountered and leaving the cursor
+     * at that start tag.  If no tags of the specified name are encountered, the cursor is
+     * moved past all of the siblings and false is returned.
+     *
+     * Typical usage of this method is as follows:
+     * <code>
+     *    while (nextSiblingTag(reader, "tag1", "tag2"))
+     *    {
+     *         if (reader.getLocalName().equals("tag1"))
+     *         {
+     *             handleTag1(reader);
+     *         }
+     *         else
+     *         {
+     *             handleTag2(reader);
+     *         }
+     *    }
+     * </code>
+     *
+     * @param reader    the xml stream reader
+     * @param tagNames  the names of the tags that, if found, halt the cursor.
+     * @return  true if one of the tags if located, false otherwise.
+     * 
+     * @throws XMLStreamException
+     */
+    public static boolean nextSiblingTag(XMLStreamReader reader, String... tagNames) throws XMLStreamException
+    {
+        while (reader.isStartElement())
+        {
+            for (String tagName : tagNames)
+            {
+                if (isElement(tagName, reader))
+                {
+                    return true;
+                }
+            }
+            nextElement(reader);
+        }
+        return false;
+    }
 }

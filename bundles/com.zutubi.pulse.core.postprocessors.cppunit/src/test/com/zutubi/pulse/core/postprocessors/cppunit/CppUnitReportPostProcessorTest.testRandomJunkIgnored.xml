@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding='ISO-8859-1' standalone='yes' ?>
+<TestRun>
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+  <FailedTests>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+    <FailedTest id="2">
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <Name>Test::testFailure</Name>
+      <FailureType>Assertion</FailureType>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <Location>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <File>cppunit.cpp</File>
+        <Line>34</Line>
+      </Location>
+      <Message>assertion failed
+- Expression: 1 == 2
+</Message>
+    </FailedTest>
+    <FailedTest id="3">
+      <Name>Test::testThrow</Name>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <FailureType>Error</FailureType>
+      <Message>uncaught exception of type std::exception
+- St9exception
+</Message>
+    </FailedTest>
+    <FailedTest id="5">
+      <Name>Test::testDidntThrow</Name>
+      <FailureType>Assertion</FailureType>
+      <Message>expected exception not thrown
+- Expected exception type: std::exception
+</Message>
+    </FailedTest>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+  </FailedTests>
+  <SuccessfulTests>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+    <Test id="1">
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <Name>Test::testHelloWorld</Name>
+    </Test>
+    <Test id="4">
+      <Name>Test::testExpectedThrow</Name>
+    </Test>
+    <Test id="6">
+      <Name>Test::testExpectedFailure</Name>
+    </Test>
+    <Test id="7">
+      <Name>AnotherTest::testIt</Name>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+    </Test>
+  </SuccessfulTests>
+  <Statistics>
+    <Tests>7</Tests>
+    <FailuresTotal>3</FailuresTotal>
+    <Errors>1</Errors>
+    <Failures>2</Failures>
+  </Statistics>
+</TestRun>

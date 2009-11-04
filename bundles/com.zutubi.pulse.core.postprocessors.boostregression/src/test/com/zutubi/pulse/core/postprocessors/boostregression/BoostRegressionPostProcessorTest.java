@@ -34,6 +34,11 @@ public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessor
         singleLogHelper("run", "statechart", "InvalidResultCopyTestRelaxed", PASS, null);
     }
 
+    public void testRandomJunkIgnored() throws Exception
+    {
+        singleLogHelper("testRandomJunkIgnored", "statechart", "InvalidResultCopyTestRelaxed", PASS, null);
+    }
+
     public void testBroken() throws Exception
     {
         singleLogHelper("broken", "statechart", "InvalidResultCopyTestRelaxed", FAILURE, "============================[ compile output below ]============================\n" +

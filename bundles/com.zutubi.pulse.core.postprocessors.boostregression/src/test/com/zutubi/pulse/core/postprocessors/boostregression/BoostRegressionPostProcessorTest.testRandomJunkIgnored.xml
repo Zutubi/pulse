@@ -1,0 +1,28 @@
+<test-log library="statechart" test-name="InvalidResultCopyTestRelaxed" test-type="run" test-program="libs/statechart/test/InvalidResultCopyTest.cpp" target-directory="bin.v2/libs/statechart/test/InvalidResultCopyTestRelaxed.test/gcc-4.1.2/debug" toolset="gcc-4.1.2" show-run-output="false">
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+<compile result="succeed" timestamp="2007-09-12 15:16:53 UTC">
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+</compile>
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+<link result="succeed" timestamp="2007-09-12 15:16:53 UTC">
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+</link>
+<run result="succeed" timestamp="2007-09-12 15:16:53 UTC">
+
+*** No errors detected
+Running 1 test case...
+
+EXIT STATUS: 0
+</run>
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+</test-log>

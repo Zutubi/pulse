@@ -41,28 +41,14 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
     {
         expectStartTag(ELEMENT_ROOT, reader);
         reader.nextTag();
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_SUITE))
         {
-            if (reader.getLocalName().equals(ELEMENT_SUITE))
+            // We skip over the top-level suite tag, which contains
+            // information about the assembly the tests were in.
+            reader.nextTag();
+            while (nextSiblingTag(reader, ELEMENT_RESULTS))
             {
-                // We skip over the top-level suite tag, which contains
-                // information about the assembly the tests were in.
-                reader.nextTag();
-                while (reader.isStartElement())
-                {
-                    if (reader.getLocalName().equals(ELEMENT_RESULTS))
-                    {
-                        processTopSuiteResults(tests, reader);
-                    }
-                    else
-                    {
-                        nextElement(reader);
-                    }
-                }
-            }
-            else
-            {
-                nextElement(reader);
+                processTopSuiteResults(tests, reader);
             }
         }
 
@@ -72,16 +58,9 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
     private void processTopSuiteResults(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
     {
         reader.nextTag();
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_SUITE))
         {
-            if (reader.getLocalName().equals(ELEMENT_SUITE))
-            {
-                processSuite(tests, "", reader);
-            }
-            else
-            {
-                nextElement(reader);
-            }
+            processSuite(tests, "", reader);
         }
     }
 
@@ -90,19 +69,12 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         Map<String, String> attributes = getAttributes(reader);
 
         reader.nextTag();
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_RESULTS))
         {
-            if (reader.getLocalName().equals(ELEMENT_RESULTS))
-            {
-                processSuiteResults(parentSuite, parentPath, reader, attributes);
+            processSuiteResults(parentSuite, parentPath, reader, attributes);
 
-                expectEndTag(ELEMENT_RESULTS, reader);
-                reader.nextTag();
-            }
-            else
-            {
-                nextElement(reader);
-            }
+            expectEndTag(ELEMENT_RESULTS, reader);
+            reader.nextTag();
         }
 
         expectEndTag(ELEMENT_SUITE, reader);
@@ -124,7 +96,7 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         String suitePath = appendPath(parentPath, suite.getName());
 
         reader.nextTag();
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, ELEMENT_SUITE, ELEMENT_CASE))
         {
             if (reader.getLocalName().equals(ELEMENT_SUITE))
             {
@@ -133,10 +105,6 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
             else if (reader.getLocalName().equals(ELEMENT_CASE))
             {
                 processCase(suite, suitePath, reader);
-            }
-            else
-            {
-                nextElement(reader);
             }
         }
     }
@@ -203,32 +171,18 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         StringBuilder message = new StringBuilder();
 
         reader.nextTag();
-        while (reader.isStartElement())
+        while (nextSiblingTag(reader, tagName))
         {
-            if (reader.getLocalName().equals(tagName))
+            reader.nextTag();
+
+            while (nextSiblingTag(reader, ELEMENT_MESSAGE, ELEMENT_STACK_TRACE))
             {
-                reader.nextTag();
-
-                while (reader.isStartElement())
-                {
-                    if (reader.getLocalName().equals(ELEMENT_MESSAGE) || reader.getLocalName().equals(ELEMENT_STACK_TRACE))
-                    {
-                        appendToMessage(reader, message);
-                        reader.nextTag();
-                    }
-                    else
-                    {
-                        nextElement(reader);
-                    }
-                }
-
-                expectEndTag(tagName, reader);
+                appendToMessage(reader, message);
                 reader.nextTag();
             }
-            else
-            {
-                nextElement(reader);
-            }
+
+            expectEndTag(tagName, reader);
+            reader.nextTag();
         }
 
         return message.toString().trim();

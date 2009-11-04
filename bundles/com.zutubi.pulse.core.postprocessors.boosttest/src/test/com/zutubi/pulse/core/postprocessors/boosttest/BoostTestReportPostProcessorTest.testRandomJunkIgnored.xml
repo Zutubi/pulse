@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestLog>
+    <junk>
+      <nested-junk>textual junk</nested-junk>
+    </junk>
+  <TestSuite
+      name="PulseTest">
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+    <TestSuite
+        name="VariantsSuite">
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <TestCase
+          name="simplePass">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      </TestCase>
+      <TestCase
+          name="checkFailure">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <Error
+            file="main.cpp"
+            line="20">check add(2, 2) == 5 failed
+        </Error>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="multipleCheckFailures">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <Error
+            file="main.cpp"
+            line="25">check add(2, 2) == 1 failed
+        </Error>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <Error
+            file="main.cpp"
+            line="26">check add(2, 2) == 2 failed
+        </Error>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <Error
+            file="main.cpp"
+            line="27">check add(2, 2) == 3 failed
+        </Error>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="requireFailure">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <FatalError
+            file="main.cpp"
+            line="32">critical check add(2, 2) == 5 failed
+        </FatalError>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="explicitError">
+        <Error
+            file="main.cpp"
+            line="37">Error message
+        </Error>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="explicitFailure">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <FatalError
+            file="main.cpp"
+            line="42">Failure message
+        </FatalError>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <TestCase
+          name="errorThenFailure">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <FatalError
+            file="main.cpp"
+            line="47">Error message
+        </FatalError>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <TestCase
+          name="uncaughtException">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <Exception
+            name="uncaughtException">C string: Catch me if you can!
+        </Exception>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="stdException">
+        <Exception
+            name="stdException">unknown type
+        </Exception>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="checkMessageFailure">
+        <Error
+            file="main.cpp"
+            line="63">add(..) result: 4
+        </Error>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="checkEqualFailure">
+        <Error
+            file="main.cpp"
+            line="68">check add( 2,2 ) == 5 failed [4 != 5]
+        </Error>
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="threeSeconds">
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+    </TestSuite>
+      <junk>
+        <nested-junk>textual junk</nested-junk>
+      </junk>
+    <TestSuite
+        name="PassingSuite">
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <TestCase
+          name="pass1">
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+        <TestingTime>0
+        </TestingTime>
+          <junk>
+            <nested-junk>textual junk</nested-junk>
+          </junk>
+      </TestCase>
+        <junk>
+          <nested-junk>textual junk</nested-junk>
+        </junk>
+      <TestCase
+          name="pass2">
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+      <TestCase
+          name="pass3">
+        <TestingTime>0
+        </TestingTime>
+      </TestCase>
+    </TestSuite>
+  </TestSuite>
+</TestLog>

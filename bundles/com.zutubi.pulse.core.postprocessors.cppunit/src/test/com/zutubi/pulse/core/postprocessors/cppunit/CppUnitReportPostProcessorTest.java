@@ -86,6 +86,19 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
         assertTest(suite, "Test");
     }
 
+    public void testRandomJunkIgnored() throws Exception
+    {
+        PersistentTestSuiteResult tests = runProcessor("testRandomJunkIgnored");
+
+        assertEquals(2, tests.getSuites().size());
+
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
+        assertAnotherTest(suite, "AnotherTest");
+
+        suite = tests.getSuites().get(1);
+        assertTest(suite, "Test");
+    }
+    
     private void assertHelloWorld(PersistentTestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 1, 0, 0);
