@@ -3156,7 +3156,7 @@ public class RemoteApi
      * @param token         authentication token, see {@link #login(String, String)}
      * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
      * @param timeoutMillis number of milliseconds to wait for the request to be handled
-     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @return {@xtype [RemoteApi.BuildRequestStatus]} the status of the request
      * @access requires view permission for the corresponding project
      * @see #triggerBuild(String, String, java.util.Hashtable)
      * @see #waitForBuildRequestToBeActivated(String, String, int)
@@ -3168,7 +3168,8 @@ public class RemoteApi
         try
         {
             long id = Long.parseLong(requestId);
-            return convertBuildRequestStatus(id, buildRequestRegistry.waitForRequestToBeHandled(id, timeoutMillis));
+            BuildRequestRegistry.RequestStatus status = buildRequestRegistry.waitForRequestToBeHandled(id, timeoutMillis);
+            return convertBuildRequestStatus(id, status);
         }
         catch (NumberFormatException e)
         {
@@ -3189,7 +3190,7 @@ public class RemoteApi
      * @param token         authentication token, see {@link #login(String, String)}
      * @param requestId     id of the build request, as returned by the triggerProjectBuild methods
      * @param timeoutMillis number of milliseconds to wait for the request to be handled
-     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @return {@xtype [RemoteApi.BuildRequestStatus]} the status of the request
      * @access requires view permission for the corresponding project
      * @see #triggerBuild(String, String, java.util.Hashtable)
      * @see #waitForBuildRequestToBeHandled(String, String, int)
@@ -3221,7 +3222,7 @@ public class RemoteApi
      *
      * @param token     authentication token, see {@link #login(String, String)}
      * @param requestId id of the build request, as returned by the triggerProjectBuild methods
-     * @return {@xtype array<[RemoteApi.BuildRequestStatus]>} the status of the request
+     * @return {@xtype [RemoteApi.BuildRequestStatus]} the status of the request
      * @access requires view permission for the corresponding project
      * @see #triggerBuild(String, String, java.util.Hashtable)
      * @see #waitForBuildRequestToBeHandled(String, String, int)

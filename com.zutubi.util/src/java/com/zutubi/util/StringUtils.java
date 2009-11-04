@@ -914,4 +914,24 @@ public class StringUtils
 
         return count;
     }
+
+    /**
+     * Returns a copy of the given string with the first letter capitalised
+     * and the rest lower cased using the default locale.  If the string is
+     * null or empty it is returned unchanged.
+     *
+     * @param s the string to capitalise
+     * @return a captilalised version of the input string
+     */
+    public static String capitalise(String s)
+    {
+        if (stringSet(s))
+        {
+            return Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase();
+        }
+        else
+        {
+            return s;
+        }
+    }
 }

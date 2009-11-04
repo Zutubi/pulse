@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.StringUtils.capitalise;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 
@@ -27,7 +28,14 @@ public class BuildRequestRegistry
     private static final int DEFAULT_LIMIT = 10000;
     private static final int DEFAULT_TRIM  = 1000;
 
+    /**
+     * Limit on the number of remembered requests - when we hit this we prune
+     * by the trim amount.
+     */
     private int limit = DEFAULT_LIMIT;
+    /**
+     * Number of requests to prune when we hit the limit.
+     */
     private int trim = DEFAULT_TRIM;
 
     private AccessManager accessManager;
@@ -114,7 +122,7 @@ public class BuildRequestRegistry
      */
     void requestRejected(BuildRequestEvent event, final String reason)
     {
-        transition(event, "Rejected", new UnaryProcedure<RegEntry>()
+        transition(event, RequestStatus.REJECTED, new UnaryProcedure<RegEntry>()
         {
             public void process(RegEntry regEntry)
             {
@@ -131,7 +139,7 @@ public class BuildRequestRegistry
      */
     void requestAssimilated(BuildRequestEvent event, final long intoRequestId)
     {
-        transition(event, "Assimilated", new UnaryProcedure<RegEntry>()
+        transition(event, RequestStatus.ASSIMILATED, new UnaryProcedure<RegEntry>()
         {
             public void process(RegEntry regEntry)
             {
@@ -147,7 +155,7 @@ public class BuildRequestRegistry
      */
     void requestQueued(BuildRequestEvent event)
     {
-        transition(event, "Queued", new UnaryProcedure<RegEntry>()
+        transition(event, RequestStatus.QUEUED, new UnaryProcedure<RegEntry>()
         {
             public void process(RegEntry regEntry)
             {
@@ -163,7 +171,7 @@ public class BuildRequestRegistry
      */
     void requestCancelled(BuildRequestEvent event)
     {
-        transition(event, "Cancelled", new UnaryProcedure<RegEntry>()
+        transition(event, RequestStatus.CANCELLED, new UnaryProcedure<RegEntry>()
         {
             public void process(RegEntry regEntry)
             {
@@ -180,7 +188,7 @@ public class BuildRequestRegistry
      */
     void requestActivated(BuildRequestEvent event, final long buildNumber)
     {
-        transition(event, "Activated", new UnaryProcedure<RegEntry>()
+        transition(event, RequestStatus.ACTIVATED, new UnaryProcedure<RegEntry>()
         {
             public void process(RegEntry regEntry)
             {
@@ -189,7 +197,7 @@ public class BuildRequestRegistry
         });
     }
 
-    private void transition(BuildRequestEvent event, String type, UnaryProcedure<RegEntry> p)
+    private void transition(BuildRequestEvent event, RequestStatus newStatus, UnaryProcedure<RegEntry> p)
     {
         {
             lock.lock();
@@ -198,7 +206,7 @@ public class BuildRequestRegistry
                 RegEntry entry = lookupEntry(event.getId());
                 if (entry == null)
                 {
-                    LOG.warning(type + " notification for unknown build request " + event.getId() + " project " + event.getProjectConfig().getName());
+                    LOG.warning(capitalise(newStatus.toString()) + " notification for unknown build request " + event.getId() + " project " + event.getProjectConfig().getName());
                 }
                 else
                 {
@@ -269,6 +277,7 @@ public class BuildRequestRegistry
                 catch (InterruptedException e)
                 {
                     // Retry.
+                    status = getStatus(eventId);
                 }
             }
 

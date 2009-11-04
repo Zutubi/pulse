@@ -848,6 +848,46 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals(5, StringUtils.count("how do you spell xxxx? one x or two?", 'x'));
     }
 
+    public void testCapitaliseNull()
+    {
+        assertNull(StringUtils.capitalise(null));
+    }
+
+    public void testCapitaliseEmpty()
+    {
+        assertEquals("", StringUtils.capitalise(""));
+    }
+
+    public void testCapitaliseSingleLetter()
+    {
+        assertEquals("D", StringUtils.capitalise("d"));
+    }
+
+    public void testCapitaliseSingleCapital()
+    {
+        assertEquals("E", StringUtils.capitalise("E"));
+    }
+
+    public void testCapitaliseWord()
+    {
+        assertEquals("Word", StringUtils.capitalise("word"));
+    }
+
+    public void testCapitaliseUppercaseWord()
+    {
+        assertEquals("Word", StringUtils.capitalise("WORD"));
+    }
+
+    public void testCapitaliseNumbers()
+    {
+        assertEquals("123", StringUtils.capitalise("123"));
+    }
+
+    public void testCapitaliseAlphanumeric()
+    {
+        assertEquals("Abc123def", StringUtils.capitalise("abc123def"));
+    }
+
     private void assertEquals(String[] expected, String[] got)
     {
         assertTrue("Expected " + format(expected) + ", got " + format(got), Arrays.equals(expected, got));
