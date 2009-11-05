@@ -4,9 +4,11 @@ import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.*;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.*;
 
@@ -118,6 +120,8 @@ public class LsAction extends VFSActionSupport
         {
             path = root + path;
         }
+
+        path = UriParser.encode(PathUtils.normalisePath(path));
         
         FileObject fo = getFS().resolveFile(path);
 

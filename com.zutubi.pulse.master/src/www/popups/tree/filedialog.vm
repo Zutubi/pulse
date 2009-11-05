@@ -261,11 +261,11 @@
                 var ajax = new Ajax.Request(
                     "$base/ajax/ls.action",
                     {
-                        method: 'post',
+                        method: 'get',
                         onComplete: lsResponse(node, onCompleteCallback),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "path=$root" + p + (showFiles && "&showFiles=" + showFiles || "") + (showHidden && "&showHidden=" + showHidden || "")
+                        parameters: "path=" + escape("#jss($root)") + p + (showFiles && "&showFiles=" + showFiles || "") + (showHidden && "&showHidden=" + showHidden || "")
                     }
                 );
             }
@@ -334,7 +334,7 @@
                         onComplete: mkdirResponse(node, name),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "path=$root" + p + "&name=" + name
+                        parameters: "path=" + escape("#jss($root)") + p + "&name=" + name
                     }
                 );
             }
@@ -397,7 +397,7 @@
                         onComplete: rmdirResponse(node),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "path=$root" + p
+                        parameters: "path=" + escape("#jss($root)") + p
                     }
                 );
             }

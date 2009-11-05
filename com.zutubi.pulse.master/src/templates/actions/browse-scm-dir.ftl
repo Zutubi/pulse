@@ -18,6 +18,6 @@ ${form.name}.items.last().on('browse', function(field)
         return start + path;
     }
 
-    var projectPath = findProjectPath('${field.parameters.parentPath}');
+    var projectPath = findProjectPath('${field.parameters.parentPath?js_string}');
     openSCMSelectDialog('${base}', false, '${form.name}', field.name, projectPath, '', 'scm');
 });

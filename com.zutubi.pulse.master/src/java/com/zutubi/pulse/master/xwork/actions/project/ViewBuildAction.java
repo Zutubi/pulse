@@ -146,6 +146,17 @@ public class ViewBuildAction extends CommandActionBase
         return dependencyDetails;
     }
 
+    public boolean isDependencyDetailsPresent()
+    {
+        return CollectionUtils.contains(dependencyDetails, new Predicate<StageDependencyDetails>()
+        {
+            public boolean satisfied(StageDependencyDetails stageDependencyDetails)
+            {
+                return stageDependencyDetails.isReportAvailable() && stageDependencyDetails.getDependencies().size() > 0;
+            }
+        });
+    }
+    
     public StageDependencyDetails getDependencyDetails(final String stageName)
     {
         return CollectionUtils.find(dependencyDetails, new Predicate<StageDependencyDetails>()

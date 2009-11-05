@@ -246,7 +246,7 @@ function openSCMSelectDialog(base, showFiles, formName, fieldName, projectPath, 
         }
     }
 
-    openFileDialog(base + '/popups/scmFileDialog.action', formName, fieldName, 'pulse:///' + projectPath + '/scm/' + path, prefix, showFiles, false, false);
+    openFileDialog(base + '/popups/scmFileDialog.action', formName, fieldName, 'pulse:///' + encodeURIPath(projectPath) + '/scm/' + path, prefix, showFiles, false, false);
 }
 
 

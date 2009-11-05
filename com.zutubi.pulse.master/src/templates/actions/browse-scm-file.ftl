@@ -18,7 +18,7 @@ ${form.name}.items.last().on('browse', function(field)
         return start + path;
     }
 
-    var projectPath = findProjectPath('${field.parameters.parentPath}');
+    var projectPath = findProjectPath('${field.parameters.parentPath?js_string}');
     var prefix = '';
 <#if field.parameters.baseDirField?exists>
     var dirField = Ext.getCmp('zfid.${field.parameters.baseDirField}')
