@@ -129,6 +129,7 @@ public class PluginManager
 
         // setup the configuration.
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
+        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA + ".readOnly", Boolean.TRUE.toString());
         equinox.start();
 
         startupInternalPlugins();
