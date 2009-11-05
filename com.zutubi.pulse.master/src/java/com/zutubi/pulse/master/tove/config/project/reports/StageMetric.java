@@ -61,6 +61,22 @@ public enum StageMetric
         }
     },
     /**
+     * The number of expected failure tests in the stage.
+     */
+    TEST_EXPECTED_FAIL_COUNT
+    {
+        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        {
+            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
+            {
+                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
+                {
+                    return recipeResult.getTestSummary().getExpectedFailures();
+                }
+            };
+        }
+    },
+    /**
      * The number of failed tests in the stage.
      */
     TEST_FAIL_COUNT

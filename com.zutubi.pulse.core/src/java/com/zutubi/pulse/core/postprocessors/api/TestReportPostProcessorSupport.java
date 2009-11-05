@@ -59,7 +59,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             ResultState state = ppContext.getResultState();
             if (config.getFailOnFailure() && state != ResultState.ERROR && state != ResultState.FAILURE)
             {
-                if (containsBrokenCase(suiteResult))
+                if (containsUnexpectedBrokenCase(suiteResult))
                 {
                     ppContext.failCommand("One or more test cases failed.");
                 }
@@ -119,7 +119,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
         }
     }
 
-    private boolean containsBrokenCase(TestSuiteResult suite)
+    private boolean containsUnexpectedBrokenCase(TestSuiteResult suite)
     {
         for (TestCaseResult caseResult: suite.getCases())
         {
@@ -132,7 +132,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
 
         for (TestSuiteResult nestedSuite: suite.getSuites())
         {
-            if (containsBrokenCase(nestedSuite))
+            if (containsUnexpectedBrokenCase(nestedSuite))
             {
                 return true;
             }

@@ -61,6 +61,22 @@ public enum BuildMetric
         }
     },
     /**
+     * The total number of expected failure tests in the build.
+     */
+    TEST_EXPECTED_FAIL_COUNT
+    {
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        {
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
+            {
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
+                {
+                    return buildResult.getTestSummary().getExpectedFailures();
+                }
+            };
+        }
+    },
+    /**
      * The total number of failed tests in the build.
      */
     TEST_FAIL_COUNT

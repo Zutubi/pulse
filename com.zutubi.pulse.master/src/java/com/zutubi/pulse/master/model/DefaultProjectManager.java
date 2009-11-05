@@ -455,6 +455,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         ));
 
         reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.builds.series.expected.failure"),
+                BuildMetric.TEST_EXPECTED_FAIL_COUNT,
+                false,
+                ChartColours.EXPECTED_FAIL_FILL.toString()
+        ));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
                 I18N.format("report.test.breakdown.builds.series.skipped"),
                 BuildMetric.TEST_SKIPPED_COUNT,
                 false,
@@ -493,6 +500,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 StageMetric.TEST_PASS_COUNT,
                 false,
                 ChartColours.SUCCESS_FILL.toString(),
+                AggregationFunction.MEAN
+        ));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.stages.series.expected.failure"),
+                StageMetric.TEST_EXPECTED_FAIL_COUNT,
+                false,
+                ChartColours.EXPECTED_FAIL_FILL.toString(),
                 AggregationFunction.MEAN
         ));
 

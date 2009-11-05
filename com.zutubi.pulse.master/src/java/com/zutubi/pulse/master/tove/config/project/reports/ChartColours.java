@@ -6,6 +6,7 @@ package com.zutubi.pulse.master.tove.config.project.reports;
 public enum ChartColours
 {
     BROKEN_FILL(0xeb5a5a),
+    EXPECTED_FAIL_FILL(0xf9e0a3),
     FAIL_FILL(0xffdddd),
     SUCCESS_FILL(0x96eb96),
     WARNING_FILL(0xffffce),

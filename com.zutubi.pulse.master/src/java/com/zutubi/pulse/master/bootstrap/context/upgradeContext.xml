@@ -93,6 +93,7 @@
                 <ref local="addJabberServiceName"/>
                 <ref local="ensureAgentPingConfigPermanent"/>
                 <ref local="expectedFailureTestCases"/>
+                <ref local="addExpectedFailureReportSeries"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -425,5 +426,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.8-patch-01.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="addExpectedFailureReportSeries" class="com.zutubi.pulse.master.upgrade.tasks.AddExpectedFailureReportSeriesUpgradeTask">
+        <property name="buildNumber" value="201008006"/>
     </bean>
 </beans>
