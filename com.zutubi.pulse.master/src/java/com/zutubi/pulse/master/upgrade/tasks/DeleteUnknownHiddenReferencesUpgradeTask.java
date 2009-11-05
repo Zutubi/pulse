@@ -3,11 +3,11 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.UnaryProcedure;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This upgrade task traverses the record store, removing references to hidden keys that
@@ -116,7 +116,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
         }
         else
         {
-            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
+            return new HashSet<String>(WebUtils.splitAndDecode(SEPARATOR, hidden));
         }
     }
 
@@ -130,7 +130,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
         }
         else
         {
-            record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+            record.putMeta(HIDDEN_KEY, WebUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
         }
 
         return result;
