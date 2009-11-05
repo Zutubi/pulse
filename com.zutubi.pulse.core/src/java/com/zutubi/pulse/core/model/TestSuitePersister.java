@@ -22,6 +22,7 @@ public class TestSuitePersister
     public static final String ELEMENT_MESSAGE = "message";
     public static final String ENCODED_PREFIX = "encoded-";
     public static final String ATTRIBUTE_TOTAL = "total";
+    public static final String ATTRIBUTE_EXPECTED_FAILURES = "expected-failures";
     public static final String ATTRIBUTE_FAILURES = "failures";
     public static final String ATTRIBUTE_ERRORS = "errors";
     public static final String ATTRIBUTE_SKIPPED = "skipped";
@@ -62,6 +63,7 @@ public class TestSuitePersister
             Element suiteElement = new Element(ELEMENT_SUITE);
             suiteElement.addAttribute(safeAttribute(ATTRIBUTE_NAME, child.getName()));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_TOTAL, Integer.toString(child.getTotal())));
+            suiteElement.addAttribute(new Attribute(ATTRIBUTE_EXPECTED_FAILURES, Integer.toString(child.getExpectedFailures())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_FAILURES, Integer.toString(child.getFailures())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_ERRORS, Integer.toString(child.getErrors())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_SKIPPED, Integer.toString(child.getSkipped())));
@@ -167,11 +169,12 @@ public class TestSuitePersister
             String name = getSafeAttributeValue(element, ATTRIBUTE_NAME);
             long duration = getDuration(element);
             int total = getIntAttribute(element, ATTRIBUTE_TOTAL);
+            int expectedFailures = getIntAttribute(element, ATTRIBUTE_EXPECTED_FAILURES);
             int errors = getIntAttribute(element, ATTRIBUTE_ERRORS);
             int failures = getIntAttribute(element, ATTRIBUTE_FAILURES);
             int skipped = getIntAttribute(element, ATTRIBUTE_SKIPPED);
 
-            if (name == null || failuresOnly && (errors == 0 && failures == 0))
+            if (name == null || failuresOnly && (errors == 0 && failures == 0 && expectedFailures == 0))
             {
                 continue;
             }
@@ -190,7 +193,7 @@ public class TestSuitePersister
             }
             else
             {
-                handler.startSuite(new PersistentTestSuiteResult(name, duration, total, errors, failures, skipped));
+                handler.startSuite(new PersistentTestSuiteResult(name, duration, total, expectedFailures, errors, failures, skipped));
                 handler.endSuite();
             }
         }

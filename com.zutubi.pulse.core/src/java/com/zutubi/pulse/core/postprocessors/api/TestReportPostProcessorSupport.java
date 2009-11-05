@@ -1,10 +1,14 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.WebUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * <p>
@@ -36,7 +40,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
 
     public void process(File artifactFile, PostProcessorContext ppContext)
     {
-        if(artifactFile.isFile())
+        if (artifactFile.isFile())
         {
             TestReportPostProcessorConfigurationSupport config = getConfig();
             TestSuiteResult suiteResult = new TestSuiteResult(null);
@@ -49,6 +53,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             }
 
             extractTestResults(artifactFile, ppContext, accumulateSuite);
+            processExpectedFailures(accumulateSuite, ppContext);
             ppContext.addTests(suiteResult, config.getResolveConflicts());
 
             ResultState state = ppContext.getResultState();
@@ -62,11 +67,64 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
         }
     }
 
+    private void processExpectedFailures(final TestSuiteResult suite, PostProcessorContext context)
+    {
+        String failureFileName = getConfig().getExpectedFailureFile();
+        if (StringUtils.stringSet(failureFileName))
+        {
+            File failureFile = new File(failureFileName);
+            if (!failureFile.isAbsolute())
+            {
+                failureFile = new File(context.getExecutionContext().getWorkingDir(), failureFileName);
+            }
+
+            if (failureFile.isFile())
+            {
+                try
+                {
+                    IOUtils.forEachLine(failureFile, new UnaryProcedure<String>()
+                    {
+                        public void process(String s)
+                        {
+                            processExpectedFailure(suite, s);
+                        }
+                    });
+                }
+                catch (IOException e)
+                {
+                    context.addFeature(new Feature(Feature.Level.WARNING, "Unable to read expected failure file '" + failureFile.getAbsolutePath() + "': " + e.getMessage()));
+                }
+            }
+        }
+    }
+
+    private void processExpectedFailure(TestSuiteResult suite, String line)
+    {
+        String[] parts = StringUtils.split(line, '/');
+        for (int i = 0; i < parts.length - 1; i++)
+        {
+            String suiteName = WebUtils.percentDecode(parts[i]);
+            suite = suite.findSuite(suiteName);
+            if (suite == null)
+            {
+                return;
+            }
+        }
+
+        String caseName = WebUtils.percentDecode(parts[parts.length - 1]);
+        TestCaseResult caseResult = suite.findCase(caseName);
+        if (caseResult != null && caseResult.getStatus().isBroken())
+        {
+            caseResult.setStatus(TestStatus.EXPECTED_FAILURE);
+        }
+    }
+
     private boolean containsBrokenCase(TestSuiteResult suite)
     {
         for (TestCaseResult caseResult: suite.getCases())
         {
-            if (caseResult.getStatus().isBroken())
+            TestStatus status = caseResult.getStatus();
+            if (status.isBroken() && status != TestStatus.EXPECTED_FAILURE)
             {
                 return true;
             }

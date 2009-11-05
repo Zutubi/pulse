@@ -24,9 +24,10 @@ public abstract class AbstractTestsPage extends SeleniumPage
         int total = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 2));
         int failures = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 3));
         int errors = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 4));
-        int skipped = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 5));
+        int expectedFailures = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 5));
+        int skipped = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 6));
 
-        return new TestResultSummary(errors, failures, skipped, total);
+        return new TestResultSummary(expectedFailures, errors, failures, skipped, total);
     }
 
     public void clickAllCrumb()

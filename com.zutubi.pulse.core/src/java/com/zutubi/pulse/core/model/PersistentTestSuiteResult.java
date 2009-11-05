@@ -24,6 +24,7 @@ public class PersistentTestSuiteResult extends PersistentTestResult
     private TestResultComparator comparator = new TestResultComparator();
 
     private int total;
+    private int expectedFailures;
     private int errors;
     private int failures;
     private int skipped;
@@ -40,7 +41,7 @@ public class PersistentTestSuiteResult extends PersistentTestResult
 
     public PersistentTestSuiteResult(String name, long duration)
     {
-        this(name, duration, -1, -1, -1, -1);
+        this(name, duration, -1, -1, -1, -1, -1);
         suites = new ArrayList<PersistentTestSuiteResult>();
         cases = new LinkedHashMap<String, PersistentTestCaseResult>();
     }
@@ -59,10 +60,11 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         }
     }
 
-    public PersistentTestSuiteResult(String name, long duration, int total, int errors, int failures, int skipped)
+    public PersistentTestSuiteResult(String name, long duration, int total, int expectedFailures, int errors, int failures, int skipped)
     {
         super(name, duration);
         this.total = total;
+        this.expectedFailures = expectedFailures;
         this.errors = errors;
         this.failures = failures;
         this.skipped = skipped;
@@ -116,6 +118,31 @@ public class PersistentTestSuiteResult extends PersistentTestResult
     public boolean hasCase(String name)
     {
         return getCase(name) != null;
+    }
+
+    @Override
+    public int getExpectedFailures()
+    {
+        if (expectedFailures < 0)
+        {
+            int result = 0;
+
+            for (PersistentTestSuiteResult child : suites)
+            {
+                result += child.getExpectedFailures();
+            }
+
+            for (PersistentTestCaseResult child : cases.values())
+            {
+                result += child.getExpectedFailures();
+            }
+
+            return result;
+        }
+        else
+        {
+            return expectedFailures;
+        }
     }
 
     public int getErrors()

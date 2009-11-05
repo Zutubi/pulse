@@ -16,6 +16,10 @@ public class TestResultSummary extends Entity
     private static final String KEY_NONE= "tests.none";
 
     /**
+     * Number of cases with expected failure status.
+     */
+    private int expectedFailures;
+    /**
      * Number of cases with failure status.
      */
     private int errors;
@@ -34,18 +38,40 @@ public class TestResultSummary extends Entity
 
     public TestResultSummary()
     {
+        expectedFailures = 0;
         errors = 0;
         failures = 0;
         skipped = 0;
         total = 0;
     }
 
-    public TestResultSummary(int errors, int failures, int skipped, int total)
+    public TestResultSummary(int expectedFailures, int errors, int failures, int skipped, int total)
     {
+        this.expectedFailures = expectedFailures;
         this.errors = errors;
         this.failures = failures;
         this.skipped = skipped;
         this.total = total;
+    }
+
+    public int getExpectedFailures()
+    {
+        return expectedFailures;
+    }
+
+    public boolean hasExpectedFailures()
+    {
+        return getExpectedFailures() > 0;
+    }
+
+    public void setExpectedFailures(int expectedFailures)
+    {
+        this.expectedFailures = expectedFailures;
+    }
+
+    public void addExpectedFailures(int expectedFailures)
+    {
+        this.expectedFailures += expectedFailures;
     }
 
     public int getErrors()
@@ -130,7 +156,7 @@ public class TestResultSummary extends Entity
 
     public int getBroken()
     {
-        return errors + failures;
+        return expectedFailures + errors + failures;
     }
 
     public boolean hasBroken()
@@ -145,7 +171,7 @@ public class TestResultSummary extends Entity
 
     public int hashCode()
     {
-        return 1000000 * skipped + errors * 10000 + failures * 100 + total;
+        return 100000000 * expectedFailures + 1000000 * skipped + errors * 10000 + failures * 100 + total;
     }
 
     public boolean equals(Object obj)
@@ -153,7 +179,7 @@ public class TestResultSummary extends Entity
         if(obj instanceof TestResultSummary)
         {
             TestResultSummary other = (TestResultSummary) obj;
-            return other.errors == errors && other.failures == failures && other.skipped == skipped && other.total == total;
+            return other.expectedFailures == expectedFailures && other.errors == errors && other.failures == failures && other.skipped == skipped && other.total == total;
         }
 
         return false;
@@ -161,6 +187,7 @@ public class TestResultSummary extends Entity
 
     public void add(TestResultSummary summary)
     {
+        addExpectedFailures(summary.expectedFailures);
         addErrors(summary.errors);
         addFailures(summary.failures);
         addSkipped(summary.skipped);

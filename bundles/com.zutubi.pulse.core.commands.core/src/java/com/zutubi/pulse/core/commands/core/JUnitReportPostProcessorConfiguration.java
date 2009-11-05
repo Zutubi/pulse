@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  * Configuration for instances of {@link com.zutubi.pulse.core.commands.core.JUnitReportPostProcessor}.
  */
 @SymbolicName("zutubi.junitReportPostProcessorConfig")
-@Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts", "suiteElement", "caseElement", "errorElement", "failureElement", "skippedElement", "classAttribute", "messageAttribute", "nameAttribute", "packageAttribute", "timeAttribute"})
+@Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts", "expectedFailureFile", "suiteElement", "caseElement", "errorElement", "failureElement", "skippedElement", "classAttribute", "messageAttribute", "nameAttribute", "packageAttribute", "timeAttribute"})
 public class JUnitReportPostProcessorConfiguration extends XMLTestReportPostProcessorConfigurationSupport
 {
     private static final String ELEMENT_SUITE   = "testsuite";

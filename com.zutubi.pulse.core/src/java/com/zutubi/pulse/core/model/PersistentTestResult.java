@@ -65,6 +65,8 @@ public abstract class PersistentTestResult
         }
     }
 
+    public abstract int getExpectedFailures();
+
     public abstract int getErrors();
 
     public abstract int getFailures();
@@ -87,11 +89,12 @@ public abstract class PersistentTestResult
 
     public TestResultSummary getSummary()
     {
-        return new TestResultSummary(getErrors(), getFailures(), getSkipped(), getTotal());
+        return new TestResultSummary(getExpectedFailures(), getErrors(), getFailures(), getSkipped(), getTotal());
     }
 
     public void accumulateSummary(TestResultSummary summary)
     {
+        summary.addExpectedFailures(getExpectedFailures());
         summary.addErrors(getErrors());
         summary.addFailures(getFailures());
         summary.addSkipped(getSkipped());

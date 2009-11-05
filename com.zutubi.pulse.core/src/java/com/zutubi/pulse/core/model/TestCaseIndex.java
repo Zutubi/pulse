@@ -11,6 +11,7 @@ public class TestCaseIndex extends Entity
     private long stageNameId;
     private String name;
     private int totalCount;
+    private int expectedFailureCount;
     private int failureCount;
     private int errorCount;
     private int skippedCount;
@@ -33,6 +34,10 @@ public class TestCaseIndex extends Entity
         totalCount++;
         switch (status)
         {
+            case EXPECTED_FAILURE:
+                expectedFailureCount++;
+                checkBroken(buildId, buildNumber);
+                break;
             case ERROR:
                 errorCount++;
                 checkBroken(buildId, buildNumber);
@@ -97,6 +102,16 @@ public class TestCaseIndex extends Entity
     public void setTotalCount(int totalCount)
     {
         this.totalCount = totalCount;
+    }
+
+    public int getExpectedFailureCount()
+    {
+        return expectedFailureCount;
+    }
+
+    public void setExpectedFailureCount(int expectedFailureCount)
+    {
+        this.expectedFailureCount = expectedFailureCount;
     }
 
     public int getFailureCount()

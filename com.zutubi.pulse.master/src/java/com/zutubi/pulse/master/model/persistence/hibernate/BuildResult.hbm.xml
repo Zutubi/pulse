@@ -157,6 +157,7 @@
             <generator class="hilo"/>
         </id>
 
+        <property name="expectedFailures" column="EXPECTED_FAILURES" type="int"/>
         <property name="errors" column="ERRORS" type="int"/>
         <property name="failures" column="FAILURES" type="int"/>
         <property name="skipped" column="SKIPPED" type="int"/>

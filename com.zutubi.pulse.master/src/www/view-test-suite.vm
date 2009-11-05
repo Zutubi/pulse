@@ -61,7 +61,7 @@
 
     #if($suite.suites.size() > 0)
         <table id="child-suites" class="fill-content">
-            <th class="heading" colspan="8">
+            <th class="heading" colspan="9">
                <span class="action">
                    <a href="#" id="suites-toggle" onclick="toggleSuccessful('suites'); return false;">
                         #wwtext("name=tests.hide.successful")
@@ -75,6 +75,7 @@
                 #contentHeading("test.total" 1)
                 #contentHeading("test.failures" 1)
                 #contentHeading("test.errors" 1)
+                #contentHeading("test.expected.failures" 1)
                 #contentHeading("test.skipped" 1)
                 #contentHeading("test.duration" 1)
             </tr>
@@ -90,6 +91,7 @@
                 #rightCell($childSuite.total)
                 #rightCell($childSuite.failures)
                 #rightCell($childSuite.errors)
+                #rightCell($childSuite.expectedFailures)
                 #rightCell($childSuite.skipped)
                 #rightCell($childSuite.prettyDuration)
             </tr>

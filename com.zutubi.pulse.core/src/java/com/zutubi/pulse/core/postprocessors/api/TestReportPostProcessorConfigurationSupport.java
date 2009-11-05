@@ -21,7 +21,7 @@ import com.zutubi.validation.annotations.Required;
  * @see com.zutubi.pulse.core.postprocessors.api.DomTestReportPostProcessorSupport
  */
 @SymbolicName("zutubi.testPostProcessorConfigSupport")
-@Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts"})
+@Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts", "expectedFailureFile"})
 public abstract class TestReportPostProcessorConfigurationSupport extends PostProcessorConfigurationSupport
 {
     @Wizard.Ignore
@@ -30,6 +30,8 @@ public abstract class TestReportPostProcessorConfigurationSupport extends PostPr
     private boolean failOnFailure = true;
     @Wizard.Ignore @Required
     private NameConflictResolution resolveConflicts = NameConflictResolution.OFF;
+    @Wizard.Ignore
+    private String expectedFailureFile;
 
     protected TestReportPostProcessorConfigurationSupport(Class<? extends TestReportPostProcessorSupport> postProcessorType)
     {
@@ -73,6 +75,40 @@ public abstract class TestReportPostProcessorConfigurationSupport extends PostPr
     public void setFailOnFailure(boolean failOnFailure)
     {
         this.failOnFailure = failOnFailure;
+    }
+
+    /**
+     * @see #setExpectedFailureFile(String)
+     * @return the path of the expected failure file, or null if none has been
+     *         specified
+     */
+    public String getExpectedFailureFile()
+    {
+        return expectedFailureFile;
+    }
+
+    /**
+     * Sets the path, relative to the base directory for the build, of a file
+     * containing expected failure information.  This file should be a simple
+     * text file with the fully-qualified names of test cases one per line.  A
+     * qualified case name has the form:
+     * <pre>
+     *   &lt;suite name&gt;/&lt;suite name&gt;/&lt;case name&gt;
+     * </pre>
+     * where the suite names are the (possibly nested) suites under which the
+     * case is found.  If a name contains a slash it should be percent-encoded
+     * as %2f, likewise a literal percent should be encoded as %25.
+     * <p/>
+     * If any cases listed in the file fail, their status will be marked as
+     * {@link com.zutubi.pulse.core.postprocessors.api.TestStatus#EXPECTED_FAILURE}.
+     * The recipe will not be failed due to such failures.
+     *
+     * @param expectedFailureFile path, relative to the base directory, of a
+     *                            file naming expected test failures
+     */
+    public void setExpectedFailureFile(String expectedFailureFile)
+    {
+        this.expectedFailureFile = expectedFailureFile;
     }
 
     public NameConflictResolution getResolveConflicts()

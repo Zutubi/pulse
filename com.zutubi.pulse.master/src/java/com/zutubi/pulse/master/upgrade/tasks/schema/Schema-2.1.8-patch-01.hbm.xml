@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.core.model.TestCaseIndex" table="TEST_CASE_INDEX" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="expectedFailureCount" type="int">
+            <column name="EXPECTED_FAILURE_COUNT" default="0"/>
+        </property>
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.TestResultSummary" table="TEST_RESULT_SUMMARY" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="expectedFailures" type="int">
+            <column name="EXPECTED_FAILURES" default="0"/>
+        </property>
+    </class>
+</hibernate-mapping>

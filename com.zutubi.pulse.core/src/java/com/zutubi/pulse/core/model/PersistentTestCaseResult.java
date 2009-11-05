@@ -83,6 +83,12 @@ public class PersistentTestCaseResult extends PersistentTestResult
         this.message = message;
     }
 
+    @Override
+    public int getExpectedFailures()
+    {
+        return status == TestStatus.EXPECTED_FAILURE ? 1 : 0;
+    }
+
     public int getErrors()
     {
         return status == TestStatus.ERROR ? 1 : 0;

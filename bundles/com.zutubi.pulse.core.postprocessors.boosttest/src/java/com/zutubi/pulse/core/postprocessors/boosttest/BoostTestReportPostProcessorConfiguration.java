@@ -8,7 +8,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * Configuration for instances of {@link BoostTestReportPostProcessor}.
  */
 @SymbolicName("zutubi.boostTestPostProcessorConfig")
-@Form(fieldOrder = {"name", "failOnFailure", "processMessages", "processInfo", "suite", "resolveConflicts"})
+@Form(fieldOrder = {"name", "failOnFailure", "processMessages", "processInfo", "suite", "resolveConflicts", "expectedFailureFile"})
 public class BoostTestReportPostProcessorConfiguration extends XMLTestReportPostProcessorConfigurationSupport
 {
     private boolean processMessages = false;

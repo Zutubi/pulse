@@ -78,6 +78,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
     private static final String LOCATOR_OUTPUT_ARTIFACT = "link=output.txt";
 
+    private static final String ANT_PROCESSOR = "ant output processor";
+    private static final String JUNIT_PROCESSOR = "junit xml report processor";
+
     private Repository repository;
 
     protected void setUp() throws Exception
@@ -560,15 +563,44 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
         String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
-        insertTestCapture(projectPath, "junit xml report processor");
+        insertTestCapture(projectPath, JUNIT_PROCESSOR);
 
+        buildAndCheckTestSummary(false, new TestResultSummary(0, 0, 1, 0, 2));
+    }
+
+    public void testTestResultsExpectedFailure() throws Exception
+    {
+        Hashtable<String, Object> config = xmlRpcHelper.getAntConfig();
+        config.put(Constants.Project.AntCommand.TARGETS, "test");
+        config.put(Constants.Project.AntCommand.ARGUMENTS, "-Dignore.test.result=true");
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), config);
+
+        // Capture the results, change our processor to load the expected
+        // failures.
+        insertTestCapture(projectPath, JUNIT_PROCESSOR);
+        String ppPath = PathUtils.getPath(projectPath, Project.POST_PROCESSORS, JUNIT_PROCESSOR);
+        config = xmlRpcHelper.getConfig(ppPath);
+        config.put("expectedFailureFile", "expected-failures.txt");
+        xmlRpcHelper.saveConfig(ppPath, config, false);
+
+        // Make sure the ant processor doesn't fail the build.
+        ppPath = PathUtils.getPath(projectPath, Project.POST_PROCESSORS, ANT_PROCESSOR);
+        config = xmlRpcHelper.getConfig(ppPath);
+        config.put("failOnError", false);
+        xmlRpcHelper.saveConfig(ppPath, config, false);
+
+        buildAndCheckTestSummary(true, new TestResultSummary(1, 0, 0, 0, 2));
+    }
+
+    private void buildAndCheckTestSummary(boolean expectedSuccess, TestResultSummary expectedSummary) throws Exception
+    {
         long buildId = xmlRpcHelper.runBuild(random);
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int) buildId);
+        boolean success = (Boolean) build.get("succeeded");
+        assertEquals(expectedSuccess, success);
 
         loginAsAdmin();
-
         BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
-
-        TestResultSummary expectedSummary = new TestResultSummary(0, 1, 0, 2);
 
         assertTrue(testsPage.hasTests());
         assertEquals(expectedSummary, testsPage.getTestSummary());
@@ -636,7 +668,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
-        TestResultSummary expectedSummary = new TestResultSummary(0, 3, 0, 583);
+        TestResultSummary expectedSummary = new TestResultSummary(0, 0, 3, 0, 583);
 
         assertTrue(testsPage.hasTests());
         assertEquals(expectedSummary, testsPage.getTestSummary());

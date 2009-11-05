@@ -10,6 +10,7 @@
         <property name="stageNameId" type="long" column="NODE_ID"/>
         <property name="name" type="text" column="NAME"/>
         <property name="totalCount" type="int" column="TOTAL_COUNT"/>
+        <property name="expectedFailureCount" type="int" column="EXPECTED_FAILURE_COUNT"/>
         <property name="failureCount" type="int" column="FAILURE_COUNT"/>
         <property name="errorCount" type="int" column="ERROR_COUNT"/>
         <property name="skippedCount" type="int" column="SKIPPED_COUNT"/>

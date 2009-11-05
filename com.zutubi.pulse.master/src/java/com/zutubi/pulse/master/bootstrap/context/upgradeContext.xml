@@ -91,6 +91,7 @@
                 <ref local="addAgentPing"/>
                 <ref local="addJabberServiceName"/>
                 <ref local="ensureAgentPingConfigPermanent"/>
+                <ref local="expectedFailureTestCases"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -410,5 +411,14 @@
 
     <bean id="ensureAgentPingConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureAgentPingConfigPermanentUpgradeTask">
         <property name="buildNumber" value="201008004"/>
+    </bean>
+
+    <bean id="expectedFailureTestCases" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201008005"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.8-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

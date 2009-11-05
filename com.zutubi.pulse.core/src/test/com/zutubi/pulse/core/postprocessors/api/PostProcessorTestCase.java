@@ -36,7 +36,7 @@ public abstract class PostProcessorTestCase extends PulseTestCase
 {
     private static final String EXTENSION_TEXT = "txt";
 
-    private File tempDir;
+    protected File tempDir;
 
     @Override
     protected void setUp() throws Exception
