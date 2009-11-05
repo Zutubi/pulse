@@ -4,6 +4,7 @@ import static com.zutubi.tove.annotations.FieldParameter.*;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.pulse.master.tove.model.AbstractParameterised;
 
 import java.util.LinkedList;
@@ -28,7 +29,7 @@ public class FieldDescriptor extends AbstractParameterised implements Descriptor
     public Field instantiate(String path, Record instance)
     {
         Field field = new Field(getType(), getName());
-        field.setLabel(getName() + ".label");
+        field.setLabel(getName() + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
         field.addAll(getParameters());
 
         // if we do not have a value set, then take the value from the instance.

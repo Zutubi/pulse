@@ -29,7 +29,6 @@ public class ActionManager
 {
     private static final Logger LOG = Logger.getLogger(ActionManager.class);
 
-    public static final String I18N_KEY_SUFFIX_LABEL   = ".label";
     public static final String I18N_KEY_SUFFIX_FEEDACK = ".feedback";
 
     private Map<CompositeType, ConfigurationActions> actionsByType = new HashMap<CompositeType, ConfigurationActions>();

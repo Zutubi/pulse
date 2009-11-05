@@ -9,6 +9,8 @@ import com.zutubi.tove.type.Type;
  */
 public class ConventionSupport
 {
+    public static final String I18N_KEY_SUFFIX_LABEL   = ".label";    
+
     public static Class getWizard(Type type)
     {
         return loadClass(type, "Wizard");

@@ -8,7 +8,7 @@ import com.zutubi.tove.type.record.TemplateRecord;
 import java.util.Set;
 
 /**
- * A reference cleanup task that hides an inherited record.  This is the smae
+ * A reference cleanup task that hides an inherited record.  This is the same
  * as deleting the record, but additionally adds the required hidden key to
  * the parent record.  Any tasks needed to cleanup references to the deleted
  * record will cascade off this.

@@ -16,6 +16,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -71,7 +72,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
         for (ColumnDescriptor column : columns)
         {
-            String key = column.getName() + ".label";
+            String key = column.getName() + ConventionSupport.I18N_KEY_SUFFIX_LABEL;
             table.addHeader(ToveUtils.format(messages, key));
         }
 
@@ -107,12 +108,24 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     {
                         String parentItemPath = PathUtils.getPath(parentPath, hidden);
                         Configuration instance = configurationProvider.get(parentItemPath, Configuration.class);
-                        messages = Messages.getInstance(instance.getClass());
-                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new ActionLink("restore", ToveUtils.format(messages, "restore.label"), "restore")));
-                        addCells(row, instance);
-                        row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
-                        row.addParameter("cls", "item-hidden");
-                        table.addRow(row);
+                        if (instance != null)
+                        {
+                            messages = Messages.getInstance(instance.getClass());
+                            Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new ActionLink("restore", ToveUtils.format(messages, "restore.label"), "restore")));
+                            addCells(row, instance);
+                            row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
+                            row.addParameter("cls", "item-hidden");
+                            table.addRow(row);
+                        }
+                        else
+                        {
+                            // we are dealing with a unknown hidden entry.  Provide feedback to the user of this situation and continue.
+                            List<ActionLink> actions = new LinkedList<ActionLink>();
+                            Row row = new Row(PathUtils.getPath(path, hidden), true, actions);
+                            row.addCell(new Cell(columns.size(), messages.format("unknown.hidden.reference", (Object)new String[]{parentItemPath})));
+                            row.addParameter("cls", "item-hidden");
+                            table.addRow(row);
+                        }
                     }
                 }
             }

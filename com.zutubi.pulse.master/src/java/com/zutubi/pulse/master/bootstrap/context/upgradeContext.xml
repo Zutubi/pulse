@@ -71,6 +71,7 @@
                 <ref local="addBuildCompletedTriggerPropagateFields"/>
                 <ref local="addCleanupStatusesField"/>
                 <ref local="refactorCleanupWhatField"/>
+                <ref local="deleteUnknownHiddenReferences"/>
                 <ref local="addDependenciesVersionField"/>
                 <ref local="addRepositoryConfiguration"/>
                 <ref local="addDependentTriggerPropagateFields"/>
@@ -273,6 +274,10 @@
 
     <bean id="addPersistentWorkDir" class="com.zutubi.pulse.master.upgrade.tasks.AddPersistentWorkDirUpgradeTask">
         <property name="buildNumber" value="200036001"/>
+    </bean>
+
+    <bean id="deleteUnknownHiddenReferences" class="com.zutubi.pulse.master.upgrade.tasks.DeleteUnknownHiddenReferencesUpgradeTask">
+        <property name="buildNumber" value="200041003"/>
     </bean>
 
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">

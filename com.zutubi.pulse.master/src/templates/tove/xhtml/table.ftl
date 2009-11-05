@@ -80,7 +80,7 @@
     </#if>
     <#if annotationCount == 0>
         <#assign rawId = "noan:${row.baseName}"/>
-            <span id="${rawId?id}">-</span>
+            <span id="${rawId?id}">&nbsp;</span>
     </#if>
         </td>
 

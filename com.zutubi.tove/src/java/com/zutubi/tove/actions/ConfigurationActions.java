@@ -5,6 +5,7 @@ import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
@@ -358,7 +359,7 @@ public class ConfigurationActions
         }
         else
         {
-            String actionLabel = messages.format(name + ActionManager.I18N_KEY_SUFFIX_LABEL);
+            String actionLabel = messages.format(name + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
             if (actionLabel == null)
             {
                 actionLabel = name;

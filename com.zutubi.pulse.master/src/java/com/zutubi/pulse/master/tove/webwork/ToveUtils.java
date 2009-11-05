@@ -14,7 +14,7 @@ import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -350,7 +350,7 @@ public class ToveUtils
             else
             {
                 Messages messages = Messages.getInstance(parentType.getClazz());
-                String key = baseName + ".label";
+                String key = baseName + ConventionSupport.I18N_KEY_SUFFIX_LABEL;
                 if (messages.isKeyDefined(key))
                 {
                     result = messages.format(key);
@@ -601,7 +601,7 @@ public class ToveUtils
     private static ActionLink getActionLink(String action, String actionName, Messages messages, File contentRoot)
     {
         File iconFile = new File(contentRoot, FileSystemUtils.composeFilename("images", "config", "actions", actionName + ".gif"));
-        return new ActionLink(action, format(messages, actionName + ActionManager.I18N_KEY_SUFFIX_LABEL), iconFile.exists() ? actionName : "generic");
+        return new ActionLink(action, format(messages, actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL), iconFile.exists() ? actionName : "generic");
     }
 
     public static String format(Messages messages, String key)
