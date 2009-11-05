@@ -1,13 +1,13 @@
 package com.zutubi.pulse.servercore.jetty;
 
-import org.mortbay.http.handler.AbstractHttpHandler;
+import org.mortbay.http.HttpException;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
-import org.mortbay.http.HttpException;
+import org.mortbay.http.handler.AbstractHttpHandler;
 import org.mortbay.util.Resource;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * When uploading resource to the {@link org.mortbay.http.handler.ResourceHandler}, if the target
@@ -19,15 +19,15 @@ public class CreateRepositoryDirectoryHandler extends AbstractHttpHandler
 {
     public void handle(String pathInContext, String pathParams, HttpRequest request, HttpResponse response) throws HttpException, IOException
     {
-        Resource resource = getResource(pathInContext);
-        if (resource == null)
-        {
-            return;
-        }
-
         String method = request.getMethod();
         if (method.equals(HttpRequest.__PUT))
         {
+            Resource resource = getResource(pathInContext);
+            if (resource == null)
+            {
+                return;
+            }
+
             handlePut(request, response, pathInContext, resource);
         }
     }

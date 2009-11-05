@@ -18,6 +18,7 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,9 +96,9 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
         }
     }
 
-    private AbstractTypeWizard getWizardInstance()
+    private AbstractTypeWizard getWizardInstance() throws FileSystemException
     {
-        String path = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName());
+        String path = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, UriParser.decode(getName().getBaseName()));
         return (AbstractTypeWizard) ConfigurationWizardAction.getWizardInstance(path);
     }
 

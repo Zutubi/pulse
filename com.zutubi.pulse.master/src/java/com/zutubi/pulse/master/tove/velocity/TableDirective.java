@@ -1,22 +1,20 @@
 package com.zutubi.pulse.master.tove.velocity;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.master.tove.model.Table;
 import com.zutubi.pulse.master.tove.table.TableDescriptor;
 import com.zutubi.pulse.master.tove.table.TableDescriptorFactory;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import org.apache.velocity.context.InternalContextAdapter;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.Node;
+import org.mortbay.http.EOFException;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -58,7 +56,7 @@ public class TableDirective extends ToveDirective
         return LINE;
     }
 
-    public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
+    public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node)
     {
         try
         {
@@ -82,23 +80,27 @@ public class TableDirective extends ToveDirective
             context.put("path", path);
             context.put("embedded", ToveUtils.isEmbeddedCollection(collectionType));
 
-            try
-            {
-                Template template = configuration.getTemplate("tove/xhtml/table.ftl");
-                template.process(context, writer);
-            }
-            catch (TemplateException e)
-            {
-                LOG.warning(e);
-                throw new ParseErrorException(e.getMessage());
-            }
-
+            Template template = configuration.getTemplate("tove/xhtml/table.ftl");
+            template.process(context, writer);
             return true;
         }
-        catch (Exception e)
+        catch (EOFException e)
         {
-            LOG.warning(e);
-            writer.write(renderError("Failed to render form. Unexpected " + e.getClass() + ": " + e.getMessage()));
+            // Client end probably closed the connection, don't clutter logs.
+            return true;
+        }
+        catch (Throwable throwable)
+        {
+            LOG.warning(throwable);
+            try
+            {
+                writer.write(renderError("Failed to render table. Unexpected " + throwable.getClass() + ": " + throwable.getMessage()));
+            }
+            catch (IOException e)
+            {
+                // We did our best.
+            }
+
             return true;
         }
     }

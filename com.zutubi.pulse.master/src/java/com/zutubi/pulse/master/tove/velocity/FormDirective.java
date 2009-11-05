@@ -13,9 +13,8 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.Node;
+import org.mortbay.http.EOFException;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -87,7 +86,7 @@ public class FormDirective extends ToveDirective
         this.namespace = namespace;
     }
 
-    public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
+    public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node)
     {
         try
         {
@@ -137,10 +136,23 @@ public class FormDirective extends ToveDirective
 
             return true;
         }
-        catch (Exception e)
+        catch (EOFException e)
         {
-            LOG.warning(e);
-            writer.write(renderError("Failed to render form. Unexpected " + e.getClass() + ": " + e.getMessage()));
+            // Client end probably closed the connection, don't clutter logs.
+            return true;
+        }
+        catch (Throwable throwable)
+        {
+            LOG.warning(throwable);
+            try
+            {
+                writer.write(renderError("Failed to render form. Unexpected " + throwable.getClass() + ": " + throwable.getMessage()));
+            }
+            catch (IOException e)
+            {
+                // We did our best.
+            }
+
             return true;
         }
     }

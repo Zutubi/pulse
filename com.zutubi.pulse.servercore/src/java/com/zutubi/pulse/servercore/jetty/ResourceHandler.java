@@ -1,18 +1,18 @@
 package com.zutubi.pulse.servercore.jetty;
 
+import org.mortbay.http.HttpFields;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
-import org.mortbay.http.HttpFields;
 import org.mortbay.http.ResourceCache;
-import org.mortbay.util.Resource;
-import org.mortbay.util.URI;
 import org.mortbay.util.CachedResource;
+import org.mortbay.util.Resource;
 import org.mortbay.util.StringUtil;
+import org.mortbay.util.URI;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.text.DateFormat;
 
 /**
  * This resource handler implementation is an extension of the original implementation
@@ -224,9 +224,9 @@ public class ResourceHandler extends org.mortbay.http.handler.ResourceHandler
 
         DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
                 DateFormat.MEDIUM);
-        for (int i = 0; i < ls.length; i++)
+        for (String l : ls)
         {
-            String encoded = URI.encodePath(ls[i]);
+            String encoded = URI.encodePath(l);
             Resource item = resource.addPath(encoded);
 
             buf.append("<TR><TD><A HREF=\"");
@@ -234,10 +234,12 @@ public class ResourceHandler extends org.mortbay.http.handler.ResourceHandler
             String path = URI.addPaths(base, encoded);
 
             if (item.isDirectory() && !path.endsWith("/"))
+            {
                 path = URI.addPaths(path, "/");
+            }
             buf.append(path);
             buf.append("\">");
-            buf.append(StringUtil.replace(StringUtil.replace(ls[i], "<", "&lt;"), ">", "&gt;"));
+            buf.append(StringUtil.replace(StringUtil.replace(l, "<", "&lt;"), ">", "&gt;"));
             buf.append("&nbsp;");
             // fix the bug by adding the </A> to the appended string to close the anchor.
             buf.append("</A></TD><TD ALIGN=right>");
