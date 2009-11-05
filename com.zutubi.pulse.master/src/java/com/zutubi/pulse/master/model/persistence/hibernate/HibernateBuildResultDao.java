@@ -537,7 +537,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("select result from BuildResult result join result.root.children child where child = :node");
-                queryObject.setMaxResults(1);
                 queryObject.setEntity("node", node);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();

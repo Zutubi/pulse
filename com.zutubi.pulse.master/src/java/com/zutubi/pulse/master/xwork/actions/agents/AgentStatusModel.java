@@ -55,7 +55,7 @@ public class AgentStatusModel
         return executingNode;
     }
 
-    public void addExecutingInfo(BuildResult build, RecipeResultNode node)
+    public void setExecutingStage(BuildResult build, RecipeResultNode node)
     {
         executingBuild = build;
         executingNode = node;

@@ -85,7 +85,7 @@ public class ViewAgentStatusAction extends AgentActionBase
                         RecipeResultNode node = buildResult.findResultNodeByRecipeId(recipeId);
                         if (node != null)
                         {
-                            model.addExecutingInfo(buildResult, node);
+                            model.setExecutingStage(buildResult, node);
                         }
                     }
                 }
