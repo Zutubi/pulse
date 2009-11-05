@@ -277,10 +277,6 @@
         <property name="buildNumber" value="200036001"/>
     </bean>
 
-    <bean id="deleteUnknownHiddenReferences" class="com.zutubi.pulse.master.upgrade.tasks.DeleteUnknownHiddenReferencesUpgradeTask">
-        <property name="buildNumber" value="200041003"/>
-    </bean>
-
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">
         <property name="buildNumber" value="200999001"/>
     </bean>
@@ -431,4 +427,9 @@
     <bean id="addExpectedFailureReportSeries" class="com.zutubi.pulse.master.upgrade.tasks.AddExpectedFailureReportSeriesUpgradeTask">
         <property name="buildNumber" value="201008006"/>
     </bean>
+
+    <bean id="deleteUnknownHiddenReferences" class="com.zutubi.pulse.master.upgrade.tasks.DeleteUnknownHiddenReferencesUpgradeTask">
+        <property name="buildNumber" value="201008007"/>
+    </bean>
+
 </beans>
