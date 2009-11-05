@@ -3,9 +3,11 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * This upgrade task traverses the record store, removing references to hidden keys that
@@ -14,6 +16,9 @@ import java.util.Set;
 public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTask
 {
     private static final Logger LOG = Logger.getLogger(DeleteUnknownHiddenReferencesUpgradeTask.class);
+
+    private static final String HIDDEN_KEY    = "hidden";
+    private static final char SEPARATOR = ',';
 
     private RecordManager recordManager;
 
@@ -24,7 +29,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
             public void process(String path)
             {
                 Record record = recordManager.select(path);
-                Set<String> hiddenKeys = TemplateRecord.getHiddenKeys(record);
+                Set<String> hiddenKeys = getHiddenKeys(record);
                 if (hiddenKeys.size() == 0)
                 {
                     return;
@@ -66,7 +71,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
                     if (!parent.containsKey(hiddenKey))
                     {
                         MutableRecord editableCopy = record.copy(false);
-                        TemplateRecord.restoreItem(editableCopy, hiddenKey);
+                        restoreItem(editableCopy, hiddenKey);
                         LOG.info("Removing unknown hidden reference " + hiddenKey + " from " + path);
                         recordManager.update(path, editableCopy);
                     }
@@ -85,7 +90,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
         return null;
     }
 
-    long getTemplateParentHandle(Record record)
+    private long getTemplateParentHandle(Record record)
     {
         String parentString = record.getMeta(TemplateRecord.PARENT_KEY);
         if (parentString != null)
@@ -102,7 +107,36 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
         return 0;
     }
 
-    protected void traverse(String path, Record record, UnaryProcedure<String> procedure)
+    private Set<String> getHiddenKeys(Record record)
+    {
+        String hidden = record.getMeta(HIDDEN_KEY);
+        if(hidden == null)
+        {
+            return new HashSet<String>();
+        }
+        else
+        {
+            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
+        }
+    }
+
+    private boolean restoreItem(MutableRecord record, String key)
+    {
+        Set<String> hiddenKeys = getHiddenKeys(record);
+        boolean result = hiddenKeys.remove(key);
+        if(hiddenKeys.size() == 0)
+        {
+            record.removeMeta(HIDDEN_KEY);
+        }
+        else
+        {
+            record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+        }
+
+        return result;
+    }
+
+    private void traverse(String path, Record record, UnaryProcedure<String> procedure)
     {
         if (path.length() != 0)
         {
