@@ -27,6 +27,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     private static final String LOCAL_AGENT = "local-agent";
     private static final String HOST_LOCALHOST = "localhost";
     private static final String STATUS_DISABLE_ON_IDLE = "disable on idle";
+    private static final int CONCURRENT_BUILD_TIMEOUT = 180000;
 
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -165,7 +166,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         assertBuildingStatus(agentsPage.getStatus(agent2));
 
         project2.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project2.getName(), 1);
+        xmlRpcHelper.waitForBuildToComplete(project2.getName(), 1, CONCURRENT_BUILD_TIMEOUT);
 
         browser.refresh();
         agentsPage.waitFor();
