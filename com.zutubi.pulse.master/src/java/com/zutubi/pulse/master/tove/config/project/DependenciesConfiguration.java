@@ -10,8 +10,6 @@ import com.zutubi.validation.annotations.Required;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.ivy.core.module.status.StatusManager;
-
 /**
  * The manually configured dependencies.
  */
@@ -19,6 +17,10 @@ import org.apache.ivy.core.module.status.StatusManager;
 @Form(fieldOrder = {"version", "status", "publicationPattern", "retrievalPattern"})
 public class DependenciesConfiguration extends AbstractConfiguration
 {
+    // We don't look up Ivy's definition as it causes early loading of ivy
+    // settings (before, e.g., we have a chance to redirect logging).
+    private static final String STATUS_INTEGRATION = "integration";
+
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
 
     @Required
@@ -28,7 +30,7 @@ public class DependenciesConfiguration extends AbstractConfiguration
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
-    private String status = StatusManager.getCurrent().getDefaultStatus();
+    private String status = STATUS_INTEGRATION;
 
     @Required
     private String version = "${build.number}";
