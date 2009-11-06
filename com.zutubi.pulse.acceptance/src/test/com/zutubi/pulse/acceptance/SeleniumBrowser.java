@@ -394,6 +394,39 @@ public class SeleniumBrowser
 
     public String getText(String locator)
     {
+        // I've experienced Selenium throwing errors from getText saying the
+        // element cannot be found, despite an immediately preceeding call to
+        // isELementPresent returning true.  This was on a page with no
+        // JavaScript magic.  The ugliness below is intended to work around
+        // this.  It's not a replacement for waiting for an element to be
+        // present first.
+        int retries = 0;
+        while (retries++ < 3)
+        {
+            if (selenium.isElementPresent(locator))
+            {
+                try
+                {
+                    return selenium.getText(locator);
+                }
+                catch (SeleniumException e)
+                {
+                    // Ignore this one.
+                }
+            }
+
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                // Just keep un truckin'
+            }
+        }
+
+        // Give it one more go - if selenium throws the caller gets it full in
+        // the face this time.
         return selenium.getText(locator);
     }
 
@@ -578,7 +611,7 @@ public class SeleniumBrowser
         {
             public boolean satisfied()
             {
-                return text.equals(selenium.getText(WebUtils.toValidHtmlName(id)));
+                return text.equals(getText(WebUtils.toValidHtmlName(id)));
             }
         }, "text '" + text + "' in element '" + id + "'");
     }
