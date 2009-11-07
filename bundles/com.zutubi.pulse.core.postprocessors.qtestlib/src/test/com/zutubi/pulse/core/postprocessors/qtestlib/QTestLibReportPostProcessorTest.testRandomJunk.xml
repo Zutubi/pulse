@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<TestCase name="TestQString">
+    <junk/>
+<Environment>
+    <QtVersion>4.5.2</QtVersion>
+    <QTestVersion>4.5.2</QTestVersion>
+</Environment>
+    <junk/>
+<TestFunction name="initTestCase">
+    <junk/>
+<Incident type="pass" file="" line="0" />
+    <junk/>
+</TestFunction>
+    <junk/>
+<TestFunction name="toUpper">
+    <junk/>
+<Incident type="pass" file="" line="0" />
+</TestFunction>
+<TestFunction name="compareFail">
+<Incident type="fail" file="testqstring.cpp" line="24">
+    <junk/>
+    <Description><![CDATA[Compared values are not the same
+   Actual (str.toUpper()): HELLO
+   Expected (QString("HELO")): HELO]]></Description>
+    <junk/>
+</Incident>
+</TestFunction>
+<TestFunction name="skippy">
+<Message type="skip" file="testqstring.cpp" line="29">
+    <junk/>
+    <Description><![CDATA[This test requires more than is on offer]]></Description>
+    <junk/>
+</Message>
+</TestFunction>
+<TestFunction name="warnly">
+<Message type="warn" file="" line="0">    <junk/>
+
+    <Description><![CDATA[I'm mildy worried.]]></Description>
+</Message>
+<Incident type="pass" file="" line="0" />
+</TestFunction>
+<TestFunction name="cleanupTestCase">
+<Incident type="pass" file="" line="0" />
+</TestFunction>
+    <junk/>
+</TestCase>
