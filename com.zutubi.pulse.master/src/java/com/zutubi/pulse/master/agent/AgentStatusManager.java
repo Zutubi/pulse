@@ -17,10 +17,7 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,6 +36,7 @@ public class AgentStatusManager implements EventListener
 
     private Map<Long, Agent> agentsById = new HashMap<Long, Agent>();
     private Map<Long, Agent> agentsByRecipeId = new HashMap<Long, Agent>();
+    private Set<Long> preemptivelyCompletedRecipes = new HashSet<Long>();
     private Lock agentsLock = new ReentrantLock();
     private Executor eventPump;
     private AgentPersistentStatusManager agentPersistentStatusManager;
@@ -298,9 +296,13 @@ public class AgentStatusManager implements EventListener
         Agent agent = agentsById.get(event.getAgent().getId());
         if(agent != null)
         {
-            agentsByRecipeId.put(event.getRecipeId(), agent);
-            publishEvent(new AgentUnavailableEvent(this, agent));
-            agent.updateStatus(Status.RECIPE_ASSIGNED, event.getRecipeId());
+            long recipeId = event.getRecipeId();
+            if (!preemptivelyCompletedRecipes.remove(recipeId))
+            {
+                agentsByRecipeId.put(recipeId, agent);
+                publishEvent(new AgentUnavailableEvent(this, agent));
+                agent.updateStatus(Status.RECIPE_ASSIGNED, recipeId);
+            }
         }
     }
 
@@ -316,7 +318,7 @@ public class AgentStatusManager implements EventListener
     private void handleRecipeCompleted(long recipeId)
     {
         Agent agent = agentsByRecipeId.remove(recipeId);
-        if(agent != null)
+        if (agent != null)
         {
             if (agent.isDisabling())
             {
@@ -331,6 +333,13 @@ public class AgentStatusManager implements EventListener
                 // Request a ping immediately so no time is wasted
                 publishEvent(new AgentPingRequestedEvent(this, agent));
             }
+        }
+        else
+        {
+            // This can happen when the build controller bails out of a build
+            // when there are pending recipe dispatch (which are managed
+            // asynchronously by the recipe queue).
+            preemptivelyCompletedRecipes.add(recipeId);
         }
     }
 

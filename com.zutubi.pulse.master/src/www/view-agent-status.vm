@@ -15,7 +15,7 @@
 
     #if($agent.isEnabled() && $agent.hasBeenPinged())
         #if($agent.isDisabling())
-            #dynamicRow("agent.status" "diabling on idle")
+            #dynamicRow("agent.status" "disabling on idle")
         #else
             #dynamicRow("agent.status" $agent.status.prettyString)
         #end

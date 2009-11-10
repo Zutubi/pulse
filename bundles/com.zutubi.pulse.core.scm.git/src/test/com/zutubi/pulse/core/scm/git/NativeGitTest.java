@@ -4,7 +4,10 @@ import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -15,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
+import static java.util.Arrays.asList;
 import java.util.List;
 
 public class NativeGitTest extends PulseTestCase
@@ -186,42 +190,85 @@ public class NativeGitTest extends PulseTestCase
 
     public void testLogParse() throws IOException, GitException
     {
-        logParseHelper();
+        assertStandardLogEntries(parseLog());
     }
 
     public void testLogParseLeadingBlankLines() throws IOException, GitException
     {
-        logParseHelper();
+        assertStandardLogEntries(parseLog());
     }
 
-    private void logParseHelper() throws IOException, GitException
+    public void testLogParseNoNewlineAfterBody() throws IOException, GitException
     {
-        NativeGit.LogOutputHandler handler = new NativeGit.LogOutputHandler();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(getInput("txt")));
-        String line;
-        while ((line = reader.readLine()) != null)
+        assertStandardLogEntries(parseLog());
+    }
+
+    public void testLogParseNonAsciiCharacters() throws IOException, GitException
+    {
+        List<GitLogEntry> logEntries = parseLog();
+
+        assertEquals(7, logEntries.size());
+        assertFalse(CollectionUtils.contains(logEntries, new Predicate<GitLogEntry>()
         {
-            handler.handleStdout(line);
+            public boolean satisfied(GitLogEntry gitLogEntry)
+            {
+                return gitLogEntry.getDate() == null;
+            }
+        }));
+
+        assertEquals("Dev3 (Name Lastname, lastname includes norwegian characters. Special norwegian characters are æ.ø,å)", logEntries.get(1).getAuthor());
+
+        List<String> revisions = CollectionUtils.map(logEntries, new Mapping<GitLogEntry, String>()
+        {
+            public String map(GitLogEntry gitLogEntry)
+            {
+                return gitLogEntry.getId();
+            }
+        });
+        assertEquals(asList(
+                "d724b1708149ec8eac0d7f6ad44161d00c66c1b2",
+                "ec13cf30f10dabce37af3ce9d6763066e8cf4cc4",
+                "a12b1538df45268f2a66ec55856ffeeb131eb751",
+                "b91f1a2f749586014e8b28c6766015ff6ba62ee7",
+                "23572588c4b0c759c14a6c1687e5bd86461e31e8",
+                "1a71e4b7960ba27fe6d47815da9337020085ac16",
+                "391441b2ce2be527db0829798631436670df0965"
+                ),
+                revisions);
         }
 
-        List<GitLogEntry> entries = handler.getEntries();
-        assertEquals(2, entries.size());
+        private List<GitLogEntry> parseLog() throws IOException, GitException
+        {
+            NativeGit.LogOutputHandler handler = new NativeGit.LogOutputHandler();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getInput("txt")));
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                handler.handleStdout(line);
+            }
 
-        GitLogEntry entry = entries.get(0);
-        assertEquals("c3bb01f6713e2625d4cc70e6d689feabf88731b4", entry.getId());
-        assertEquals("Alan User", entry.getAuthor());
-        assertEquals("Revert \"Some change\"\nThis reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.", entry.getComment());
-        assertEquals("Wed Apr 8 21:01:00 2009 +1000", entry.getDateString());
-        assertSingleFileEntry(entry, "configure.exe");
+            return handler.getEntries();
+        }
 
-        entry = entries.get(1);
-        assertEquals("406d8ef682af938172aa5f196774666f83811289", entry.getId());
-        assertEquals("Alan User", entry.getAuthor());
-        assertEquals("Revert \"Another Change\"\n" +
-                "This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.", entry.getComment());
-        assertEquals("Wed Apr 8 21:01:51 2009 +1000", entry.getDateString());
-        assertSingleFileEntry(entry, "tools/configure/configureapp.cpp");
-    }
+        private void assertStandardLogEntries(List<GitLogEntry> entries)
+        {
+            assertEquals(2, entries.size());
+
+            GitLogEntry entry = entries.get(0);
+            assertEquals("c3bb01f6713e2625d4cc70e6d689feabf88731b4", entry.getId());
+            assertEquals("Alan User", entry.getAuthor());
+            assertEquals("Revert \"Some change\"\nThis reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.", entry.getComment());
+            assertEquals(1257227193000L, entry.getDate().getTime());
+            assertSingleFileEntry(entry, "configure.exe");
+
+            entry = entries.get(1);
+            assertEquals("406d8ef682af938172aa5f196774666f83811289", entry.getId());
+            assertEquals("Alan User", entry.getAuthor());
+            assertEquals("Revert \"Another Change\"\n" +
+                    "This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.", entry.getComment());
+            assertEquals(1257327193000L, entry.getDate().getTime());
+            assertSingleFileEntry(entry, "tools/configure/configureapp.cpp");
+        }
 
     private void assertSingleFileEntry(GitLogEntry entry, String path)
     {

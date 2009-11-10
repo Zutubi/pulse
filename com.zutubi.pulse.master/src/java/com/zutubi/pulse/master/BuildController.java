@@ -47,6 +47,8 @@ import org.quartz.Trigger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
@@ -294,7 +296,8 @@ public class BuildController implements EventListener
         catch (Exception e)
         {
             LOG.severe(e);
-            buildResult.error("Unexpected error: " + e.getMessage());
+            buildResult.error();
+            recordUnexpectedError(Feature.Level.ERROR, e, "Handling " + evt.getClass().getSimpleName());
             completeBuild();
         }
     }
@@ -743,12 +746,26 @@ public class BuildController implements EventListener
                 {
                     LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
                 }
+                catch (Exception e)
+                {
+                    LOG.warning("Unexpected error retrieving changelist details from SCM server: " + e.getMessage(), e);
+                    recordUnexpectedError(Feature.Level.WARNING, e, "Retrieving changelist details from SCM server");
+                }
                 finally
                 {
                     IOUtils.close(client);
                 }
             }
         }
+    }
+
+    private void recordUnexpectedError(Feature.Level level, Exception exception, String context)
+    {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        printWriter.println("Unexpected error: " + context + ":");
+        exception.printStackTrace(printWriter);
+        buildResult.addFeature(level, stringWriter.toString());
     }
 
     private void scheduleTimeout(long recipeId)

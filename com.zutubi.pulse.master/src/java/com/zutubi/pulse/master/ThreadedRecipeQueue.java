@@ -17,13 +17,13 @@ import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
@@ -452,7 +452,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         if (evt instanceof AgentAvailableEvent)
         {
-            handleAvaialbleEvent();
+            handleAvailableEvent();
         }
         else if (evt instanceof AgentConnectivityEvent)
         {
@@ -479,7 +479,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void handleAvaialbleEvent()
+    private void handleAvailableEvent()
     {
         lock.lock();
         try

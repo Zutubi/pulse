@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -21,6 +22,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 public class GitClient implements ScmClient
 {
+    private static final Logger LOG = Logger.getLogger(GitClient.class);
+
     private static final Revision HEAD = new Revision("HEAD");
 
     static final Messages I18N = Messages.getInstance(GitClient.class);
@@ -522,8 +525,17 @@ public class GitClient implements ScmClient
                     changes.add(change);
                 }
 
-                Changelist changelist = new Changelist(rev, entry.getDate().getTime(), entry.getAuthor(), entry.getComment(), changes);
-                changelists.add(changelist);
+                // For changelists we require a date -- which we try to ignore
+                // when it is unparseable.
+                if (entry.getDate() != null)
+                {
+                    Changelist changelist = new Changelist(rev, entry.getDate().getTime(), entry.getAuthor(), entry.getComment(), changes);
+                    changelists.add(changelist);
+                }
+                else
+                {
+                    LOG.warning("Ignoring change '" + entry.getId() + "' which has unparseable date.");
+                }
             }
 
             return changelists;

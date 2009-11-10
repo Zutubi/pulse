@@ -28,13 +28,15 @@ import java.util.regex.Pattern;
 public class NativeGit
 {
     private static final Logger LOG = Logger.getLogger(NativeGit.class);
+    private static final Logger LOG_COMMANDS = Logger.getLogger(NativeGit.class.getPackage().getName() + ".commands");
 
     /**
-     * Sentinal value used to detect separate parts of log entries.  A hash is
-     * chosen as it is difficult to have one in a commit comment (it is a
-     * comment character).
+     * Sentinal value used to detect separate parts of log entries.  A GUID is
+     * used to prevent false positives in commit comments.  To be extra
+     * paranoid we start with a # as it is difficult to have one in a commit
+     * comment (it is a comment character).
      */
-    private static final String LOG_SENTINAL = "#";
+    private static final String LOG_SENTINAL = "#5d7bf160-ce21-11de-8a39-0800200c9a66";
 
     private ProcessBuilder git;
     private int inactivityTimeout;
@@ -159,7 +161,7 @@ public class NativeGit
         command.add(COMMAND_LOG);
         command.add(FLAG_NAME_STATUS);
         command.add(FLAG_SHOW_MERGE_FILES);
-        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%ct%n%s%n%b" + LOG_SENTINAL);
+        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%ct%n%s%n%b%n" + LOG_SENTINAL);
         command.add(FLAG_REVERSE);
         if (changes != -1)
         {
@@ -375,10 +377,10 @@ public class NativeGit
             async.destroy();
         }
 
-        if (LOG.isLoggable(Level.FINEST))
+        if (LOG_COMMANDS.isLoggable(Level.FINEST))
         {
             long currentTime = System.currentTimeMillis();
-            LOG.finest(timeFormat.format(new Date(currentTime)) + "\t" + commandLine + "\t" + git.directory().getAbsolutePath() + "\t" + (currentTime - startTime) + "\t" + lineCount + "\n");
+            LOG_COMMANDS.finest(timeFormat.format(new Date(currentTime)) + "\t" + commandLine + "\t" + git.directory().getAbsolutePath() + "\t" + (currentTime - startTime) + "\t" + lineCount + "\n");
         }
     }
 
@@ -608,8 +610,8 @@ public class NativeGit
                             comment += str;
                             raw.add(str);
                         }
-                        logEntry.setComment(comment);
-                        raw.add(str); // blank line
+                        logEntry.setComment(comment.trim());
+                        raw.add(str);
 
                         // Until sentinal or until the end.  Note that most of
                         // the time a blank line appears at the end of the

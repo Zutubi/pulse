@@ -155,8 +155,11 @@ public class AgentPingService extends BackgroundServiceSupport implements EventL
                     LOG.warning(message);
                     status = new SlaveStatus(PingStatus.OFFLINE, message);
                 }
-
-                pingCompleted(agent);
+                finally
+                {
+                    pingCompleted(agent);
+                }
+                
                 eventManager.publish(new AgentPingEvent(this, agent, status));
             }
         });
