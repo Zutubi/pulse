@@ -114,11 +114,16 @@ public class Repository
      */
     public IvyModuleDescriptor getIvyModuleDescriptor(String org, String name, Object revision) throws Exception
     {
+        return IvyModuleDescriptor.newInstance(new File(getBase(), getIvyModuleDescriptorPath(org, name, revision)), configuration);
+    }
+
+    public String getIvyModuleDescriptorPath(String org, String name, Object revision) throws Exception
+    {
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
         ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(orgString, name, null, revisionString);
 
-        return IvyModuleDescriptor.newInstance(new File(getBase(), configuration.getIvyPath(mrid)), configuration);
+        return configuration.getIvyPath(mrid);
     }
 
     public String getArtifactPath(String name, String stageName, Object revision, String artifactName, String artifactExtension)

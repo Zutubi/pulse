@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
-import com.zutubi.pulse.core.dependency.DependencyManager;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.List;
@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class BuildStatusOptionProvider extends ListOptionProvider
 {
-    private DependencyManager dependencyManager;
-
     public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         return null;
@@ -20,11 +18,6 @@ public class BuildStatusOptionProvider extends ListOptionProvider
 
     public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
     {
-        return dependencyManager.getStatuses();
-    }
-
-    public void setDependencyManager(DependencyManager dependencyManager)
-    {
-        this.dependencyManager = dependencyManager;
+        return IvyStatus.getStatuses();
     }
 }

@@ -1,16 +1,15 @@
 package com.zutubi.pulse.master.cleanup.requests;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import static org.mockito.Mockito.*;
 
-import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ProjectCleanupRequestTest extends PulseTestCase
 {
@@ -76,7 +75,7 @@ public class ProjectCleanupRequestTest extends PulseTestCase
             stub(cleanupConfig.isCleanupAll()).toReturn(true);
         }
         stub(cleanupConfig.getName()).toReturn(name);
-        stub(cleanupConfig.getMatchingResults((Project)anyObject(), (BuildResultDao)anyObject(), (DependencyManager)anyObject())).toReturn(Arrays.asList(results));
+        stub(cleanupConfig.getMatchingResults((Project)anyObject(), (BuildResultDao)anyObject())).toReturn(Arrays.asList(results));
         cleanups.put(name, cleanupConfig);
     }
 

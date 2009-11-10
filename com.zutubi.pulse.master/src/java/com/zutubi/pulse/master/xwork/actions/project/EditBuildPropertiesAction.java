@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
@@ -14,10 +14,10 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.model.CheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
-import com.zutubi.pulse.master.tove.model.CheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -56,7 +56,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private ConfigurationResponse configurationResponse;
     private String submitField;
 
-    private DependencyManager dependencyManager;
     private ScmManager scmManager;
     private Configuration configuration;
 
@@ -165,7 +164,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         OptionFieldDescriptor statusFieldDescriptor = new OptionFieldDescriptor();
         statusFieldDescriptor.setName("status");
         statusFieldDescriptor.setType(FieldType.TEXT);
-        statusFieldDescriptor.setList(dependencyManager.getStatuses());
+        statusFieldDescriptor.setList(IvyStatus.getStatuses());
         MutableRecord r = new MutableRecordImpl();
         r.put("status", project.getConfig().getDependencies().getStatus());
         form.add(statusFieldDescriptor.instantiate(null, r));
@@ -345,10 +344,5 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
-    }
-
-    public void setDependencyManager(DependencyManager dependencyManager)
-    {
-        this.dependencyManager = dependencyManager;
     }
 }

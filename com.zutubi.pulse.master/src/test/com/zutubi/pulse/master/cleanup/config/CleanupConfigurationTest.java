@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.pulse.core.dependency.DependencyManager;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -12,8 +11,6 @@ import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.util.Constants;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +25,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     private BuildResult b2;
     private BuildResult b3;
     private BuildResult b4;
-    private DependencyManager dependencyManager;
 
     protected void setUp() throws Exception
     {
@@ -50,51 +46,47 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         // Create a build that has started but is not in progress yet: -1 timestamp
         createBuild(p1, 6, -1, ResultState.PENDING, true, STATUS_INTEGRATION);
 
-        dependencyManager = mock(DependencyManager.class);
-        stub(dependencyManager.getStatuses()).toReturn(
-                Arrays.asList(STATUS_INTEGRATION, STATUS_MILESTONE, STATUS_RELEASE)
-        );
     }
 
     public void testWorkAfterBuilds()
     {
         CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.BUILDS);
-        List<BuildResult> results = workBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = workBuildsRule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b3), results);
     }
 
     public void testAllAfterBuilds()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.BUILDS);
-        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3), results);
     }
 
     public void testWorkAfterDays()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.DAYS);
-        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b3, b4), results);
     }
 
     public void testAllAfterDays()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.DAYS);
-        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3, b4), results);
     }
 
     public void testStatesBuilds()
     {
         CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.BUILDS);
-        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3), results);
     }
 
     public void testStatesDays()
     {
         CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
-        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }
 
@@ -102,7 +94,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     {
         CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         rule.setStatuses(Arrays.asList(STATUS_INTEGRATION));
-        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b3), results);
     }
 
@@ -110,7 +102,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     {
         CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         rule.setStatuses(Arrays.asList(STATUS_INTEGRATION, STATUS_MILESTONE));
-        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
+        List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }
 

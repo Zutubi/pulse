@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.dependency.DependencyManager;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.NamedEntity;
@@ -48,7 +47,6 @@ public class FatControllerTest extends PulseTestCase
     private ThreadFactory threadFactory;
     private BuildControllerFactory buildControllerFactory;
     private BuildManager buildManager;
-    private DependencyManager dependencyManager;
 
     private AtomicInteger nextProjectId = new AtomicInteger(1);
     private AtomicInteger nextBuildResultId = new AtomicInteger(1);
@@ -118,11 +116,6 @@ public class FatControllerTest extends PulseTestCase
 
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
-
-        dependencyManager = mock(DependencyManager.class);
-        stub(dependencyManager.getPriority(STATUS_RELEASE)).toReturn(1);
-        stub(dependencyManager.getPriority(STATUS_MILESTONE)).toReturn(2);
-        stub(dependencyManager.getPriority(STATUS_INTEGRATION)).toReturn(3);
 
         objectFactory.initProperties(this);
 

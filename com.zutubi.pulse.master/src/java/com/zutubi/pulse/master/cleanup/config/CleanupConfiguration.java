@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -124,7 +124,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
         this.cleanupAll = cleanupAll;
     }
 
-    public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao, DependencyManager dependencyManager)
+    public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao)
     {
         // The build query allows us to filter on builds that have working directories or not.  If
         // the cleanup rule is only for builds with working directories, we can make use of this filter
@@ -153,7 +153,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
         }
         if (allowedStatuses == null || allowedStatuses.length == 0)
         {
-            allowedStatuses = dependencyManager.getStatuses().toArray(new String[dependencyManager.getStatuses().size()]);
+            allowedStatuses = IvyStatus.getStatuses().toArray(new String[IvyStatus.getStatuses().size()]);
         }
 
         List<BuildResult> results = new LinkedList<BuildResult>();

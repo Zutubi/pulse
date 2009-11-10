@@ -4,7 +4,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -37,7 +37,6 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
     private EventListener eventListener;
     private ProjectManager projectManager;
     private BuildManager buildManager;
-    private DependencyManager dependencyManager;
     private BuildRequestRegistry buildRequestRegistry;
     private SingleBuildRequestEvent originalRequest;
 
@@ -218,7 +217,7 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
                     // Check the status to see if a new build of the dependency will be picked up.
 
                     String dependencyStatus = revision.substring(DependencyConfiguration.LATEST.length());
-                    if (dependencyManager.getPriority(buildStatus) <= dependencyManager.getPriority(dependencyStatus))
+                    if (IvyStatus.getPriority(buildStatus) <= IvyStatus.getPriority(dependencyStatus))
                     {
                         return dependency.isTransitive();
                     }
@@ -241,11 +240,6 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-    }
-
-    public void setDependencyManager(DependencyManager dependencyManager)
-    {
-        this.dependencyManager = dependencyManager;
     }
 
     public void setBuildManager(BuildManager buildManager)

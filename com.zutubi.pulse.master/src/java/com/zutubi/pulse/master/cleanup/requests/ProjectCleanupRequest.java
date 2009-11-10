@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.cleanup.requests;
 
-import com.zutubi.pulse.core.dependency.DependencyManager;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.model.BuildCleanupOptions;
 import com.zutubi.pulse.master.model.BuildManager;
@@ -21,7 +20,6 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
 {
     private BuildResultDao buildResultDao;
     private BuildManager buildManager;
-    private DependencyManager dependencyManager;
 
     private Project project;
 
@@ -42,7 +40,7 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
             // if cleanup rules are specified.  Maybe we should always have at least an empty map?
             for (CleanupConfiguration rule : cleanupConfigs.values())
             {
-                List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao, dependencyManager);
+                List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
 
                 for (BuildResult build : oldBuilds)
                 {
@@ -73,10 +71,5 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
     public void setBuildResultDao(BuildResultDao buildResultDao)
     {
         this.buildResultDao = buildResultDao;
-    }
-
-    public void setDependencyManager(DependencyManager dependencyManager)
-    {
-        this.dependencyManager = dependencyManager;
     }
 }

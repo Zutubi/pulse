@@ -542,7 +542,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private void assertIvyNotInRepository(ProjectConfigurationHelper project, Object revision) throws Exception
     {
-        assertNotInRepository(repository.getIvyModuleDescriptor(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
+        assertNotInRepository(repository.getIvyModuleDescriptorPath(project.getConfig().getOrganisation(), project.getConfig().getName(), revision));
     }
 
     private void assertArtifactInRepository(ProjectConfigurationHelper project, String stageName, Object revision, String artifactName, String artifactExtension) throws IOException
