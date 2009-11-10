@@ -40,7 +40,7 @@ public class Repository
 
     public Repository(File dir)
     {
-        this.configuration = new IvyConfiguration(dir.toURI().toString());
+        this.configuration = new IvyConfiguration(dir.toString());
     }
 
     public Repository(IvyConfiguration configuration)

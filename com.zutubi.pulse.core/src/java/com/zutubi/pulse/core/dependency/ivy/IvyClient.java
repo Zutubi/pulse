@@ -217,7 +217,7 @@ public class IvyClient
 
             if (tmp != null && !rmdir(tmp))
             {
-                LOG.warning(I18N.format("warning.file.cleanup.failure", new String[]{tmp.getCanonicalPath()}));
+                LOG.warning(I18N.format("warning.file.cleanup.failure", new Object[]{tmp.getCanonicalPath()}));
             }
         }
     }

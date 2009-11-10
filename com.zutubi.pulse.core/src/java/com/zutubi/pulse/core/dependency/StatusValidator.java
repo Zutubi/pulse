@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.dependency;
 
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.StringFieldValidatorSupport;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 
 import java.util.List;
 
@@ -10,19 +11,12 @@ import java.util.List;
  */
 public class StatusValidator extends StringFieldValidatorSupport
 {
-    private DependencyManager dependencyManager;
-
     protected void validateStringField(String value) throws ValidationException
     {
-        List<String> validStatuses = dependencyManager.getStatuses();
+        List<String> validStatuses = IvyStatus.getStatuses();
         if (!validStatuses.contains(value))
         {
             addError("invalid", value);
         }
-    }
-
-    public void setDependencyManager(DependencyManager dependencyManager)
-    {
-        this.dependencyManager = dependencyManager;
     }
 }
