@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -14,8 +15,10 @@ import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.HandleAllocator;
+import com.zutubi.tove.type.record.PathUtils;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -96,6 +99,7 @@ public class ConfigurationHelper
         // Configure the plugin configuration types that will be available to the acceptance
         // tests.
         configurationRegistry.registerConfigurationType(AntCommandConfiguration.class);
+        configurationRegistry.registerConfigurationType(AntPostProcessorConfiguration.class);
         configurationRegistry.registerConfigurationType(SubversionConfiguration.class);
         configurationRegistry.registerConfigurationType(DependentBuildTriggerConfiguration.class);
     }
@@ -141,6 +145,12 @@ public class ConfigurationHelper
         V config = type.newInstance();
         config.setConfigurationPath(path);
         config.setHandle(Long.valueOf(xmlRpcHelper.getConfigHandle(path)));
+
+        if (config instanceof NamedConfiguration)
+        {
+            ((NamedConfiguration)config).setName(PathUtils.getBaseName(path));
+        }
+
         return config;
     }
 
@@ -176,6 +186,20 @@ public class ConfigurationHelper
         updatePathsAndHandles(config, insertedPath, data);
 
         return insertedPath;
+    }
+
+    /**
+     * Convenience method for updating an existing project configuration.
+     *
+     * @param project   the updated project configuration
+     * @return the path at which the configuration was updated.
+     *
+     * @throws Exception thrown on error
+     */
+    public String updateProject(ProjectConfiguration project) throws Exception
+    {
+        Hashtable<String, Object> data = toXmlRpc(project);
+        return xmlRpcHelper.saveConfig(project.getConfigurationPath(), data, true);
     }
 
     /**

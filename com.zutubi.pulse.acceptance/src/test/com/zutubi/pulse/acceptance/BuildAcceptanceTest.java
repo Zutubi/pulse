@@ -21,8 +21,8 @@ import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_RELEASE;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -522,7 +522,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // next page is the project homepage.
         waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
 
-        assertEquals(STATUS_RELEASE, repository.getIvyFile(random, 1).getStatus());
+        assertEquals(STATUS_RELEASE, repository.getIvyModuleDescriptor(random, 1).getStatus());
     }
 
     public void testTriggerProperties() throws Exception

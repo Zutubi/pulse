@@ -5,16 +5,16 @@ import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunctionE;
-import org.apache.ivy.core.cache.ResolutionCacheManager;
+import com.zutubi.util.io.IOUtils;
+import org.apache.ivy.core.IvyPatternHelper;
+import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.id.ModuleId;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
-import org.apache.ivy.core.resolve.ResolveOptions;
-import org.apache.ivy.plugins.report.XmlReportParser;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 
 /**
@@ -40,8 +40,7 @@ public class RetrieveDependenciesCommand implements Command
         {
             final PulseExecutionContext context = (PulseExecutionContext) commandContext.getExecutionContext();
 
-            commandContext.registerArtifact(OUTPUT_NAME, null);
-            final File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), OUTPUT_NAME);
+            final File outDir = commandContext.registerArtifact(OUTPUT_NAME, null);
 
             URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));
             String host = masterUrl.getHost();
@@ -50,35 +49,42 @@ public class RetrieveDependenciesCommand implements Command
             {
                 public Object process() throws Exception
                 {
-                    ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
-                    ModuleRevisionId mrid = descriptor.getModuleRevisionId();
-                    String retrievalPattern = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
-
-                    if (!ivy.isResolved(mrid))
+                    final PrintWriter outputWriter = new PrintWriter(context.getOutputStream());
+                    try
                     {
-                        ivy.resolve(descriptor);
+                        ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
+                        String retrievalPattern = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
+
+                        String targetPattern = PathUtils.getPath(context.getWorkingDir().getAbsolutePath(), retrievalPattern);
+                        IvyRetrievalReport retrievalReport = ivy.retrieveArtifacts(descriptor, targetPattern);
+                        for (Artifact artifact : retrievalReport.getArtifacts())
+                        {
+                            outputWriter.println(IvyPatternHelper.substitute(targetPattern, artifact));
+                        }
+
+                        File reportFile = new File(outDir, IVY_REPORT_FILE);
+                        if (!outDir.isDirectory() && !outDir.mkdirs())
+                        {
+                            throw new BuildException("Failed to create command output directory: " + outDir.getCanonicalPath());
+                        }
+
+                        FileOutputStream output = null;
+                        try
+                        {
+                            output = new FileOutputStream(reportFile);
+                            retrievalReport.toXml(output);
+                        }
+                        finally
+                        {
+                            IOUtils.close(output);
+                        }
+
+                        return null;
                     }
-                    ivy.retrieve(mrid, context.getWorkingDir().getAbsolutePath() + "/" + retrievalPattern);
-
-                    // capture the resolve report for later processing.
-                    ResolutionCacheManager cacheMgr = ivy.getResolutionCacheManager();
-
-                    String resolveId = ResolveOptions.getDefaultResolveId(new ModuleId(mrid.getOrganisation(), mrid.getName()));
-                    File xml = cacheMgr.getConfigurationResolveReportInCache(resolveId, IvyClient.CONFIGURATION_BUILD);
-
-                    File ivyReport = new File(outDir, IVY_REPORT_FILE);
-                    if (!outDir.isDirectory() && !outDir.mkdirs())
+                    finally
                     {
-                        throw new BuildException("Failed to create command output directory: " + outDir.getCanonicalPath());
+                        IOUtils.close(outputWriter);
                     }
-
-                    FileSystemUtils.copy(ivyReport, xml);
-
-                    XmlReportParser parser = new XmlReportParser();
-                    parser.parse(ivyReport);
-                    
-
-                    return null;
                 }
             });
         }
@@ -90,6 +96,6 @@ public class RetrieveDependenciesCommand implements Command
 
     public void terminate()
     {
-        
+
     }
 }

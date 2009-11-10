@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.pulse.core.dependency.DependencyManager;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.EqualityAssertions;
@@ -41,18 +41,18 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         projectDao.save(p1);
         projectDao.save(p2);
 
-        createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 6, ResultState.SUCCESS, false, IvyManager.STATUS_INTEGRATION);
-        b1 = createBuild(p1, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false, IvyManager.STATUS_MILESTONE);
-        b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, false, IvyManager.STATUS_RELEASE);
-        b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true, IvyManager.STATUS_INTEGRATION);
-        b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true, IvyManager.STATUS_MILESTONE);
-        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true, IvyManager.STATUS_RELEASE);
+        createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 6, ResultState.SUCCESS, false, STATUS_INTEGRATION);
+        b1 = createBuild(p1, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false, STATUS_MILESTONE);
+        b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, false, STATUS_RELEASE);
+        b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true, STATUS_INTEGRATION);
+        b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true, STATUS_MILESTONE);
+        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true, STATUS_RELEASE);
         // Create a build that has started but is not in progress yet: -1 timestamp
-        createBuild(p1, 6, -1, ResultState.PENDING, true, IvyManager.STATUS_INTEGRATION);
+        createBuild(p1, 6, -1, ResultState.PENDING, true, STATUS_INTEGRATION);
 
         dependencyManager = mock(DependencyManager.class);
         stub(dependencyManager.getStatuses()).toReturn(
-                Arrays.asList(IvyManager.STATUS_INTEGRATION, IvyManager.STATUS_MILESTONE, IvyManager.STATUS_RELEASE)
+                Arrays.asList(STATUS_INTEGRATION, STATUS_MILESTONE, STATUS_RELEASE)
         );
     }
 
@@ -101,7 +101,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     public void testSingleStatus()
     {
         CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
-        rule.setStatuses(Arrays.asList(IvyManager.STATUS_INTEGRATION));
+        rule.setStatuses(Arrays.asList(STATUS_INTEGRATION));
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b3), results);
     }
@@ -109,7 +109,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     public void testMultipleStatuses()
     {
         CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
-        rule.setStatuses(Arrays.asList(IvyManager.STATUS_INTEGRATION, IvyManager.STATUS_MILESTONE));
+        rule.setStatuses(Arrays.asList(STATUS_INTEGRATION, STATUS_MILESTONE));
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }

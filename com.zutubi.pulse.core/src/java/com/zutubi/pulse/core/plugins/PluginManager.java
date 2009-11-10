@@ -28,12 +28,12 @@ import java.util.Map;
  * The PluginManager is responsible for handling everything needed to support plugins.
  * <p/>
  * The Plugin Manager delegates much of the work to an embedded Equinox instance which
- * is responsible for handling the lifecycle, classloading and interactions between plugins.
+ * handles the lifecycle, classloading and interactions between plugins.
  * <p/>
  * The Plugin Manager handles the management tasks around equinox, including managing the
  * deployed plugin files, tracking the plugin states (ENABLED, DISABLED etc), starting and
- * stopping the equinox installation, deploying new plugins at runtime, managing the upgrade
- * of plugins and more.
+ * stopping equinox, deploying new plugins at runtime, managing the upgrade of plugins and
+ * more.
  */
 public class PluginManager
 {
@@ -132,6 +132,7 @@ public class PluginManager
 
         // setup the configuration.
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
+        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA + ".readOnly", Boolean.TRUE.toString());
         equinox.start();
 
         startupInternalPlugins();

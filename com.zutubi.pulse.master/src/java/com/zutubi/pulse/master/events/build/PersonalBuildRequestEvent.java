@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;

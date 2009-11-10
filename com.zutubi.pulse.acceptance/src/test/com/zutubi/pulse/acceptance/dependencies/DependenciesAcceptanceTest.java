@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
@@ -27,7 +27,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         loginAsAdmin();
 
         repository = new Repository();
-        repository.clear();
+        repository.clean();
 
         randomName = randomName();
 
@@ -50,6 +50,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
         configurationHelper.insertProject(project.getConfig());
+    }
+
+    private void updateProject(ProjectConfigurationHelper project) throws Exception
+    {
+        configurationHelper.updateProject(project.getConfig());
     }
 
     public void testPublish_NoArtifacts() throws Exception
@@ -146,6 +151,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
 
+        assertIvyInRepository(project, buildNumber);
         assertIvyStatus(STATUS_INTEGRATION, project, buildNumber);
     }
 
@@ -185,14 +191,16 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
-        buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        assertIvyInRepository(projectA, buildNumber);
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar");
         insertProject(projectB);
 
-        int buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
+        buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
         assertIvyInRepository(projectB, buildNumber);
     }
@@ -461,6 +469,32 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         runBuildWithCharacterInArtifactName(invalidCharacters, ResultState.ERROR);
     }
 
+    // CIB-2171
+    public void testDependencyStatusUpdates() throws Exception
+    {
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addArtifacts("build/artifact.jar");
+        projectA.addFilesToCreate("build/artifact.jar");
+        projectA.getConfig().getDependencies().setStatus(STATUS_INTEGRATION);
+        insertProject(projectA);
+
+        buildRunner.triggerSuccessfulBuild(projectA);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DependencyConfiguration dependency = projectB.addDependency(projectA.getConfig());
+        dependency.setRevision("latest." + STATUS_INTEGRATION);
+        projectB.addExpectedFiles("lib/artifact-1.jar");
+        projectB.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
+        insertProject(projectB);
+
+        buildRunner.triggerSuccessfulBuild(projectB);
+
+        dependency.setRevision("latest." + STATUS_RELEASE);
+        updateProject(projectB);
+
+        buildRunner.triggerFailedBuild(projectB);
+    }
+
     private void runBuildWithCharacterInArtifactName(String testCharacters, ResultState expected) throws Exception
     {
         for (char c : testCharacters.toCharArray())
@@ -491,34 +525,34 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
-    private void assertIvyStatus(String expectedStatus, ProjectConfigurationHelper project, int buildNumber) throws IOException
+    private void assertIvyStatus(String expectedStatus, ProjectConfigurationHelper project, int buildNumber) throws Exception
     {
-        assertEquals(expectedStatus, repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), buildNumber).getStatus());
+        assertEquals(expectedStatus, repository.getIvyModuleDescriptor(project.getConfig().getOrganisation(), project.getConfig().getName(), buildNumber).getStatus());
     }
 
-    private void assertIvyRevision(String expectedRevision, ProjectConfigurationHelper project, String version) throws IOException
+    private void assertIvyRevision(String expectedRevision, ProjectConfigurationHelper project, String version) throws Exception
     {
-        assertEquals(expectedRevision, repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), version).getRevision());
+        assertEquals(expectedRevision, repository.getIvyModuleDescriptor(project.getConfig().getOrganisation(), project.getConfig().getName(), version).getRevision());
     }
 
-    private void assertIvyInRepository(ProjectConfigurationHelper project, Object revision) throws IOException
+    private void assertIvyInRepository(ProjectConfigurationHelper project, Object revision) throws Exception
     {
-        assertInRepository(repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
+        assertInRepository(repository.getIvyModuleDescriptor(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
     }
 
-    private void assertIvyNotInRepository(ProjectConfigurationHelper project, Object revision) throws IOException
+    private void assertIvyNotInRepository(ProjectConfigurationHelper project, Object revision) throws Exception
     {
-        assertNotInRepository(repository.getIvyFile(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
+        assertNotInRepository(repository.getIvyModuleDescriptor(project.getConfig().getOrganisation(), project.getConfig().getName(), revision).getPath());
     }
 
     private void assertArtifactInRepository(ProjectConfigurationHelper project, String stageName, Object revision, String artifactName, String artifactExtension) throws IOException
     {
-        assertInRepository(repository.getArtifactFile(project.getConfig().getOrganisation(), project.getConfig().getName(), stageName, revision, artifactName, artifactExtension).getPath());
+        assertInRepository(repository.getArtifactPath(project.getConfig().getOrganisation(), project.getConfig().getName(), stageName, revision, artifactName, artifactExtension));
     }
 
     private void assertArtifactNotInRepository(ProjectConfigurationHelper project, String stageName, Object revision, String artifactName, String artifactExtension) throws IOException
     {
-        assertNotInRepository(repository.getArtifactFile(project.getConfig().getOrganisation(), project.getConfig().getName(), stageName, revision, artifactName, artifactExtension).getPath());
+        assertNotInRepository(repository.getArtifactPath(project.getConfig().getOrganisation(), project.getConfig().getName(), stageName, revision, artifactName, artifactExtension));
     }
 
     private void assertInRepository(String baseArtifactName) throws IOException

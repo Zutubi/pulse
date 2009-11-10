@@ -31,7 +31,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
-import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -111,7 +110,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
         IvyManager ivyManager = mock(IvyManager.class);
         IvyClient ivyClient = mock(IvyClient.class);
-        stub(ivyClient.hasDependencies((ModuleDescriptor) anyObject())).toReturn(false);
         stub(ivyManager.createIvyClient(anyString())).toReturn(ivyClient);
         recipeProcessor.setIvyManager(ivyManager);
     }

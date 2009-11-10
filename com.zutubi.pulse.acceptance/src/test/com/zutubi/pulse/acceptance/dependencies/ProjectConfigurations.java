@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 
 import java.io.File;
 
@@ -80,6 +81,10 @@ public class ProjectConfigurations
     private void configureBaseProject(ProjectConfigurationHelper helper) throws Exception
     {
         AgentConfiguration master = configurationHelper.getMasterAgentReference();
+
+        // setup the Ant post processor so that the commands have something to reference.
+        AntPostProcessorConfiguration postProcessorReference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/ant output processor", AntPostProcessorConfiguration.class);
+        helper.getConfig().getPostProcessors().put(postProcessorReference.getName(), postProcessorReference);
 
         // setup the defaults:
         BuildStageConfiguration stage = helper.addStage(ProjectConfigurationWizard.DEFAULT_STAGE);

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.dependency.ivy;
 
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
@@ -19,7 +20,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
     {
         super.setUp();
 
-        factory = new ModuleDescriptorFactory();
+        factory = new ModuleDescriptorFactory(new IvyConfiguration());
     }
 
     public void testDefaultProjectConfiguration()
@@ -27,7 +28,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         ProjectConfiguration project = newProject("organisation", "project");
 
         ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
-        assertEquals(1, descriptor.getConfigurationsNames().length);
+        assertEquals(0, descriptor.getConfigurationsNames().length);
         assertEquals(0, descriptor.getAllArtifacts().length);
         assertEquals(0, descriptor.getDependencies().length);
 
@@ -69,10 +70,10 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         ProjectConfiguration project = newProject("", "project");
 
         ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
-        assertEquals(IvyManager.STATUS_INTEGRATION, descriptor.getStatus());
+        assertEquals(IvyStatus.STATUS_INTEGRATION, descriptor.getStatus());
 
-        project.getDependencies().setStatus(IvyManager.STATUS_MILESTONE);
+        project.getDependencies().setStatus(IvyStatus.STATUS_MILESTONE);
         descriptor = factory.createRetrieveDescriptor(project);
-        assertEquals(IvyManager.STATUS_MILESTONE, descriptor.getStatus());
+        assertEquals(IvyStatus.STATUS_MILESTONE, descriptor.getStatus());
     }
 }

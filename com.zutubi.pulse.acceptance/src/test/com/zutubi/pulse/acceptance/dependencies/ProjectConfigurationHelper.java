@@ -6,13 +6,13 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +25,8 @@ import java.util.Map;
  */
 public abstract class ProjectConfigurationHelper
 {
+    private static final String ANT_PROCESSOR_NAME = "ant output processor";
+
     private ProjectConfiguration config;
 
     public ProjectConfigurationHelper(ProjectConfiguration config)
@@ -125,6 +127,8 @@ public abstract class ProjectConfigurationHelper
         AntCommandConfiguration command = new AntCommandConfiguration();
         command.setBuildFile("build.xml");
         command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
+        // add the reference to the ant post processor.
+        command.addPostProcessor(config.getPostProcessors().get(ANT_PROCESSOR_NAME));
         return command;
     }
 

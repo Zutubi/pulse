@@ -1,93 +1,28 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.pulse.core.dependency.DependencyManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import org.apache.ivy.core.module.status.Status;
-import org.apache.ivy.core.module.status.StatusManager;
+import org.apache.ivy.core.cache.RepositoryCacheManager;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.util.Message;
 
-import java.io.IOException;
 import java.io.File;
-import java.net.URI;
+import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The ivy implementation of the dependency manager interface.
  */
-public class IvyManager implements DependencyManager
+public class IvyManager
 {
-    // These status's are the default status's configured in ivy.  If / when we allow
-    // customisation of the status's, these static fields will need to be revisited.
-    // See org.apache.ivy.core.module.status.StatusManager for details.
-    public static String STATUS_INTEGRATION   = "integration";
-    public static String STATUS_MILESTONE     = "milestone";
-    public static String STATUS_RELEASE       = "release";
-
-    private IvySettings defaultSettings;
-
     private File cacheBase;
 
-    public void init() throws IOException, ParseException
+    static
     {
         // redirect the default logging to our own logging system.
         Message.setDefaultLogger(new IvyMessageLoggerAdapter());
-
-        defaultSettings = loadDefaultSettings();
     }
 
-    protected IvySettings loadDefaultSettings() throws ParseException, IOException
+    public void init()
     {
-        IvySettings settings = new IvySettings();
-        settings.load(getClass().getResource("ivysettings.xml"));
-        return settings;
-    }
-
-    /**
-     * Get the default ivy settings.
-     *
-     * @return the default ivy settings instance.
-     */
-    public IvySettings getDefaultSettings()
-    {
-        return defaultSettings;
-    }
-
-    /**
-     * Get the list of statuses available for use with builds.
-     *
-     * @return a list of strings representing valid statuses.
-     */
-    public List<String> getStatuses()
-    {
-        @SuppressWarnings("unchecked")
-        List<Status> statues = (List<Status>) StatusManager.getCurrent().getStatuses();
-        return CollectionUtils.map(statues, new Mapping<Status, String>()
-        {
-            public String map(Status s)
-            {
-                return s.getName();
-            }
-        });
-    }
-
-    public int getPriority(String status)
-    {
-        return StatusManager.getCurrent().getPriority(status);
-    }
-
-    /**
-     * Get the default status.
-     *
-     * @return the default status.
-     */
-    public String getDefaultStatus()
-    {
-        return StatusManager.getCurrent().getDefaultStatus();
     }
 
     public void setDataDir(File dataDir)
@@ -95,31 +30,55 @@ public class IvyManager implements DependencyManager
         this.cacheBase = new File(dataDir, "cache");
     }
 
-    /**
-     * @param repositoryBase    defines the base path to the internal pulse repository.  The
-     * format of this field must be a valid uri.
-     * @return  a new configured ivy support instance.
-     *
-     * @throws Exception on error.
-     */
     public IvyClient createIvyClient(String repositoryBase) throws Exception
     {
-        // validate the repository base parameter and fail early if there are any problems.
-        new URI(repositoryBase);
-
-        Map<String, String> variables = new HashMap<String, String>();
-        variables.put(DefaultIvyClientFactory.VARIABLE_REPOSITORY_BASE, repositoryBase);
-        
-        if (cacheBase != null)
-        {
-            variables.put("ivy.cache.dir", cacheBase.toURI().toString());
-            variables.put("ivy.cache.resolution", cacheBase.getCanonicalPath());
-            variables.put("ivy.cache.repository", cacheBase.getCanonicalPath());
-        }
-        
-        DefaultIvyClientFactory ivyClientFactory = new DefaultIvyClientFactory();
-        ivyClientFactory.setIvyManager(this);
-        return ivyClientFactory.createClient(variables);
+        return createIvyClient(new IvyConfiguration(repositoryBase));
     }
 
+    public IvyClient createIvyClient(IvyConfiguration configuration) throws Exception
+    {
+        applyCacheSettings(configuration);
+
+        return new IvyClient(configuration);
+    }
+
+    /**
+     * Clean all of the local ivy caches.
+     *
+     * Note: Do not run this while ivy processing is active.  The caches may be in use.
+     *
+     * @param configuration     the configuration defining the caches.
+     *
+     * @throws IOException is thrown on error.
+     * @throws ParseException is thrown on error.
+     */
+    public void cleanCaches(IvyConfiguration configuration) throws IOException, ParseException
+    {
+        // implementation note:  the problem with caching is that I can not find a way to turn it
+        // off completely.  this means potentially large artifacts are being cached on potentially
+        // resource limited systems.  cleaning caches regularly helps by requires synchronisation
+        // so that caches that are in use are not cleaned.
+        
+        applyCacheSettings(configuration);
+        
+        IvySettings settings = configuration.loadDefaultSettings();
+
+        settings.getResolutionCacheManager().clean();
+        
+        RepositoryCacheManager[] caches = settings.getRepositoryCacheManagers();
+        for (RepositoryCacheManager cache : caches)
+        {
+            cache.clean();
+        }
+    }
+
+    private void applyCacheSettings(IvyConfiguration configuration) throws IOException
+    {
+        if (cacheBase != null)
+        {
+            configuration.setVariable("ivy.cache.dir", cacheBase.toURI().toString());
+            configuration.setVariable("ivy.cache.resolution", cacheBase.getCanonicalPath());
+            configuration.setVariable("ivy.cache.repository", cacheBase.getCanonicalPath());
+        }
+    }
 }

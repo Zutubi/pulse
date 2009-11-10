@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,9 +21,9 @@ public class DependencyConfiguration extends AbstractConfiguration
     public static final String LATEST = "latest.";
 
     public static final String ALL_STAGES = "*";
-    public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyManager.STATUS_INTEGRATION;
-    public static final String REVISION_LATEST_MILESTONE = LATEST + IvyManager.STATUS_MILESTONE;
-    public static final String REVISION_LATEST_RELEASE = LATEST + IvyManager.STATUS_RELEASE;
+    public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyStatus.STATUS_INTEGRATION;
+    public static final String REVISION_LATEST_MILESTONE = LATEST + IvyStatus.STATUS_MILESTONE;
+    public static final String REVISION_LATEST_RELEASE = LATEST + IvyStatus.STATUS_RELEASE;
     public static final String REVISION_CUSTOM = "custom";
 
     /**

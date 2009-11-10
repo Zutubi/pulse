@@ -25,7 +25,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -97,10 +97,17 @@ public class CleanupTestUtils
         return new File(data, "projects/" + projectId + "/" + String.format("%08d", buildNumber));
     }
 
-    public boolean hasIvyFile(String projectName, int buildNumber) throws IOException
+    public boolean hasIvyFile(String projectName, int buildNumber) throws Exception
     {
-        Repository repository = new Repository();
-        return repository.getIvyFile(projectName, buildNumber).exists();
+        try
+        {
+            new Repository().getIvyModuleDescriptor(projectName, buildNumber);
+            return true;
+        }
+        catch (FileNotFoundException e)
+        {
+            return false;
+        }
     }
 
     public boolean hasBuildDirectory(String projectName, int buildNumber) throws Exception

@@ -64,6 +64,55 @@ public class BuildRunner
     }
 
     /**
+     * Trigger a build for the specified project and asserting that it is failed.
+     *
+     * @param project   the project for which a build is being triggered.
+     * @param options   the trigger options
+     * @return  the build number
+     *
+     * @throws Exception on error or if the build status was not failure.
+     */
+    public int triggerFailedBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    {
+        return triggerFailedBuild(project.getConfig(), options);
+    }
+
+    /**
+     * Trigger a build for the specified project and asserting that it failed.
+     *
+     * @param project   the project for which a build is being triggered.
+     * @param options   the trigger options
+     * @return  the build number
+     *
+     * @throws Exception on error or if the build status was not failure.
+     */
+    public int triggerFailedBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
+    {
+        int buildNumber = triggerCompleteBuild(project, options);
+
+        ResultState buildStatus = getBuildStatus(project, buildNumber);
+        if (!ResultState.FAILURE.equals(buildStatus))
+        {
+            throw new RuntimeException("Expected failure, had " + buildStatus + " instead.");
+        }
+        return buildNumber;
+    }
+
+    /**
+     * Trigger a build for the specified project and wait for it to complete.
+     *
+     * @param project   the project for which a build is being triggered.
+     * @param options   the trigger options.
+     * @return the build number
+     *
+     * @throws Exception on error or if the we timed out waiting for the build to complete.
+     */
+    public int triggerCompleteBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    {
+        return triggerCompleteBuild(project.getConfig(), options);
+    }
+
+    /**
      * Trigger a build for the specified project and wait for it to complete.
      *
      * @param project   the project for which a build is being triggered.
@@ -77,6 +126,20 @@ public class BuildRunner
         int number = triggerBuild(project, options);
         xmlRpcHelper.waitForBuildToComplete(project.getName(), number);
         return number;
+    }
+
+    /**
+     * Trigger a build of the specified project.
+     *
+     * @param project   the project for which the build is being triggered.
+     * @param options   the build options.
+     * @return  the build number
+     *
+     * @throws Exception on error.
+     */
+    public int triggerBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    {
+        return triggerBuild(project.getConfig(), options);
     }
 
     /**
@@ -107,6 +170,15 @@ public class BuildRunner
         return number;
     }
 
+    /**
+     * Trigger a build of the specified project, with the 'rebuild' trigger option set to
+     * true.
+     *
+     * @param project   the project to be built.
+     * @param options   the build options.
+     * @return  the build number.
+     * @throws Exception on error.
+     */
     public int triggerRebuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
     {
         return triggerRebuild(project.getConfig(), options);

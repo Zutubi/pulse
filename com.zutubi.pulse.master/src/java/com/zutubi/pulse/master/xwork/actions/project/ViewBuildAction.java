@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
-import com.zutubi.pulse.core.dependency.ivy.IvyFile;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import com.zutubi.pulse.core.dependency.ivy.IvyRetrievalReport;
 import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommand;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
@@ -22,14 +22,13 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
-import org.apache.ivy.core.report.ArtifactDownloadReport;
-import org.apache.ivy.plugins.report.XmlReportParser;
 
 import java.io.File;
 import java.util.*;
@@ -60,7 +59,6 @@ public class ViewBuildAction extends CommandActionBase
     private MasterConfigurationManager configurationManager;
     private SystemPaths systemPaths;
 
-    private IvyManager ivyManager;
     private MasterLocationProvider masterLocationProvider;
     private ConfigurationProvider configurationProvider;
     private List<StageDependencyDetails> dependencyDetails = new LinkedList<StageDependencyDetails>();
@@ -255,14 +253,13 @@ public class ViewBuildAction extends CommandActionBase
 
             String artifactPath = RetrieveDependenciesCommand.OUTPUT_NAME + "/"+ RetrieveDependenciesCommand.IVY_REPORT_FILE;
             File outputDir = new File(dataDir, command.getOutputDir());
-            File ivyReport = new File(outputDir, artifactPath);
+            File reportFile = new File(outputDir, artifactPath);
             try
             {
-                if (ivyReport.isFile())
+                if (reportFile.isFile())
                 {
-                    XmlReportParser parser = new XmlReportParser();
-                    parser.parse(ivyReport);
-                    dependencyDetails.add(new StageDependencyDetails(recipe.getStageName(), parser));
+                    IvyRetrievalReport report = IvyRetrievalReport.fromXml(reportFile);
+                    dependencyDetails.add(new StageDependencyDetails(recipe.getStageName(), report));
                 }
                 else
                 {
@@ -313,11 +310,6 @@ public class ViewBuildAction extends CommandActionBase
         this.systemPaths = systemPaths;
     }
 
-    public void setIvyManager(IvyManager ivyManager)
-    {
-        this.ivyManager = ivyManager;
-    }
-
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
@@ -334,7 +326,7 @@ public class ViewBuildAction extends CommandActionBase
      */
     public class StageDependencyDetails
     {
-        private XmlReportParser report;
+        private IvyRetrievalReport report;
 
         private String stageName;
         private List<StageDependency> dependencies;
@@ -344,7 +336,7 @@ public class ViewBuildAction extends CommandActionBase
             this(stageName, null);
         }
 
-        public StageDependencyDetails(String stageName, XmlReportParser report) throws Exception
+        public StageDependencyDetails(String stageName, IvyRetrievalReport report) throws Exception
         {
             this.stageName = stageName;
             this.report = report;
@@ -352,7 +344,7 @@ public class ViewBuildAction extends CommandActionBase
             {
                 String masterLocation = masterLocationProvider.getMasterUrl();
                 final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
-                final IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
+                IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);
                 Urls urls = new Urls( configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
 
                 dependencies = new LinkedList<StageDependency>();
@@ -361,16 +353,11 @@ public class ViewBuildAction extends CommandActionBase
                     StageDependency stageDependency = new StageDependency();
                     dependencies.add(stageDependency);
 
-                    ArtifactDownloadReport downloadReport = getDownloadReport(artifact);
                     stageDependency.setArtifactName(artifact.getName() + "." + artifact.getExt());
 
-                    String artifactUrl = downloadReport.getArtifactOrigin().getLocation();
+                    String repositoryPath = configuration.getArtifactPath(artifact);
+                    String artifactUrl = PathUtils.getPath(masterLocation, WebManager.REPOSITORY_PATH, uriComponentEncode(repositoryPath));
 
-                    // extract the repository path portion of the artifact url so that we can access it directly
-                    // on the file system.
-                    
-                    String repositoryUrlComponent = WebManager.REPOSITORY_PATH + "/";
-                    String repositoryPath = artifactUrl.substring(artifactUrl.indexOf(repositoryUrlComponent) + repositoryUrlComponent.length());
                     File artifactFile = new File(configurationManager.getUserPaths().getRepositoryRoot(), repositoryPath);
                     if (artifactFile.isFile())
                     {
@@ -384,17 +371,18 @@ public class ViewBuildAction extends CommandActionBase
                     boolean isDependencyAvailable = projectManager.getProjectConfig(mrid.getName(), false) != null;
                     if (isDependencyAvailable)
                     {
-                        stageDependency.setProjectUrl(urls.project(uriComponentEncode(mrid.getName())));
+                        stageDependency.setProjectUrl(urls.project(uriComponentEncode(dependencyProjectName)));
                     }
 
-                    String ivyPath = ivy.getIvyPath(mrid, mrid.getRevision());
-                    IvyFile ivyFile = new IvyFile(repositoryRoot, ivyPath);
+                    String ivyPath = configuration.getIvyPath(mrid, mrid.getRevision());
+                    File ivyFile = new File(repositoryRoot, ivyPath);
                     if (ivyFile.exists())
                     {
-                        stageDependency.setBuildName(ivyFile.getBuildNumber());
+                        IvyModuleDescriptor ivyDescriptor = IvyModuleDescriptor.newInstance(ivyFile, configuration);
+                        stageDependency.setBuildName(String.valueOf(ivyDescriptor.getBuildNumber()));
                         if (isDependencyAvailable)
                         {
-                            stageDependency.setBuildUrl(urls.build(uriComponentEncode(dependencyProjectName), ivyFile.getBuildNumber()));
+                            stageDependency.setBuildUrl(urls.build(uriComponentEncode(dependencyProjectName), String.valueOf(ivyDescriptor.getBuildNumber())));
                         }
                     }
                     else
@@ -414,17 +402,6 @@ public class ViewBuildAction extends CommandActionBase
                     }
                 });
             }
-        }
-
-        private ArtifactDownloadReport getDownloadReport(final Artifact artifact)
-        {
-            return CollectionUtils.find(report.getArtifactReports(), new Predicate<ArtifactDownloadReport>()
-            {
-                public boolean satisfied(ArtifactDownloadReport report)
-                {
-                    return report.getArtifact().equals(artifact);
-                }
-            });
         }
 
         public List<StageDependency> getDependencies()

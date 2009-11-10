@@ -4,7 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.dependency.DependencyManager;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;

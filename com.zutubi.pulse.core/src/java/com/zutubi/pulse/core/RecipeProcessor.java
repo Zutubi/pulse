@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
+import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommandConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -130,11 +131,13 @@ public class RecipeProcessor
         ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
         if (descriptor != null)
         {
-            IvyClient ivy = ivyManager.createIvyClient(context.getString(PROPERTY_MASTER_URL) + "/repository");
-            ivy.setMessageLogger(new IvyMessageOutputStreamAdapter(context.getOutputStream()));
-            if (ivy.hasDependencies(descriptor))
+            if (descriptor.getDependencies().length > 0)
             {
-                CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
+                IvyClient ivy = ivyManager.createIvyClient(context.getString(PROPERTY_MASTER_URL) + "/repository");
+                ivy.pushMessageLogger(new IvyMessageOutputStreamAdapter(context.getOutputStream()));
+
+                RetrieveDependenciesCommandConfiguration retrieveCommandConfig = new RetrieveDependenciesCommandConfiguration();
+                retrieveCommandConfig.setIvy(ivy);
                 if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
                 {
                     return;

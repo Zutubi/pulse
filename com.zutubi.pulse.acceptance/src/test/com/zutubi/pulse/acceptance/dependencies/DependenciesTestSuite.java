@@ -40,7 +40,7 @@ public class DependenciesTestSuite
         protected void tearDown() throws Exception
         {
             repository = new Repository();
-            repository.clear();
+            repository.clean();
 
             super.tearDown();
         }

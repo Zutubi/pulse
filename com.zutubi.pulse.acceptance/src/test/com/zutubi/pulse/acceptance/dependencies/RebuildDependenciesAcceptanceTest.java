@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_MILESTONE;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
@@ -29,7 +29,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         loginAsAdmin();
 
         Repository repository = new Repository();
-        repository.clear();
+        repository.clean();
 
         tmpDir = FileSystemUtils.createTempDir(randomName());
 

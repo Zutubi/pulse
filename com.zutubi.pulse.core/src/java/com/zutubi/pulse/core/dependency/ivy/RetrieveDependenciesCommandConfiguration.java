@@ -9,6 +9,7 @@ public class RetrieveDependenciesCommandConfiguration extends CommandConfigurati
     public RetrieveDependenciesCommandConfiguration()
     {
         super(RetrieveDependenciesCommand.class);
+        setName(RetrieveDependenciesCommand.COMMAND_NAME);
     }
 
     public IvyClient getIvy()

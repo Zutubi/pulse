@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -74,8 +75,8 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
             // is getting used anywhere - at least not this particular instances name.
             Resource res = new MemoryResource("ivy.xml", descriptor);
             ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser(res);
-
-            IvySettings ivySettings = ivyManager.getDefaultSettings();
+            
+            IvySettings ivySettings = new IvyConfiguration().loadDefaultSettings();
 
             return parser.parseDescriptor(ivySettings, tmp.toURI().toURL(), res, ivySettings.doValidate());
         }

@@ -22,7 +22,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         loginAsAdmin();
 
         repository = new Repository();
-        repository.clear();
+        repository.clean();
     }
 
     protected void tearDown() throws Exception

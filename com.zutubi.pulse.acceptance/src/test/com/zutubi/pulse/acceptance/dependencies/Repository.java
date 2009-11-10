@@ -1,17 +1,17 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
-import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
 import com.zutubi.util.FileSystemUtils;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
-
-import org.apache.ivy.core.module.id.ModuleRevisionId;
-import org.apache.ivy.core.IvyPatternHelper;
+import java.util.Map;
 
 /**
  * The repository class provides tests with a simple way to interact with the
@@ -25,10 +25,7 @@ public class Repository
      */
     private static final int AVAILABILITY_TIMEOUT = 5000;
 
-    private File base;
-
-    private String ivyPattern = "([organisation]/)[module]/([stage]/)ivy-[revision].xml";
-    private String artifactPattern = "([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[type]";
+    private IvyConfiguration configuration;
 
     /**
      * Create a new instance of the repository, using the acceptance tests standard
@@ -41,15 +38,14 @@ public class Repository
         this(getRepositoryBase());
     }
 
-    /**
-     * Create a new instance of the repository, using the specified directory
-     * as the base directory for this repository.
-     *
-     * @param dir  the repositories base directory.
-     */
     public Repository(File dir)
     {
-        this.base = dir;
+        this.configuration = new IvyConfiguration(dir.toURI().toString());
+    }
+
+    public Repository(IvyConfiguration configuration)
+    {
+        this.configuration = configuration;
     }
 
     /**
@@ -57,8 +53,10 @@ public class Repository
      *
      * @throws IOException on error.
      */
-    public void clear() throws IOException
+    public void clean() throws IOException
     {
+        File base = getBase();
+        
         if (base.isDirectory())
         {
             if (!FileSystemUtils.rmdir(base))
@@ -82,7 +80,7 @@ public class Repository
      */
     public boolean waitUntilInRepository(String path) throws IOException
     {
-        File artifact = new File(base, path);
+        File artifact = new File(getBase(), path);
         try
         {
             long startTime = System.currentTimeMillis();
@@ -98,16 +96,15 @@ public class Repository
         return artifact.exists();
     }
 
-    public IvyFile getIvyFile(String name, Object revision)
+    public IvyModuleDescriptor getIvyModuleDescriptor(String name, Object revision) throws Exception
     {
-        return getIvyFile(null, name, revision);
+        return getIvyModuleDescriptor(null, name, revision);
     }
     
     /**
      * Get a reference to the ivy file for the specified project and revision.  Note that
      * the reference points to where the ivy file would be if it exists in the repository,
      * and does not infer that it actually does exist.  For that, use
-     * {@link com.zutubi.pulse.acceptance.dependencies.IvyFile#exists()}
      *
      * @param org       the projects organisation, or null if no organisation is present
      * @param name      the name of the project
@@ -115,21 +112,21 @@ public class Repository
      *
      * @return  a reference to the ivy file.
      */
-    public IvyFile getIvyFile(String org, String name, Object revision)
+    public IvyModuleDescriptor getIvyModuleDescriptor(String org, String name, Object revision) throws Exception
     {
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
         ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(orgString, name, null, revisionString);
-        String path = IvyPatternHelper.substitute(ivyPattern, mrid);
-        return new IvyFile(this, path);
+
+        return IvyModuleDescriptor.newInstance(new File(getBase(), configuration.getIvyPath(mrid)), configuration);
     }
 
-    public ArtifactFile getArtifactFile(String name, String stageName, Object revision, String artifactName, String artifactExtension)
+    public String getArtifactPath(String name, String stageName, Object revision, String artifactName, String artifactExtension)
     {
-        return getArtifactFile(null, name, stageName, revision, artifactName,  artifactExtension);
+        return getArtifactPath(null, name, stageName, revision, artifactName,  artifactExtension);
     }
 
-    public ArtifactFile getArtifactFile(String org, String name, String stageName, Object revision, String artifactName, String artifactExtension)
+    public String getArtifactPath(String org, String name, String stageName, Object revision, String artifactName, String artifactExtension)
     {
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
@@ -137,8 +134,7 @@ public class Repository
         extraAttributes.put("e:stage", IvyUtils.ivyEncodeStageName(stageName));
         ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(orgString, name, revisionString, extraAttributes);
 
-        String path = IvyPatternHelper.substitute(artifactPattern, mrid, artifactName, artifactExtension, artifactExtension);
-        return new ArtifactFile(this, path);
+        return configuration.getArtifactPath(mrid, artifactName, artifactExtension);
     }
 
     /**
@@ -151,7 +147,7 @@ public class Repository
      */
     public boolean isInRepository(String path) throws IOException
     {
-        return new File(base, path).exists();
+        return new File(getBase(), path).exists();
     }
 
     /**
@@ -176,7 +172,7 @@ public class Repository
      */
     protected boolean createFile(String path) throws IOException
     {
-        File file = new File(base, path);
+        File file = new File(getBase(), path);
         File parentFile = file.getParentFile();
         if (!parentFile.mkdirs())
         {
@@ -196,7 +192,7 @@ public class Repository
      */
     protected File getBase()
     {
-        return base;
+        return new File(configuration.getRepositoryBase());
     }
 
     /**

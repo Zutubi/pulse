@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;
@@ -129,8 +130,8 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void assertBuildVersion(String projectName, int buildNumber, String expectedVersion) throws Exception
     {
         // verify a build version by:
-        // a) the ivy file name
-        assertTrue(repository.getIvyFile(projectName, expectedVersion).exists());
+        // a) the ivy file name - an exception is generated if it is not found or valid.
+        repository.getIvyModuleDescriptor(projectName, expectedVersion);
 
         // b) the xml rpc interface - build details
         Hashtable<String, Object> buildDetails = xmlRpcHelper.getBuild(projectName, buildNumber);

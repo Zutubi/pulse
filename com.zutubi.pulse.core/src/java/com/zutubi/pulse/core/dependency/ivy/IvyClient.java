@@ -1,220 +1,111 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.util.*;
+import com.zutubi.i18n.Messages;
+import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.FileSystemUtils.rmdir;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.Ivy;
-import org.apache.ivy.core.IvyPatternHelper;
-import org.apache.ivy.core.cache.ArtifactOrigin;
-import org.apache.ivy.core.cache.ResolutionCacheManager;
-import org.apache.ivy.core.deliver.DeliverOptions;
 import org.apache.ivy.core.module.descriptor.Artifact;
-import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.apache.ivy.core.report.ResolveReport;
-import org.apache.ivy.core.resolve.ResolveData;
-import org.apache.ivy.core.resolve.ResolveEngine;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
-import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorParser;
-import org.apache.ivy.plugins.repository.Resource;
-import org.apache.ivy.plugins.repository.file.FileResource;
+import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.resolver.AbstractPatternsBasedResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
-import org.apache.ivy.plugins.resolver.RepositoryResolver;
-import org.apache.ivy.plugins.resolver.util.ResolvedResource;
-import org.apache.ivy.util.Message;
+import org.apache.ivy.plugins.resolver.FileSystemResolver;
+import org.apache.ivy.plugins.resolver.URLResolver;
 import org.apache.ivy.util.MessageLogger;
 import org.apache.ivy.util.url.URLHandler;
 import org.apache.ivy.util.url.URLHandlerRegistry;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.text.ParseException;
 
 /**
- * The IvyClient provides a facade around the ivy dependency management system
+ * The ivy client provides the core interface for interacting with ivy processes, encapsulating
+ * all of the ivy process specific logic.
+ * <p/>
+ * The only ivy specific code that should be outside of this class relates to the configuration
+ * of the repository and the various module descriptors.
  */
 public class IvyClient
 {
+    private static final Messages I18N = Messages.getInstance(IvyClient.class);
     private static final Logger LOG = Logger.getLogger(IvyClient.class);
 
-    private static final String[] ALL_CONFS = new String[]{"*"};
-
-    public static final String CONFIGURATION_BUILD = "build";
-
     private Ivy ivy;
-    private String ivyPattern;
-    private String artifactPattern;
+    private IvyConfiguration configuration;
 
-    public IvyClient(Ivy ivy, String ivyPattern, String artifactPattern)
-    {
-        this.ivy = ivy;
-        this.ivyPattern = ivyPattern;
-        this.artifactPattern = artifactPattern;
-    }
+    private static final String SOURCEFILE = "sourcefile";
 
     /**
-     * Deliver the resolved descriptor of the specified module to the default resolver.  This default
-     * repository needs to use a local file system path for its ivy pattern for this to work.
+     * Create a new instance of the ivy client using the specified ivy configuration.
      *
-     * @param mrid     the id of the module descriptor to be delivered
-     * @param revision the revision of the delivered file.
-     * @throws java.io.IOException      on error
-     * @throws java.text.ParseException on error
+     * @param configuration the configuration used to setup the embedded ivy system.
+     * @throws Exception if there are any problems setting up the IvyClient.
      */
-    public void deliver(ModuleRevisionId mrid, String revision) throws IOException, ParseException
+    public IvyClient(IvyConfiguration configuration) throws Exception
     {
-        AbstractPatternsBasedResolver resolver = (AbstractPatternsBasedResolver) getArtifactRepositoryResolver();
-        String destIvyPattern = (String) resolver.getIvyPatterns().get(0);
-
-        deliver(mrid, revision, destIvyPattern);
-    }
-
-    /**
-     * Deliver the resolved descriptor of the specified module to the path defined by the destIvyPattern
-     * parameter.
-     *
-     * @param mrid           the id of the resolved module descriptor to be delivered.
-     * @param revision       the revision of the delivered descriptor
-     * @param destIvyPattern the pattern to which the descriptor will be delivered.
-     * @throws IOException    is thrown on error
-     * @throws ParseException is thrown on error
-     */
-    public void deliver(ModuleRevisionId mrid, String revision, String destIvyPattern) throws IOException, ParseException
-    {
-        //IMPLEMENTATION NOTE:  Delivery only works for the local file system.
-
-        DeliverOptions options = DeliverOptions.newInstance(ivy.getSettings());
-
-        ivy.deliver(mrid, revision, destIvyPattern, options);
-    }
-
-    /**
-     * Retrieve the dependencies defined by the specified resolved module descriptor, placing them on the local
-     * file system as is defined by the target pattern parameter.  The module descriptors 'build' configuration
-     * is used for this retrieval.
-     *
-     * @param mrid          the id of the resolved descriptor for which the dependencies are being retrieved.
-     * @param targetPattern the pattern defining where the dependencies will be placed.
-     * @throws IOException is thrown on error
-     */
-    public void retrieve(ModuleRevisionId mrid, String targetPattern) throws IOException
-    {
-        retrieve(mrid, targetPattern, CONFIGURATION_BUILD);
-    }
-
-    /**
-     * Retrieve the dependencies defined by the specified 'resolved' module descriptor, using the specified
-     * configurations to identify which dependencies to retrieve.  The retrieved artifacts are written to the
-     * file system using the specified target pattern.
-     *
-     * @param mrid          the id of the resolved descriptor for which the dependencies are being retrieved.
-     * @param targetPattern the pattern defining where the dependencies will be placed.
-     * @param confs         the configurations identifying the artifacts to be retrieved.
-     * 
-     * @throws IOException is thrown on error
-     */
-    public void retrieve(ModuleRevisionId mrid, String targetPattern, String... confs) throws IOException
-    {
-        RetrieveOptions options = new RetrieveOptions();
-        options.setConfs(confs);
-        options.setSync(true); // important if the build directory is being re-used.
-
-        ivy.retrieve(mrid, targetPattern, options);
-
-        // Time to provide some feedback on what files were retrieved.  We want this to appear in the build
-        // log in a similar format to other bootstrap processes that prepare the working directory. 
-        try
+        if (configuration.getRepositoryBase() == null)
         {
-            @SuppressWarnings("unchecked")
-            Map<ArtifactDownloadReport, Set<String>> artifacts = ivy.getRetrieveEngine().determineArtifactsToCopy(mrid, targetPattern, options);
-            for (ArtifactDownloadReport report : artifacts.keySet())
-            {
-                // if the report has a null local file, it was not downloaded - should report this somehow (difficult to test, not sure what the circumstances are)
-                if (report.getLocalFile() == null)
-                {
-                    continue;
-                }
-
-                Set<String> destinationFiles = artifacts.get(report);
-                for (String dest : destinationFiles)
-                {
-                    info("retrieved file " + dest); 
-                }
-            }
-        }
-        catch (ParseException e)
-        {
-            // will not happen since the original retrieve would have already encountered
-            // and failed to this exception.  The fact that we are here (post retrieve)
-            // indicates that it didn't happen.
-        }
-    }
-
-    private void info(String msg)
-    {
-        ivy.getLoggerEngine().log(msg, Message.MSG_INFO);
-    }
-
-    /**
-     * Publish artifacts to the default repository resolver.  The artifacts are picked up from the local
-     * file system using the defined artifact patterns.
-     *
-     * @param mrid             the module revision id identifying the module the artifacts are associated with.
-     * @param revision         the revision of the artifact being published.
-     * @param conf             the configuration defining the artifacts being published.  This is typically the
-     *                         name of the stage from which the artifacts are being published.
-     * @param artifactPatterns the artifact patterns that define the location of the artifacts on disk.
-     * @throws IOException is throw on error
-     */
-    public void publish(ModuleRevisionId mrid, String revision, String conf, String... artifactPatterns) throws IOException
-    {
-        Collection srcArtifactsPatterns = Arrays.asList(artifactPatterns);
-
-        PublishOptions options = new PublishOptions();
-        options.setOverwrite(true);
-        options.setUpdate(true);
-        options.setHaltOnMissing(true);
-        options.setConfs(new String[]{conf});
-
-        if (StringUtils.stringSet(revision))
-        {
-            options.setPubrevision(revision);
+            throw new IllegalArgumentException(I18N.format("configuration.repositoryBase.required"));
         }
 
-        String resolverName = getArtifactRepositoryResolver().getName();
+        IvySettings settings = configuration.loadDefaultSettings();
 
-        // annoying but necessary.  See CustomURLHandler for details.
-        URLHandler originalDefault = URLHandlerRegistry.getDefault();
-        try
+        String repositoryBase = configuration.getRepositoryBase();
+
+        AbstractPatternsBasedResolver resolver;
+        if (isFile(repositoryBase))
         {
-            URLHandlerRegistry.setDefault(new CustomURLHandler());
-            ivy.publish(mrid, srcArtifactsPatterns, resolverName, options);
+            resolver = new FileSystemResolver();
+
+            // this resolver requires that the repository base be an absolute path when used in the patterns.
+            repositoryBase = new File(new URI(repositoryBase)).getCanonicalPath();
         }
-        finally
+        else
         {
-            URLHandlerRegistry.setDefault(originalDefault);
+            resolver = new URLResolver();
         }
+
+        resolver.setName(configuration.getResolverName());
+        resolver.addArtifactPattern(repositoryBase + "/" + configuration.getArtifactPattern());
+        resolver.addIvyPattern(repositoryBase + "/" + configuration.getIvyPattern());
+        resolver.setCheckmodified(true);
+
+        settings.addResolver(resolver);
+        settings.setDefaultResolver(configuration.getResolverName());
+
+        this.ivy = Ivy.newInstance(settings);
+        this.configuration = configuration;
     }
 
     /**
-     * Publish the file to the default repository resolver.
+     * Publish local artifacts to the ivy repository.  The artifacts to be published are
+     * those defined in the module descriptor that match the specified confNames.
+     * <p/>
+     * The location of the artifact file to be published is defined by the extra attribute
+     * 'sourcefile' which needs to be defined for each artifact being published.
      *
-     * @param descriptor    the module descriptor that defines how the artifact file will be published.
-     * @param pattern       the pattern used by ivy to locate the artifacts to be published.
-     * @throws IOException is throw on error
+     * @param descriptor    the descriptor that defines the artifacts to be published.
+     * @param confNames     the configuration names identifying the set of artifacts to be published.  If
+     * blank, all artifacts will be published.
+     *
+     * @throws IOException  is thrown if there is a failure to publish an artifact.
      */
-    public void publishArtifacts(ModuleDescriptor descriptor, String pattern) throws IOException
+    public void publishArtifacts(DefaultModuleDescriptor descriptor, String... confNames) throws IOException
     {
-        // annoying but necessary.  See CustomURLHandler for details.
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
         ivy.pushContext();
         try
@@ -228,10 +119,21 @@ public class IvyClient
             options.setUpdate(true);
             options.setHaltOnMissing(true);
 
-            Collection missing = ivy.getPublishEngine().publish(descriptor, Arrays.asList(pattern), dependencyResolver, options);
+            if (confNames.length > 0)
+            {
+                options.setConfs(confNames);
+            }
+
+            Collection bad = checkCanPublishArtifacts(descriptor, confNames);
+            if (bad.size() > 0)
+            {
+                throw new IOException(I18N.format("failure.publish.missingSourcefile"));
+            }
+
+            Collection missing = ivy.getPublishEngine().publish(descriptor, Arrays.asList("["+SOURCEFILE+"]"), dependencyResolver, options);
             if (missing.size() > 0)
             {
-                throw new IOException("Failed to publish.");
+                throw new IOException(I18N.format("failure.publish.general"));
             }
         }
         finally
@@ -241,25 +143,54 @@ public class IvyClient
         }
     }
 
+    // sanity check that 'sourcefile' is defined for the artifacts to be published.
+    private Collection<Artifact> checkCanPublishArtifacts(DefaultModuleDescriptor descriptor, String... confNames) throws IOException
+    {
+        List<Artifact> artifacts = new LinkedList<Artifact>();
+        if (confNames.length > 0)
+        {
+            for (String confName : confNames)
+            {
+                artifacts.addAll(Arrays.asList(descriptor.getArtifacts(confName)));
+            }
+        }
+        else
+        {
+            artifacts.addAll(Arrays.asList(descriptor.getAllArtifacts()));
+        }
+
+        List<Artifact> badArtifacts = new LinkedList<Artifact>();
+        for (Artifact artifact : artifacts)
+        {
+            if (!artifact.getId().getExtraAttributes().containsKey(SOURCEFILE))
+            {
+                // we can not publish this artifact because we don't know what file to publish.
+                badArtifacts.add(artifact);
+            }
+        }
+        return badArtifacts;
+    }
+
     /**
-     * Similar to the regular publish, except that special allowances are made for the fact that the artifact
-     * being published is an ivy file.
+     * Publish the descriptor to the repository.
      *
-     * @param descriptor the descriptor to be published as an ivy file to the repository
-     * @param revision   the revision of the published descriptor.
-     * @return a collection of artifacts that are missing.
-     * @throws IOException    is thrown on error
-     * @throws ParseException is thrown on error
+     * @param descriptor    to be published
+     *
+     * @throws IOException  is thrown if there are any errors publishing the descriptor.
      */
-    public Collection publishIvy(ModuleDescriptor descriptor, String revision) throws IOException, ParseException
+    public void publishDescriptor(DefaultModuleDescriptor descriptor) throws IOException
     {
         // we can only publish from a file, so we need to deliver the descriptor to a local file first.
         File tmp = null;
+        // annoying but necessary.  See CustomURLHandler for details.
+        URLHandler originalDefault = URLHandlerRegistry.getDefault();
         try
         {
+            String revision = descriptor.getRevision();
+
             tmp = FileSystemUtils.createTempDir();
-            String destIvyPattern = tmp.getCanonicalPath() + "/[artifact].[ext]";
-            ivy.deliver(descriptor.getModuleRevisionId(), revision, destIvyPattern);
+            File ivyFile = new File(tmp, "ivy.xml");
+            XmlModuleDescriptorWriter.write(descriptor, ivyFile);
 
             ModuleRevisionId mrid = descriptor.getModuleRevisionId();
 
@@ -268,202 +199,130 @@ public class IvyClient
             options.setUpdate(true);
             options.setHaltOnMissing(false); // we dont care about missing artifacts here, just that the ivy file gets published.
             options.setConfs(new String[]{"*"});
-            options.setSrcIvyPattern(new File(tmp, "ivy.xml").getCanonicalPath());
+            options.setSrcIvyPattern(ivyFile.getCanonicalPath());
 
             if (StringUtils.stringSet(revision))
             {
                 options.setPubrevision(revision);
             }
 
-            String resolverName = getArtifactRepositoryResolver().getName();
+            String resolverName = configuration.getResolverName();
 
-            // annoying but necessary.  See CustomURLHandler for details.
-            URLHandler originalDefault = URLHandlerRegistry.getDefault();
-            try
-            {
-                URLHandlerRegistry.setDefault(new CustomURLHandler());
-                return ivy.publish(mrid, Collections.emptySet(), resolverName, options);
-            }
-            finally
-            {
-                URLHandlerRegistry.setDefault(originalDefault);
-            }
+            URLHandlerRegistry.setDefault(new CustomURLHandler());
+            ivy.publish(mrid, Collections.emptySet(), resolverName, options);
         }
         finally
         {
-            if (tmp != null && !FileSystemUtils.rmdir(tmp))
+            URLHandlerRegistry.setDefault(originalDefault);
+
+            if (tmp != null && !rmdir(tmp))
             {
-                LOG.warning("Failed to clean up: " + tmp.getCanonicalPath());
+                LOG.warning(I18N.format("warning.file.cleanup.failure", new String[]{tmp.getCanonicalPath()}));
             }
         }
     }
 
-    public ResolveReport resolve(ModuleDescriptor descriptor) throws IOException, ParseException
+    /**
+     * Retrieve the artifacts defined by the dependencies in this descriptor, and write them to the
+     * file system according to the target pattern.
+     *
+     * @param descriptor        the descriptor defining the dependencies to be retrieved.
+     * @param targetPattern     the pattern defining where the artifacts will be written.  This pattern,
+     * supports the usual ivy tokens.
+     *
+     * @return  a retrieval report containing details of the artifacts that were retrieved.
+     *
+     * @throws Exception is thrown if any problems are encountered.
+     */
+    public IvyRetrievalReport retrieveArtifacts(ModuleDescriptor descriptor, String targetPattern) throws IOException, ParseException
+    {
+        // annoying but necessary.  See CustomURLHandler for details.
+        URLHandler originalDefault = URLHandlerRegistry.getDefault();
+        try
+        {
+            ModuleRevisionId mrid = descriptor.getModuleRevisionId();
+
+            // always resolve the descriptor first since it may be different from what is in the cache.
+            resolve(descriptor);
+
+            String conf = "build";
+
+            RetrieveOptions options = new RetrieveOptions();
+            options.setConfs(new String[]{conf});
+            options.setSync(true); // important if the build directory is being re-used.
+
+            URLHandlerRegistry.setDefault(new CustomURLHandler());
+            ivy.retrieve(mrid, targetPattern, options);
+            IvyRetrievalReport report = new IvyRetrievalReport();
+
+            Map<ArtifactDownloadReport, Set<String>> artifactDownloadReports = ivy.getRetrieveEngine().determineArtifactsToCopy(mrid, targetPattern, options);
+            for (final ArtifactDownloadReport artifactDownloadReport : artifactDownloadReports.keySet())
+            {
+                report.addArtifact(artifactDownloadReport.getArtifact());
+            }
+
+            return report;
+        }
+        finally
+        {
+            URLHandlerRegistry.setDefault(originalDefault);
+        }
+    }
+
+    /**
+     * Resolve the descriptors dependencies, identifying the artifacts described and
+     * caching the result.
+     *
+     * @param descriptor    the descriptor whos dependencies are being resovled.
+     * @param confNames     the configuration names that define the set of dependencies to be resolved.
+     * @return  a resolve report.
+     *
+     * @throws Exception is thrown on error.
+     */
+    public ResolveReport resolve(ModuleDescriptor descriptor, String... confNames) throws IOException, ParseException
     {
         ResolveOptions options = new ResolveOptions();
         options.setValidate(ivy.getSettings().doValidate());
-        options.setConfs(ALL_CONFS);
+        if (confNames.length > 0)
+        {
+            options.setConfs(confNames);
+        }
+        else
+        {
+            options.setConfs(new String[]{"*"});
+        }
         options.setCheckIfChanged(true);
 
         return ivy.resolve(descriptor, options);
     }
 
-    public ResolveReport resolve(ModuleRevisionId mrid, String... confs) throws IOException, ParseException
-    {
-        ResolveOptions options = new ResolveOptions();
-        options.setValidate(ivy.getSettings().doValidate());
-        options.setConfs(ALL_CONFS);
-        options.setUseCacheOnly(true);
-        options.setConfs(confs);
-        options.setResolveId(ResolveOptions.getDefaultResolveId(mrid.getModuleId()));
-
-        return ivy.resolve(mrid, options, false);
-    }
-
-    public List<String> getArtifactPaths(ModuleRevisionId mrid) throws IOException, ParseException
-    {
-        final RepositoryResolver resolver = (RepositoryResolver) ivy.getSettings().getDefaultResolver();
-
-        ResolveOptions resolveOptions = new ResolveOptions();
-        ResolveData resolveData = new ResolveData(ivy.getResolveEngine(), resolveOptions);
-        DefaultDependencyDescriptor dependencyDescriptor = new DefaultDependencyDescriptor(mrid, true);
-
-        ResolvedResource resolvedResource = resolver.findIvyFileRef(dependencyDescriptor, resolveData);
-        if (resolvedResource == null || !resolvedResource.getResource().exists())
-        {
-            // failed to locate the ivy file, we can not continue.
-            throw new IllegalArgumentException("Failed to located ivy descriptor for '" + mrid + "'");
-        }
-
-        Resource resource = resolvedResource.getResource();
-        URL ivyFileUrl = resourceToURL(resource);
-        return getArtifactPaths(ivyFileUrl);
-    }
-
-    public List<String> getArtifactPaths(URL ivyFileUrl) throws ParseException, IOException
-    {
-        final RepositoryResolver resolver = (RepositoryResolver) ivy.getSettings().getDefaultResolver();
-        XmlModuleDescriptorParser parser = XmlModuleDescriptorParser.getInstance();
-
-        ModuleDescriptor repositoryBasedDescriptor = parser.parseDescriptor(ivy.getSettings(), ivyFileUrl, false);
-
-        List<ArtifactOrigin> artifactOrigins = CollectionUtils.map(repositoryBasedDescriptor.getAllArtifacts(), new Mapping<Artifact, ArtifactOrigin>()
-        {
-            public ArtifactOrigin map(Artifact artifact)
-            {
-                return resolver.locate(artifact);
-            }
-        });
-
-        // resolver.locate returns null if the artifact does not exist, so we filter out the nulls.
-        List<ArtifactOrigin> artifacts = CollectionUtils.filter(artifactOrigins, new Predicate<ArtifactOrigin>()
-        {
-            public boolean satisfied(ArtifactOrigin artifactOrigin)
-            {
-                return artifactOrigin != null;
-            }
-        });
-
-        return CollectionUtils.map(artifacts, new Mapping<ArtifactOrigin, String>()
-        {
-            public String map(ArtifactOrigin artifact)
-            {
-                return IvyPatternHelper.substitute(artifactPattern, artifact.getArtifact(), artifact);
-            }
-        });
-    }
-
-    private URL resourceToURL(Resource resource) throws MalformedURLException
-    {
-        if (resource instanceof FileResource)
-        {
-            return new File(resource.getName()).toURI().toURL();
-        }
-        else
-        {
-            return new URL(resource.getName());
-        }
-    }
-
-    public String getIvyPath(ModuleRevisionId mrid, String revision) throws IOException, ParseException
-    {
-        return IvyPatternHelper.substitute(ivyPattern, mrid.getOrganisation(), mrid.getName(), revision, "ivy", "xml", "xml");
-    }
-
-    public boolean isResolved(ModuleRevisionId mrid)
-    {
-        File ivyFile = (getCache() != null) ? getCache().getResolvedIvyFileInCache(mrid) : null;
-        return ivyFile != null && ivyFile.isFile();
-    }
-
-    public IvySettings getSettings()
-    {
-        return ivy.getSettings();
-    }
-
-    public ResolveEngine getResolveEngine()
-    {
-        return ivy.getResolveEngine();
-    }
-
-    public ResolutionCacheManager getResolutionCacheManager()
-    {
-        return ivy.getResolutionCacheManager();
-    }
-
-    public void setMessageLogger(MessageLogger logger)
+    /**
+     * Set this message logger to receive all future logging messages from ivy.
+     * This logger will continue to receive messages until it is popped.
+     *
+     * @param logger    the logger to receive logging messages.
+     *
+     * @see #popMessageLogger()
+     */
+    public void pushMessageLogger(MessageLogger logger)
     {
         ivy.getLoggerEngine().pushLogger(logger);
     }
 
-    private ResolutionCacheManager getCache()
+    public void popMessageLogger()
     {
-        return ivy.getResolutionCacheManager();
+        ivy.getLoggerEngine().popLogger();
     }
 
-    public DependencyResolver getArtifactRepositoryResolver()
+    private boolean isFile(String path)
     {
-        return ivy.getSettings().getDefaultResolver();
-    }
-
-    /**
-     * Get a command that wraps the dependency retrieve process.
-     *
-     * @return a command instance able to run a dependency retrieve during a
-     *         recipe execution.
-     */
-    public CommandConfiguration getRetrieveCommand()
-    {
-        // Note: the creation of this command is being embedded in teh ivy support
-        // to allow the recipe processor tests to 'override' the retrieve command
-        // with a noop.
-        RetrieveDependenciesCommandConfiguration command = new RetrieveDependenciesCommandConfiguration();
-        command.setName(RetrieveDependenciesCommand.COMMAND_NAME);
-        command.setIvy(this);
-        return command;
-    }
-
-    /**
-     * Return true if the specified descriptor has configured dependencies.
-     *
-     * @param descriptor the descriptor in question
-     * @return true if the descriptor has dependencies, false otherwise.
-     */
-    public boolean hasDependencies(ModuleDescriptor descriptor)
-    {
-        return descriptor != null && descriptor.getDependencies().length > 0;
-    }
-
-    /**
-     * Return true if the specified descriptor has artifacts for the specified
-     * configuration
-     *
-     * @param descriptor the descriptor in question
-     * @param conf       the configuration
-     * @return true if the descriptor has artifacts for the specified configuration.
-     */
-    public boolean hasArtifacts(ModuleDescriptor descriptor, String conf)
-    {
-        return descriptor != null && descriptor.getArtifacts(conf).length > 0;
+        try
+        {
+            return new URI(path).getScheme().equals("file");
+        }
+        catch (URISyntaxException e)
+        {
+            return false;
+        }
     }
 }

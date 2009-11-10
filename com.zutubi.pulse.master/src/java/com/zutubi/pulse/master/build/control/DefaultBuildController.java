@@ -11,10 +11,8 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -115,7 +113,6 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private IvyManager ivyManager;
     private RepositoryAttributes repositoryAttributes;
-    private ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory();
 
     public DefaultBuildController(BuildRequestEvent event)
     {
@@ -283,6 +280,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
     {
+        ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration());
         DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createRetrieveDescriptor(project, buildResult);
         descriptor.setStatus(buildResult.getStatus());
         return descriptor;
@@ -938,8 +936,10 @@ public class DefaultBuildController implements EventListener, BuildController
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
             String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
 
-            final IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
-            ivy.setMessageLogger(buildLogger.getMessageLogger());
+            IvyConfiguration configuration = new IvyConfiguration(repositoryUrl);
+            
+            final IvyClient ivy = ivyManager.createIvyClient(configuration);
+            ivy.pushMessageLogger(buildLogger.getMessageLogger());
 
             String host = new URL(masterUrl).getHost();
             String password = buildContext.getSecurityHash();
@@ -949,24 +949,23 @@ public class DefaultBuildController implements EventListener, BuildController
             CredentialsStore.INSTANCE.addCredentials(realm, host, user, password);
 
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);
-            final ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(projectConfig.getOrganisation(), projectConfig.getName(), version);
+
+            ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration());
+            DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version, configurationManager);
+            IvyModuleDescriptor.setBuildNumber(descriptor, buildResult.getNumber());
+
+            final ModuleRevisionId mrid = descriptor.getModuleRevisionId();
 
             // add projecthandle attribute to the repository.
             long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
             if (projectHandle != 0)
             {
-                String path = ivy.getIvyPath(mrid, version);
+                String path = configuration.getIvyPath(mrid, version);
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version, configurationManager);
-            descriptor.setStatus(buildResult.getStatus());
-            descriptor.addExtraInfo("buildNumber", String.valueOf(buildResult.getNumber()));
-
-            ivy.publishArtifacts(descriptor, "[sourcefile]");
-
-            ivy.resolve(descriptor);
-            ivy.publishIvy(descriptor, version);
+            ivy.publishArtifacts(descriptor);
+            ivy.publishDescriptor(descriptor);
         }
         catch (Exception e)
         {

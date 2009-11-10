@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.dependency.ivy;
 
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -17,10 +18,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 import org.apache.ivy.core.module.descriptor.Configuration;
-import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.MDArtifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -28,6 +27,7 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -41,25 +41,57 @@ public class ModuleDescriptorFactory
 {
     public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
 
+    private IvyConfiguration configuration;
+
+    public ModuleDescriptorFactory(IvyConfiguration configuration)
+    {
+        this.configuration = configuration;
+    }
+
     /**
-     * Create a descriptor based on the specified configuration.
+     * Create a module descriptor that contains the details necessary to retrieve the
+     * dependencies as defined by the configuration.
      *
-     * @param project the configuration on which to base the descriptor
+     * @param project   the configuration on which to base the descriptor
+     * 
      * @return the created descriptor.
+     *
+     * @see #createRetrieveDescriptor(com.zutubi.pulse.master.tove.config.project.ProjectConfiguration, com.zutubi.pulse.master.model.BuildResult)
      */
     public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project)
     {
         return createRetrieveDescriptor(project, null);
     }
     
+    /**
+     * Create a module descriptor that contains the details necessary to retrieve the
+     * dependencies as defined by the configuration.
+     *
+     * @param project   the configuration on which to base the descriptor
+     * @param result    the build result for the current build
+     *
+     * @return the created descriptor.
+     *
+     * @see #createRetrieveDescriptor(com.zutubi.pulse.master.tove.config.project.ProjectConfiguration, com.zutubi.pulse.master.model.BuildResult)
+     */
     public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, BuildResult result)
     {
         return createRetrieveDescriptor(project, result, null);
     }
 
     /**
-     * Create an ivy descriptor based on the specified configuration, that can be used for
-     * the dependency retrieval process.
+     * Create a module descriptor that contains the details necessary to retrieve the dependencies
+     * as defined by the configuration.
+     *
+     * If a build result is specified, then the descriptors dependencies will match the results
+     * dependencies when possible.  This is required when a build result is part of a larger build
+     * and we want to ensure that dependencies are taken from that build rather than the configured
+     * revision.
+     *
+     * The build result should be the build result associated with the build for which the retrieval
+     * descriptor is used.
+     *
+     * The revision field defines the revision of the generated module descriptor.
      *
      * @param project   the configuration on which to base the descriptor.
      * @param result    the build result for the current build
@@ -68,43 +100,45 @@ public class ModuleDescriptorFactory
      */
     public DefaultModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, BuildResult result, String revision)
     {
-        ModuleRevisionId mrid = newInstance(project, revision);
-
+        String status = (result != null && result.getStatus() != null) ? result.getStatus() : project.getDependencies().getStatus();
+        IvyModuleDescriptor ivyDescriptor = new IvyModuleDescriptor(newInstance(project, revision), status, configuration);
         DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
-
-        String status = project.getDependencies().getStatus();
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null);
-        descriptor.addConfiguration(new Configuration(IvyClient.CONFIGURATION_BUILD));
-        descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
-
         for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
         {
             ModuleRevisionId dependencyMrid = getDependencyMRID(result, dependency);
-            
-            DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
-
-            String stages = DependencyConfiguration.ALL_STAGES;
+            List<String> stageNames = new LinkedList<String>();
             if (!dependency.isAllStages())
             {
-                List<String> stageNames = CollectionUtils.map(dependency.getStages(), new Mapping<BuildStageConfiguration, String>()
+                stageNames = CollectionUtils.map(dependency.getStages(), new Mapping<BuildStageConfiguration, String>()
                 {
                     public String map(BuildStageConfiguration stage)
                     {
                         return IvyUtils.ivyEncodeStageName(stage.getName());
                     }
                 });
-                stages = StringUtils.join(",", stageNames);
             }
-            depDesc.addDependencyConfiguration(IvyClient.CONFIGURATION_BUILD, stages);
-
-            descriptor.addDependency(depDesc);
+            ivyDescriptor.addDependency(dependencyMrid, dependency.isTransitive(), stageNames.toArray(new String[stageNames.size()]));
         }
 
-        return descriptor;
+        return ivyDescriptor.getDescriptor();
     }
 
+    /**
+     * Determine the module revision that this dependency references.  If the build result is related
+     * to a build of the project we are dependent on, then the dependency will reference this build,
+     * otherwise the dependency will reference the version defined in the configuraiton.
+     *
+     * @param result        a build result, or null.
+     * @param dependency    the dependency configuration
+     * 
+     * @return  the module revision we should be depending on.
+     */
     private ModuleRevisionId getDependencyMRID(BuildResult result, DependencyConfiguration dependency)
     {
+        //NOTE: an alternate implementation might involve using the over arching build id to identify the
+        //      set of results associated with it, and using this and the project name to identify the result
+        //      of interest.
+
         ProjectConfiguration dependsOnProject = dependency.getProject();
         BuildResult dependsOnResult = (result != null) ? result.getDependsOn(dependsOnProject.getName()) : null;
         ModuleRevisionId dependencyMrid;
@@ -132,37 +166,7 @@ public class ModuleDescriptorFactory
      */
     public DefaultModuleDescriptor createDescriptor(ProjectConfiguration project, BuildResult result, String revision, final MasterConfigurationManager configurationManager) throws IOException
     {
-        ModuleRevisionId mrid = newInstance(project, revision);
-
-        DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
-
-        String status = project.getDependencies().getStatus();
-        final DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null);
-        descriptor.addConfiguration(new Configuration(IvyClient.CONFIGURATION_BUILD));
-        descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
-
-        for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
-        {
-            ModuleRevisionId dependencyMrid = getDependencyMRID(result, dependency);
-
-            DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
-
-            String stages = DependencyConfiguration.ALL_STAGES;
-            if (!dependency.isAllStages())
-            {
-                List<String> stageNames = CollectionUtils.map(dependency.getStages(), new Mapping<BuildStageConfiguration, String>()
-                {
-                    public String map(BuildStageConfiguration stage)
-                    {
-                        return IvyUtils.ivyEncodeStageName(stage.getName());
-                    }
-                });
-                stages = StringUtils.join(",", stageNames);
-            }
-            depDesc.addDependencyConfiguration(IvyClient.CONFIGURATION_BUILD, stages);
-
-            descriptor.addDependency(depDesc);
-        }
+        final DefaultModuleDescriptor descriptor = createRetrieveDescriptor(project, result, revision);
 
         final boolean[] success = { true };
         result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()

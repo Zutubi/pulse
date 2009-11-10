@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;

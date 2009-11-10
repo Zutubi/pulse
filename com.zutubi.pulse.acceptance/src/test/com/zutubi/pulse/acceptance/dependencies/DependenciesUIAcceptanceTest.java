@@ -27,7 +27,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         randomName = randomName();
 
         repository = new Repository();
-        repository.clear();
+        repository.clean();
 
         browser = new SeleniumBrowser();
         browser.start();
@@ -117,7 +117,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
 
         // delete the artifact from the file system
-        repository.clear();
+        repository.clean();
 
         browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
         assertFalse(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));

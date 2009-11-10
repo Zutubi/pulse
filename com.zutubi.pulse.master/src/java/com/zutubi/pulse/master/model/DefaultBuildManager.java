@@ -3,9 +3,8 @@ package com.zutubi.pulse.master.model;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
-import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
@@ -25,14 +24,11 @@ import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.ivy.util.url.CredentialsStore;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,7 +51,6 @@ public class DefaultBuildManager implements BuildManager
     private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
     private FileDeletionService fileDeletionService;
 
-    private IvyManager ivyManager;
     private MasterLocationProvider masterLocationProvider;
     private RepositoryAttributes repositoryAttributes;
 
@@ -608,62 +603,46 @@ public class DefaultBuildManager implements BuildManager
     {
         final List<File> repositoryFiles = new LinkedList<File>();
 
-        String securityToken = RandomUtils.randomToken(15);
-        try
+        // provide the authentication details for the subsquent repository requests.
+        String masterLocation = masterLocationProvider.getMasterUrl();
+
+        // the reponse from the ivy client will be relative to the repository root.
+        final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
+
+        IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);
+
+        String candidateIvyPath = configuration.getIvyPath(MasterIvyModuleRevisionId.newInstance(build), build.getVersion());
+        File candidateIvyFile = new File(repositoryRoot, candidateIvyPath);
+        if (!candidateIvyFile.isFile())
         {
-            repositoryAuthenticationProvider.activate(securityToken);
+            List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
 
-            // provide the authentication details for the subsquent repository requests.
-            String masterLocation = masterLocationProvider.getMasterUrl();
-            String host = new URL(masterLocation).getHost();
-
-            // the reponse from the ivy client will be relative to the repository root.
-            final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
-
-            final IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
-
-            String user = AuthenticatedAction.USER;
-            String realm = AuthenticatedAction.REALM;
-            CredentialsStore.INSTANCE.addCredentials(realm, host, user, securityToken);
-
-            String candidateIvyPath = ivy.getIvyPath(MasterIvyModuleRevisionId.newInstance(build), build.getVersion());
-            File candidateIvyFile = new File(repositoryRoot, candidateIvyPath);
-            if (!candidateIvyFile.isFile())
+            // file the ivy file.
+            candidateIvyPath = CollectionUtils.find(paths, new Predicate<String>()
             {
-                List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
-
-                // file the ivy file.
-                candidateIvyPath = CollectionUtils.find(paths, new Predicate<String>()
+                public boolean satisfied(String path)
                 {
-                    public boolean satisfied(String path)
-                    {
-                        return new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml").isFile();
-                    }
-                });
-                candidateIvyFile = new File(repositoryRoot, candidateIvyPath + "/ivy-" + build.getVersion() + ".xml");
-            }
-
-            if (candidateIvyFile.isFile())
-            {
-                URL ivyUrl = candidateIvyFile.toURI().toURL();
-
-                List<String> artifacts = ivy.getArtifactPaths(ivyUrl);
-                if (artifacts != null)
-                {
-                    for (String relativePath : artifacts)
-                    {
-                        File file = new File(repositoryRoot, relativePath);
-                        repositoryFiles.add(file);
-                        repositoryFiles.addAll(findRelatedFiles(file));
-                    }
+                    return new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml").isFile();
                 }
-                repositoryFiles.add(candidateIvyFile);
-                repositoryFiles.addAll(findRelatedFiles(candidateIvyFile));
-            }
+            });
+            candidateIvyFile = new File(repositoryRoot, candidateIvyPath + "/ivy-" + build.getVersion() + ".xml");
         }
-        finally
+
+        if (candidateIvyFile.isFile())
         {
-            repositoryAuthenticationProvider.deactivate(securityToken);
+            IvyModuleDescriptor ivyModuleDescriptor = IvyModuleDescriptor.newInstance(candidateIvyFile, configuration);
+            List<String> artifacts = ivyModuleDescriptor.getArtifactPaths();
+            if (artifacts != null)
+            {
+                for (String relativePath : artifacts)
+                {
+                    File file = new File(repositoryRoot, relativePath);
+                    repositoryFiles.add(file);
+                    repositoryFiles.addAll(findRelatedFiles(file));
+                }
+            }
+            repositoryFiles.add(candidateIvyFile);
+            repositoryFiles.addAll(findRelatedFiles(candidateIvyFile));
         }
 
         return repositoryFiles;
@@ -809,11 +788,6 @@ public class DefaultBuildManager implements BuildManager
     public void setThreadFactory(PulseThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    public void setIvyManager(IvyManager ivyManager)
-    {
-        this.ivyManager = ivyManager;
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
