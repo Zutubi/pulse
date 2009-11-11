@@ -598,6 +598,7 @@ public class NativeGit
                         catch (NumberFormatException e)
                         {
                             LOG.severe("Failed to parse the timestamp: '" + str + "'");
+                            LOG.severe("The log output received was:\n" + StringUtils.join("\n", lines));
                         }
 
                         String comment = "";
@@ -636,8 +637,7 @@ public class NativeGit
             catch (Exception e)
             {
                 // print some debugging output.
-                LOG.severe("A problem has occured whilst parsing the git log output.");
-                LOG.severe(e);
+                LOG.severe("A problem has occured whilst parsing the git log output: " + e.getMessage(), e);
                 LOG.severe("The log output received was:\n" + StringUtils.join("\n", lines));
 
                 throw new GitException(e);
