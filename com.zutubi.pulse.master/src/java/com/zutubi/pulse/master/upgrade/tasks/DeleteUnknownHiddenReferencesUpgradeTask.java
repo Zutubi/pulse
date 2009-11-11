@@ -48,14 +48,16 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
                 String scope = pathElements[0];
                 String owner = pathElements[1];
 
-                Record owningRecord = recordManager.select(PathUtils.getPath(scope, owner));
+                String owningPath = PathUtils.getPath(scope, owner);
+                Record owningRecord = recordManager.select(owningPath);
                 String owningParentPath = getTemplateParentPath(owningRecord);
                 if (owningParentPath == null)
                 {
-                    LOG.warning("Hidden keys found in path " + path + " ignored, no parent path.");
-                    LOG.warning(" - owning path: " + PathUtils.getPath(scope, owner));
-                    LOG.warning(" - parent handle: " + owningRecord.getMeta(TemplateRecord.PARENT_KEY));
-                    LOG.warning(" - parent path: " + recordManager.getPathForHandle(Long.parseLong(owningRecord.getMeta(TemplateRecord.PARENT_KEY))));
+                    // unable to locate the parent record in which we check for the existance of the hidden items.
+                    LOG.warning("Hidden keys found in path " + path + " ignored, no owning parent path located.");
+                    LOG.warning(" - owning path: " + owningPath);
+                    LOG.warning(" - owning record exists: " + (owningRecord != null));
+                    LOG.warning(" - template parent handle: " + getTemplateParentHandle(owningRecord));
                     return;
                 }
 
@@ -65,6 +67,14 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
                 System.arraycopy(pathElements, 2, parentPath, 2, parentPath.length - 2);
 
                 Record parent = recordManager.select(PathUtils.getPath(parentPath));
+                if (parent == null)
+                {
+                    LOG.warning("Hidden keys found in path " + path + " ignored: Failed to load parent record.");
+                    LOG.warning(" - owning path: " + owningPath);
+                    LOG.warning(" - owning parent path: " + owningParentPath);
+                    LOG.warning(" - parent path: " + PathUtils.getPath(parentPath));
+                    return;
+                }
                 
                 for (String hiddenKey : hiddenKeys)
                 {
