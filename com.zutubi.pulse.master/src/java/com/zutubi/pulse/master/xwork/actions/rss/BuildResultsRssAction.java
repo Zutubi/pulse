@@ -23,15 +23,19 @@ import com.zutubi.pulse.master.webwork.dispatcher.JITFeed;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.i18n.Messages;
 import org.hibernate.criterion.Projections;
 
 import java.io.StringWriter;
 import java.util.*;
 
 /**
+ * Generate a build results rss feed.
  */
 public class BuildResultsRssAction extends ProjectActionSupport
 {
+    private static final Messages I18N = Messages.getInstance(BuildResultsRssAction.class);
+    
     private Urls urls;
     private CacheManager cacheManager;
 
@@ -43,7 +47,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     private JITFeed feed;
 
-    private long userId = -1;
+    private long userId = NONE_SPECIFIED;
     private String groupName;
 
     public void setUserId(long userId)
@@ -63,40 +67,86 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     public String execute()
     {
+        RssFeedTemplate feedTemplate;
+
         urls = new Urls(getBaseUrl());
 
         // check that rss is enabled.
         if (!configurationProvider.get(GlobalConfiguration.class).isRssEnabled())
         {
             addActionError("rss feed is disabled");
-            return "disabled";
+            feedTemplate = new ErrorResultTemplate(
+                    I18N.format("disabled.title"),
+                    I18N.format("disabled.description")
+            );
         }
-
-        Project project = getProject();
-        if (project == null)
+        else if (projectId != NONE_SPECIFIED)
         {
-            if (userId != -1)
+            Project project = projectManager.getProject(projectId, false);
+            if (project != null)
             {
-                User u = userManager.getUser(userId);
-                feed = new BuildJITFeed(new UserDashboardTemplate(u));
-            }
-            else if(TextUtils.stringSet(groupName))
-            {
-                ProjectGroup g = projectManager.getProjectGroup(groupName);
-                feed = new BuildJITFeed(new ProjectGroupTemplate(g));
+                feedTemplate = new ProjectResultTemplate(project);
             }
             else
             {
-                feed = new BuildJITFeed(new AllProjectsResultTemplate());
+                feedTemplate = new ErrorResultTemplate(
+                        I18N.format("unknown.project.title", projectId),
+                        I18N.format("unknown.project.description", projectId)
+                );
+            }
+        }
+        else if (TextUtils.stringSet(projectName))
+        {
+            Project project = projectManager.getProject(projectName, false);
+            if (project != null)
+            {
+                feedTemplate = new ProjectResultTemplate(project);
+            }
+            else
+            {
+                feedTemplate = new ErrorResultTemplate(
+                        I18N.format("unknown.project.title", new Object[]{projectName}),
+                        I18N.format("unknown.project.description", new Object[]{projectName})
+                );
+            }
+        }
+        else if (TextUtils.stringSet(groupName))
+        {
+            ProjectGroup group = projectManager.getProjectGroup(groupName);
+            if (group.getProjects().size() != 0)
+            {
+                feedTemplate = new ProjectGroupTemplate(group);
+            }
+            else
+            {
+                feedTemplate = new ErrorResultTemplate(
+                        I18N.format("unknown.group.title", new Object[]{groupName}),
+                        I18N.format("unknown.group.description", new Object[]{groupName})
+                );
+            }
+        }
+        else if (userId != NONE_SPECIFIED)
+        {
+            User user = userManager.getUser(userId);
+            if (user != null)
+            {
+                feedTemplate = new UserDashboardTemplate(user);
+            }
+            else
+            {
+                feedTemplate = new ErrorResultTemplate(
+                        I18N.format("unknown.user.title", userId),
+                        I18N.format("unknown.user.description", userId)
+                );
             }
         }
         else
         {
-            feed = new BuildJITFeed(new ProjectResultTemplate(project));
+            feedTemplate = new AllProjectsResultTemplate();
         }
 
-        // return the requested feed type. at the moment,
-        // we only support RSS.
+        feed = new BuildJITFeed(feedTemplate);
+
         return "rss";
     }
 
@@ -153,24 +203,115 @@ public class BuildResultsRssAction extends ProjectActionSupport
         return projectManager.getProjectConfig(project.getId(), true).getName();
     }
 
-    private interface RssFeedTemplate
+    /**
+     * Base class for the different build feed types.
+     */
+    protected abstract class RssFeedTemplate
     {
-        SearchQuery<Long> getQuery();
+        /**
+         * The query that generates the data set for the feed.  The ids returned by the
+         * queries are ids for build results.
+         *
+         * @return
+         */
+        protected abstract SearchQuery<Long> getQuery();
 
-        String getTitle();
+        /**
+         * Get the title for this feed.
+         *
+         * @return  the title string.
+         */
+        protected abstract String getTitle();
 
-        String getDescription();
+        /**
+         * Get a human readable description of this feed.
+         *
+         * @return the description.
+         */
+        protected abstract String getDescription();
 
-        String getLink();
+        /**
+         * Get a link to be associated with this feed.  The link should take the
+         * user to the data set contained by this feed.
+         *
+         * Note that this link will be rendered on an external client, so needs to
+         * be fully qualified.
+         *
+         * @return
+         */
+        protected abstract String getLink();
 
-        String getEntryTitle(BuildResult result);
+        /**
+         * Get the title for the feed entry that contains the specified build result.
+         *
+         * @param result    the build result being rendered.
+         * @return
+         */
+        protected abstract String getEntryTitle(BuildResult result);
 
-        String getEntryLink(BuildResult result);
+        /**
+         * Get an id that uniquely identifies the data from this feed.  This is used
+         * for caching purposes, and must be unique.
+         *
+         * @return a unique identifier.
+         */
+        protected abstract String getUID();
 
-        String getUID();
+        protected String getEntryLink(BuildResult result)
+        {
+            return urls.build(result);
+        }
     }
 
-    private class AllProjectsResultTemplate implements RssFeedTemplate
+    /**
+     * This template allows error messages to be returned to the client using the
+     * feed format so that it can be read by the feed reader.
+     */
+    private class ErrorResultTemplate extends RssFeedTemplate
+    {
+        private String title;
+        private String description;
+
+        private ErrorResultTemplate(String title, String description)
+        {
+            this.title = title;
+            this.description = description;
+        }
+
+        protected SearchQuery<Long> getQuery()
+        {
+            return null;
+        }
+
+        protected String getTitle()
+        {
+            return title;
+        }
+
+        protected String getDescription()
+        {
+            return description;
+        }
+
+        protected String getLink()
+        {
+            return urls.projects();
+        }
+
+        protected String getEntryTitle(BuildResult result)
+        {
+            // never going to happen.
+            return null;
+        }
+
+        protected String getUID()
+        {
+            // this query does not return any results, so do not cache it.
+            return null;
+        }
+    }
+
+    private class AllProjectsResultTemplate extends RssFeedTemplate
     {
         public SearchQuery<Long> getQuery()
         {
@@ -208,18 +349,13 @@ public class BuildResultsRssAction extends ProjectActionSupport
             );
         }
 
-        public String getEntryLink(BuildResult result)
-        {
-            return urls.build(result);
-        }
-
         public String getUID()
         {
             return "AllProjectsResultTemplate";
         }
     }
 
-    private class ProjectGroupTemplate implements RssFeedTemplate
+    private class ProjectGroupTemplate extends RssFeedTemplate
     {
         private ProjectGroup group;
 
@@ -276,18 +412,13 @@ public class BuildResultsRssAction extends ProjectActionSupport
             );
         }
 
-        public String getEntryLink(BuildResult result)
-        {
-            return urls.build(result);
-        }
-
         public String getUID()
         {
             return "ProjectGroupTemplate." + ((group != null) ? StringUtils.uriComponentEncode(group.getName()) : "");
         }
     }
 
-    private class ProjectResultTemplate implements RssFeedTemplate
+    private class ProjectResultTemplate extends RssFeedTemplate
     {
         private Project project;
 
@@ -329,18 +460,13 @@ public class BuildResultsRssAction extends ProjectActionSupport
             return String.format("Build %s %s", result.getNumber(), (result.succeeded() ? "succeeded" : "failed"));
         }
 
-        public String getEntryLink(BuildResult result)
-        {
-            return urls.build(result);
-        }
-
         public String getUID()
         {
             return "ProjectResultTemplate." + ((project != null) ? project.getId() : "");
         }
     }
 
-    private class UserDashboardTemplate implements RssFeedTemplate
+    private class UserDashboardTemplate extends RssFeedTemplate
     {
         private User user;
 
@@ -389,11 +515,6 @@ public class BuildResultsRssAction extends ProjectActionSupport
                     result.getNumber(),
                     (result.succeeded() ? "succeeded" : "failed")
             );
-        }
-
-        public String getEntryLink(BuildResult result)
-        {
-            return urls.build(result);
         }
 
         public String getUID()
@@ -475,7 +596,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
                     return entry;
                 }
             });
-            
+
             feed.setEntries(entries);
             return feed.createWireFeed(format);
         }
@@ -489,7 +610,10 @@ public class BuildResultsRssAction extends ProjectActionSupport
         if (entries == null)
         {
             entries = new LinkedList<CacheEntry>();
-            cache.put(key, entries);
+            if (key != null) // only cache entries where a key is defined.
+            {
+                cache.put(key, entries);
+            }
         }
 
         synchronized (entries)
