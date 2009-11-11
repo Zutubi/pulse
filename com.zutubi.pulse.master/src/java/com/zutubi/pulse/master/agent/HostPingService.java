@@ -161,8 +161,11 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
                     LOG.warning(message);
                     status = new HostStatus(PingStatus.OFFLINE, message);
                 }
-
-                pingCompleted(host);
+                finally
+                {
+                    pingCompleted(host);
+                }
+                
                 eventManager.publish(new HostPingEvent(this, host, status));
             }
         });

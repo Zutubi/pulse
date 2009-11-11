@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -63,6 +62,8 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
@@ -372,7 +373,8 @@ public class DefaultBuildController implements EventListener, BuildController
         catch (Exception e)
         {
             LOG.severe(e);
-            buildResult.error("Unexpected error: " + e.getMessage());
+            buildResult.error();
+            recordUnexpectedError(Feature.Level.ERROR, e, "Handling " + evt.getClass().getSimpleName());
             completeBuild();
         }
     }
@@ -778,12 +780,26 @@ public class DefaultBuildController implements EventListener, BuildController
                 {
                     LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
                 }
+                catch (Exception e)
+                {
+                    LOG.warning("Unexpected error retrieving changelist details from SCM server: " + e.getMessage(), e);
+                    recordUnexpectedError(Feature.Level.WARNING, e, "Retrieving changelist details from SCM server");
+                }
                 finally
                 {
                     IOUtils.close(client);
                 }
             }
         }
+    }
+
+    private void recordUnexpectedError(Feature.Level level, Exception exception, String context)
+    {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        printWriter.println("Unexpected error: " + context + ":");
+        exception.printStackTrace(printWriter);
+        buildResult.addFeature(level, stringWriter.toString());
     }
 
     private void scheduleTimeout(long recipeId)

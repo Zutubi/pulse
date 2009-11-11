@@ -1,0 +1,100 @@
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+d724b1708149ec8eac0d7f6ad44161d00c66c1b2
+Dev1 (Name Middle Lastname)
+1257427193
+Don't crash in QStateMachine when event transition listens to
+QApplication instance
+
+We can't assert on actually watching the watched object, since we may
+have installed an event filter on QApplication::instance(), in which
+case we will filter events for all objects.
+
+Reviewed-by: Dev2 (One name)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	src/corelib/statemachine/qstatemachine.cpp
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+ec13cf30f10dabce37af3ce9d6763066e8cf4cc4
+Dev3 (Name Lastname, lastname includes norwegian characters. Special norwegian characters are æ.ø,å)
+1257416608
+Removed the FBO stacking behaviour and the test attached to it.
+Having this behaviour in QGLFrameBufferObject complicates alot of things
+and isn't really necessary.
+
+Reviewed-by: Dev4 (Name Lastname)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	src/opengl/qglframebufferobject.cpp
+M	src/opengl/qglframebufferobject_p.h
+M	tests/auto/qgl/tst_qgl.cpp
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+a12b1538df45268f2a66ec55856ffeeb131eb751
+Dev5 (Name Middle Last)
+1257412771
+Fixed soft-light composition mode in raster and OpenGL1.
+Updated the soft-light composition mode implementation in the raster
+and OpenGL1 engines to use the equations in the SVG specification as of
+April 2009.
+
+Task-number: QTBUG-3193
+Reviewed-by: Dev6 (Name)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	src/gui/painting/qdrawhelper.cpp
+M	src/opengl/util/composition_mode_softlight.glsl
+M	src/opengl/util/fragmentprograms_p.h
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+b91f1a2f749586014e8b28c6766015ff6ba62ee7
+Dev7 (Name Last)
+1257403565
+Modify QGLShader and QGLShaderProgram in response to API review
+Reviewed-by: Dev8 (Name Last)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	demos/boxes/scene.cpp
+M	doc/src/snippets/code/src_opengl_qglshaderprogram.cpp
+M	examples/opengl/hellogl_es2/glwidget.cpp
+M	examples/opengl/textures/glwidget.cpp
+M	src/opengl/gl2paintengineex/qglengineshadermanager.cpp
+M	src/opengl/gl2paintengineex/qpaintengineex_opengl2.cpp
+M	src/opengl/qglshaderprogram.cpp
+M	src/opengl/qglshaderprogram.h
+M	src/opengl/qwindowsurface_gl.cpp
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+23572588c4b0c759c14a6c1687e5bd86461e31e8
+Dev9 (Name)
+1257365581
+Fixed some debug and some minor optims to QPaintBuffer
+Reviewed-by: Dev10 (Name)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	src/gui/painting/qpaintbuffer.cpp
+M	src/gui/painting/qpaintbuffer_p.h
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+1a71e4b7960ba27fe6d47815da9337020085ac16
+Dev11 (Name)
+1257365581
+Made QPen== catch QPen(Qt::NoPen) == QPen(QBrush(Qt::NoBrush))
+QSvgDocument uses the latter as default pen so every svg filling
+command would issue a penChange without this.
+
+Reviewed-by: Dev12 (Name)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	src/gui/painting/qpen.cpp
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+391441b2ce2be527db0829798631436670df0965
+Dev13 (Name)
+1257365580
+Added some helpful info to QBrush and QPen's QDebug operators
+Reviewed-by: Dev14 (Name)
+
+#5d7bf160-ce21-11de-8a39-0800200c9a66
+M	src/gui/painting/qbrush.cpp
+M	src/gui/painting/qpen.cpp

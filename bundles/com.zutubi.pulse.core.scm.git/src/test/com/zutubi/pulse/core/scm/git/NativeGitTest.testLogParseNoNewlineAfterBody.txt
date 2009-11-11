@@ -4,17 +4,13 @@ Alan User
 1257227193
 Revert "Some change"
 This reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.
-
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 M       configure.exe
-
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 406d8ef682af938172aa5f196774666f83811289
 Alan User
 1257327193
 Revert "Another Change"
 This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.
-
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 M       tools/configure/configureapp.cpp
-
