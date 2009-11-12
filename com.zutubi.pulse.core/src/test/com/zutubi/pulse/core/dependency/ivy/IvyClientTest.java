@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.apache.ivy.util.DefaultMessageLogger;
+import org.apache.ivy.util.Message;
+
 public class IvyClientTest extends ZutubiTestCase
 {
     private IvyClient client;
@@ -14,6 +17,7 @@ public class IvyClientTest extends ZutubiTestCase
     private File tmp;
     private File repositoryBase;
     private File workBase;
+    private File cacheBase;
 
     private IvyModuleDescriptor descriptor;
     private IvyConfiguration configuration;
@@ -26,10 +30,12 @@ public class IvyClientTest extends ZutubiTestCase
         tmp = createTempDirectory();
         repositoryBase = new File(tmp, "repository");
         workBase = new File(tmp, "work");
+        cacheBase = new File(tmp, "cache");
 
         configuration = new IvyConfiguration(repositoryBase.toURI().toString());
-        
+        configuration.setCacheBase(cacheBase);
         client = new IvyClient(configuration);
+//        client.pushMessageLogger(new DefaultMessageLogger(Message.MSG_VERBOSE));
 
         descriptor = new IvyModuleDescriptor("org", "module", "revision", configuration);
     }

@@ -292,7 +292,7 @@ public class IvyClient
             options.setConfs(new String[]{"*"});
         }
         options.setCheckIfChanged(true);
-
+        options.setUseCacheOnly(false);
         return ivy.resolve(descriptor, options);
     }
 

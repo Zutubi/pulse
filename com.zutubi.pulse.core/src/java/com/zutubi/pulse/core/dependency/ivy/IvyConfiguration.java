@@ -10,6 +10,7 @@ import java.util.Map;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.IOException;
+import java.io.File;
 import java.text.ParseException;
 
 /**
@@ -22,6 +23,10 @@ public class IvyConfiguration
     private static final String DEFAULT_PATTERN_ARTIFACT = "([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[ext]";
     private static final String DEFAULT_PATTERN_IVY = "([organisation]/)[module]/ivy-[revision].xml";
     
+    private static final String IVY_CACHE_DIR = "ivy.cache.dir";
+    private static final String IVY_CACHE_RESOLUTION = "ivy.cache.resolution";
+    private static final String IVY_CACHE_REPOSITORY = "ivy.cache.repository";
+
     private static final String DEFAULT_RESOLVER_NAME = "pulse";
 
     /**
@@ -90,6 +95,13 @@ public class IvyConfiguration
     public void setVariable(String name, String value)
     {
         variables.put(name, value);
+    }
+
+    public void setCacheBase(File cacheBase) throws IOException
+    {
+        setVariable(IVY_CACHE_DIR, cacheBase.toURI().toString());
+        setVariable(IVY_CACHE_RESOLUTION, cacheBase.getCanonicalPath());
+        setVariable(IVY_CACHE_REPOSITORY, cacheBase.getCanonicalPath());
     }
 
     public String getRepositoryBase()

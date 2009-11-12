@@ -76,9 +76,7 @@ public class IvyManager
     {
         if (cacheBase != null)
         {
-            configuration.setVariable("ivy.cache.dir", cacheBase.toURI().toString());
-            configuration.setVariable("ivy.cache.resolution", cacheBase.getCanonicalPath());
-            configuration.setVariable("ivy.cache.repository", cacheBase.getCanonicalPath());
+            configuration.setCacheBase(cacheBase);
         }
     }
 }
