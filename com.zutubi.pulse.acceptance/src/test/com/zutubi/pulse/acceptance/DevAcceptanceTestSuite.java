@@ -22,6 +22,8 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
 
+        suite.addTestSuite(RssAcceptanceTest.class);
+
         //---( web ui acceptance tests )---
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
