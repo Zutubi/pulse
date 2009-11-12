@@ -68,4 +68,9 @@ public class RandomUtils
             return randomString(length);
         }
     }
+
+    public static long randomLong()
+    {
+        return RAND.nextLong();
+    }
 }

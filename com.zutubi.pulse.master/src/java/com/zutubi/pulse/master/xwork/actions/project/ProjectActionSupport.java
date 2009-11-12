@@ -20,7 +20,7 @@ public class ProjectActionSupport extends ActionSupport
     protected ScmManager scmManager;
     protected Scheduler scheduler;
 
-    private static final long NONE_SPECIFIED = -1;
+    protected static final long NONE_SPECIFIED = -1;
 
     protected long projectId = NONE_SPECIFIED;
     protected String projectName = null;

@@ -24,6 +24,8 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
 
+        suite.addTestSuite(RssAcceptanceTest.class);
+
         //---( web ui acceptance tests )---
         suite.addTestSuite(AgentsSectionAcceptanceTest.class);
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
