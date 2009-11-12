@@ -61,7 +61,7 @@ public class IvyManager
         
         applyCacheSettings(configuration);
         
-        IvySettings settings = configuration.loadDefaultSettings();
+        IvySettings settings = configuration.loadSettings();
 
         settings.getResolutionCacheManager().clean();
         

@@ -124,11 +124,12 @@ public class ModuleDescriptorFactory
     }
 
     /**
-     * Determine the module revision that this dependency references.  If the build result is related
-     * to a build of the project we are dependent on, then the dependency will reference this build,
-     * otherwise the dependency will reference the version defined in the configuraiton.
+     * Determine the module revision that this dependency references.  If the build result is part of a
+     * larger meta build that also built the dependency, then the dependency will reference the specific
+     * dependency revision that was produced as part of the meta build.  Otherwise, the dependency will
+     * reference the revision as defined by the configuration.
      *
-     * @param result        a build result, or null.
+     * @param result        a build result, or null if this processing occurs outside the context of a build.
      * @param dependency    the dependency configuration
      * 
      * @return  the module revision we should be depending on.

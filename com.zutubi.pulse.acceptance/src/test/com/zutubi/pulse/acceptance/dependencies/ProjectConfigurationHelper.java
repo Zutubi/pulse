@@ -127,7 +127,6 @@ public abstract class ProjectConfigurationHelper
         AntCommandConfiguration command = new AntCommandConfiguration();
         command.setBuildFile("build.xml");
         command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
-        // add the reference to the ant post processor.
         command.addPostProcessor(config.getPostProcessors().get(ANT_PROCESSOR_NAME));
         return command;
     }

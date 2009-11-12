@@ -76,7 +76,7 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
             Resource res = new MemoryResource("ivy.xml", descriptor);
             ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser(res);
             
-            IvySettings ivySettings = new IvyConfiguration().loadDefaultSettings();
+            IvySettings ivySettings = new IvyConfiguration().loadSettings();
 
             return parser.parseDescriptor(ivySettings, tmp.toURI().toURL(), res, ivySettings.doValidate());
         }

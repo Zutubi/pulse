@@ -55,7 +55,7 @@ public class IvyModuleDescriptor
     {
         ModuleDescriptorParser parser =  XmlModuleDescriptorParser.getInstance();
 
-        IvySettings ivySettings = configuration.loadDefaultSettings();
+        IvySettings ivySettings = configuration.loadSettings();
 
         return new IvyModuleDescriptor((DefaultModuleDescriptor) parser.parseDescriptor(ivySettings, url, ivySettings.doValidate()), configuration);
     }

@@ -7,9 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.apache.ivy.util.DefaultMessageLogger;
-import org.apache.ivy.util.Message;
-
 public class IvyClientTest extends ZutubiTestCase
 {
     private IvyClient client;
@@ -105,7 +102,7 @@ public class IvyClientTest extends ZutubiTestCase
         IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]");
 
         assertExists(workBase, "artifact-revision.jar");
-        assertEquals(1, report.getArtifacts().size());
+        assertEquals(1, report.getDownloadedArtifacts().size());
     }
 
     public void testRetrieveMultipleArtifacts() throws IOException, ParseException
@@ -118,11 +115,79 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]");
+        String retrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), retrievalPattern);
 
         assertExists(workBase, "artifactA-revision.jar");
         assertExists(workBase, "artifactB-revision.jar");
-        assertEquals(2, report.getArtifacts().size());
+        assertEquals(2, report.getDownloadedArtifacts().size());
+    }
+
+    public void testTransitiveDependency() throws IOException, ParseException
+    {
+        descriptor.addArtifact(createArtifact("artifact.jar"), "build");
+        client.publishArtifacts(descriptor.getDescriptor());
+        client.publishDescriptor(descriptor.getDescriptor());
+
+        IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        descriptorB.addDependency(descriptor.getDescriptor().getModuleRevisionId(), true);
+        client.publishDescriptor(descriptorB.getDescriptor());
+
+        IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
+        descriptorC.addDependency(descriptor.getDescriptor().getModuleRevisionId(), true);
+
+        String retrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        IvyRetrievalReport report = client.retrieveArtifacts(descriptorC.getDescriptor(), retrievalPattern);
+
+        assertExists(workBase, "artifact-revision.jar");
+        assertEquals(1, report.getDownloadedArtifacts().size());
+    }
+
+    public void testRetrievalFailure() throws IOException, ParseException
+    {
+        descriptor.addArtifact(createArtifact("artifact.jar"), "build");
+        client.publishDescriptor(descriptor.getDescriptor());
+
+        IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());
+
+        String retrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), retrievalPattern);
+        assertTrue(report.hasFailures());
+    }
+
+    public void testResolveFailure() throws IOException, ParseException
+    {
+        descriptor.addArtifact(createArtifact("artifact.jar"), "build");
+
+        IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());
+
+        String retrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), retrievalPattern);
+        assertTrue(report.hasFailures());
+    }
+
+    public void testUnresolvedTransiantDependency() throws IOException, ParseException
+    {
+        descriptor.addArtifact(createArtifact("artifact.jar"), "build");
+
+        IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        descriptorB.addDependency(descriptor.getDescriptor().getModuleRevisionId(), true);
+        client.publishDescriptor(descriptorB.getDescriptor());
+
+        IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
+        descriptorC.addArtifact(createArtifact("artifactC.jar"), "build");
+        descriptorC.addDependency(descriptorB.getDescriptor().getModuleRevisionId(), true);
+        client.publishArtifacts(descriptorC.getDescriptor());
+        client.publishDescriptor(descriptorC.getDescriptor());
+
+        IvyModuleDescriptor descriptorD = new IvyModuleDescriptor("org", "moduleD", "revision", configuration);
+        descriptorD.addDependency(descriptorC.getDescriptor().getModuleRevisionId(), true);
+
+        String retrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        IvyRetrievalReport report = client.retrieveArtifacts(descriptorD.getDescriptor(), retrievalPattern);
+        assertTrue(report.hasFailures());
     }
 
     private File createArtifact(String path) throws IOException

@@ -102,15 +102,13 @@ public class Repository
     }
     
     /**
-     * Get a reference to the ivy file for the specified project and revision.  Note that
-     * the reference points to where the ivy file would be if it exists in the repository,
-     * and does not infer that it actually does exist.  For that, use
+     * Get a handle to the ivy module descriptor for the specified project and revision.
      *
      * @param org       the projects organisation, or null if no organisation is present
      * @param name      the name of the project
-     * @param revision  the revision of the ivy file to be retrieved
+     * @param revision  the revision of the ivy descriptor to be retrieved
      *
-     * @return  a reference to the ivy file.
+     * @return  a reference to the ivy descriptor
      */
     public IvyModuleDescriptor getIvyModuleDescriptor(String org, String name, Object revision) throws Exception
     {

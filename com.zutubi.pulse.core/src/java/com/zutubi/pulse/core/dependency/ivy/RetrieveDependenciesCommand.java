@@ -11,9 +11,13 @@ import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.report.ArtifactDownloadReport;
+import org.xml.sax.SAXException;
 
+import javax.xml.transform.TransformerConfigurationException;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 
@@ -34,13 +38,11 @@ public class RetrieveDependenciesCommand implements Command
         this.ivy = config.getIvy();
     }
 
-    public void execute(CommandContext commandContext)
+    public void execute(final CommandContext commandContext)
     {
         try
         {
             final PulseExecutionContext context = (PulseExecutionContext) commandContext.getExecutionContext();
-
-            final File outDir = commandContext.registerArtifact(OUTPUT_NAME, null);
 
             URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));
             String host = masterUrl.getHost();
@@ -57,27 +59,26 @@ public class RetrieveDependenciesCommand implements Command
 
                         String targetPattern = PathUtils.getPath(context.getWorkingDir().getAbsolutePath(), retrievalPattern);
                         IvyRetrievalReport retrievalReport = ivy.retrieveArtifacts(descriptor, targetPattern);
-                        for (Artifact artifact : retrievalReport.getArtifacts())
+
+                        captureRetrievalReport(retrievalReport, commandContext);
+
+                        if (retrievalReport.hasFailures())
                         {
-                            outputWriter.println(IvyPatternHelper.substitute(targetPattern, artifact));
+                            // along with this recorded failure, ivy will report the details of the
+                            // problems encountered in the builds log.
+                            for (ArtifactDownloadReport failure : retrievalReport.getFailures())
+                            {
+                                commandContext.failure(failure.toString());
+                            }
+                        }
+                        else
+                        {
+                            for (Artifact artifact : retrievalReport.getDownloadedArtifacts())
+                            {
+                                outputWriter.println(IvyPatternHelper.substitute(targetPattern, artifact));
+                            }
                         }
 
-                        File reportFile = new File(outDir, IVY_REPORT_FILE);
-                        if (!outDir.isDirectory() && !outDir.mkdirs())
-                        {
-                            throw new BuildException("Failed to create command output directory: " + outDir.getCanonicalPath());
-                        }
-
-                        FileOutputStream output = null;
-                        try
-                        {
-                            output = new FileOutputStream(reportFile);
-                            retrievalReport.toXml(output);
-                        }
-                        finally
-                        {
-                            IOUtils.close(output);
-                        }
 
                         return null;
                     }
@@ -91,6 +92,28 @@ public class RetrieveDependenciesCommand implements Command
         catch (Exception e)
         {
             throw new BuildException("Error running dependency retrieval: " + e.getMessage(), e);
+        }
+    }
+
+    private void captureRetrievalReport(IvyRetrievalReport retrievalReport, CommandContext commandContext) throws IOException, TransformerConfigurationException, SAXException
+    {
+        final File outDir = commandContext.registerArtifact(OUTPUT_NAME, null);
+
+        File reportFile = new File(outDir, IVY_REPORT_FILE);
+        if (!outDir.isDirectory() && !outDir.mkdirs())
+        {
+            throw new BuildException("Failed to create command output directory: " + outDir.getCanonicalPath());
+        }
+
+        FileOutputStream output = null;
+        try
+        {
+            output = new FileOutputStream(reportFile);
+            retrievalReport.toXml(output);
+        }
+        finally
+        {
+            IOUtils.close(output);
         }
     }
 

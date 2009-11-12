@@ -27,8 +27,6 @@ public class IvyConfiguration
     private static final String IVY_CACHE_RESOLUTION = "ivy.cache.resolution";
     private static final String IVY_CACHE_REPOSITORY = "ivy.cache.repository";
 
-    private static final String DEFAULT_RESOLVER_NAME = "pulse";
-
     /**
      * A set of key value pairs that are passed through to the underlying ivy
      * system.
@@ -59,17 +57,47 @@ public class IvyConfiguration
         this.repositoryBase = repositoryBase;
     }
 
+    /**
+     * The artifact pattern defines the expected layout of artifacts within
+     * the remote repository.
+     *
+     * @return the artifact pattern
+     *
+     * @see #getArtifactPath(org.apache.ivy.core.module.descriptor.Artifact)
+     * @see #getArtifactPath(org.apache.ivy.core.module.id.ModuleRevisionId, String, String)
+     */
     public String getArtifactPattern()
     {
         return artifactPattern;
     }
 
+    /**
+     * The ivy pattern defines the expected layout of ivy files within 
+     * the remote repository.
+     *
+     * @return the ivy pattern
+     *
+     * @see #getIvyPath(org.apache.ivy.core.module.id.ModuleRevisionId)
+     * @see #getIvyPath(org.apache.ivy.core.module.id.ModuleRevisionId, String)
+     */
     public String getIvyPattern()
     {
         return ivyPattern;
     }
 
-    public IvySettings loadDefaultSettings() throws IOException, ParseException
+    /**
+     * Load the ivy settings.  This settings are a combination of the
+     * default ivy settings and any variables that are defined by this
+     * configuration instance.
+     *
+     * @return  the ivy settings instance.
+     *
+     * @throws IOException is thrown if the local ivysettings.xml template
+     * can not be located.
+     * @throws ParseException is thrown if the local ivysettings.xml template
+     * is invalid.
+     */
+    public IvySettings loadSettings() throws IOException, ParseException
     {
         IvySettings settings = new IvySettings();
         settings.load(getClass().getResource("ivysettings.xml"));
@@ -97,6 +125,13 @@ public class IvyConfiguration
         variables.put(name, value);
     }
 
+    /**
+     * Define the base cache directory to be used for all of ivy's caching.
+     * This includes the resolution cache and the artifact cache.
+     *
+     * @param cacheBase     the directory to use as the cache root.
+     * @throws IOException on error.
+     */
     public void setCacheBase(File cacheBase) throws IOException
     {
         setVariable(IVY_CACHE_DIR, cacheBase.toURI().toString());
@@ -109,6 +144,12 @@ public class IvyConfiguration
         return repositoryBase;
     }
 
+    /**
+     * The repository base is the a Uri that identifies the base path
+     * used to access the remote artifact repository.
+     *
+     * @param uri   the repository base uri
+     */
     public void setRepositoryBase(String uri)
     {
         checkValidUri(uri);
@@ -127,26 +168,57 @@ public class IvyConfiguration
         }
     }
 
-    public String getResolverName()
-    {
-        return DEFAULT_RESOLVER_NAME;
-    }
-
+    /**
+     * Get the path of the ivy module descriptor defined by the module revision id.
+     * This path is relative to the base of the repository.
+     *
+     * @param mrid  the id uniquely identifying the ivy module descriptor of interest
+     * @return the path relative to the base of the repository.
+     */
     public String getIvyPath(ModuleRevisionId mrid)
     {
         return getIvyPath(mrid, mrid.getRevision());
     }
 
+    /**
+     * Get the path of the ivy module descriptor defined by the module revision id.
+     * This path is relative to the base of the repository.
+     *
+     * @param mrid      the id uniquely identifying the ivy module descriptor of interest
+     * @param revision  the revision of the module descriptor, this overrides the revision
+     * (if any) that is specified in the module revision id.
+     *
+     * @return the path relative to the base of the repository.
+     */
     public String getIvyPath(ModuleRevisionId mrid, String revision)
     {
         return IvyPatternHelper.substitute(getIvyPattern(), mrid.getOrganisation(), mrid.getName(), revision, "ivy", "xml", "xml");
     }
 
+    /**
+     * Get the path of the artifact defined by the artifact instance.
+     * This path is relative to the base of the repository.
+     *
+     * @param artifact  the artifact instance that provides the necessary details
+     * to determine its path within the repository.
+     *
+     * @return the path relative to the base of the repository.
+     */
     public String getArtifactPath(Artifact artifact)
     {
         return IvyPatternHelper.substitute(getArtifactPattern(), artifact);
     }
 
+    /**
+     * Get the path of the artifact defined by the artifact instance.
+     * This path is relative to the base of the repository.
+     *
+     * @param mrid          the id uniquely identifying the ivy module descriptor of interest
+     * @param artifactName  the name of the artifact
+     * @param artifactExt   the extension of the artifact.  (This extension is also used as the
+     * artifacts type for pattern resolution purposes)
+     * @return the path relative to the base of the repository.
+     */
     public String getArtifactPath(ModuleRevisionId mrid, String artifactName, String artifactExt)
     {
         return IvyPatternHelper.substitute(getArtifactPattern(), mrid, artifactName, artifactExt, artifactExt);

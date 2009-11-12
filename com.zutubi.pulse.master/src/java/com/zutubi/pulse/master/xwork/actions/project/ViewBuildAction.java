@@ -348,7 +348,7 @@ public class ViewBuildAction extends CommandActionBase
                 Urls urls = new Urls( configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
 
                 dependencies = new LinkedList<StageDependency>();
-                for (Artifact artifact : report.getArtifacts())
+                for (Artifact artifact : report.getDownloadedArtifacts())
                 {
                     StageDependency stageDependency = new StageDependency();
                     dependencies.add(stageDependency);

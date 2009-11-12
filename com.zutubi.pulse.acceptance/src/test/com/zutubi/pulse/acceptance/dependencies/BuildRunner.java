@@ -29,7 +29,7 @@ public class BuildRunner
     }
 
     /**
-     * Trigger a build for the specified project and asserting that it is successful.
+     * Trigger a build for the specified project and assert that it is successful.
      *
      * @param project   the project for which a build is being triggered.
      * @param options   the trigger options
@@ -43,7 +43,7 @@ public class BuildRunner
     }
 
     /**
-     * Trigger a build for the specified project and asserting that it is successful.
+     * Trigger a build for the specified project and assert that it is successful.
      *
      * @param project   the project for which a build is being triggered.
      * @param options   the trigger options
@@ -53,7 +53,7 @@ public class BuildRunner
      */
     public int triggerSuccessfulBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
-        int buildNumber = triggerCompleteBuild(project, options);
+        int buildNumber = triggerAndWaitForBuild(project, options);
 
         ResultState buildStatus = getBuildStatus(project, buildNumber);
         if (!ResultState.SUCCESS.equals(buildStatus))
@@ -64,7 +64,7 @@ public class BuildRunner
     }
 
     /**
-     * Trigger a build for the specified project and asserting that it is failed.
+     * Trigger a build for the specified project and assert that it fails
      *
      * @param project   the project for which a build is being triggered.
      * @param options   the trigger options
@@ -78,7 +78,7 @@ public class BuildRunner
     }
 
     /**
-     * Trigger a build for the specified project and asserting that it failed.
+     * Trigger a build for the specified project and assert that it fails
      *
      * @param project   the project for which a build is being triggered.
      * @param options   the trigger options
@@ -88,7 +88,7 @@ public class BuildRunner
      */
     public int triggerFailedBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
-        int buildNumber = triggerCompleteBuild(project, options);
+        int buildNumber = triggerAndWaitForBuild(project, options);
 
         ResultState buildStatus = getBuildStatus(project, buildNumber);
         if (!ResultState.FAILURE.equals(buildStatus))
@@ -107,9 +107,9 @@ public class BuildRunner
      *
      * @throws Exception on error or if the we timed out waiting for the build to complete.
      */
-    public int triggerCompleteBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    public int triggerAndWaitForBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
     {
-        return triggerCompleteBuild(project.getConfig(), options);
+        return triggerAndWaitForBuild(project.getConfig(), options);
     }
 
     /**
@@ -121,7 +121,7 @@ public class BuildRunner
      *
      * @throws Exception on error or if the we timed out waiting for the build to complete.
      */
-    public int triggerCompleteBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
+    public int triggerAndWaitForBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
         int number = triggerBuild(project, options);
         xmlRpcHelper.waitForBuildToComplete(project.getName(), number);

@@ -11,6 +11,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -119,7 +121,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         project.addFilesToCreate("incorrect/path/artifact.jar");
         insertProject(project);
 
-        int buildNumber = buildRunner.triggerCompleteBuild(project.getConfig());
+        int buildNumber = buildRunner.triggerAndWaitForBuild(project.getConfig());
         assertEquals(ResultState.ERROR, buildRunner.getBuildStatus(project.getConfig(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -359,7 +361,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.addExpectedFiles("lib/artifact.jar");
         insertProject(projectB);
 
-        int buildNumber = buildRunner.triggerCompleteBuild(projectB.getConfig());
+        int buildNumber = buildRunner.triggerAndWaitForBuild(projectB.getConfig());
         assertEquals(ResultState.FAILURE, getBuildStatus(projectB.getConfig().getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -493,6 +495,22 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         updateProject(projectB);
 
         buildRunner.triggerFailedBuild(projectB);
+
+        // ensure that the 'retrieve' command is what failed.
+        assertCommandFailed(projectB.getName(), 2, "retrieve");
+    }
+
+    private void assertCommandFailed(String projectName, int buildNumber, String commandName) throws Exception
+    {
+        Vector<Hashtable<String, String>> features = xmlRpcHelper.call("getErrorMessagesInBuild", projectName, buildNumber);
+        for (Hashtable<String, String> feature : features)
+        {
+            if (feature.containsKey("command"))
+            {
+                assertEquals(commandName, feature.get("command"));
+                assertEquals("error", feature.get("level"));
+            }
+        }
     }
 
     private void runBuildWithCharacterInArtifactName(String testCharacters, ResultState expected) throws Exception
@@ -509,7 +527,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
             insertProject(project);
 
-            int buildNumber = buildRunner.triggerCompleteBuild(project.getConfig());
+            int buildNumber = buildRunner.triggerAndWaitForBuild(project.getConfig());
             assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getConfig().getName(), buildNumber));
 
             if (expected == ResultState.SUCCESS)

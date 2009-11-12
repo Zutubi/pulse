@@ -2,9 +2,14 @@ package com.zutubi.pulse.core.dependency.ivy;
 
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.core.report.ArtifactDownloadReport;
+import org.apache.ivy.core.report.DownloadStatus;
+import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -47,7 +52,15 @@ public class IvyRetrievalReport
 
     private static final String XML_CDATA = "CDATA";
 
-    private Map<ModuleRevisionId, List<Artifact>> moduleArtifacts = new HashMap<ModuleRevisionId, List<Artifact>>();
+    private Map<ModuleRevisionId, List<ArtifactDownloadReport>> moduleArtifacts = new HashMap<ModuleRevisionId, List<ArtifactDownloadReport>>();
+    private static final String ELEMENT_DOWNLOAD_REPORT = "downloadReport";
+    private static final String ATTRIBUTE_STATUS = "status";
+    private static final String ATTRIBUTE_DETAILS = "details";
+    private static final String ATTRIBUTE_TIME = "time";
+    private static final String ATTRIBUTE_SIZE = "size";
+    private static final String ATTRIBUTE_LOCATION = "location";
+    private static final String ATTRIBUTE_LOCAL = "local";
+    private static final String ELEMENT_ARTIFACT_ORIGIN = "origin";
 
     /**
      * Read a retrieval report from the specified file.
@@ -83,18 +96,38 @@ public class IvyRetrievalReport
         return fromXml(parser);
     }
 
+    /**
+     * Read a retrieval report from the xml report parser.
+     *
+     * @param parser    report parser containing the retriveal details the
+     * retrieval report is to be based on.
+     *
+     * @return an instance of the report representing the data in the report parser.
+     */
     public static IvyRetrievalReport fromXml(XmlReportParser parser)
     {
         IvyRetrievalReport report = new IvyRetrievalReport();
 
-        for (Artifact artifact : parser.getArtifacts())
+        for (ArtifactDownloadReport downloadReport : parser.getArtifactReports())
         {
-            report.addArtifact(artifact);
+            report.addDownloadReports(downloadReport);
         }
 
         return report;
     }
 
+    /**
+     * Read a retrieval report from the input stream.
+     *
+     * @param input the input stream containing the serialised contents of
+     * an ivy retrieval report.
+     * @return an instance of the retrieval report representing the contents of the
+     * input stream.
+     *
+     * @throws XMLStreamException on error
+     *
+     * @see #toXml(java.io.OutputStream) 
+     */
     public static IvyRetrievalReport fromXml(InputStream input) throws XMLStreamException
     {
         XMLStreamReader reader = null;
@@ -138,9 +171,9 @@ public class IvyRetrievalReport
 
             reader.nextTag();
 
-            while (nextSiblingTag(reader, ELEMENT_ARTIFACT))
+            while (nextSiblingTag(reader, ELEMENT_DOWNLOAD_REPORT))
             {
-                readArtifact(reader, mrid, report);
+                readDownloadReport(reader, mrid, report);
             }
             expectEndTag(ELEMENT_MODULE, reader);
             reader.nextTag();
@@ -149,7 +182,60 @@ public class IvyRetrievalReport
         expectEndTag(ELEMENT_MODULES, reader);
     }
 
-    private static void readArtifact(XMLStreamReader reader, ModuleRevisionId mrid, IvyRetrievalReport report) throws XMLStreamException
+    private static void readDownloadReport(XMLStreamReader reader, ModuleRevisionId mrid, IvyRetrievalReport report) throws XMLStreamException
+    {
+        expectStartTag(ELEMENT_DOWNLOAD_REPORT, reader);
+
+        Map<String, String> attributes = getAttributes(reader);
+
+        String status = attributes.get(ATTRIBUTE_STATUS);
+        String details = attributes.get(ATTRIBUTE_DETAILS);
+        String time = attributes.get(ATTRIBUTE_TIME);
+        String size = attributes.get(ATTRIBUTE_SIZE);
+        reader.nextTag();
+
+        Artifact artifact = null;
+        ArtifactOrigin origin = null;
+        while (nextSiblingTag(reader, ELEMENT_ARTIFACT, ELEMENT_ARTIFACT_ORIGIN))
+        {
+            if (isElement(ELEMENT_ARTIFACT, reader))
+            {
+                artifact = readArtifact(reader, mrid);
+            }
+            else if (isElement(ELEMENT_ARTIFACT_ORIGIN, reader))
+            {
+                origin = readArtifactOrigin(reader, artifact);
+            }
+        }
+
+        ArtifactDownloadReport downloadReport = new ArtifactDownloadReport(artifact);
+        downloadReport.setArtifactOrigin(origin);
+        downloadReport.setDownloadDetails(details);
+        downloadReport.setSize(Long.valueOf(size));
+        downloadReport.setDownloadTimeMillis(Long.valueOf(time));
+        downloadReport.setDownloadStatus((status != null) ? DownloadStatus.fromString(status) : null);
+        report.addDownloadReports(downloadReport);
+
+        expectEndTag(ELEMENT_DOWNLOAD_REPORT, reader);
+        reader.nextTag();
+    }
+
+    private static ArtifactOrigin readArtifactOrigin(XMLStreamReader reader, Artifact artifact) throws XMLStreamException
+    {
+        expectStartTag(ELEMENT_ARTIFACT_ORIGIN, reader);
+
+        Map<String, String> attributes = getAttributes(reader);
+        String location = attributes.get(ATTRIBUTE_LOCATION);
+        String local = attributes.get(ATTRIBUTE_LOCAL);
+
+        ArtifactOrigin origin = new ArtifactOrigin(artifact, Boolean.valueOf(local), location);
+
+        expectEndTag(ELEMENT_ARTIFACT_ORIGIN, reader);
+        reader.nextTag();
+        return origin;
+    }
+
+    private static Artifact readArtifact(XMLStreamReader reader, ModuleRevisionId mrid) throws XMLStreamException
     {
         expectStartTag(ELEMENT_ARTIFACT, reader);
 
@@ -173,10 +259,11 @@ public class IvyRetrievalReport
         }
 
         DefaultArtifact artifact = new DefaultArtifact(mrid, null, name, type, extension, extraAttributes);
-        report.addArtifact(artifact);
 
         expectEndTag(ELEMENT_ARTIFACT, reader);
         reader.nextTag();
+
+        return artifact;
     }
 
     protected IvyRetrievalReport()
@@ -203,9 +290,17 @@ public class IvyRetrievalReport
             moduleAttrs.addAttribute(null, ATTRIBUTE_REVISION, ATTRIBUTE_REVISION, XML_CDATA, mrid.getRevision());
             saxHandler.startElement(null, ELEMENT_MODULE, ELEMENT_MODULE, moduleAttrs);
 
-            List<Artifact> artifacts = moduleArtifacts.get(mrid);
-            for (Artifact artifact : artifacts)
+            List<ArtifactDownloadReport> downloadReports = moduleArtifacts.get(mrid);
+            for (ArtifactDownloadReport report : downloadReports)
             {
+                AttributesImpl reportAttrs = new AttributesImpl();
+                reportAttrs.addAttribute(null, ATTRIBUTE_STATUS, ATTRIBUTE_STATUS, XML_CDATA, report.getDownloadStatus().toString());
+                reportAttrs.addAttribute(null, ATTRIBUTE_DETAILS, ATTRIBUTE_DETAILS, XML_CDATA, report.getDownloadDetails());
+                reportAttrs.addAttribute(null, ATTRIBUTE_TIME, ATTRIBUTE_TIME, XML_CDATA, String.valueOf(report.getDownloadTimeMillis()));
+                reportAttrs.addAttribute(null, ATTRIBUTE_SIZE, ATTRIBUTE_SIZE, XML_CDATA, String.valueOf(report.getSize()));
+                saxHandler.startElement(null, ELEMENT_DOWNLOAD_REPORT, ELEMENT_DOWNLOAD_REPORT, reportAttrs);
+
+                Artifact artifact = report.getArtifact();
                 AttributesImpl artifactAttrs = new AttributesImpl();
                 artifactAttrs.addAttribute(null, ATTRIBUTE_NAME, ATTRIBUTE_NAME, XML_CDATA, artifact.getName());
                 artifactAttrs.addAttribute(null, ATTRIBUTE_EXTENSION, ATTRIBUTE_EXTENSION, XML_CDATA, artifact.getExt());
@@ -231,6 +326,17 @@ public class IvyRetrievalReport
                 }
 
                 saxHandler.endElement(null, ELEMENT_ARTIFACT, ELEMENT_ARTIFACT);
+
+                ArtifactOrigin origin = report.getArtifactOrigin();
+                if (origin != null)
+                {
+                    AttributesImpl originAttrs = new AttributesImpl();
+                    originAttrs.addAttribute(null, ATTRIBUTE_LOCATION, ATTRIBUTE_LOCATION, XML_CDATA, origin.getLocation());
+                    originAttrs.addAttribute(null, ATTRIBUTE_LOCAL, ATTRIBUTE_LOCAL, XML_CDATA, String.valueOf(origin.isLocal()));
+                    saxHandler.startElement(null, ELEMENT_ARTIFACT_ORIGIN, ELEMENT_ARTIFACT_ORIGIN, reportAttrs);
+                    saxHandler.endElement(null, ELEMENT_ARTIFACT_ORIGIN, ELEMENT_ARTIFACT_ORIGIN);
+                }
+                saxHandler.endElement(null, ELEMENT_DOWNLOAD_REPORT, ELEMENT_DOWNLOAD_REPORT);
             }
 
             saxHandler.endElement(null, ELEMENT_MODULE, ELEMENT_MODULE);
@@ -258,47 +364,85 @@ public class IvyRetrievalReport
     }
 
     /**
-     * Add an artifact to this report.
+     * Include the specified artifact download reports to this report.
      *
-     * @param artifact  the artifact to be added to the report.
+     * @param reports    the reports to be added.
      */
-    protected void addArtifact(Artifact artifact)
+    protected void addDownloadReports(ArtifactDownloadReport... reports)
     {
-        ModuleRevisionId mrid = artifact.getModuleRevisionId();
-        if (!moduleArtifacts.containsKey(mrid))
+        for (ArtifactDownloadReport report : reports)
         {
-            moduleArtifacts.put(mrid, new LinkedList<Artifact>());
+            Artifact artifact = report.getArtifact();
+            ModuleRevisionId mrid = artifact.getModuleRevisionId();
+            if (!moduleArtifacts.containsKey(mrid))
+            {
+                moduleArtifacts.put(mrid, new LinkedList<ArtifactDownloadReport>());
+            }
+            List<ArtifactDownloadReport> artifacts = moduleArtifacts.get(mrid);
+            artifacts.add(report);
         }
-        List<Artifact> artifacts = moduleArtifacts.get(mrid);
-        artifacts.add(artifact);
     }
 
     /**
-     * Get a list of all of the artifacts contained within this report.
+     * Get a list of all of the artifacts downloaded.
      *
      * @return a list of artifacts.
      */
-    public List<Artifact> getArtifacts()
+    public List<Artifact> getDownloadedArtifacts()
     {
         List<Artifact> artifacts = new LinkedList<Artifact>();
         for (ModuleRevisionId mrid : moduleArtifacts.keySet())
         {
-            artifacts.addAll(moduleArtifacts.get(mrid));
+            artifacts.addAll(getDownloadedArtifacts(mrid));
         }
         return artifacts;
     }
 
     /**
-     * Get a list of all the artifacts contained within this report
-     * that belong to the specified module
+     * Get a list of downloaded artifacts contained that belong to the specified module
      *
      * @param mrid  the module revision id specifying the subset of
      * artifacts to be returned.
      *
      * @return a list of artifacts.
      */
-    public List<Artifact> getArtifacts(ModuleRevisionId mrid)
+    public List<Artifact> getDownloadedArtifacts(ModuleRevisionId mrid)
     {
-        return moduleArtifacts.get(mrid);
+        List<Artifact> artifacts = new LinkedList<Artifact>();
+        for (ArtifactDownloadReport report : moduleArtifacts.get(mrid))
+        {
+            if (report.isDownloaded())
+            {
+                artifacts.add(report.getArtifact());
+            }
+        }
+        return artifacts;
+    }
+
+    /**
+     * Returns true if one or more reports show a problem with the download of their
+     * respective artifacts.
+     *
+     * @return true if a problem is present, false otherwise.
+     */
+    public boolean hasFailures()
+    {
+        return getFailures().size() > 0;
+    }
+
+    public List<ArtifactDownloadReport> getFailures()
+    {
+        List<ArtifactDownloadReport> failures = new LinkedList<ArtifactDownloadReport>();
+        for (ModuleRevisionId mrid : moduleArtifacts.keySet())
+        {
+            failures.addAll(CollectionUtils.filter(moduleArtifacts.get(mrid), new Predicate<ArtifactDownloadReport>()
+            {
+                public boolean satisfied(ArtifactDownloadReport downloadReport)
+                {
+                    return downloadReport.getDownloadStatus() == DownloadStatus.FAILED;
+                }
+            }));
+        }
+        return failures;
     }
 }
