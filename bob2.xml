@@ -45,9 +45,9 @@
                 <include pattern="pulse-*$(pulse.version).*"/>
             </dir-artifact>
         </ant>
-        <ant name="dist" targets="dist.all"/>
+        <!-- <ant name="dist" targets="dist.all"/>
         <ant name="javadoc" targets="javadoc">
             <dir-artifact name="javadoc" base="build/docs/javadoc"/>
-        </ant>
+        </ant> -->
     </recipe>
 </project>
