@@ -20,6 +20,9 @@ import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -74,6 +77,9 @@ public class BuildQueueTestCase extends PulseTestCase
 
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
+        ProjectManager projectManager = mock(ProjectManager.class);
+        Mockito.stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
+        buildRequestRegistry.setProjectManager(projectManager);
     }
 
     protected void tearDown() throws Exception
