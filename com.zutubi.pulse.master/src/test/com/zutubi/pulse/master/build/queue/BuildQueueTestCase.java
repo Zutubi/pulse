@@ -16,6 +16,9 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.WiringObjectFactory;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -50,6 +53,9 @@ public abstract class BuildQueueTestCase extends PulseTestCase
 
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
+        ProjectManager projectManager = mock(ProjectManager.class);
+        Mockito.stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
+        buildRequestRegistry.setProjectManager(projectManager);
     }
 
     protected void assertActive(List<EntityBuildQueue.ActiveBuild> activeSnapshot, BuildRequestEvent... events)

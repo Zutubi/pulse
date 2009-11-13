@@ -4,9 +4,13 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.security.AccessManager;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 
 public class BuildRequestRegistryTest extends PulseTestCase
@@ -19,6 +23,9 @@ public class BuildRequestRegistryTest extends PulseTestCase
         super.setUp();
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(mock(AccessManager.class));
+        ProjectManager projectManager = mock(ProjectManager.class);
+        Mockito.stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
+        buildRequestRegistry.setProjectManager(projectManager);
     }
 
     public void testReject()

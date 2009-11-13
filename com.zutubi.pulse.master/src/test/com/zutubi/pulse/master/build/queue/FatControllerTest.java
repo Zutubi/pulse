@@ -24,6 +24,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -116,6 +117,9 @@ public class FatControllerTest extends PulseTestCase
 
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
+        ProjectManager projectManager = mock(ProjectManager.class);
+        Mockito.stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
+        buildRequestRegistry.setProjectManager(projectManager);
 
         objectFactory.initProperties(this);
 

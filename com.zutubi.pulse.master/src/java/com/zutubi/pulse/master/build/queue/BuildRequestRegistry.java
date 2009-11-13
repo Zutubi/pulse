@@ -1,11 +1,14 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.StringUtils.capitalise;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
+import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -25,8 +28,8 @@ public class BuildRequestRegistry
      */
     public static final int NONE = 0;
 
-    private static final int DEFAULT_LIMIT = 10000;
-    private static final int DEFAULT_TRIM  = 1000;
+    private static final int DEFAULT_LIMIT = 2000;
+    private static final int DEFAULT_TRIM  = 200;
 
     /**
      * Limit on the number of remembered requests - when we hit this we prune
@@ -39,6 +42,11 @@ public class BuildRequestRegistry
     private int trim = DEFAULT_TRIM;
 
     private AccessManager accessManager;
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
 
     /**
      * States in a request's lifecycle.
@@ -79,6 +87,7 @@ public class BuildRequestRegistry
     private ReentrantLock lock = new ReentrantLock();
     private Condition lockCondition = lock.newCondition();
     private Map<Long, RegEntry> requestIdToEntry = new HashMap<Long, RegEntry>();
+    private ProjectManager projectManager;
 
     /**
      * Registers a new request with the registry.  Should be done before a
@@ -385,7 +394,13 @@ public class BuildRequestRegistry
         RegEntry entry = requestIdToEntry.get(eventId);
         if (entry != null)
         {
-            accessManager.ensurePermission(AccessManager.ACTION_VIEW, entry.request.getProjectConfig());
+            Project project = projectManager.getProject(entry.projectId, true);
+            if (project == null)
+            {
+                throw new AccessDeniedException("Unable to access project");
+            }
+            
+            accessManager.ensurePermission(AccessManager.ACTION_VIEW, project);
         }
 
         return entry;
@@ -408,7 +423,7 @@ public class BuildRequestRegistry
 
     private static class RegEntry
     {
-        private BuildRequestEvent request;
+        private long projectId;
         private RequestStatus status = RequestStatus.UNHANDLED;
         private long buildNumber = NONE;
         private long assimilatedId = NONE;
@@ -416,7 +431,7 @@ public class BuildRequestRegistry
 
         public RegEntry(BuildRequestEvent request)
         {
-            this.request = request;
+            this.projectId = request.getProjectConfig().getProjectId();
         }
 
         public void reject(String reason)

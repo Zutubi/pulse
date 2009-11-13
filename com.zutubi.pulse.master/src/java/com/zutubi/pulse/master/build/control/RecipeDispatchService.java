@@ -15,11 +15,26 @@ public class RecipeDispatchService extends BackgroundServiceSupport
 {
     private static final Logger LOG = Logger.getLogger(RecipeDispatchService.class);
 
+    private static final int DEFAULT_POOL_SIZE = 5;
+
     private EventManager eventManager;
 
     public RecipeDispatchService()
     {
-        super("Recipe Dispatch");
+        super("Recipe Dispatch", getPoolSize());
+    }
+
+    private static int getPoolSize()
+    {
+        try
+        {
+            return Integer.parseInt(System.getProperty("pulse.recipe.dispatch.pool.size", Integer.toString(DEFAULT_POOL_SIZE)));
+        }
+        catch (NumberFormatException e)
+        {
+            LOG.warning(e);
+            return DEFAULT_POOL_SIZE;
+        }
     }
 
     public void dispatch(final RecipeAssignedEvent assignment)
