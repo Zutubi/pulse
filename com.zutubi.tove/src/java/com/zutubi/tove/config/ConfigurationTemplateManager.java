@@ -405,7 +405,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     }
                     else
                     {
-                        checkBasenameUniqueInHierarchy(path, newPath, elements);
+                        checkBasenameUniqueInHierarchy(path, newPath, elements[elements.length - 1]);
 
                         TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
                         TemplateNode node = hierarchy.getNodeById(elements[1]);
@@ -419,20 +419,19 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                 recordManager.insert(newPath, record);
                 refreshCaches();
-                State state = getState();
-                raiseInsertEvents(state.instances, getDescendentPaths(newPath, false, true, false));
+                raiseInsertEvents(getDescendentPaths(newPath, false, true, false));
 
                 return newPath;
             }
         });
     }
 
-    private void checkBasenameUniqueInHierarchy(String path, String newPath, String[] newPathElements)
+    private void checkBasenameUniqueInHierarchy(String path, String newPath, String name)
     {
         String ancestorPath = findAncestorPath(newPath);
         if(ancestorPath != null)
         {
-            throw new IllegalArgumentException("Unable to insert record with name '" + newPathElements[newPathElements.length - 1] + "' into path '" + path + "': a record with this name already exists in ancestor '" + PathUtils.getPathElements(ancestorPath)[1] + "'");
+            throw new IllegalArgumentException("Unable to insert record with name '" + name + "' into path '" + path + "': a record with this name already exists in ancestor '" + PathUtils.getPathElements(ancestorPath)[1] + "'");
         }
 
         List<String> descendentPaths = getDescendentPaths(newPath, true, false, false);
@@ -446,7 +445,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 }
             });
 
-            throw new IllegalArgumentException("Unable to insert record with name '" + newPathElements[newPathElements.length - 1] + "' into path '" + path + "': a record with this name already exists in descendents " + descendentNames);
+            throw new IllegalArgumentException("Unable to insert record with name '" + name + "' into path '" + path + "': a record with this name already exists in descendents " + descendentNames);
         }
     }
 
@@ -519,7 +518,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private void addInheritedSkeletons(final String scope, final String remainderPath, CompositeType actualType, Record record, TemplateNode node, boolean strict)
+    void addInheritedSkeletons(final String scope, final String remainderPath, CompositeType actualType, Record record, TemplateNode node, boolean strict)
     {
         final Record skeleton = createSkeletonRecord(actualType, record);
 
@@ -556,7 +555,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return result;
     }
 
-    private void raiseInsertEvents(DefaultInstanceCache instances, List<String> concretePaths)
+    void raiseInsertEvents(List<String> concretePaths)
     {
         State state = getState();
 
@@ -564,7 +563,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         for (String concretePath : concretePaths)
         {
             // Raise an event for all the config instances under this path.
-            for (Object instance : instances.getAllDescendents(concretePath, false))
+            for (Object instance : state.instances.getAllDescendents(concretePath, false))
             {
                 if (isComposite(instance))
                 {
@@ -1470,7 +1469,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         for(String path: getDescendentPaths(collectionPath, false, false, false))
         {
-            MutableRecord record = recordManager.select(path).copy(false);
+            MutableRecord record = recordManager.select(path).copy(false, true);
             if(collectionType.updateKeyReferences(record, oldKey, newKey))
             {
                 recordManager.update(path, record);
@@ -1558,7 +1557,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         if (existingRecord instanceof TemplateRecord)
         {
             TemplateRecord templateRecord = (TemplateRecord) existingRecord;
-            newRecord = templateRecord.getMoi().copy(false);
+            newRecord = templateRecord.getMoi().copy(false, true);
             newRecord.update(updates);
 
             // Scrub values from the incoming record where they are identical
@@ -1567,7 +1566,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
         else
         {
-            newRecord = existingRecord.copy(false);
+            newRecord = existingRecord.copy(false, true);
             newRecord.update(updates);
         }
 
@@ -2128,7 +2127,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
                 }
 
-                MutableRecord parentCopy = parentRecord.getMoi().copy(false);
+                MutableRecord parentCopy = parentRecord.getMoi().copy(false, true);
                 if(!(TemplateRecord.restoreItem(parentCopy, PathUtils.getBaseName(path))))
                 {
                     throw new IllegalArgumentException("Invalid path '" + path + "': not hidden");
@@ -2144,8 +2143,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node, false);
 
                 refreshCaches();
-                State state = getState();
-                raiseInsertEvents(state.instances, getDescendentPaths(path, false, true, false));
+                raiseInsertEvents(getDescendentPaths(path, false, true, false));
                 return null;
             }
         });
@@ -2201,11 +2199,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 MutableRecord mutable;
                 if(record instanceof TemplateRecord)
                 {
-                    mutable = ((TemplateRecord) record).getMoi().copy(false);
+                    mutable = ((TemplateRecord) record).getMoi().copy(false, true);
                 }
                 else
                 {
-                    mutable = record.copy(false);
+                    mutable = record.copy(false, true);
                 }
 
                 CollectionType.setOrder(mutable, order);

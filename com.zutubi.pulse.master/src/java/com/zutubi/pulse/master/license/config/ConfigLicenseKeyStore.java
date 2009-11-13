@@ -56,7 +56,7 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
 
     public void setKey(String licenseKey) throws LicenseException
     {
-        MutableRecord licenseRecord = configurationTemplateManager.getRecord(LICENSE_PATH).copy(false);
+        MutableRecord licenseRecord = configurationTemplateManager.getRecord(LICENSE_PATH).copy(false, true);
         licenseRecord.put(LICENSE_PROPERTY, licenseKey);
         configurationTemplateManager.saveRecord(LICENSE_PATH, licenseRecord);
     }

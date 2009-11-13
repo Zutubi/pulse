@@ -1,12 +1,10 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.events.Event;
 import com.zutubi.tove.annotations.NoInherit;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
@@ -15,7 +13,6 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 
 import java.util.*;
 
@@ -455,7 +452,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         String path = "project/child";
         Project instance = configurationTemplateManager.getInstance(path, Project.class);
         Listener listener = registerListener();
-        configurationTemplateManager.saveRecord(path, recordManager.select(path).copy(false));
+        configurationTemplateManager.saveRecord(path, recordManager.select(path).copy(false, true));
         listener.assertEvents();
         assertSame(instance, configurationTemplateManager.getInstance(path, Project.class));
     }
@@ -468,7 +465,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         String path = "project/child";
         Project instance = configurationTemplateManager.getInstance(path, Project.class);
         Listener listener = registerListener();
-        MutableRecord record = recordManager.select(path).copy(false);
+        MutableRecord record = recordManager.select(path).copy(false, true);
         record.put("property", createProperty("foo", "bar"));
         configurationTemplateManager.saveRecord(path, record);
 
@@ -618,7 +615,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.delete(inheritedPropertyPath);
         assertNull(configurationTemplateManager.getRecord(inheritedPropertyPath));
 
-        MutableRecord property = configurationTemplateManager.getRecord(propertyPath).copy(true);
+        MutableRecord property = configurationTemplateManager.getRecord(propertyPath).copy(true, true);
         property.put("name", "newfoo");
         configurationTemplateManager.saveRecord(propertyPath, property);
         String newInheritedPropertyPath = "project/child/stages/default/properties/newfoo";
@@ -649,7 +646,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         // Rename the first property (if the order is not fixed this property
         // will then fall to the end).
         String firstStagePath = getPath(stagesPath, newOrder.get(0));
-        MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true);
+        MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true, true);
         property.put("name", "renamed");
         configurationTemplateManager.saveRecord(firstStagePath, property);
 
@@ -680,7 +677,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         // Rename the first property (if the order is not fixed this property
         // will then fall to the end).
         String firstStagePath = getPath(stagesPath, newOrder.get(0));
-        MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true);
+        MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true, true);
         property.put("name", "renamed");
         configurationTemplateManager.saveRecord(firstStagePath, property);
 
@@ -1552,13 +1549,6 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         }
     }
 
-    private Listener registerListener()
-    {
-        Listener listener = new Listener();
-        eventManager.register(listener);
-        return listener;
-    }
-
     private String insertGlobal()
     {
         MutableRecord global = createGlobal();
@@ -1681,133 +1671,6 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(owner, stage.getOwner());
         assertEquals(GLOBAL_PROJECT, stage.getOwner("name"));
         assertEquals("default", stage.get("name"));
-    }
-
-    public static class Listener implements com.zutubi.events.EventListener
-    {
-        private List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
-
-        public List<ConfigurationEvent> getEvents()
-        {
-            return events;
-        }
-
-        public void clearEvents()
-        {
-            events.clear();
-        }
-
-        public void assertEvents(EventSpec... expectedEvents)
-        {
-            assertEquals(expectedEvents.length, events.size());
-            for(final EventSpec spec: expectedEvents)
-            {
-                ConfigurationEvent matchingEvent = CollectionUtils.find(events, new Predicate<ConfigurationEvent>()
-                {
-                    public boolean satisfied(ConfigurationEvent event)
-                    {
-                        return spec.matches(event);
-                    }
-                });
-
-                assertNotNull("Expected event '" + spec.toString() + "' missing", matchingEvent);
-            }
-        }
-
-        public void handleEvent(Event evt)
-        {
-            events.add((ConfigurationEvent) evt);
-        }
-
-        public Class[] getHandledEvents()
-        {
-            return new Class[]{ConfigurationEvent.class};
-        }
-    }
-
-    public static abstract class EventSpec
-    {
-        private String path;
-        private boolean cascaded;
-        private Class<? extends ConfigurationEvent> eventClass;
-
-        protected EventSpec(String path, Class<? extends ConfigurationEvent> eventClass)
-        {
-            this(path, false, eventClass);
-        }
-
-        protected EventSpec(String path, boolean cascaded, Class<? extends ConfigurationEvent> eventClass)
-        {
-            this.path = path;
-            this.cascaded = cascaded;
-            this.eventClass = eventClass;
-        }
-
-        public boolean matches(ConfigurationEvent event)
-        {
-            if(event instanceof CascadableEvent)
-            {
-                if(cascaded != ((CascadableEvent)event).isCascaded())
-                {
-                    return false;
-                }
-            }
-
-            return eventClass.isInstance(event) && event.getInstance().getConfigurationPath().equals(path);
-        }
-
-        public String toString()
-        {
-            return eventClass.getSimpleName() + ": " + path;
-        }
-    }
-
-    public static class InsertEventSpec extends EventSpec
-    {
-        public InsertEventSpec(String path, boolean cascaded)
-        {
-            super(path, cascaded, InsertEvent.class);
-        }
-    }
-
-    public static class DeleteEventSpec extends EventSpec
-    {
-        public DeleteEventSpec(String path, boolean cascaded)
-        {
-            super(path, cascaded, DeleteEvent.class);
-        }
-    }
-
-    public static class SaveEventSpec extends EventSpec
-    {
-        public SaveEventSpec(String path)
-        {
-            super(path, SaveEvent.class);
-        }
-    }
-
-    public static class PostInsertEventSpec extends EventSpec
-    {
-        public PostInsertEventSpec(String path, boolean cascaded)
-        {
-            super(path, cascaded, PostInsertEvent.class);
-        }
-    }
-
-    public static class PostDeleteEventSpec extends EventSpec
-    {
-        public PostDeleteEventSpec(String path, boolean cascaded)
-        {
-            super(path, cascaded, PostDeleteEvent.class);
-        }
-    }
-
-    public static class PostSaveEventSpec extends EventSpec
-    {
-        public PostSaveEventSpec(String path)
-        {
-            super(path, PostSaveEvent.class);
-        }
     }
 
     public static enum Coolness

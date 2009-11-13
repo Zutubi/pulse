@@ -654,7 +654,7 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-            MutableRecord record = type.fromXmlRpc(config);
+            MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config);
 
             Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true, true);
             if (!type.isValid(instance))
@@ -734,7 +734,7 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-            MutableRecord record = type.fromXmlRpc(config);
+            MutableRecord record = type.fromXmlRpc(null, config);
             configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
             if (template)
             {
@@ -817,7 +817,7 @@ public class RemoteApi
             }
 
             CompositeType type = typeRegistry.getType(existingSymbolicName);
-            MutableRecord record = type.fromXmlRpc(config);
+            MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config);
 
             Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, configurationTemplateManager.isConcrete(path), deep);
             if ((deep && !type.isValid(instance)) || !instance.isValid())
@@ -1210,7 +1210,7 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
-            MutableRecord record = type.fromXmlRpc(argument);
+            MutableRecord record = type.fromXmlRpc(null, argument);
             Configuration arg = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, true);
             if (!type.isValid(arg))
             {

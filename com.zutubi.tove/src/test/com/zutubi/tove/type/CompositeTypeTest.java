@@ -192,7 +192,7 @@ public class CompositeTypeTest extends TypeTestCase
         outer.put("meta.symbolicName", "typeA");
         outer.put("a", inner);
 
-        Object o = typeA.fromXmlRpc(outer);
+        Object o = typeA.fromXmlRpc(null, outer);
         assertTrue(o instanceof Record);
         Record outerRecord = (Record) o;
         assertEquals(1, outerRecord.size());
@@ -213,7 +213,7 @@ public class CompositeTypeTest extends TypeTestCase
         {
             Hashtable rpcForm = new Hashtable();
             rpcForm.put("a", "avalue");
-            typeB.fromXmlRpc(rpcForm);
+            typeB.fromXmlRpc(null, rpcForm);
             fail();
         }
         catch (TypeException e)
@@ -229,7 +229,7 @@ public class CompositeTypeTest extends TypeTestCase
             Hashtable rpcForm = new Hashtable();
             rpcForm.put("meta.symbolicName", "grr");
             rpcForm.put("a", "avalue");
-            typeB.fromXmlRpc(rpcForm);
+            typeB.fromXmlRpc(null, rpcForm);
             fail();
         }
         catch (TypeException e)
@@ -242,7 +242,7 @@ public class CompositeTypeTest extends TypeTestCase
     {
         try
         {
-            typeB.fromXmlRpc("string");
+            typeB.fromXmlRpc(null, "string");
             fail();
         }
         catch (TypeException e)
@@ -258,7 +258,7 @@ public class CompositeTypeTest extends TypeTestCase
             Hashtable rpcForm = new Hashtable();
             rpcForm.put("meta.symbolicName", "typeB");
             rpcForm.put("a", new Vector());
-            typeB.fromXmlRpc(rpcForm);
+            typeB.fromXmlRpc(null, rpcForm);
             fail();
         }
         catch (TypeException e)
@@ -275,7 +275,7 @@ public class CompositeTypeTest extends TypeTestCase
             rpcForm.put("meta.symbolicName", "typeB");
             rpcForm.put("unknown", "ignored value");
 
-            typeB.fromXmlRpc(rpcForm);
+            typeB.fromXmlRpc(null, rpcForm);
             fail();
         }
         catch (TypeException e)

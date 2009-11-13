@@ -570,7 +570,7 @@ public class CompositeType extends AbstractType implements ComplexType
         return (String) o;
     }
 
-    public MutableRecord fromXmlRpc(Object data) throws TypeException
+    public MutableRecord fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         typeCheck(data, Hashtable.class);
 
@@ -601,7 +601,7 @@ public class CompositeType extends AbstractType implements ComplexType
             
             for (TypeProperty property : properties.values())
             {
-                propertyFromXmlRpc(property, rpcForm, result);
+                propertyFromXmlRpc(templateOwnerPath, property, rpcForm, result);
             }
 
             return result;
@@ -615,7 +615,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 throw new TypeException("XML-RPC struct has unrecognised symbolic name '" + symbolicName + "'");
             }
 
-            return actualType.fromXmlRpc(data);
+            return actualType.fromXmlRpc(templateOwnerPath, data);
         }
     }
 
@@ -624,14 +624,14 @@ public class CompositeType extends AbstractType implements ComplexType
         return property.equals(XML_RPC_SYMBOLIC_NAME) || properties.containsKey(property);
     }
 
-    private void propertyFromXmlRpc(TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
+    private void propertyFromXmlRpc(String tempalteOwnerPath, TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
     {
         Object value = rpcForm.get(property.getName());
         if (value != null)
         {
             try
             {
-                result.put(property.getName(), property.getType().fromXmlRpc(value));
+                result.put(property.getName(), property.getType().fromXmlRpc(tempalteOwnerPath, value));
             }
             catch (TypeException e)
             {

@@ -100,7 +100,7 @@ public class MutableRecordImpl extends AbstractMutableRecord
         getData().clear();
     }
 
-    public MutableRecord copy(boolean deep)
+    public MutableRecord copy(boolean deep, boolean preserveHandles)
     {
         MutableRecordImpl clone = new MutableRecordImpl();
 
@@ -108,7 +108,10 @@ public class MutableRecordImpl extends AbstractMutableRecord
         {
             String key = entry.getKey();
             String value = entry.getValue();
-            clone.putMeta(key, value);
+            if (preserveHandles || !key.equals(HANDLE_KEY))
+            {
+                clone.putMeta(key, value);
+            }
         }
 
         for (Map.Entry<String, Object> entry : getData().entrySet())
@@ -117,7 +120,7 @@ public class MutableRecordImpl extends AbstractMutableRecord
             Object value = entry.getValue();
             if (deep && value instanceof Record)
             {
-                value = ((Record) value).copy(deep);
+                value = ((Record) value).copy(deep, preserveHandles);
             }
             clone.put(key, value);
         }
@@ -177,6 +180,6 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     protected Object clone() throws CloneNotSupportedException
     {
-        return copy(true);
+        return copy(true, true);
     }
 }

@@ -246,7 +246,7 @@ public class ListType extends CollectionType
         }
     }
 
-    public Object fromXmlRpc(Object data) throws TypeException
+    public Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         typeCheck(data, Vector.class);
         Vector vector = (Vector) data;
@@ -262,7 +262,7 @@ public class ListType extends CollectionType
             {
                 try
                 {
-                    result[i++] = simpleType.fromXmlRpc(item);
+                    result[i++] = simpleType.fromXmlRpc(templateOwnerPath, item);
                 }
                 catch (TypeException e)
                 {
@@ -274,7 +274,7 @@ public class ListType extends CollectionType
         }
         else
         {
-            return convertToRecord(vector, collectionType, new XmlRpcToRecord());
+            return convertToRecord(vector, collectionType, new XmlRpcToRecord(templateOwnerPath));
         }
     }
 
@@ -430,9 +430,16 @@ public class ListType extends CollectionType
 
     private static class XmlRpcToRecord implements ToRecord
     {
+        private String templateOwnerPath;
+
+        public XmlRpcToRecord(String templateOwnerPath)
+        {
+            this.templateOwnerPath = templateOwnerPath;
+        }
+
         public Object convert(Type type, Object data) throws TypeException
         {
-            return type.fromXmlRpc(data);
+            return type.fromXmlRpc(templateOwnerPath, data);
         }
     }
 }

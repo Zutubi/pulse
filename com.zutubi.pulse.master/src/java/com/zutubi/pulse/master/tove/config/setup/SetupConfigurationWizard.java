@@ -11,8 +11,8 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.wizard.AbstractChainableState;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
@@ -159,7 +159,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
             // apply the settings
-            MutableRecord record = configurationTemplateManager.getRecord(GlobalConfiguration.SCOPE_NAME).copy(false);
+            MutableRecord record = configurationTemplateManager.getRecord(GlobalConfiguration.SCOPE_NAME).copy(false, true);
             record.setPermanent(true);
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);

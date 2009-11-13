@@ -50,14 +50,14 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
 
     public void testFromXmlRpcNull() throws TypeException
     {
-        assertEquals("0", referenceType.fromXmlRpc(null));
+        assertEquals("0", referenceType.fromXmlRpc(null, null));
     }
 
     public void testToXmlRpcInvalidPath() throws TypeException
     {
         try
         {
-            referenceType.fromXmlRpc("nosuchpath");
+            referenceType.fromXmlRpc(null, "nosuchpath");
             fail();
         }
         catch (IllegalArgumentException e)
@@ -74,7 +74,7 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
         String eePath = PathUtils.getPath(erPath, "r");
 
         Record eeRecord = configurationTemplateManager.getRecord(eePath);
-        Object o = referenceType.fromXmlRpc(eePath);
+        Object o = referenceType.fromXmlRpc(null, eePath);
         assertTrue(o instanceof String);
         assertEquals(Long.toString(eeRecord.getHandle()), o);
     }

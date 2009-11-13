@@ -40,7 +40,7 @@ public abstract class RecordStoreTestCase extends AbstractTransactionTestCase
         }
         for (int i = 0; i < depth; i++)
         {
-            random.put("nested" + i, random.copy(true));
+            random.put("nested" + i, random.copy(true, true));
         }
         return random;
     }

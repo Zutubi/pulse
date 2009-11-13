@@ -74,9 +74,11 @@ public interface Type
      * Converts the given XML-RPC form data into record form.  This is the
      * inverse of {#link toXmlRpc}.
      *
-     * @param data the data to be converted (XML-RPC form)
-     * @return the record formatted data
+     * @param templateOwnerPath path of the templated collection item that
+     *                          the data is or will be contained by, may be
+     *                          null if not within a templated scope
+     * @param data the data to be converted (XML-RPC form)  @return the record formatted data
      * @throws TypeException in the event of an error
      */
-    Object fromXmlRpc(Object data) throws TypeException;
+    Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException;
 }

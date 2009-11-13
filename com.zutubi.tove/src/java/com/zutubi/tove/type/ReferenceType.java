@@ -129,7 +129,7 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public String fromXmlRpc(Object data) throws TypeException
+    public String fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         if(data == null)
         {
@@ -146,7 +146,7 @@ public class ReferenceType extends SimpleType implements Type
             }
             else
             {
-                handle = configurationReferenceManager.getReferenceHandleForPath(path);
+                handle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, path);
                 if(handle == 0)
                 {
                     throw new TypeException("Reference to unknown path '" + path + "'");

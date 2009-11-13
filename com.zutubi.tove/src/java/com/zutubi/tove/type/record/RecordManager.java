@@ -202,7 +202,7 @@ public class RecordManager implements HandleAllocator
         }
 
         // we copy first because we do not want to modify the argument.
-        final Record copy = record.copy(true);
+        final Record copy = record.copy(true, true);
 
         stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {

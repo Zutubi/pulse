@@ -186,7 +186,7 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
 
         assertNull(selected.get("c"));
 
-        MutableRecord update = selected.copy(true);
+        MutableRecord update = selected.copy(true, true);
         update.put("c", "d");
 
         recordStore.update("path", update);

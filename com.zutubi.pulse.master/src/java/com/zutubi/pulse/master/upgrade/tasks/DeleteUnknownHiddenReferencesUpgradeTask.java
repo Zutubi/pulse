@@ -80,7 +80,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
                 {
                     if (!parent.containsKey(hiddenKey))
                     {
-                        MutableRecord editableCopy = record.copy(false);
+                        MutableRecord editableCopy = record.copy(false, true);
                         restoreItem(editableCopy, hiddenKey);
                         LOG.info("Removing unknown hidden reference " + hiddenKey + " from " + path);
                         recordManager.update(path, editableCopy);

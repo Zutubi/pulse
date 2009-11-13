@@ -50,7 +50,7 @@ public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
                     
                     String encodedPassword = encoder.encodePassword(randomPassword, null);
 
-                    MutableRecord updatedUser = user.copy(true);
+                    MutableRecord updatedUser = user.copy(true, true);
                     updatedUser.put("password", encodedPassword);
                     
                     recordManager.update(path, updatedUser);

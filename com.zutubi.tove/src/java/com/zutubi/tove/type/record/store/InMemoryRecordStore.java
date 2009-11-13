@@ -113,7 +113,7 @@ public class InMemoryRecordStore implements RecordStore
 
     private Record insert(MutableRecordHolder holder, String path, Record newRecord)
     {
-        MutableRecord base = holder.getRecord().copy(true);
+        MutableRecord base = holder.getRecord().copy(true, true);
 
         String[] parentPathElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
@@ -134,7 +134,7 @@ public class InMemoryRecordStore implements RecordStore
         // The external client may hold on to a reference of the newRecord, and may change it.  To
         // ensure the integrity of the internal datastructure of the record sture, we must run a
         // deep copy prior to the insertion so that no external reference remains.
-        MutableRecord record = newRecord.copy(true);
+        MutableRecord record = newRecord.copy(true, true);
         
         parent.put(baseName, record);
 
@@ -145,7 +145,7 @@ public class InMemoryRecordStore implements RecordStore
 
     private Record update(MutableRecordHolder holder, String path, Record updatedRecord)
     {
-        MutableRecord base = holder.getRecord().copy(true);
+        MutableRecord base = holder.getRecord().copy(true, true);
 
         String[] parentPathElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
@@ -199,7 +199,7 @@ public class InMemoryRecordStore implements RecordStore
 
     private Record delete(MutableRecordHolder holder, String path)
     {
-        MutableRecord base = holder.getRecord().copy(true);
+        MutableRecord base = holder.getRecord().copy(true, true);
 
         String[] parentPathElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
@@ -290,7 +290,7 @@ public class InMemoryRecordStore implements RecordStore
 
         public MutableRecordHolder copy()
         {
-            return new MutableRecordHolder(record.copy(true));
+            return new MutableRecordHolder(record.copy(true, true));
         }
     }
 }

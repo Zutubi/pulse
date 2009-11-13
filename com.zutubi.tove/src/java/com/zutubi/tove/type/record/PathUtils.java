@@ -214,4 +214,19 @@ public class PathUtils
     {
         return getPath(0, elements, getPathElements(path));
     }
+
+    /**
+     * Gets the end part of the path by trimming off beginIndex elements from
+     * the start.  If there are less than beginIndex elements, the empty string
+     * is returned.
+     *
+     * @param path       path to retrieve the suffix of
+     * @param beginIndex index of the first path element to return
+     * @return the given string with beginIndex path elements stripped from the
+     *         front
+     */
+    public static String getSuffix(String path, int beginIndex)
+    {
+        return getPath(beginIndex, getPathElements(path));
+    }
 }

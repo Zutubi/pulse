@@ -45,7 +45,7 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
         for (Map.Entry<String, Record> recordEntry: recordsToUpgrade.entrySet())
         {
             String path = recordEntry.getKey();
-            MutableRecord mutableRecord = recordEntry.getValue().copy(false);
+            MutableRecord mutableRecord = recordEntry.getValue().copy(false, true);
             for (RecordUpgrader upgrader: recordUpgraders)
             {
                 upgrader.upgrade(path, mutableRecord);

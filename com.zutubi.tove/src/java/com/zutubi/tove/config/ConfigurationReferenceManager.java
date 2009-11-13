@@ -36,8 +36,8 @@ public class ConfigurationReferenceManager implements ReferenceResolver
     /**
      * Returns the path that is referenced by the given handle, which may not
      * be the path for that handle directly in a templated scope.  In templated
-     * scopes references always use the handle where an instance is first
-     * defined in the hierarchy.
+     * scopes references to within the same templated instance always use the
+     * handle where the referenced sub-path is first defined in the hierarchy.
      *
      * @param templateOwnerPath if in a templated scope, the item of the
      *                          templated collection that this reference is
@@ -85,11 +85,14 @@ public class ConfigurationReferenceManager implements ReferenceResolver
      * given path.  This may not be the handle of the record at that path in a
      * templated scope.
      *
-     * @param path the path of the record
+     * @param templateOwnerPath if in a templated scope, the item of the
+     *                          templated collection that this reference is
+     *                          coming from, otherwise null
+     * @param path              the path of the record
      * @return the handle for the record at path, or 0 if there is no such
      *         record
      */
-    public long getReferenceHandleForPath(String path)
+    public long getReferenceHandleForPath(String templateOwnerPath, String path)
     {
         Record record = configurationTemplateManager.getRecord(path);
         if (record == null)
@@ -98,9 +101,9 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         }
         else
         {
-            if (record instanceof TemplateRecord && PathUtils.getPathElements(path).length > 2)
+            if (record instanceof TemplateRecord && PathUtils.getPathElements(path).length > 2 && path.startsWith(templateOwnerPath))
             {
-                // Inside a templated collection item, pull up to the level
+                // Inside this templated collection item, pull up to the level
                 // where it is first defined.
                 TemplateRecord templateRecord = (TemplateRecord) record;
                 while (templateRecord.getParent() != null)

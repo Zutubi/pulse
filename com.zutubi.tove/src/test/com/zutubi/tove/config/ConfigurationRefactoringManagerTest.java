@@ -11,6 +11,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getBaseName;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
@@ -25,6 +26,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 {
     private static final String SAMPLE_SCOPE = "sample";
     private static final String TEMPLATE_SCOPE = "template";
+    private static final String NAME_ROOT = "root";
 
     private ConfigurationRefactoringManager configurationRefactoringManager;
     private CompositeType typeA;
@@ -48,7 +50,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationPersistenceManager.register(SAMPLE_SCOPE, mapA);
         configurationPersistenceManager.register(TEMPLATE_SCOPE, templatedMap);
 
-        MutableRecord root = typeA.unstantiate(new MockA("root"));
+        MutableRecord root = typeA.unstantiate(new MockA(NAME_ROOT));
         configurationTemplateManager.markAsTemplate(root);
         rootPath = configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, root);
         rootHandle = configurationTemplateManager.getRecord(rootPath).getHandle();
@@ -669,6 +671,235 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         TemplateRecord colbyRecord = (TemplateRecord) bmapRecord.get("colby");
         assertEquals("1", colbyRecord.get("y"));
         assertEquals("extracted", colbyRecord.getOwner("y"));
+    }
+
+    public void testCanPullUpInvalidPath()
+    {
+        assertFalse(configurationRefactoringManager.canPullUp("invalid/path/here", "anything"));
+    }
+
+    public void testCanPullUpTemplateCollectionItem() throws TypeException
+    {
+        String path = insertTemplateA(rootPath, "a", false);
+        assertFalse(configurationRefactoringManager.canPullUp(path, NAME_ROOT));
+    }
+
+    public void testCanPullUpNonTemplatedItem() throws TypeException
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertFalse(configurationRefactoringManager.canPullUp(path, NAME_ROOT));
+    }
+
+    public void testCanPullUpNoAncestor() throws TypeException
+    {
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(rootPath, "b"), NAME_ROOT));
+    }
+
+    public void testCanPullUpBadAncestor() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        insertTemplateAInstance(rootPath, createAInstance("a2"), false);
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b"), "a2"));
+    }
+
+    public void testCanPullUpAncestorDefinesPath() throws TypeException
+    {
+        String templateParentPath = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
+        String path = insertTemplateAInstance(templateParentPath, createAInstance("a2"), false);
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b"), NAME_ROOT));
+    }
+
+    public void testCanPullUpSiblingDefinesPath() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        insertTemplateAInstance(rootPath, createAInstance("a2"), false);
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b"), NAME_ROOT));
+    }
+
+    public void testCanPullUpSimple() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b", "y"), NAME_ROOT));
+    }
+
+    public void testCanPullUpInternalReference() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+
+        MockA child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        child.getB().setRefToRef(child.getRef());
+        configurationTemplateManager.save(child);
+
+        String pullPath = PathUtils.getPath(childPath, "b");
+        assertFalse(configurationRefactoringManager.canPullUp(pullPath, NAME_PARENT));
+    }
+
+    public void testCanPullUpComposite() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        assertTrue(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b"), NAME_ROOT));
+    }
+
+    public void testCanPullUpCollectionItem() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        assertTrue(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "bmap", "colby"), NAME_ROOT));
+    }
+
+    public void testCanPullUpInternalReferenceDefinedInAncestor() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        MockA parent = new MockA(NAME_PARENT);
+        parent.setRef(new Referee("ee"));
+        String templateParentPath = insertTemplateAInstance(rootPath, parent, true);
+
+        parent = configurationTemplateManager.getInstance(templateParentPath, MockA.class);
+        MockA child = new MockA("child");
+        MockB childB = new MockB("b");
+        childB.setRefToRef(parent.getRef());
+        child.setB(childB);
+        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+
+        String pullPath = PathUtils.getPath(childPath, "b");
+        assertTrue(configurationRefactoringManager.canPullUp(pullPath, NAME_PARENT));
+    }
+
+    public void testPullUpSiblingDefinesPath() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        insertTemplateAInstance(rootPath, createAInstance("a2"), false);
+        try
+        {
+            configurationRefactoringManager.pullUp(PathUtils.getPath(path, "b"), NAME_ROOT);
+            fail("Should not be able to pull up when sibling defines path");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Unable to pull up path 'template/a1/b': Ancestor 'root' already has descendents [template/a2/b] that define this path", e.getMessage());
+        }
+    }
+
+    public void testPullUpInternalReference() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+
+        MockA child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        child.getB().setRefToRef(child.getRef());
+        configurationTemplateManager.save(child);
+
+        try
+        {
+            String pullPath = PathUtils.getPath(childPath, "b");
+            configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+            fail("Should not be able to pull up when path contains reference not defined at ancestor level");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Unable to pull up path 'template/child/b': Path contains reference to 'template/child/ref' which does not exist in ancestor 'parent'", e.getMessage());
+        }
+    }
+
+    public void testPullUpComposite() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String pullPath = PathUtils.getPath(childPath, "b");
+
+        String path = configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+
+        assertEquals(PathUtils.getPath(templateParentPath, "b"), path);
+        TemplateRecord pulledUp = (TemplateRecord) configurationTemplateManager.getRecord(path);
+        assertEquals("44", pulledUp.get("y"));
+        assertEquals(NAME_PARENT, pulledUp.getOwner("y"));
+        
+        TemplateRecord inherited = (TemplateRecord) configurationTemplateManager.getRecord(pullPath);
+        assertEquals("44", inherited.get("y"));
+        assertEquals(NAME_PARENT, inherited.getOwner("y"));
+    }
+
+    public void testPullUpCollectionItem() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String pullPath = PathUtils.getPath(childPath, "bmap", "colby");
+
+        String path = configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+
+        assertEquals(PathUtils.getPath(templateParentPath, "bmap", "colby"), path);
+        TemplateRecord pulledUp = (TemplateRecord) configurationTemplateManager.getRecord(path);
+        assertEquals("1", pulledUp.get("y"));
+        assertEquals(NAME_PARENT, pulledUp.getOwner("y"));
+
+        TemplateRecord inherited = (TemplateRecord) configurationTemplateManager.getRecord(pullPath);
+        assertEquals("1", inherited.get("y"));
+        assertEquals(NAME_PARENT, inherited.getOwner("y"));
+    }
+
+    public void testPullUpEvents() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String siblingPath = insertTemplateAInstance(templateParentPath, new MockA("sibling"), false);
+        String pullPath = PathUtils.getPath(childPath, "b");
+
+        Listener listener = registerListener();
+
+        configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+
+        String siblingInsertPath = PathUtils.getPath(siblingPath, "b");
+        listener.assertEvents(new InsertEventSpec(siblingInsertPath, false), new PostInsertEventSpec(siblingInsertPath, false));
+    }
+
+    public void testPullUpInternalReferenceDefinedInAncestor() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        MockA parent = new MockA(NAME_PARENT);
+        parent.setRef(new Referee("ee"));
+        String templateParentPath = insertTemplateAInstance(rootPath, parent, true);
+
+        parent = configurationTemplateManager.getInstance(templateParentPath, MockA.class);
+        MockA child = new MockA("child");
+        MockB childB = new MockB("b");
+        childB.setRefToRef(parent.getRef());
+        child.setB(childB);
+        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+
+
+        String pullPath = PathUtils.getPath(childPath, "b");
+        String path = configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+
+
+        parent = configurationTemplateManager.getInstance(templateParentPath, MockA.class);
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+
+        assertSame(parent.getRef(), parent.getB().getRefToRef());
+        assertSame(child.getRef(), child.getB().getRefToRef());
+        
+        TemplateRecord templateParentRecord = (TemplateRecord) configurationTemplateManager.getRecord(templateParentPath);
+        assertEquals(NAME_PARENT, templateParentRecord.getOwner("b"));
+        TemplateRecord pulledUpB = (TemplateRecord) templateParentRecord.get("b");
+        assertEquals(NAME_PARENT, pulledUpB.getOwner("refToRef"));
+
+        String handle = Long.toString(((Record) templateParentRecord.get("ref")).getHandle());
+        assertEquals(handle, pulledUpB.get("refToRef"));
+
+        TemplateRecord inherited = (TemplateRecord) configurationTemplateManager.getRecord(path);
+        assertEquals(NAME_PARENT, inherited.getOwner("refToRef"));
+        assertEquals(handle, inherited.get("refToRef"));
     }
 
     private MockA createAInstance(String name)

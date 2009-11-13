@@ -2,9 +2,9 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.UserTransaction;
+import com.zutubi.tove.type.record.*;
 
 import java.util.Map;
 
@@ -64,25 +64,25 @@ public class DependenciesUpgradeTask extends AbstractUpgradeTask
             for (Map.Entry<String, Record> entry : projects.entrySet())
             {
                 String projectPath = entry.getKey();
-                MutableRecord projectEntry = entry.getValue().copy(true);
-                recordManager.insert(projectPath + "/dependencies", dependenciesSkeleton.copy(true));
+                MutableRecord projectEntry = entry.getValue().copy(true, true);
+                recordManager.insert(projectPath + "/dependencies", dependenciesSkeleton.copy(true, true));
 
                 MutableRecord stagesEntry = (MutableRecord) projectEntry.get("stages");
                 for (String stageName : stagesEntry.keySet())
                 {
-                    recordManager.insert(projectPath + "/stages/" + stageName + "/publications", stagePublicationsSkeleton.copy(true));
+                    recordManager.insert(projectPath + "/stages/" + stageName + "/publications", stagePublicationsSkeleton.copy(true, true));
                 }
 
                 // Triggers are only associated with concrete projects.
                 if (!projectEntry.containsMetaKey(TemplateRecord.TEMPLATE_KEY))
                 {
-                    recordManager.insert(projectPath + "/triggers/" + triggerSkeleton.get(PROPERTY_NAME), triggerSkeleton.copy(true));
+                    recordManager.insert(projectPath + "/triggers/" + triggerSkeleton.get(PROPERTY_NAME), triggerSkeleton.copy(true, true));
                 }
             }
 
             // for global project, add specific values.
             Record globalDependencies = recordManager.select(PATH_GLOBAL_DEPENDENCIES);
-            MutableRecord globalDependenciesEntry = globalDependencies.copy(true);
+            MutableRecord globalDependenciesEntry = globalDependencies.copy(true, true);
             globalDependenciesEntry.put(PROPERTY_PUBLICATION_PATTERN, "build/[artifact].[ext]");
             globalDependenciesEntry.put(PROPERTY_RETRIEVAL_PATTERN, "lib/[artifact].[ext]");
             recordManager.update(PATH_GLOBAL_DEPENDENCIES, globalDependenciesEntry);

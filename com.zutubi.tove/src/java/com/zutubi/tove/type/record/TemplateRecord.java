@@ -335,7 +335,7 @@ public class TemplateRecord extends AbstractRecord
         return true;
     }
 
-    public MutableRecord copy(boolean deep)
+    public MutableRecord copy(boolean deep, boolean preserveHandles)
     {
         return flatten();
     }

@@ -197,7 +197,7 @@ public class PrimitiveTypeTest extends TypeTestCase
     private void fromXmlRpcHelper(Class fromClass, Object from, String to) throws TypeException
     {
         PrimitiveType type = new PrimitiveType(fromClass);
-        Object o = type.fromXmlRpc(from);
+        Object o = type.fromXmlRpc(null, from);
         assertTrue(o instanceof String);
         assertEquals(to, o);
     }

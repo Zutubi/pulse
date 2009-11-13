@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
+import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
@@ -39,7 +39,7 @@ public class ToveFileUpgradeTask extends AbstractUpgradeTask
         String pulseFileString = (String) typeRecord.get(PROPERTY_PULSE_FILE_STRING);
         if (pulseFileString != null)
         {
-            MutableRecord mutableTypeRecord = typeRecord.copy(false);
+            MutableRecord mutableTypeRecord = typeRecord.copy(false, true);
             try
             {
                 String converted = PulseFileToToveFile.convert(pulseFileString);

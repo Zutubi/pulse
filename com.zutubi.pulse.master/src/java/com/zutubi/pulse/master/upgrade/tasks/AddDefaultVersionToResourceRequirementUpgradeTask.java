@@ -45,7 +45,7 @@ public class AddDefaultVersionToResourceRequirementUpgradeTask extends AbstractU
                 continue;
             }
 
-            MutableRecord copy = record.copy(true);
+            MutableRecord copy = record.copy(true, true);
 
             String version = (String) record.get("version");
             if (StringUtils.stringSet(version))

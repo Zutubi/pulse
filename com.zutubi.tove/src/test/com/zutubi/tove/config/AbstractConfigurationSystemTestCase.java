@@ -1,8 +1,10 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
+import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.security.ActorProvider;
 import com.zutubi.tove.security.AuthorityProvider;
@@ -15,15 +17,15 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.tove.type.record.store.InMemoryRecordStore;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
 public abstract class AbstractConfigurationSystemTestCase extends AbstractTransactionTestCase
@@ -172,5 +174,139 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
     {
         CompositeType type = typeRegistry.getType(c.getClass());
         return type.unstantiate(c);
+    }
+
+    protected Listener registerListener()
+    {
+        Listener listener = new Listener();
+        eventManager.register(listener);
+        return listener;
+    }
+
+    public static class Listener implements com.zutubi.events.EventListener
+    {
+        private List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
+
+        public List<ConfigurationEvent> getEvents()
+        {
+            return events;
+        }
+
+        public void clearEvents()
+        {
+            events.clear();
+        }
+
+        public void assertEvents(TemplateRecordPersistenceTest.EventSpec... expectedEvents)
+        {
+            assertEquals(expectedEvents.length, events.size());
+            for(final TemplateRecordPersistenceTest.EventSpec spec: expectedEvents)
+            {
+                ConfigurationEvent matchingEvent = CollectionUtils.find(events, new Predicate<ConfigurationEvent>()
+                {
+                    public boolean satisfied(ConfigurationEvent event)
+                    {
+                        return spec.matches(event);
+                    }
+                });
+
+                assertNotNull("Expected event '" + spec.toString() + "' missing", matchingEvent);
+            }
+        }
+
+        public void handleEvent(Event evt)
+        {
+            events.add((ConfigurationEvent) evt);
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return new Class[]{ConfigurationEvent.class};
+        }
+    }
+
+    public static abstract class EventSpec
+    {
+        private String path;
+        private boolean cascaded;
+        private Class<? extends ConfigurationEvent> eventClass;
+
+        protected EventSpec(String path, Class<? extends ConfigurationEvent> eventClass)
+        {
+            this(path, false, eventClass);
+        }
+
+        protected EventSpec(String path, boolean cascaded, Class<? extends ConfigurationEvent> eventClass)
+        {
+            this.path = path;
+            this.cascaded = cascaded;
+            this.eventClass = eventClass;
+        }
+
+        public boolean matches(ConfigurationEvent event)
+        {
+            if(event instanceof CascadableEvent)
+            {
+                if(cascaded != ((CascadableEvent)event).isCascaded())
+                {
+                    return false;
+                }
+            }
+
+            return eventClass.isInstance(event) && event.getInstance().getConfigurationPath().equals(path);
+        }
+
+        public String toString()
+        {
+            return eventClass.getSimpleName() + ": " + path;
+        }
+    }
+
+    public static class InsertEventSpec extends EventSpec
+    {
+        public InsertEventSpec(String path, boolean cascaded)
+        {
+            super(path, cascaded, InsertEvent.class);
+        }
+    }
+
+    public static class DeleteEventSpec extends EventSpec
+    {
+        public DeleteEventSpec(String path, boolean cascaded)
+        {
+            super(path, cascaded, DeleteEvent.class);
+        }
+    }
+
+    public static class SaveEventSpec extends EventSpec
+    {
+        public SaveEventSpec(String path)
+        {
+            super(path, SaveEvent.class);
+        }
+    }
+
+    public static class PostInsertEventSpec extends EventSpec
+    {
+        public PostInsertEventSpec(String path, boolean cascaded)
+        {
+            super(path, cascaded, PostInsertEvent.class);
+        }
+    }
+
+    public static class PostDeleteEventSpec extends EventSpec
+    {
+        public PostDeleteEventSpec(String path, boolean cascaded)
+        {
+            super(path, cascaded, PostDeleteEvent.class);
+        }
+    }
+
+    public static class PostSaveEventSpec extends EventSpec
+    {
+        public PostSaveEventSpec(String path)
+        {
+            super(path, PostSaveEvent.class);
+        }
     }
 }

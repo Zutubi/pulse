@@ -30,7 +30,7 @@ public class UpdateDefaultActionUpgradeTask extends AbstractUpgradeTask
             String currentDefault = (String) record.get("defaultAction");
             if("projects".equals(currentDefault))
             {
-                MutableRecord mutable = record.copy(false);
+                MutableRecord mutable = record.copy(false, true);
                 mutable.put("defaultAction", "browse");
                 recordManager.update(preferencesEntry.getKey(), mutable);
             }

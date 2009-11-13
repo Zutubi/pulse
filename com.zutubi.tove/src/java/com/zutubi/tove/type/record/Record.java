@@ -70,11 +70,15 @@ public interface Record
     /**
      * Create a copy of this record.
      *
-     * @param deep if true, the copy is deep: child records are also copied
-     * 
+     * @param deep            if true, the copy is deep: child records are also
+     *                        copied, if false child records will still be
+     *                        present in the copy, but will be reused from the
+     *                        original
+     * @param preserveHandles if true the copy will retain the handles in this
+     *                        record, if false the copy will have no handles
      * @return a value copy of this record
      */
-    MutableRecord copy(boolean deep);
+    MutableRecord copy(boolean deep, boolean preserveHandles);
 
     /**
      * Retrieve the set of keys to the data contained within this record.

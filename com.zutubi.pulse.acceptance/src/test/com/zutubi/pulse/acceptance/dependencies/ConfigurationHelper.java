@@ -4,11 +4,11 @@ import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
@@ -63,7 +63,7 @@ public class ConfigurationHelper
                 return xmlRpcHelper.getConfigPath(String.valueOf(handle));
             }
         });
-        stub(referenceManager.getReferenceHandleForPath(anyString())).toAnswer(new Answer()
+        stub(referenceManager.getReferenceHandleForPath(anyString(), anyString())).toAnswer(new Answer()
         {
             public Object answer(InvocationOnMock invocation) throws Throwable
             {

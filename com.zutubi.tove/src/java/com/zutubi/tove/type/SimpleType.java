@@ -27,7 +27,7 @@ public abstract class SimpleType extends AbstractType
         // Nothing to to
     }
 
-    public abstract String fromXmlRpc(Object data) throws TypeException;
+    public abstract String fromXmlRpc(String templateOwnerPath, Object data) throws TypeException;
 
     public String toString()
     {

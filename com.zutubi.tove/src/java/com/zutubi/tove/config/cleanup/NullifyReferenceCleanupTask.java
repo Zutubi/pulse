@@ -25,7 +25,7 @@ public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
         Record parentRecord = recordManager.select(parentPath);
         if (parentRecord != null)
         {
-            MutableRecord newValue = parentRecord.copy(false);
+            MutableRecord newValue = parentRecord.copy(false, true);
             String key = PathUtils.getBaseName(getAffectedPath());
             if (hasTemplateParent)
             {

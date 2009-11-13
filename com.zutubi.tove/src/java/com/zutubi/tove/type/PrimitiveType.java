@@ -135,7 +135,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public String fromXmlRpc(Object data) throws TypeException
+    public String fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         Class clazz = getClazz();
         if(PRIMITIVE_CLASSES_MAP.containsKey(clazz))

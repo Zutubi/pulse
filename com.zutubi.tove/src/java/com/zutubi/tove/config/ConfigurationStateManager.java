@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.CompositeType;
@@ -9,7 +10,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -117,7 +117,7 @@ public class ConfigurationStateManager
         {
             TypeProperty property = type.getExternalStateProperty();
             Record record = recordManager.select(instance.getConfigurationPath());
-            MutableRecord mutable = record.copy(false);
+            MutableRecord mutable = record.copy(false, true);
             mutable.put(property.getName(), property.getType().unstantiate(id));
             recordManager.update(instance.getConfigurationPath(), mutable);
             property.setValue(instance, id);

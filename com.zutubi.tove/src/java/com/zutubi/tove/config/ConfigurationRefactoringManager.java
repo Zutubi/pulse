@@ -236,6 +236,48 @@ public class ConfigurationRefactoringManager
         return configurationTemplateManager.executeInsideTransaction(new SmartCloneAction(parentPath, rootKey, parentKey, originalKeyToCloneKey));
     }
 
+    /**
+     * Tests if a given path can be pulled up in the template hierarchy to the
+     * given ancestor.  To be pulled up a path must:
+     *
+     * <ul>
+     *   <li>Refer to an existing item of composite type</li>
+     *   <li>Be in a templated scope</li>
+     *   <li>Not be defined in any ancestor</li>
+     *   <li>Not be defined in any other descendent of the specified ancestor</li>
+     *   <li>Not contain any references to items not visible from the specified ancestor</li>
+     * </ul>
+     *
+     * The given ancestor must be a strict ancestor of the templated collection
+     * item that owns the specified path.
+     *
+     * @param path        the path to test
+     * @param ancestorKey key of the templated collection item to pull the path
+     *                    up to (must be an ancestor of the paths template owner)
+     * @return true iff the path may be pulled up
+     */
+    public boolean canPullUp(final String path, final String ancestorKey)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new CanPullUpAction(path, ancestorKey));
+    }
+
+    /**
+     * Pulls up an item from its current location in the template hierarchy to
+     * the given ancestor.  This is not possible for all paths, see
+     * {@link #canPullUp(String, String)} for details.
+     *
+     * @param path        path of the item to pull up
+     * @param ancestorKey key of the templated collection item to pull the path
+     *                    up to (must be an ancestor of the paths template owner)
+     * @return the path of the pulled up item
+     * @throws IllegalArgumentException if the given path or ancestor are invalid,
+     *         or the path cannot be pulled up
+     */
+    public String pullUp(final String path, final String ancestorKey)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new PullUpAction(path, ancestorKey));
+    }
+
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
@@ -314,10 +356,9 @@ public class ConfigurationRefactoringManager
                 }
                 else
                 {
-                    clone = record.copy(true);
+                    clone = record.copy(true, false);
                 }
                 
-                clearHandles(clone);
                 clone.put(keyPropertyName, cloneKey);
 
                 if(templatedCollection)
@@ -392,15 +433,6 @@ public class ConfigurationRefactoringManager
             return record;
         }
 
-        private void clearHandles(MutableRecord record)
-        {
-            record.setHandle(RecordManager.UNDEFINED);
-            for (String key : record.nestedKeySet())
-            {
-                clearHandles((MutableRecord) record.get(key));
-            }
-        }
-
         private void checkParent(String scope, String originalKey, MutableRecord clone, Map<String, String> originalKeyToCloneKey)
         {
             TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
@@ -456,10 +488,10 @@ public class ConfigurationRefactoringManager
                                 // Then we need to update the reference to point to
                                 // the new clone.
                                 String newPath = convertPath(referencedPath, parentPath, oldKeyToNewKey);
-                                long newHandle = configurationReferenceManager.getReferenceHandleForPath(newPath);
+                                long newHandle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, newPath);
                                 if (mutableRecord == null)
                                 {
-                                    mutableRecord = record.copy(false);
+                                    mutableRecord = record.copy(false, true);
                                 }
 
                                 mutableRecord.put(property.getName(), Long.toString(newHandle));
@@ -608,46 +640,52 @@ public class ConfigurationRefactoringManager
             // operation is complete!
             configurationTemplateManager.suspendInstanceCache();
 
-            // Extract and save the new parent.
-            MapType parentType = configurationTemplateManager.getType(parentPath, MapType.class);
-            MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
-            common.put(mapType.getKeyProperty(), parentTemplateName);
-            configurationTemplateManager.markAsTemplate(common);
-            configurationTemplateManager.setParentTemplate(common, recordManager.select(templateParentNode.getPath()).getHandle());
-            String newParentTemplatePath = configurationTemplateManager.insertRecord(parentPath, common);
-            TemplateRecord newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
-            long newParentTemplateHandle = newParentTemplateRecord.getHandle();
-
-            // Fix internal references which were pulled up (note we need to
-            // refresh the record after saving).
-            MutableRecord newParentTemplateCopy = newParentTemplateRecord.getMoi().copy(true);
-            newParentTemplateCopy.forEach(new PullUpReferencesFunction(mapType.getTargetType(), newParentTemplateCopy, newParentTemplatePath, PathUtils.getPath(parentPath, keys.get(0))));
-            newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
-            
-            // Reparent all the children.  Note we need to scrub all the
-            // values we just pulled up and then do a deep update.  No events
-            // need to be sent as no concrete instance is changed.
-            for (String key: keys)
+            try
             {
-                String path = getPath(parentPath, key);
-                MutableRecord copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(false);
+                // Extract and save the new parent.
+                MapType parentType = configurationTemplateManager.getType(parentPath, MapType.class);
+                MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
+                common.put(mapType.getKeyProperty(), parentTemplateName);
+                configurationTemplateManager.markAsTemplate(common);
+                configurationTemplateManager.setParentTemplate(common, recordManager.select(templateParentNode.getPath()).getHandle());
+                String newParentTemplatePath = configurationTemplateManager.insertRecord(parentPath, common);
+                TemplateRecord newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
+                long newParentTemplateHandle = newParentTemplateRecord.getHandle();
 
-                // Update the parent reference.
-                configurationTemplateManager.setParentTemplate(copy, newParentTemplateHandle);
-                recordManager.update(path, copy);
+                // Fix internal references which were pulled up (note we need to
+                // refresh the record after saving).
+                MutableRecord newParentTemplateCopy = newParentTemplateRecord.getMoi().copy(true, true);
+                newParentTemplateCopy.forEach(new PullUpReferencesFunction(mapType.getTargetType(), newParentTemplateCopy, newParentTemplatePath, PathUtils.getPath(parentPath, keys.get(0))));
+                newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
 
-                // Fix references, scrub and apply updates.
-                copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(true);
-                copy.forEach(new CanonicaliseReferencesFunction(mapType.getTargetType(), copy, path));
-                configurationTemplateManager.scrubInheritedValues(newParentTemplateRecord, copy, true);
-                copy.forEach(new DeepUpdateFunction(path));
+                // Reparent all the children.  Note we need to scrub all the
+                // values we just pulled up and then do a deep update.  No events
+                // need to be sent as no concrete instance is changed.
+                for (String key: keys)
+                {
+                    String path = getPath(parentPath, key);
+                    MutableRecord copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(false, true);
+
+                    // Update the parent reference.
+                    configurationTemplateManager.setParentTemplate(copy, newParentTemplateHandle);
+                    recordManager.update(path, copy);
+
+                    // Fix references, scrub and apply updates.
+                    copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(true, true);
+                    copy.forEach(new CanonicaliseReferencesFunction(mapType.getTargetType(), copy, path));
+                    configurationTemplateManager.scrubInheritedValues(newParentTemplateRecord, copy, true);
+                    copy.forEach(new DeepUpdateFunction(path));
+                }
+
+                return newParentTemplatePath;
             }
-
-            configurationTemplateManager.resumeInstanceCache();
-            return newParentTemplatePath;
+            finally
+            {
+                configurationTemplateManager.resumeInstanceCache();
+            }
         }
 
-        public MutableRecord extractCommon(List<Pair<String, Record>> pathRecordPairs, String parentPath, ComplexType type)
+        private MutableRecord extractCommon(List<Pair<String, Record>> pathRecordPairs, String parentPath, ComplexType type)
         {
             Map<String, String> commonMeta = new HashMap<String, String>();
             Map<String, Object> commonSimple = new HashMap<String, Object>();
@@ -974,10 +1012,10 @@ public class ConfigurationRefactoringManager
     private static abstract class TypeAwareFunction implements GraphFunction<Record>
     {
         protected Stack<ComplexType> typeStack = new Stack<ComplexType>();
-        protected Stack<MutableRecord> recordStack = new Stack<MutableRecord>();
+        protected Stack<Record> recordStack = new Stack<Record>();
         protected String path;
 
-        public TypeAwareFunction(ComplexType type, MutableRecord record, String path)
+        public TypeAwareFunction(ComplexType type, Record record, String path)
         {
             typeStack.push(type);
             recordStack.push(record);
@@ -1015,7 +1053,7 @@ public class ConfigurationRefactoringManager
     {
         protected String templateOwnerPath;
 
-        public ReferenceWalkingFunction(ComplexType type, MutableRecord record, String path)
+        public ReferenceWalkingFunction(ComplexType type, Record record, String path)
         {
             super(type, record, path);
             templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
@@ -1109,7 +1147,7 @@ public class ConfigurationRefactoringManager
                     path = templateOwnerPath + path.substring(fromOwnerPath.length());
                 }
 
-                long upHandle = configurationReferenceManager.getReferenceHandleForPath(path);
+                long upHandle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, path);
                 return Long.toString(upHandle);
             }
         }
@@ -1151,7 +1189,7 @@ public class ConfigurationRefactoringManager
             else
             {
                 String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, originalHandle);
-                long canonicalisedHandle = configurationReferenceManager.getReferenceHandleForPath(path);
+                long canonicalisedHandle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, path);
                 return Long.toString(canonicalisedHandle);
             }
         }
@@ -1213,7 +1251,7 @@ public class ConfigurationRefactoringManager
             Record existing = recordManager.select(path);
             if (!record.shallowEquals(existing))
             {
-                MutableRecord r = record.copy(false);
+                MutableRecord r = record.copy(false, false);
                 r.setHandle(existing.getHandle());
                 recordManager.update(path, r);
                 configurationTemplateManager.refreshCaches();
@@ -1223,6 +1261,237 @@ public class ConfigurationRefactoringManager
         public void pop()
         {
             path = PathUtils.getParentPath(path);
+        }
+    }
+
+    /**
+     * Helper base class for "pull up" actions.
+     */
+    private class PullUpActionSupport
+    {
+        protected final String path;
+        protected final String ancestorKey;
+
+        private PullUpActionSupport(String path, String ancestorKey)
+        {
+            this.path = path;
+            this.ancestorKey = ancestorKey;
+        }
+
+        /**
+         * Checks if our path can actually be pulled up, throwing an error if
+         * it cannot.
+         *
+         * @return the path that the item would be pulled up to
+         * @throws IllegalArgumentException if our path cannot be pulled up
+         */
+        public String ensurePullUp()
+        {
+            // Path must be a composite in a templated scope.
+            if (!configurationTemplateManager.pathExists(path))
+            {
+                throw new IllegalArgumentException("Path does not exist");
+            }
+            
+            String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+            if (templateOwnerPath == null)
+            {
+                throw new IllegalArgumentException("Path does not refer to a templated item");
+            }
+
+            String remainderPath = PathUtils.getSuffix(path, 2);
+            if (!StringUtils.stringSet(remainderPath))
+            {
+                throw new IllegalArgumentException("Path refers to a top-level templated collection item");
+            }
+
+            Type type = configurationTemplateManager.getType(path);
+            if (!(type instanceof CompositeType))
+            {
+                throw new IllegalArgumentException("Path does not refer to an item of composite type");
+            }
+
+            // Specified ancestor must strictly be our ancestor.
+            TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+            final boolean[] found = new boolean[]{false};
+            node.forEachAncestor(new TemplateNode.NodeHandler()
+            {
+                public boolean handle(TemplateNode node)
+                {
+                    if (node.getId().equals(ancestorKey))
+                    {
+                        found[0] = true;
+                        return false;
+                    }
+
+                    return true;
+                }
+            }, true);
+
+            if (!found[0])
+            {
+                throw new IllegalArgumentException("Specified ancestor '" + ancestorKey + "' is not an ancestor of this path's template owner");
+            }
+
+            // We must be able to insert the composite into the ancestor.
+            // Requires checking the descendents of this ancestor -
+            // ignoring the subtree where the composite is currently
+            // defined.
+            String scope = PathUtils.getPrefix(path, 1);
+            String existingAncestorPath = configurationTemplateManager.findAncestorPath(path);
+            if (existingAncestorPath != null)
+            {
+                throw new IllegalArgumentException("Path has an existing ancestor '" + existingAncestorPath + "'");
+            }
+
+            String ancestorPath = PathUtils.getPath(scope, ancestorKey, remainderPath);
+            List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(ancestorPath, true, false, false);
+            List<String> existingDescendentPaths = configurationTemplateManager.getDescendentPaths(path, false, false, false);
+            descendentPaths.removeAll(existingDescendentPaths);
+            if (descendentPaths.size() > 0)
+            {
+                throw new IllegalArgumentException("Ancestor '" + ancestorKey + "' already has descendents " + descendentPaths + " that define this path");
+            }
+
+            // We cannot have any references to items defined in our template
+            // owner that do not exist at the specified ancestor's level.
+            Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, (CompositeType) type);
+            for (String referencedPath: referencedPaths)
+            {
+                if (referencedPath.startsWith(templateOwnerPath) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
+                {
+                    throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in ancestor '" + ancestorKey + "'");
+                }
+            }
+
+            return ancestorPath;
+        }
+
+        private Set<String> getReferencedPaths(final String templateOwnerPath, CompositeType type)
+        {
+            final Set<String> result = new HashSet<String>();
+            TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            record.forEach(new ReferenceWalkingFunction(type, record, templateOwnerPath)
+            {
+                @Override
+                protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+                {
+                    for (String handleString: value)
+                    {
+                        addPath(handleString);
+                    }
+                }
+
+                @Override
+                protected void handleReference(Record record, TypeProperty property, String value)
+                {
+                    addPath(value);
+                }
+
+                private void addPath(String handleString)
+                {
+                    long handle = Long.parseLong(handleString);
+                    if (handle != 0)
+                    {
+                        String referencedPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, handle);
+                        if (referencedPath != null)
+                        {
+                            result.add(referencedPath);
+                        }
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        private String pullUpPath(String path)
+        {
+            String[] elements = PathUtils.getPathElements(path);
+            elements[1] = ancestorKey;
+            return PathUtils.getPath(elements);
+        }
+    }
+
+    /**
+     * Action to test if a path can be pulled up.
+     *
+     * @see com.zutubi.tove.config.ConfigurationRefactoringManager#canPullUp(String, String)
+     */
+    private class CanPullUpAction extends PullUpActionSupport implements ConfigurationTemplateManager.Action<Boolean>
+    {
+        public CanPullUpAction(String path, String ancestorKey)
+        {
+            super(path, ancestorKey);
+        }
+
+        public Boolean execute() throws Exception
+        {
+            try
+            {
+                ensurePullUp();
+                return true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Action to pull up a path.
+     *
+     * @see com.zutubi.tove.config.ConfigurationRefactoringManager#pullUp(String, String)
+     */
+    private class PullUpAction extends PullUpActionSupport implements ConfigurationTemplateManager.Action<String>
+    {
+        public PullUpAction(String path, String ancestorKey)
+        {
+            super(path, ancestorKey);
+        }
+
+        public String execute() throws Exception
+        {
+            String insertPath;
+
+            List<String> existingConcreteDescendents = configurationTemplateManager.getDescendentPaths(path, false, true, false);
+            configurationTemplateManager.suspendInstanceCache();
+            try
+            {
+                insertPath = ensurePullUp();
+
+                String[] elements = PathUtils.getPathElements(insertPath);
+                String scope = elements[0];
+                TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
+                TemplateNode node = hierarchy.getNodeById(elements[1]);
+
+                CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
+                MutableRecord deepCopy = recordManager.select(path).copy(true, false);
+                configurationTemplateManager.addInheritedSkeletons(scope, PathUtils.getPath(2, elements), type, deepCopy, node, true);
+                recordManager.insert(insertPath, deepCopy);
+
+                Record skeleton = configurationTemplateManager.createSkeletonRecord(type, deepCopy);
+                skeleton.forEach(new DeepSkeletoniseFunction(path));
+
+                deepCopy = recordManager.select(insertPath).copy(true, true);
+                deepCopy.forEach(new CanonicaliseReferencesFunction(type, deepCopy, insertPath));
+                deepCopy.forEach(new DeepUpdateFunction(insertPath));
+            }
+            catch (Exception e)
+            {
+                throw new IllegalArgumentException("Unable to pull up path '" + path + "': " + e.getMessage(), e);
+            }
+            finally
+            {
+                configurationTemplateManager.resumeInstanceCache();
+            }
+
+            List<String> newConcreteDescendents = configurationTemplateManager.getDescendentPaths(insertPath, false, true, false);
+            newConcreteDescendents.removeAll(existingConcreteDescendents);
+            configurationTemplateManager.raiseInsertEvents(newConcreteDescendents);
+
+            return insertPath;
         }
     }
 }

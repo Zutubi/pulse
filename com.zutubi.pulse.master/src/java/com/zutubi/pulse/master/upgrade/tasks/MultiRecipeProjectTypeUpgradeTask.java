@@ -357,7 +357,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
                 Record value = (Record) oldTypeRecord.get(property);
                 if (value != null)
                 {
-                    newCommandRecord.put(property, value.copy(true));
+                    newCommandRecord.put(property, value.copy(true, true));
                 }
             }
         }

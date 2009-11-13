@@ -37,7 +37,7 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
             String[] references = (String[]) parentRecord.get(baseName);
             if (references != null && CollectionUtils.contains(references, deletedHandle))
             {
-                MutableRecord newValues = parentRecord.copy(false);
+                MutableRecord newValues = parentRecord.copy(false, true);
                 String[] newReferences = CollectionUtils.filterToArray(references, new Predicate<String>()
                 {
                     public boolean satisfied(String handle)

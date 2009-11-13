@@ -29,7 +29,7 @@ public class HideRecordCleanupTask extends RecordCleanupTaskSupport
 
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());
-        MutableRecord parent = recordManager.select(parentPath).copy(false);
+        MutableRecord parent = recordManager.select(parentPath).copy(false, true);
 
         TemplateRecord.hideItem(parent, baseName);
         recordManager.update(parentPath, parent);

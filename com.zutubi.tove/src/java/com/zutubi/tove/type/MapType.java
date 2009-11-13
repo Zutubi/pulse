@@ -176,10 +176,10 @@ public class MapType extends CollectionType
         }
     }
 
-    public Object fromXmlRpc(Object data) throws TypeException
+    public Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         typeCheck(data, Hashtable.class);
-        return convertToRecord((Hashtable) data, new XmlRpcToRecord());
+        return convertToRecord((Hashtable) data, new XmlRpcToRecord(templateOwnerPath));
     }
 
     private MutableRecord convertToRecord(Map instance, ToRecord toRecord) throws TypeException
@@ -380,9 +380,16 @@ public class MapType extends CollectionType
 
     private static class XmlRpcToRecord implements ToRecord
     {
+        private String templateOwnerPath;
+
+        public XmlRpcToRecord(String templateOwnerPath)
+        {
+            this.templateOwnerPath = templateOwnerPath;
+        }
+
         public Object convert(Type type, Object object) throws TypeException
         {
-            return type.fromXmlRpc(object);
+            return type.fromXmlRpc(templateOwnerPath, object);
         }
     }
 }

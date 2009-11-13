@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.ReferenceType;
@@ -26,6 +27,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
 
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
@@ -44,13 +46,14 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         // can be used to ensure a selection is made.
         options.put("0", "");
 
+        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
         for (Configuration r : referencable)
         {
             if (configurationSecurityManager.hasPermission(r.getConfigurationPath(), AccessManager.ACTION_VIEW))
             {
                 try
                 {
-                    long handle = configurationReferenceManager.getReferenceHandleForPath(r.getConfigurationPath());
+                    long handle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, r.getConfigurationPath());
                     options.put(Long.toString(handle), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
                 }
                 catch (BeanException e)
@@ -71,5 +74,10 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

@@ -48,9 +48,9 @@ public class ImmutableRecord implements Record
         return delegate.containsKey(key);
     }
 
-    public MutableRecord copy(boolean deep)
+    public MutableRecord copy(boolean deep, boolean preserveHandles)
     {
-        return delegate.copy(deep);
+        return delegate.copy(deep, true);
     }
 
     public Set<String> keySet()

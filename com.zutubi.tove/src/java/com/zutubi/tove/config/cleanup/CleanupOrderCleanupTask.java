@@ -30,7 +30,7 @@ public class CleanupOrderCleanupTask extends RecordCleanupTaskSupport
             List<String> order = CollectionType.getDeclaredOrder(parentRecord);
             if(order.remove(baseName))
             {
-                MutableRecord mutableParent = parentRecord.copy(false);
+                MutableRecord mutableParent = parentRecord.copy(false, true);
                 CollectionType.setOrder(mutableParent, order);
                 recordManager.update(parentPath, mutableParent);
             }
