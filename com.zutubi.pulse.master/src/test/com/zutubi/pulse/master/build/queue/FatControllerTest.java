@@ -276,16 +276,6 @@ public class FatControllerTest extends PulseTestCase
         dependencyTreeCalculationsHelper(project1, project2, requestStatus, expectedTraversal);
     }
 
-    public void testDependencyTreeCalculationUsesTheDependencyTransitiveField() throws InterruptedException
-    {
-        Project project1 = createProject("project1");
-        Project project2 = createProject("project2");
-
-        addDependency(project1, project2).setTransitive(false);
-
-        dependencyTreeCalculationsHelper(project1, project2, STATUS_INTEGRATION, false);
-    }
-
     private void dependencyTreeCalculationsHelper(Project project1, Project project2, String requestStatus, boolean expectedTraversal) throws InterruptedException
     {
         SingleBuildRequestEvent request = createRebuildRequest(project2);
@@ -306,6 +296,32 @@ public class FatControllerTest extends PulseTestCase
         publishSucceededEvent(project2);
         assertCounts(project1, 0, 0);
         assertCounts(project2, 0, 0);
+    }
+
+    public void testDependencyTreeCalculationUsesTheDependencyTransitiveField() throws InterruptedException
+    {
+        Project project1 = createProject("project1-1-1");
+        Project project2 = createProject("project1-1");
+        Project project3 = createProject("project1");
+
+        addDependency(project1, project2);
+        addDependency(project2, project3).setTransitive(false);
+
+        SingleBuildRequestEvent rebuildRequest = createRebuildRequest(project3);
+        fatController.requestBuild(rebuildRequest);
+        assertCounts(project1, 0, 0);
+        assertCounts(project2, 1, 0);
+        assertCounts(project3, 0, 0);
+
+        publishSucceededEvent(project2);
+        assertCounts(project1, 0, 0);
+        assertCounts(project2, 0, 0);
+        assertCounts(project3, 1, 0);
+
+        publishSucceededEvent(project3);
+        assertCounts(project1, 0, 0);
+        assertCounts(project2, 0, 0);
+        assertCounts(project3, 0, 0);
     }
 
     public void testMultipleDependenciesRebuild() throws InterruptedException
