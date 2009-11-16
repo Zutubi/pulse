@@ -21,6 +21,7 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
     private static final String ELEMENT_TEST_CASE = "TestCase";
     private static final String ELEMENT_TEST_FUNCTION = "TestFunction";
     private static final String ELEMENT_INCIDENT = "Incident";
+    private static final String ELEMENT_DATA_TAG = "DataTag";
     private static final String ELEMENT_DESCRIPTION = "Description";
     private static final String ELEMENT_MESSAGE = "Message";
 
@@ -131,14 +132,28 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
         }
 
         reader.nextTag();
-        while (nextSiblingTag(reader, ELEMENT_DESCRIPTION))
+        while (nextSiblingTag(reader, ELEMENT_DESCRIPTION, ELEMENT_DATA_TAG))
         {
-            message += getElementText(reader);
+            if (reader.getLocalName().equals(ELEMENT_DATA_TAG))
+            {
+                message += "Data Tag: '" + getElementText(reader) + "': ";
+            }
+            else
+            {
+                message += getElementText(reader);
+            }
+            
             reader.nextTag();
         }
 
         if (StringUtils.stringSet(message))
         {
+            String currentMessage = caseResult.getMessage();
+            if (StringUtils.stringSet(currentMessage))
+            {
+                message = currentMessage + "\n" + message;
+            }
+            
             caseResult.setMessage(message);
         }
     }

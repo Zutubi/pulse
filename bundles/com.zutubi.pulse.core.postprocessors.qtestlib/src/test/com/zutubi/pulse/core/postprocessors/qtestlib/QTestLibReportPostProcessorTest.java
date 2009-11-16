@@ -62,4 +62,34 @@ public class QTestLibReportPostProcessorTest extends XMLTestPostProcessorTestCas
             )
         );
     }
+
+    public void testFull() throws IOException
+    {
+        TestSuiteResult expected =
+            buildSuite(null,
+                buildSuite("tst_QFontComboBox",
+                    new TestCaseResult("initTestCase", PASS),
+                    new TestCaseResult("qfontcombobox", PASS),
+                        new TestCaseResult("currentFont", -1, FAILURE, "/home/cduclos/dev/qt-4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp:152: Data Tag: 'default': Compared values are not the same\n" +
+                                "   Actual (boxFontFamily): Arial\n" +
+                                "   Expected (currentFont.family()): Sans Serif\n" +
+                                "/home/cduclos/dev/qt-4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp:147: Data Tag: 'default': Compared values are not the same\n" +
+                                "/home/cduclos/dev/qt-4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp:147: Data Tag: 'Courier': Compared values are not the same"),
+                        new TestCaseResult("sizeHint", PASS),
+                        new TestCaseResult("writingSystem", -1, FAILURE, "/home/cduclos/dev/qt-4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp:277: Data Tag: 'Any': Compared values are not the same\n" +
+                                "   Actual (spy0.count()): 2\n" +
+                                "   Expected ((currentFont != box.currentFont()) ? 1 : 0): 1\n" +
+                                "/home/cduclos/dev/qt-4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp:277: Data Tag: 'Latin': Compared values are not the same\n" +
+                                "   Actual (spy0.count()): 2\n" +
+                                "   Expected ((currentFont != box.currentFont()) ? 1 : 0): 1\n" +
+                                "/home/cduclos/dev/qt-4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp:277: Data Tag: 'enum': Compared values are not the same\n" +
+                                "   Actual (spy0.count()): 2\n" +
+                                "   Expected ((currentFont != box.currentFont()) ? 1 : 0): 1"),
+                        new TestCaseResult("currentFontChanged", PASS),
+                        new TestCaseResult("cleanupTestCase", PASS)
+                )
+            );
+
+        assertEquals(expected, runProcessorAndGetTests(pp));
+    }
 }

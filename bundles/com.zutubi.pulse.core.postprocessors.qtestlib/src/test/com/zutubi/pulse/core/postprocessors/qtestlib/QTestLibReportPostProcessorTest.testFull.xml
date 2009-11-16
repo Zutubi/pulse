@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<TestCase name="tst_QFontComboBox">
+<Environment>
+    <QtVersion>4.6.0</QtVersion>
+    <QTestVersion>4.6.0</QTestVersion>
+</Environment>
+<TestFunction name="initTestCase">
+<Incident type="pass" file="" line="0"/>
+</TestFunction>
+<TestFunction name="qfontcombobox">
+<Incident type="pass" file="" line="0"/>
+</TestFunction>
+<TestFunction name="currentFont">
+<Incident type="fail" file="/home/cduclos/dev/qt&#x002D;4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp" line="152">
+    <DataTag><![CDATA[default]]></DataTag>
+    <Description><![CDATA[Compared values are not the same
+   Actual (boxFontFamily): Arial
+   Expected (currentFont.family()): Sans Serif]]></Description>
+</Incident>
+<Incident type="fail" file="/home/cduclos/dev/qt&#x002D;4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp" line="147">
+    <DataTag><![CDATA[default]]></DataTag>
+    <Description><![CDATA[Compared values are not the same]]></Description>
+</Incident>
+<Incident type="fail" file="/home/cduclos/dev/qt&#x002D;4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp" line="147">
+    <DataTag><![CDATA[Courier]]></DataTag>
+    <Description><![CDATA[Compared values are not the same]]></Description>
+</Incident>
+</TestFunction>
+<TestFunction name="sizeHint">
+<Incident type="pass" file="" line="0"/>
+</TestFunction>
+<TestFunction name="writingSystem">
+<Incident type="fail" file="/home/cduclos/dev/qt&#x002D;4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp" line="277">
+    <DataTag><![CDATA[Any]]></DataTag>
+    <Description><![CDATA[Compared values are not the same
+   Actual (spy0.count()): 2
+   Expected ((currentFont != box.currentFont()) ? 1 : 0): 1]]></Description>
+</Incident>
+<Incident type="fail" file="/home/cduclos/dev/qt&#x002D;4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp" line="277">
+    <DataTag><![CDATA[Latin]]></DataTag>
+    <Description><![CDATA[Compared values are not the same
+   Actual (spy0.count()): 2
+   Expected ((currentFont != box.currentFont()) ? 1 : 0): 1]]></Description>
+</Incident>
+<Incident type="fail" file="/home/cduclos/dev/qt&#x002D;4.6/tests/auto/qfontcombobox/tst_qfontcombobox.cpp" line="277">
+    <DataTag><![CDATA[enum]]></DataTag>
+    <Description><![CDATA[Compared values are not the same
+   Actual (spy0.count()): 2
+   Expected ((currentFont != box.currentFont()) ? 1 : 0): 1]]></Description>
+</Incident>
+</TestFunction>
+<TestFunction name="currentFontChanged">
+<Incident type="pass" file="" line="0"/>
+</TestFunction>
+<TestFunction name="cleanupTestCase">
+<Incident type="pass" file="" line="0"/>
+</TestFunction>
+</TestCase>
