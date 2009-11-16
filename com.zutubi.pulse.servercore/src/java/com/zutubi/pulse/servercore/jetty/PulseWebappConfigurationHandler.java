@@ -1,8 +1,9 @@
 package com.zutubi.pulse.servercore.jetty;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import org.mortbay.http.HttpListener;
+import com.zutubi.util.Constants;
 import org.mortbay.http.NCSARequestLog;
 import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
@@ -18,6 +19,8 @@ import java.io.IOException;
 public class PulseWebappConfigurationHandler implements ServerConfigurationHandler, WebappConfigurationHandler
 {
     private static final String[] LOGGING_IGNORE_PATHS = new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"};
+    private static final String PROPERTY_IDLE_TIMEOUT = "pulse.jetty.idle.timeout";
+    private static final int DEFAULT_IDLE_TIMEOUT = (int) (60 * Constants.SECOND);
 
     private ConfigurationManager configurationManager;
 
@@ -35,7 +38,7 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
     {
         SystemConfiguration config = configurationManager.getSystemConfig();
 
-        HttpListener listener;
+        SocketListener listener;
 
         if (config.isSslEnabled())
         {
@@ -56,9 +59,29 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
 
         listener.setHost(config.getBindAddress());
         listener.setPort(config.getServerPort());
-
+        listener.setMaxIdleTimeMs(getIdleTimeout());
         server.addListener(listener);
 
+    }
+
+    private int getIdleTimeout()
+    {
+        String timeoutValue = System.getProperty(PROPERTY_IDLE_TIMEOUT);
+        if (TextUtils.stringSet(timeoutValue))
+        {
+            try
+            {
+                return (int) (Integer.parseInt(timeoutValue) * Constants.SECOND);
+            }
+            catch (NumberFormatException e)
+            {
+                return DEFAULT_IDLE_TIMEOUT;
+            }
+        }
+        else
+        {
+            return DEFAULT_IDLE_TIMEOUT;
+        }
     }
 
     public void configure(WebApplicationContext context) throws IOException
