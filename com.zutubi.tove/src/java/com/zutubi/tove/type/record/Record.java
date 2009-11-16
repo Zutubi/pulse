@@ -75,7 +75,9 @@ public interface Record
      *                        present in the copy, but will be reused from the
      *                        original
      * @param preserveHandles if true the copy will retain the handles in this
-     *                        record, if false the copy will have no handles
+     *                        record (suitable for saving in-place changes), if
+     *                        false the copy will have no handles (suitable for
+     *                        inserting a new record based on this one)
      * @return a value copy of this record
      */
     MutableRecord copy(boolean deep, boolean preserveHandles);
