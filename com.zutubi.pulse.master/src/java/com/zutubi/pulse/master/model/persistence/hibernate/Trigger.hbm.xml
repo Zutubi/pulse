@@ -38,7 +38,7 @@
 
         <subclass name="com.zutubi.pulse.master.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
             <property name="startTime" column="START_TIME" type="date"/>
-            <property name="interval" column="INTERVAL" type="long"/>
+            <property name="interval" column="TRIGGER_INTERVAL" type="long"/>
             <property name="repeatCount" column="REPEAT_COUNT" type="int"/>
         </subclass>
 

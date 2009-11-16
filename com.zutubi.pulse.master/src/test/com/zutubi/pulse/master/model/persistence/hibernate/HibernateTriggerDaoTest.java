@@ -18,14 +18,6 @@ public class HibernateTriggerDaoTest extends MasterPersistenceTestCase
         super(testName);
     }
 
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        // add setup code here.
-        dao = (TriggerDao) context.getBean("triggerDao");
-    }
-
     public void testCreateAndLoad()
     {
         Trigger trigger = new NoopTrigger("triggerName", "triggerGroup");
