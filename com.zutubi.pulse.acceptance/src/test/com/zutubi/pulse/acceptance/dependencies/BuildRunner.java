@@ -63,6 +63,20 @@ public class BuildRunner
         return buildNumber;
     }
 
+    public int triggerSuccessfulBuild(WaitAntProject project, Pair<String, Object>... options) throws Exception
+    {
+        int buildNumber = triggerBuild(project, options);
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
+        project.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
+        ResultState buildStatus = getBuildStatus(project, buildNumber);
+        if (!ResultState.SUCCESS.equals(buildStatus))
+        {
+            throw new RuntimeException("Expected success, had " + buildStatus + " instead.");
+        }
+        return buildNumber;
+    }
+
     /**
      * Trigger a build for the specified project and assert that it fails
      *

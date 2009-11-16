@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
@@ -53,9 +54,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super.tearDown();
     }
 
-    private void insertProject(ProjectConfigurationHelper project) throws Exception
+    private ProjectConfigurationHelper insertProject(ProjectConfigurationHelper project) throws Exception
     {
         configurationHelper.insertProject(project.getConfig());
+        return project;
     }
 
     public void testRebuildSingleDependency() throws Exception
@@ -195,13 +197,16 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         final WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
         insertProject(projectA);
+        // even though project a is not rebuilt as part of the rebuild, project b does depend on it
+        // so we require it to have been built at least once for project b to be successful.
+        buildRunner.triggerSuccessfulBuild(projectA);
 
         final WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
-        projectB.addDependency(projectA).setTransitive(false);
+        projectB.addDependency(projectA);
         insertProject(projectB);
 
         final WaitAntProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
-        projectC.addDependency(projectB);
+        projectC.addDependency(projectB).setTransitive(false);
         insertProject(projectC);
 
         buildRunner.triggerRebuild(projectC.getConfig());
@@ -214,6 +219,8 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         projectB.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
+
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
 
         assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
@@ -226,7 +233,9 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildUsesStatusProperty() throws Exception
     {
         final WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
+        projectA.getConfig().getDependencies().setStatus(IvyStatus.STATUS_RELEASE);
         insertProject(projectA);
+        buildRunner.triggerSuccessfulBuild(projectA);
 
         final WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA).setRevision(REVISION_LATEST_RELEASE);
@@ -251,22 +260,22 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         projectB.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
-
         assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
+
+        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
         assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectC, 1));
         assertEquals(ResultState.PENDING_DEPENDENCY, buildRunner.getBuildStatus(projectD, 1));
 
         projectC.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
-        xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
-
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
         assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectC, 1));
+
+        xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
         assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectD, 1));
 
         projectD.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectD.getName(), 1);
+        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectD, 1));
     }
 
     public void testRebuildStopsOnFailure() throws Exception

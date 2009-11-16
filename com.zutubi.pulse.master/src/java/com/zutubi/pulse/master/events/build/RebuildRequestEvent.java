@@ -82,12 +82,20 @@ public class RebuildRequestEvent extends BuildRequestEvent
                 source.getTraverseDependencyPredicate()
         );
 
-        for (DependencyConfiguration dependency : traversableDependencies)
+        for (DependencyConfiguration traversedDependency : traversableDependencies)
         {
-            ProjectConfiguration p = dependency.getProject();
-
-            BuildResult dependentResult = prepareResults(p, preparedResults, buildManager, projectManager);
-            result.addDependsOn(dependentResult);
+            ProjectConfiguration p = traversedDependency.getProject();
+            if (traversedDependency.isTransitive())
+            {
+                BuildResult dependentResult = prepareResults(p, preparedResults, buildManager, projectManager);
+                result.addDependsOn(dependentResult);
+            }
+            else
+            {
+                BuildResult r = newBuildResult(p, projectManager);
+                preparedResults.put(p, r);
+                buildManager.save(r);
+            }
         }
 
         buildManager.save(result);

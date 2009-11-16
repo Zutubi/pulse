@@ -1,15 +1,16 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
+import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.apache.ivy.core.report.DownloadStatus;
-import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -38,6 +39,8 @@ import java.util.Map;
  */
 public class IvyRetrievalReport
 {
+    private static final Logger LOG = Logger.getLogger(IvyRetrievalReport.class);
+
     private static final String ELEMENT_ARTIFACT = "artifact";
     private static final String ELEMENT_EXTRA_ATTRIBUTE = "extra";
     private static final String ELEMENT_MODULE = "module";
@@ -84,6 +87,8 @@ public class IvyRetrievalReport
         catch (Exception e)
         {
             // The file format is not what we expected, revert to the older format for backward compatibility.
+            LOG.warning("Failed to parse ivy retrieval report. Cause: " + e.getClass() + " " + e.getMessage() +
+                    ". Reverting to resolution report format.");
         }
         finally
         {
@@ -229,6 +234,7 @@ public class IvyRetrievalReport
         String local = attributes.get(ATTRIBUTE_LOCAL);
 
         ArtifactOrigin origin = new ArtifactOrigin(artifact, Boolean.valueOf(local), location);
+        reader.nextTag();
 
         expectEndTag(ELEMENT_ARTIFACT_ORIGIN, reader);
         reader.nextTag();
@@ -333,7 +339,7 @@ public class IvyRetrievalReport
                     AttributesImpl originAttrs = new AttributesImpl();
                     originAttrs.addAttribute(null, ATTRIBUTE_LOCATION, ATTRIBUTE_LOCATION, XML_CDATA, origin.getLocation());
                     originAttrs.addAttribute(null, ATTRIBUTE_LOCAL, ATTRIBUTE_LOCAL, XML_CDATA, String.valueOf(origin.isLocal()));
-                    saxHandler.startElement(null, ELEMENT_ARTIFACT_ORIGIN, ELEMENT_ARTIFACT_ORIGIN, reportAttrs);
+                    saxHandler.startElement(null, ELEMENT_ARTIFACT_ORIGIN, ELEMENT_ARTIFACT_ORIGIN, originAttrs);
                     saxHandler.endElement(null, ELEMENT_ARTIFACT_ORIGIN, ELEMENT_ARTIFACT_ORIGIN);
                 }
                 saxHandler.endElement(null, ELEMENT_DOWNLOAD_REPORT, ELEMENT_DOWNLOAD_REPORT);

@@ -101,7 +101,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         }
         else
         {
-            if (record instanceof TemplateRecord && PathUtils.getPathElements(path).length > 2 && path.startsWith(templateOwnerPath))
+            if (templateOwnerPath != null && record instanceof TemplateRecord && PathUtils.getPathElements(path).length > 2 && path.startsWith(templateOwnerPath))
             {
                 // Inside this templated collection item, pull up to the level
                 // where it is first defined.

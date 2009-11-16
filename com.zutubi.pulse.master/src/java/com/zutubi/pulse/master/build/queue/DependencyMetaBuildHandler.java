@@ -193,11 +193,20 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
                 project.getDependencies().getDependencies(),
                 getTraverseDependencyPredicate()
         );
-        for (DependencyConfiguration dependency : traversableDependencies)
+        for (DependencyConfiguration traversedDependency : traversableDependencies)
         {
-            ProjectConfiguration p = dependency.getProject();
-            projects.add(p);
-            recordDependencies(p, dependencies);
+            ProjectConfiguration dependentProject = traversedDependency.getProject();
+            projects.add(dependentProject);
+            if (traversedDependency.isTransitive())
+            {
+                recordDependencies(dependentProject, dependencies);
+            }
+            else
+            {
+                // Although we are not traversing to it, this dependent project still
+                // needs to be built so we record a blank entry for it.
+                dependencies.put(dependentProject, new LinkedList<ProjectConfiguration>());  
+            }
         }
         dependencies.put(project, projects);
     }
@@ -219,7 +228,7 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
                     String dependencyStatus = revision.substring(DependencyConfiguration.LATEST.length());
                     if (IvyStatus.getPriority(buildStatus) <= IvyStatus.getPriority(dependencyStatus))
                     {
-                        return dependency.isTransitive();
+                        return true;
                     }
                 }
                 return false;

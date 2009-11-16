@@ -45,7 +45,6 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         // was actually persisted.
     }
 
-
     protected void checkPostPulseData()
     {
         browser.open("/");

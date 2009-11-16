@@ -190,6 +190,24 @@ public class IvyClientTest extends ZutubiTestCase
         assertTrue(report.hasFailures());
     }
 
+    public void testNonTransitiveDependencyIsNotResolved() throws IOException, ParseException
+    {
+        descriptor.addArtifact(createArtifact("artifactA.jar"), "build");
+
+        IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        descriptorB.addDependency(descriptor.getDescriptor().getModuleRevisionId(), false);
+        descriptorB.addArtifact(createArtifact("artifactB.jar"), "build");
+        client.publishArtifacts(descriptorB.getDescriptor());
+        client.publishDescriptor(descriptorB.getDescriptor());
+
+        IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
+        descriptorC.addDependency(descriptorB.getDescriptor().getModuleRevisionId(), false);
+
+        String retrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        IvyRetrievalReport report = client.retrieveArtifacts(descriptorC.getDescriptor(), retrievalPattern);
+        assertFalse(report.hasFailures());
+    }
+
     private File createArtifact(String path) throws IOException
     {
         String parentPath = PathUtils.getParentPath(path);
