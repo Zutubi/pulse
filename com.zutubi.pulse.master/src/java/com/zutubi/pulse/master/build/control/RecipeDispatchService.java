@@ -15,6 +15,7 @@ public class RecipeDispatchService extends BackgroundServiceSupport
 {
     private static final Logger LOG = Logger.getLogger(RecipeDispatchService.class);
 
+    private static final String PROPERTY_POOL_SIZE = "pulse.recipe.dispatch.pool.size";
     private static final int DEFAULT_POOL_SIZE = 5;
 
     private EventManager eventManager;
@@ -28,7 +29,7 @@ public class RecipeDispatchService extends BackgroundServiceSupport
     {
         try
         {
-            return Integer.parseInt(System.getProperty("pulse.recipe.dispatch.pool.size", Integer.toString(DEFAULT_POOL_SIZE)));
+            return Integer.parseInt(System.getProperty(PROPERTY_POOL_SIZE, Integer.toString(DEFAULT_POOL_SIZE)));
         }
         catch (NumberFormatException e)
         {
