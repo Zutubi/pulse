@@ -34,7 +34,7 @@ public class TestUtils
         {
             if(System.currentTimeMillis() > endTime)
             {
-                throw new RuntimeException("Timed out waiting for " + description);
+                throw new TimeoutException("Timed out waiting for " + description);
             }
             try
             {

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
@@ -876,21 +877,46 @@ public class XmlRpcHelper
      */
     public void waitForBuildToComplete(final String projectName, final int number, long timeout) throws Exception
     {
-        waitForCondition(new Condition()
+        final BuildHolder buildHolder = new BuildHolder();
+
+        try
         {
-            public boolean satisfied()
+            waitForCondition(new Condition()
             {
-                try
+                public boolean satisfied()
                 {
-                    Hashtable<String, Object> build = getBuild(projectName, number);
-                    return build != null && Boolean.TRUE.equals(build.get("completed"));
+                    try
+                    {
+                        buildHolder.build = getBuild(projectName, number);
+                        return buildHolder.build != null && Boolean.TRUE.equals(buildHolder.build.get("completed"));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RuntimeException(e);
+                    }
                 }
-                catch (Exception e)
+            }, timeout, "build " + number + " of project " + projectName + " to complete");
+        }
+        catch (TimeoutException e)
+        {
+            String message = e.getMessage();
+            Hashtable<String, Object> build = buildHolder.build;
+            if (build == null)
+            {
+                message += ": build does not seem to exist";
+            }
+            else
+            {
+                message += ": build status is '" + build.get("status") + "'";
+                long startTimeMillis = Long.parseLong((String) build.get("startTimeMillis"));
+                if (startTimeMillis > 0)
                 {
-                    throw new RuntimeException(e);
+                    message += ", started " + (System.currentTimeMillis() - startTimeMillis) + "ms ago";
                 }
             }
-        }, timeout, "build " + number + " of project " + projectName + " to complete");
+
+            throw new TimeoutException(message, e);
+        }
     }
 
     public Vector<String> getArtifactFileListing(String projectName, int buildId, String stageName, String commandName, String artifactName, String path) throws Exception
@@ -941,6 +967,11 @@ public class XmlRpcHelper
     public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception
     {
         return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);
+    }
+
+    private static class BuildHolder
+    {
+        Hashtable<String, Object> build = null;
     }
 
     public static void main(String[] argv) throws Exception
