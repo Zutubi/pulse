@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
@@ -17,6 +18,9 @@ public class JettyServerFactoryBean implements FactoryBean
 {
     private static final Logger LOG = Logger.getLogger(JettyServerFactoryBean.class);
 
+    private static final String PROPERTY_IDLE_TIMEOUT = "pulse.jetty.idle.timeout";
+    private static final int DEFAULT_IDLE_TIMEOUT = (int) (60 * Constants.SECOND);
+    
     private Server instance;
 
     private ConfigurationManager configManager = null;
@@ -38,6 +42,8 @@ public class JettyServerFactoryBean implements FactoryBean
                         SslListener sslListener = new SslListener();
                         sslListener.setHost(systemConfiguration.getBindAddress());
                         sslListener.setPort(systemConfiguration.getServerPort());
+                        sslListener.setMaxIdleTimeMs(getIdleTimeout());
+
                         if(TextUtils.stringSet(systemConfiguration.getSslKeystore()))
                         {
                             sslListener.setKeystore(systemConfiguration.getSslKeystore());
@@ -68,12 +74,33 @@ public class JettyServerFactoryBean implements FactoryBean
                         SocketListener listener = new SocketListener();
                         listener.setHost(systemConfiguration.getBindAddress());
                         listener.setPort(systemConfiguration.getServerPort());
+                        listener.setMaxIdleTimeMs(getIdleTimeout());
                         instance.addListener(listener);
                     }
                 }
             }
         }
         return instance;
+    }
+
+    private int getIdleTimeout()
+    {
+        String timeoutValue = System.getProperty(PROPERTY_IDLE_TIMEOUT);
+        if (TextUtils.stringSet(timeoutValue))
+        {
+            try
+            {
+                return (int) (Integer.parseInt(timeoutValue) * Constants.SECOND);
+            }
+            catch (NumberFormatException e)
+            {
+                return DEFAULT_IDLE_TIMEOUT;
+            }
+        }
+        else
+        {
+            return DEFAULT_IDLE_TIMEOUT;
+        }
     }
 
     public Class getObjectType()
