@@ -2384,43 +2384,82 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            final Project project = internalGetProject(projectName, true);
-            final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-
-            buildManager.executeInTransaction(new Runnable()
+            return internalGetArtifactsInBuild(new NullaryFunction<BuildResult>()
             {
-                public void run()
+                public BuildResult process()
                 {
-                    final BuildResult build = internalGetBuild(project, id);
-
-                    build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
-                    {
-                        public void process(RecipeResultNode recipeResultNode)
-                        {
-                            RecipeResult recipeResult = recipeResultNode.getResult();
-                            if(recipeResult != null)
-                            {
-                                String stage = recipeResultNode.getStageName();
-                                for(CommandResult commandResult: recipeResult.getCommandResults())
-                                {
-                                    String command = commandResult.getCommandName();
-                                    for(StoredArtifact artifact: commandResult.getArtifacts())
-                                    {
-                                        result.add(convertArtifact(artifact, project, build, stage, command));
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    final Project project = internalGetProject(projectName, true);
+                    return internalGetBuild(project, id);
                 }
             });
-
-            return result;
         }
         finally
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Returns an array of all artifacts captured in a personal build for the logged-in user.
+     * Artifacts from all stages are returned.  The returned structures indicate the context (stage
+     * and command) in which each artifact was captured.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param id          ID of the personal build to retrieve the artifacts for
+     * @return {@xtype array<[RemoteApi.Artifact]>} all artifacts captured in the given build
+     * @throws IllegalArgumentException if the given build ID is invalid
+     * @access available to all users (users can only access their own personal builds)
+     */
+    public Vector<Hashtable<String, Object>> getArtifactsInPersonalBuild(String token, final int id)
+    {
+        final User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            return internalGetArtifactsInBuild(new NullaryFunction<BuildResult>()
+            {
+                public BuildResult process()
+                {
+                    return internalGetPersonalBuild(user, id);
+                }
+            });
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Vector<Hashtable<String, Object>> internalGetArtifactsInBuild(final NullaryFunction<BuildResult> buildRetrievingFn)
+    {
+        final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+        buildManager.executeInTransaction(new Runnable()
+        {
+            public void run()
+            {
+                final BuildResult build = buildRetrievingFn.process();
+
+                build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+                {
+                    public void process(RecipeResultNode recipeResultNode)
+                    {
+                        RecipeResult recipeResult = recipeResultNode.getResult();
+                        if(recipeResult != null)
+                        {
+                            String stage = recipeResultNode.getStageName();
+                            for(CommandResult commandResult: recipeResult.getCommandResults())
+                            {
+                                for(StoredArtifact artifact: commandResult.getArtifacts())
+                                {
+                                    result.add(convertArtifact(artifact, build, stage, commandResult));
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        return result;
     }
 
     /**
@@ -2453,37 +2492,16 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            final Project project = internalGetProject(projectName, true);
-            final Vector<String> result = new Vector<String>();
-            
-            buildManager.executeInTransaction(new Runnable()
+            NullaryFunction<BuildResult> buildRetrievalFn = new NullaryFunction<BuildResult>()
             {
-                public void run()
+                public BuildResult process()
                 {
-                    BuildResult build = internalGetBuild(project, id);
-                    RecipeResultNode recipeNode = build.findResultNode(stageName);
-                    if (recipeNode == null)
-                    {
-                        throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' does not have a stage named '" + stageName + "'");
-                    }
-
-                    CommandResult commandResult = recipeNode.getResult().getCommandResult(commandName);
-                    if (commandResult == null)
-                    {
-                        throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' stage '" + stageName + "' does not have a command named '" + commandName + "'");
-                    }
-
-                    StoredArtifact artifact = commandResult.getArtifact(artifactName);
-                    if (artifact == null)
-                    {
-                        throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' stage '" + stageName + "' command '" + commandName + "' does not have an artifact named '" + artifactName + "'");
-                    }
-
-                    result.addAll(artifact.getFileListing(path));
+                    Project project = internalGetProject(projectName, true);
+                    return internalGetBuild(project, id);
                 }
-            });
+            };
 
-            return result;
+            return internalGetArtifactFileListing(buildRetrievalFn, stageName, commandName, artifactName, path, "Project '" + projectName + "' build '" + id + "'");
         }
         finally
         {
@@ -2491,14 +2509,89 @@ public class RemoteApi
         }
     }
 
-    private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, Project project, BuildResult build, String stage, String command)
+    /**
+     * Returns an array of all artifact file paths for files nested under the given path in the
+     * given artifact captured in a personal build for the logged-in user.  The returned paths are
+     * relative to the given path.  Note that all files nested anywhere under the path, even under
+     * child directories, are returned.  Directories themselves are not returned as separate entries
+     * (although they can be inferred from the file paths).  All paths use forward slashes (/) as
+     * separators.  The path may be empty to list all files captured in the artifact.  If the path
+     * matches no files in the artifact, an empty array will be returned.
+     *
+     * @param token        authentication token, see {@link #login(String, String)}
+     * @param id           ID of the personal build result
+     * @param stageName    name of the stage that captured the artifact
+     * @param commandName  name of the command that captured the artifact
+     * @param artifactName name of the artifact to list files under
+     * @param path         path of a directory within the artifact to restrict the result to, may be
+     *                     empty to list all files in the artifact
+     * @return an array of files captured in the given artifact that fall under the given path
+     * @throws IllegalArgumentException if the given build ID, stage name, command name or artifact
+     *         name is invalid
+     * @access available to all users (users can only access their own personal builds)
+     */
+    public Vector<String> getArtifactFileListingPersonal(String token, final int id, final String stageName, final String commandName, final String artifactName, final String path)
+    {
+        final User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            NullaryFunction<BuildResult> buildRetrievalFn = new NullaryFunction<BuildResult>()
+            {
+                public BuildResult process()
+                {
+                    return internalGetPersonalBuild(user, id);
+                }
+            };
+
+            return internalGetArtifactFileListing(buildRetrievalFn, stageName, commandName, artifactName, path, "Personal build '" + id + "'");
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Vector<String> internalGetArtifactFileListing(final NullaryFunction<BuildResult> buildRetrievalFn, final String stageName, final String commandName, final String artifactName, final String path, final String messagePrefix)
+    {
+        final Vector<String> result = new Vector<String>();
+        buildManager.executeInTransaction(new Runnable()
+        {
+            public void run()
+            {
+                BuildResult build = buildRetrievalFn.process();
+                RecipeResultNode recipeNode = build.findResultNode(stageName);
+                if (recipeNode == null)
+                {
+                    throw new IllegalArgumentException(messagePrefix + " does not have a stage named '" + stageName + "'");
+                }
+
+                CommandResult commandResult = recipeNode.getResult().getCommandResult(commandName);
+                if (commandResult == null)
+                {
+                    throw new IllegalArgumentException(messagePrefix + " stage '" + stageName + "' does not have a command named '" + commandName + "'");
+                }
+
+                StoredArtifact artifact = commandResult.getArtifact(artifactName);
+                if (artifact == null)
+                {
+                    throw new IllegalArgumentException(messagePrefix + " stage '" + stageName + "' command '" + commandName + "' does not have an artifact named '" + artifactName + "'");
+                }
+
+                result.addAll(artifact.getFileListing(path));
+            }
+        });
+
+        return result;
+    }
+
+    private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, BuildResult build, String stage, CommandResult command)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         result.put("id", Long.toString(artifact.getId()));
         result.put("stage", stage);
-        result.put("command", command);
+        result.put("command", command.getCommandName());
         result.put("name", artifact.getName());
-        result.put("permalink", Urls.getBaselessInstance().commandDownload(project, Long.toString(build.getNumber()), stage, command, artifact.getName()));
+        result.put("permalink", Urls.getBaselessInstance().commandDownload(build, command, artifact.getName()));
         return result;
     }
 
@@ -3542,6 +3635,17 @@ public class RemoteApi
         if (build == null)
         {
             throw new IllegalArgumentException("Unknown build '" + id + "' for project '" + project.getName() + "'");
+        }
+
+        return build;
+    }
+
+    private BuildResult internalGetPersonalBuild(User user, int id)
+    {
+        BuildResult build = buildManager.getByUserAndNumber(user, id);
+        if (build == null)
+        {
+            throw new IllegalArgumentException("Unknown build '" + id + "' for user '" + user.getLogin() + "'");
         }
 
         return build;

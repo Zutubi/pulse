@@ -15,9 +15,7 @@ import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.RandomUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -34,10 +32,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Simple sanity checks for personal builds.
@@ -94,6 +89,29 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_USER, "admin"));
         // Make sure this view is not decorated (CIB-1711).
         assertTextNotPresent("logout");
+        
+        verifyPersonalBuildArtifacts(buildNumber);
+    }
+
+    private void verifyPersonalBuildArtifacts(long buildNumber) throws Exception
+    {
+        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInPersonalBuild((int) buildNumber);
+        assertEquals(3, artifacts.size());
+
+        Hashtable<String, Object> outputArtifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> stringObjectHashtable)
+            {
+                return stringObjectHashtable.get("name").equals("command output");
+            }
+        });
+
+        assertNotNull(outputArtifact);
+        assertEquals("/dashboard/my/" + buildNumber + "/downloads/default/build/command%20output/", outputArtifact.get("permalink"));
+
+        Vector<String> listing = xmlRpcHelper.getArtifactFileListingPersonal((int) buildNumber, "default", "build", "command output", "");
+        assertEquals(1, listing.size());
+        assertEquals("output.txt", listing.get(0));
     }
 
     public void testPersonalBuildViaProxy() throws Exception

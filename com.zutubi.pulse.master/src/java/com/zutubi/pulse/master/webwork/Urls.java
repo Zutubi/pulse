@@ -399,7 +399,12 @@ public class Urls
 
     public String commandDownload(Object project, String number, String stage, String command, String artifact)
     {
-        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/" + uriComponentEncode(artifact) + "/";
+        return commandDownloads(project, number, stage, command) + uriComponentEncode(artifact) + "/";
+    }
+
+    public String commandDownload(BuildResult build, CommandResult commandResult, String artifact)
+    {
+        return commandDownloads(build, commandResult) + uriComponentEncode(artifact) + "/";
     }
 
     public String buildWorkingCopy(BuildResult build)
