@@ -49,7 +49,7 @@ public class IvyModuleDescriptor
      *
      * @return  a new instance of the IvyModuleDescriptor
      *
-     * @throws Exception is thrown on error.
+     * @throws Exception on error.
      */
     public static IvyModuleDescriptor newInstance(URL url, IvyConfiguration configuration) throws Exception
     {

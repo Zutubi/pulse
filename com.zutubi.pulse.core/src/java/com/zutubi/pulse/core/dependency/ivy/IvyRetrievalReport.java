@@ -72,9 +72,9 @@ public class IvyRetrievalReport
      *
      * @return  an instance of the report representing the data contained within the file.
      *
-     * @throws ParseException           is thrown if there is a problem parsing the file.
-     * @throws FileNotFoundException    is thrown if the file could not be located
-     * @throws XMLStreamException       is thrown if there is a problem parsing the file
+     * @throws ParseException if there is a problem parsing the file.
+     * @throws FileNotFoundException if the file could not be located
+     * @throws XMLStreamException if there is a problem parsing the file
      */
     public static IvyRetrievalReport fromXml(File file) throws ParseException, FileNotFoundException, XMLStreamException
     {
@@ -436,6 +436,13 @@ public class IvyRetrievalReport
         return getFailures().size() > 0;
     }
 
+    /**
+     * Returns a list of artifact download reports that failed.
+     *
+     * @return a list of artifact download reports
+     *
+     * @see DownloadStatus#FAILED
+     */
     public List<ArtifactDownloadReport> getFailures()
     {
         List<ArtifactDownloadReport> failures = new LinkedList<ArtifactDownloadReport>();

@@ -372,7 +372,7 @@ public class CvsCore
     /**
      * Check that a connection can be opened to the cvs server.
      *
-     * @throws ScmException is thrown if the check fails.
+     * @throws ScmException if the check fails.
      */
     public void testConnection() throws ScmException
     {
@@ -478,7 +478,7 @@ public class CvsCore
      * @return the newly created connection.
      *
      * @throws AuthenticationException if authentication fails.
-     * @throws CommandAbortedException is thrown on error
+     * @throws CommandAbortedException on error
      */
     private Connection openConnection() throws AuthenticationException, CommandAbortedException
     {

@@ -817,7 +817,7 @@ public class XmlRpcHelper
      * @param status        the status of the build being triggered.
      * @param timeout       maximum number of milliseconds to wait for the build
      * @return  the build number
-     * @throws Exception is thrown on any error.
+     * @throws Exception on any error.
      *
      * @see #runBuild(String, long)
      */

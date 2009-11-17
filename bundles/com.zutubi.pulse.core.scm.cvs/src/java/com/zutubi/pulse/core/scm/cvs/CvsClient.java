@@ -243,7 +243,7 @@ public class CvsClient implements ScmClient
     /**
      * Run some diagnostics on the cvs configuration.
      *
-     * @throws ScmException is thrown if there is a problem with the server connection or configuration that
+     * @throws ScmException if there is a problem with the server connection or configuration that
      *                      prevents us from querying the cvs repository.
      */
     public void testConnection() throws ScmException

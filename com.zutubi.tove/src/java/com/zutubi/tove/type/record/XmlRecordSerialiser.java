@@ -31,7 +31,7 @@ public class XmlRecordSerialiser
      * @param file      the file to which the serialised record will be writen
      * @param record    the record being serialised.
      * @param deep      if true, the full record will be serialised. If false, will not serialise nested records.
-     * @throws RecordSerialiseException is thrown if there is a problem serialising the record.
+     * @throws RecordSerialiseException if there is a problem serialising the record.
      */
     public void serialise(File file, Record record, boolean deep) throws RecordSerialiseException
     {

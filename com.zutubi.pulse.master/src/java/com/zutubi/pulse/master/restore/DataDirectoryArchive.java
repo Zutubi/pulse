@@ -116,7 +116,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
      *
      * @param dest  the destination directory into which the files are copied.
      * @param files the files being copied to the destination directory
-     * @throws IOException is thrown on error
+     * @throws IOException on error
      */
     private void copy(File dest, File[] files) throws IOException
     {
@@ -148,7 +148,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
      * @param dest  the destination of the copy
      * @param file  the source of the copy
      * @see com.zutubi.util.FileSystemUtils#copy(java.io.File, java.io.File[])
-     * @throws IOException is thrown on error.
+     * @throws IOException on error.
      */
     private void conditionalCopy(File dest, File file) throws IOException
     {
@@ -163,7 +163,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
      * file begins with 'database'.
      *
      * @param base  the directory being cleaned up.
-     * @throws IOException  is thrown on error.
+     * @throws IOException  on error.
      */
     private void cleanup(File base) throws IOException
     {

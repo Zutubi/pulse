@@ -49,8 +49,8 @@ public class IvyManager
      *
      * @param configuration     the configuration defining the caches.
      *
-     * @throws IOException is thrown on error.
-     * @throws ParseException is thrown on error.
+     * @throws IOException on error.
+     * @throws ParseException on error.
      */
     public void cleanCaches(IvyConfiguration configuration) throws IOException, ParseException
     {

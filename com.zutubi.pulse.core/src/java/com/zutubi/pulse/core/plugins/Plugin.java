@@ -170,7 +170,7 @@ public interface Plugin
      *
      * @param name  the name of the class
      * @return  the class instance
-     * @throws ClassNotFoundException is thrown if the named class could not be located.
+     * @throws ClassNotFoundException if the named class could not be located.
      */
     Class<?> loadClass(String name) throws ClassNotFoundException;
 }

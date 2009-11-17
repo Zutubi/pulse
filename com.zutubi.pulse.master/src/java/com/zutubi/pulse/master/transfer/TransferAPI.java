@@ -135,7 +135,7 @@ public class TransferAPI
      * @param dataSource the source DataSource connection.
      * @param dataTarget the target DataSource connection.
      *
-     * @throws TransferException is thrown if there are any problems with the migration that would
+     * @throws TransferException if there are any problems with the migration that would
      * result in a difference in the source and target representations of the data.
      */
     public void migrate(Configuration sourceConfiguration, DataSource dataSource, Configuration targetConfiguration, DataSource dataTarget) throws TransferException

@@ -86,15 +86,15 @@ public class IvyConfiguration
     }
 
     /**
-     * Load the ivy settings.  This settings are a combination of the
+     * Load the ivy settings.  These settings are a combination of the
      * default ivy settings and any variables that are defined by this
      * configuration instance.
      *
      * @return  the ivy settings instance.
      *
-     * @throws IOException is thrown if the local ivysettings.xml template
+     * @throws IOException if the local ivysettings.xml template
      * can not be located.
-     * @throws ParseException is thrown if the local ivysettings.xml template
+     * @throws ParseException if the local ivysettings.xml template
      * is invalid.
      */
     public IvySettings loadSettings() throws IOException, ParseException

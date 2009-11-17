@@ -57,7 +57,7 @@ public class SchemaRefactor
      *
      * @param mapping the classpath reference to the patch hbm.xml file
      *
-     * @throws IOException is thrown if there is a problem loading the patch file.
+     * @throws IOException if there is a problem loading the patch file.
      */
     public void patch(String mapping) throws IOException
     {

@@ -47,6 +47,7 @@ public class IvyClient
 {
     private static final Messages I18N = Messages.getInstance(IvyClient.class);
     private static final Logger LOG = Logger.getLogger(IvyClient.class);
+
     private static final String RESOLVER_NAME = "pulse";
     private static final String SOURCEFILE = "sourcefile";
 
@@ -103,7 +104,7 @@ public class IvyClient
      * @param descriptor the descriptor that defines the artifacts to be published.
      * @param confNames  the configuration names identifying the set of artifacts to be published.  If
      *                   blank, all artifacts will be published.
-     * @throws IOException is thrown if there is a failure to publish an artifact.
+     * @throws IOException if there is a failure to publish an artifact.
      */
     public void publishArtifacts(DefaultModuleDescriptor descriptor, String... confNames) throws IOException
     {
@@ -176,7 +177,7 @@ public class IvyClient
      * Publish the descriptor to the repository.
      *
      * @param descriptor to be published
-     * @throws IOException is thrown if there are any errors publishing the descriptor.
+     * @throws IOException if there are any errors publishing the descriptor.
      */
     public void publishDescriptor(DefaultModuleDescriptor descriptor) throws IOException
     {
@@ -228,7 +229,7 @@ public class IvyClient
      * @param targetPattern the pattern defining where the artifacts will be written.  This pattern,
      *                      supports the usual ivy tokens.
      * @return a retrieval report containing details of the artifacts that were retrieved.
-     * @throws Exception is thrown if any problems are encountered.
+     * @throws Exception if any problems are encountered.
      */
     public IvyRetrievalReport retrieveArtifacts(ModuleDescriptor descriptor, String targetPattern) throws IOException, ParseException
     {
@@ -297,12 +298,6 @@ public class IvyClient
                     {
                         report.addDownloadReports(downloadReports);
                     }
-                    else
-                    {
-                        // no artifacts were downloaded as part of this dependency.  An artifact download
-                        // report is not appropriate, but the data it contains, particularly the mrid
-                        // would be handy for reporting.
-                    }
                 }
             }
             return true;
@@ -326,7 +321,7 @@ public class IvyClient
      * @param descriptor the descriptor whos dependencies are being resovled.
      * @param confNames  the configuration names that define the set of dependencies to be resolved.
      * @return a resolve report.
-     * @throws Exception is thrown on error.
+     * @throws Exception on error.
      */
     public ResolveReport resolve(ModuleDescriptor descriptor, String... confNames) throws IOException, ParseException
     {
