@@ -7,7 +7,7 @@ import com.zutubi.tove.type.Type;
 /**
  * Holds information about a root configuration scope.
  */
-class ConfigurationScopeInfo
+public class ConfigurationScopeInfo
 {
     private String scopeName;
     private ComplexType type;

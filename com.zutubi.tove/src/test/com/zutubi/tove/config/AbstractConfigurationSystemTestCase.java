@@ -5,6 +5,8 @@ import com.zutubi.events.Event;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.tove.config.events.*;
+import com.zutubi.tove.config.health.ConfigurationHealthChecker;
+import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.security.ActorProvider;
 import com.zutubi.tove.security.AuthorityProvider;
@@ -170,10 +172,23 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         objectFactory.initProperties(this);
     }
 
+    @Override
+    protected void tearDown() throws Exception
+    {
+        ConfigurationHealthChecker checker = objectFactory.buildBean(ConfigurationHealthChecker.class);
+        ConfigurationHealthReport report = checker.checkAll();
+        if (!report.isHealthy())
+        {
+            throw new AssertionError(report.toString());
+        }
+
+        super.tearDown();
+    }
+
     public MutableRecord unstantiate(Configuration c) throws TypeException
     {
         CompositeType type = typeRegistry.getType(c.getClass());
-        return type.unstantiate(c);
+        return type.unstantiate(c, null);
     }
 
     protected Listener registerListener()

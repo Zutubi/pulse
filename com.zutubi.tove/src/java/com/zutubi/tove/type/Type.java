@@ -50,11 +50,12 @@ public interface Type
      * etc).  The inverse of {@link #instantiate}.
      *
      * @param instance the instance to convert, may be null
+     * @param templateOwnerPath
      * @return record form of the instance, may be null if there is no
      *         representation for the given instance
      * @throws TypeException in the event of an error
      */
-    Object unstantiate(Object instance) throws TypeException;
+    Object unstantiate(Object instance, String templateOwnerPath) throws TypeException;
 
     /**
      * Converts the given record form data into a form suitable for use in an

@@ -120,7 +120,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         if (instance != null)
         {
             // Does this ever happen, and if so, what then... no initial values i suppose?
-            record = type.unstantiate(instance);
+            record = type.unstantiate(instance, null);
         }
         return ajax ? "render" : INPUT;
     }

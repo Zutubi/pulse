@@ -45,7 +45,7 @@ public class MapTypeTest extends TypeTestCase
         instance.put("keyA", new MockA("valueA"));
         instance.put("keyB", new MockA("valueB"));
 
-        Record record = mapType.unstantiate(instance);
+        Record record = mapType.unstantiate(instance, null);
         SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         Map newInstance = (Map) instantiator.instantiate(mapType, record);
 
@@ -56,13 +56,13 @@ public class MapTypeTest extends TypeTestCase
 
     public void testGetItemKeyNoPath() throws TypeException
     {
-        Record record = mockAType.unstantiate(new MockA("valueA"));
+        Record record = mockAType.unstantiate(new MockA("valueA"), null);
         assertEquals("valueA", mapType.getItemKey(null, record));
     }
 
     public void testGetItemKeyPath() throws TypeException
     {
-        Record record = mockAType.unstantiate(new MockA("valueA"));
+        Record record = mockAType.unstantiate(new MockA("valueA"), null);
         assertEquals("valueA", mapType.getItemKey("coll/oldkey", record));
     }
 
@@ -84,7 +84,7 @@ public class MapTypeTest extends TypeTestCase
         Map<String, MockA> m = new HashMap<String, MockA>();
         m.put("key1", new MockA("1"));
         m.put("key2", new MockA("2"));
-        Record record = mapType.unstantiate(m);
+        Record record = mapType.unstantiate(m, null);
         Object o = mapType.toXmlRpc(null, record);
         assertTrue(o instanceof Hashtable);
         @SuppressWarnings("unchecked")
@@ -210,7 +210,7 @@ public class MapTypeTest extends TypeTestCase
         aMap.put("bar", new MockA("bar"));
         aMap.put("baz", new MockA("baz"));
 
-        MutableRecord record = orderedMapType.unstantiate(aMap);
+        MutableRecord record = orderedMapType.unstantiate(aMap, null);
         assertEquals(Arrays.asList("foo", "bar", "baz"), orderedMapType.getOrder(record));
 
         // Trying a second order gurantees wwe don't get lucky by matching
@@ -220,7 +220,7 @@ public class MapTypeTest extends TypeTestCase
         aMap.put("foo", new MockA("foo"));
         aMap.put("bar", new MockA("bar"));
 
-        record = orderedMapType.unstantiate(aMap);
+        record = orderedMapType.unstantiate(aMap, null);
         assertEquals(Arrays.asList("baz", "foo", "bar"), orderedMapType.getOrder(record));
     }
 

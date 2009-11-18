@@ -138,7 +138,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 globalAgent.addPermission(new AgentAclConfiguration(group, ACTION_VIEW));
 
                 CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);
-                MutableRecord globalTemplate = agentType.unstantiate(globalAgent);
+                MutableRecord globalTemplate = agentType.unstantiate(globalAgent, PathUtils.getPath(AGENTS_SCOPE, GLOBAL_AGENT_NAME));
                 configurationTemplateManager.markAsTemplate(globalTemplate);
                 configurationTemplateManager.insertRecord(AGENTS_SCOPE, globalTemplate);
 
@@ -149,7 +149,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 masterAgent.setName(MASTER_AGENT_NAME);
                 masterAgent.setRemote(false);
 
-                MutableRecord masterAgentRecord = agentType.unstantiate(masterAgent);
+                MutableRecord masterAgentRecord = agentType.unstantiate(masterAgent, PathUtils.getPath(AGENTS_SCOPE, MASTER_AGENT_NAME));
                 configurationTemplateManager.setParentTemplate(masterAgentRecord, persistedGlobalTemplate.getHandle());
                 configurationTemplateManager.insertRecord(AGENTS_SCOPE, masterAgentRecord);
             }

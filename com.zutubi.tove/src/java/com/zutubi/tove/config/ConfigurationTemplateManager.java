@@ -337,7 +337,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         try
         {
-            final MutableRecord record = type.unstantiate(instance);
+            final MutableRecord record = type.unstantiate(instance, getTemplateOwnerPath(path));
             return executeInsideTransaction(new Action<String>()
             {
                 public String execute() throws Exception
@@ -1279,7 +1279,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public String save(final Configuration instance)
     {
-        if (instance.getConfigurationPath() == null)
+        final String path = instance.getConfigurationPath();
+        if (path == null)
         {
             throw new IllegalArgumentException("Instance does not appear to be persistent (configuration path is unset), use insert for new instances");
         }
@@ -1292,13 +1293,13 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         try
         {
-            final MutableRecord record = type.unstantiate(instance);
+            final MutableRecord record = type.unstantiate(instance, getTemplateOwnerPath(path));
 
             return executeInsideTransaction(new Action<String>()
             {
                 public String execute() throws Exception
                 {
-                    return saveRecord(instance.getConfigurationPath(), record, true);
+                    return saveRecord(path, record, true);
                 }
             });
         }

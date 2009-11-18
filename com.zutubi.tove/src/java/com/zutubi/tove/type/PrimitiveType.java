@@ -75,7 +75,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public String unstantiate(Object instance) throws TypeException
+    public String unstantiate(Object instance, String templateOwnerPath) throws TypeException
     {
         if (instance == null)
         {
@@ -146,7 +146,7 @@ public class PrimitiveType extends SimpleType implements Type
         if(CollectionUtils.contains(XML_RPC_SUPPORTED_TYPES, clazz))
         {
             typeCheck(data, clazz);
-            return unstantiate(data);
+            return unstantiate(data, templateOwnerPath);
         }
         else if(clazz == Byte.class)
         {

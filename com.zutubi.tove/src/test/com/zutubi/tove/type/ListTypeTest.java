@@ -46,7 +46,7 @@ public class ListTypeTest extends TypeTestCase
         list.add(new MockA("valueA"));
         list.add(new MockA("valueB"));
 
-        Record record = (Record) listType.unstantiate(list);
+        Record record = (Record) listType.unstantiate(list, null);
 
         SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         List newList = (List) instantiator.instantiate(listType, record);
@@ -57,13 +57,13 @@ public class ListTypeTest extends TypeTestCase
     public void testGetItemKeyNoPath() throws TypeException
     {
         long lastHandle = recordManager.allocateHandle();
-        MutableRecord record = mockAType.unstantiate(new MockA("valueA"));
+        MutableRecord record = mockAType.unstantiate(new MockA("valueA"), null);
         assertEquals(Long.toString(lastHandle + 1), listType.getItemKey(null, record));
     }
 
     public void testGetItemKeyPath() throws TypeException
     {
-        MutableRecord record = mockAType.unstantiate(new MockA("valueA"));
+        MutableRecord record = mockAType.unstantiate(new MockA("valueA"), null);
         assertEquals("123", listType.getItemKey("any/123", record));
     }
 
@@ -86,7 +86,7 @@ public class ListTypeTest extends TypeTestCase
         List<MockA> l = new LinkedList<MockA>();
         l.add(new MockA("one"));
         l.add(new MockA("two"));
-        Record r = (Record) listType.unstantiate(l);
+        Record r = (Record) listType.unstantiate(l, null);
 
         Object rpcForm = listType.toXmlRpc(null, r);
         assertTrue(rpcForm instanceof Vector);

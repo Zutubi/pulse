@@ -119,7 +119,7 @@ public class GenericAction extends ToveActionSupport
                 CompositeType type = typeRegistry.getType(result.getClass());
                 try
                 {
-                    record = type.unstantiate(result);
+                    record = type.unstantiate(result, null);
                 }
                 catch (TypeException e)
                 {

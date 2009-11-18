@@ -150,7 +150,7 @@ public class MapType extends CollectionType
         }
     }
 
-    public MutableRecord unstantiate(Object instance) throws TypeException
+    public MutableRecord unstantiate(Object instance, String templateOwnerPath) throws TypeException
     {
         if (instance == null)
         {
@@ -158,7 +158,7 @@ public class MapType extends CollectionType
         }
 
         typeCheck(instance, Map.class);
-        return convertToRecord((Map) instance, new UnstantiateToRecord());
+        return convertToRecord((Map) instance, new UnstantiateToRecord(templateOwnerPath));
     }
 
     public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
@@ -372,9 +372,16 @@ public class MapType extends CollectionType
 
     private static class UnstantiateToRecord implements ToRecord
     {
+        private String templateOwnerPath;
+
+        private UnstantiateToRecord(String templateOwnerPath)
+        {
+            this.templateOwnerPath = templateOwnerPath;
+        }
+
         public Object convert(Type type, Object object) throws TypeException
         {
-            return type.unstantiate(object);
+            return type.unstantiate(object, templateOwnerPath);
         }
     }
 

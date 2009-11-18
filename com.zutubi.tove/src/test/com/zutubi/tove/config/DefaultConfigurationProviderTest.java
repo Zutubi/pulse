@@ -162,7 +162,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
     public void testGetAllDescendents() throws TypeException
     {
-        MutableRecord record = typeA.unstantiate(new A("global"));
+        MutableRecord record = unstantiate(new A("global"));
         configurationTemplateManager.markAsTemplate(record);
 
         String globalPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
@@ -170,7 +170,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         String childPath = insertConcreteChild(globalHandle, "concrete-child");
 
-        record = typeA.unstantiate(new A("template-child"));
+        record = unstantiate(new A("template-child"));
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.setParentTemplate(record, globalHandle);
         String templatePath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
@@ -198,7 +198,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
     private String insertConcreteChild(long parentHandle, String name) throws TypeException
     {
-        MutableRecord record = typeA.unstantiate(new A(name));
+        MutableRecord record = unstantiate(new A(name));
         configurationTemplateManager.setParentTemplate(record, parentHandle);
         return configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
     }

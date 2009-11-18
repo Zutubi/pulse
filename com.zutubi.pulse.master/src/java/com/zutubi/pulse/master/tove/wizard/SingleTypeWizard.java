@@ -48,7 +48,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
             try
             {
                 ConfigurationCreator creator = (ConfigurationCreator) instantiator.instantiate(creatorType, record);
-                record = type.unstantiate(creator.create());
+                record = type.unstantiate(creator.create(), null);
             }
             catch (TypeException e)
             {

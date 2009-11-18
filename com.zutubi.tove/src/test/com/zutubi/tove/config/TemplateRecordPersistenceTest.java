@@ -481,7 +481,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         String path = "project/child";
         Project instance = configurationTemplateManager.getInstance(path, Project.class);
         Listener listener = registerListener();
-        MutableRecord record = projectType.unstantiate(instance);
+        MutableRecord record = unstantiate(instance);
         record.put("property", createProperty("foo", "bar"));
         configurationTemplateManager.saveRecord(path, record, true);
 

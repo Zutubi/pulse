@@ -50,7 +50,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationPersistenceManager.register(SAMPLE_SCOPE, mapA);
         configurationPersistenceManager.register(TEMPLATE_SCOPE, templatedMap);
 
-        MutableRecord root = typeA.unstantiate(new MockA(NAME_ROOT));
+        MutableRecord root = unstantiate(new MockA(NAME_ROOT));
         configurationTemplateManager.markAsTemplate(root);
         rootPath = configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, root);
         rootHandle = configurationTemplateManager.getRecord(rootPath).getHandle();
@@ -966,7 +966,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     private String insertTemplateAInstance(String templateParentPath, MockA instance, boolean template) throws TypeException
     {
-        MutableRecord record = typeA.unstantiate(instance);
+        MutableRecord record = unstantiate(instance);
         if(template)
         {
             configurationTemplateManager.markAsTemplate(record);

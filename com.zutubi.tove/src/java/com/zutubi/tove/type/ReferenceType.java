@@ -3,7 +3,6 @@ package com.zutubi.tove.type;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
 
@@ -67,7 +66,7 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    private long getHandle(Object data) throws TypeException
+    public long getHandle(Object data) throws TypeException
     {
         String referenceHandle = (String) data;
         try
@@ -80,7 +79,7 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public Object unstantiate(Object instance) throws TypeException
+    public Object unstantiate(Object instance, String templateOwnerPath) throws TypeException
     {
         if (instance == null)
         {
@@ -88,8 +87,8 @@ public class ReferenceType extends SimpleType implements Type
         }
         else
         {
-            long handle = ((Configuration) instance).getHandle();
-            if(handle == RecordManager.UNDEFINED)
+            String referencedPath = ((Configuration) instance).getConfigurationPath();
+            if (referencedPath == null)
             {
                 // This should not be possible via the UI, as the user has no
                 // way to select a non-persistent (i.e. no handle) instance
@@ -98,7 +97,7 @@ public class ReferenceType extends SimpleType implements Type
                 throw new TypeException("Attempt to unstantiate a reference to an instance that is not yet persistent.  Ensure the referee is persistent before saving a reference to it.");
             }
 
-            return Long.toString(handle);
+            return Long.toString(configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, referencedPath));
         }
     }
 

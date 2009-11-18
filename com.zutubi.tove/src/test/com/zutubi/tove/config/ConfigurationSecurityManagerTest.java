@@ -53,13 +53,13 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
         pathA2 = configurationTemplateManager.insert(SCOPE_A, new MockA("a2"));
 
         MockA a = new MockA("global");
-        MutableRecord record = typeA.unstantiate(a);
+        MutableRecord record = unstantiate(a);
         configurationTemplateManager.markAsTemplate(record);
         pathGlobal = configurationTemplateManager.insertRecord(SCOPE_A_TEMPLATED, record);
         long handle = configurationTemplateManager.getRecord(pathGlobal).getHandle();
 
         a = new MockA("child");
-        record = typeA.unstantiate(a);
+        record = unstantiate(a);
         configurationTemplateManager.setParentTemplate(record, handle);
         pathChild = configurationTemplateManager.insertRecord(SCOPE_A_TEMPLATED, record);
 

@@ -73,7 +73,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setShortP((short) 12);
         instance.setString("howdy");
 
-        Record record = basicType.unstantiate(instance);
+        Record record = basicType.unstantiate(instance, null);
         SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         Object newInstance = instantiator.instantiate(basicType, record);
         assertTrue(newInstance instanceof BasicTypes);
@@ -111,7 +111,7 @@ public class CompositeTypeTest extends TypeTestCase
         objectTypeB.setA("b");
         instance.setA(objectTypeB);
 
-        Record record = typeA.unstantiate(instance);
+        Record record = typeA.unstantiate(instance, null);
         SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(typeA, record);
 
@@ -147,7 +147,7 @@ public class CompositeTypeTest extends TypeTestCase
         b.setA("string");
         a.setB(b);
 
-        Record record = typeA.unstantiate(a);
+        Record record = typeA.unstantiate(a, null);
         Object rpcForm = typeA.toXmlRpc(null, record);
         assertTrue(rpcForm instanceof Hashtable);
 
@@ -163,7 +163,7 @@ public class CompositeTypeTest extends TypeTestCase
     public void testToXmlRpcNullNotIncluded() throws TypeException
     {
         ObjectTypeA a = new ObjectTypeA();
-        Record record = typeA.unstantiate(a);
+        Record record = typeA.unstantiate(a, null);
         Object rpcForm = typeA.toXmlRpc(null, record);
         assertTrue(rpcForm instanceof Hashtable);
 
@@ -177,7 +177,7 @@ public class CompositeTypeTest extends TypeTestCase
     public void testToXmlRpcNullReference() throws TypeException
     {
         RefConfig config = new RefConfig();
-        Record record = refType.unstantiate(config);
+        Record record = refType.unstantiate(config, null);
         Hashtable rpcForm = refType.toXmlRpc(null, record);
         assertFalse(rpcForm.containsKey("ref"));
     }

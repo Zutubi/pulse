@@ -549,7 +549,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testDeepCloneAndSavePreservesMeta() throws TypeException
     {
         MockA a = new MockA("a");
-        MutableRecord record = typeA.unstantiate(a);
+        MutableRecord record = unstantiate(a);
         record.putMeta("testkey", "value");
 
         String path = configurationTemplateManager.insertRecord(SCOPE_SAMPLE, record);
@@ -615,6 +615,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testValidateNestedPath() throws TypeException
     {
         MutableRecord record = typeA.createNewRecord(true);
+        configurationTemplateManager.markAsTemplate(record);
         record.put("name", "a");
         configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
@@ -682,7 +683,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MockA a = new MockA("a");
         a.setMock(new MockB());
-        MutableRecord record = typeA.unstantiate(a);
+        MutableRecord record = unstantiate(a);
 
         MockA instance = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, false);
         assertTrue(instance.isValid());
@@ -693,7 +694,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MockA a = new MockA("a");
         a.setMock(new MockB());
-        MutableRecord record = typeA.unstantiate(a);
+        MutableRecord record = unstantiate(a);
 
         MockA instance = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
         assertTrue(instance.isValid());
@@ -704,7 +705,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MockA a = new MockA("a");
         a.getDs().add(new MockD());
-        Record record = typeA.unstantiate(a);
+        Record record = unstantiate(a);
 
         MockA validated = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
         assertTrue(validated.isValid());
@@ -716,7 +717,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MockA a = new MockA("a");
         a.getCs().put("name", new MockC());
-        Record record = typeA.unstantiate(a);
+        Record record = unstantiate(a);
 
         MockA validated = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
         assertTrue(validated.isValid());
@@ -739,8 +740,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         assertFalse(configurationTemplateManager.isTemplatedCollection("template/a"));
 
-        MockA a = new MockA("a");
-        configurationTemplateManager.insert(SCOPE_TEMPLATED, a);
+        MutableRecord record = typeA.createNewRecord(true);
+        configurationTemplateManager.markAsTemplate(record);
+        record.put("name", "a");
+        configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
         assertFalse(configurationTemplateManager.isTemplatedCollection("template/a"));
     }
@@ -807,11 +810,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("mock");
         a.setMock(new MockB("bee"));
         a.getCs().put("cee", new MockC("cee"));
-        MutableRecord record = typeA.unstantiate(a);
+        MutableRecord record = unstantiate(a);
         configurationTemplateManager.markAsTemplate(record);
         String path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        record = typeA.unstantiate(new MockA("child"));
+        record = unstantiate(new MockA("child"));
         configurationTemplateManager.setParentTemplate(record, recordManager.select(path).getHandle());
         path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         return path;
@@ -984,13 +987,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         parent.getDs().add(parentD);
         child.getDs().add(childD);
 
-        MutableRecord parentRecord = typeA.unstantiate(parent);
+        MutableRecord parentRecord = unstantiate(parent);
         configurationTemplateManager.markAsTemplate(parentRecord);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, parentRecord);
 
         Record loadedParent = configurationTemplateManager.getRecord(parentPath);
 
-        MutableRecord childRecord = typeA.unstantiate(child);
+        MutableRecord childRecord = unstantiate(child);
         configurationTemplateManager.setParentTemplate(childRecord, loadedParent.getHandle());
         String childPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, childRecord);
 
@@ -1204,9 +1207,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInTemplateParentTemplateRecord()
     {
-        MockA a = new MockA("a");
+        MutableRecord record = typeA.createNewRecord(true);
+        configurationTemplateManager.markAsTemplate(record);
+        record.put("name", "a");
+        String aPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
+
+        MockA a = configurationTemplateManager.getInstance(aPath, MockA.class);
         a.setMock(new MockB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_TEMPLATED, a);
+        String path = configurationTemplateManager.save(a);
         assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "mock")));
     }
 
@@ -1289,9 +1297,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testIsOverriddenTemplateRecord()
     {
-        MockA a = new MockA("a");
+        MutableRecord record = typeA.createNewRecord(true);
+        configurationTemplateManager.markAsTemplate(record);
+        record.put("name", "a");
+        String aPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
+
+        MockA a = configurationTemplateManager.getInstance(aPath, MockA.class);
         a.setMock(new MockB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_TEMPLATED, a);
+        String path = configurationTemplateManager.save(a);
         assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "mock")));
     }
 
@@ -1747,30 +1760,30 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
     {
-        MutableRecord record = typeA.unstantiate(parent);
+        MutableRecord record = unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         long parentHandle = recordManager.select(parentPath).getHandle();
 
-        record = typeA.unstantiate(child);
+        record = unstantiate(child);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
         return new Pair<String, String>(parentPath, configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record));
     }
 
     private String[] insertParentChildAndGrandchildA(MockA parent, MockA child, MockA grandchild) throws TypeException
     {
-        MutableRecord record = typeA.unstantiate(parent);
+        MutableRecord record = unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         long parentHandle = recordManager.select(parentPath).getHandle();
 
-        record = typeA.unstantiate(child);
+        record = unstantiate(child);
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
         String childPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         long childHandle = recordManager.select(childPath).getHandle();
 
-        record = typeA.unstantiate(grandchild);
+        record = unstantiate(grandchild);
         configurationTemplateManager.setParentTemplate(record, childHandle);
         String grandChildPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         return new String[]{parentPath, childPath, grandChildPath};

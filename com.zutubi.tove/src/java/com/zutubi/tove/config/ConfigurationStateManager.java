@@ -118,7 +118,7 @@ public class ConfigurationStateManager
             TypeProperty property = type.getExternalStateProperty();
             Record record = recordManager.select(instance.getConfigurationPath());
             MutableRecord mutable = record.copy(false, true);
-            mutable.put(property.getName(), property.getType().unstantiate(id));
+            mutable.put(property.getName(), property.getType().unstantiate(id, null));
             recordManager.update(instance.getConfigurationPath(), mutable);
             property.setValue(instance, id);
         }

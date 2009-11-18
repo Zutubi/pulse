@@ -258,7 +258,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
             try
             {
-                projectRecord.put(PROPERTY_PROJECT_REQUIREMENTS, projectType.getProperty(PROPERTY_PROJECT_REQUIREMENTS).getType().unstantiate(configurations));
+                projectRecord.put(PROPERTY_PROJECT_REQUIREMENTS, projectType.getProperty(PROPERTY_PROJECT_REQUIREMENTS).getType().unstantiate(configurations, null));
             }
             catch (TypeException e)
             {
@@ -279,7 +279,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             {
                 CommandConfiguration commandConfig = (CommandConfiguration) instantiator.instantiate(commandState.getType(), commandDataRecord);
                 commandConfig.initialiseSingleCommandProject(templateParentProject.getPostProcessors());
-                commandDataRecord = commandState.getType().unstantiate(commandConfig);
+                commandDataRecord = commandState.getType().unstantiate(commandConfig, null);
             }
             catch (TypeException e)
             {

@@ -267,7 +267,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 addDefaultReports(globalProject);
 
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
-                MutableRecord globalTemplate = projectType.unstantiate(globalProject);
+                MutableRecord globalTemplate = projectType.unstantiate(globalProject, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, GLOBAL_PROJECT_NAME));
                 configurationTemplateManager.markAsTemplate(globalTemplate);
                 configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
             }

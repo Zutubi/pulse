@@ -213,7 +213,7 @@ public class ConfigurationHelper
     private Hashtable<String, Object> toXmlRpc(Configuration config) throws Exception
     {
         CompositeType type = typeRegistry.getType(config.getClass());
-        return type.toXmlRpc(templateOwnerPath, type.unstantiate(config));
+        return type.toXmlRpc(templateOwnerPath, type.unstantiate(config, templateOwnerPath));
     }
 
     private void updatePathsAndHandles(Configuration config, String path, Hashtable<String, Object> data) throws Exception

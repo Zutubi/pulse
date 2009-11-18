@@ -426,7 +426,8 @@ public class RemoteApi
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
 
             Type t = configurationTemplateManager.getType(path);
-            return t.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), t.unstantiate(instance));
+            String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+            return t.toXmlRpc(templateOwnerPath, t.unstantiate(instance, templateOwnerPath));
         }
         finally
         {

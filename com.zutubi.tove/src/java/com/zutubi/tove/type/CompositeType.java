@@ -472,7 +472,7 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public MutableRecord unstantiate(Object instance) throws TypeException
+    public MutableRecord unstantiate(Object instance, String templateOwnerPath) throws TypeException
     {
         if (instance == null)
         {
@@ -488,7 +488,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
         if (actualType != this)
         {
-            return actualType.unstantiate(instance);
+            return actualType.unstantiate(instance, templateOwnerPath);
         }
         else
         {
@@ -496,11 +496,11 @@ public class CompositeType extends AbstractType implements ComplexType
 
             for (TypeProperty property : properties.values())
             {
-                unstantiateProperty(property, instance, result);
+                unstantiateProperty(property, instance, templateOwnerPath, result);
             }
             for (TypeProperty property : internalProperties.values())
             {
-                unstantiateProperty(property, instance, result);
+                unstantiateProperty(property, instance, templateOwnerPath, result);
             }
 
             copyMetaToRecord(instance, result);
@@ -640,12 +640,12 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    private void unstantiateProperty(TypeProperty property, Object instance, MutableRecord result) throws TypeException
+    private void unstantiateProperty(TypeProperty property, Object instance, String templateOwnerPath, MutableRecord result) throws TypeException
     {
         try
         {
             Object value = property.getValue(instance);
-            Object unstantiatedValue = property.getType().unstantiate(value);
+            Object unstantiatedValue = property.getType().unstantiate(value, templateOwnerPath);
             if (unstantiatedValue != null)
             {
                 result.put(property.getName(), unstantiatedValue);
@@ -664,7 +664,7 @@ public class CompositeType extends AbstractType implements ComplexType
             if (applyDefaults)
             {
                 Object defaultInstance = getClazz().newInstance();
-                return unstantiate(defaultInstance);
+                return unstantiate(defaultInstance, null);
             }
             else
             {

@@ -140,7 +140,7 @@ public class ListType extends CollectionType
         }
     }
 
-    public Object unstantiate(Object instance) throws TypeException
+    public Object unstantiate(Object instance, String templateOwnerPath) throws TypeException
     {
         if (instance == null)
         {
@@ -158,7 +158,7 @@ public class ListType extends CollectionType
             int i = 0;
             for(Object o: list)
             {
-                result[i++] = (String) collectionType.unstantiate(o);
+                result[i++] = (String) collectionType.unstantiate(o, templateOwnerPath);
             }
 
             return result;
@@ -167,7 +167,7 @@ public class ListType extends CollectionType
         {
             // A sub-record.  Need to set the ordering based on the iteration
             // order of the list.
-            return convertToRecord(list, collectionType, new UnstantiateToRecord());
+            return convertToRecord(list, collectionType, new UnstantiateToRecord(templateOwnerPath));
         }
     }
 
@@ -422,9 +422,16 @@ public class ListType extends CollectionType
 
     private static class UnstantiateToRecord implements ToRecord
     {
+        private String templateOwnerPath;
+
+        private UnstantiateToRecord(String templateOwnerPath)
+        {
+            this.templateOwnerPath = templateOwnerPath;
+        }
+
         public Object convert(Type type, Object data) throws TypeException
         {
-            return type.unstantiate(data);
+            return type.unstantiate(data, templateOwnerPath);
         }
     }
 

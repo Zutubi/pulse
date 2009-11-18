@@ -40,7 +40,7 @@ public class EnumType extends SimpleType
         }
     }
 
-    public Object unstantiate(Object instance) throws TypeException
+    public Object unstantiate(Object instance, String templateOwnerPath) throws TypeException
     {
         if (instance == null)
         {
