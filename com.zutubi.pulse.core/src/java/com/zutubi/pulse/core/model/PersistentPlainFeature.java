@@ -2,6 +2,9 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * A PlainFeature is a feture discovered by analysing an artifact as plain
  * text, line by line.  In addition to the summary, these features contain
@@ -104,9 +107,25 @@ public class PersistentPlainFeature extends PersistentFeature
         return (int) (lineNumber - firstLine + 1);
     }
 
-    public String[] getSummaryLines()
+    public List<String> getSummaryLines()
     {
-        return getSummary().split("\n");
+        // String splitting has strange handling of empty pieces, especially
+        // trailing ones.  We want to preserve things, so we do our own split.
+        List<String> result = new LinkedList<String>();
+        String summary = getSummary();
+        int startIndex = 0;
+        for (int i = 0; i < summary.length(); i++)
+        {
+            char c = summary.charAt(i);
+            if (c == '\n')
+            {
+                result.add(summary.substring(startIndex, i));
+                startIndex = i + 1;
+            }
+        }
+
+        result.add(summary.substring(startIndex));        
+        return result;
     }
 
     public boolean equals(Object o)

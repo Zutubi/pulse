@@ -77,6 +77,12 @@ public class FeaturePersisterTest extends PulseTestCase
         roundTrip(result);
     }
 
+    public void testFeatureWhitespacePreserved() throws IOException, ParsingException
+    {
+        CommandResult result = getResultWithFeatures(getFeature("\nleading and trailing whitespace  "));
+        roundTrip(result);
+    }
+
     private PersistentPlainFeature getFeature(String summary)
     {
         return new PersistentPlainFeature(Feature.Level.INFO, summary, 1, 10, 3);
