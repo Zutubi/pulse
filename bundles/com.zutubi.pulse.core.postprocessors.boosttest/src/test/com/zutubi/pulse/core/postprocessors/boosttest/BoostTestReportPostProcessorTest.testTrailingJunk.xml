@@ -1,0 +1,4 @@
+<TestLog><TestSuite name="Hello"><TestCase name="universeInOrder"><Error file="hello.cpp" line="12">check add(2, 2) == 5 failed</Error><TestingTime>0</TestingTime></TestCase></TestSuite></TestLog>
+*** 1 failure detected in test suite "Hello"
+
+EXIT STATUS: 201

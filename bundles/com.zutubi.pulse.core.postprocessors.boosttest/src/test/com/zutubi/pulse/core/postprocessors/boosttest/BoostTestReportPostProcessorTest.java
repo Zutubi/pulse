@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.boosttest;
 
 import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.api.XMLTestPostProcessorTestCase;
@@ -131,5 +132,14 @@ public class BoostTestReportPostProcessorTest extends XMLTestPostProcessorTestCa
         BoostTestReportPostProcessorConfiguration config = new BoostTestReportPostProcessorConfiguration();
         config.setProcessMessages(true);
         assertEquals(expected, runProcessorAndGetTests(new BoostTestReportPostProcessor(config), "testMessages", EXTENSION_XML));
+    }
+
+    public void testTrailingJunk() throws IOException
+    {
+        TestSuiteResult expected =
+                buildSuite(null,
+                    buildSuite("Hello", 0,
+                        new TestCaseResult("universeInOrder", 0, TestStatus.FAILURE, "error: hello.cpp:12: check add(2, 2) == 5 failed")));
+        assertEquals(expected, runProcessorAndGetTests(new BoostTestReportPostProcessor(new BoostTestReportPostProcessorConfiguration())));
     }
 }
