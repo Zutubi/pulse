@@ -5,6 +5,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -112,12 +113,9 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
         ProjectConfiguration builtProject = buildResult.getProject().getConfig();
 
         buildOrder.remove(builtProject);
-
-        if (buildOrder.size() == 0)
+        if (isMetaBuildFinished())
         {
-            // our work here is finished.
-            eventManager.unregister(eventListener);
-            eventManager.publish(new MetaBuildCompletedEvent(this, evt.getBuildResult(), evt.getContext()));
+            metaBuildFinished(evt.getBuildResult(), evt.getContext());
         }
         else
         {
@@ -173,8 +171,24 @@ public class DependencyMetaBuildHandler extends BaseMetaBuildHandler
                     pendingResult.error(I18N.format("skip.build", new Object[]{failedProjectName}));
                     buildManager.save(pendingResult);
                 }
+
+                if (isMetaBuildFinished())
+                {
+                    metaBuildFinished(evt.getBuildResult(), evt.getContext());
+                }
             }
         }
+    }
+
+    private boolean isMetaBuildFinished()
+    {
+        return buildOrder.size() == 0;
+    }
+
+    private void metaBuildFinished(BuildResult result, PulseExecutionContext context)
+    {
+        eventManager.unregister(eventListener);
+        eventManager.publish(new MetaBuildCompletedEvent(this, result, context));
     }
 
     private RebuildRequestEvent createRequest(ProjectConfiguration project)
