@@ -333,6 +333,16 @@ public class XmlRpcHelper
         return call("getArtifactsInBuild", project, (int)buildNumber);
     }
 
+    public Vector<Hashtable<String, Object>> getArtifactsInPersonalBuild(int buildNumber) throws Exception
+    {
+        return call("getArtifactsInPersonalBuild", buildNumber);
+    }
+
+    public Vector<String> getArtifactFileListingPersonal(int id, final String stageName, final String commandName, final String artifactName, final String path) throws Exception
+    {
+        return call("getArtifactFileListingPersonal", id, stageName, commandName, artifactName, path);
+    }
+
     public String insertSimpleProject(String name) throws Exception
     {
         return insertSimpleProject(name, false);

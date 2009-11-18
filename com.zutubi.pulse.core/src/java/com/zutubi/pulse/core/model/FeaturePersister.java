@@ -162,7 +162,7 @@ public class FeaturePersister
                 long firstLine = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_FIRST_LINE));
                 long lastLine = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_LAST_LINE));
                 long line = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_LINE));
-                String summary = XMLUtils.getText(element);
+                String summary = XMLUtils.getText(element, null, false);
 
                 fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
             }
