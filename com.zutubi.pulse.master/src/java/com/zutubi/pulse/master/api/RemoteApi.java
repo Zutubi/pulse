@@ -1345,8 +1345,9 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            List<Project> projects = projectManager.getProjects(true);
-            return getNames(projects);
+            List<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
+            List<ProjectConfiguration> concreteProjects = CollectionUtils.filter(allProjects, ProjectFilters.concrete());
+            return getConfigNames(concreteProjects);
         }
         finally
         {
@@ -1482,6 +1483,20 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    private Vector<String> getConfigNames(Collection<ProjectConfiguration> projects)
+    {
+        Vector<String> result = new Vector<String>(projects.size());
+        CollectionUtils.map(projects, new Mapping<ProjectConfiguration, String>()
+        {
+            public String map(ProjectConfiguration config)
+            {
+                return config.getName();
+            }
+        }, result);
+
+        return result;
     }
 
     private Vector<String> getNames(Collection<Project> projects)

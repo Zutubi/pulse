@@ -1,21 +1,17 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.master.model.LabelProjectTuple;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectGroup;
-import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.TruePredicate;
 import com.zutubi.util.bean.ObjectFactory;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Action to load the projects data for the browse view.
@@ -38,11 +34,14 @@ public class BrowseDataAction extends ProjectActionSupport
         final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
         Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
 
-        List<Project> projects = projectManager.getProjects(true);
+        projectManager.getProjects(true);
+
+        Collection<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
+        List<ProjectConfiguration> allConcreteProjects = CollectionUtils.filter(allProjects, ProjectFilters.concrete());
 
         // Filter invalid projects into a separate list.
         List<String> invalidProjects = new LinkedList<String>();
-        for (Project project: projects)
+        for (ProjectConfiguration project: allConcreteProjects)
         {
             if (!projectManager.isProjectValid(project))
             {

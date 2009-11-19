@@ -47,10 +47,8 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
+import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -612,7 +610,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private void initialiseProjects()
     {
         // Restore project states that are out of sync due to unclean shutdown.
-        for (Project project: projectDao.findAll())
+        for (Project project: filter(projectDao.findAll(), ProjectFilters.exists()))
         {
             makeStateTransition(project.getId(), Project.Transition.STARTUP);
         }
@@ -811,12 +809,23 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             return null;
         }
-        return projectDao.findById(config.getProjectId());
+        Project project = projectDao.findById(config.getProjectId());
+        if (ProjectFilters.exists(project))
+        {
+            return project;
+        }
+        return null;
     }
 
     public Project getProject(long id, boolean allowInvalid)
     {
         Project project = projectDao.findById(id);
+        if (ProjectFilters.notExists(project))
+        {
+            // orphaned projects 'do not exist'.
+            return null;
+        }
+
         if (allowInvalid || isProjectValid(project))
         {
             return project;
@@ -831,7 +840,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         for (Long id : ids)
         {
             Project project = projectDao.findById(id);
-            if (project != null)
+            if (ProjectFilters.exists(project))
             {
                 result.add(project);
             }
@@ -847,7 +856,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             result = filterValidProjects(result);
         }
 
-        return result;
+        return filter(result, ProjectFilters.exists());
     }
 
     public List<Project> getDescendentProjects(String project, boolean strict, boolean allowInvalid)
@@ -876,7 +885,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private List<Project> filterValidProjects(List<Project> projects)
     {
-        return CollectionUtils.filter(projects, new Predicate<Project>()
+        return filter(projects, new Predicate<Project>()
         {
             public boolean satisfied(Project project)
             {
@@ -887,7 +896,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public int getProjectCount()
     {
-        return getProjects(true).size();
+        return filter(getAllProjectConfigs(true), ProjectFilters.concrete()).size();
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
@@ -1117,16 +1126,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public void setProjectDao(ProjectDao dao)
-    {
-        projectDao = dao;
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
-    }
-
     public Collection<ProjectGroup> getAllProjectGroups()
     {
         final Comparator<String> cmp = new Sort.StringComparator();
@@ -1190,10 +1189,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             if(accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, config))
             {
-                group.add(projectDao.findById(config.getProjectId()));
+                Project project = projectDao.findById(config.getProjectId());
+                if (ProjectFilters.exists(project))
+                {
+                    group.add(project);
+                }
             }
         }
-
         return group;
     }
 
@@ -1203,7 +1205,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         for(ProjectConfiguration config: projects)
         {
             Project project = projectDao.findById(config.getProjectId());
-            if(project != null)
+            if(ProjectFilters.exists(project))
             {
                 result.add(project);
             }
@@ -1354,7 +1356,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         if(projectConfig != null)
         {
             Project project = projectDao.findById(projectConfig.getProjectId());
-            if(project != null)
+            if(ProjectFilters.exists(project))
             {
                 if(project.clearForceCleanForAgent(rde.getAgent().getId()))
                 {
@@ -1477,5 +1479,15 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
     {
         this.buildRequestRegistry = buildRequestRegistry;
+    }
+
+    public void setProjectDao(ProjectDao dao)
+    {
+        projectDao = dao;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

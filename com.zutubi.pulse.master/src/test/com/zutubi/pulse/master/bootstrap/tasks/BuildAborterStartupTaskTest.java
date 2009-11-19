@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.RandomUtils;
 import static org.mockito.Mockito.*;
@@ -51,7 +52,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
 
     public void testCompletedBuild()
     {
-        Project project = new Project();
+        Project project = createProject();
         BuildResult result = createResult(project);
         result.commence(10);
         result.complete();
@@ -66,7 +67,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
 
     public void testIncompleteBuild()
     {
-        Project project = new Project();
+        Project project = createProject();
         BuildResult result = createResult(project);
         result.commence(10);
 
@@ -81,7 +82,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
 
     public void testCompletePersonalBuild()
     {
-        Project project = new Project();
+        Project project = createProject();
         User user = newUser();
         BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.commence(10);
@@ -99,7 +100,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
 
     public void testIncompletePersonalBuild()
     {
-        Project project = new Project();
+        Project project = createProject();
         User user = newUser();
         BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.commence(10);
@@ -112,6 +113,14 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
         wireMockUserManager(user);
         aborter.execute();
         verify(buildManager, times(1)).abortUnfinishedBuilds(user, BuildAborterStartupTask.ABORT_MESSAGE);
+    }
+
+    private Project createProject()
+    {
+        ProjectConfiguration config = new ProjectConfiguration();
+        Project project = new Project();
+        project.setConfig(config);
+        return project;
     }
 
     private BuildResult createResult(Project project)

@@ -65,6 +65,16 @@ public interface ProjectManager extends EntityManager<Project>
 
     boolean isProjectValid(Project project);
 
+    /**
+     * A check to see whether or not the specified project configuration is
+     * valid.
+     *
+     * @param project   the configuration in question.
+     *
+     * @return true if the configuration is valid, false otherwise.
+     */
+    boolean isProjectValid(ProjectConfiguration project);
+
     int getProjectCount();
 
     void abortUnfinishedBuilds(Project project, String message);
