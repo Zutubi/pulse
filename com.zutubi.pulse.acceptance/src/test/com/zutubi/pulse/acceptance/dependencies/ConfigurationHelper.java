@@ -67,8 +67,8 @@ public class ConfigurationHelper
         {
             public Object answer(InvocationOnMock invocation) throws Throwable
             {
-                String path= (String) invocation.getArguments()[0];
-                return xmlRpcHelper.getConfigHandle(path);
+                String path = (String) invocation.getArguments()[1];
+                return Long.valueOf(xmlRpcHelper.getConfigHandle(path));
             }
         });
 
