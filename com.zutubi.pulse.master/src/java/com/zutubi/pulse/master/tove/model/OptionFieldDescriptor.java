@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.type.record.Record;
 
 import java.util.List;
@@ -91,11 +92,11 @@ public class OptionFieldDescriptor extends FieldDescriptor
         {
             if (isEditable())
             {
-                setType("combobox");
+                setType(FieldType.COMBOBOX);
             }
             else
             {
-                setType("dropdown");
+                setType(FieldType.DROPDOWN);
             }
         }
 

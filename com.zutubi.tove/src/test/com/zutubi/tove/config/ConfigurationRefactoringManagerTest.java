@@ -18,6 +18,13 @@ import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
+import org.acegisecurity.AccessDeniedException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.startsWith;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.util.*;
 import static java.util.Arrays.asList;
@@ -40,6 +47,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationRefactoringManager.setTypeRegistry(typeRegistry);
         configurationRefactoringManager.setConfigurationTemplateManager(configurationTemplateManager);
         configurationRefactoringManager.setConfigurationReferenceManager(configurationReferenceManager);
+        configurationRefactoringManager.setConfigurationSecurityManager(configurationSecurityManager);
         configurationRefactoringManager.setRecordManager(recordManager);
 
         typeA = typeRegistry.register(MockA.class);
@@ -673,6 +681,76 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("extracted", colbyRecord.getOwner("y"));
     }
 
+    public void testGetPullUpAncestorsInvalidPath()
+    {
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors("invalid/path/here"));
+    }
+
+    public void testGetPullUpAncestorsTemplateCollectionItem() throws TypeException
+    {
+        String path = insertTemplateA(rootPath, "a", false);
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors(path));
+    }
+
+    public void testGetPullUpAncenstorsNotTemplate()
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors(path));
+    }
+
+    public void testGetPullUpAncenstorsNoAncestor() throws TypeException
+    {
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors(PathUtils.getPath(rootPath, "b")));
+    }
+
+    public void testGetPullUpAncestorsNoValidAncestor() throws TypeException
+    {
+        String templateParentPath = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
+        String path = insertTemplateAInstance(templateParentPath, createAInstance("a2"), false);
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors(PathUtils.getPath(path, "b")));
+    }
+
+    public void testGetPullUpAncestors() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        assertEquals(asList(NAME_ROOT), configurationRefactoringManager.getPullUpAncestors(PathUtils.getPath(path, "b")));
+    }
+
+    public void testCanPullUpAnyInvalidPath()
+    {
+        assertFalse(configurationRefactoringManager.canPullUp("invalid/path/here"));
+    }
+
+    public void testCanPullUpAnyTemplateCollectionItem() throws TypeException
+    {
+        String path = insertTemplateA(rootPath, "a", false);
+        assertFalse(configurationRefactoringManager.canPullUp(path));
+    }
+
+    public void testCanPullUpAnyNotTemplate()
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertFalse(configurationRefactoringManager.canPullUp(path));
+    }
+
+    public void testCanPullUpAnyNoAncestor() throws TypeException
+    {
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(rootPath, "b")));
+    }
+
+    public void testCanPullUpAnyNoValidAncestor() throws TypeException
+    {
+        String templateParentPath = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
+        String path = insertTemplateAInstance(templateParentPath, createAInstance("a2"), false);
+        assertFalse(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b")));
+    }
+
+    public void testCanPullUpAny() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        assertTrue(configurationRefactoringManager.canPullUp(PathUtils.getPath(path, "b")));
+    }
+    
     public void testCanPullUpInvalidPath()
     {
         assertFalse(configurationRefactoringManager.canPullUp("invalid/path/here", "anything"));
@@ -735,6 +813,26 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         String pullPath = PathUtils.getPath(childPath, "b");
         assertFalse(configurationRefactoringManager.canPullUp(pullPath, NAME_PARENT));
+    }
+
+    public void testPullUpUnableToWriteToAncestor() throws TypeException
+    {
+        final String ERROR_MESSAGE = "No such luck, bozo";
+        
+        ConfigurationSecurityManager securityManager = mock(ConfigurationSecurityManager.class);
+        doThrow(new AccessDeniedException(ERROR_MESSAGE)).when(securityManager).ensurePermission(startsWith(rootPath), anyString());
+        configurationRefactoringManager.setConfigurationSecurityManager(securityManager);
+
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        try
+        {
+            configurationRefactoringManager.pullUp(PathUtils.getPath(path, "b"), NAME_ROOT);
+            fail("Should not be able to pull up with no permission");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString(ERROR_MESSAGE));
+        }
     }
 
     public void testCanPullUpComposite() throws TypeException

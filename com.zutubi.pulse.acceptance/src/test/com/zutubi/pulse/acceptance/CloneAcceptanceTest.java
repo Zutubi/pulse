@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
+import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getParentPath;
@@ -157,7 +158,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage labelList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(labelList.isItemPresent(TEST_PROPERTY_NAME));
-        assertTrue(labelList.isActionLinkPresent(TEST_PROPERTY_NAME, AccessManager.ACTION_CLONE));
+        assertTrue(labelList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_CLONE));
         return labelList;
     }
 

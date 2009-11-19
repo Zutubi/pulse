@@ -4,7 +4,6 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.master.tove.model.ControllingCheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.tove.model.SubmitFieldDescriptor;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.TemplateNode;
@@ -16,11 +15,7 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateException;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,34 +24,25 @@ import java.util.Set;
 /**
  * Action to gather new keys and request a clone for map items.
  */
-public class CloneAction extends ToveActionSupport
+public class CloneAction extends ToveFormActionSupport
 {
-    private static final String SUBMIT_CLONE = "clone";
-
     public static final String CHECK_FIELD_PREFIX = "cloneCheck_";
     public static final String KEY_FIELD_PREFIX   = "cloneKey_";
 
-    private ConfigurationPanel newPanel;
     private Record record;
     private String parentPath;
     private MapType mapType;
     private boolean templatedCollection;
     private boolean smart;
-    private String formSource;
     private String cloneKey;
     private String parentKey;
+    private Map<String, String> keyMap;
 
     private ConfigurationRefactoringManager configurationRefactoringManager;
-    private Configuration freemarkerConfiguration;
 
-    public ConfigurationPanel getNewPanel()
+    public CloneAction()
     {
-        return newPanel;
-    }
-
-    public String getFormSource()
-    {
-        return formSource;
+        super(ConfigurationRefactoringManager.ACTION_CLONE, "clone");
     }
 
     public boolean isSmart()
@@ -79,6 +65,7 @@ public class CloneAction extends ToveActionSupport
         this.parentKey = parentKey;
     }
 
+    @Override
     public void doCancel()
     {
         String parentPath = PathUtils.getParentPath(path);
@@ -86,22 +73,37 @@ public class CloneAction extends ToveActionSupport
         response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
     }
 
-    public String execute() throws Exception
+    @Override
+    protected void validatePath()
     {
-        validatePath();
-        if(isInputSelected())
+        parentPath = PathUtils.getParentPath(path);
+        if(parentPath == null)
         {
-            renderForm();
-            return INPUT;
+            throw new IllegalArgumentException("Invalid path '" + path + "': no parent path");
         }
 
+        Type parentType = configurationTemplateManager.getType(parentPath);
+        if(!(parentType instanceof MapType))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': parent is not a map (only map elements may be cloned)");
+        }
+
+        mapType = (MapType) parentType;
+        type = parentType.getTargetType();
+        templatedCollection = configurationTemplateManager.isTemplatedCollection(parentPath);
+
+        record = configurationTemplateManager.getRecord(path);
+    }
+
+    @Override
+    protected void validateForm()
+    {
         MessagesTextProvider textProvider = new MessagesTextProvider(mapType.getTargetType().getClazz());
         Set<String> seenKeys = new HashSet<String>();
         validateCloneKey("cloneKey", cloneKey, seenKeys, textProvider);
 
-        Map<String, String> keyMap = new HashMap<String, String>();
+        keyMap = new HashMap<String, String>();
         keyMap.put(PathUtils.getBaseName(path), cloneKey);
-        String newPath = PathUtils.getPath(parentPath, cloneKey);
 
         if(templatedCollection)
         {
@@ -112,33 +114,6 @@ public class CloneAction extends ToveActionSupport
 
             getDescendents(keyMap, seenKeys, textProvider);
         }
-
-        if(hasErrors())
-        {
-            renderForm();
-            return INPUT;
-        }
-
-        if (smart)
-        {
-            configurationRefactoringManager.smartClone(parentPath, PathUtils.getBaseName(path), parentKey, keyMap);
-        }
-        else
-        {
-            configurationRefactoringManager.clone(parentPath, keyMap);
-        }
-
-        String templatePath = configurationTemplateManager.getTemplatePath(newPath);
-        response = new ConfigurationResponse(newPath, templatePath);
-        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
-        if (smart)
-        {
-            String newParent = PathUtils.getPath(parentPath, parentKey);
-            String collapsedCollection = ToveUtils.getCollapsedCollection(newParent, configurationTemplateManager.getType(newParent), configurationSecurityManager);
-            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), collapsedCollection, ToveUtils.getIconCls(newParent, configurationTemplateManager), false, false));
-            response.addRemovedPath(path);
-        }
-        return SUCCESS;
     }
 
     private void validateCloneKey(String name, String value, Set<String> seenKeys, TextProvider textProvider)
@@ -191,53 +166,22 @@ public class CloneAction extends ToveActionSupport
         return selectedDescedents;
     }
 
-    private String getParameterValue(Map parameters, String name)
+    @Override
+    protected String getFormAction()
     {
-        Object cloneKeyObject = parameters.get(name);
-        String value = null;
-        if(cloneKeyObject instanceof String)
-        {
-            value = (String) cloneKeyObject;
-        }
-        else if(cloneKeyObject instanceof String[])
-        {
-            value = ((String[]) cloneKeyObject)[0];
-        }
-        return value;
+        return smart ? "smartclone" : "clone";
     }
 
-    private void validatePath()
-    {
-        parentPath = PathUtils.getParentPath(path);
-        if(parentPath == null)
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': no parent path");
-        }
-
-        Type parentType = configurationTemplateManager.getType(parentPath);
-        if(!(parentType instanceof MapType))
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': parent is not a map (only map elements may be cloned)");
-        }
-
-        mapType = (MapType) parentType;
-        type = parentType.getTargetType();
-        templatedCollection = configurationTemplateManager.isTemplatedCollection(parentPath);
-
-        record = configurationTemplateManager.getRecord(path);
-    }
-
-    private void renderForm() throws IOException, TemplateException
+    @Override
+    protected void addFormFields(Form form)
     {
         Map parameters = ActionContext.getContext().getParameters();
 
-        Form form = new Form("form", "clone", ToveUtils.getConfigURL(path, smart ? "smartclone" : "clone", null, "aconfig"), SUBMIT_CLONE);
         Field field = new Field(FieldType.TEXT, "cloneKey");
         field.setLabel("clone name");
         field.setValue(getValue("cloneKey", getKey(record), parameters));
         form.add(field);
 
-        
         if(templatedCollection)
         {
             if(smart)
@@ -247,15 +191,6 @@ public class CloneAction extends ToveActionSupport
 
             addDescendentFields(form);
         }
-
-        addSubmit(form, SUBMIT_CLONE, true);
-        addSubmit(form, "cancel", false);
-
-        StringWriter writer = new StringWriter();
-        ToveUtils.renderForm(form, getClass(), writer, freemarkerConfiguration);
-        formSource = writer.toString();
-
-        newPanel = new ConfigurationPanel("aconfig/clone.vm");
     }
 
     private void addParentField(Form form, Map parameters)
@@ -320,18 +255,6 @@ public class CloneAction extends ToveActionSupport
         return result;
     }
 
-    private void addSubmit(Form form, String name, boolean isDefault)
-    {
-        Field field = new Field(FieldType.SUBMIT, name);
-        field.setValue(name);
-        if(isDefault)
-        {
-            field.addParameter(SubmitFieldDescriptor.PARAM_DEFAULT, true);
-        }
-        
-        form.add(field);
-    }
-
     private String getValue(String fieldName, String key, Map parameters)
     {
         if (isInputSelected())
@@ -349,13 +272,33 @@ public class CloneAction extends ToveActionSupport
         return (String) record.get(mapType.getKeyProperty());
     }
 
+    @Override
+    protected void doAction()
+    {
+        if (smart)
+        {
+            configurationRefactoringManager.smartClone(parentPath, PathUtils.getBaseName(path), parentKey, keyMap);
+        }
+        else
+        {
+            configurationRefactoringManager.clone(parentPath, keyMap);
+        }
+
+        String newPath = PathUtils.getPath(parentPath, cloneKey);
+        String templatePath = configurationTemplateManager.getTemplatePath(newPath);
+        response = new ConfigurationResponse(newPath, templatePath);
+        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
+        if (smart)
+        {
+            String newParent = PathUtils.getPath(parentPath, parentKey);
+            String collapsedCollection = ToveUtils.getCollapsedCollection(newParent, configurationTemplateManager.getType(newParent), configurationSecurityManager);
+            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), collapsedCollection, ToveUtils.getIconCls(newParent, configurationTemplateManager), false, false));
+            response.addRemovedPath(path);
+        }
+    }
+
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
     {
         this.configurationRefactoringManager = configurationRefactoringManager;
-    }
-
-    public void setFreemarkerConfiguration(Configuration configuration)
-    {
-        this.freemarkerConfiguration = configuration;
     }
 }

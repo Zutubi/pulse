@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
+import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -259,7 +260,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupsPath);
         cleanupsPage.expandTreeNode(cleanupsPath);
-        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
+        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
         assertTrue(cleanupsPage.isTreeLinkPresent("default"));
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
@@ -281,14 +282,14 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String cleanupssPath = PathUtils.getPath(projectPath, "cleanup");
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupssPath);
-        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
+        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         confirmPage.clickCancel();
 
         cleanupsPage.waitFor();
-        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
+        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
     }
 
     public void testHideMapItemWithSkeletonDescendent() throws Exception
@@ -305,7 +306,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, parentCleanupsPath);
-        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
+        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
@@ -335,7 +336,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, parentCleanupsPath);
-        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
+        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
@@ -364,7 +365,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         cleanupsPage.clickRestore("default");
         cleanupsPage.waitFor();
-        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
+        assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
         cleanupsPage.expandTreeNode(cleanupsPath);
         assertTrue(cleanupsPage.isTreeLinkPresent("default"));
     }

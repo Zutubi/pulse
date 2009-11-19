@@ -6,10 +6,7 @@ import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.tove.config.ConfigurationPersistenceManager;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationSecurityManager;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.links.ConfigurationLink;
 import com.zutubi.tove.links.LinkManager;
@@ -222,7 +219,7 @@ public class ConfigurationUIModel
         final Messages messages = Messages.getInstance(type.getClazz());
         List<String> actionNames = actionManager.getActions(instance, true);
         actionNames.remove(AccessManager.ACTION_VIEW);
-        actionNames.remove(AccessManager.ACTION_CLONE);
+        actionNames.remove(ConfigurationRefactoringManager.ACTION_CLONE);
 
         if (actionNames.size() > 0)
         {

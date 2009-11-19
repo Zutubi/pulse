@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
@@ -22,9 +23,13 @@ public class ConfigurationRefactoringManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRefactoringManager.class);
 
+    public static final String ACTION_CLONE = "clone";
+    public static final String ACTION_PULL_UP = "pullUp";
+
     private TypeRegistry typeRegistry;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationReferenceManager configurationReferenceManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
     private RecordManager recordManager;
 
     /**
@@ -237,6 +242,61 @@ public class ConfigurationRefactoringManager
     }
 
     /**
+     * Returns a list of all ancestors that the given path may be pulled up to.
+     * If the path cannot be pulled up at all, the list will be empty.  The
+     * requirements for pulling up are documented on {@link #canPullUp(String, String)}.
+     *
+     * @param path the path that is a candidate to pull up
+     * @return the keys of all ancestors that the path may be pulled up to
+     */
+    public List<String> getPullUpAncestors(final String path)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<List<String>>()
+        {
+            public List<String> execute() throws Exception
+            {
+                String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+                if (templateOwnerPath == null)
+                {
+                    return Collections.emptyList();
+                }
+
+                List<String> result = new LinkedList<String>();
+                TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+                node = node.getParent();
+                while (node != null)
+                {
+                    if (canPullUp(path, node.getId()))
+                    {
+                        result.add(node.getId());
+                    }
+
+                    node = node.getParent();
+                }
+
+                return result;
+            }
+        });
+    }
+
+    /**
+     * Tests if a given path can be pulled up in the template hierarchy to any
+     * of its ancestors.  The requirements for pulling up are documented on
+     * {@link #canPullUp(String, String)}.
+     * <p/>
+     * <b>Note</b> that this method does not take security into account: i.e.
+     * it does not check that the user has permission to write into the
+     * ancestor.
+     *
+     * @param path the path to test
+     * @return true iff the path may be pulled up at least one of its ancestors
+     */
+    public boolean canPullUp(final String path)
+    {
+        return !getPullUpAncestors(path).isEmpty();
+    }
+
+    /**
      * Tests if a given path can be pulled up in the template hierarchy to the
      * given ancestor.  To be pulled up a path must:
      *
@@ -249,8 +309,13 @@ public class ConfigurationRefactoringManager
      * </ul>
      *
      * The given ancestor must be a strict ancestor of the templated collection
-     * item that owns the specified path.
-     *
+     * item that owns the specified path, and must be writable by the calling
+     * user.
+     * <p/>
+     * <b>Note</b> that this method does not take security into account: i.e.
+     * it does not check that the user has permission to write into the
+     * ancestor.
+
      * @param path        the path to test
      * @param ancestorKey key of the templated collection item to pull the path
      *                    up to (must be an ancestor of the paths template owner)
@@ -291,6 +356,11 @@ public class ConfigurationRefactoringManager
     public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
     {
         this.configurationReferenceManager = configurationReferenceManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 
     public void setRecordManager(RecordManager recordManager)
@@ -1025,7 +1095,7 @@ public class ConfigurationRefactoringManager
         public void push(String edge)
         {
             path = PathUtils.getPath(path, edge);
-            MutableRecord record = (MutableRecord) recordStack.peek().get(edge);
+            Record record = (Record) recordStack.peek().get(edge);
             typeStack.push((ComplexType) typeStack.peek().getActualPropertyType(edge, record));
             recordStack.push(record);
         }
@@ -1460,7 +1530,8 @@ public class ConfigurationRefactoringManager
             try
             {
                 insertPath = ensurePullUp();
-
+                configurationSecurityManager.ensurePermission(insertPath, AccessManager.ACTION_CREATE);
+                
                 String[] elements = PathUtils.getPathElements(insertPath);
                 String scope = elements[0];
                 TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);

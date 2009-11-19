@@ -47,17 +47,22 @@ public class ActionManager
             String path = configurationInstance.getConfigurationPath();
             if (includeDefault)
             {
-                if(configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW))
+                if (configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW))
                 {
                     result.add(AccessManager.ACTION_VIEW);
                 }
 
-                if(configurationRefactoringManager.canClone(path) && configurationSecurityManager.hasPermission(PathUtils.getParentPath(path), AccessManager.ACTION_CREATE))
+                if (configurationRefactoringManager.canClone(path) && configurationSecurityManager.hasPermission(PathUtils.getParentPath(path), AccessManager.ACTION_CREATE))
                 {
-                    result.add(AccessManager.ACTION_CLONE);
+                    result.add(ConfigurationRefactoringManager.ACTION_CLONE);
                 }
 
-                if(configurationTemplateManager.canDelete(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
+                if (configurationRefactoringManager.canPullUp(path))
+                {
+                    result.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
+                }
+
+                if (configurationTemplateManager.canDelete(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
                 {
                     result.add(AccessManager.ACTION_DELETE);
                 }
