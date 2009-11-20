@@ -1162,12 +1162,39 @@ public class ConfigurationRefactoringManager
     }
 
     /**
+     * Base for reference walking functions that update references in place.
+     * Returns a mutable record as input.
+     */
+    private abstract class ReferenceUpdatingFunction extends ReferenceWalkingFunction
+    {
+        public ReferenceUpdatingFunction(ComplexType type, MutableRecord record, String path)
+        {
+            super(type, record, path);
+        }
+
+        protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+        {
+            for (int i = 0; i < value.length; i++)
+            {
+                value[i] = updateReference(value[i]);
+            }
+        }
+
+        protected void handleReference(Record record, TypeProperty property, String value)
+        {
+            ((MutableRecord) record).put(property.getName(), updateReference(value));
+        }
+
+        protected abstract String updateReference(String value);
+    }
+
+    /**
      * A record walking function that pulls up references from an original
      * owner path into the new parent owner path.  This relies on the fact that
      * all pulled-up references use the handle from the first sibling in the
      * smart clone operation -- the from owner is this sibling.
      */
-    private class PullUpReferencesFunction extends ReferenceWalkingFunction
+    private class PullUpReferencesFunction extends ReferenceUpdatingFunction
     {
         private String fromOwnerPath;
 
@@ -1188,20 +1215,7 @@ public class ConfigurationRefactoringManager
             }
         }
 
-        protected void handleReference(Record record, TypeProperty property, String value)
-        {
-            ((MutableRecord) record).put(property.getName(), pullUp(value));
-        }
-
-        protected void handleReferenceList(Record record, TypeProperty property, String[] value)
-        {
-            for (int i = 0; i < value.length; i++)
-            {
-                value[i] = pullUp(value[i]);
-            }
-        }
-
-        private String pullUp(String value)
+        protected String updateReference(String value)
         {
             long originalHandle = Long.parseLong(value);
             if (originalHandle == 0)
@@ -1228,27 +1242,14 @@ public class ConfigurationRefactoringManager
      * internal references may be pointing to items that have now been pulled
      * up into the parent -- these reference handles need fixing.
      */
-    private class CanonicaliseReferencesFunction extends ReferenceWalkingFunction
+    private class CanonicaliseReferencesFunction extends ReferenceUpdatingFunction
     {
         public CanonicaliseReferencesFunction(ComplexType type, MutableRecord record, String path)
         {
             super(type, record, path);
         }
 
-        protected void handleReference(Record record, TypeProperty property, String value)
-        {
-            ((MutableRecord) record).put(property.getName(), canonicaliseReference(value));
-        }
-
-        protected void handleReferenceList(Record record, TypeProperty property, String[] value)
-        {
-            for (int i = 0; i < value.length; i++)
-            {
-                value[i] = canonicaliseReference(value[i]);
-            }
-        }
-
-        private String canonicaliseReference(String value)
+        protected String updateReference(String value)
         {
             long originalHandle = Long.parseLong(value);
             if (originalHandle == 0)
@@ -1427,7 +1428,7 @@ public class ConfigurationRefactoringManager
             Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, (CompositeType) type);
             for (String referencedPath: referencedPaths)
             {
-                if (referencedPath.startsWith(templateOwnerPath) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
+                if (referencedPath.startsWith(templateOwnerPath) && !referencedPath.startsWith(path) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
                 {
                     throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in ancestor '" + ancestorKey + "'");
                 }
@@ -1532,9 +1533,9 @@ public class ConfigurationRefactoringManager
                 configurationSecurityManager.ensurePermission(insertPath, AccessManager.ACTION_CREATE);
                 
                 String[] elements = PathUtils.getPathElements(insertPath);
-                String scope = elements[0];
+                final String scope = elements[0];
                 TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
-                TemplateNode node = hierarchy.getNodeById(elements[1]);
+                TemplateNode node = hierarchy.getNodeById(ancestorKey);
 
                 CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
                 MutableRecord deepCopy = recordManager.select(path).copy(true, false);
@@ -1544,9 +1545,50 @@ public class ConfigurationRefactoringManager
                 Record skeleton = configurationTemplateManager.createSkeletonRecord(type, deepCopy);
                 skeleton.forEach(new DeepSkeletoniseFunction(path));
 
+                // If the pulled up composite has a reference to within itself
+                // it needs to be pulled up too.
                 deepCopy = recordManager.select(insertPath).copy(true, true);
-                deepCopy.forEach(new CanonicaliseReferencesFunction(type, deepCopy, insertPath));
+                deepCopy.forEach(new ReferenceUpdatingFunction(type, deepCopy, insertPath)
+                {
+                    @Override
+                    protected String updateReference(String value)
+                    {
+                        long handle = Long.parseLong(value);
+                        if (handle == 0)
+                        {
+                            return "0";
+                        }
+                        else
+                        {
+                            String referencedPath = recordManager.getPathForHandle(handle);
+                            if (referencedPath.startsWith(PullUpAction.this.path))
+                            {
+                                referencedPath = PathUtils.getPath(scope, ancestorKey, PathUtils.getSuffix(referencedPath, 2));
+                                handle = recordManager.select(referencedPath).getHandle();
+                            }
+
+                            return Long.toString(handle);
+                        }
+                    }
+                });
                 deepCopy.forEach(new DeepUpdateFunction(insertPath));
+
+                // If any descendent had an internal reference to something
+                // defined in the pulled up path it will need to be
+                // canonicalised.
+                node = node.getChild(PathUtils.getElement(path, 1));
+                final CompositeType templateOwnerType = (CompositeType) configurationTemplateManager.getType(node.getPath());
+                node.forEachDescendent(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode node)
+                    {
+                        String descendentPath = node.getPath();
+                        MutableRecord deepCopy = recordManager.select(descendentPath).copy(true, true);
+                        deepCopy.forEach(new CanonicaliseReferencesFunction(templateOwnerType, deepCopy, descendentPath));
+                        deepCopy.forEach(new DeepUpdateFunction(descendentPath));
+                        return true;
+                    }
+                }, false);
             }
             catch (Exception e)
             {

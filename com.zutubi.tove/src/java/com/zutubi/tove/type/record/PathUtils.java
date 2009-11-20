@@ -229,4 +229,18 @@ public class PathUtils
     {
         return getPath(beginIndex, getPathElements(path));
     }
+
+    /**
+     * Gets the specified element of a path.  If the specified index is beyond
+     * the end of the path, the empty string is returned.
+     *
+     * @param path  path to retrieve the element from
+     * @param index zero-based index of the element to retrieve
+     * @return the index'th element of the path, or the empty string if there
+     *         is no such element
+     */
+    public static String getElement(String path, int index)
+    {
+        return getPath(index, index + 1, getPathElements(path));
+    }
 }

@@ -2809,6 +2809,19 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         this.wireService = wireService;
     }
 
+    public boolean isTemplateAncestor(String candidateAncestorPath, String path)
+    {
+        TemplateNode toNode = getTemplateNode(candidateAncestorPath);
+        TemplateNode localNode = getTemplateNode(path);
+        while (localNode != null && localNode != toNode)
+        {
+            localNode = localNode.getParent();
+        }
+
+        // Did we exit before we hit the root?
+        return localNode != null;
+    }
+
     interface Action<T>
     {
         T execute() throws Exception;

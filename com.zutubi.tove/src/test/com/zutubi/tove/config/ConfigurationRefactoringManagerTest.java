@@ -868,6 +868,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testPullUpSiblingDefinesPath() throws TypeException
     {
+        // a1
+        //   b <-- pulled up
+        // a2
+        //   b
         String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
         insertTemplateAInstance(rootPath, createAInstance("a2"), false);
         try
@@ -885,6 +889,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_PARENT = "parent";
 
+        // child
+        //   ref: defines ee
+        //   b <-- pulled up
+        //     refToRef: refers to ee
         String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
         String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
 
@@ -908,6 +916,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_PARENT = "parent";
 
+        // child
+        //   b <-- pulled up
         String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
         String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
         String pullPath = PathUtils.getPath(childPath, "b");
@@ -928,6 +938,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_PARENT = "parent";
 
+        // child
+        //   bmap
+        //     colby <-- pulled up
         String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
         String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
         String pullPath = PathUtils.getPath(childPath, "bmap", "colby");
@@ -965,6 +978,12 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_PARENT = "parent";
 
+        // parent
+        //   ref: defines ee
+        //
+        // child
+        //   b <-- pulled up
+        //     refToRef: refers to ee
         MockA parent = new MockA(NAME_PARENT);
         parent.setRef(new Referee("ee"));
         String templateParentPath = insertTemplateAInstance(rootPath, parent, true);
@@ -998,6 +1017,73 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         TemplateRecord inherited = (TemplateRecord) configurationTemplateManager.getRecord(path);
         assertEquals(NAME_PARENT, inherited.getOwner("refToRef"));
         assertEquals(handle, inherited.get("refToRef"));
+    }
+
+    public void testPullUpReferenceWithinPulledUp() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        // child
+        //   b <-- pulled up
+        //     ref: defines ee
+        //     refToRef: refers to ee
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+
+        MockA child = new MockA("child");
+        MockB childB = new MockB("b");
+        childB.setRef(new Referee("ee"));
+        child.setB(childB);
+        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        child.getB().setRefToRef(child.getB().getRef());
+        configurationTemplateManager.save(child.getB());
+
+
+        String pullPath = PathUtils.getPath(childPath, "b");
+        configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+
+
+        MockA parent = configurationTemplateManager.getInstance(templateParentPath, MockA.class);
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+
+        assertNotNull(parent.getB());
+        assertSame(parent.getB().getRef(), parent.getB().getRef());
+        assertSame(child.getB().getRef(), child.getB().getRefToRef());
+    }
+
+    public void testPullUpInternalReferenceToWithinPulledUp() throws TypeException
+    {
+        final String NAME_PARENT = "parent";
+
+        // child
+        //   refToRef: refers to ee
+        //   b <-- pulled up
+        //     ref: defines ee
+        String templateParentPath = insertTemplateAInstance(rootPath, new MockA(NAME_PARENT), true);
+
+        MockA child = new MockA("child");
+        MockB childB = new MockB("b");
+        childB.setRef(new Referee("ee"));
+        child.setB(childB);
+        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        child.setRefToRef(child.getB().getRef());
+        configurationTemplateManager.save(child);
+
+
+        String pullPath = PathUtils.getPath(childPath, "b");
+        configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
+
+
+        MockA parent = configurationTemplateManager.getInstance(templateParentPath, MockA.class);
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+
+        assertNotNull(parent.getB());
+        assertNotNull(parent.getB().getRef());
+        assertNull(parent.getRefToRef());
+        assertSame(child.getB().getRef(), child.getRefToRef());
     }
 
     private MockA createAInstance(String name)
@@ -1175,6 +1261,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public static class MockB extends AbstractNamedConfiguration
     {
         private int y;
+        private Referee ref;
         @Reference
         private Referee refToRef;
 
@@ -1195,6 +1282,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setY(int y)
         {
             this.y = y;
+        }
+
+        public Referee getRef()
+        {
+            return ref;
+        }
+
+        public void setRef(Referee ref)
+        {
+            this.ref = ref;
         }
 
         public Referee getRefToRef()

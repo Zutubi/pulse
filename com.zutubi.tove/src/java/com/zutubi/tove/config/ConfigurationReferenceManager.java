@@ -56,7 +56,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
             String toTemplateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(toPath);
             if (toTemplateOwnerPath != null)
             {
-                if (isTemplateAncestor(toTemplateOwnerPath, templateOwnerPath))
+                if (configurationTemplateManager.isTemplateAncestor(toTemplateOwnerPath, templateOwnerPath))
                 {
                     String suffix = PathUtils.getPath(2, PathUtils.getPathElements(toPath));
                     toPath = PathUtils.getPath(templateOwnerPath, suffix);
@@ -65,19 +65,6 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         }
 
         return toPath;
-    }
-
-    private boolean isTemplateAncestor(String toTemplateOwnerPath, String templateOwnerPath)
-    {
-        TemplateNode toNode = configurationTemplateManager.getTemplateNode(toTemplateOwnerPath);
-        TemplateNode localNode = configurationTemplateManager.getTemplateNode(templateOwnerPath);
-        while (localNode != null && localNode != toNode)
-        {
-            localNode = localNode.getParent();
-        }
-
-        // Did we exit before we hit the root?
-        return localNode != null;
     }
 
     /**

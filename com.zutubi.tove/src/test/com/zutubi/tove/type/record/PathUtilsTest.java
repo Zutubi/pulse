@@ -69,4 +69,32 @@ public class PathUtilsTest extends ZutubiTestCase
         assertEquals("el2/el3/el4", PathUtils.getSuffix("el1/el2/el3/el4", 1));
         assertEquals("el3/el4", PathUtils.getSuffix("el1/el2/el3/el4", 2));
     }
+
+    public void testGetElementEmpty()
+    {
+        assertEquals("", PathUtils.getElement("", 0));
+        assertEquals("", PathUtils.getElement("", 1));
+        assertEquals("", PathUtils.getElement("", 2));
+    }
+
+    public void testGetElementSingleElement()
+    {
+        assertEquals("one", PathUtils.getElement("one", 0));
+        assertEquals("", PathUtils.getElement("one", 1));
+        assertEquals("", PathUtils.getElement("one", 2));
+    }
+
+    public void testGetElementTwoElements()
+    {
+        assertEquals("one", PathUtils.getElement("one/two", 0));
+        assertEquals("two", PathUtils.getElement("one/two", 1));
+        assertEquals("", PathUtils.getElement("one/two", 2));
+    }
+
+    public void testGetElementManyElements()
+    {
+        assertEquals("one", PathUtils.getElement("one/two/three/four/five", 0));
+        assertEquals("two", PathUtils.getElement("one/two/three/four/five", 1));
+        assertEquals("three", PathUtils.getElement("one/two/three/four/five", 2));
+    }
 }
