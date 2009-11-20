@@ -2,10 +2,10 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.model.ProjectFilters.exists;
-import static com.zutubi.pulse.master.model.ProjectFilters.notExists;
+import static com.zutubi.pulse.master.model.ProjectPredicates.exists;
+import static com.zutubi.pulse.master.model.ProjectPredicates.notExists;
 
-public class ProjectFiltersTest extends ZutubiTestCase
+public class ProjectPredicatesTest extends ZutubiTestCase
 {
     public void testExistsForNull()
     {
@@ -15,9 +15,9 @@ public class ProjectFiltersTest extends ZutubiTestCase
 
     public void testExistsForOrphaned()
     {
-        Project orphane = createOrphaned();
-        assertFalse(exists(orphane));
-        assertTrue(notExists(orphane));
+        Project orphan = createOrphaned();
+        assertFalse(exists(orphan));
+        assertTrue(notExists(orphan));
     }
 
     public void testExistsForExistingProject()
@@ -31,7 +31,7 @@ public class ProjectFiltersTest extends ZutubiTestCase
     public void testConcrete()
     {
         ProjectConfiguration project = createConcrete();
-        assertTrue(ProjectFilters.concrete(project));
+        assertTrue(ProjectPredicates.concrete(project));
     }
 
     private Project createOrphaned()

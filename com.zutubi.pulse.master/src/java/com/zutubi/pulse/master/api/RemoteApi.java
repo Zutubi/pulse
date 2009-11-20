@@ -1414,7 +1414,7 @@ public class RemoteApi
         try
         {
             List<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
-            List<ProjectConfiguration> concreteProjects = CollectionUtils.filter(allProjects, ProjectFilters.concrete());
+            List<ProjectConfiguration> concreteProjects = CollectionUtils.filter(allProjects, ProjectPredicates.concrete());
             return getConfigNames(concreteProjects);
         }
         finally

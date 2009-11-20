@@ -610,7 +610,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private void initialiseProjects()
     {
         // Restore project states that are out of sync due to unclean shutdown.
-        for (Project project: filter(projectDao.findAll(), ProjectFilters.exists()))
+        for (Project project: filter(projectDao.findAll(), ProjectPredicates.exists()))
         {
             makeStateTransition(project.getId(), Project.Transition.STARTUP);
         }
@@ -810,7 +810,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             return null;
         }
         Project project = projectDao.findById(config.getProjectId());
-        if (ProjectFilters.exists(project))
+        if (ProjectPredicates.exists(project))
         {
             return project;
         }
@@ -820,7 +820,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public Project getProject(long id, boolean allowInvalid)
     {
         Project project = projectDao.findById(id);
-        if (ProjectFilters.notExists(project))
+        if (ProjectPredicates.notExists(project))
         {
             // orphaned projects 'do not exist'.
             return null;
@@ -840,7 +840,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         for (Long id : ids)
         {
             Project project = projectDao.findById(id);
-            if (ProjectFilters.exists(project))
+            if (ProjectPredicates.exists(project))
             {
                 result.add(project);
             }
@@ -856,7 +856,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             result = filterValidProjects(result);
         }
 
-        return filter(result, ProjectFilters.exists());
+        return filter(result, ProjectPredicates.exists());
     }
 
     public List<Project> getDescendentProjects(String project, boolean strict, boolean allowInvalid)
@@ -896,7 +896,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public int getProjectCount()
     {
-        return filter(getAllProjectConfigs(true), ProjectFilters.concrete()).size();
+        return filter(getAllProjectConfigs(true), ProjectPredicates.concrete()).size();
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
@@ -1190,7 +1190,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             if(accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, config))
             {
                 Project project = projectDao.findById(config.getProjectId());
-                if (ProjectFilters.exists(project))
+                if (ProjectPredicates.exists(project))
                 {
                     group.add(project);
                 }
@@ -1205,7 +1205,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         for(ProjectConfiguration config: projects)
         {
             Project project = projectDao.findById(config.getProjectId());
-            if(ProjectFilters.exists(project))
+            if(ProjectPredicates.exists(project))
             {
                 result.add(project);
             }
@@ -1356,7 +1356,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         if(projectConfig != null)
         {
             Project project = projectDao.findById(projectConfig.getProjectId());
-            if(ProjectFilters.exists(project))
+            if(ProjectPredicates.exists(project))
             {
                 if(project.clearForceCleanForAgent(rde.getAgent().getId()))
                 {

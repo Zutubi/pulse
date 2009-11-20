@@ -34,10 +34,8 @@ public class BrowseDataAction extends ProjectActionSupport
         final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
         Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
 
-        projectManager.getProjects(true);
-
         Collection<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
-        List<ProjectConfiguration> allConcreteProjects = CollectionUtils.filter(allProjects, ProjectFilters.concrete());
+        List<ProjectConfiguration> allConcreteProjects = CollectionUtils.filter(allProjects, ProjectPredicates.concrete());
 
         // Filter invalid projects into a separate list.
         List<String> invalidProjects = new LinkedList<String>();
