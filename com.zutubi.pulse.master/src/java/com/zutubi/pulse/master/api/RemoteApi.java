@@ -963,6 +963,74 @@ public class RemoteApi
     }
 
     /**
+     * Tests if a given path can be pulled up in the template hierarchy to the
+     * given ancestor.  To be pulled up a path must:
+     *
+     * <ul>
+     *   <li>Refer to an existing item of composite type</li>
+     *   <li>Be in a templated scope</li>
+     *   <li>Not be defined in any ancestor</li>
+     *   <li>Not be defined in any other descendent of the specified ancestor</li>
+     *   <li>Not contain any references to items not visible from the specified ancestor</li>
+     * </ul>
+     *
+     * The given ancestor must be a strict ancestor of the templated collection
+     * item that owns the specified path.
+     * <p/>
+     * <b>Note</b> that this method does not take security into account: i.e.
+     * it does not check that the user has permission to write into the
+     * ancestor.
+     *
+     * @param token       authentication token (see {@link #login})
+     * @param path        the path to test
+     * @param ancestorKey key of the templated collection item to pull the path
+     *                    up to (must be an ancestor of the path's template owner)
+     * @return true if the path may be pulled up to the given ancestor
+     * @access available to all users
+     * @see #pullUpConfig(String, String, String)
+     */
+    public boolean canPullUpConfig(String token, String path, String ancestorKey)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return configurationRefactoringManager.canPullUp(path, ancestorKey);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Pulls up an item from its current location in the template hierarchy to
+     * the given ancestor.  This is not possible for all paths, see
+     * {@link #canPullUpConfig(String, String, String)} for details.
+     *
+     * @param path        path of the item to pull up
+     * @param ancestorKey key of the templated collection item to pull the path
+     *                    up to (must be an ancestor of the paths template owner)
+     * @return the path of the pulled up item
+     * @throws IllegalArgumentException if the given path or ancestor are invalid,
+     *         or the path cannot be pulled up
+     * @access requires view permission for the given path, and write
+     *         permission for the ancestor
+     * @see #canPullUpConfig(String, String, String)
+     */
+    public String pullUpConfig(String token, String path, String ancestorKey)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return configurationRefactoringManager.pullUp(path, ancestorKey);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Deletes the configuration object at the given path, if one exists.  If the object is complex,
      * all nested objects will be deleted with it.  Further cleanup actions (e.g. deleting all build
      * results for a project) may also be triggered by a delete.  These actions are not reversible.

@@ -10,6 +10,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.containsString;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.Vector;
 
 /**
@@ -352,6 +354,18 @@ public class SeleniumTestBase extends PulseTestCase
         {
             throw new IllegalArgumentException("Unknown scm config: " + s);
         }
+    }
+
+    protected Hashtable<String, Object> createLabel(String name)
+    {
+        Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
+        label.put("label", name);
+        return label;
+    }
+
+    protected String insertLabel(String project, Hashtable<String, Object> label) throws Exception
+    {
+        return xmlRpcHelper.insertConfig(PathUtils.getPath("projects", project, "labels"), label);
     }
 
     /**

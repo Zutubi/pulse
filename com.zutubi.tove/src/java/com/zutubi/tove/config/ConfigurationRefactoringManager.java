@@ -309,8 +309,7 @@ public class ConfigurationRefactoringManager
      * </ul>
      *
      * The given ancestor must be a strict ancestor of the templated collection
-     * item that owns the specified path, and must be writable by the calling
-     * user.
+     * item that owns the specified path.
      * <p/>
      * <b>Note</b> that this method does not take security into account: i.e.
      * it does not check that the user has permission to write into the

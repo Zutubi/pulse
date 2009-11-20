@@ -31,6 +31,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
         suite.addTestSuite(CloneAcceptanceTest.class);
+        suite.addTestSuite(PullUpAcceptanceTest.class);
         suite.addTestSuite(CollapsedCollectionAcceptanceTest.class);
         suite.addTestSuite(ConfigLinksAcceptanceTest.class);
         suite.addTestSuite(ConfigActionsAcceptanceTest.class);

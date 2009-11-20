@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
-import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
@@ -147,18 +146,6 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
 
         browsePage.openAndWaitFor();
         assertFalse(browsePage.isGroupPresent(group));
-    }
-
-    private Hashtable<String, Object> createLabel(String name)
-    {
-        Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
-        label.put("label", name);
-        return label;
-    }
-
-    private String insertLabel(String project, Hashtable<String, Object> label) throws Exception
-    {
-        return xmlRpcHelper.insertConfig(PathUtils.getPath("projects", project, "labels"), label);
     }
 
     private void assertGroupPresent(BrowsePage browsePage, String group, String... projects)

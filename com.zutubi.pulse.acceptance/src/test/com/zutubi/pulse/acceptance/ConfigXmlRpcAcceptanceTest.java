@@ -733,6 +733,39 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(PathUtils.getPath(childPath, Constants.Project.STAGES, "default"), stages.get(0));
     }
 
+    public void testCanPullUp() throws Exception
+    {
+        String random = randomName();
+        String parentProject = random + "-parent";
+        String childProject = random + "-child";
+
+        xmlRpcHelper.insertSimpleProject(parentProject, true);
+        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+
+        String parentPropertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
+        String childPropertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
+
+        assertTrue(xmlRpcHelper.canPullUpConfig(childPropertyPath, parentProject));
+        assertFalse(xmlRpcHelper.canPullUpConfig(parentPropertyPath.replace(parentProject, childProject), parentProject));
+    }
+
+    public void testPullUp() throws Exception
+    {
+        String random = randomName();
+        String parentProject = random + "-parent";
+        String childProject = random + "-child";
+
+        xmlRpcHelper.insertSimpleProject(parentProject, true);
+        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+
+        String propertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
+        String pulledUpPath = propertyPath.replace(childProject, parentProject);
+
+        assertFalse(xmlRpcHelper.configPathExists(pulledUpPath));
+        assertEquals(pulledUpPath, xmlRpcHelper.pullUpConfig(propertyPath, parentProject));
+        assertTrue(xmlRpcHelper.configPathExists(pulledUpPath));
+    }
+
     private void assertSortedEquals(Collection<String> got, String... expected)
     {
         assertEquals(expected.length, got.size());

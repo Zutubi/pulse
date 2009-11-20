@@ -3,7 +3,9 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
+import com.zutubi.pulse.acceptance.forms.admin.PullUpForm;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
 import static com.zutubi.util.WebUtils.uriPathEncode;
@@ -93,6 +95,12 @@ public class ListPage extends ConfigPage
     {
         clickAction(baseName, ACTION_CLONE);
         return browser.createForm(CloneForm.class, false);
+    }
+
+    public PullUpForm clickPullUp(String baseName)
+    {
+        clickAction(baseName, ConfigurationRefactoringManager.ACTION_PULL_UP);
+        return browser.createForm(PullUpForm.class);
     }
 
     public DeleteConfirmPage clickDelete(String baseName)

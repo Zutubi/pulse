@@ -227,6 +227,16 @@ public class XmlRpcHelper
         call("restoreConfig", path);
     }
 
+    public boolean canPullUpConfig(String path, String ancestorKey) throws Exception
+    {
+        return (Boolean) call("canPullUpConfig", path, ancestorKey);
+    }
+
+    public String pullUpConfig(String path, String ancestorKey) throws Exception
+    {
+        return call("pullUpConfig", path, ancestorKey);
+    }
+
     public void setConfigOrder(String path, String... order) throws Exception
     {
         call("setConfigOrder", path, new Vector<String>(Arrays.asList(order)));
