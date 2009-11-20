@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.model.ControllingCheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
@@ -26,6 +27,14 @@ import java.util.Set;
  */
 public class CloneAction extends ToveFormActionSupport
 {
+    private static final Messages I18N = Messages.getInstance(CloneAction.class);
+
+    private static final String ACTION_SMART_CLONE = "smartclone";
+    private static final String ACTION_CLONE = "clone";
+
+    private static final String FIELD_CLONE_KEY = "cloneKey";
+    private static final String FIELD_PARENT_KEY = "parentKey";
+
     public static final String CHECK_FIELD_PREFIX = "cloneCheck_";
     public static final String KEY_FIELD_PREFIX   = "cloneKey_";
 
@@ -79,13 +88,13 @@ public class CloneAction extends ToveFormActionSupport
         parentPath = PathUtils.getParentPath(path);
         if(parentPath == null)
         {
-            throw new IllegalArgumentException("Invalid path '" + path + "': no parent path");
+            throw new IllegalArgumentException(I18N.format("path.noParent", new Object[]{path}));
         }
 
         Type parentType = configurationTemplateManager.getType(parentPath);
         if(!(parentType instanceof MapType))
         {
-            throw new IllegalArgumentException("Invalid path '" + path + "': parent is not a map (only map elements may be cloned)");
+            throw new IllegalArgumentException(I18N.format("path.notMapElement", new Object[]{path}));
         }
 
         mapType = (MapType) parentType;
@@ -100,7 +109,7 @@ public class CloneAction extends ToveFormActionSupport
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(mapType.getTargetType().getClazz());
         Set<String> seenKeys = new HashSet<String>();
-        validateCloneKey("cloneKey", cloneKey, seenKeys, textProvider);
+        validateCloneKey(FIELD_CLONE_KEY, cloneKey, seenKeys, textProvider);
 
         keyMap = new HashMap<String, String>();
         keyMap.put(PathUtils.getBaseName(path), cloneKey);
@@ -109,7 +118,7 @@ public class CloneAction extends ToveFormActionSupport
         {
             if(smart)
             {
-                validateCloneKey("parentKey", parentKey, seenKeys, textProvider);
+                validateCloneKey(FIELD_PARENT_KEY, parentKey, seenKeys, textProvider);
             }
 
             getDescendents(keyMap, seenKeys, textProvider);
@@ -120,13 +129,13 @@ public class CloneAction extends ToveFormActionSupport
     {
         if(!StringUtils.stringSet(value))
         {
-            addFieldError(name, "name is required");
+            addFieldError(name, I18N.format("name.required"));
         }
         else
         {
             if(seenKeys.contains(value))
             {
-                addFieldError(name, "duplicate name, all names must be unique");
+                addFieldError(name, I18N.format("name.duplicate"));
             }
             else
             {
@@ -169,7 +178,7 @@ public class CloneAction extends ToveFormActionSupport
     @Override
     protected String getFormAction()
     {
-        return smart ? "smartclone" : "clone";
+        return smart ? ACTION_SMART_CLONE : ACTION_CLONE;
     }
 
     @Override
@@ -177,9 +186,9 @@ public class CloneAction extends ToveFormActionSupport
     {
         Map parameters = ActionContext.getContext().getParameters();
 
-        Field field = new Field(FieldType.TEXT, "cloneKey");
-        field.setLabel("clone name");
-        field.setValue(getValue("cloneKey", getKey(record), parameters));
+        Field field = new Field(FieldType.TEXT, FIELD_CLONE_KEY);
+        field.setLabel(I18N.format("cloneName.label"));
+        field.setValue(getValue(FIELD_CLONE_KEY, getKey(record), parameters));
         form.add(field);
 
         if(templatedCollection)
@@ -196,15 +205,15 @@ public class CloneAction extends ToveFormActionSupport
     private void addParentField(Form form, Map parameters)
     {
         Field field;
-        field = new Field(FieldType.TEXT, "parentKey");
-        field.setLabel("extracted parent name");
+        field = new Field(FieldType.TEXT, FIELD_PARENT_KEY);
+        field.setLabel(I18N.format("extractedParent.label"));
         if (isInputSelected())
         {
-            field.setValue(getKey(record) + " template");
+            field.setValue(I18N.format("extractedParent.default", new Object[]{getKey(record)}));
         }
         else
         {
-            field.setValue(getParameterValue(parameters, "parentKey"));
+            field.setValue(getParameterValue(parameters, FIELD_PARENT_KEY));
         }
 
         form.add(field);
@@ -225,7 +234,7 @@ public class CloneAction extends ToveFormActionSupport
                 Field field = new Field(FieldType.CONTROLLING_CHECKBOX, CHECK_FIELD_PREFIX + key);
                 field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_INVERT, false);
                 field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_DEPENDENT_FIELDS, getDependentFields(nameField, node));
-                field.setLabel("clone descendent '" + key + "'");
+                field.setLabel(I18N.format("cloneDescendent.label", new Object[]{key}));
                 if(parameters.containsKey(CHECK_FIELD_PREFIX + key))
                 {
                     field.setValue("true");
@@ -233,7 +242,7 @@ public class CloneAction extends ToveFormActionSupport
                 form.add(field);
 
                 field = new Field(FieldType.TEXT, nameField);
-                field.setLabel("clone name");
+                field.setLabel(I18N.format("cloneName.label"));
                 field.setValue(getValue(KEY_FIELD_PREFIX + key, key, parameters));
                 form.add(field);
 
@@ -259,7 +268,7 @@ public class CloneAction extends ToveFormActionSupport
     {
         if (isInputSelected())
         {
-            return "clone of " + key;
+            return I18N.format("cloneName.default", new Object[]{key});
         }
         else
         {

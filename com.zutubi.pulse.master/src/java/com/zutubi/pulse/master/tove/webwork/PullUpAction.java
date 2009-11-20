@@ -19,7 +19,14 @@ public class PullUpAction extends ToveFormActionSupport
     private static final String FIELD_NEW_PATH = "newPath";
     private static final String FIELD_ANCESTOR_KEY = "ancestorKey";
 
+    /**
+     * Path that we should return to after completion/cancellation (may be
+     * supplied by the UI, if not default to path).
+     */
     private String newPath;
+    /**
+     * Ancestor to pull the configuration up to.
+     */
     private String ancestorKey;
 
     private ConfigurationRefactoringManager configurationRefactoringManager;
