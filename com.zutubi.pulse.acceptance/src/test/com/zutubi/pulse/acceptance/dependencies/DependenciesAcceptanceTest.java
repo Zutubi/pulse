@@ -500,6 +500,25 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertCommandFailed(projectB.getName(), 2, "retrieve");
     }
 
+    // CIB-2194
+    public void testDownstreamRetrieval() throws Exception
+    {
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addArtifacts("build/projectA-artifact.jar");
+        projectA.addFilesToCreate("build/projectA-artifact.jar");
+        insertProject(projectA);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/projectA-artifact.jar");
+        insertProject(projectB);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+
+        buildRunner.triggerSuccessfulBuild(projectB);
+    }
+
     private void assertCommandFailed(String projectName, int buildNumber, String commandName) throws Exception
     {
         Vector<Hashtable<String, String>> features = xmlRpcHelper.call("getErrorMessagesInBuild", projectName, buildNumber);

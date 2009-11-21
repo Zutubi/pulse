@@ -22,7 +22,7 @@ public class IvyRetrievalReportTest extends ZutubiTestCase
         IvyRetrievalReport originalReport = new IvyRetrievalReport();
 
         IvyRetrievalReport report = roundTrip(originalReport);
-        assertEquals(0, report.getDownloadedArtifacts().size());
+        assertEquals(0, report.getRetrievedArtifacts().size());
     }
 
     public void testSingleArtifact() throws Exception
@@ -31,7 +31,7 @@ public class IvyRetrievalReportTest extends ZutubiTestCase
         originalReport.addDownloadReports(createDownloadReport("artifact", "jar"));
 
         IvyRetrievalReport report = roundTrip(originalReport);
-        assertEquals(1, report.getDownloadedArtifacts().size());
+        assertEquals(1, report.getRetrievedArtifacts().size());
     }
 
     public void testMultipleArtifacts() throws Exception
@@ -42,7 +42,7 @@ public class IvyRetrievalReportTest extends ZutubiTestCase
         originalReport.addDownloadReports(createDownloadReport("artifactC", "jar"));
 
         IvyRetrievalReport report = roundTrip(originalReport);
-        assertEquals(3, report.getDownloadedArtifacts().size());
+        assertEquals(3, report.getRetrievedArtifacts().size());
     }
 
     public void testMultipleModules() throws Exception
@@ -52,7 +52,7 @@ public class IvyRetrievalReportTest extends ZutubiTestCase
         originalReport.addDownloadReports(createDownloadReport("org", "moduleB", "revision", "artifactA", "jar"));
 
         IvyRetrievalReport report = roundTrip(originalReport);
-        assertEquals(2, report.getDownloadedArtifacts().size());
+        assertEquals(2, report.getRetrievedArtifacts().size());
     }
 
     public void testArtifactExtraAttributes() throws Exception
@@ -61,7 +61,7 @@ public class IvyRetrievalReportTest extends ZutubiTestCase
         originalReport.addDownloadReports(createDownloadReport("artifactA", "jar", map("extra", "attribute")));
 
         IvyRetrievalReport report = roundTrip(originalReport);
-        Artifact artifact = report.getDownloadedArtifacts().get(0);
+        Artifact artifact = report.getRetrievedArtifacts().get(0);
         Map<String, String> extraAttributes = artifact.getId().getExtraAttributes();
         assertEquals("attribute", extraAttributes.get("extra"));
     }

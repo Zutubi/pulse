@@ -11,6 +11,7 @@ import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.xml.sax.SAXException;
 
@@ -73,13 +74,13 @@ public class RetrieveDependenciesCommand implements Command
                         }
                         else
                         {
-                            for (Artifact artifact : retrievalReport.getDownloadedArtifacts())
+                            for (Artifact artifact : retrievalReport.getRetrievedArtifacts())
                             {
-                                outputWriter.println(IvyPatternHelper.substitute(targetPattern, artifact));
+                                ModuleRevisionId mrid = artifact.getModuleRevisionId();
+                                String artifactName = mrid.getName() + "#" + artifact.getName() + "(" + mrid.getRevision() + ")";
+                                outputWriter.println(artifactName + " retrieved to -> "+ IvyPatternHelper.substitute(targetPattern, artifact)); 
                             }
                         }
-
-
                         return null;
                     }
                     finally

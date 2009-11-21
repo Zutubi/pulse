@@ -390,34 +390,34 @@ public class IvyRetrievalReport
     }
 
     /**
-     * Get a list of all of the artifacts downloaded.
+     * Get a list of all of the artifacts retrieved.
      *
      * @return a list of artifacts.
      */
-    public List<Artifact> getDownloadedArtifacts()
+    public List<Artifact> getRetrievedArtifacts()
     {
         List<Artifact> artifacts = new LinkedList<Artifact>();
         for (ModuleRevisionId mrid : moduleArtifacts.keySet())
         {
-            artifacts.addAll(getDownloadedArtifacts(mrid));
+            artifacts.addAll(getRetrievedArtifacts(mrid));
         }
         return artifacts;
     }
 
     /**
-     * Get a list of downloaded artifacts contained that belong to the specified module
+     * Get a list of retrieved artifacts contained that belong to the specified module
      *
      * @param mrid  the module revision id specifying the subset of
      * artifacts to be returned.
      *
      * @return a list of artifacts.
      */
-    public List<Artifact> getDownloadedArtifacts(ModuleRevisionId mrid)
+    public List<Artifact> getRetrievedArtifacts(ModuleRevisionId mrid)
     {
         List<Artifact> artifacts = new LinkedList<Artifact>();
         for (ArtifactDownloadReport report : moduleArtifacts.get(mrid))
         {
-            if (report.isDownloaded())
+            if (report.getDownloadStatus() != DownloadStatus.FAILED)
             {
                 artifacts.add(report.getArtifact());
             }
