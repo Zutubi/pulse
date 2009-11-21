@@ -342,6 +342,87 @@ public class ConfigurationRefactoringManager
         return configurationTemplateManager.executeInsideTransaction(new PullUpAction(path, ancestorKey));
     }
 
+    /**
+     * Returns a list of all children that the given path may be pushed down
+     * to.  If the path cannot be pushed down at all, the list will be empty.
+     * The requirements for pushing down are documented on {@link #canPushDown(String, String)}.
+     *
+     * @param path the path that is a candidate to push down
+     * @return the keys of all children that the path may be pushed down to
+     */
+    public List<String> getPushDownChildren(final String path)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<List<String>>()
+        {
+            public List<String> execute() throws Exception
+            {
+                String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+                if (templateOwnerPath == null)
+                {
+                    return Collections.emptyList();
+                }
+
+                List<String> result = new LinkedList<String>();
+                TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+                for (TemplateNode childNode: node.getChildren())
+                {
+                    if (canPushDown(path, childNode.getId()))
+                    {
+                        result.add(childNode.getId());
+                    }
+                }
+
+                return result;
+            }
+        });
+    }
+
+    /**
+     * Tests if a given path can be pushed down in the template hierarchy to
+     * any of its children.  The requirements for pushing down are documented
+     * on {@link #canPushDown(String, String)}.
+     * <p/>
+     * <b>Note</b> that this method does not take security into account: i.e.
+     * it does not check that the user has permission to write into the
+     * children.
+     *
+     * @param path the path to test
+     * @return true iff the path may be pushed down to at least one of its
+     *         children
+     */
+    public boolean canPushDown(String path)
+    {
+        return !getPushDownChildren(path).isEmpty();
+    }
+    
+    /**
+     * Tests if a given path can be pushed down in the template hierarchy to
+     * the given child.  To be pushed down a path must:
+     *
+     * <ul>
+     *   <li>Refer to an existing item of composite type</li>
+     *   <li>Be in a templated scope</li>
+     *   <li>Not be hidden in the child</li>
+     *   <li>Not contain any references to items not visible from the specified child</li>
+     * </ul>
+     *
+     * The given child must be a direct child of the templated collection
+     * item that owns the specified path.
+     * <p/>
+     * <b>Note</b> that this method does not take security into account: i.e.
+     * it does not check that the user has permission to write into the
+     * child.
+
+     * @param path     the path to test
+     * @param childKey key of the templated collection item to push the path
+     *                 down to (must be a child of the path's template owner)
+     * @return true iff the path may be pulled up
+     */
+    public boolean canPushDown(String path, String childKey)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new CanPushDownAction(path, childKey));
+    }
+
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
@@ -1335,16 +1416,97 @@ public class ConfigurationRefactoringManager
     }
 
     /**
+     * Helper base class for "pull up" and "push down" actions.
+     */
+    private class MoveActionSupport
+    {
+        protected String path;
+        protected String templateOwnerPath;
+        protected String remainderPath;
+
+        private MoveActionSupport(String path)
+        {
+            this.path = path;
+            templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+            remainderPath = PathUtils.getSuffix(path, 2);
+        }
+
+        public CompositeType ensureMovable()
+        {
+            // Path must be a composite in a templated scope.
+            if (!configurationTemplateManager.pathExists(path))
+            {
+                throw new IllegalArgumentException("Path does not exist");
+            }
+
+            if (templateOwnerPath == null)
+            {
+                throw new IllegalArgumentException("Path does not refer to a templated item");
+            }
+
+            if (!StringUtils.stringSet(remainderPath))
+            {
+                throw new IllegalArgumentException("Path refers to a top-level templated collection item");
+            }
+
+            Type type = configurationTemplateManager.getType(path);
+            if (!(type instanceof CompositeType))
+            {
+                throw new IllegalArgumentException("Path does not refer to an item of composite type");
+            }
+
+            return (CompositeType) type;
+        }
+
+        protected Set<String> getReferencedPaths(final String templateOwnerPath, CompositeType type)
+        {
+            final Set<String> result = new HashSet<String>();
+            TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            record.forEach(new ReferenceWalkingFunction(type, record, templateOwnerPath)
+            {
+                @Override
+                protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+                {
+                    for (String handleString: value)
+                    {
+                        addPath(handleString);
+                    }
+                }
+
+                @Override
+                protected void handleReference(Record record, TypeProperty property, String value)
+                {
+                    addPath(value);
+                }
+
+                private void addPath(String handleString)
+                {
+                    long handle = Long.parseLong(handleString);
+                    if (handle != 0)
+                    {
+                        String referencedPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, handle);
+                        if (referencedPath != null)
+                        {
+                            result.add(referencedPath);
+                        }
+                    }
+                }
+            });
+
+            return result;
+        }
+    }
+
+    /**
      * Helper base class for "pull up" actions.
      */
-    private class PullUpActionSupport
+    private class PullUpActionSupport extends MoveActionSupport
     {
-        protected final String path;
         protected final String ancestorKey;
 
         private PullUpActionSupport(String path, String ancestorKey)
         {
-            this.path = path;
+            super(path);
             this.ancestorKey = ancestorKey;
         }
 
@@ -1357,29 +1519,7 @@ public class ConfigurationRefactoringManager
          */
         public String ensurePullUp()
         {
-            // Path must be a composite in a templated scope.
-            if (!configurationTemplateManager.pathExists(path))
-            {
-                throw new IllegalArgumentException("Path does not exist");
-            }
-            
-            String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
-            if (templateOwnerPath == null)
-            {
-                throw new IllegalArgumentException("Path does not refer to a templated item");
-            }
-
-            String remainderPath = PathUtils.getSuffix(path, 2);
-            if (!StringUtils.stringSet(remainderPath))
-            {
-                throw new IllegalArgumentException("Path refers to a top-level templated collection item");
-            }
-
-            Type type = configurationTemplateManager.getType(path);
-            if (!(type instanceof CompositeType))
-            {
-                throw new IllegalArgumentException("Path does not refer to an item of composite type");
-            }
+            CompositeType type = ensureMovable();
 
             // Specified ancestor must strictly be our ancestor.
             TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
@@ -1425,7 +1565,7 @@ public class ConfigurationRefactoringManager
 
             // We cannot have any references to items defined in our template
             // owner that do not exist at the specified ancestor's level.
-            Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, (CompositeType) type);
+            Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, type);
             for (String referencedPath: referencedPaths)
             {
                 if (referencedPath.startsWith(templateOwnerPath) && !referencedPath.startsWith(path) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
@@ -1435,44 +1575,6 @@ public class ConfigurationRefactoringManager
             }
 
             return ancestorPath;
-        }
-
-        private Set<String> getReferencedPaths(final String templateOwnerPath, CompositeType type)
-        {
-            final Set<String> result = new HashSet<String>();
-            TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
-            record.forEach(new ReferenceWalkingFunction(type, record, templateOwnerPath)
-            {
-                @Override
-                protected void handleReferenceList(Record record, TypeProperty property, String[] value)
-                {
-                    for (String handleString: value)
-                    {
-                        addPath(handleString);
-                    }
-                }
-
-                @Override
-                protected void handleReference(Record record, TypeProperty property, String value)
-                {
-                    addPath(value);
-                }
-
-                private void addPath(String handleString)
-                {
-                    long handle = Long.parseLong(handleString);
-                    if (handle != 0)
-                    {
-                        String referencedPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, handle);
-                        if (referencedPath != null)
-                        {
-                            result.add(referencedPath);
-                        }
-                    }
-                }
-            });
-
-            return result;
         }
 
         private String pullUpPath(String path)
@@ -1604,6 +1706,93 @@ public class ConfigurationRefactoringManager
             configurationTemplateManager.raiseInsertEvents(newConcreteDescendents);
 
             return insertPath;
+        }
+    }
+
+    /**
+     * Helper base class for "push down" actions.
+     */
+    private class PushDownActionSupport extends MoveActionSupport
+    {
+        protected final String childKey;
+
+        private PushDownActionSupport(String path, String childKey)
+        {
+            super(path);
+            this.childKey = childKey;
+        }
+
+        /**
+         * Checks if our path can actually be pushed down, throwing an error if
+         * it cannot.
+         *
+         * @return the path that the item would be pushed down to
+         * @throws IllegalArgumentException if our path cannot be pushed down
+         */
+        public String ensurePushDown()
+        {
+            CompositeType type = ensureMovable();
+
+            // Specified child must be a direct child.
+            TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+            TemplateNode childNode = node.getChild(childKey);
+            if (childNode == null)
+            {
+                throw new IllegalArgumentException("Specified child '" + childKey + "' is not a direct child of this path's template owner");
+            }
+
+            // The path must not be hidden in the child.
+            String childPath = PathUtils.getPath(childNode.getPath(), remainderPath);
+            if (!configurationTemplateManager.pathExists(childPath))
+            {
+                throw new IllegalArgumentException("Path is hidden in specified child '" + childKey + "'");
+            }
+
+            // We cannot have any references to items defined in our template
+            // owner that do not exist at the specified child's level.
+            Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, type);
+            for (String referencedPath: referencedPaths)
+            {
+                if (referencedPath.startsWith(templateOwnerPath) && !referencedPath.startsWith(path) && !configurationTemplateManager.pathExists(pushDownPath(referencedPath)))
+                {
+                    throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in child '" + childKey + "'");
+                }
+            }
+
+            return childPath;
+        }
+
+        private String pushDownPath(String path)
+        {
+            String[] elements = PathUtils.getPathElements(path);
+            elements[1] = childKey;
+            return PathUtils.getPath(elements);
+        }
+    }
+
+    /**
+     * Action to test if a path can be pushed down.
+     *
+     * @see com.zutubi.tove.config.ConfigurationRefactoringManager#canPushDown(String, String)
+     */
+    private class CanPushDownAction extends PushDownActionSupport implements ConfigurationTemplateManager.Action<Boolean>
+    {
+        public CanPushDownAction(String path, String childKey)
+        {
+            super(path, childKey);
+        }
+
+        public Boolean execute() throws Exception
+        {
+            try
+            {
+                ensurePushDown();
+                return true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                return false;
+            }
         }
     }
 }

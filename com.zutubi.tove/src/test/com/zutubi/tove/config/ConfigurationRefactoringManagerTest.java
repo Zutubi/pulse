@@ -36,7 +36,6 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     private static final String NAME_ROOT = "root";
 
     private ConfigurationRefactoringManager configurationRefactoringManager;
-    private CompositeType typeA;
     private String rootPath;
     private long rootHandle;
 
@@ -50,7 +49,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationRefactoringManager.setConfigurationSecurityManager(configurationSecurityManager);
         configurationRefactoringManager.setRecordManager(recordManager);
 
-        typeA = typeRegistry.register(MockA.class);
+        CompositeType typeA = typeRegistry.register(MockA.class);
         MapType mapA = new MapType(typeA, typeRegistry);
 
         MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
@@ -815,26 +814,6 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertFalse(configurationRefactoringManager.canPullUp(pullPath, NAME_PARENT));
     }
 
-    public void testPullUpUnableToWriteToAncestor() throws TypeException
-    {
-        final String ERROR_MESSAGE = "No such luck, bozo";
-        
-        ConfigurationSecurityManager securityManager = mock(ConfigurationSecurityManager.class);
-        doThrow(new AccessDeniedException(ERROR_MESSAGE)).when(securityManager).ensurePermission(startsWith(rootPath), anyString());
-        configurationRefactoringManager.setConfigurationSecurityManager(securityManager);
-
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
-        try
-        {
-            configurationRefactoringManager.pullUp(PathUtils.getPath(path, "b"), NAME_ROOT);
-            fail("Should not be able to pull up with no permission");
-        }
-        catch (Exception e)
-        {
-            assertThat(e.getMessage(), containsString(ERROR_MESSAGE));
-        }
-    }
-
     public void testCanPullUpComposite() throws TypeException
     {
         String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
@@ -864,6 +843,26 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         String pullPath = PathUtils.getPath(childPath, "b");
         assertTrue(configurationRefactoringManager.canPullUp(pullPath, NAME_PARENT));
+    }
+
+    public void testPullUpUnableToWriteToAncestor() throws TypeException
+    {
+        final String ERROR_MESSAGE = "No such luck, bozo";
+
+        ConfigurationSecurityManager securityManager = mock(ConfigurationSecurityManager.class);
+        doThrow(new AccessDeniedException(ERROR_MESSAGE)).when(securityManager).ensurePermission(startsWith(rootPath), anyString());
+        configurationRefactoringManager.setConfigurationSecurityManager(securityManager);
+
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        try
+        {
+            configurationRefactoringManager.pullUp(PathUtils.getPath(path, "b"), NAME_ROOT);
+            fail("Should not be able to pull up with no permission");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString(ERROR_MESSAGE));
+        }
     }
 
     public void testPullUpSiblingDefinesPath() throws TypeException
@@ -1084,6 +1083,150 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertNotNull(parent.getB().getRef());
         assertNull(parent.getRefToRef());
         assertSame(child.getB().getRef(), child.getRefToRef());
+    }
+
+    public void testGetPushDownChildrenInvalidPath()
+    {
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPushDownChildren("invalid/path/here"));
+    }
+
+    public void testGetPushDownChildrenTemplateCollectionItem() throws TypeException
+    {
+        String path = insertTemplateA(rootPath, "a", false);
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPushDownChildren(path));
+    }
+
+    public void testGetPushDownChildrenNotTemplate()
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPushDownChildren(path));
+    }
+
+    public void testGetPushDownChildrenNoChildren() throws TypeException
+    {
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPushDownChildren(PathUtils.getPath(rootPath, "b")));
+    }
+
+    public void testGetPushDownChildrenHiddenInChild() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
+        String childPath = insertTemplateAInstance(path, createAInstance("a2"), false);
+        // Hide the path in the child
+        configurationTemplateManager.delete(PathUtils.getPath(childPath, "bmap", "colby"));
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPushDownChildren(PathUtils.getPath(path, "bmap", "colby")));
+    }
+
+    public void testGetPushDownChildren() throws TypeException
+    {
+        final String NAME_CHILD = "child";
+
+        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(path, createAInstance(NAME_CHILD), false);
+        assertEquals(asList(NAME_CHILD), configurationRefactoringManager.getPushDownChildren(PathUtils.getPath(path, "b")));
+    }
+
+    public void testCanPushDownAnyInvalidPath()
+    {
+        assertFalse(configurationRefactoringManager.canPushDown("invalid/path/here"));
+    }
+
+    public void testCanPushDownAnyTemplateCollectionItem() throws TypeException
+    {
+        String path = insertTemplateA(rootPath, "a", false);
+        assertFalse(configurationRefactoringManager.canPushDown(path));
+    }
+
+    public void testCanPushDownAnyNotTemplate()
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertFalse(configurationRefactoringManager.canPushDown(path));
+    }
+
+    public void testCanPushDownAnyNoChildren() throws TypeException
+    {
+        assertFalse(configurationRefactoringManager.canPushDown(PathUtils.getPath(rootPath, "b")));
+    }
+
+    public void testCanPushDownAnyNoValidChild() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
+        String childPath = insertTemplateAInstance(path, createAInstance("a2"), false);
+        // Hide the path in the child
+        configurationTemplateManager.delete(PathUtils.getPath(childPath, "bmap", "colby"));
+        assertFalse(configurationRefactoringManager.canPushDown(PathUtils.getPath(path, "bmap", "colby")));
+    }
+
+    public void testCanPushDownAny() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(path, createAInstance("child"), false);
+        assertTrue(configurationRefactoringManager.canPushDown(PathUtils.getPath(path, "b")));
+    }
+
+    public void testCanPushDownInvalidPath()
+    {
+        assertFalse(configurationRefactoringManager.canPushDown("invalid/path/here", "anything"));
+    }
+
+    public void testCanPushDownTemplateCollectionItem() throws TypeException
+    {
+        String path = insertTemplateA(rootPath, "a", false);
+        assertFalse(configurationRefactoringManager.canPushDown(path, NAME_ROOT));
+    }
+
+    public void testCanPushDownNonTemplatedItem() throws TypeException
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertFalse(configurationRefactoringManager.canPushDown(path, NAME_ROOT));
+    }
+
+    public void testCanPushDownNoChild() throws TypeException
+    {
+        assertFalse(configurationRefactoringManager.canPushDown(PathUtils.getPath(rootPath, "b"), NAME_ROOT));
+    }
+
+    public void testCanPushDownBadChild() throws TypeException
+    {
+        String path = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        assertFalse(configurationRefactoringManager.canPushDown(PathUtils.getPath(path, "b"), NAME_ROOT));
+    }
+
+    public void testCanPushDownChildHidesPath() throws TypeException
+    {
+        final String NAME_CHILD = "child";
+
+        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        String childPath = insertTemplateAInstance(path, createAInstance(NAME_CHILD), false);
+        // Hide the path in the child
+        configurationTemplateManager.delete(PathUtils.getPath(childPath, "bmap", "colby"));
+        assertFalse(configurationRefactoringManager.canPushDown(PathUtils.getPath(path, "bmap", "colby"), NAME_CHILD));
+    }
+
+    public void testCanPushDownSimple() throws TypeException
+    {
+        final String NAME_CHILD = "child";
+
+        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(path, createAInstance(NAME_CHILD), false);
+        assertFalse(configurationRefactoringManager.canPushDown(PathUtils.getPath(path, "b", "y"), NAME_CHILD));
+    }
+
+    public void testCanPushDownComposite() throws TypeException
+    {
+        final String NAME_CHILD = "child";
+
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(parentPath, new MockA(NAME_CHILD), false);
+        assertTrue(configurationRefactoringManager.canPushDown(PathUtils.getPath(parentPath, "b"), NAME_CHILD));
+    }
+
+    public void testCanPushDownCollectionItem() throws TypeException
+    {
+        final String NAME_CHILD = "child";
+
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(parentPath, new MockA(NAME_CHILD), false);
+        assertTrue(configurationRefactoringManager.canPushDown(PathUtils.getPath(parentPath, "bmap", "colby"), NAME_CHILD));
     }
 
     private MockA createAInstance(String name)
