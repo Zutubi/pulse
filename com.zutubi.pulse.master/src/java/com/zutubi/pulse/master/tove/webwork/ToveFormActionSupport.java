@@ -76,6 +76,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
         validatePath();
         if(isInputSelected())
         {
+            initialiseParameters();
             renderForm();
             return INPUT;
         }
@@ -148,6 +149,15 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
     protected String getFormAction()
     {
         return actionName;
+    }
+
+    /**
+     * May be overridden to provide initial values for parameters to be used
+     * to populate a new form.
+     */
+    protected void initialiseParameters()
+    {
+        // Do nothing.
     }
 
     /**

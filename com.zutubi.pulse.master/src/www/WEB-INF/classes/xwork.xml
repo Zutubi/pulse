@@ -614,6 +614,12 @@
             <result name="input" type="flexjson">newPanel</result>
         </action>
 
+        <action name="pushDown" class="com.zutubi.pulse.master.tove.webwork.PushDownAction">
+            <result name="cancel" type="flexjson">configurationResponse</result>
+            <result name="success" type="flexjson">configurationResponse</result>
+            <result name="input" type="flexjson">newPanel</result>
+        </action>
+
         <action name="options" class="com.zutubi.pulse.master.tove.webwork.OptionsAction">
             <result name="success" type="flexjson">options</result>
             <result name="error" type="velocity">error.vm</result>

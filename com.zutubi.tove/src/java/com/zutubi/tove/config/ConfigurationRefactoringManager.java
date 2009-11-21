@@ -25,6 +25,7 @@ public class ConfigurationRefactoringManager
 
     public static final String ACTION_CLONE = "clone";
     public static final String ACTION_PULL_UP = "pullUp";
+    public static final String ACTION_PUSH_DOWN = "pushDown";
 
     private TypeRegistry typeRegistry;
     private ConfigurationTemplateManager configurationTemplateManager;

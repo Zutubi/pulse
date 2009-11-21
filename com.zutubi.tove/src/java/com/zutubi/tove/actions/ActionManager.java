@@ -62,6 +62,11 @@ public class ActionManager
                     result.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
                 }
 
+                if (configurationRefactoringManager.canPushDown(path))
+                {
+                    result.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
+                }
+
                 if (configurationTemplateManager.canDelete(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
                 {
                     result.add(AccessManager.ACTION_DELETE);
