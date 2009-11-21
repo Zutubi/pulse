@@ -423,6 +423,27 @@ public class ConfigurationRefactoringManager
         return configurationTemplateManager.executeInsideTransaction(new CanPushDownAction(path, childKey));
     }
 
+    /**
+     * Pushes down an item from its current location in the template hiearchy
+     * to the given children.  Each specified child must satisfy
+     * {@link #canPushDown(String, String)}.  Children that hide the item
+     * cannot be included, and will not have the item pushed down to them.  At
+     * least one other child must be specified (otherwise this would be
+     * equivalent to deleting the item -- and we would prefer the user to
+     * explicitly specify that this is what they intend to do).  Any children
+     * that do not hide the item and are not specified will have the item
+     * deleted.
+     *
+     * @param path      the path to push down
+     * @param childKeys keys of the children of the item's current template
+     *                  owner to push the item down to
+     * @return the set of child paths to which the item was pushed down
+     */
+    public Set<String> pushDown(String path, Set<String> childKeys)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new PushDownAction(path, childKeys));
+    }
+
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
@@ -1180,9 +1201,9 @@ public class ConfigurationRefactoringManager
             recordStack.push(record);
         }
 
-        public void process(com.zutubi.tove.type.record.Record record)
+        public void process(Record record)
         {
-            process(record, typeStack.peek());
+            process(path, record, typeStack.peek());
         }
 
         public void pop()
@@ -1192,7 +1213,7 @@ public class ConfigurationRefactoringManager
             typeStack.pop();
         }
 
-        protected abstract void process(com.zutubi.tove.type.record.Record record, Type type);
+        protected abstract void process(String path, Record record, Type type);
     }
 
     /**
@@ -1209,7 +1230,7 @@ public class ConfigurationRefactoringManager
             templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
         }
 
-        protected  void process(Record record, Type type)
+        protected  void process(String path, Record record, Type type)
         {
             if (type instanceof CompositeType)
             {
@@ -1219,7 +1240,7 @@ public class ConfigurationRefactoringManager
                     String value = (String) record.get(property.getName());
                     if (value != null)
                     {
-                        handleReference(record, property, value);
+                        handleReference(path, record, property, value);
                     }
                 }
 
@@ -1231,15 +1252,15 @@ public class ConfigurationRefactoringManager
                         String[] value = (String[]) record.get(property.getName());
                         if (value != null)
                         {
-                            handleReferenceList(record, property, value);
+                            handleReferenceList(path, record, property, value);
                         }
                     }
                 }
             }
         }
 
-        protected abstract void handleReferenceList(Record record, TypeProperty property, String[] value);
-        protected abstract void handleReference(Record record, TypeProperty property, String value);
+        protected abstract void handleReferenceList(String path, Record record, TypeProperty property, String[] value);
+        protected abstract void handleReference(String path, Record record, TypeProperty property, String value);
     }
 
     /**
@@ -1253,7 +1274,7 @@ public class ConfigurationRefactoringManager
             super(type, record, path);
         }
 
-        protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+        protected void handleReferenceList(String path, Record record, TypeProperty property, String[] value)
         {
             for (int i = 0; i < value.length; i++)
             {
@@ -1261,7 +1282,7 @@ public class ConfigurationRefactoringManager
             }
         }
 
-        protected void handleReference(Record record, TypeProperty property, String value)
+        protected void handleReference(String path, Record record, TypeProperty property, String value)
         {
             ((MutableRecord) record).put(property.getName(), updateReference(value));
         }
@@ -1286,12 +1307,12 @@ public class ConfigurationRefactoringManager
         }
 
         @Override
-        protected void process(Record record, Type type)
+        protected void process(String path, Record record, Type type)
         {
-            super.process(record, type);
-            if (!record.shallowEquals(recordManager.select(path)))
+            super.process(path, record, type);
+            if (!record.shallowEquals(recordManager.select(this.path)))
             {
-                recordManager.update(path, record);
+                recordManager.update(this.path, record);
                 configurationTemplateManager.refreshCaches();
             }
         }
@@ -1431,7 +1452,7 @@ public class ConfigurationRefactoringManager
             remainderPath = PathUtils.getSuffix(path, 2);
         }
 
-        public CompositeType ensureMovable()
+        public void ensureMovable()
         {
             // Path must be a composite in a templated scope.
             if (!configurationTemplateManager.pathExists(path))
@@ -1454,32 +1475,37 @@ public class ConfigurationRefactoringManager
             {
                 throw new IllegalArgumentException("Path does not refer to an item of composite type");
             }
-
-            return (CompositeType) type;
         }
 
-        protected Set<String> getReferencedPaths(final String templateOwnerPath, CompositeType type)
+        /**
+         * Returns the set of all references within our template owner.  Each
+         * is a pair (from path, to path).
+         *
+         * @return the set of all references within our template owner
+         */
+        protected Set<Pair<String, String>> getReferencedPaths()
         {
-            final Set<String> result = new HashSet<String>();
-            TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            final Set<Pair<String, String>> result = new HashSet<Pair<String, String>>();
+            CompositeType type = (CompositeType) configurationTemplateManager.getType(templateOwnerPath);
+            TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(templateOwnerPath);
             record.forEach(new ReferenceWalkingFunction(type, record, templateOwnerPath)
             {
                 @Override
-                protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+                protected void handleReferenceList(String path, Record record, TypeProperty property, String[] value)
                 {
                     for (String handleString: value)
                     {
-                        addPath(handleString);
+                        addPath(path, handleString);
                     }
                 }
 
                 @Override
-                protected void handleReference(Record record, TypeProperty property, String value)
+                protected void handleReference(String path, Record record, TypeProperty property, String value)
                 {
-                    addPath(value);
+                    addPath(path, value);
                 }
 
-                private void addPath(String handleString)
+                private void addPath(String fromPath, String handleString)
                 {
                     long handle = Long.parseLong(handleString);
                     if (handle != 0)
@@ -1487,7 +1513,7 @@ public class ConfigurationRefactoringManager
                         String referencedPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, handle);
                         if (referencedPath != null)
                         {
-                            result.add(referencedPath);
+                            result.add(CollectionUtils.asPair(fromPath, referencedPath));
                         }
                     }
                 }
@@ -1519,7 +1545,7 @@ public class ConfigurationRefactoringManager
          */
         public String ensurePullUp()
         {
-            CompositeType type = ensureMovable();
+            ensureMovable();
 
             // Specified ancestor must strictly be our ancestor.
             TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
@@ -1565,9 +1591,10 @@ public class ConfigurationRefactoringManager
 
             // We cannot have any references to items defined in our template
             // owner that do not exist at the specified ancestor's level.
-            Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, type);
-            for (String referencedPath: referencedPaths)
+            Set<Pair<String, String>> referencedPaths = getReferencedPaths();
+            for (Pair<String, String> pair: referencedPaths)
             {
+                String referencedPath = pair.second;
                 if (referencedPath.startsWith(templateOwnerPath) && !referencedPath.startsWith(path) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
                 {
                     throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in ancestor '" + ancestorKey + "'");
@@ -1714,24 +1741,23 @@ public class ConfigurationRefactoringManager
      */
     private class PushDownActionSupport extends MoveActionSupport
     {
-        protected final String childKey;
-
-        private PushDownActionSupport(String path, String childKey)
+        private PushDownActionSupport(String path)
         {
             super(path);
-            this.childKey = childKey;
         }
 
         /**
-         * Checks if our path can actually be pushed down, throwing an error if
-         * it cannot.
+         * Checks if our path can actually be pushed down to the given child,
+         * throwing an error if it cannot.
          *
+         * @param childKey key of the template child to test if we can push
+         *                 down to
          * @return the path that the item would be pushed down to
          * @throws IllegalArgumentException if our path cannot be pushed down
          */
-        public String ensurePushDown()
+        public String ensurePushDown(String childKey)
         {
-            CompositeType type = ensureMovable();
+            ensureMovable();
 
             // Specified child must be a direct child.
             TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
@@ -1749,20 +1775,34 @@ public class ConfigurationRefactoringManager
             }
 
             // We cannot have any references to items defined in our template
-            // owner that do not exist at the specified child's level.
-            Set<String> referencedPaths = getReferencedPaths(templateOwnerPath, type);
-            for (String referencedPath: referencedPaths)
+            // owner that do not exist at the specified child's level.  Nor can
+            // there be references to within the item to push down from
+            // elsewhere in the template owner.
+            Set<Pair<String, String>> referencedPaths = getReferencedPaths();
+            for (Pair<String, String> referencedPath: referencedPaths)
             {
-                if (referencedPath.startsWith(templateOwnerPath) && !referencedPath.startsWith(path) && !configurationTemplateManager.pathExists(pushDownPath(referencedPath)))
+                String fromPath = referencedPath.first;
+                String toPath = referencedPath.second;
+                if (toPath.startsWith(templateOwnerPath))
                 {
-                    throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in child '" + childKey + "'");
+                    if (toPath.startsWith(path))
+                    {
+                        if (!fromPath.startsWith(path))
+                        {
+                            throw new IllegalArgumentException("Reference from '" + fromPath + "' to within item to pull down that would become invalid");
+                        }
+                    }
+                    else if (!configurationTemplateManager.pathExists(pushDownPath(toPath, childKey)))
+                    {
+                        throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in child '" + childKey + "'");
+                    }
                 }
             }
 
             return childPath;
         }
 
-        private String pushDownPath(String path)
+        private String pushDownPath(String path, String childKey)
         {
             String[] elements = PathUtils.getPathElements(path);
             elements[1] = childKey;
@@ -1777,21 +1817,204 @@ public class ConfigurationRefactoringManager
      */
     private class CanPushDownAction extends PushDownActionSupport implements ConfigurationTemplateManager.Action<Boolean>
     {
+        private String childKey;
+
         public CanPushDownAction(String path, String childKey)
         {
-            super(path, childKey);
+            super(path);
+            this.childKey = childKey;
         }
 
         public Boolean execute() throws Exception
         {
             try
             {
-                ensurePushDown();
+                ensurePushDown(childKey);
                 return true;
             }
             catch (IllegalArgumentException e)
             {
                 return false;
+            }
+        }
+    }
+
+    /**
+     * Action to push down a composite item in the template hierarchy.
+     *
+     * @see ConfigurationRefactoringManager#pushDown(String, Set<String>)
+     */
+    private class PushDownAction extends PushDownActionSupport implements ConfigurationTemplateManager.Action<Set<String>>
+    {
+        private Set<String> childKeys;
+
+        private PushDownAction(String path, Set<String> childKeys)
+        {
+            super(path);
+            this.childKeys = childKeys;
+        }
+
+        public Set<String> execute() throws Exception
+        {
+            validateChildKeys();
+
+            // The easiest way is to push down to all children where the path
+            // is not hidden, then later do a regular delete (with cleanup
+            // tasks and events) for all children that are not included.
+            Set<String> result = new HashSet<String>();
+            Set<String> pathsToDelete = new HashSet<String>();
+
+            configurationTemplateManager.suspendInstanceCache();
+            try
+            {
+                Record pushDownRecord = recordManager.select(path);
+
+                final String scope = PathUtils.getPrefix(path, 1);
+                TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+                CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
+                for (TemplateNode childNode: node.getChildren())
+                {
+                    final String childKey = childNode.getId();
+                    String childPath = PathUtils.getPath(scope, childKey, remainderPath);
+                    if (configurationTemplateManager.pathExists(childPath))
+                    {
+                        if (childKeys.contains(childKey))
+                        {
+                            result.add(childPath);
+                        }
+                        else
+                        {
+                            pathsToDelete.add(childPath);
+                        }
+
+                        pushDownToChild(scope, childPath, type, pushDownRecord);
+                    }
+                    else
+                    {
+                        cleanupHiddenKey(childKey, childPath);
+                    }
+                }
+
+                // Go direct to the record manager to delete the pushed down
+                // template records (no cleanup/events are required).
+                recordManager.delete(path);
+            }
+            finally
+            {
+                configurationTemplateManager.resumeInstanceCache();
+            }
+
+            for (String deletePath: pathsToDelete)
+            {
+                configurationTemplateManager.delete(deletePath);
+            }
+
+            return result;
+        }
+
+        private void pushDownToChild(final String scope, final String childPath, final CompositeType type, Record pushDownRecord)
+        {
+            MutableRecord childRecordCopy = recordManager.select(childPath).copy(true, true);
+            pushDownRecord.forEach(new PushDownValuesFunction(childRecordCopy));
+
+            final String childKey = PathUtils.getElement(childPath, 1);
+            childRecordCopy.forEach(new ReferenceUpdatingFunction(type, childRecordCopy, childPath)
+            {
+                @Override
+                protected String updateReference(String value)
+                {
+                    long handle = Long.parseLong(value);
+                    if (handle == 0)
+                    {
+                        return "0";
+                    }
+                    else
+                    {
+                        String referencedPath = recordManager.getPathForHandle(handle);
+                        if (referencedPath.startsWith(PushDownAction.this.path))
+                        {
+                            referencedPath = PathUtils.getPath(scope, childKey, PathUtils.getSuffix(referencedPath, 2));
+                            handle = recordManager.select(referencedPath).getHandle();
+                        }
+
+                        return Long.toString(handle);
+                    }
+                }
+            });
+
+            childRecordCopy.forEach(new DeepUpdateFunction(childPath));
+        }
+
+        private void validateChildKeys()
+        {
+            if (childKeys.isEmpty())
+            {
+                throw new IllegalArgumentException("At least one child must be specified");
+            }
+
+            for (String childKey: childKeys)
+            {
+                ensurePushDown(childKey);
+            }
+        }
+
+        private void cleanupHiddenKey(String childKey, String childPath)
+        {
+            // Hidden in this child, remove the hidden key from the
+            // collection.
+            String childCollectionPath = PathUtils.getParentPath(childPath);
+            MutableRecord collectionClone = recordManager.select(childCollectionPath).copy(false, true);
+            if (!TemplateRecord.restoreItem(collectionClone, childKey))
+            {
+                throw new IllegalStateException("Did not find expected hidden key for path '" + childPath + "'");
+            }
+        }
+
+        private class PushDownValuesFunction implements GraphFunction<Record>
+        {
+            private Stack<MutableRecord> recordStack = new Stack<MutableRecord>();
+
+            public PushDownValuesFunction(MutableRecord toRecord)
+            {
+                recordStack.push(toRecord);
+            }
+
+            public void push(String edge)
+            {
+                MutableRecord currentRecord = recordStack.peek();
+                MutableRecord record = (MutableRecord) currentRecord.get(edge);
+                if (record == null)
+                {
+                    // Must be hidden in child, remove the hidden key.
+                    if (!TemplateRecord.restoreItem(currentRecord, edge))
+                    {
+                        throw new IllegalStateException("Did not find expected hidden key when child structure didn't match parent");
+                    }
+
+                    // We can harmlessly provide a dummy record to be processed
+                    // (and then forgotten).
+                    record = new MutableRecordImpl();
+                }
+
+                recordStack.push(record);
+            }
+
+            public void process(Record record)
+            {
+                MutableRecord toRecord = recordStack.peek();
+                Set<String> toSimpleKeySet = toRecord.simpleKeySet();
+                for (String key: record.simpleKeySet())
+                {
+                    if (!toSimpleKeySet.contains(key))
+                    {
+                        toRecord.put(key, record.get(key));
+                    }
+                }
+            }
+
+            public void pop()
+            {
+                recordStack.pop();
             }
         }
     }

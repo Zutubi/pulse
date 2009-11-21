@@ -302,7 +302,7 @@ public class ConfigurationHealthChecker
         {
             if (!hiddenKeys.isEmpty())
             {
-                report.addProblem(path, "Hidden keys " + hiddenKeys + " found in template root.");
+                report.addProblem(path, "Hidden keys " + hiddenKeys + " found when there is no template parent.");
             }
         }
         else
