@@ -304,6 +304,7 @@ public class ConfigurationRefactoringManager
      * <ul>
      *   <li>Refer to an existing item of composite type</li>
      *   <li>Be in a templated scope</li>
+     *   <li>Not be marked permanent</li>
      *   <li>Not be defined in any ancestor</li>
      *   <li>Not be defined in any other descendent of the specified ancestor</li>
      *   <li>Not contain any references to items not visible from the specified ancestor</li>
@@ -403,6 +404,8 @@ public class ConfigurationRefactoringManager
      * <ul>
      *   <li>Refer to an existing item of composite type</li>
      *   <li>Be in a templated scope</li>
+     *   <li>Not be marked permanent</li>
+     *   <li>Not be inherited</li>
      *   <li>Not be hidden in the child</li>
      *   <li>Not contain any references to items not visible from the specified child</li>
      * </ul>
@@ -1476,6 +1479,12 @@ public class ConfigurationRefactoringManager
             {
                 throw new IllegalArgumentException("Path does not refer to an item of composite type");
             }
+
+            Record record = configurationTemplateManager.getRecord(path);
+            if (record.isPermanent())
+            {
+                throw new IllegalArgumentException("Path is marked permanent");
+            }
         }
 
         /**
@@ -1759,6 +1768,12 @@ public class ConfigurationRefactoringManager
         public String ensurePushDown(String childKey)
         {
             ensureMovable();
+
+            // Path must not be inherited.
+            if( configurationTemplateManager.getTemplateParentRecord(path) != null)
+            {
+                throw new IllegalArgumentException("Path is inherited");
+            }
 
             // Specified child must be a direct child.
             TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);

@@ -108,6 +108,7 @@ public class PullUpAction extends ToveFormActionSupport
     {
         configurationRefactoringManager.pullUp(path, ancestorKey);
         response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+        response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format("pulled.up")));
     }
 
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)

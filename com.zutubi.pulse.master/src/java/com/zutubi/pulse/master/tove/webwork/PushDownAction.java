@@ -1,17 +1,18 @@
 package com.zutubi.pulse.master.tove.webwork;
 
-import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
+import com.zutubi.pulse.master.tove.model.ItemPickerFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
+import com.zutubi.tove.type.CollectionType;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Action to prompt the user for the children that they would like to push down
@@ -25,8 +26,9 @@ public class PushDownAction extends ToveFormActionSupport
     private static final String FIELD_CHILD_KEYS = "childKeys";
 
     /**
-     * Path that we should return to after completion/cancellation (may be
-     * supplied by the UI, if not default to path).
+     * Path that we should return to after cancellation (may be supplied by
+     * the UI, if not default to path).  After completion we always go to the
+     * parent path.
      */
     private String newPath;
     /**
@@ -70,11 +72,6 @@ public class PushDownAction extends ToveFormActionSupport
             throw new IllegalArgumentException(I18N.format("path.invalid", new Object[]{path}));
         }
 
-        if (newPath == null)
-        {
-            newPath = path;
-        }
-
         type = configurationTemplateManager.getType(path);
     }
 
@@ -91,6 +88,7 @@ public class PushDownAction extends ToveFormActionSupport
         Field field = new Field(FieldType.ITEM_PICKER, FIELD_CHILD_KEYS);
         field.setLabel(I18N.format(FIELD_CHILD_KEYS + ".label"));
         field.addParameter(OptionFieldDescriptor.PARAMETER_LIST, configurationRefactoringManager.getPushDownChildren(path));
+        field.addParameter(ItemPickerFieldDescriptor.PARAMETER_SUPPRESS_DEFAULT, true);
         field.setValue(childKeys);
         form.add(field);
 
@@ -102,8 +100,6 @@ public class PushDownAction extends ToveFormActionSupport
     @Override
     protected void validateForm()
     {
-        Map params = ActionContext.getContext().getParameters();
-        this.childKeys = (String[]) params.get(FIELD_CHILD_KEYS);
         if (childKeys == null || childKeys.length == 0)
         {
             addFieldError(FIELD_CHILD_KEYS, I18N.format(FIELD_CHILD_KEYS + ".required"));
@@ -123,8 +119,28 @@ public class PushDownAction extends ToveFormActionSupport
     @Override
     protected void doAction()
     {
+        String originalDisplayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
+
         configurationRefactoringManager.pushDown(path, new HashSet<String>(Arrays.asList(childKeys)));
+
+        String parentPath = PathUtils.getParentPath(path);
+        boolean collectionElement = (configurationTemplateManager.getType(parentPath) instanceof CollectionType);
+        newPath = collectionElement ? parentPath : path;
         response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+        response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format("pushed.down")));
+
+        if (collectionElement)
+        {
+            response.addRemovedPath(path);
+        }
+        else
+        {
+            String newDisplayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
+            if(!newDisplayName.equals(originalDisplayName))
+            {
+                response.addRenamedPath(new ConfigurationResponse.Rename(path, path, newDisplayName, null));
+            }
+        }
     }
 
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)

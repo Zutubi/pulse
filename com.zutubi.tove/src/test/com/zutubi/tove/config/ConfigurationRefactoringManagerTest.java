@@ -743,6 +743,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b")));
     }
 
+    public void testCanPullUpAnyPermanent() throws TypeException
+    {
+        MockA mockA = createAInstance("a1");
+        mockA.getB().setPermanent(true);
+        String path = insertTemplateAInstance(rootPath, mockA, false);
+        assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b")));
+    }
+
     public void testCanPullUpAny() throws TypeException
     {
         String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
@@ -1153,6 +1161,23 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         // Hide the path in the child
         configurationTemplateManager.delete(getPath(childPath, "bmap", "colby"));
         assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "bmap", "colby")));
+    }
+
+    public void testCanPushDownAnyPermanent() throws TypeException
+    {
+        MockA mockA = createAInstance("parent");
+        mockA.getB().setPermanent(true);
+        String path = insertTemplateAInstance(rootPath, mockA, true);
+        insertTemplateAInstance(path, createAInstance("child"), false);
+        assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "b")));
+    }
+
+    public void testCanPushDownInherited() throws TypeException
+    {
+        String grandParentPath = insertTemplateAInstance(rootPath, createAInstance("gp"), true);
+        String parentPath = insertTemplateAInstance(grandParentPath, createAInstance("p"), true);
+        insertTemplateAInstance(parentPath, createAInstance("c"), false);
+        assertFalse(configurationRefactoringManager.canPushDown(getPath(parentPath, "b")));
     }
 
     public void testCanPushDownAny() throws TypeException
