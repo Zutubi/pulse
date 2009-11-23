@@ -1056,9 +1056,9 @@ public class RemoteApi
      *                 down to (must be a child of the path's template owner)
      * @return true iff the path may be pulled up
      * @access available to all users
-     * @see #pushDown(String, String, java.util.Vector)
+     * @see #pushDownConfig(String, String, java.util.Vector)
      */
-    public boolean canPushDown(String token, String path, String childKey)
+    public boolean canPushDownConfig(String token, String path, String childKey)
     {
         tokenManager.loginUser(token);
         try
@@ -1074,7 +1074,7 @@ public class RemoteApi
     /**
      * Pushes down an item from its current location in the template hiearchy
      * to the given children.  Each specified child must satisfy
-     * {@link #canPushDown(String, String, String)}.  Children that hide the item
+     * {@link #canPushDownConfig(String, String, String)}.  Children that hide the item
      * cannot be included, and will not have the item pushed down to them.  At
      * least one other child must be specified (otherwise this would be
      * equivalent to deleting the item -- and we would prefer the user to
@@ -1088,9 +1088,9 @@ public class RemoteApi
      * @return the set of child paths to which the item was pushed down
      * @access requires write permission for the given path and for all
      *         children (even those not included in childKeys)
-     * @see #canPushDown(String, String, String) 
+     * @see #canPushDownConfig(String, String, String)
      */
-    public Vector<String> pushDown(String token, String path, Vector<String> childKeys)
+    public Vector<String> pushDownConfig(String token, String path, Vector<String> childKeys)
     {
         tokenManager.loginUser(token);
         try

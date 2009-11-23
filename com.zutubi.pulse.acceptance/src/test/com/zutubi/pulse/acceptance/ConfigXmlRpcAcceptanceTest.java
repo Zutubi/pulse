@@ -779,8 +779,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String parentPropertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
         String childPropertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
 
-        assertTrue(xmlRpcHelper.canPushDown(parentPropertyPath, childProject));
-        assertFalse(xmlRpcHelper.canPushDown(childPropertyPath, childProject));
+        assertTrue(xmlRpcHelper.canPushDownConfig(parentPropertyPath, childProject));
+        assertFalse(xmlRpcHelper.canPushDownConfig(childPropertyPath, childProject));
     }
 
     public void testPushDown() throws Exception
@@ -796,7 +796,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String pushedDownToPath = propertyPath.replace(parentProject, childProject);
 
         assertTrue(xmlRpcHelper.configPathExists(propertyPath));
-        assertEquals(new Vector<String>(asList(pushedDownToPath)), xmlRpcHelper.pushDown(propertyPath, new Vector<String>(asList(childProject))));
+        assertEquals(new Vector<String>(asList(pushedDownToPath)), xmlRpcHelper.pushDownConfig(propertyPath, new Vector<String>(asList(childProject))));
         assertFalse(xmlRpcHelper.configPathExists(propertyPath));
         assertTrue(xmlRpcHelper.configPathExists(pushedDownToPath));
     }
