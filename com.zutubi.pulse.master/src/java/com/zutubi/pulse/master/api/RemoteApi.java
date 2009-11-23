@@ -969,6 +969,7 @@ public class RemoteApi
      * <ul>
      *   <li>Refer to an existing item of composite type</li>
      *   <li>Be in a templated scope</li>
+     *   <li>Not be marked permanent</li>
      *   <li>Not be defined in any ancestor</li>
      *   <li>Not be defined in any other descendent of the specified ancestor</li>
      *   <li>Not contain any references to items not visible from the specified ancestor</li>
@@ -1023,6 +1024,79 @@ public class RemoteApi
         try
         {
             return configurationRefactoringManager.pullUp(path, ancestorKey);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Tests if a given path can be pushed down in the template hierarchy to
+     * the given child.  To be pushed down a path must:
+     *
+     * <ul>
+     *   <li>Refer to an existing item of composite type</li>
+     *   <li>Be in a templated scope</li>
+     *   <li>Not be marked permanent</li>
+     *   <li>Not be inherited</li>
+     *   <li>Not be hidden in the child</li>
+     *   <li>Not contain any references to items not visible from the specified child</li>
+     * </ul>
+     *
+     * The given child must be a direct child of the templated collection
+     * item that owns the specified path.
+     * <p/>
+     * <b>Note</b> that this method does not take security into account: i.e.
+     * it does not check that the user has permission to write into the
+     * child.
+
+     * @param path     the path to test
+     * @param childKey key of the templated collection item to push the path
+     *                 down to (must be a child of the path's template owner)
+     * @return true iff the path may be pulled up
+     * @access available to all users
+     * @see #pushDown(String, String, java.util.Vector)
+     */
+    public boolean canPushDown(String token, String path, String childKey)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return configurationRefactoringManager.canPushDown(path, childKey);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Pushes down an item from its current location in the template hiearchy
+     * to the given children.  Each specified child must satisfy
+     * {@link #canPushDown(String, String, String)}.  Children that hide the item
+     * cannot be included, and will not have the item pushed down to them.  At
+     * least one other child must be specified (otherwise this would be
+     * equivalent to deleting the item -- and we would prefer the user to
+     * explicitly specify that this is what they intend to do).  Any children
+     * that do not hide the item and are not specified will have the item
+     * deleted.
+     *
+     * @param path      the path to push down
+     * @param childKeys keys of the children of the item's current template
+     *                  owner to push the item down to
+     * @return the set of child paths to which the item was pushed down
+     * @access requires write permission for the given path and for all
+     *         children (even those not included in childKeys)
+     * @see #canPushDown(String, String, String) 
+     */
+    public Vector<String> pushDown(String token, String path, Vector<String> childKeys)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Set<String> childKeySet = new HashSet<String>(childKeys);
+            return new Vector<String>(configurationRefactoringManager.pushDown(path, childKeySet));
         }
         finally
         {

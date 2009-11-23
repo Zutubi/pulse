@@ -10,6 +10,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 
 import java.util.*;
+import static java.util.Arrays.asList;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -572,9 +573,9 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.insertProjectProperty(random, "p1", "v1");
         xmlRpcHelper.insertProjectProperty(random, "p2", "v2");
 
-        assertEquals(Arrays.asList("p1", "p2"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
+        assertEquals(asList("p1", "p2"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
         xmlRpcHelper.setConfigOrder(propertiesPath, "p2", "p1");
-        assertEquals(Arrays.asList("p2", "p1"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
+        assertEquals(asList("p2", "p1"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
     }
 
     public void testGetConfigActions() throws Exception
@@ -584,7 +585,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         try
         {
             Vector<String> actions = xmlRpcHelper.getConfigActions(path);
-            assertEquals(Arrays.asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING),
+            assertEquals(asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING),
                          new LinkedList<String>(actions));
         }
         finally
@@ -601,7 +602,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             xmlRpcHelper.doConfigAction(path, AgentConfigurationActions.ACTION_DISABLE);
             Vector<String> actions = xmlRpcHelper.getConfigActions(path);
-            assertEquals(Arrays.asList(AgentConfigurationActions.ACTION_ENABLE),
+            assertEquals(asList(AgentConfigurationActions.ACTION_ENABLE),
                      new LinkedList<String>(actions));
         }
         finally
@@ -764,6 +765,40 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertFalse(xmlRpcHelper.configPathExists(pulledUpPath));
         assertEquals(pulledUpPath, xmlRpcHelper.pullUpConfig(propertyPath, parentProject));
         assertTrue(xmlRpcHelper.configPathExists(pulledUpPath));
+    }
+
+    public void testCanPushDown() throws Exception
+    {
+        String random = randomName();
+        String parentProject = random + "-parent";
+        String childProject = random + "-child";
+
+        xmlRpcHelper.insertSimpleProject(parentProject, true);
+        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+
+        String parentPropertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
+        String childPropertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
+
+        assertTrue(xmlRpcHelper.canPushDown(parentPropertyPath, childProject));
+        assertFalse(xmlRpcHelper.canPushDown(childPropertyPath, childProject));
+    }
+
+    public void testPushDown() throws Exception
+    {
+        String random = randomName();
+        String parentProject = random + "-parent";
+        String childProject = random + "-child";
+
+        xmlRpcHelper.insertSimpleProject(parentProject, true);
+        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+
+        String propertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
+        String pushedDownToPath = propertyPath.replace(parentProject, childProject);
+
+        assertTrue(xmlRpcHelper.configPathExists(propertyPath));
+        assertEquals(new Vector<String>(asList(pushedDownToPath)), xmlRpcHelper.pushDown(propertyPath, new Vector<String>(asList(childProject))));
+        assertFalse(xmlRpcHelper.configPathExists(propertyPath));
+        assertTrue(xmlRpcHelper.configPathExists(pushedDownToPath));
     }
 
     private void assertSortedEquals(Collection<String> got, String... expected)

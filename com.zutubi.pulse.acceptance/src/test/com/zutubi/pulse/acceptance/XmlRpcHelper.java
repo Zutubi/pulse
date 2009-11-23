@@ -237,6 +237,16 @@ public class XmlRpcHelper
         return call("pullUpConfig", path, ancestorKey);
     }
 
+    public boolean canPushDown(String path, String childKey) throws Exception
+    {
+        return (Boolean) call("canPushDown", path, childKey);
+    }
+
+    public Vector<String> pushDown(String path, Vector<String> childKeys) throws Exception
+    {
+        return call("pushDown", path, childKeys);
+    }
+
     public void setConfigOrder(String path, String... order) throws Exception
     {
         call("setConfigOrder", path, new Vector<String>(Arrays.asList(order)));
