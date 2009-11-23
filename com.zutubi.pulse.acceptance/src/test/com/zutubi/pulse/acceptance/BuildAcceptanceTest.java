@@ -399,16 +399,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
 
-        browser.openAndWaitFor(BuildDetailedViewPage.class, random, 1L);
+        BuildDetailedViewPage page = browser.openAndWaitFor(BuildDetailedViewPage.class, random, 1L);
 
-        String logLinkId = "log-" + random + "-1";
-
-        assertTrue(browser.isLinkPresent(logLinkId));
-
-        browser.click("id=" + logLinkId);
-        browser.waitForPageToLoad(10 * SECOND);
-
-        assertTextPresent("tail of build log");
+        assertTrue(page.isBuildLogLinkPresent());
+        BuildLogPage log = page.clickBuildLogLink();
+        assertTrue(log.isLogAvailable());
     }
 
     public void testDownloadArtifactLink() throws Exception

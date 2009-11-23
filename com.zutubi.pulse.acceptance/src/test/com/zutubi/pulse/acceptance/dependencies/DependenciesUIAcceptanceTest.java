@@ -3,8 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
-import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
+import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 
 import static java.lang.String.valueOf;
@@ -121,6 +120,31 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
         assertFalse(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
+    }
+
+    public void testRetrieveCommandLogging() throws Exception
+    {
+        browser.loginAsAdmin();
+
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addArtifacts("build/artifact.jar");
+        projectA.addFilesToCreate("build/artifact.jar");
+        insertProject(projectA);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/artifact.jar");
+        insertProject(projectB);
+
+        buildRunner.triggerSuccessfulBuild(projectA);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+
+        BuildDetailedViewPage page = browser.openAndWaitFor(BuildDetailedViewPage.class, projectB.getName(), 1L);
+        assertTrue(page.isBuildLogLinkPresent());
+        StageLogPage log = page.clickStageLogLink("default");
+        assertTrue(log.isLogAvailable());
+        // check for a reference to the artifact retrieval in the log.
+        assertTrue(log.getLog().contains(randomName + "A#artifact(1)"));
     }
 
     public void testProjectDependenciesTab() throws Exception

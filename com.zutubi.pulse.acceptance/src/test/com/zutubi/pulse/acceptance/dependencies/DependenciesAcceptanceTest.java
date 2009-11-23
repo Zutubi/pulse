@@ -513,7 +513,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.addExpectedFiles("lib/projectA-artifact.jar");
         insertProject(projectB);
 
-        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA);
+        buildRunner.triggerSuccessfulBuild(projectA);
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         buildRunner.triggerSuccessfulBuild(projectB);

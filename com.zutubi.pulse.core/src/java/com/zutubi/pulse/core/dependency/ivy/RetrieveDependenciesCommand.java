@@ -8,6 +8,7 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.i18n.Messages;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -28,6 +29,8 @@ import java.net.URL;
  */
 public class RetrieveDependenciesCommand implements Command
 {
+    private static final Messages I18N = Messages.getInstance(RetrieveDependenciesCommand.class);
+
     public static final String COMMAND_NAME = "retrieve";
     public static final String OUTPUT_NAME = "retrieve output";
     public static final String IVY_REPORT_FILE = "ivyreport.xml";
@@ -77,8 +80,11 @@ public class RetrieveDependenciesCommand implements Command
                             for (Artifact artifact : retrievalReport.getRetrievedArtifacts())
                             {
                                 ModuleRevisionId mrid = artifact.getModuleRevisionId();
-                                String artifactName = mrid.getName() + "#" + artifact.getName() + "(" + mrid.getRevision() + ")";
-                                outputWriter.println(artifactName + " retrieved to -> "+ IvyPatternHelper.substitute(targetPattern, artifact)); 
+                                String targetPath = IvyPatternHelper.substitute(targetPattern, artifact);
+                                String feedback = I18N.format("retrieve.feedback", new Object[]{
+                                        mrid.getName(), artifact.getName(), mrid.getRevision(), targetPath
+                                });
+                                outputWriter.println(feedback);
                             }
                         }
                         return null;
