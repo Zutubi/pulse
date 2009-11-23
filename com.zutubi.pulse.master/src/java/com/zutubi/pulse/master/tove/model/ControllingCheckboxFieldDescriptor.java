@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 
 /**
  * Describes a controlling checkbox: i.e. a checkbox whose checked state
@@ -9,8 +8,8 @@ import com.zutubi.pulse.master.tove.model.FieldDescriptor;
  */
 public class ControllingCheckboxFieldDescriptor extends FieldDescriptor
 {
-    public static final String PARAM_INVERT           = "invert";
-    public static final String PARAM_DEPENDENT_FIELDS = "dependentFields";
+    public static final String PARAM_CHECKED_FIELDS   = "checkedFields";
+    public static final String PARAM_UNCHECKED_FIELDS = "uncheckedFields";
 
     public ControllingCheckboxFieldDescriptor()
     {
@@ -18,13 +17,13 @@ public class ControllingCheckboxFieldDescriptor extends FieldDescriptor
         setSubmitOnEnter(true);
     }
 
-    public void setInvert(boolean invert)
+    public void setCheckedFields(String[] deps)
     {
-        addParameter(PARAM_INVERT, invert);
+        addParameter(PARAM_CHECKED_FIELDS, deps);
     }
 
-    public void setDependentFields(String[] deps)
+    public void setUncheckedFields(String[] deps)
     {
-        addParameter(PARAM_DEPENDENT_FIELDS, deps);
+        addParameter(PARAM_UNCHECKED_FIELDS, deps);
     }
 }

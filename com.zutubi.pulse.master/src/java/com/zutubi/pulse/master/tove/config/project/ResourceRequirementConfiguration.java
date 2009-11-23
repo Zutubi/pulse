@@ -13,7 +13,7 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
     @Required
     @FieldAction(template = "ResourceRequirementConfiguration.browser")
     private String resource;
-    @ControllingCheckbox(invert = true, dependentFields = {"version"})
+    @ControllingCheckbox(uncheckedFields = {"version"})
     private boolean defaultVersion = true;
     @Required // if version is enabled, it is also required.
     private String version;

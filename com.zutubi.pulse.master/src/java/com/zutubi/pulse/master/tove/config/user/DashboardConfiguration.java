@@ -14,7 +14,7 @@ import java.util.List;
 @Classification(single = "dashboard")
 public class DashboardConfiguration extends ProjectsSummaryConfiguration
 {
-    @ControllingCheckbox(invert = true, dependentFields = {"shownProjects", "sortProjectsAlphabetically"})
+    @ControllingCheckbox(uncheckedFields = {"shownProjects", "sortProjectsAlphabetically"})
     private boolean showAllProjects = true;
     /**
      * Projects to show on the dashboard.
@@ -23,9 +23,9 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
     private List<ProjectConfiguration> shownProjects = new LinkedList<ProjectConfiguration>();
     private boolean sortProjectsAlphabetically = true;
 
-    @ControllingCheckbox(dependentFields = {"showAllGroups", "showUngrouped"})
+    @ControllingCheckbox(checkedFields = {"showAllGroups", "showUngrouped"})
     private boolean groupsShown = true;
-    @ControllingCheckbox(invert = true, dependentFields = {"shownGroups", "sortGroupsAlphabetically"})
+    @ControllingCheckbox(uncheckedFields = {"shownGroups", "sortGroupsAlphabetically"})
     private boolean showAllGroups = true;
     private boolean sortGroupsAlphabetically = true;
 
@@ -35,14 +35,14 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
     @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.project.ProjectLabelOptionProvider")
     private List<String> shownGroups = new LinkedList<String>();
     private boolean showUngrouped = true;
-    @ControllingCheckbox(dependentFields = {"myChangeCount"})
+    @ControllingCheckbox(checkedFields = {"myChangeCount"})
     private boolean showMyChanges = true;
     /**
      * The number of recent changes by this user to show.
      */
     private int myChangeCount = 10;
 
-    @ControllingCheckbox(dependentFields = {"projectChangeCount"})
+    @ControllingCheckbox(checkedFields = {"projectChangeCount"})
     private boolean showProjectChanges = true;
     /**
      * The number of recent changes to this user's projects to show.

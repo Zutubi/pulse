@@ -57,7 +57,7 @@ public class DependencyConfiguration extends AbstractConfiguration
      */
     private boolean transitive = true;
 
-    @ControllingCheckbox(invert = true, dependentFields = {"stages"})
+    @ControllingCheckbox(uncheckedFields = {"stages"})
     private boolean allStages = true;
 
     @Reference(dependentOn = "project", optionProvider = "DependencyStagesOptionProvider")

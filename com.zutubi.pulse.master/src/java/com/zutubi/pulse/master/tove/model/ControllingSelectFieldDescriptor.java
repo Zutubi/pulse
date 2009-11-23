@@ -9,7 +9,7 @@ import com.zutubi.tove.annotations.FieldType;
 public class ControllingSelectFieldDescriptor extends OptionFieldDescriptor
 {
     public static final String PARAM_ENABLE_SET       = "enableSet";
-    public static final String PARAM_DEPENDENT_FIELDS = "dependentFields";
+    public static final String PARAM_DEPENDENT_FIELDS = "checkedFields";
 
     public ControllingSelectFieldDescriptor()
     {

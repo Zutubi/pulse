@@ -34,7 +34,7 @@ public abstract class FileSystemArtifactConfigurationSupport extends ArtifactCon
      * published to the internal artifact repository.
      */
     @Wizard.Ignore
-    @ControllingCheckbox(dependentFields = {"artifactPattern"})
+    @ControllingCheckbox(checkedFields = {"artifactPattern"})
     private boolean publish = false;
 
     /**

@@ -17,7 +17,7 @@ import java.util.List;
 @SymbolicName("zutubi.projectSummaryConfig")
 public abstract class ProjectsSummaryConfiguration extends AbstractConfiguration
 {
-    @ControllingCheckbox(dependentFields = "hiddenHierarchyLevels")
+    @ControllingCheckbox(checkedFields = "hiddenHierarchyLevels")
     private boolean hierarchyShown = true;
     @Numeric(min = 0)
     private int hiddenHierarchyLevels = 1;

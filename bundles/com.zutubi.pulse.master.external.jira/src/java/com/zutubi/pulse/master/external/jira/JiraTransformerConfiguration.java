@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.external.jira;
 
-import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.annotations.Required;
@@ -22,7 +22,7 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
     @Required
     @Url
     private String url;
-    @ControllingCheckbox(dependentFields = {"keys"}, invert = true)
+    @ControllingCheckbox(uncheckedFields = {"keys"})
     private boolean matchAnyKey = true;
     @StringList
     private List<String> keys = new LinkedList<String>();

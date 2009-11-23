@@ -28,7 +28,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private boolean anonymousSignupEnabled = false;
     private int scmPollingInterval = 5;
 
-    @ControllingCheckbox(dependentFields = {"recipeTimeout"})
+    @ControllingCheckbox(checkedFields = {"recipeTimeout"})
     private boolean recipeTimeoutEnabled = true;
     private int recipeTimeout = 15;
 

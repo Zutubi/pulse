@@ -21,7 +21,7 @@ public class BackupConfiguration extends AbstractConfiguration
     @Constraint("com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValidator")
     private String cronSchedule = DEFAULT_CRON_SCHEDULE;
 
-    @ControllingCheckbox(dependentFields = {"cronSchedule"})
+    @ControllingCheckbox(checkedFields = {"cronSchedule"})
     private boolean enabled = true;
 
     public BackupConfiguration()

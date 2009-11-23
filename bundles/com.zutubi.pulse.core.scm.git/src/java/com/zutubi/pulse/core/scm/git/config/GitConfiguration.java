@@ -17,7 +17,7 @@ public class GitConfiguration extends PollableScmConfiguration
     @Required
     private String branch = "master";
     private boolean trackSelectedBranch = false;
-    @ControllingCheckbox(dependentFields = "inactivityTimeoutSeconds") @Wizard.Ignore
+    @ControllingCheckbox(checkedFields = "inactivityTimeoutSeconds") @Wizard.Ignore
     private boolean inactivityTimeoutEnabled = false;
     @Wizard.Ignore
     private int inactivityTimeoutSeconds = 300;

@@ -20,7 +20,7 @@ import java.util.List;
 @Form(fieldOrder = {"name", "runForAll", "runForStates", "failOnError", "runForPersonal", "allowManualTrigger"})
 public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
 {
-    @ControllingCheckbox(dependentFields = "runForStates", invert = true)
+    @ControllingCheckbox(uncheckedFields = "runForStates")
     private boolean runForAll = true;
     @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
     private List<ResultState> runForStates = new LinkedList<ResultState>();

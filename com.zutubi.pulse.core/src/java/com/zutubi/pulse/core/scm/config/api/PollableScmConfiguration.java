@@ -17,7 +17,7 @@ public abstract class PollableScmConfiguration extends ScmConfiguration implemen
     @Wizard.Ignore
     private boolean monitor = true;
 
-    @ControllingCheckbox(dependentFields = {"pollingInterval"})
+    @ControllingCheckbox(checkedFields = {"pollingInterval"})
     @Wizard.Ignore
     private boolean customPollingInterval = false;
     /**
@@ -27,7 +27,7 @@ public abstract class PollableScmConfiguration extends ScmConfiguration implemen
     @Wizard.Ignore
     private int pollingInterval = 1;
 
-    @ControllingCheckbox(dependentFields = {"quietPeriod"})
+    @ControllingCheckbox(checkedFields = {"quietPeriod"})
     @Wizard.Ignore
     private boolean quietPeriodEnabled = false;
     /**

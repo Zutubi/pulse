@@ -27,7 +27,7 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private List<String> aliases = new LinkedList<String>();
     @Select(optionProvider = "DefaultActionOptionProvider")
     private String defaultAction = DefaultAction.WELCOME_ACTION;
-    @ControllingCheckbox(dependentFields = "refreshInterval")
+    @ControllingCheckbox(checkedFields = "refreshInterval")
     boolean refreshingEnabled = true;
     /**
      * Number of seconds between refreshes of "live" content, or 0 if the

@@ -232,8 +232,7 @@ public class CloneAction extends ToveFormActionSupport
                 String nameField = KEY_FIELD_PREFIX + key;
 
                 Field field = new Field(FieldType.CONTROLLING_CHECKBOX, CHECK_FIELD_PREFIX + key);
-                field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_INVERT, false);
-                field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_DEPENDENT_FIELDS, getDependentFields(nameField, node));
+                field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_CHECKED_FIELDS, getDependentFields(nameField, node));
                 field.setLabel(I18N.format("cloneDescendent.label", new Object[]{key}));
                 if(parameters.containsKey(CHECK_FIELD_PREFIX + key))
                 {

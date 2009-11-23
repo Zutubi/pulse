@@ -888,6 +888,21 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals("Abc123def", StringUtils.capitalise("abc123def"));
     }
 
+    public void testToHexStringEmpty()
+    {
+        assertEquals("", StringUtils.toHexString(new byte[0]));
+    }
+
+    public void testToHexStringSingle()
+    {
+        assertEquals("0c", StringUtils.toHexString(new byte[]{12}));
+    }
+
+    public void testToHexStringMultiple()
+    {
+        assertEquals("0c807fff", StringUtils.toHexString(new byte[]{12, -128, 127, -1}));
+    }
+
     private void assertEquals(String[] expected, String[] got)
     {
         assertTrue("Expected " + format(expected) + ", got " + format(got), Arrays.equals(expected, got));

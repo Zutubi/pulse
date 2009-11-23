@@ -35,7 +35,7 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
      * If true, the revision of the completed build will also be used for the
      * triggered build.
      */
-    @ControllingCheckbox(dependentFields = {"supercedeQueued"})
+    @ControllingCheckbox(checkedFields = {"supercedeQueued"})
     private boolean propagateRevision;
     /**
      * If true, build requests raised by this trigger will supercede earlier

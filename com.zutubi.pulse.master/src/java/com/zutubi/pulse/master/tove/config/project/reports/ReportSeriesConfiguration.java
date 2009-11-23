@@ -16,7 +16,7 @@ public abstract class ReportSeriesConfiguration extends AbstractNamedConfigurati
     private String field;
     private MetricType fieldType;
     private boolean successfulOnly;
-    @ControllingCheckbox(dependentFields = {"customColour"})
+    @ControllingCheckbox(checkedFields = {"customColour"})
     private boolean useCustomColour;
     @Constraint("ColourValidator")
     private String customColour;

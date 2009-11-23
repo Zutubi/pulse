@@ -22,6 +22,8 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String P4PASSWD = "pulse";
     private static final String P4CLIENT = "triviant";
 
+    private static final String MANUAL_VIEW = "//depot/triviant/trunk/... //pulse/...";
+
     private static final String WORKSPACE_PREFIX = "pulse-";
 
     private static final long WORKSPACE_TIMEOUT = 30000;
@@ -49,8 +51,18 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testSimpleBuild() throws Exception
     {
+        simpleBuildTest(createSpecConfig());
+    }
+
+    public void testManualView() throws Exception
+    {
+        simpleBuildTest(createViewConfig());
+    }
+
+    private void simpleBuildTest(Hashtable<String, Object> p4Config) throws Exception
+    {
         String project = randomName();
-        xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
+        xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, xmlRpcHelper.getAntConfig());
         int buildId = xmlRpcHelper.runBuild(project);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
         assertEquals("success", build.get("status"));
@@ -61,7 +73,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(getAllPulseWorkspaces().isEmpty());
 
         String project = randomName();
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createSpecConfig(), xmlRpcHelper.getAntConfig());
         xmlRpcHelper.runBuild(project);
 
         assertFalse(getAllPulseWorkspaces().isEmpty());
@@ -105,13 +117,27 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         return core;
     }
 
+    private Hashtable<String, Object> createSpecConfig() throws Exception
+    {
+        Hashtable<String, Object> p4Config = createPerforceConfig();
+        p4Config.put("spec", P4CLIENT);
+        return p4Config;
+    }
+
+    private Hashtable<String, Object> createViewConfig() throws Exception
+    {
+        Hashtable<String, Object> p4Config = createPerforceConfig();
+        p4Config.put("useTemplateClient", false);
+        p4Config.put("view", MANUAL_VIEW);
+        return p4Config;
+    }
+
     private Hashtable<String, Object> createPerforceConfig() throws Exception
     {
         Hashtable<String, Object> p4Config = xmlRpcHelper.createDefaultConfig("zutubi.perforceConfig");
         p4Config.put("port", P4PORT);
         p4Config.put("user", P4USER);
         p4Config.put("password", P4PASSWD);
-        p4Config.put("spec", P4CLIENT);
         p4Config.put("monitor", false);
         return p4Config;
     }

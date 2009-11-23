@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.StringUtils;
 
 import java.io.*;
@@ -344,7 +345,12 @@ public class PerforceClient extends CachingScmClient
 
     public String getLocation()
     {
-        return configuration.getSpec() + "@" + configuration.getPort();
+        return getUniqueWorkspaceString() + "@" + configuration.getPort();
+    }
+
+    private String getUniqueWorkspaceString()
+    {
+        return configuration.getUseTemplateClient() ? configuration.getSpec() : SecurityUtils.sha1Digest(configuration.getView());
     }
 
     public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException

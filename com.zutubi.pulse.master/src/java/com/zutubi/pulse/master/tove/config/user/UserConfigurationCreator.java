@@ -22,7 +22,7 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
     private String login;
     @Required
     private String name;
-    @ControllingCheckbox(dependentFields = {"password", "confirmPassword"}, invert = true)
+    @ControllingCheckbox(uncheckedFields = {"password", "confirmPassword"})
     private boolean authenticatedViaLdap;
     @Password
     private String password;

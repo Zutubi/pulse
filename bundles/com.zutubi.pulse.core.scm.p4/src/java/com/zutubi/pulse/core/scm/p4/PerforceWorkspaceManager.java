@@ -58,7 +58,16 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
     private PerforceWorkspace updateWorkspace(PerforceCore core, PerforceConfiguration configuration, String workspaceName, File root, String description, boolean temporary) throws ScmException
     {
         String rootPath = FileSystemUtils.getNormalisedAbsolutePath(root);
-        PerforceWorkspace workspace = core.createOrUpdateWorkspace(configuration.getSpec(), workspaceName, description, rootPath);
+        PerforceWorkspace workspace;
+        if (configuration.getUseTemplateClient())
+        {
+            workspace = core.createOrUpdateWorkspace(configuration.getSpec(), workspaceName, description, rootPath, null);
+        }
+        else
+        {
+            workspace = core.createOrUpdateWorkspace(null, workspaceName, description, rootPath, configuration.getView());
+        }
+
         workspace.setTemporary(temporary);
         return workspace;
     }

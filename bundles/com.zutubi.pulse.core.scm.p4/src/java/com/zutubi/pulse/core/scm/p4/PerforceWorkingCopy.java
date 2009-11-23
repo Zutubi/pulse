@@ -47,7 +47,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
     public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
-        // Location is <template workspace>@<port>
+        // Location is <template workspace/view hash>@<port>
         String[] pieces = location.split("@");
 
         // $ p4 set

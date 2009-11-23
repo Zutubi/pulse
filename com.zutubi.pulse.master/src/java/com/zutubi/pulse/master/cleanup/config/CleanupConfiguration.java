@@ -23,7 +23,7 @@ import java.util.List;
 @Table(columns = {"name", "what", "after", "states"})
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
-    @ControllingCheckbox(dependentFields = {"what"}, invert = true)
+    @ControllingCheckbox(uncheckedFields = {"what"})
     private boolean cleanupAll = true;
 
     @Required

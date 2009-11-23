@@ -3,16 +3,13 @@ package com.zutubi.pulse.core.scm.p4.config;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.pulse.core.scm.p4.PerforceWorkspaceManager;
-import com.zutubi.tove.annotations.ConfigurationCheck;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wizard;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.validation.annotations.Required;
 
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern" })
+@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -22,8 +19,12 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @Required
     private String user;
     private String password;
+    @ControllingCheckbox(checkedFields = {"spec"}, uncheckedFields = {"view"})
+    private boolean useTemplateClient = true;
     @Required
     private String spec;
+    @TextArea(rows = 10, cols = 80) @Required
+    private String view = "//depot/... //pulse/...";
     private boolean useTicketAuth = false;
     @Wizard.Ignore
     private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(agent.handle)";
@@ -70,6 +71,16 @@ public class PerforceConfiguration extends PollableScmConfiguration
         this.password = password;
     }
 
+    public boolean getUseTemplateClient()
+    {
+        return useTemplateClient;
+    }
+
+    public void setUseTemplateClient(boolean useTemplateClient)
+    {
+        this.useTemplateClient = useTemplateClient;
+    }
+
     public String getSpec()
     {
         return spec;
@@ -78,6 +89,16 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setSpec(String spec)
     {
         this.spec = spec;
+    }
+
+    public String getView()
+    {
+        return view;
+    }
+
+    public void setView(String view)
+    {
+        this.view = view;
     }
 
     public String getType()

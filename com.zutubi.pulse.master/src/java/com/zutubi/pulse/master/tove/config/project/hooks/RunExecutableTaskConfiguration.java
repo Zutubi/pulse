@@ -31,7 +31,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
     private String command;
     private String arguments;
     private String workingDir;
-    @ControllingCheckbox(dependentFields = {"timeout"})
+    @ControllingCheckbox(checkedFields = {"timeout"})
     private boolean timeoutApplied;
     @Numeric(min = 0)
     private int timeout;

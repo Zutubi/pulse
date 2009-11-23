@@ -28,6 +28,7 @@ public class PerforceCore
 
     private static final long P4_TIMEOUT = Long.getLong("pulse.p4.inactivity.timeout", 300);
 
+    private static final String DUMMY_CLIENT = "pulse";
     private static final String ROOT_PREFIX = "Root:";
 
     private static final Pattern PATTERN_LINE_SPLITTER = Pattern.compile("\\r?\\n");
@@ -232,7 +233,7 @@ public class PerforceCore
         return getWorkspace(workspaceName, false) != null;
     }
 
-    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root) throws ScmException
+    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root, String view) throws ScmException
     {
         PerforceWorkspace workspace;
         if (templateWorkspace == null)
@@ -246,12 +247,18 @@ public class PerforceCore
             {
                 throw new ScmException("Template client '" + templateWorkspace + "' does not exist.");
             }
+
+            workspace.rename(workspaceName);
         }
 
-        workspace.rename(workspaceName);
         workspace.setHost(null);
         workspace.setDescription(Arrays.asList(description));
         workspace.setRoot(root);
+        if (view != null)
+        {
+            view = view.replaceAll("//" + Pattern.quote(DUMMY_CLIENT) + "/", Matcher.quoteReplacement("//" + workspaceName + "/"));
+            workspace.setView(Arrays.asList(view.split("\\n")));
+        }
         workspace.deleteOption(OPTION_LOCKED);
 
         runP4(workspace.toSpecification(), getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_INPUT);

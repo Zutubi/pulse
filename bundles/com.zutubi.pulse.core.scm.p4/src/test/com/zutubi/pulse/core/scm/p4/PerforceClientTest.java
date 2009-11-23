@@ -53,14 +53,14 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetLocation() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         assertEquals(client.getLocation(), "test-client@" + getP4Port());
     }
 
     public void testNonExistantTemplateWorkspaceFails() throws ScmException
     {
         final String WORKSPACE_NAME = "i-do-not-exist";
-        getServer(WORKSPACE_NAME);
+        setupClient(WORKSPACE_NAME);
         try
         {
             client.getLatestRevision(null).getRevisionString();
@@ -76,26 +76,26 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetLatestRevision() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         assertEquals("7", client.getLatestRevision(null).getRevisionString());
     }
 
     public void testGetLatestRevisionRestrictedToView() throws ScmException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         assertEquals("4", client.getLatestRevision(null).getRevisionString());
     }
 
     public void testGetRevisionsLatest() throws ScmException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         Revision latest = client.getLatestRevision(null);
         assertEquals(0, client.getRevisions(null, latest, null).size());
     }
 
     public void testGetRevisions() throws ScmException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         Revision latest = client.getLatestRevision(null);
         List<Revision> revisions = client.getRevisions(null, latest.calculatePreviousNumericalRevision(), null);
         assertEquals(1, revisions.size());
@@ -104,7 +104,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetRevisionsBetweenLabels() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<Revision> revisions = client.getRevisions(null, new Revision(LABEL_TWO), new Revision(LABEL_LATEST));
         // The latest thing in our view is revision 7, so we expect revisions 3-7.
         assertEquals(5, revisions.size());
@@ -114,7 +114,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testCheckoutHead() throws Exception
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         List<String> statuses = checkoutChanges(workDir, null, 4);
 
         assertEquals(10, statuses.size());
@@ -146,16 +146,36 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testCheckoutRevision() throws Exception
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         Revision revision = client.checkout(createExecutionContext(workDir, false), createRevision(1), null);
         assertEquals("1", revision.getRevisionString());
         checkDirectory("checkoutRevision");
     }
 
+    public void testCheckoutCustomView() throws ScmException, IOException
+    {
+        setupClient("//depot/... //pulse/nested/depot/...");
+        
+        Revision revision = client.checkout(createExecutionContext(workDir, false), createRevision(1), null);
+        assertEquals("1", revision.getRevisionString());
+        checkDirectory("checkoutRevision", "nested");
+    }
+
+    public void testCheckoutCustomMultilineView() throws ScmException, IOException
+    {
+        setupClient(
+                "//depot/... //pulse/...\n" +
+                "-//depot/file1 //pulse/file1");
+
+        client.checkout(createExecutionContext(workDir, false), null, null);
+        assertFalse(new File(workDir, "file1").exists());
+        assertTrue(new File(workDir, "file2").exists());
+    }
+
     public void testSyncWorkspacePersists() throws ScmException, IOException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         ExecutionContext context = createExecutionContext(workDir, false);
         client.checkout(context, createRevision(1), null);
@@ -164,7 +184,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testSyncWorkspaceCleanedOnDestroy() throws ScmException, IOException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         ExecutionContext context = createExecutionContext(workDir, false);
         client.checkout(context, createRevision(1), null);
@@ -177,21 +197,21 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testCheckoutFile() throws ScmException, IOException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         String content = IOUtils.inputStreamToString(client.retrieve(null, FileSystemUtils.composeFilename("depot", "file2"), null));
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
     public void testCheckoutFileRevision() throws ScmException, IOException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         String content = IOUtils.inputStreamToString(client.retrieve(null, FileSystemUtils.composeFilename("depot", "file2"), createRevision(2)));
         assertEquals("content of file2\n", content);
     }
 
     public void testProjectWorkspacePersists() throws ScmException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         client.retrieve(createScmContext(), FileSystemUtils.composeFilename("depot", "file2"), null);
         assertTrue(core.workspaceExists("pulse-" + TEST_PROJECT_HANDLE));
@@ -199,7 +219,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testProjectWorkspaceCleanedOnDestroy() throws ScmException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         ScmContextImpl context = createScmContext();
         client.retrieve(context, FileSystemUtils.composeFilename("depot", "file2"), null);
@@ -218,7 +238,7 @@ public class PerforceClientTest extends PerforceTestBase
         //  { uid: :6666, rev: 4, changes: [//depot/file2#2 - EDIT, //depot2/file2#2 - EDIT] },
         //  { uid: :6666, rev: 3, changes: [//depot2/file1#2 - EDIT, //depot2/file10#2 - DELETE] },
         //  { uid: :6666, rev: 2, changes: [//depot2/file1#1 - ADD, //depot2/file10#1 - ADD, //depot2/file2#1 - ADD, //depot2/file3#1 - ADD, //depot2/file4#1 - ADD, //depot2/file5#1 - ADD, //depot2/file6#1 - ADD, //depot2/file7#1 - ADD, //depot2/file8#1 - ADD, //depot2/file9#1 - ADD] }]
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<Changelist> changes = client.getChanges(null, createRevision(1), createRevision(7));
         assertEquals(6, changes.size());
         Changelist list = changes.get(1);
@@ -237,14 +257,14 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetChangesReverseRange() throws Exception
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(2));
         assertTrue(changes.isEmpty());
     }
 
     public void testGetChangesRestrictedToView() throws Exception
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
         List<Changelist> changes = client.getChanges(null, createRevision(1), createRevision(7));
         assertEquals(1, changes.size());
         assertEquals("4", (changes.get(0).getRevision()).getRevisionString());
@@ -252,7 +272,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testListNonExistent() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         try
         {
             client.browse(null, "depot4", null);
@@ -266,7 +286,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testListRoot() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<ScmFile> files = client.browse(null, "", null);
         assertEquals(2, files.size());
         ScmFile f = files.get(0);
@@ -281,7 +301,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testListPath() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<ScmFile> files = client.browse(null, "depot2", null);
         assertEquals(10, files.size());
 
@@ -302,7 +322,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testListComplexClient() throws ScmException
     {
-        getServer("complex-client");
+        setupClient("complex-client");
         List<ScmFile> files = client.browse(null, "", null);
         assertEquals(1, files.size());
         ScmFile scmFile = files.get(0);
@@ -312,7 +332,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testListComplexSrc() throws ScmException
     {
-        getServer("complex-client");
+        setupClient("complex-client");
         List<ScmFile> files = client.browse(null, "src", null);
         assertEquals(2, files.size());
 
@@ -327,7 +347,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testListComplexSnuth() throws ScmException
     {
-        getServer("complex-client");
+        setupClient("complex-client");
         List<ScmFile> files = client.browse(null, "src/libraries/snuth", null);
         assertEquals(2, files.size());
 
@@ -342,7 +362,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testTag() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         assertFalse(client.labelExists(TEST_WORKSPACE, "test-tag"));
         client.tag(null, null, createRevision(5), "test-tag", false);
         assertTrue(client.labelExists(TEST_WORKSPACE, "test-tag"));
@@ -361,7 +381,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testUnmovableTag() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         client.tag(null, null, createRevision(5), "test-tag", false);
         assertTrue(client.labelExists(TEST_WORKSPACE, "test-tag"));
         try
@@ -377,7 +397,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testTagSameRevision() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         client.tag(null, null, createRevision(5), "test-tag", false);
         assertTrue(client.labelExists(TEST_WORKSPACE, "test-tag"));
         client.tag(null, null, createRevision(5), "test-tag", true);
@@ -385,7 +405,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetRevisionsSince() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<Revision> revisions = client.getRevisions(null, createRevision(5), null);
         assertEquals(2, revisions.size());
         assertEquals("6", revisions.get(0).getRevisionString());
@@ -394,14 +414,14 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetRevisionsSinceLatest() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         List<Revision> revisions = client.getRevisions(null, createRevision(7), null);
         assertEquals(0, revisions.size());
     }
 
     public void testGetRevisionsSinceFiltered() throws ScmException
     {
-        getServer(TEST_WORKSPACE, "//depot2/*");
+        setupClient(TEST_WORKSPACE, "//depot2/*");
         List<Revision> revisions = client.getRevisions(null, createRevision(5), null);
         assertEquals(1, revisions.size());
         assertEquals("7", revisions.get(0).getRevisionString());
@@ -409,7 +429,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testCheckoutThenUpdate() throws ScmException, IOException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         Revision got = client.checkout(createExecutionContext(workDir, true), createRevision(1), null);
         assertEquals("1", got.getRevisionString());
@@ -423,7 +443,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testUpdateSameRevision() throws ScmException, IOException
     {
-        getServer(DEPOT_WORKSPACE);
+        setupClient(DEPOT_WORKSPACE);
 
         client.checkout(createExecutionContext(workDir, true), null, null);
 
@@ -434,7 +454,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testMultiUpdates() throws ScmException, IOException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
 
         client.checkout(createExecutionContext(workDir, true), createRevision(1), null);
 
@@ -447,7 +467,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testParseRevisionLatest() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         Revision latest = client.getLatestRevision(null);
         Revision rev = client.parseRevision(null, latest.getRevisionString());
         assertEquals(latest.getRevisionString(), rev.getRevisionString());
@@ -455,7 +475,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testParseRevisionLabel() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         Revision rev = client.parseRevision(null, LABEL_TWO);
         assertEquals(LABEL_TWO, rev.getRevisionString());
     }
@@ -474,7 +494,7 @@ public class PerforceClientTest extends PerforceTestBase
     {
         // Perforce happily accepts such a revision, but we will map it to
         // the equivalent that makes sense.
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         Revision rev = client.parseRevision(null, "10000");
         assertEquals(client.getLatestRevision(null).toString(), rev.getRevisionString());
     }
@@ -486,7 +506,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     private void failedParseRevisionHelper(String revision, String expectedMessage) throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         try
         {
             client.parseRevision(null, revision);
@@ -504,8 +524,8 @@ public class PerforceClientTest extends PerforceTestBase
         spec = spec.replaceAll("(\nOptions:.*)unlocked", "$1locked");
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
-        PerforceCore core = getClient();
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", getTempDir().getAbsolutePath());
+        PerforceCore core = getCore();
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", getTempDir().getAbsolutePath(), null);
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
@@ -515,9 +535,9 @@ public class PerforceClientTest extends PerforceTestBase
     public void testDeletedChangelist() throws Exception
     {
         // CIB-1010
-        getServer(TEST_WORKSPACE, "//depot/file2");
+        setupClient(TEST_WORKSPACE, "//depot/file2");
 
-        PerforceCore core = getClient();
+        PerforceCore core = getCore();
         core.runP4("Change: new\n" +
                      "Client: test-client\n" +
                      "User: test-user\n" +
@@ -527,7 +547,7 @@ public class PerforceClientTest extends PerforceTestBase
                      "p4", FLAG_CLIENT, TEST_WORKSPACE, "change", "-i");
         core.runP4(null, "p4", FLAG_CLIENT, TEST_WORKSPACE, "change", "-d", "9");
 
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "edit-client", "description", workDir.getAbsolutePath());
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "edit-client", "description", workDir.getAbsolutePath(), null);
         core.setEnv(PerforceConstants.ENV_CLIENT, "edit-client");
         core.runP4(null, "p4", "sync");
         core.runP4(null, "p4", "edit", "//depot/file1");
@@ -539,11 +559,11 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testGetEmail() throws ScmException
     {
-        getServer(TEST_WORKSPACE);
+        setupClient(TEST_WORKSPACE);
         assertEquals("jsankey@bob", client.getEmailAddress(null, "jsankey"));
     }
 
-    private PerforceCore getClient()
+    private PerforceCore getCore()
     {
         PerforceCore core = new PerforceCore();
         core.setEnv(PerforceConstants.ENV_PORT, getP4Port());
@@ -551,9 +571,20 @@ public class PerforceClientTest extends PerforceTestBase
         return core;
     }
 
-    private void getServer(String workspace, String... excludedPaths) throws ScmException
+    private void setupClient(String workspaceOrView, String... excludedPaths) throws ScmException
     {
-        PerforceConfiguration configuration = new PerforceConfiguration(getP4Port(), "test-user", "", workspace);
+        PerforceConfiguration configuration;
+        if (workspaceOrView.contains("//"))
+        {
+            configuration = new PerforceConfiguration(getP4Port(), "test-user", "", null);
+            configuration.setUseTemplateClient(false);
+            configuration.setView(workspaceOrView);
+        }
+        else
+        {
+            configuration = new PerforceConfiguration(getP4Port(), "test-user", "", workspaceOrView);
+        }
+        
         configuration.setFilterPaths(Arrays.asList(excludedPaths));
         this.client = new PerforceClient(configuration, new PerforceWorkspaceManager());
         this.core.setEnv(PerforceConstants.ENV_PORT, getP4Port());
@@ -562,12 +593,27 @@ public class PerforceClientTest extends PerforceTestBase
 
     private void checkDirectory(String name) throws IOException
     {
+        checkDirectory(name, null);
+    }
+
+    private void checkDirectory(String name, String nestedUnder) throws IOException
+    {
         File expectedDir = new File(getTempDir(), DIR_EXPECTED);
         removeDirectory(expectedDir);
         assertTrue(expectedDir.mkdirs());
         unzipInput(name, expectedDir);
 
-        IOAssertions.assertDirectoriesEqual(expectedDir, workDir);
+        File dir;
+        if (nestedUnder == null)
+        {
+            dir = workDir;
+        }
+        else
+        {
+            dir = new File(workDir, nestedUnder);
+        }
+
+        IOAssertions.assertDirectoriesEqual(expectedDir, dir);
     }
 
     private List<String> checkoutChanges(File dir, Revision revision, long expectedRevision) throws ScmException

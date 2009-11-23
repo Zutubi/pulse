@@ -346,6 +346,11 @@ public class PerforceWorkspace
         this.root = root;
     }
 
+    public void setView(List<String> view)
+    {
+        this.view = view;
+    }
+
     /**
      * @return the set of options enabled for this workspace
      */

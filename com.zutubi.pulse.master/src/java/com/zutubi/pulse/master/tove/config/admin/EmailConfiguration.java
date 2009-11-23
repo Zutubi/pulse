@@ -30,7 +30,7 @@ public class EmailConfiguration extends AbstractConfiguration implements Validat
     private String subjectPrefix;
     private String localhost;
 
-    @ControllingCheckbox(dependentFields = {"port"})
+    @ControllingCheckbox(checkedFields = {"port"})
     private boolean customPort;
     
     @Numeric(min = 1)

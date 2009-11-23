@@ -28,7 +28,10 @@ public class ControllingSelectValidator extends FieldValidatorSupport
         IgnoreDependentsFieldValidator delegate = new IgnoreDependentsFieldValidator();
         delegate.setFieldName(getFieldName());
         delegate.setNonIgnoreValues(enableSet);
-        delegate.setDependentFields(dependentFields);
+        if (dependentFields.length > 0)
+        {
+            delegate.setDependentFields(dependentFields);
+        }
         delegate.setValidationContext(getValidationContext());
         delegate.validateField(object);
     }

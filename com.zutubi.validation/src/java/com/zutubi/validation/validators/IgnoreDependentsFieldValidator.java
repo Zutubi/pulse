@@ -1,7 +1,7 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.ValidationException;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.validation.ValidationException;
 
 /**
  * A validator that inspects the value of a field and decides based on this
@@ -43,17 +43,17 @@ public class IgnoreDependentsFieldValidator extends FieldValidatorSupport
 
         if(!found)
         {
-            if(dependentFields.length > 0)
+            if(dependentFields == null)
+            {
+                // Turn off field validation altogether
+                getValidationContext().ignoreAllFields();
+            }
+            else
             {
                 for(String dependentField: dependentFields)
                 {
                     getValidationContext().addIgnoredField(dependentField);
                 }
-            }
-            else
-            {
-                // Turn off field validation altogether
-                getValidationContext().ignoreAllFields();
             }
         }
     }

@@ -10,8 +10,9 @@ import java.lang.annotation.Target;
 /**
  * A checkbox field that controls dependent fields.  When the checkbox is in
  * a certain state, dependent fields will be disabled and ignored during
- * validation.  If no dependent fields are specified, the checkbox controls
- * all other fields in the form.
+ * validation.  If no dependent fields are specified (i.e. no checked or
+ * unchecked fields), all other fields in the form will only be enabled when
+ * the box is checked.
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -20,7 +21,14 @@ import java.lang.annotation.Target;
 @Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface ControllingCheckbox
 {
-    boolean invert() default false;
-
-    String[] dependentFields() default {};
+    /**
+     * @return the names of fields that should be enabled when the box is
+     *         checked
+     */
+    String[] checkedFields() default {};
+    /**
+     * @return the names of fields that should be enabled when the box is
+     *         not checked
+     */
+    String[] uncheckedFields() default {};
 }

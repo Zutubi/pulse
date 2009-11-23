@@ -1,6 +1,7 @@
 package com.zutubi.util;
 
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -933,5 +934,23 @@ public class StringUtils
         {
             return s;
         }
+    }
+
+    /**
+     * Converts a byte array to a hexadecimal string.  Each single byte is
+     * converted to a two character hexadecimal string.
+     *
+     * @param bytes the input bytes
+     * @return the hexadecimal string form of the input bytes
+     */
+    public static String toHexString(byte[] bytes)
+    {
+        Formatter formatter = new Formatter();
+        for (byte b: bytes)
+        {
+            formatter.format("%02x", b);
+        }
+
+        return formatter.toString();
     }
 }

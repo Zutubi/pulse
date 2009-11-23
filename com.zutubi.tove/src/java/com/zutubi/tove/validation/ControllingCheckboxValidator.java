@@ -10,26 +10,52 @@ import com.zutubi.validation.validators.IgnoreDependentsFieldValidator;
  */
 public class ControllingCheckboxValidator extends FieldValidatorSupport
 {
-    private boolean invert;
-    private String[] dependentFields;
+    private String[] checkedFields;
+    private String[] uncheckedFields;
 
-    public void setInvert(boolean invert)
+    public void setCheckedFields(String[] checkedFields)
     {
-        this.invert = invert;
+        this.checkedFields = checkedFields;
     }
 
-    public void setDependentFields(String[] dependentFields)
+    public void setUncheckedFields(String[] uncheckedFields)
     {
-        this.dependentFields = dependentFields;
+        this.uncheckedFields = uncheckedFields;
     }
 
     public void validateField(Object object) throws ValidationException
     {
+        if (checkedFields.length == 0 && uncheckedFields.length == 0)
+        {
+            IgnoreDependentsFieldValidator delegate = createDelegate();
+            delegate.setNonIgnoreValues(Boolean.toString(true));
+            delegate.validateField(object);
+        }
+        else
+        {
+            if (checkedFields.length > 0)
+            {
+                IgnoreDependentsFieldValidator checkedDelegate = createDelegate();
+                checkedDelegate.setNonIgnoreValues(Boolean.toString(true));
+                checkedDelegate.setDependentFields(checkedFields);
+                checkedDelegate.validateField(object);
+            }
+
+            if (uncheckedFields.length > 0)
+            {
+                IgnoreDependentsFieldValidator uncheckedDelegate = createDelegate();
+                uncheckedDelegate.setNonIgnoreValues(Boolean.toString(false));
+                uncheckedDelegate.setDependentFields(uncheckedFields);
+                uncheckedDelegate.validateField(object);
+            }
+        }
+    }
+
+    private IgnoreDependentsFieldValidator createDelegate()
+    {
         IgnoreDependentsFieldValidator delegate = new IgnoreDependentsFieldValidator();
         delegate.setFieldName(getFieldName());
-        delegate.setNonIgnoreValues(Boolean.toString(!invert));
-        delegate.setDependentFields(dependentFields);
-        delegate.setValidationContext(getValidationContext());
-        delegate.validateField(object);
+        delegate.setValidationContext(validationContext);
+        return delegate;
     }
 }

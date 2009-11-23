@@ -41,7 +41,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         core = mock(PerforceCore.class);
-        stub(core.createOrUpdateWorkspace(anyString(), anyString(), anyString(), anyString())).toAnswer(new Answer<PerforceWorkspace>()
+        stub(core.createOrUpdateWorkspace(anyString(), anyString(), anyString(), anyString(), (String) isNull())).toAnswer(new Answer<PerforceWorkspace>()
         {
             public PerforceWorkspace answer(InvocationOnMock invocationOnMock) throws Throwable
             {
@@ -107,7 +107,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         ExecutionContext context = createExecutionContext(1, 1);
         PerforceConfiguration config = new PerforceConfiguration(TEST_PORT, TEST_USER, TEST_PASSWORD, TEST_TEMPLATE_WORKSPACE);
         final PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, config, context);
-        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getSyncWorkspaceDescription(context), TEST_ROOT);
+        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getSyncWorkspaceDescription(context), TEST_ROOT, null);
         verifyNoMoreInteractions(core);
     }
 
@@ -131,7 +131,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     {
         ScmContextImpl scmContext = createScmContext(88);
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
-        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
+        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT, null);
         verifyNoMoreInteractions(core);
     }
 
@@ -139,7 +139,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     {
         ScmContextImpl scmContext = createScmContext(88);
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
-        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
+        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT, null);
         workspaceManager.freeWorkspace(core, workspace);
         verifyNoMoreInteractions(core);
     }
@@ -147,7 +147,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     public void testFreeTempWorkspaceDeletesClient() throws ScmException
     {
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, null);
-        verify(core).createOrUpdateWorkspace(eq(TEST_TEMPLATE_WORKSPACE), eq(workspace.getName()), anyString(), anyString());
+        verify(core).createOrUpdateWorkspace(eq(TEST_TEMPLATE_WORKSPACE), eq(workspace.getName()), anyString(), anyString(), (String) isNull());
         workspaceManager.freeWorkspace(core, workspace);
         verify(core).deleteWorkspace(workspace.getName());
         verifyNoMoreInteractions(core);
@@ -187,7 +187,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
         // Now do a broken allocation, which should not hold onto the name
         PerforceCore brokenCore = mock(PerforceCore.class);
-        stub(brokenCore.createOrUpdateWorkspace(anyString(), anyString(), anyString(), anyString())).toThrow(new ScmException(ERROR_MESSAGE));
+        stub(brokenCore.createOrUpdateWorkspace(anyString(), anyString(), anyString(), anyString(), (String) isNull())).toThrow(new ScmException(ERROR_MESSAGE));
         try
         {
             workspaceManager.allocateWorkspace(brokenCore, TEST_PERFORCE_CONFIGURATION, scmContext);

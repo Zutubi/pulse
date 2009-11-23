@@ -27,7 +27,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
 {
     @ExternalState
     private long agentStateId;
-    @ControllingCheckbox(dependentFields = {"host", "port"})
+    @ControllingCheckbox(checkedFields = {"host", "port"})
     private boolean remote = true;
     @NoInherit
     private String name;
