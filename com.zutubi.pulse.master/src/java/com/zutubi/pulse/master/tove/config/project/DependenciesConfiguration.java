@@ -6,6 +6,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,10 +18,6 @@ import java.util.List;
 @Form(fieldOrder = {"version", "status", "publicationPattern", "retrievalPattern"})
 public class DependenciesConfiguration extends AbstractConfiguration
 {
-    // We don't look up Ivy's definition as it causes early loading of ivy
-    // settings (before, e.g., we have a chance to redirect logging).
-    private static final String STATUS_INTEGRATION = "integration";
-
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
 
     @Required
@@ -30,7 +27,12 @@ public class DependenciesConfiguration extends AbstractConfiguration
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
-    private String status = STATUS_INTEGRATION;
+    private String status = IvyStatus.STATUS_INTEGRATION;
+
+    public DependenciesConfiguration()
+    {
+        setPermanent(true);
+    }
 
     @Required
     private String version = "${build.number}";
