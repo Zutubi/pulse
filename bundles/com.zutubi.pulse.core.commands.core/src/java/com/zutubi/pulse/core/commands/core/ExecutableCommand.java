@@ -116,8 +116,6 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             }
 
             final int result = child.waitFor();
-            child.destroy();
-            child = null;
 
             // Wait at least once: we want to allow the reader some time to
             // complete after we are terminated so that we can identify the
