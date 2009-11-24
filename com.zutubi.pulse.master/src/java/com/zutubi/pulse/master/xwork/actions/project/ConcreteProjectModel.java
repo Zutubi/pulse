@@ -29,11 +29,12 @@ public class ConcreteProjectModel extends ProjectModel
     private boolean built;
     private List<ProjectBuildModel> buildRows;
     private boolean canTrigger;
+    private boolean prompt;
     private boolean canRebuild;
     private boolean canViewSource;
     private long projectId;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean canTrigger, boolean canViewSource)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean canTrigger, boolean prompt, boolean canViewSource)
     {
         super(group, project.getName());
 
@@ -64,6 +65,7 @@ public class ConcreteProjectModel extends ProjectModel
         });
 
         this.canTrigger = canTrigger;
+        this.prompt = prompt;
         this.canRebuild = canTrigger && project.getConfig().hasDependencies();
         this.canViewSource = canViewSource;
     }
@@ -112,6 +114,11 @@ public class ConcreteProjectModel extends ProjectModel
     public boolean isCanTrigger()
     {
         return canTrigger;
+    }
+
+    public boolean isPrompt()
+    {
+        return prompt;
     }
 
     public boolean isCanRebuild()

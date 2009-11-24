@@ -154,6 +154,7 @@ ZUTUBI.ConcreteProject.prototype = {
 
         if (menuType == 'actions')
         {
+            var encodedName = encodeURIComponent(this.data.name);
             items = [{
                 id: 'home',
                 url: this.getProjectTabLink('home'),
@@ -176,17 +177,27 @@ ZUTUBI.ConcreteProject.prototype = {
                 image: 'script.gif'
             }, {
                 id: 'configuration',
-                url: 'admin/projects/' + encodeURIComponent(this.data.name) + '/',
+                url: 'admin/projects/' + encodedName + '/',
                 image: 'pencil.gif'
             }];
 
             if (this.data.canTrigger)
             {
-                items.push({
+                var item = {
                     id: 'trigger',
-                    image: 'lightning.gif',
-                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
-                });
+                    image: 'lightning.gif'
+                };
+
+                if (this.data.prompt)
+                {
+                    item.url = 'triggerBuild.action?projectName=' + encodedName;
+                }
+                else
+                {
+                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
+                }
+
+                items.push(item);
             }
 
             if (this.data.canRebuild)
@@ -202,7 +213,7 @@ ZUTUBI.ConcreteProject.prototype = {
             {
                 items.push({
                     id: 'hide',
-                    url: 'user/hideDashboardProject.action?projectName=' + encodeURIComponent(this.data.name),
+                    url: 'user/hideDashboardProject.action?projectName=' + encodedName,
                     image: 'close.gif'
                 });
             }

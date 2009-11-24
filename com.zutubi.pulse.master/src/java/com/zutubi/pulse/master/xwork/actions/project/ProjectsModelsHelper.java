@@ -153,8 +153,9 @@ public class ProjectsModelsHelper
             for (Project p : projects)
             {
                 boolean canTrigger = accessManager.hasPermission(ProjectConfigurationActions.ACTION_TRIGGER, p);
+                boolean prompt = p.getConfig().getOptions().getPrompt();
                 boolean canViewSource = accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, p);
-                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, canTrigger, canViewSource));
+                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, canTrigger, prompt, canViewSource));
             }
         }
 
@@ -176,8 +177,9 @@ public class ProjectsModelsHelper
                         Project project = projectManager.getProject(name, true);
                         List<BuildResult> builds = getBuilds(project, configuration, buildCache);
                         boolean canTrigger = accessManager.hasPermission(ProjectConfigurationActions.ACTION_TRIGGER, project);
+                        boolean prompt = project.getConfig().getOptions().getPrompt();
                         boolean canViewSource = accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project);
-                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, canTrigger, canViewSource);
+                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, canTrigger, prompt, canViewSource);
                     }
                     else
                     {
