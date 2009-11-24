@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<project>
+    <addables>
+        <dash-item name="dashdash"/>
+        <dashItem name="dashcamel"/>
+        <camelItem name="camelcamel"/>
+        <camel-item name="cameldash"/>
+    </addables>
+</project>
+        

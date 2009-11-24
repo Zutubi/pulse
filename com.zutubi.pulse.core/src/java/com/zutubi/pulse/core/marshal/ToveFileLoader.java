@@ -265,7 +265,7 @@ public class ToveFileLoader
         for (TypeProperty property: parentType.getProperties(CollectionType.class))
         {
             Addable annotation = property.getAnnotation(Addable.class);
-            if (annotation != null && propertyName.equals(annotation.value()))
+            if (annotation != null && propertyName.equals(convertLocalNameToPropertyName(annotation.value())))
             {
                 Type propertyType = property.getType();
                 Type targetType = propertyType.getTargetType();

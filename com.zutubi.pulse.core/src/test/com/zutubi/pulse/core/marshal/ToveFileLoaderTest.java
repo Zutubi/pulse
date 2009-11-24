@@ -221,6 +221,23 @@ public class ToveFileLoaderTest extends PulseTestCase
         assertEquals("val2", list.get(1));
     }
 
+    public void testAddables() throws PulseException
+    {
+        SimpleRoot root = load();
+        Addables addables = root.getAddables();
+        assertNotNull(addables);
+
+        List<AddableItem> dashList = addables.getDashList();
+        assertEquals(2, dashList.size());
+        assertEquals("dashdash", dashList.get(0).getName());
+        assertEquals("dashcamel", dashList.get(1).getName());
+
+        Map<String, AddableItem> camelMap = addables.getCamelMap();
+        assertEquals(2, camelMap.size());
+        assertNotNull(camelMap.get("camelcamel"));
+        assertNotNull(camelMap.get("cameldash"));
+    }
+
     public void testBasicImport() throws IOException, PulseException
     {
         File tempDir = createTempDirectory();
@@ -452,6 +469,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         private Textual textual;
         private List<Enumerator> enumerators = new LinkedList<Enumerator>();
         private StringList stringList;
+        private Addables addables;
 
         public Map<String, SimpleReference> getReferences()
         {
@@ -521,6 +539,16 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setStringList(StringList stringList)
         {
             this.stringList = stringList;
+        }
+
+        public Addables getAddables()
+        {
+            return addables;
+        }
+
+        public void setAddables(Addables addables)
+        {
+            this.addables = addables;
         }
     }
 
@@ -640,7 +668,7 @@ public class ToveFileLoaderTest extends PulseTestCase
     @SymbolicName("stringlist")
     public static class StringList extends AbstractConfiguration
     {
-        @Addable(value = "add", attribute = "val")
+        @Addable(value = "add-item", attribute = "val")
         private List<String> addableList = new LinkedList<String>();
         private List<String> notAddableList = new LinkedList<String>();
 
@@ -663,5 +691,40 @@ public class ToveFileLoaderTest extends PulseTestCase
         {
             this.notAddableList = notAddableList;
         }
+    }
+
+    @SymbolicName("addables")
+    public static class Addables extends AbstractConfiguration
+    {
+        @Addable(value = "dash-item")
+        private List<AddableItem> dashList = new LinkedList<AddableItem>();
+        @Addable(value = "camelItem")
+        private Map<String, AddableItem> camelMap = new HashMap<String, AddableItem>();
+
+        public List<AddableItem> getDashList()
+        {
+            return dashList;
+        }
+
+        public void setDashList(List<AddableItem> dashList)
+        {
+            this.dashList = dashList;
+        }
+
+        public Map<String, AddableItem> getCamelMap()
+        {
+            return camelMap;
+        }
+
+        public void setCamelMap(Map<String, AddableItem> camelMap)
+        {
+            this.camelMap = camelMap;
+        }
+    }
+
+    @SymbolicName("addableItem")
+    public static class AddableItem extends AbstractNamedConfiguration
+    {
+
     }
 }
