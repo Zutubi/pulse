@@ -165,7 +165,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         assertBuildingStatus(agentsPage.getStatus(agent2));
 
         project2.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project2.getName(), 1, 180000);
+        xmlRpcHelper.waitForBuildToComplete(project2.getName(), 1);
 
         browser.refresh();
         agentsPage.waitFor();

@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -16,7 +17,7 @@ import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.REVISION_LATEST_INTEGRATION;
+import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.security.AccessManager;
@@ -111,12 +112,15 @@ public class FatControllerTest extends PulseTestCase
             }
         };
         sequenceManager = mock(SequenceManager.class);
-        stub(sequenceManager.getSequence(FatController.SEQUENCE_BUILD_ID)).toReturn(buildIdSequence);
+        doReturn(buildIdSequence).when(sequenceManager).getSequence(FatController.SEQUENCE_BUILD_ID);
 
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
         ProjectManager projectManager = mock(ProjectManager.class);
-        stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
+        doReturn(new Project()).when(projectManager).getProject(anyLong(), anyBoolean());
+        doNothing().when(projectManager).lockProjectStates(anyLong());
+        doNothing().when(projectManager).unlockProjectStates(anyLong());
+        doReturn(true).when(projectManager).makeStateTransition(anyLong(), (Project.Transition) anyObject());
         buildRequestRegistry.setProjectManager(projectManager);
 
         objectFactory.initProperties(this);
@@ -253,16 +257,16 @@ public class FatControllerTest extends PulseTestCase
         assertCounts(project2, 0, 0);
     }
 
-//    public void testDependencyTreeCalculationUsesTheDependencyRevisionField() throws InterruptedException
-//    {
-//        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_LATEST_MILESTONE, STATUS_INTEGRATION, false);
-//        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_LATEST_INTEGRATION, STATUS_INTEGRATION, true);
-//        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_LATEST_INTEGRATION, STATUS_MILESTONE, true);
-//
-//        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_CUSTOM, STATUS_INTEGRATION, false);
-//        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_CUSTOM, STATUS_MILESTONE, false);
-//        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_CUSTOM, STATUS_RELEASE, false);
-//    }
+    public void testDependencyTreeCalculationUsesTheDependencyRevisionField() throws InterruptedException
+    {
+        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_LATEST_MILESTONE, STATUS_INTEGRATION, false);
+        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_LATEST_INTEGRATION, STATUS_INTEGRATION, true);
+        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_LATEST_INTEGRATION, STATUS_MILESTONE, true);
+
+        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_CUSTOM, STATUS_INTEGRATION, false);
+        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_CUSTOM, STATUS_MILESTONE, false);
+        dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(REVISION_CUSTOM, STATUS_RELEASE, false);
+    }
 
     private void dependencyTreeCalculationsUsesDependencyRevisionFieldHelper(String dependencyRevision, String requestStatus, boolean expectedTraversal) throws InterruptedException
     {
@@ -524,7 +528,7 @@ public class FatControllerTest extends PulseTestCase
         projectConfiguration.setProjectId(project.getId());
         projectConfiguration.setHandle(nextHandle.getAndIncrement());
         project.setConfig(projectConfiguration);
-        stub(projectManager.getProject(project.getId(), false)).toReturn(project);
+        doReturn(project).when(projectManager).getProject(project.getId(), false);
         return project;
     }
 }
