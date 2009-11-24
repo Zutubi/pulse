@@ -25,6 +25,8 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
 import static org.mockito.Mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +60,7 @@ public class FatControllerTest extends PulseTestCase
     // build per owner is possible.
     private Map<NamedEntity, BuildController> projectToControllerMap;
     private Map<NamedEntity, Long> projectToMetaBuildIdMap;
+    private Map<Long, Project> projectsById = new HashMap<Long, Project>();
 
     @Override
     protected void setUp() throws Exception
@@ -65,18 +68,32 @@ public class FatControllerTest extends PulseTestCase
         super.setUp();
 
         accessManager = mock(AccessManager.class);
-        projectManager = mock(ProjectManager.class);
         buildManager = mock(BuildManager.class);
         eventManager = new DefaultEventManager();
         objectFactory = new WiringObjectFactory();
         threadFactory = new PulseThreadFactory();
+
+        projectManager = mock(ProjectManager.class);
+        doAnswer(new Answer<Project>()
+        {
+            public Project answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Long id = (Long) invocationOnMock.getArguments()[0];
+                Project project = projectsById.get(id);
+                if (project == null)
+                {
+                    project = new Project();
+                }
+                return project;
+            }
+        }).when(projectManager).getProject(anyLong(), anyBoolean());
         
         buildControllerFactory = new BuildControllerFactory()
         {
             public BuildController create(final BuildRequestEvent request)
             {
                 final long buildResultId = nextBuildResultId.getAndIncrement();
-                
+
                 BuildController handler = new BuildController()
                 {
                     public boolean updateRevisionIfNotFixed(Revision revision)
@@ -96,7 +113,7 @@ public class FatControllerTest extends PulseTestCase
                 };
 
                 // record enough information about the build request so that we can create
-                // an appropriate build completed event 
+                // an appropriate build completed event
                 projectToControllerMap.put(request.getOwner(), handler);
                 projectToMetaBuildIdMap.put(request.getOwner(), request.getMetaBuildId());
 
@@ -116,11 +133,6 @@ public class FatControllerTest extends PulseTestCase
 
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
-        ProjectManager projectManager = mock(ProjectManager.class);
-        doReturn(new Project()).when(projectManager).getProject(anyLong(), anyBoolean());
-        doNothing().when(projectManager).lockProjectStates(anyLong());
-        doNothing().when(projectManager).unlockProjectStates(anyLong());
-        doReturn(true).when(projectManager).makeStateTransition(anyLong(), (Project.Transition) anyObject());
         buildRequestRegistry.setProjectManager(projectManager);
 
         objectFactory.initProperties(this);
@@ -528,7 +540,7 @@ public class FatControllerTest extends PulseTestCase
         projectConfiguration.setProjectId(project.getId());
         projectConfiguration.setHandle(nextHandle.getAndIncrement());
         project.setConfig(projectConfiguration);
-        doReturn(project).when(projectManager).getProject(project.getId(), false);
+        projectsById.put(project.getId(), project);
         return project;
     }
 }
