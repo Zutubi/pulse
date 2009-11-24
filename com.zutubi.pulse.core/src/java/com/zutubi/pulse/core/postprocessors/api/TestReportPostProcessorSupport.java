@@ -27,6 +27,8 @@ import java.io.IOException;
  */
 public abstract class TestReportPostProcessorSupport extends PostProcessorSupport
 {
+    private boolean testMode = false;
+
     protected TestReportPostProcessorSupport(TestReportPostProcessorConfigurationSupport config)
     {
         super(config);
@@ -149,11 +151,18 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
 
     protected void handleException(String message, PostProcessorContext ppContext, Exception e)
     {
-        if(e.getMessage() != null)
+        if (testMode)
         {
-            message += ": " + e.getMessage();
+            throw new RuntimeException(e);
         }
-        ppContext.addFeatureToCommand(new Feature(Feature.Level.WARNING, message));
+        else
+        {
+            if(e.getMessage() != null)
+            {
+                message += ": " + e.getMessage();
+            }
+            ppContext.addFeatureToCommand(new Feature(Feature.Level.WARNING, message));
+        }
     }
 
     /**
@@ -171,4 +180,14 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
      *                  the recipe test results)
      */
     protected abstract void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests);
+
+    /**
+     * If called, exceptions during processing will be propagated instead of
+     * handled and recorded as warnings.  This is intended for unit tests of
+     * the processor itself.
+     */
+    public void enableTestMode()
+    {
+        testMode = true;
+    }
 }

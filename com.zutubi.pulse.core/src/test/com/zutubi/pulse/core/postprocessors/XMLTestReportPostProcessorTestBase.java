@@ -3,11 +3,15 @@ package com.zutubi.pulse.core.postprocessors;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestCaseResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.TestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.File;
@@ -49,8 +53,12 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
             CommandResult commandResult = new CommandResult("test");
             PostProcessorContext ppContext = new DefaultPostProcessorContext(artifact, commandResult, context);
             pp.process(artifactFile, ppContext);
+            if (commandResult.hasMessages(Feature.Level.WARNING))
+            {
+                throw new RuntimeException("Command result has warnings after post-processing");
+            }
         }
-        
+
         return testResults;
     }
 

@@ -50,6 +50,9 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
             {
                 processTopSuiteResults(tests, reader);
             }
+
+            expectEndTag(ELEMENT_SUITE, reader);
+            reader.nextTag();
         }
 
         expectEndTag(ELEMENT_ROOT, reader);
@@ -62,6 +65,9 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         {
             processSuite(tests, "", reader);
         }
+
+        expectEndTag(ELEMENT_RESULTS, reader);
+        reader.nextTag();
     }
 
     private void processSuite(TestSuiteResult parentSuite, String parentPath, XMLStreamReader reader) throws XMLStreamException

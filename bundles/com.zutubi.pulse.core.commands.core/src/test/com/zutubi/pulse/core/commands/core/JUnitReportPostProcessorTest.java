@@ -11,8 +11,6 @@ import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import java.io.File;
 import java.net.URL;
 
-/**
- */
 public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTestBase
 {
     public JUnitReportPostProcessorTest()

@@ -84,7 +84,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         }
 
         expectEndTag(getConfig().getSuiteElement(), reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private String getTestSuiteName(Map<String, String> attributes)

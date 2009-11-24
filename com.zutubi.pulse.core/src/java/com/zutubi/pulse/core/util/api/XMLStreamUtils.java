@@ -63,6 +63,47 @@ public class XMLStreamUtils
     }
 
     /**
+     * Identical to {@link javax.xml.stream.XMLStreamReader#nextTag()}, but
+     * will not throw an error if the end of the document is reached.
+     *
+     * @param reader the reader
+     * @return the type of event that the reader has reached (one of
+     *         START_ELEMENT, END_ELEMENT or END_DOCUMENT)
+     * @throws XMLStreamException
+     */
+    public static int nextTagOrEnd(XMLStreamReader reader) throws XMLStreamException
+    {
+        int eventType = reader.next();
+        while(isWhitespaceCommentOrPI(reader, eventType))
+        {
+            eventType = reader.next();
+        }
+
+        if (eventType != XMLStreamConstants.START_ELEMENT && eventType != XMLStreamConstants.END_ELEMENT && eventType != XMLStreamConstants.END_DOCUMENT)
+        {
+            throw new XMLStreamException("expected start or end tag or end of document", reader.getLocation());
+        }
+
+        return eventType;
+    }
+
+    private static boolean isWhitespaceCommentOrPI(XMLStreamReader reader, int eventType)
+    {
+        switch (eventType)
+        {
+            case XMLStreamConstants.CDATA:
+            case XMLStreamConstants.CHARACTERS:
+                return reader.isWhiteSpace();
+            case XMLStreamConstants.COMMENT:
+            case XMLStreamConstants.SPACE:
+            case XMLStreamConstants.PROCESSING_INSTRUCTION:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
      * Move the xml stream readers cursor to the end tag that matches the
      * current start tag, skipping the contents of the element.
      *
@@ -141,10 +182,8 @@ public class XMLStreamUtils
     public static boolean nextElement(XMLStreamReader reader) throws XMLStreamException
     {
         skipElement(reader);
-
-        reader.nextTag();
-
-        return (reader.isStartElement());
+        nextTagOrEnd(reader);
+        return reader.isStartElement();
     }
 
     /**
@@ -212,7 +251,7 @@ public class XMLStreamUtils
 
             elements.put(name, text);
 
-            reader.nextTag();
+            nextTagOrEnd(reader);
         }
         return elements;
     }

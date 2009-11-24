@@ -1,9 +1,7 @@
 package com.zutubi.pulse.core.util.api;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.getAttributes;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.skipElement;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.nextElement;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.util.io.IOUtils;
 
 import javax.xml.stream.XMLInputFactory;
@@ -44,6 +42,46 @@ public class XMLStreamUtilsTest extends PulseTestCase
 
         attributes = getAttributes(reader);
         assertEquals(0, attributes.size());
+    }
+
+    public void testNextTagOrEnd() throws XMLStreamException
+    {
+        XMLStreamReader reader = getXMLStreamReader(getName());
+
+        try
+        {
+            XMLStreamUtils.nextTagOrEnd(reader);
+            fail("Can't ask for next tag on text");
+        }
+        catch (XMLStreamException e)
+        {
+            // Continue
+        }
+        
+        reader.getText();
+
+        assertEquals(END_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("a", reader.getLocalName());
+        assertEquals(START_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("b", reader.getLocalName());
+        assertEquals(END_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("b", reader.getLocalName());
+        assertEquals(START_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("c", reader.getLocalName());
+        assertEquals(START_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("ca", reader.getLocalName());
+        assertEquals(END_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("ca", reader.getLocalName());
+        assertEquals(END_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("c", reader.getLocalName());
+        assertEquals(START_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("d", reader.getLocalName());
+        reader.getElementText();
+        assertEquals(END_ELEMENT, reader.getEventType());
+        assertEquals("d", reader.getLocalName());
+        assertEquals(END_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
+        assertEquals("root", reader.getLocalName());
+        assertEquals(END_DOCUMENT, XMLStreamUtils.nextTagOrEnd(reader));
     }
 
     public void testSkipElement() throws XMLStreamException
