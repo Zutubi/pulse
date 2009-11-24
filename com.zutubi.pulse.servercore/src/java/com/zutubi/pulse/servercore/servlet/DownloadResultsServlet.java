@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.servlet;
 
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
@@ -29,6 +30,8 @@ public class DownloadResultsServlet extends HttpServlet
     public static final String PARAM_AGENT_DATA_PATTERN = "agentDataPattern";
     public static final String PARAM_PROJECT_HANDLE = "projectHandle";
     public static final String PARAM_PROJECT = "project";
+    public static final String PARAM_STAGE_HANDLE = "stageHandle";
+    public static final String PARAM_STAGE = "stage";
     public static final String PARAM_RECIPE_ID = "recipeId";
     public static final String PARAM_INCREMENTAL = "incremental";
     public static final String PARAM_PERSISTENT_PATTERN = "persistentPattern";
@@ -39,14 +42,18 @@ public class DownloadResultsServlet extends HttpServlet
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
+        AgentRecipeDetails details = new AgentRecipeDetails();
+        details.setAgent(request.getParameter(PARAM_AGENT));
+        details.setProject(request.getParameter(PARAM_PROJECT));
+        details.setStage(request.getParameter(PARAM_STAGE)) ;
+        details.setIncremental(Boolean.parseBoolean(request.getParameter(PARAM_INCREMENTAL)));
+        details.setProjectPersistentPattern(request.getParameter(PARAM_PERSISTENT_PATTERN));
+        details.setAgentDataPattern(request.getParameter(PARAM_AGENT_DATA_PATTERN));
+
         String agentHandleString = request.getParameter(PARAM_AGENT_HANDLE);
-        String agent = request.getParameter(PARAM_AGENT);
-        String agentDataPattern = request.getParameter(PARAM_AGENT_DATA_PATTERN);
         String projectHandleString = request.getParameter(PARAM_PROJECT_HANDLE);
-        String project = request.getParameter(PARAM_PROJECT);
+        String stageHandleString = request.getParameter(PARAM_STAGE_HANDLE);
         String recipeIdString = request.getParameter(PARAM_RECIPE_ID);
-        boolean incremental = Boolean.parseBoolean(request.getParameter(PARAM_INCREMENTAL));
-        String persistentPattern = request.getParameter(PARAM_PERSISTENT_PATTERN);
 
         try
         {
@@ -60,15 +67,15 @@ public class DownloadResultsServlet extends HttpServlet
                 response.sendError(403, "Invalid token");
             }
 
-            long agentHandle = Long.parseLong(agentHandleString);
-            long projectHandle = Long.parseLong(projectHandleString);
-            long recipeId = Long.parseLong(recipeIdString);
-            boolean output = Boolean.parseBoolean(request.getParameter(PARAM_OUTPUT));
+            details.setAgentHandle(Long.parseLong(agentHandleString));
+            details.setProjectHandle(Long.parseLong(projectHandleString));
+            details.setStageHandle(Long.parseLong(stageHandleString));
+            details.setRecipeId(Long.parseLong(recipeIdString));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(agentHandle, agent, agentDataPattern, projectHandle, project, recipeId, incremental, persistentPattern, configurationManager.getUserPaths().getData());
+            ServerRecipePaths paths = new ServerRecipePaths(details, configurationManager.getUserPaths().getData());
             File zipFile;
-
+            boolean output = Boolean.parseBoolean(request.getParameter(PARAM_OUTPUT));
             if (output)
             {
                 zipFile = new File(paths.getOutputDir().getAbsolutePath() + ".zip");

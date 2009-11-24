@@ -235,6 +235,7 @@ public class DefaultBuildController implements EventListener, BuildController
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
+            recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
 
             String retrievalPattern = projectConfig.getDependencies().getRetrievalPattern();
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, retrievalPattern);

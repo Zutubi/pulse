@@ -33,11 +33,6 @@ public class ServerRecipePaths implements RecipePaths
         this.dataDir = dataDir;
     }
 
-    public ServerRecipePaths(long agentHandle, String agentName, String agentDataPattern, long projectHandle, String project, long recipeId, boolean incremental, String projectPersistentPattern, File dataDir)
-    {
-        this(new AgentRecipeDetails(agentHandle, agentName, agentDataPattern, projectHandle, project, recipeId, incremental, projectPersistentPattern), dataDir);
-    }
-
     private File getAgentDataDir()
     {
         VariableMap references = new HashVariableMap();
@@ -74,6 +69,8 @@ public class ServerRecipePaths implements RecipePaths
         references.add(new GenericVariable<String>("data.dir", dataDir.getAbsolutePath()));
         references.add(new GenericVariable<String>("project", WebUtils.formUrlEncode(recipeDetails.getProject())));
         references.add(new GenericVariable<String>("project.handle", Long.toString(recipeDetails.getProjectHandle())));
+        references.add(new GenericVariable<String>("stage", WebUtils.formUrlEncode(recipeDetails.getStage())));
+        references.add(new GenericVariable<String>("stage.handle", Long.toString(recipeDetails.getStageHandle())));
 
         try
         {

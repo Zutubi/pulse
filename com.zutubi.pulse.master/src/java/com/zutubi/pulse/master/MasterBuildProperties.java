@@ -141,6 +141,7 @@ public class MasterBuildProperties extends BuildProperties
 
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, node.getStageName());
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, node.getStageHandle());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());
         }
 

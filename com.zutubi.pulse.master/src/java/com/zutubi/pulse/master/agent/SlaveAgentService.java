@@ -92,6 +92,8 @@ public class SlaveAgentService implements AgentService
                                             asPair(PARAM_AGENT_DATA_PATTERN, recipeDetails.getAgentDataPattern()),
                                             asPair(PARAM_PROJECT_HANDLE, Long.toString(recipeDetails.getProjectHandle())),
                                             asPair(PARAM_PROJECT, recipeDetails.getProject()),
+                                            asPair(PARAM_STAGE_HANDLE, Long.toString(recipeDetails.getStageHandle())),
+                                            asPair(PARAM_STAGE, recipeDetails.getStage()),
                                             asPair(PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId())),
                                             asPair(PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental())),
                                             asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getProjectPersistentPattern()),

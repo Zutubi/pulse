@@ -23,7 +23,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     private boolean autoClearResponsibility = true;
     @Reference
     private ProjectConfiguration idLeader = null;
-    private String persistentWorkDir = "${agent.data.dir}/work/${project}";
+    private String persistentWorkDir = "$(agent.data.dir)/work/$(project)/$(stage)";
 
     public BuildOptionsConfiguration()
     {

@@ -70,16 +70,12 @@ public class SlaveRecipeRunner implements RecipeRunner
         if (masterProxy != null)
         {
             PulseExecutionContext context = request.getContext();
-            long agentHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, 0);
-            EventListener listener = registerMasterListener(master, masterProxy, request.getId());
-            ResourceRepository repo = new RemoteResourceRepository(agentHandle, masterProxy, serviceTokenManager);
-            String agentName = context.getString(NAMESPACE_INTERNAL, PROPERTY_AGENT);
-            String agentDataPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN);
-            long projectHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, 0);
-            boolean incremental = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false);
+            AgentRecipeDetails details = new AgentRecipeDetails(context);
             File dataDir = configurationManager.getUserPaths().getData();
-            String persistentPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(agentHandle, agentName, agentDataPattern, projectHandle, request.getProject(), request.getId(), incremental, persistentPattern, dataDir);
+            ServerRecipePaths processorPaths = new ServerRecipePaths(details, dataDir);
+
+            EventListener listener = registerMasterListener(master, masterProxy, request.getId());
+            ResourceRepository repo = new RemoteResourceRepository(details.getAgentHandle(), masterProxy, serviceTokenManager);
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));

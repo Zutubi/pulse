@@ -248,6 +248,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_STAGE                   = "stage";
     /**
+     * The handle of the stage being built.
+     */
+    public static final String PROPERTY_STAGE_HANDLE            = "stage.handle";
+    /**
      * The pattern that defines where retrieved dependencies are to be delivered.
      */
     public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";

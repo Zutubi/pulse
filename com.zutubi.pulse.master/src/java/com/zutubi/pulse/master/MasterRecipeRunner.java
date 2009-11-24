@@ -42,14 +42,8 @@ public class MasterRecipeRunner implements RecipeRunner
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
         PulseExecutionContext context = request.getContext();
-        long agentHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, 0);
-        String agentName = context.getString(NAMESPACE_INTERNAL, PROPERTY_AGENT);
-        String agentDataPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN);
-        long projectHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, 0);
         File dataDir = configurationManager.getUserPaths().getData();
-        boolean incremental = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false);
-        String projectPersistentPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN);
-        ServerRecipePaths recipePaths = new ServerRecipePaths(agentHandle, agentName, agentDataPattern, projectHandle, request.getProject(), request.getId(), incremental, projectPersistentPattern, dataDir);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(new AgentRecipeDetails(context), dataDir);
 
         CommandEventOutputStream outputStream = null;
         context.push();

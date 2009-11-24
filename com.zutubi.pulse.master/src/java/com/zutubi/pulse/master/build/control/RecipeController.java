@@ -15,10 +15,14 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultCustomFields;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.MasterBuildProperties;
 import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.log.RecipeLogger;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.events.build.PostStageEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
@@ -31,10 +35,6 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.pulse.master.*;
-import com.zutubi.pulse.master.build.queue.RecipeQueue;
-import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
-import com.zutubi.pulse.master.build.log.RecipeLogger;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
@@ -342,7 +342,7 @@ public class RecipeController
         try
         {
             logger.collecting(recipeResult, collectWorkingCopy);
-            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            collector.collect(buildResult, recipeResultNode.getStageHandle(), recipeResultNode.getStageName(), recipeResult.getId(), collectWorkingCopy, recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
             copyBuildScopedData();
         }
         catch (BuildException e)
@@ -421,7 +421,7 @@ public class RecipeController
         try
         {
             logger.cleaning();
-            collector.cleanup(buildResult, recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            collector.cleanup(buildResult, recipeResultNode.getStageHandle(), recipeResultNode.getStageName(), recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
         }
         catch (Exception e)
         {
