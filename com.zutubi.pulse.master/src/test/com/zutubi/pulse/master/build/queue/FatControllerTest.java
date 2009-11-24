@@ -24,10 +24,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,21 +77,23 @@ public class FatControllerTest extends PulseTestCase
             {
                 final long buildResultId = nextBuildResultId.getAndIncrement();
                 
-                BuildController handler = mock(BuildController.class);
-                synchronized (FatControllerTest.this)
+                BuildController handler = new BuildController()
                 {
-                    stub(handler.getBuildResultId()).toReturn(buildResultId);
-
-                    // a bit hackish, but prevents the need to implement the interface.
-                    doAnswer(new Answer()
+                    public boolean updateRevisionIfNotFixed(Revision revision)
                     {
-                        public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-                        {
-                            request.createResult(projectManager, buildManager);
-                            return null;
-                        }
-                    }).when(handler).start();
-                }
+                        return false;
+                    }
+
+                    public long getBuildResultId()
+                    {
+                        return buildResultId;
+                    }
+
+                    public long start()
+                    {
+                        return request.createResult(projectManager, buildManager).getNumber();
+                    }
+                };
 
                 // record enough information about the build request so that we can create
                 // an appropriate build completed event 
@@ -118,7 +117,7 @@ public class FatControllerTest extends PulseTestCase
         buildRequestRegistry = new BuildRequestRegistry();
         buildRequestRegistry.setAccessManager(accessManager);
         ProjectManager projectManager = mock(ProjectManager.class);
-        Mockito.stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
+        stub(projectManager.getProject(anyLong(), anyBoolean())).toReturn(new Project());
         buildRequestRegistry.setProjectManager(projectManager);
 
         objectFactory.initProperties(this);
@@ -526,12 +525,7 @@ public class FatControllerTest extends PulseTestCase
         projectConfiguration.setProjectId(project.getId());
         projectConfiguration.setHandle(nextHandle.getAndIncrement());
         project.setConfig(projectConfiguration);
-
-        synchronized (this)
-        {
-            stub(projectManager.getProject(project.getId(), false)).toReturn(project);
-        }
-
+        stub(projectManager.getProject(project.getId(), false)).toReturn(project);
         return project;
     }
 }
