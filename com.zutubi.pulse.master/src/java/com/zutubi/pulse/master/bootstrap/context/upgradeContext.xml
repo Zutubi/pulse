@@ -96,6 +96,7 @@
                 <ref local="addExpectedFailureReportSeries"/>
                 <ref local="renameTriggerIntervalColumn"/>
                 <ref local="ensureDependenciesAndOptionsConfigPermanent"/>
+                <ref local="addPerforceView"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -449,5 +450,7 @@
         <property name="buildNumber" value="201008009"/>
     </bean>
 
-
+    <bean id="addPerforceView" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceViewUpgradeTask">
+        <property name="buildNumber" value="201008010"/>
+    </bean>
 </beans>
