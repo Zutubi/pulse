@@ -48,6 +48,12 @@ PIDDIR="."
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
 
+# Pick up pulse sysconfig (RedHat-style)
+if [ -f /etc/sysconfig/pulse ]
+then
+    . /etc/sysconfig/pulse
+fi
+
 # Get the fully qualified path to the script
 case $0 in
     /*)
