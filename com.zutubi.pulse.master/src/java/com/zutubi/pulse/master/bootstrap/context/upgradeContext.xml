@@ -95,7 +95,7 @@
                 <ref local="expectedFailureTestCases"/>
                 <ref local="addExpectedFailureReportSeries"/>
                 <ref local="renameTriggerIntervalColumn"/>
-                <ref local="ensureDependenciesConfigPermanent"/>
+                <ref local="ensureDependenciesAndOptionsConfigPermanent"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -445,7 +445,7 @@
         </property>
     </bean>
 
-    <bean id="ensureDependenciesConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureDependenciesConfigPermanentUpgradeTask">
+    <bean id="ensureDependenciesAndOptionsConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureDependenciesAndOptionsConfigPermanentUpgradeTask">
         <property name="buildNumber" value="201008009"/>
     </bean>
 
