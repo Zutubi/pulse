@@ -28,7 +28,7 @@ public class PushDownForm extends SeleniumForm
         return new int[]{ITEM_PICKER};
     }
 
-    public void pullUpFormElements(String... args)
+    public void pushDownFormElements(String... args)
     {
         submitFormElements("push down", args);
     }

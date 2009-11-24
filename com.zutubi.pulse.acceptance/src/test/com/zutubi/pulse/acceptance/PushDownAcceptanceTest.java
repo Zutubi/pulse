@@ -69,7 +69,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         ListPage listPage = prepareProperty(parent, child);
         PushDownForm pushDownForm = listPage.clickPushDown(TEST_PROPERTY_NAME);
         pushDownForm.waitFor();
-        pushDownForm.pullUpFormElements(child);
+        pushDownForm.pushDownFormElements(child);
 
         listPage.waitFor();
         assertFalse(listPage.isItemPresent(TEST_PROPERTY_NAME));

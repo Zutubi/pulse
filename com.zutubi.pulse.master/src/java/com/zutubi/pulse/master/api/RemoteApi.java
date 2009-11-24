@@ -1008,6 +1008,7 @@ public class RemoteApi
      * the given ancestor.  This is not possible for all paths, see
      * {@link #canPullUpConfig(String, String, String)} for details.
      *
+     * @param token       authentication token (see {@link #login})
      * @param path        path of the item to pull up
      * @param ancestorKey key of the templated collection item to pull the path
      *                    up to (must be an ancestor of the paths template owner)
@@ -1051,6 +1052,7 @@ public class RemoteApi
      * it does not check that the user has permission to write into the
      * child.
 
+     * @param token       authentication token (see {@link #login})
      * @param path     the path to test
      * @param childKey key of the templated collection item to push the path
      *                 down to (must be a child of the path's template owner)
@@ -1082,6 +1084,7 @@ public class RemoteApi
      * that do not hide the item and are not specified will have the item
      * deleted.
      *
+     * @param token       authentication token (see {@link #login})
      * @param path      the path to push down
      * @param childKeys keys of the children of the item's current template
      *                  owner to push the item down to

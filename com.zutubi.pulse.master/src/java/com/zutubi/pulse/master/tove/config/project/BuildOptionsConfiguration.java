@@ -25,6 +25,11 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     private ProjectConfiguration idLeader = null;
     private String persistentWorkDir = "${agent.data.dir}/work/${project}";
 
+    public BuildOptionsConfiguration()
+    {
+        setPermanent(true);
+    }
+
     public boolean getIsolateChangelists()
     {
         return isolateChangelists;
