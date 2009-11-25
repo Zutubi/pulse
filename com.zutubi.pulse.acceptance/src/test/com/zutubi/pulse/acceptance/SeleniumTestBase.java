@@ -36,7 +36,7 @@ public class SeleniumTestBase extends PulseTestCase
      * up of zombie browsers.  To avoid this, we keep track of all started
      * browsers and make sure to stop them before we start another.
      */
-    private static Set<SeleniumBrowser> runningBrowsers = new HashSet<SeleniumBrowser>();
+    private static final Set<SeleniumBrowser> runningBrowsers = new HashSet<SeleniumBrowser>();
 
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to
