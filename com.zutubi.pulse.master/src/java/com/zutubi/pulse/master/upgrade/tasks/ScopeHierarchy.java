@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -61,13 +61,15 @@ public class ScopeHierarchy
     }
 
     /**
-     * Runs a procedure over all nodes in the hierarchy.
+     * Runs a function over all nodes in the hierarchy.  If the function
+     * returns false at a node, the subtree under the node will not be
+     * processed.
      *
-     * @param p the procedure to run
+     * @param f the function to run
      */
-    public void forEach(UnaryProcedure<Node> p)
+    public void forEach(UnaryFunction<Node, Boolean> f)
     {
-        root.forEach(p);
+        root.forEach(f);
     }
 
     /**
@@ -152,16 +154,21 @@ public class ScopeHierarchy
         }
 
         /**
-         * Runs a procedure over this and every descendent node.
+         * Runs a function over this, and if the function returns true runs it
+         * over every child node (recursively).  Essentially the function is
+         * applied to the whole tree but stops traversing a branch when it
+         * returns false.
          *
-         * @param p the procedure to run
+         * @param f the function to run
          */
-        void forEach(UnaryProcedure<Node> p)
+        void forEach(UnaryFunction<Node, Boolean> f)
         {
-            p.process(this);
-            for (Node child: children)
+            if (f.process(this))
             {
-                child.forEach(p);
+                for (Node child: children)
+                {
+                    child.forEach(f);
+                }
             }
         }
     }
