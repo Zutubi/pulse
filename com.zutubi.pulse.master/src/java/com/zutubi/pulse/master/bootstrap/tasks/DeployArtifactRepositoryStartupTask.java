@@ -6,6 +6,7 @@ import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 import com.zutubi.pulse.servercore.jetty.ArtifactRepositoryConfigurationHandler;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
+import com.zutubi.util.StringUtils;
 import org.mortbay.http.HttpHandler;
 
 import java.io.File;
@@ -29,7 +30,8 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
 
         repository.setBase(repositoryBase); // need to make this configurable.
 
-        jettyServerManager.configureContext(WebManager.WEBAPP_PULSE, WebManager.REPOSITORY_PATH, repository);
+        String contextPath = StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), WebManager.REPOSITORY_PATH);
+        jettyServerManager.configureContext(WebManager.WEBAPP_PULSE, contextPath, repository);
     }
 
     private void ensureIsDirectory(File dir)
