@@ -21,10 +21,7 @@ import junit.framework.TestCase;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Helper base class for web UI acceptance tests that use Selenium.
@@ -32,6 +29,14 @@ import java.util.Vector;
 public class SeleniumTestBase extends PulseTestCase
 {
     private static final long STATUS_TIMEOUT = 30000;
+
+    /**
+     * If a test fails during setup, after starting a browser, tearDown never
+     * runs and the browser is never stopped.  This leads to an unholy build
+     * up of zombie browsers.  To avoid this, we keep track of all started
+     * browsers and make sure to stop them before we start another.
+     */
+    private static Set<SeleniumBrowser> runningBrowsers = new HashSet<SeleniumBrowser>();
 
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to
@@ -59,15 +64,28 @@ public class SeleniumTestBase extends PulseTestCase
         xmlRpcHelper = new XmlRpcHelper();
         random = randomName();
 
+        cleanupRunningBrowsers();
         browser = new SeleniumBrowser();
         browser.start();
+        runningBrowsers.add(browser);
 
         urls = browser.getUrls();
+    }
+
+    private void cleanupRunningBrowsers()
+    {
+        Iterator<SeleniumBrowser> it = runningBrowsers.iterator();
+        while (it.hasNext())
+        {
+            it.next().stop();
+            it.remove();
+        }
     }
 
     protected void tearDown() throws Exception
     {
         browser.stop();
+        runningBrowsers.remove(browser);
         super.tearDown();
     }
 
