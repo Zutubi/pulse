@@ -66,4 +66,66 @@ public abstract class ConfigPage extends ConfigurationPanePage
     {
         return browser.isElementIdPresent(IDs.LINKS_BOX);
     }
+
+    public String getStateId()
+    {
+        return "config-state";
+    }
+
+    public boolean isStatePresent()
+    {
+        return browser.isElementIdPresent(getStateId());
+    }
+
+    public String getStateFieldId(String name)
+    {
+        return "state." + name;
+    }
+
+    public boolean isStateFieldPresent(String field)
+    {
+        return browser.isElementIdPresent(getStateFieldId(field));
+    }
+
+    public String getStateField(String name)
+    {
+        return browser.getText(getStateFieldId(name));
+    }
+
+    public boolean isStateFieldExpandable(String field)
+    {
+        return browser.isElementIdPresent(getStateFieldExpandId(field));
+    }
+
+    public boolean isStateFieldExpandVisible(String field)
+    {
+        return browser.isVisible(getStateFieldExpandId(field));
+    }
+
+    public void expandStateField(String field)
+    {
+        browser.click(getStateFieldExpandId(field));
+        browser.waitForVisible(getStateFieldCollapseId(field));
+    }
+
+    public boolean isStateFieldCollapseVisible(String field)
+    {
+        return browser.isVisible(getStateFieldCollapseId(field));
+    }
+
+    public void collapseStateField(String field)
+    {
+        browser.click(getStateFieldCollapseId(field));
+        browser.waitForVisible(getStateFieldExpandId(field));
+    }
+
+    private String getStateFieldExpandId(String field)
+    {
+        return getStateFieldId(field) + ".expand";
+    }
+
+    private String getStateFieldCollapseId(String field)
+    {
+        return getStateFieldId(field) + ".collapse";
+    }
 }

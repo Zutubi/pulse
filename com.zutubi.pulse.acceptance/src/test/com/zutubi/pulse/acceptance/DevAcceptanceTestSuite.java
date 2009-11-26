@@ -36,6 +36,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(CollapsedCollectionAcceptanceTest.class);
         suite.addTestSuite(ConfigLinksAcceptanceTest.class);
         suite.addTestSuite(ConfigActionsAcceptanceTest.class);
+        suite.addTestSuite(ConfigStateAcceptanceTest.class);
         suite.addTestSuite(PluginUIAcceptanceTest.class);
         suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);

@@ -69,31 +69,6 @@ public class CompositePage extends ConfigPage
         waitFor();
     }
 
-    public String getStateId()
-    {
-        return "config-state";
-    }
-
-    public boolean isStatePresent()
-    {
-        return browser.isElementIdPresent(getStateId());
-    }
-
-    public String getStateFieldId(String name)
-    {
-        return "state." + name;
-    }
-
-    public boolean isStateFieldPresent(String field)
-    {
-        return browser.isElementIdPresent(getStateFieldId(field));
-    }
-
-    public String getStateField(String name)
-    {
-        return browser.getText(getStateFieldId(name));
-    }
-
     public String getErrorsId()
     {
         return "nested-errors";

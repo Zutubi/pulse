@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.util.TreeNode;
+import com.zutubi.util.WebUtils;
 
 import java.util.Collection;
 
@@ -33,7 +34,7 @@ public class StateDisplayRenderer
      */
     public String render(String fieldName, Configuration instance)
     {
-        return renderFormatted(stateDisplayManager.format(fieldName, instance));
+        return renderFormatted(fieldName, stateDisplayManager.format(fieldName, instance));
     }
 
     /**
@@ -50,18 +51,18 @@ public class StateDisplayRenderer
      */
     public String renderCollection(String fieldName, CompositeType type, Collection<? extends Configuration> collection, Configuration parentInstance)
     {
-        return renderFormatted(stateDisplayManager.formatCollection(fieldName, type, collection, parentInstance));
+        return renderFormatted(fieldName, stateDisplayManager.formatCollection(fieldName, type, collection, parentInstance));
     }
 
-    private String renderFormatted(Object formatted)
+    private String renderFormatted(String fieldName, Object formatted)
     {
         if (formatted instanceof TreeNode)
         {
-            return renderTree((TreeNode) formatted);
+            return renderTree(fieldName, (TreeNode) formatted);
         }
         else if (formatted instanceof Collection)
         {
-            return renderCollection((Collection) formatted);
+            return renderCollection(fieldName, (Collection) formatted);
         }
         else
         {
@@ -69,15 +70,15 @@ public class StateDisplayRenderer
         }
     }
 
-    private String renderTree(TreeNode treeNode)
+    private String renderTree(String fieldName, TreeNode treeNode)
     {
         StringBuilder result = new StringBuilder();
         boolean hasExcess = treeNode.size() - 1 - COLLECTION_LIMIT > 1;
-        renderChildren(treeNode, true, hasExcess, new int[]{0}, result);
+        renderChildren(fieldName, treeNode, true, hasExcess, new int[]{0}, result);
         return result.toString();
     }
 
-    private void renderChildren(TreeNode<?> treeNode, boolean isRoot, boolean hasExcess, int[] count, StringBuilder result)
+    private void renderChildren(String fieldName, TreeNode<?> treeNode, boolean isRoot, boolean hasExcess, int[] count, StringBuilder result)
     {
         if (!treeNode.isLeaf())
         {
@@ -86,14 +87,14 @@ public class StateDisplayRenderer
             {
                 count[0]++;
                 renderItem(result, hasExcess, count[0], child.getData());
-                renderChildren(child, false, hasExcess, count, result);
+                renderChildren(fieldName, child, false, hasExcess, count, result);
                 closeItem(result);
             }
-            endList(result, treeNode.size() - 1, isRoot && hasExcess);
+            endList(fieldName, result, treeNode.size() - 1, isRoot && hasExcess);
         }
     }
 
-    private String renderCollection(Collection collection)
+    private String renderCollection(String fieldName, Collection collection)
     {
         StringBuilder result = new StringBuilder();
         boolean hasExcess = collection.size() - COLLECTION_LIMIT > 1;
@@ -108,7 +109,7 @@ public class StateDisplayRenderer
             closeItem(result);
         }
 
-        endList(result, collection.size(), hasExcess);
+        endList(fieldName, result, collection.size(), hasExcess);
         return result.toString();
     }
 
@@ -122,14 +123,18 @@ public class StateDisplayRenderer
         result.append(">");
     }
 
-    private void endList(StringBuilder result, int size, boolean showToggleItems)
+    private void endList(String fieldName, StringBuilder result, int size, boolean showToggleItems)
     {
         if (showToggleItems)
         {
-            result.append("<li class='details expansion'/>");
+            result.append("<li class='details expansion' id='state.");
+            result.append(WebUtils.toValidHtmlName(fieldName));
+            result.append(".expand'/>");
             result.append(I18N.format("collection.more", size - COLLECTION_LIMIT));
             result.append("</li>");
-            result.append("<li class='details excess'/>");
+            result.append("<li class='details excess' id='state.");
+            result.append(WebUtils.toValidHtmlName(fieldName));
+            result.append(".collapse'/>");
             result.append(I18N.format("collection.all", size));
             result.append("</li>");
         }
