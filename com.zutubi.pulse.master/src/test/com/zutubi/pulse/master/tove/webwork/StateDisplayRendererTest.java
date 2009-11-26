@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.util.TreeNode;
 import org.mockito.Matchers;
 import static org.mockito.Matchers.anyString;
 import org.mockito.Mockito;
@@ -62,17 +63,69 @@ public class StateDisplayRendererTest extends PulseTestCase
     public void testRenderCollectionJustOverLimit()
     {
         setupFormat(asList("1", "2", "3", "4", "5"));
-        assertEquals("<ul onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='details expansion'/>... 2 more items (click to expand)</li><li class='excess'>4</li><li class='excess'>5</li><li class='details excess'/>all 5 items shown (click to collapse)</li></ul>",
+        assertEquals("<ul class='top-level' onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='excess'>4</li><li class='excess'>5</li><li class='details expansion'/>... 2 more items (click to expand)</li><li class='details excess'/>all 5 items shown (click to collapse)</li></ul>",
                 renderer.render(DUMMY_FIELD, null));
     }
 
     public void testRenderCollectionWellOverLimit()
     {
         setupFormat(asList("1", "2", "3", "4", "5", "6", "7"));
-        assertEquals("<ul onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='details expansion'/>... 4 more items (click to expand)</li><li class='excess'>4</li><li class='excess'>5</li><li class='excess'>6</li><li class='excess'>7</li><li class='details excess'/>all 7 items shown (click to collapse)</li></ul>",
+        assertEquals("<ul class='top-level' onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='excess'>4</li><li class='excess'>5</li><li class='excess'>6</li><li class='excess'>7</li><li class='details expansion'/>... 4 more items (click to expand)</li><li class='details excess'/>all 7 items shown (click to collapse)</li></ul>",
+                renderer.render(DUMMY_FIELD, null));
+    }
+
+    public void testRenderTree()
+    {
+        setupFormat(new TreeNode<String>("root",
+                new TreeNode<String>("leaf1"),
+                new TreeNode<String>("middle",
+                        new TreeNode<String>("leaf2"))));
+        assertEquals("<ul><li>leaf1</li><li>middle<ul><li>leaf2</li></ul></li></ul>",
+                renderer.render(DUMMY_FIELD, null));
+    }
+
+    public void testRenderTreeOnLimit()
+    {
+        setupFormat(
+                new TreeNode<String>("0",
+                        new TreeNode<String>("00L"),
+                        new TreeNode<String>("01",
+                                new TreeNode<String>("010L")),
+                        new TreeNode<String>("02L")));
+        assertEquals(
+                "<ul>" +
+                        "<li>00L</li>" +
+                        "<li>01<ul>" +
+                                "<li>010L</li>" +
+                        "</ul></li>" +
+                        "<li>02L</li>" +
+                "</ul>",
                 renderer.render(DUMMY_FIELD, null));
     }
     
+    public void testRenderTreeOverLimit()
+    {
+        setupFormat(
+                new TreeNode<String>("0",
+                        new TreeNode<String>("00L"),
+                        new TreeNode<String>("01",
+                                new TreeNode<String>("010L"),
+                                new TreeNode<String>("011L")),
+                        new TreeNode<String>("02L")));
+        assertEquals(
+                "<ul class='top-level' onclick='toggleStateList(event);'>" +
+                        "<li>00L</li>" +
+                        "<li>01<ul>" +
+                                "<li>010L</li>" +
+                                "<li class='excess'>011L</li>" +
+                        "</ul></li>" +
+                        "<li class='excess'>02L</li>" +
+                        "<li class='details expansion'/>... 2 more items (click to expand)</li>" +
+                        "<li class='details excess'/>all 5 items shown (click to collapse)</li>" +
+                "</ul>",
+                renderer.render(DUMMY_FIELD, null));
+    }
+
     private void setupFormat(Object formatted)
     {
         doReturn(formatted).when(stateDisplayManager).format(anyString(), Matchers.<Configuration>anyObject());

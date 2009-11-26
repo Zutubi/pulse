@@ -5,6 +5,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
+import com.zutubi.util.TreeNode;
 
 import java.util.Collection;
 
@@ -54,7 +55,11 @@ public class StateDisplayRenderer
 
     private String renderFormatted(Object formatted)
     {
-        if (formatted instanceof Collection)
+        if (formatted instanceof TreeNode)
+        {
+            return renderTree((TreeNode) formatted);
+        }
+        else if (formatted instanceof Collection)
         {
             return renderCollection((Collection) formatted);
         }
@@ -64,49 +69,88 @@ public class StateDisplayRenderer
         }
     }
 
+    private String renderTree(TreeNode treeNode)
+    {
+        StringBuilder result = new StringBuilder();
+        boolean hasExcess = treeNode.size() - 1 - COLLECTION_LIMIT > 1;
+        renderChildren(treeNode, true, hasExcess, new int[]{0}, result);
+        return result.toString();
+    }
+
+    private void renderChildren(TreeNode<?> treeNode, boolean isRoot, boolean hasExcess, int[] count, StringBuilder result)
+    {
+        if (!treeNode.isLeaf())
+        {
+            startList(result, isRoot && hasExcess);
+            for (TreeNode<?> child: treeNode)
+            {
+                count[0]++;
+                renderItem(result, hasExcess, count[0], child.getData());
+                renderChildren(child, false, hasExcess, count, result);
+                closeItem(result);
+            }
+            endList(result, treeNode.size() - 1, isRoot && hasExcess);
+        }
+    }
+
     private String renderCollection(Collection collection)
     {
         StringBuilder result = new StringBuilder();
         boolean hasExcess = collection.size() - COLLECTION_LIMIT > 1;
 
-        result.append("<ul");
-        if (hasExcess)
-        {
-            result.append(" onclick='toggleStateList(event);'");
-        }
-        result.append(">");
+        startList(result, hasExcess);
 
         int count = 0;
         for (Object o: collection)
         {
             count++;
-            result.append("<li");
-            if (hasExcess && count > COLLECTION_LIMIT)
-            {
-                result.append(" class='excess'");
-            }
-            result.append(">");
-            result.append(TextUtils.htmlEncode(o.toString()));
-            result.append("</li>");
-
-            if (hasExcess && count == COLLECTION_LIMIT)
-            {
-                result.append("<li class='details expansion'/>");
-                result.append(I18N.format("collection.more", collection.size() - COLLECTION_LIMIT));
-                result.append("</li>");
-            }
+            renderItem(result, hasExcess, count, o);
+            closeItem(result);
         }
 
-        if (hasExcess)
+        endList(result, collection.size(), hasExcess);
+        return result.toString();
+    }
+
+    private void startList(StringBuilder result, boolean enableToggle)
+    {
+        result.append("<ul");
+        if (enableToggle)
         {
+            result.append(" class='top-level' onclick='toggleStateList(event);'");
+        }
+        result.append(">");
+    }
+
+    private void endList(StringBuilder result, int size, boolean showToggleItems)
+    {
+        if (showToggleItems)
+        {
+            result.append("<li class='details expansion'/>");
+            result.append(I18N.format("collection.more", size - COLLECTION_LIMIT));
+            result.append("</li>");
             result.append("<li class='details excess'/>");
-            result.append(I18N.format("collection.all", collection.size()));
+            result.append(I18N.format("collection.all", size));
             result.append("</li>");
         }
 
         result.append("</ul>");
+    }
 
-        return result.toString();
+    private void renderItem(StringBuilder result, boolean hasExcess, int count, Object value)
+    {
+        result.append("<li");
+        if (hasExcess && count > COLLECTION_LIMIT)
+        {
+            result.append(" class='excess'");
+        }
+        result.append(">");
+        result.append(TextUtils.htmlEncode(value.toString()));
+    }
+
+    private void closeItem(StringBuilder result)
+    {
+        result.append("</li>");
     }
 
     public void setStateDisplayManager(StateDisplayManager stateDisplayManager)

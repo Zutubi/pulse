@@ -13,6 +13,7 @@ import java.util.Map;
  * external tool, a certain operating system, or some virtual concept.
  */
 @Form(fieldOrder = { "name", "defaultVersion" })
+@StateDisplay("com.zutubi.pulse.master.tove.config.agent.ResourceConfigurationStateDisplay")
 @Table(columns = {"name", "defaultVersion"})
 @SymbolicName("zutubi.resource")
 public class ResourceConfiguration  extends AbstractNamedConfiguration

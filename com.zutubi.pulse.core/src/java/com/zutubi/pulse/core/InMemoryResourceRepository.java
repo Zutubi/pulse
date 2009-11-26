@@ -2,10 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * A repository that holds a cache of resource information in memory.
@@ -28,6 +25,19 @@ public class InMemoryResourceRepository extends ResourceRepositorySupport
     public void addResource(ResourceConfiguration resource)
     {
         resources.put(resource.getName(), resource);
+    }
+
+    /**
+     * Adds all of the given resources to this repoistory via {@link #addResource(com.zutubi.pulse.core.config.ResourceConfiguration)}.
+     *
+     * @param resources collection of resources to add
+     */
+    public void addAllResources(Collection<? extends ResourceConfiguration> resources)
+    {
+        for (ResourceConfiguration r: resources)
+        {
+            addResource(r);
+        }
     }
 
     /**

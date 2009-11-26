@@ -783,5 +783,5 @@ function markForClean(projectName)
 function toggleStateList(e)
 {
     var target = e.target || e.srcElement;
-    Ext.get(target).up('ul').toggleClass('expanded');
+    Ext.get(target).findParent('ul.top-level', document.body, true).toggleClass('expanded');
 }

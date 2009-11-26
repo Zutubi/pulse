@@ -43,7 +43,7 @@ public class ResourceRequirementConfigurationStateDisplay implements MessagesAwa
      */
     public Object formatCollectionCompatibleAgents(Collection<ResourceRequirementConfiguration> requirementConfigurations, Configuration parentInstance)
     {
-        ConfigurationToRequirement fn = new ConfigurationToRequirement();
+        ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement();
         List<ResourceRequirement> requirements = CollectionUtils.map(requirementConfigurations, fn);
 
         if (parentInstance instanceof BuildStageConfiguration)
@@ -101,11 +101,4 @@ public class ResourceRequirementConfigurationStateDisplay implements MessagesAwa
         this.messages = messages;
     }
 
-    private static class ConfigurationToRequirement implements Mapping<ResourceRequirementConfiguration, ResourceRequirement>
-    {
-        public ResourceRequirement map(ResourceRequirementConfiguration resourceRequirementConfiguration)
-        {
-            return resourceRequirementConfiguration.asResourceRequirement();
-        }
-    }
 }

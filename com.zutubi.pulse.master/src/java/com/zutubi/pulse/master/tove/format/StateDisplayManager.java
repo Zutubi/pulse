@@ -1,9 +1,11 @@
 package com.zutubi.pulse.master.tove.format;
 
 import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.annotations.StateDisplay;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -153,7 +155,26 @@ public class StateDisplayManager
         if (fields == null)
         {
             Class<? extends Configuration> configurationClass = type.getClazz();
-            fields = new StateDisplayFields(configurationClass, ConventionSupport.getStateDisplay(configurationClass), objectFactory);
+            StateDisplay annotation = type.getAnnotation(StateDisplay.class, false);
+            Class stateDisplayClass;
+            if (annotation == null)
+            {
+                stateDisplayClass = ConventionSupport.getStateDisplay(configurationClass);
+            }
+            else
+            {
+                try
+                {
+                    stateDisplayClass = ClassLoaderUtils.loadAssociatedClass(configurationClass, annotation.value());
+                }
+                catch (ClassNotFoundException e)
+                {
+                    LOG.warning("Invalid state display class '" + annotation.value() + "' specified for configuration class '" + configurationClass.getName() + "'");
+                    stateDisplayClass = null;
+                }
+            }
+            
+            fields = new StateDisplayFields(configurationClass, stateDisplayClass, objectFactory);
             fieldsByType.put(type, fields);
         }
 

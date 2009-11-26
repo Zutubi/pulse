@@ -131,6 +131,22 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
     }
 
     /**
+     * Returns the total number of nodes in this tree, including this one.
+     *
+     * @return the number of nodes in the tree rooted at this node
+     */
+    public int size()
+    {
+        int total = 1;
+        for (TreeNode<T> child: children)
+        {
+            total += child.size();
+        }
+
+        return total;
+    }
+
+    /**
      * Walks over the tree rooted at this node in depth first order, applying
      * the given operation to each node.  Depth-first order guarantees a node's
      * children are all processed before the node itself is.
@@ -189,5 +205,53 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
         {
             child.filteringWalk(predicate);
         }
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        TreeNode treeNode = (TreeNode) o;
+
+        if (!children.equals(treeNode.children))
+        {
+            return false;
+        }
+        if (data != null ? !data.equals(treeNode.data) : treeNode.data != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = data != null ? data.hashCode() : 0;
+        result = 31 * result + children.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder result = new StringBuilder();
+        result.append(data);
+        for (TreeNode<T> child: children)
+        {
+            result.append("\n  ");
+            result.append(child.toString().replace("\n", "\n  "));
+        }
+
+        return result.toString();
     }
 }

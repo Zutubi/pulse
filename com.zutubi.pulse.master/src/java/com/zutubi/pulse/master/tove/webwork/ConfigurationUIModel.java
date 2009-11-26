@@ -272,7 +272,7 @@ public class ConfigurationUIModel
 
     public Object format(String fieldName)
     {
-        if (instance instanceof Collection)
+        if (type instanceof CollectionType)
         {
             return stateDisplayRenderer.renderCollection(fieldName, (CompositeType) targetType, instanceToItems(), configurationProvider.get(parentPath, Configuration.class));
         }
