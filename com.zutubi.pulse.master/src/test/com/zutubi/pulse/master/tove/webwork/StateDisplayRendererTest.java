@@ -63,14 +63,14 @@ public class StateDisplayRendererTest extends PulseTestCase
     public void testRenderCollectionJustOverLimit()
     {
         setupFormat(asList("1", "2", "3", "4", "5"));
-        assertEquals("<ul class='top-level' onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='excess'>4</li><li class='excess'>5</li><li class='details expansion'/>... 2 more items (click to expand)</li><li class='details excess'/>all 5 items shown (click to collapse)</li></ul>",
+        assertEquals("<ul class='top-level' onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='excess'>4</li><li class='excess'>5</li><li class='details expansion' id='state.field.expand'/>... 2 more items (click to expand)</li><li class='details excess' id='state.field.collapse'/>all 5 items shown (click to collapse)</li></ul>",
                 renderer.render(DUMMY_FIELD, null));
     }
 
     public void testRenderCollectionWellOverLimit()
     {
         setupFormat(asList("1", "2", "3", "4", "5", "6", "7"));
-        assertEquals("<ul class='top-level' onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='excess'>4</li><li class='excess'>5</li><li class='excess'>6</li><li class='excess'>7</li><li class='details expansion'/>... 4 more items (click to expand)</li><li class='details excess'/>all 7 items shown (click to collapse)</li></ul>",
+        assertEquals("<ul class='top-level' onclick='toggleStateList(event);'><li>1</li><li>2</li><li>3</li><li class='excess'>4</li><li class='excess'>5</li><li class='excess'>6</li><li class='excess'>7</li><li class='details expansion' id='state.field.expand'/>... 4 more items (click to expand)</li><li class='details excess' id='state.field.collapse'/>all 7 items shown (click to collapse)</li></ul>",
                 renderer.render(DUMMY_FIELD, null));
     }
 
@@ -120,8 +120,8 @@ public class StateDisplayRendererTest extends PulseTestCase
                                 "<li class='excess'>011L</li>" +
                         "</ul></li>" +
                         "<li class='excess'>02L</li>" +
-                        "<li class='details expansion'/>... 2 more items (click to expand)</li>" +
-                        "<li class='details excess'/>all 5 items shown (click to collapse)</li>" +
+                        "<li class='details expansion' id='state.field.expand'/>... 2 more items (click to expand)</li>" +
+                        "<li class='details excess' id='state.field.collapse'/>all 5 items shown (click to collapse)</li>" +
                 "</ul>",
                 renderer.render(DUMMY_FIELD, null));
     }
