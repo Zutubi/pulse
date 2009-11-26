@@ -5,6 +5,10 @@
     #i18n("key=introduction")
 </p>
 <p>
+    #if ($config.displayFields.size() > 0)
+        #renderState($config)
+    #end
+
     #table("path=$config.path")
 </p>
 

@@ -7,7 +7,7 @@ import com.zutubi.i18n.context.ClassContext;
 import com.zutubi.i18n.context.ContextResolver;
 import com.zutubi.i18n.context.ExtendedClassContextResolver;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.template.VelocityClasspathResourceLoader;
+import com.zutubi.pulse.master.tove.velocity.VelocityClasspathResourceLoader;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;

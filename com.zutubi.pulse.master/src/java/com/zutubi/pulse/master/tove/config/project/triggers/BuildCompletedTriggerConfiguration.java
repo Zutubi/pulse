@@ -29,7 +29,7 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
      * If non-empty, the trigger will only fire after builds completed in one
      * of the given states.
      */
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> states;
     /**
      * If true, the revision of the completed build will also be used for the

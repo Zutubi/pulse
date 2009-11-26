@@ -21,6 +21,7 @@ import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class ConfigurationUIModel
     private LinkManager linkManager;
     private ActionManager actionManager;
     private StateDisplayManager stateDisplayManager;
+    private StateDisplayRenderer stateDisplayRenderer;
     private SystemPaths systemPaths;
 
     private Record record;
@@ -163,7 +165,16 @@ public class ConfigurationUIModel
             instance = configurationProvider.get(path, Configuration.class);
         }
 
-        if (!(type instanceof CollectionType))
+        if (type instanceof CollectionType)
+        {
+            if (instance != null && targetType instanceof CompositeType)
+            {
+                CompositeType itemType = (CompositeType) targetType;
+                Collection<? extends Configuration> items = instanceToItems();
+                displayFields = stateDisplayManager.getCollectionDisplayFields(itemType, items, instance);
+            }
+        }
+        else
         {
             determineActions(parentType);
 
@@ -203,6 +214,20 @@ public class ConfigurationUIModel
         }
 
         displayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
+    }
+
+    private Collection<? extends Configuration> instanceToItems()
+    {
+        Collection<? extends Configuration> items;
+        if (instance instanceof ConfigurationList)
+        {
+            items = ((ConfigurationList) instance);
+        }
+        else
+        {
+            items = ((ConfigurationMap) instance).values();
+        }
+        return items;
     }
 
     private void resolveNested()
@@ -247,7 +272,14 @@ public class ConfigurationUIModel
 
     public Object format(String fieldName)
     {
-        return stateDisplayManager.format(fieldName, instance);
+        if (instance instanceof Collection)
+        {
+            return stateDisplayRenderer.renderCollection(fieldName, (CompositeType) targetType, instanceToItems(), configurationProvider.get(parentPath, Configuration.class));
+        }
+        else
+        {
+            return stateDisplayRenderer.render(fieldName, instance);
+        }
     }
 
     public boolean isConfigurationCheckAvailable()
@@ -457,5 +489,10 @@ public class ConfigurationUIModel
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void setStateDisplayRenderer(StateDisplayRenderer stateDisplayRenderer)
+    {
+        this.stateDisplayRenderer = stateDisplayRenderer;
     }
 }

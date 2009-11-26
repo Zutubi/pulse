@@ -21,7 +21,7 @@ public class ProjectStateTriggerConditionConfiguration extends TriggerConditionC
 {
     @Reference @Required
     private ProjectConfiguration project;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> states;
 
     @Override

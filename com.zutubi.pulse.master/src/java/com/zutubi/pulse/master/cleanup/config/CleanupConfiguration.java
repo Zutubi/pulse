@@ -36,7 +36,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
     @Select(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
     private CleanupUnit unit;
 
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     @Format("CleanupStateColumnFormatter")
     private List<ResultState> states;
 

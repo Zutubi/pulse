@@ -4,6 +4,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.HostLocationFormatter;
@@ -217,6 +218,20 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
     public ResourceRepository getAgentRepository(Agent agent)
     {
         return getAgentRepository(agent.getConfig());
+    }
+
+    public Set<AgentConfiguration> getCapableAgents(Collection<? extends ResourceRequirement> requirements)
+    {
+        Set<AgentConfiguration> agents = new HashSet<AgentConfiguration>();
+        for (AgentResourceRepository repository: agentRepositories.values())
+        {
+            if (repository.satisfies(requirements))
+            {
+                agents.add(repository.getAgentConfig());
+            }
+        }
+
+        return agents;
     }
 
     public List<AgentConfiguration> addDiscoveredResources(final String hostLocation, final List<ResourceConfiguration> discoveredResources)

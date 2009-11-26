@@ -3,6 +3,8 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 
+import java.util.Collection;
+
 /**
  * Base interface for access to resources.  When implementing consider
  * extending {@link com.zutubi.pulse.core.ResourceRepositorySupport}.
@@ -18,6 +20,15 @@ public interface ResourceRepository
      * @return true if this repository can fulfil the given requirement
      */
     boolean hasResource(ResourceRequirement requirement);
+
+    /**
+     * Indicates if the repository has resources to fulfil all of the given
+     * requirements.  Optional requirements are ignored.
+     *
+     * @param requirements the requirements to test for
+     * @return true of this repository can fulfil all of the given requirements
+     */
+    boolean satisfies(Collection<? extends ResourceRequirement> requirements);
 
     /**
      * Indicates if this repository has a resource of the given name.

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 
@@ -12,17 +11,12 @@ import java.io.File;
  */
 public interface AgentService
 {
-    AgentConfiguration getAgentConfig();
-
     /**
-     * Returns true iff the service has the given version of the given
-     * resource.
+     * Returns the configuration of the agent underlying this service.
      *
-     * @param requirement the resource requirement
-     *
-     * @return true iff this service has the give resource version
+     * @return the configuration of our agent
      */
-    boolean hasResource(ResourceRequirement requirement);
+    AgentConfiguration getAgentConfig();
 
     boolean build(RecipeRequest request);
 

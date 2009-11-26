@@ -26,7 +26,7 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
     private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
     @ControllingCheckbox(uncheckedFields = "runForStates")
     private boolean runForAll = true;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> runForStates = new LinkedList<ResultState>();
 
     public boolean isApplyToAllStages()

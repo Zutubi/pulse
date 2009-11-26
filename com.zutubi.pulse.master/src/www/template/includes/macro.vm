@@ -2255,3 +2255,25 @@
         #end
     </table>
 #end
+
+##
+## Renders state tables for configuration pages.
+##
+#macro(renderState $configUIModel)
+    <div id="config-state" class="config-panel">
+        #i18nexists("key=state.heading")<h3 class="config-header">#i18n("key=state.heading")</h3>#end
+        <table class="config-state-table">
+            #i18nexists("key=state.table.heading")<th colspan="2">#i18n("key=state.table.heading")</th>#end
+            #set($odd = true)
+            #foreach($field in $configUIModel.displayFields)
+            <tr>
+                <td class="label" width="20%">#i18n("key=${field}.label")</td>
+                <td id='#id("state.$field")' class="value #if($odd) odd #else even #end">
+                    $configUIModel.format($field)
+                </td>
+            </tr>
+                #if($odd) #set($odd = false) #else #set($odd = true) #end
+            #end
+        </table>
+    </div>
+#end

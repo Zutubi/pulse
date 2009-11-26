@@ -291,6 +291,17 @@ public class ReflectionUtils
         return Modifier.isFinal(member.getModifiers());
     }
 
+    /**
+     * Returns true if a member is declared as static.
+     *
+     * @param member the member to test
+     * @return true if the member was declared static
+     */
+    public static boolean isStatic(Member member)
+    {
+        return Modifier.isStatic(member.getModifiers());
+    }
+
     public static Object getFieldValue(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException
     {
         Field f = target.getClass().getDeclaredField(fieldName);

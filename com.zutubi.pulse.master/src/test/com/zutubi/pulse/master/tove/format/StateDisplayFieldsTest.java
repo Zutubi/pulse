@@ -2,16 +2,18 @@ package com.zutubi.pulse.master.tove.format;
 
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
 public class StateDisplayFieldsTest extends ZutubiTestCase
 {
     private DefaultObjectFactory objectFactory = new DefaultObjectFactory();
@@ -38,6 +40,38 @@ public class StateDisplayFieldsTest extends ZutubiTestCase
     {
         StateDisplayFields sd = new StateDisplayFields(T.class, DefaultFields.class, objectFactory);
         assertEquals("noparam", sd.format("noParam", new T("test name")));
+    }
+
+    public void testDefaultCollectionFields() throws Exception
+    {
+        StateDisplayFields sd = new StateDisplayFields(T.class, DefaultCollectionFields.class, objectFactory);
+        assertFields(sd.getCollectionFields(asList(new T()), new ConfigType()), "a", "b", "noParam", "parent");
+    }
+
+    public void testDefinedCollectionFields() throws Exception
+    {
+        StateDisplayFields sd = new StateDisplayFields(T.class, DefinedCollectionFields.class, objectFactory);
+        assertFields(sd.getCollectionFields(asList(new T()), new ConfigType()), "a");
+    }
+
+    public void testFormatCollection() throws Exception
+    {
+        StateDisplayFields sd = new StateDisplayFields(T.class, DefaultCollectionFields.class, objectFactory);
+        assertEquals(asList("x", "y"), sd.formatCollection("a", asList(new T("x"), new T("y")), new ConfigType()));        
+    }
+
+    public void testFormatCollectionParent() throws Exception
+    {
+        StateDisplayFields sd = new StateDisplayFields(T.class, DefaultCollectionFields.class, objectFactory);
+        ConfigType parentInstance = new ConfigType();
+        parentInstance.setConfigurationPath("some/path");
+        assertEquals("some/path", sd.formatCollection("parent", asList(new T("x"), new T("y")), parentInstance));
+    }
+
+    public void testFormatCollectionNoParam() throws Exception
+    {
+        StateDisplayFields sd = new StateDisplayFields(T.class, DefaultCollectionFields.class, objectFactory);
+        assertEquals("noparam", sd.formatCollection("noParam", asList(new T("x"), new T("y")), new ConfigType()));        
     }
 
     private void assertFields(List<String> got, String... expected)
@@ -125,7 +159,78 @@ public class StateDisplayFieldsTest extends ZutubiTestCase
 
         public List<String> getFields(T t)
         {
-            return Arrays.asList("a");
+            return asList("a");
+        }
+    }
+
+    public static class DefaultCollectionFields
+    {
+        public List<String> formatCollectionA(Collection<T> ts)
+        {
+            return CollectionUtils.map(ts, new Mapping<T, String>()
+            {
+                public String map(T t)
+                {
+                    return t.getName();
+                }
+            });
+        }
+
+        public String formatCollectionB(Collection<T> ts)
+        {
+            return "fixed";
+        }
+
+        public String formatCollectionParent(Collection<T> ts, Configuration parentInstance)
+        {
+            return parentInstance.getConfigurationPath();
+        }
+
+        public String formatCollectionNoParam()
+        {
+            return "noparam";
+        }
+
+        public void formatCollectionVoidReturn()
+        {
+        }
+
+        public String formatCollectionNonConfigParent(NonConfigType nc, Collection<T> ts)
+        {
+            return "nonconfigtype";
+        }
+
+        public String format()
+        {
+            return "format";
+        }
+
+        public String formatCollection()
+        {
+            return "formatCollection";
+        }
+
+        public String anything()
+        {
+            return "anything";
+        }
+    }
+
+    public static class DefinedCollectionFields
+    {
+        public String formatCollectionA(Collection<T> ts)
+        {
+            return "a";
+        }
+
+        public String formatCollectionB(Collection<T> ts)
+        {
+            return "b";
+        }
+
+        public List<String> getCollectionFields(Collection<T> ts, Configuration parentInstance)
+        {
+            return asList("a");
         }
     }
 }

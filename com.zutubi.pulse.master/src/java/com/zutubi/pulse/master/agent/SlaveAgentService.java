@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.model.ResourceManager;
@@ -41,11 +40,6 @@ public class SlaveAgentService implements AgentService
     {
         this.service = service;
         this.agentConfig = agentConfig;
-    }
-
-    public boolean hasResource(ResourceRequirement requirement)
-    {
-        return resourceManager.getAgentRepository(agentConfig).hasResource(requirement);
     }
 
     public boolean build(RecipeRequest request)

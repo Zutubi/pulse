@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.master.MasterRecipeRunner;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -37,11 +36,6 @@ public class MasterAgentService implements AgentService
     public AgentConfiguration getAgentConfig()
     {
         return agentConfig;
-    }
-
-    public boolean hasResource(ResourceRequirement requirement)
-    {
-        return resourceManager.getAgentRepository(agentConfig).hasResource(requirement);
     }
 
     public boolean build(RecipeRequest request)

@@ -1,7 +1,6 @@
-package com.zutubi.pulse.master.tove;
+package com.zutubi.pulse.master.tove.config;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 
 /**
  * Option provider for ResultState's that only includes completed states.

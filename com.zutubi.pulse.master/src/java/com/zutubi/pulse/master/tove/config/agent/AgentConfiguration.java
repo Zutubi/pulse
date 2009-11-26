@@ -50,6 +50,11 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     {
     }
 
+    public AgentConfiguration(String name)
+    {
+        this.name = name;
+    }
+
     public AgentConfiguration(String name, String host, int port)
     {
         remote = true;

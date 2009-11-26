@@ -779,3 +779,9 @@ function markForClean(projectName)
         callback: handleMarkForCleanResponse
     });
 }
+
+function toggleStateList(e)
+{
+    var target = e.target || e.srcElement;
+    Ext.get(target).up('ul').toggleClass('expanded');
+}

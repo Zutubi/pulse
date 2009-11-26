@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.agent.AgentService;
-
-import java.util.List;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.model.ResourceManager;
 
 /**
  * Requirements that allow a stage to be dispatched to any agent that has the
@@ -12,9 +10,7 @@ import java.util.List;
  */
 public class AnyCapableAgentRequirements implements AgentRequirements
 {
-    public AnyCapableAgentRequirements()
-    {
-    }
+    private ResourceManager resourceManager;
 
     public String getSummary()
     {
@@ -23,15 +19,11 @@ public class AnyCapableAgentRequirements implements AgentRequirements
 
     public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
     {
-        List<ResourceRequirement> requirements = request.getResourceRequirements();
-        for(ResourceRequirement requirement: requirements)
-        {
-            if (!requirement.isOptional() && !service.hasResource(requirement))
-            {
-                return false;
-            }
-        }
+        return resourceManager.getAgentRepository(service.getAgentConfig()).satisfies(request.getResourceRequirements());
+    }
 
-        return true;
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 }

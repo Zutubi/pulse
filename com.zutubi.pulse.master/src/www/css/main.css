@@ -1349,6 +1349,24 @@ h3.config-header-small {
     font-weight:normal;
     padding:5px;
 }
+.config-state-table ul li {
+    list-style-type: disc;
+    margin: 1px;
+}
+.config-state-table ul li.excess {
+    display: none;
+}
+.config-state-table ul.expanded li.expansion {
+    display: none;
+}
+.config-state-table ul.expanded li.excess {
+    display: list-item;
+}
+.config-state-table ul li.details {
+    list-style-type: none;
+    color: #555;
+    font-style: italic;
+}
 
 #config-table td, #config-table th {
     padding: 4px;

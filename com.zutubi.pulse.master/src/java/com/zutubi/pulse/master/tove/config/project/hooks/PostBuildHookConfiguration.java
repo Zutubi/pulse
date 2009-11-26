@@ -22,7 +22,7 @@ public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
 {
     @ControllingCheckbox(uncheckedFields = "runForStates")
     private boolean runForAll = true;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> runForStates = new LinkedList<ResultState>();
 
     public boolean isRunForAll()

@@ -1,17 +1,20 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.InMemoryResourceRepository;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.agent.AgentService;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
 public class AnyCapableAgentRequirementsTest extends PulseTestCase
 {
-    private static final String EXISTING_RESOURCE = "existingresource";
-    private static final String EXISTING_VERSION = "existingversion";
+    private static final String RESOURCE_NAME = "resource";
 
     private AnyCapableAgentRequirements requirements = new AnyCapableAgentRequirements();
     private AgentService mockAgentService;
@@ -21,9 +24,14 @@ public class AnyCapableAgentRequirementsTest extends PulseTestCase
     {
         super.setUp();
         mockAgentService = mock(AgentService.class);
-        stub(mockAgentService.hasResource((ResourceRequirement) anyObject())).toReturn(false);
-        stub(mockAgentService.hasResource(new ResourceRequirement(EXISTING_RESOURCE, false))).toReturn(true);
-        stub(mockAgentService.hasResource(new ResourceRequirement(EXISTING_RESOURCE, EXISTING_VERSION, false))).toReturn(true);
+
+        InMemoryResourceRepository resourceRepository = new InMemoryResourceRepository();
+        resourceRepository.addResource(new ResourceConfiguration(RESOURCE_NAME));
+
+        ResourceManager resourceManager = mock(ResourceManager.class);
+        stub(resourceManager.getAgentRepository((AgentConfiguration) anyObject())).toReturn(resourceRepository);
+
+        requirements.setResourceManager(resourceManager);
     }
 
     public void testNoResources()
@@ -36,29 +44,9 @@ public class AnyCapableAgentRequirementsTest extends PulseTestCase
         assertFalse(requirements.fulfilledBy(createRequest(new ResourceRequirement("doesnt exist", false)), mockAgentService));
     }
 
-    public void testNonExistantResourceOptional()
+    public void testExistingResource()
     {
-        assertTrue(requirements.fulfilledBy(createRequest(new ResourceRequirement("doesnt exist", true)), mockAgentService));
-    }
-
-    public void testExistingResourceDefaultVersion()
-    {
-        assertTrue(requirements.fulfilledBy(createRequest(new ResourceRequirement(EXISTING_RESOURCE, false)), mockAgentService));
-    }
-
-    public void testExistingResourceExistingVersion()
-    {
-        assertTrue(requirements.fulfilledBy(createRequest(new ResourceRequirement(EXISTING_RESOURCE, EXISTING_VERSION, false)), mockAgentService));
-    }
-
-    public void testExistingResourceNonExistantVersion()
-    {
-        assertFalse(requirements.fulfilledBy(createRequest(new ResourceRequirement(EXISTING_RESOURCE, "nope", false)), mockAgentService));
-    }
-
-    public void testExistingResourceNonExistantVersionOptional()
-    {
-        assertTrue(requirements.fulfilledBy(createRequest(new ResourceRequirement(EXISTING_RESOURCE, "nope", true)), mockAgentService));
+        assertTrue(requirements.fulfilledBy(createRequest(new ResourceRequirement(RESOURCE_NAME, false)), mockAgentService));
     }
 
     private RecipeAssignmentRequest createRequest(ResourceRequirement... resourceRequirements)
