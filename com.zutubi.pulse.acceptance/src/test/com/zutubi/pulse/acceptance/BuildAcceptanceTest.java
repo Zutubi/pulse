@@ -817,7 +817,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String statusId = IDs.buildStatusCell(projectName, 1);
         browser.refreshUntilElement(statusId, BUILD_TIMEOUT);
-        browser.refreshUntilText(statusId, "success", BUILD_TIMEOUT);
+        browser.refreshUntilText(statusId, BUILD_TIMEOUT, "success");
 
         assertEquals(agent, browser.getText(WebUtils.toValidHtmlName(IDs.stageAgentCell(projectName, 1, "default"))));
     }

@@ -266,7 +266,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         else
         {
             browser.refreshUntilElement(statusId, BUILD_TIMEOUT);
-            browser.refreshUntilText(statusId, "success", BUILD_TIMEOUT);
+            browser.refreshUntilText(statusId, BUILD_TIMEOUT, "success");
         }
     }
 }

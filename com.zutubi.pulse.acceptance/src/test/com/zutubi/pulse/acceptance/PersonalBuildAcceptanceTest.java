@@ -423,7 +423,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.openAndWaitFor(MyBuildsPage.class);
         browser.refreshUntilElement(MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
-        browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus.getPrettyString(), BUILD_TIMEOUT);
+        browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), BUILD_TIMEOUT, expectedStatus.getPrettyString());
         return buildNumber;
     }
 

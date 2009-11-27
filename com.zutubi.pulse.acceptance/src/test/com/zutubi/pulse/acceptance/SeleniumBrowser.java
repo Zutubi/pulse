@@ -600,20 +600,20 @@ public class SeleniumBrowser
         }, "element '" + id + "'");
     }
 
-    public void refreshUntilText(final String id, final String text)
+    public void refreshUntilText(final String id, final String... texts)
     {
-        refreshUntilText(id, text, REFRESH_TIMEOUT);
+        refreshUntilText(id, REFRESH_TIMEOUT, texts);
     }
 
-    public void refreshUntilText(final String id, final String text, long timeout)
+    public void refreshUntilText(final String id, long timeout, final String... texts)
     {
         refreshUntil(timeout, new Condition()
         {
             public boolean satisfied()
             {
-                return text.equals(getText(WebUtils.toValidHtmlName(id)));
+                return CollectionUtils.contains(texts, getText(WebUtils.toValidHtmlName(id)));
             }
-        }, "text '" + text + "' in element '" + id + "'");
+        }, "one of the following texts '" + Arrays.asList(texts) + "' in element '" + id + "'");
     }
 
     public void refreshUntil(long timeout, Condition condition, String conditionText)

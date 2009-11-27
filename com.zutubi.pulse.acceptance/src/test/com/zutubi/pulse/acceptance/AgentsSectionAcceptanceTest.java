@@ -125,7 +125,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         agentsPage.clickAction(LOCAL_AGENT, ACTION_ENABLE);
         agentsPage.clickAction(LOCAL_AGENT, ACTION_PING);
 
-        browser.refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), BUILDING.getPrettyString());
+        browser.refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), BUILDING.getPrettyString(),RECIPE_ASSIGNED.getPrettyString());
 
         agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
 
