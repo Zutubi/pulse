@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
@@ -242,6 +243,28 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
         }
 
         return message;
+    }
+
+    /**
+     * Asserts the counts of cases with each status within a suite.
+     *
+     * @param suite            the suite to test
+     * @param name             expected name of the suite
+     * @param total            expected total number of nested cases
+     * @param failures         expected total number of nested failures
+     * @param errors           expected total number of nested errors
+     * @param expectedFailures expected total number of nested expected
+     *                         failures
+     * @param skips            expected total number of nested skips
+     */
+    protected void checkStatusCounts(TestSuiteResult suite, String name, int total, int failures, int errors, int expectedFailures, int skips)
+    {
+        assertEquals(name, suite.getName());
+        assertEquals(total, suite.getTotal());
+        assertEquals(failures, suite.getTotalWithStatus(FAILURE));
+        assertEquals(errors, suite.getTotalWithStatus(ERROR));
+        assertEquals(expectedFailures, suite.getTotalWithStatus(EXPECTED_FAILURE));
+        assertEquals(skips, suite.getTotalWithStatus(SKIPPED));
     }
 
     private static class TestResultToName<T extends TestResult> implements Mapping<T, String>

@@ -79,7 +79,7 @@ public class XMLStreamUtils
             eventType = reader.next();
         }
 
-        if (eventType != XMLStreamConstants.START_ELEMENT && eventType != XMLStreamConstants.END_ELEMENT && eventType != XMLStreamConstants.END_DOCUMENT)
+        if (!(reader.isStartElement() || reader.isEndElement() || !reader.hasNext()))
         {
             throw new XMLStreamException("expected start or end tag or end of document", reader.getLocation());
         }

@@ -1,28 +1,12 @@
 package com.zutubi.pulse.core.postprocessors.boostregression;
 
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
-import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
-import com.zutubi.pulse.core.postprocessors.api.TestResult;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.*;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.PASS;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessorTestBase
+public class BoostRegressionPostProcessorTest extends XMLTestPostProcessorTestCase
 {
-    public BoostRegressionPostProcessorTest()
-    {
-        super(new BoostRegressionPostProcessor(new BoostRegressionPostProcessorConfiguration()));
-    }
-
-    protected File getOutputDir() throws URISyntaxException
-    {
-        URL resource = getClass().getResource("BoostRegressionPostProcessorTest.run.xml");
-        return new File(resource.toURI()).getParentFile();
-    }
+    private BoostRegressionPostProcessor pp = new BoostRegressionPostProcessor(new BoostRegressionPostProcessorConfiguration());
 
     public void testBasic() throws Exception
     {
@@ -48,24 +32,24 @@ public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessor
 
     public void testNested() throws Exception
     {
-        PersistentTestSuiteResult tests = runProcessor("nested");
+        TestSuiteResult tests = runProcessorAndGetTests(pp, "nested", EXTENSION_XML);
         assertEquals(1, tests.getSuites().size());
-        PersistentTestSuiteResult suite = tests.getSuites().get(0);
+        TestSuiteResult suite = tests.getSuites().get(0);
         assertEquals("algorithm", suite.getName());
         assertEquals(1, suite.getTotal());
-        suite = suite.getSuite("minmax");
+        suite = suite.findSuite("minmax");
         assertNotNull(suite);
-        checkCase(suite.getCase("minmax"), "minmax", PASS, TestResult.DURATION_UNKNOWN, null);
+        assertEquals(new TestCaseResult("minmax", TestResult.DURATION_UNKNOWN, PASS, null), suite.findCase("minmax"));
     }
 
     private void singleLogHelper(String testName, String suiteName, String caseName, TestStatus status, String message) throws Exception
     {
-        PersistentTestSuiteResult tests = runProcessor(testName);
+        TestSuiteResult tests = runProcessorAndGetTests(pp, testName, EXTENSION_XML);
         assertEquals(1, tests.getSuites().size());
-        PersistentTestSuiteResult suite = tests.getSuites().get(0);
+        TestSuiteResult suite = tests.getSuites().get(0);
         assertEquals(suiteName, suite.getName());
         assertEquals(1, suite.getTotal());
-        checkCase(suite.getCase(caseName), caseName, status, TestResult.DURATION_UNKNOWN, message);
+        assertEquals(new TestCaseResult(caseName, TestResult.DURATION_UNKNOWN, status, message), suite.findCase(caseName));
     }
 
 }
