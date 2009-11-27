@@ -4,7 +4,6 @@ import com.zutubi.pulse.acceptance.forms.admin.CustomTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.MultiRecipeTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.SetPasswordForm;
 import com.zutubi.pulse.acceptance.forms.admin.UserForm;
-import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
@@ -13,7 +12,6 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Hashtable;
 
@@ -59,11 +57,6 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         // Login with the new password
         login(random, "testpw");
-        browser.waitForPageToLoad(30 * SECOND);
-
-        WelcomePage welcomePage = browser.createPage(WelcomePage.class);
-        assertTrue(welcomePage.isPresent());
-        assertTitle(welcomePage);
     }
 
     public void testCustomActionWithArgumentValidation() throws Exception
@@ -90,10 +83,6 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         // Check the password is unchanged
         login(random, "");
-        browser.waitForPageToLoad(30 * SECOND);
-        WelcomePage welcomePage = browser.createPage(WelcomePage.class);
-        assertTrue(welcomePage.isPresent());
-        assertTitle(welcomePage);
     }
 
     private ListPage customActionWithArgumentPrelude() throws Exception

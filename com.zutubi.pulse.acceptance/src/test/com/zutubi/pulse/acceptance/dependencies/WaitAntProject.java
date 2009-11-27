@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -22,7 +22,11 @@ public class WaitAntProject extends ProjectConfigurationHelper
     public WaitAntProject(ProjectConfiguration config, File tmpDir)
     {
         super(config);
-        this.waitFile =  new File(tmpDir, getConfig().getName());
+        waitFile =  new File(tmpDir, getConfig().getName());
+        if (waitFile.exists() && !waitFile.delete())
+        {
+            throw new RuntimeException("Unable to clean up wait file '" + waitFile.getAbsolutePath() + "'");
+        }
     }
 
     @Override
