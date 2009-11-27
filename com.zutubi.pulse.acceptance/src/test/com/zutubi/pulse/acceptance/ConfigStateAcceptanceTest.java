@@ -27,9 +27,15 @@ public class ConfigStateAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.deleteConfig(agentPath);
-        xmlRpcHelper.logout();
-        super.tearDown();
+        try
+        {
+            xmlRpcHelper.deleteConfig(agentPath);
+            xmlRpcHelper.logout();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     public void testCompositeState() throws Exception

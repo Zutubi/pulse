@@ -73,6 +73,7 @@ public class StateDisplayRenderer
     private String renderTree(String fieldName, TreeNode treeNode)
     {
         StringBuilder result = new StringBuilder();
+        // Exclude the root from the count - it is not rendered.
         boolean hasExcess = treeNode.size() - 1 - COLLECTION_LIMIT > 1;
         renderChildren(fieldName, treeNode, true, hasExcess, new int[]{0}, result);
         return result.toString();
@@ -86,9 +87,10 @@ public class StateDisplayRenderer
             for (TreeNode<?> child: treeNode)
             {
                 count[0]++;
-                renderItem(result, hasExcess, count[0], child.getData());
+                startItem(result, hasExcess, count[0]);
+                renderSimple(result, child.getData());
                 renderChildren(fieldName, child, false, hasExcess, count, result);
-                closeItem(result);
+                endItem(result);
             }
             endList(fieldName, result, treeNode.size() - 1, isRoot && hasExcess);
         }
@@ -105,12 +107,18 @@ public class StateDisplayRenderer
         for (Object o: collection)
         {
             count++;
-            renderItem(result, hasExcess, count, o);
-            closeItem(result);
+            startItem(result, hasExcess, count);
+            renderSimple(result, o);
+            endItem(result);
         }
 
         endList(fieldName, result, collection.size(), hasExcess);
         return result.toString();
+    }
+
+    private void renderSimple(StringBuilder result, Object value)
+    {
+        result.append(TextUtils.htmlEncode(value.toString()));
     }
 
     private void startList(StringBuilder result, boolean enableToggle)
@@ -142,7 +150,7 @@ public class StateDisplayRenderer
         result.append("</ul>");
     }
 
-    private void renderItem(StringBuilder result, boolean hasExcess, int count, Object value)
+    private void startItem(StringBuilder result, boolean hasExcess, int count)
     {
         result.append("<li");
         if (hasExcess && count > COLLECTION_LIMIT)
@@ -150,10 +158,9 @@ public class StateDisplayRenderer
             result.append(" class='excess'");
         }
         result.append(">");
-        result.append(TextUtils.htmlEncode(value.toString()));
     }
 
-    private void closeItem(StringBuilder result)
+    private void endItem(StringBuilder result)
     {
         result.append("</li>");
     }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.format;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import static com.zutubi.util.reflection.MethodPredicates.*;
@@ -73,83 +74,34 @@ public class StateDisplayFields
     private void findAvailableFields()
     {
         Method[] methods = stateDisplayClass.getMethods();
-        for (Method method : methods)
+        findFieldMethods(methods,
+                METHOD_PREFIX_FORMAT,
+                availableFields,
+                acceptsParameters(),
+                acceptsParameters(configurationClass));
+
+        findFieldMethods(
+                methods,
+                METHOD_PREFIX_FORMAT_COLLECTION,
+                availableCollectionFields,
+                acceptsParameters(),
+                acceptsParameters(Collection.class),
+                acceptsParameters(Collection.class, configurationClass));
+    }
+
+    private void findFieldMethods(Method[] allMethods, String prefix, Map<String, Method> availableMap, Predicate<Method>... parameterPredicates)
+    {
+        List<Method> fieldMethods = CollectionUtils.filter(allMethods,
+                and(hasPrefix(prefix, false),
+                        not(returnsType(Void.TYPE)),
+                        or(parameterPredicates)
+                )
+        );
+
+        for (Method m: fieldMethods)
         {
-            String methodName = method.getName();
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            int parameterCount = parameterTypes.length;
-
-            boolean isCollection;
-            if (isCollectionFormatMethodName(methodName))
-            {
-                isCollection = true;
-                if (parameterCount > 2)
-                {
-                    continue;
-                }
-
-                if (parameterCount > 1 && !parameterTypes[1].isAssignableFrom(Configuration.class))
-                {
-                    continue;
-                }
-
-                if (parameterCount > 0 && !parameterTypes[0].isAssignableFrom(Collection.class))
-                {
-                    continue;
-                }
-            }
-            else if (isFormatMethodName(methodName))
-            {
-                isCollection = false;
-                if (parameterCount > 1)
-                {
-                    continue;
-                }
-
-                if (parameterCount > 0 && !parameterTypes[0].isAssignableFrom(configurationClass))
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                continue;
-            }
-
-            if (method.getDeclaringClass() == Object.class)
-            {
-                continue;
-            }
-            if (method.getReturnType() == Void.TYPE)
-            {
-                continue;
-            }
-
-            // ok, we have a field here.
-            if (isCollection)
-            {
-                availableCollectionFields.put(stripPrefix(methodName, METHOD_PREFIX_FORMAT_COLLECTION), method);
-            }
-            else
-            {
-                availableFields.put(stripPrefix(methodName, METHOD_PREFIX_FORMAT), method);
-            }
+            availableMap.put(stripPrefix(m.getName(), prefix), m);
         }
-    }
-
-    private boolean isFormatMethodName(String methodName)
-    {
-        return isPrefixedMethodName(methodName, METHOD_PREFIX_FORMAT);
-    }
-
-    private boolean isCollectionFormatMethodName(String methodName)
-    {
-        return isPrefixedMethodName(methodName, METHOD_PREFIX_FORMAT_COLLECTION);
-    }
-
-    private boolean isPrefixedMethodName(String methodName, String prefix)
-    {
-        return methodName.startsWith(prefix) && methodName.length() > prefix.length();
     }
 
     private String stripPrefix(String methodName, String prefix)

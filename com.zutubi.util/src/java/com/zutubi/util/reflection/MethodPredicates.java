@@ -2,6 +2,7 @@ package com.zutubi.util.reflection;
 
 import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.DisjunctivePredicate;
+import com.zutubi.util.InvertedPredicate;
 import com.zutubi.util.Predicate;
 
 import java.lang.reflect.Method;
@@ -20,6 +21,11 @@ public class MethodPredicates
     public static Predicate<Method> or(Predicate<Method>... ps)
     {
         return new DisjunctivePredicate<Method>(ps);
+    }
+
+    public static Predicate<Method> not(Predicate<Method> p)
+    {
+        return new InvertedPredicate<Method>(p);
     }
 
     public static MethodNameEqualsPredicate hasName(String name)
