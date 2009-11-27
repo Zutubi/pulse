@@ -20,6 +20,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     private static final String ID_BUILD_QUEUE_TABLE = "server.activity.build.queue";
     private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
     private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.recipe.queue";
+    private static final String REVISION_WAIT_ANT = "21";
 
     private static final int TIMEOUT = 90000;
 
@@ -89,7 +90,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         assertEquals(random, activeBuildsTable.getOwner());
         assertEquals("1", activeBuildsTable.getBuildId());
         assertEquals(random, activeBuildsTable.getProject());
-        assertEquals("4", activeBuildsTable.getRevision());
+        assertEquals(REVISION_WAIT_ANT, activeBuildsTable.getRevision());
         assertEquals("in progress", activeBuildsTable.getStatus());
 
         waitForBuildToComplete(1);

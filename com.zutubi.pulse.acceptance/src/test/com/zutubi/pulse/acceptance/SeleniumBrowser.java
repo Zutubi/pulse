@@ -648,7 +648,7 @@ public class SeleniumBrowser
         }
     }
 
-    private File captureFailure()
+    public File captureFailure()
     {
         int i = 1;
         File failureFile;

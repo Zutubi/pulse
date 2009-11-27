@@ -731,6 +731,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
         svn.put(Constants.Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
         xmlRpcHelper.saveConfig(svnPath, svn, false);
+        xmlRpcHelper.waitForProjectToInitialise(random);
 
         String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
         Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);

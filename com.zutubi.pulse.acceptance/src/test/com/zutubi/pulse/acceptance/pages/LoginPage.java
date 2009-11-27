@@ -1,10 +1,13 @@
 package com.zutubi.pulse.acceptance.pages;
 
+import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.master.webwork.Urls;
 import static com.zutubi.util.CollectionUtils.asPair;
+
+import java.io.File;
 
 /**
  */
@@ -26,7 +29,15 @@ public class LoginPage extends SeleniumPage
     {
         LoginForm form = browser.createForm(LoginForm.class);
         form.submitNamedFormElements("login", asPair("j_username", username), asPair("j_password", password));
-        browser.waitForPageToLoad();
+        try
+        {
+            browser.waitForPageToLoad();
+        }
+        catch (Exception e)
+        {
+            File failureFile = browser.captureFailure();
+            throw new SeleniumException("Failure while waiting to login (see: " + failureFile.getName() + "): " + e.getMessage(), e);
+        }
     }
 
     public boolean isSignupPresent()
