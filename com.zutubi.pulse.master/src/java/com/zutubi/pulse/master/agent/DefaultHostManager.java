@@ -33,16 +33,20 @@ public class DefaultHostManager implements HostManager
     {
         this.agentManager = agentManager;
 
-        for (HostState state: hostStateDao.findAll())
+        List<HostState> hostStates = hostStateDao.findAll();
+        synchronized (locationToHostMap)
         {
-            if (state.getUpgradeState() == HostState.PersistentUpgradeState.UPGRADING)
+            for (HostState state: hostStates)
             {
-                state.setUpgradeState(HostState.PersistentUpgradeState.FAILED_UPGRADE);
-                hostStateDao.save(state);
-            }
+                if (state.getUpgradeState() == HostState.PersistentUpgradeState.UPGRADING)
+                {
+                    state.setUpgradeState(HostState.PersistentUpgradeState.FAILED_UPGRADE);
+                    hostStateDao.save(state);
+                }
 
-            Host host = buildHost(state);
-            locationToHostMap.put(host.getLocation(), host);
+                Host host = buildHost(state);
+                locationToHostMap.put(host.getLocation(), host);
+            }
         }
     }
 

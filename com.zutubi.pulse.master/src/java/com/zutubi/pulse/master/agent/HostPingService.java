@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.scheduling.tasks.PingSlaves;
 import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.tove.config.TypeAdapter;
@@ -45,6 +46,7 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
     private static final int DEFAULT_POOL_SIZE = 24;
 
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
+    private boolean systemStarted = false;
     private AgentPingConfiguration configuration;
     private Lock inProgressLock = new ReentrantLock();
     private Set<Long> inProgress = new HashSet<Long>();
@@ -55,7 +57,7 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
     public HostPingService()
     {
         // Establish a default pool size as the config is not yet available
-        super("Agent Ping", DEFAULT_POOL_SIZE);
+        super("Host Ping", DEFAULT_POOL_SIZE);
     }
 
     /**
@@ -69,11 +71,17 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
      * @param host        the host to ping
      * @param hostService service for communicating with the host
      * @return true if the request was submitted, false if it was filtered
-     *         due to a pending request for the same agent
+     *         due to a pending request for the same agent (or because the
+     *         system is not yet ready)
      */
     public boolean requestPing(Host host, HostService hostService)
     {
         inProgressLock.lock();
+        if (!systemStarted)
+        {
+            return false;
+        }
+
         try
         {
             // Ignore duplicate requests.  If there is ping result pending
@@ -84,7 +92,6 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
             }
             else
             {
-                pingStarted(host);
                 enqueueRequest(host, hostService);
                 return true;
             }
@@ -131,6 +138,10 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
         ExecutorService threadPool = getExecutorService();
         final Future<HostStatus> future = threadPool.submit(new HostPing(host, hostService, masterBuildNumber, masterLocationProvider.getMasterUrl()));
 
+        // Mark ping as started as late as possible so any errors happen
+        // beforehand (we don't want to leave this host locked forever).
+        pingStarted(host);
+
         // Run a second thread to wait for up to the agent ping timeout for
         // the result of the ping.  This way we can send out the ping event
         // after at most the agent timeout period, even when the original
@@ -171,7 +182,7 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
         });
     }
 
-    void refreshSettings(AgentPingConfiguration agentPingConfig)
+    synchronized void refreshSettings(AgentPingConfiguration agentPingConfig)
     {
         configuration = agentPingConfig;
         int poolSize = agentPingConfig.getMaxConcurrent() * 2;
@@ -198,24 +209,33 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
 
     public void handleEvent(Event event)
     {
-        ConfigurationEventSystemStartedEvent eventSystemStartedEvent = (ConfigurationEventSystemStartedEvent) event;
-        TypeListener typeListener = new TypeAdapter<AgentPingConfiguration>(AgentPingConfiguration.class)
+        if (event instanceof ConfigurationEventSystemStartedEvent)
         {
-            @Override
-            public void postSave(AgentPingConfiguration instance, boolean nested)
+            ConfigurationEventSystemStartedEvent eventSystemStartedEvent = (ConfigurationEventSystemStartedEvent) event;
+            TypeListener typeListener = new TypeAdapter<AgentPingConfiguration>(AgentPingConfiguration.class)
             {
-                refreshSettings(instance);
-            }
-        };
+                @Override
+                public void postSave(AgentPingConfiguration instance, boolean nested)
+                {
+                    refreshSettings(instance);
+                }
+            };
 
-        typeListener.register(eventSystemStartedEvent.getConfigurationProvider(), false);
-        init();
-        refreshSettings(eventSystemStartedEvent.getConfigurationProvider().get(AgentPingConfiguration.class));
+            typeListener.register(eventSystemStartedEvent.getConfigurationProvider(), false);
+            init();
+            refreshSettings(eventSystemStartedEvent.getConfigurationProvider().get(AgentPingConfiguration.class));
+        }
+        else
+        {
+            inProgressLock.lock();
+            systemStarted = true;
+            inProgressLock.unlock();
+        }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class, SystemStartedEvent.class};
     }
     
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
