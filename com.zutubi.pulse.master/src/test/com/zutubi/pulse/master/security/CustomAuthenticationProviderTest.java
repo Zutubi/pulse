@@ -55,7 +55,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
         stub(userManager.getUserConfig(user.getLogin())).toReturn(null);
         stub(userManager.insert(same(user))).toReturn(user);
-        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser("user", "pass"));
+        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(1, "user", "pass"));
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
         authenticationProvider.authenticate(token);
@@ -73,7 +73,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         stub(ldapManager.canAutoAdd()).toReturn(true);
         stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
         stub(userManager.getUserConfig(user.getLogin())).toReturn(user);
-        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(user.getLogin(), "pass"));
+        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(1, user.getLogin(), "pass"));
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
         authenticationProvider.authenticate(token);

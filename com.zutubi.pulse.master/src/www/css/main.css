@@ -1161,6 +1161,12 @@ table.template-actions
     width: 20px;
 }
 
+.x-tree-node-collapsed .config-active-user-icon, .x-tree-node-expanded .config-active-user-icon, .x-tree-node-leaf .config-active-user-icon
+{
+	background-image: url(../images/user-active.gif);
+    width: 20px;
+}
+
 .x-tree-node-collapsed .config-users-icon, .x-tree-node-expanded .config-users-icon, .x-tree-node-leaf .config-users-icon
 {
 	background-image: url(../images/folder_user.gif);

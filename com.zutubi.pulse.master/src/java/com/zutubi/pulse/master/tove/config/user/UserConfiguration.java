@@ -17,7 +17,7 @@ import java.util.Map;
 @SymbolicName("zutubi.userConfig")
 @Form(fieldOrder = {"login", "name", "authenticatedViaLdap"})
 @Table(columns = {"login", "name"})
-@Classification(single = "user", collection = "users")
+@Classification(collection = "users")
 public class UserConfiguration extends AbstractConfiguration implements Extendable
 {
     @ID

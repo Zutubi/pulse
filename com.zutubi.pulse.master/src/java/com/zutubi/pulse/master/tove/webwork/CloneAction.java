@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.model.ControllingCheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
@@ -48,6 +49,7 @@ public class CloneAction extends ToveFormActionSupport
     private Map<String, String> keyMap;
 
     private ConfigurationRefactoringManager configurationRefactoringManager;
+    private ClassificationManager classificationManager;
 
     public CloneAction()
     {
@@ -295,12 +297,12 @@ public class CloneAction extends ToveFormActionSupport
         String newPath = PathUtils.getPath(parentPath, cloneKey);
         String templatePath = configurationTemplateManager.getTemplatePath(newPath);
         response = new ConfigurationResponse(newPath, templatePath);
-        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
+        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager, classificationManager);
         if (smart)
         {
             String newParent = PathUtils.getPath(parentPath, parentKey);
             String collapsedCollection = ToveUtils.getCollapsedCollection(newParent, configurationTemplateManager.getType(newParent), configurationSecurityManager);
-            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), collapsedCollection, ToveUtils.getIconCls(newParent, configurationTemplateManager), false, false));
+            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), collapsedCollection, ToveUtils.getIconCls(newParent, classificationManager), false, false));
             response.addRemovedPath(path);
         }
     }
@@ -308,5 +310,10 @@ public class CloneAction extends ToveFormActionSupport
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
     {
         this.configurationRefactoringManager = configurationRefactoringManager;
+    }
+
+    public void setClassificationManager(ClassificationManager classificationManager)
+    {
+        this.classificationManager = classificationManager;
     }
 }

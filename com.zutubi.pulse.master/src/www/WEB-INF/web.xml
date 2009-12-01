@@ -17,10 +17,15 @@
     -->
     <filter>
         <filter-name>Acegi Session Filter</filter-name>
+        <filter-class>com.zutubi.pulse.master.security.HttpSessionContextIntegrationFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>access</filter-name>
         <filter-class>com.zutubi.pulse.servercore.spring.FilterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
-            <param-value>com.zutubi.pulse.master.security.HttpSessionContextIntegrationFilter</param-value>
+            <param-value>com.zutubi.pulse.master.security.LastAccessFilter</param-value>
         </init-param>
     </filter>
 
@@ -38,15 +43,13 @@
         </init-param>
     </filter>
 
-    <!-- webwork 2.2 filter dispatcher support.
-        <filter>
-            <filter-name>webwork</filter-name>
-            <filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
-        </filter>
-
-    -->
     <filter-mapping>
         <filter-name>Acegi Session Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>access</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
@@ -59,14 +62,6 @@
         <filter-name>redirect</filter-name>
         <url-pattern>/</url-pattern>
     </filter-mapping>
-
-    <!-- webwork 2.2 filter dispatcher support.
-        <filter-mapping>
-            <filter-name>webwork</filter-name>
-            <url-pattern>/*</url-pattern>
-        </filter-mapping>
-
-    -->
 
     <!--
     If the System property 'xwork.reload.bundles' is specified, the following listener to set

@@ -9,8 +9,20 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class UsersPage extends ListPage
 {
+    private static final String STATE_ACTIVE_COUNT = "activeCount";
+
     public UsersPage(SeleniumBrowser browser, Urls urls)
     {
         super(browser, urls, MasterConfigurationRegistry.USERS_SCOPE);
+    }
+
+    public boolean isActiveCountPresent()
+    {
+        return isStateFieldPresent(STATE_ACTIVE_COUNT);
+    }
+
+    public String getActiveCount()
+    {
+        return getStateField(STATE_ACTIVE_COUNT);
     }
 }

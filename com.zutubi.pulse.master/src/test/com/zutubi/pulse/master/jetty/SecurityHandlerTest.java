@@ -54,7 +54,7 @@ public class SecurityHandlerTest extends PulseTestCase
 
     public void testForbidden() throws IOException, ServletException
     {
-        Actor user = new AcegiUser("name", "pass");
+        Actor user = new AcegiUser(1, "name", "pass");
         stub(accessManager.getActor()).toReturn(user);
         stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(false);
 

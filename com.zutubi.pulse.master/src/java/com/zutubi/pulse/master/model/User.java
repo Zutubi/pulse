@@ -25,6 +25,11 @@ public class User extends Entity implements NamedEntity
      */
     private long nextBuildNumber = 1;
     /**
+     * The last time the user access the web interface.  These numbers are not
+     * flushed to the database on every access (for performance reasons).
+     */
+    private long lastAccessTime = 0;
+    /**
      * Collapsed groups/projects on the browse view.
      */
     private Set<LabelProjectTuple> browseViewCollapsed = new HashSet<LabelProjectTuple>();
@@ -77,6 +82,16 @@ public class User extends Entity implements NamedEntity
     public String getLogin()
     {
         return config != null ? config.getLogin() : null;
+    }
+
+    public long getLastAccessTime()
+    {
+        return lastAccessTime;
+    }
+
+    public void setLastAccessTime(long lastAccessTime)
+    {
+        this.lastAccessTime = lastAccessTime;
     }
 
     public void setConfig(UserConfiguration config)

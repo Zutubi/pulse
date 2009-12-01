@@ -17,6 +17,7 @@ import java.util.Set;
  */
 public class AcegiUser implements Actor, UserDetails
 {
+    private long id;
     private String username;
     private String password;
     private Set<String> authoritySet;
@@ -24,8 +25,9 @@ public class AcegiUser implements Actor, UserDetails
     private boolean enabled;
     private boolean ldapAuthentication;
 
-    public AcegiUser(String user, String pass)
+    public AcegiUser(long id, String user, String pass)
     {
+        this.id = id;
         this.username = user;
         this.password = pass;
         this.enabled = true;
@@ -41,6 +43,7 @@ public class AcegiUser implements Actor, UserDetails
 
     public AcegiUser(UserConfiguration config, List<UserGroupConfiguration> groups)
     {
+        id = config.getUserId();
         username = config.getLogin();
         password = config.getPassword();
         initAuthorities(config, groups);
@@ -90,6 +93,11 @@ public class AcegiUser implements Actor, UserDetails
         }
 
         return authorities;
+    }
+
+    public long getId()
+    {
+        return id;
     }
 
     public String getPassword()

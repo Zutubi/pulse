@@ -43,6 +43,7 @@
     <bean id="linkManager" class="com.zutubi.tove.links.LinkManager" autowire="byName"/>
     <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager" autowire="byName"/>
     <bean id="stateDisplayRenderer" class="com.zutubi.pulse.master.tove.webwork.StateDisplayRenderer" autowire="byName"/>
+    <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager" autowire="byName"/>
 
     <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" autowire="byName" init-method="init"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>

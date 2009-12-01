@@ -98,6 +98,7 @@
                 <ref local="ensureDependenciesAndOptionsConfigPermanent"/>
                 <ref local="addPerforceView"/>
                 <ref local="fixExpectedFailureSeries"/>
+                <ref local="lastAccessTimes"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -457,5 +458,14 @@
 
     <bean id="fixExpectedFailureSeries" class="com.zutubi.pulse.master.upgrade.tasks.FixExpectedFailureSeriesUpgradeTask">
         <property name="buildNumber" value="201009001"/>
+    </bean>
+
+    <bean id="lastAccessTimes" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201010001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.10-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

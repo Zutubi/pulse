@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.record.PathUtils;
@@ -22,6 +23,8 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
     private ComplexType type;
     private Record value;
     private String error;
+    
+    private ClassificationManager classificationManager;
 
     public ConfigErrorFileObject(FileName name, AbstractFileSystem fs)
     {
@@ -79,12 +82,17 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
         }
         else
         {
-            return ToveUtils.getIconCls(type);
+            return ToveUtils.getIconCls(configPath, classificationManager);
         }
     }
 
     protected String[] doListChildren() throws Exception
     {
         return new String[0];
+    }
+
+    public void setClassificationManager(ClassificationManager classificationManager)
+    {
+        this.classificationManager = classificationManager;
     }
 }

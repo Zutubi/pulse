@@ -41,6 +41,11 @@ public class ConventionSupport
         return loadClass(clazz, "StateDisplay");
     }
 
+    public static Class getClassifier(Class<? extends Configuration> clazz)
+    {
+        return loadClass(clazz, "Classifier");
+    }
+
     public static Class getExamples(Class<? extends Configuration> clazz)
     {
         return loadClass(clazz, "Examples");

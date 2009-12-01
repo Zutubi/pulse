@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.wizard.webwork;
 
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationErrors;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
@@ -19,6 +20,7 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
     private ConfigurationResponse configurationResponse;
     private ConfigurationErrors configurationErrors;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ClassificationManager classificationManager;
 
     public ConfigurationPanel getConfigurationPanel()
     {
@@ -65,7 +67,7 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
                 else
                 {
                     // Then we just added this path
-                    configurationResponse.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
+                    configurationResponse.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager, classificationManager);
                 }
             }
         }
@@ -99,5 +101,10 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setClassificationManager(ClassificationManager classificationManager)
+    {
+        this.classificationManager = classificationManager;
     }
 }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.filesystem.FileSystemException;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -25,8 +26,6 @@ import java.util.Map;
  */
 public class ConfigFileObject extends AbstractPulseFileObject implements ComparatorProvider
 {
-    private ConfigurationTemplateManager configurationTemplateManager;
-    private ConfigurationSecurityManager configurationSecurityManager;
     /**
      * This is the path into the configuration subsystem, which is *not*
      * necessarily the same as the filesystem path due to collapsed
@@ -36,6 +35,10 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     private ComplexType parentType;
     private ComplexType type;
     private Record value;
+
+    private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
+    private ClassificationManager classificationManager;
 
     public ConfigFileObject(FileName name, AbstractFileSystem fs)
     {
@@ -152,7 +155,7 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
 
     public String getIconCls()
     {
-        return ToveUtils.getIconCls(type);
+        return ToveUtils.getIconCls(path, classificationManager);
     }
 
     protected String[] doListChildren() throws Exception
@@ -188,5 +191,10 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setClassificationManager(ClassificationManager classificationManager)
+    {
+        this.classificationManager = classificationManager;
     }
 }

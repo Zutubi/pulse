@@ -7,6 +7,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.freemarker.BaseNameMethod;
 import com.zutubi.pulse.master.tove.freemarker.GetTextMethod;
 import com.zutubi.pulse.master.tove.freemarker.ValidIdMethod;
@@ -15,11 +16,9 @@ import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
-import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
@@ -506,53 +505,9 @@ public class ToveUtils
         }
     }
 
-    public static String getClassification(ComplexType type)
+    public static String getIconCls(String path, ClassificationManager classificationManager)
     {
-        Type targetType = type.getTargetType();
-        if(targetType instanceof CompositeType)
-        {
-            Classification classification = ((CompositeType)targetType).getAnnotation(Classification.class, true);
-            if(classification != null)
-            {
-                if(type instanceof CompositeType)
-                {
-                    if(StringUtils.stringSet(classification.single()))
-                    {
-                        return classification.single();
-                    }
-                }
-                else
-                {
-                    if(StringUtils.stringSet(classification.collection()))
-                    {
-                        return classification.collection();
-                    }
-                }
-            }
-        }
-
-        return type instanceof CompositeType ? "composite" : "collection";
-    }
-
-    public static String getIconCls(ComplexType type)
-    {
-        return "config-" + getClassification(type) + "-icon";
-    }
-
-    public static String getIconCls(String path, ConfigurationTemplateManager configurationTemplateManager)
-    {
-        String iconCls;
-        TemplateNode templateNode = configurationTemplateManager.getTemplateNode(path);
-        if(templateNode == null)
-        {
-            iconCls = getIconCls(configurationTemplateManager.getType(path));
-        }
-        else
-        {
-            iconCls = "config-" + (templateNode.isConcrete() ? "concrete" : "template") + "-icon";
-        }
-
-        return iconCls;
+        return "config-" + classificationManager.classify(path) + "-icon";
     }
 
     /**

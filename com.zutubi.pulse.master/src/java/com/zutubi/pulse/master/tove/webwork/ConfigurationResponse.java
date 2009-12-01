@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
@@ -87,12 +88,13 @@ public class ConfigurationResponse
      *
      * @param configurationTemplateManager required manager
      * @param configurationSecurityManager required manager
+     * @param classificationManager        required manager
      */
-    public void registerNewPathAdded(ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
+    public void registerNewPathAdded(ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager, ClassificationManager classificationManager)
     {
         String displayName = ToveUtils.getDisplayName(newPath, configurationTemplateManager);
         String collapsedCollection = ToveUtils.getCollapsedCollection(newPath, configurationTemplateManager.getType(newPath), configurationSecurityManager);
-        String iconCls = ToveUtils.getIconCls(newPath, configurationTemplateManager);
+        String iconCls = ToveUtils.getIconCls(newPath, classificationManager);
         boolean leaf = ToveUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager);
         TemplateNode templateNode = configurationTemplateManager.getTemplateNode(newPath);
         boolean templateLeaf = !(templateNode != null && templateNode.getChildren().size() > 0);

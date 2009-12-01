@@ -12,6 +12,8 @@
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
 
+        <property name="lastAccessTime" column="LAST_ACCESS_TIME" type="long"/>
+
         <set name="browseViewCollapsed" table="USER_BROWSE_VIEW_COLLAPSED" lazy="true">
             <key column="USER_ID"/>
             <composite-element class="com.zutubi.pulse.master.model.LabelProjectTuple">

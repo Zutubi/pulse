@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
-import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 
@@ -14,6 +14,7 @@ import com.zutubi.util.StringUtils;
 public class DisplayScopeAction extends ActionSupport
 {
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ClassificationManager classificationManager;
 
     /**
      * Section of the UI we live in.  Overridden in
@@ -133,10 +134,10 @@ public class DisplayScopeAction extends ActionSupport
             return ERROR;
         }
 
-        // This also serves as a validity check for the path: the user should
+        // This serves as a validity check for the path: the user should
         // only be requesting a complex type that can be determined.  Note
         // that the path may not exist - although its parent must.
-        ComplexType type = configurationTemplateManager.getType(path);
+        configurationTemplateManager.getType(path);
 
         String[] pathElements = PathUtils.getPathElements(path);
         if (pathElements.length > 0)
@@ -178,7 +179,7 @@ public class DisplayScopeAction extends ActionSupport
         }
         else
         {
-            configClassification = ToveUtils.getClassification(type);
+            configClassification = classificationManager.classify(path);
         }
 
         return templated ? "template" : "config";
@@ -187,5 +188,10 @@ public class DisplayScopeAction extends ActionSupport
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setClassificationManager(ClassificationManager classificationManager)
+    {
+        this.classificationManager = classificationManager;
     }
 }
