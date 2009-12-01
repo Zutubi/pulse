@@ -36,7 +36,7 @@ public class CustomVelocityManager extends VelocityManager
         SpringComponentContext.autowire(this);
     }
 
-    public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
+    public synchronized Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
     {
         Context context = super.createContext(stack, req, res);
         context.put("urls", new Urls((String) context.get("base")));
@@ -95,7 +95,6 @@ public class CustomVelocityManager extends VelocityManager
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-        systemStarted = true;
     }
 
     public void setEventManager(EventManager eventManager)
@@ -105,6 +104,10 @@ public class CustomVelocityManager extends VelocityManager
             public void systemStarted()
             {
                 SpringComponentContext.autowire(CustomVelocityManager.this);
+                synchronized (CustomVelocityManager.this)
+                {
+                    systemStarted = true;
+                }
             }
         });
     }

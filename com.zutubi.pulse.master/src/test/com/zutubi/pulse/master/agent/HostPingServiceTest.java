@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -73,6 +74,8 @@ public class HostPingServiceTest extends PulseTestCase
 
         hostPingService.init();
         hostPingService.refreshSettings(new AgentPingConfiguration());
+
+        eventManager.publish(new SystemStartedEvent(this));
     }
 
     public void testSimplePing()
