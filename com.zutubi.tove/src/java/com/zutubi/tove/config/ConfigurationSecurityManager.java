@@ -2,10 +2,10 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
@@ -96,7 +96,7 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
      *   doing the access check.</li>
      *
      *   <li>When reading a path in a templated scope, access may be granted
-     *   because the actor has permission to read a template descendent of
+     *   because the actor has permission to read a template descendant of
      *   the given path.  This ensures that an actor can read all ancestors
      *   of any resources they can read (which they could implicitly anyway).</li>
      * </ol>
@@ -135,15 +135,15 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
                         return true;
                     }
 
-                    // No direct permission, see if any descendents have permission.
+                    // No direct permission, see if any descendants have permission.
                     if (resource != null)
                     {
-                        for(String descendentPath: configurationTemplateManager.getDescendentPaths(resource.getConfigurationPath(), true, false, false))
+                        for(String descendantPath: configurationTemplateManager.getDescendantPaths(resource.getConfigurationPath(), true, false, false))
                         {
-                            Configuration instance = configurationTemplateManager.getInstance(descendentPath);
+                            Configuration instance = configurationTemplateManager.getInstance(descendantPath);
                             if(instance != null && accessManager.hasPermission(action, instance))
                             {
-                                LOG.finest("Permission reverse inherited via descendent");
+                                LOG.finest("Permission reverse inherited via descendant");
                                 return true;
                             }
                         }

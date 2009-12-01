@@ -202,12 +202,12 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         invalidCloneNameHelper(childBPath, "parentB", "name is already in use in ancestor \"root\", please select another name");
     }
 
-    public void testCloneCloneNameInDescendent() throws TypeException
+    public void testCloneCloneNameInDescendant() throws TypeException
     {
         String parentBPath = addB(rootPath, "parentB");
         String childPath = insertTemplateA(rootPath, "child", false);
         addB(childPath, "childB");
-        invalidCloneNameHelper(parentBPath, "childB", "name is already in use in descendent \"child\", please select another name");
+        invalidCloneNameHelper(parentBPath, "childB", "name is already in use in descendant \"child\", please select another name");
     }
 
     public void testSimpleClone()
@@ -887,7 +887,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals("Unable to pull up path 'template/a1/b': Ancestor 'root' already has descendents [template/a2/b] that define this path", e.getMessage());
+            assertEquals("Unable to pull up path 'template/a1/b': Ancestor 'root' already has descendants [template/a2/b] that define this path", e.getMessage());
         }
     }
 

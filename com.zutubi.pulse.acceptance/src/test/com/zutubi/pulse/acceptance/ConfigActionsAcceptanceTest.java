@@ -229,7 +229,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
     }
 
-    public void testDescendentActions() throws Exception
+    public void testDescendantActions() throws Exception
     {
         String parentName = random + "-parent";
         String child1Name = random + "-child1";
@@ -239,44 +239,44 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentName, true);
-        assertFalse(projectPage.isDescendentActionsPresent());
+        assertFalse(projectPage.isDescendantActionsPresent());
 
         String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
         xmlRpcHelper.insertTrivialProject(child2Name, parentName, false);
 
         projectPage.openAndWaitFor();
-        assertTrue(projectPage.isDescendentActionsPresent());
-        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
-        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+        assertTrue(projectPage.isDescendantActionsPresent());
+        assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
         assertDefaultAndComplexActionsNotShown(projectPage);
 
-        projectPage.clickDescendentActionAndWait(ProjectConfigurationActions.ACTION_PAUSE);
-        assertTextPresent("action 'pause' triggered on 2 descendents");
-        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
-        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+        projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_PAUSE);
+        assertTextPresent("action 'pause' triggered on 2 descendants");
+        assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
         assertEquals(Project.State.PAUSED, xmlRpcHelper.getProjectState(child1Name));
         assertEquals(Project.State.PAUSED, xmlRpcHelper.getProjectState(child2Name));
 
         xmlRpcHelper.doConfigAction(child1Path, ProjectConfigurationActions.ACTION_RESUME);
         projectPage.openAndWaitFor();
-        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
-        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+        assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
-        projectPage.clickDescendentActionAndWait(ProjectConfigurationActions.ACTION_RESUME);
-        assertTextPresent("action 'resume' triggered on 1 descendent");
-        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
-        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+        projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_RESUME);
+        assertTextPresent("action 'resume' triggered on 1 descendant");
+        assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
     }
 
     private void assertDefaultAndComplexActionsNotShown(ProjectConfigPage projectPage)
     {
-        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
-        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
-        assertFalse(projectPage.isDescendentActionPresent(ConfigurationRefactoringManager.ACTION_CLONE));
-        assertFalse(projectPage.isDescendentActionPresent(ConfigurationRefactoringManager.ACTION_PULL_UP));
-        assertFalse(projectPage.isDescendentActionPresent(ConfigurationRefactoringManager.ACTION_PUSH_DOWN));
-        assertFalse(projectPage.isDescendentActionPresent(AccessManager.ACTION_DELETE));
-        assertFalse(projectPage.isDescendentActionPresent(AccessManager.ACTION_VIEW));
+        assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
+        assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
+        assertFalse(projectPage.isDescendantActionPresent(ConfigurationRefactoringManager.ACTION_CLONE));
+        assertFalse(projectPage.isDescendantActionPresent(ConfigurationRefactoringManager.ACTION_PULL_UP));
+        assertFalse(projectPage.isDescendantActionPresent(ConfigurationRefactoringManager.ACTION_PUSH_DOWN));
+        assertFalse(projectPage.isDescendantActionPresent(AccessManager.ACTION_DELETE));
+        assertFalse(projectPage.isDescendantActionPresent(AccessManager.ACTION_VIEW));
     }
 }

@@ -281,7 +281,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTextPresent("name is already in use, please select another name");
     }
 
-    public void testNameValidationDuplicateInDescendent() throws Exception
+    public void testNameValidationDuplicateInDescendant() throws Exception
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
@@ -298,10 +298,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use in descendent \"" + childName + "\", please select another name");
+        assertTextPresent("name is already in use in descendant \"" + childName + "\", please select another name");
     }
 
-    public void testNameValidationDuplicateInDescendents() throws Exception
+    public void testNameValidationDuplicateInDescendants() throws Exception
     {
         String parentName = random + "-parent";
         String child1Name = random + "-child1";
@@ -321,7 +321,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use in descendents [" + child1Name + ", " + child2Name + "], please select another name");
+        assertTextPresent("name is already in use in descendants [" + child1Name + ", " + child2Name + "], please select another name");
     }
 
     public void testNameValidationDuplicateInAncestor() throws Exception
@@ -368,7 +368,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // in the parent.
         compositePage.openAndWaitFor();
         assertFalse(compositePage.isConfigureLinkPresent());
-        assertTrue(compositePage.isConfiguredDescendentPresent(childName));
+        assertTrue(compositePage.isConfiguredDescendantPresent(childName));
     }
 
     public void testOrderLinks() throws Exception

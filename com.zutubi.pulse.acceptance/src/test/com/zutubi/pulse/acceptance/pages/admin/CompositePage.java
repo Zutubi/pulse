@@ -37,9 +37,9 @@ public class CompositePage extends ConfigPage
         return browser.isLinkPresent(CONFIGURE_LINK);
     }
 
-    public boolean isConfiguredDescendentPresent(String descendent)
+    public boolean isConfiguredDescendantPresent(String descendant)
     {
-        return browser.isElementIdPresent(WebUtils.toValidHtmlName("cd-" + descendent));
+        return browser.isElementIdPresent(WebUtils.toValidHtmlName("cd-" + descendant));
     }
 
     public void clickConfigure()
@@ -68,29 +68,29 @@ public class CompositePage extends ConfigPage
         waitForAction();
     }
 
-    public boolean isDescendentActionsPresent()
+    public boolean isDescendantActionsPresent()
     {
-        return browser.isElementPresent("descendent.actions");
+        return browser.isElementPresent("descendant.actions");
     }
 
-    public String getDescendentActionId(String action)
+    public String getDescendantActionId(String action)
     {
-        return "descendent.action." + action;
+        return "descendant.action." + action;
     }
 
-    public boolean isDescendentActionPresent(String action)
+    public boolean isDescendantActionPresent(String action)
     {
-        return browser.isElementPresent(getDescendentActionId(action));
+        return browser.isElementPresent(getDescendantActionId(action));
     }
 
-    public void clickDescendentAction(String action)
+    public void clickDescendantAction(String action)
     {
-        browser.click(getDescendentActionId(action));
+        browser.click(getDescendantActionId(action));
     }
 
-    public void clickDescendentActionAndWait(String action)
+    public void clickDescendantActionAndWait(String action)
     {
-        clickDescendentAction(action);
+        clickDescendantAction(action);
         waitForAction();
     }
 

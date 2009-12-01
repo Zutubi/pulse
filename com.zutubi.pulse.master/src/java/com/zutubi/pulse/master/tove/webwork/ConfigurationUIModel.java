@@ -67,11 +67,11 @@ public class ConfigurationUIModel
 
     private List<ConfigurationLink> links = new LinkedList<ConfigurationLink>();
     private List<ActionLink> actions = new LinkedList<ActionLink>();
-    private List<ActionLink> descendentActions = new LinkedList<ActionLink>();
+    private List<ActionLink> descendantActions = new LinkedList<ActionLink>();
 
     private List<String> displayFields = new LinkedList<String>();
 
-    private List<String> configuredDescendents = new LinkedList<String>();
+    private List<String> configuredDescendants = new LinkedList<String>();
 
     private boolean writable;
     private boolean embedded = false;
@@ -175,17 +175,17 @@ public class ConfigurationUIModel
         }
         else
         {
-            // Is this path configured in any descendents?
-            List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(path, true, false, false);
+            // Is this path configured in any descendants?
+            List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(path, true, false, false);
 
             determineActions(parentType);
-            determineDescendentActions(descendentPaths);
+            determineDescendantActions(descendantPaths);
 
             displayFields = stateDisplayManager.getDisplayFields(instance);
             
             if(instance == null)
             {
-                configuredDescendents = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
+                configuredDescendants = CollectionUtils.map(descendantPaths, new Mapping<String, String>()
                 {
                     public String map(String s)
                     {
@@ -193,7 +193,7 @@ public class ConfigurationUIModel
                     }
                 });
 
-                if (configuredDescendents.size() == 0 && !((CompositeType) type).isExtendable())
+                if (configuredDescendants.size() == 0 && !((CompositeType) type).isExtendable())
                 {
                     resolveNested();
                 }
@@ -272,13 +272,13 @@ public class ConfigurationUIModel
         }
     }
 
-    private void determineDescendentActions(List<String> configuredDescendents)
+    private void determineDescendantActions(List<String> configuredDescendants)
     {
         final Messages messages = Messages.getInstance(type.getClazz());
         Set<String> actionSet = new HashSet<String>();
-        for (String descendentPath: configuredDescendents)
+        for (String descendantPath: configuredDescendants)
         {
-            Configuration instance = configurationTemplateManager.getInstance(descendentPath);
+            Configuration instance = configurationTemplateManager.getInstance(descendantPath);
             if (instance != null && instance.isConcrete())
             {
                 actionSet.addAll(actionManager.getActions(instance, false, false));
@@ -287,10 +287,10 @@ public class ConfigurationUIModel
 
         for (String action: actionSet)
         {
-            descendentActions.add(ToveUtils.getActionLink(action, messages, systemPaths.getContentRoot()));
+            descendantActions.add(ToveUtils.getActionLink(action, messages, systemPaths.getContentRoot()));
         }
 
-        Collections.sort(descendentActions, new ActionLinkComparator());
+        Collections.sort(descendantActions, new ActionLinkComparator());
     }
 
     public Object format(String fieldName)
@@ -439,9 +439,9 @@ public class ConfigurationUIModel
         return actions;
     }
 
-    public List<ActionLink> getDescendentActions()
+    public List<ActionLink> getDescendantActions()
     {
-        return descendentActions;
+        return descendantActions;
     }
 
     public List<String> getDisplayFields()
@@ -449,9 +449,9 @@ public class ConfigurationUIModel
         return displayFields;
     }
 
-    public List<String> getConfiguredDescendents()
+    public List<String> getConfiguredDescendants()
     {
-        return configuredDescendents;
+        return configuredDescendants;
     }
 
     public boolean isWritable()

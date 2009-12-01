@@ -1653,7 +1653,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertNotSame(erCollection, configurationTemplateManager.getInstance(SCOPE_REFERER));
     }
 
-    public void testCacheUpdateUpdatesDescendents() throws TypeException
+    public void testCacheUpdateUpdatesDescendants() throws TypeException
     {
         Pair<String, String> paths = insertParentAndChildA(new MockA("parent"), new MockA("child"));
         MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
@@ -1679,7 +1679,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertSame(parent, configurationTemplateManager.getInstance(paths.first, MockA.class));
     }
 
-    public void testCacheNestedUpdateWithDescendents() throws TypeException
+    public void testCacheNestedUpdateWithDescendants() throws TypeException
     {
         MockA parent = new MockA("parent");
         parent.getCs().put("c1", new MockC("c1"));

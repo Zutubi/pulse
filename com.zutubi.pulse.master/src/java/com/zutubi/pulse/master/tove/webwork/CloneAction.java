@@ -123,7 +123,7 @@ public class CloneAction extends ToveFormActionSupport
                 validateCloneKey(FIELD_PARENT_KEY, parentKey, seenKeys, textProvider);
             }
 
-            getDescendents(keyMap, seenKeys, textProvider);
+            getDescendants(keyMap, seenKeys, textProvider);
         }
     }
 
@@ -155,7 +155,7 @@ public class CloneAction extends ToveFormActionSupport
         }
     }
 
-    private Map<String, String> getDescendents(Map<String, String> selectedDescedents, Set<String> seenKeys, TextProvider textProvider)
+    private Map<String, String> getDescendants(Map<String, String> selectedDescedents, Set<String> seenKeys, TextProvider textProvider)
     {
         Map parameters = ActionContext.getContext().getParameters();
         for(Object n: parameters.keySet())
@@ -163,13 +163,13 @@ public class CloneAction extends ToveFormActionSupport
             String name = (String) n;
             if(name.startsWith(CHECK_FIELD_PREFIX))
             {
-                String descendentKey = name.substring(CHECK_FIELD_PREFIX.length());
-                String value = getParameterValue(parameters, KEY_FIELD_PREFIX + descendentKey);
+                String descendantKey = name.substring(CHECK_FIELD_PREFIX.length());
+                String value = getParameterValue(parameters, KEY_FIELD_PREFIX + descendantKey);
 
                 if (value != null)
                 {
-                    validateCloneKey(KEY_FIELD_PREFIX + descendentKey, value, seenKeys, textProvider);
-                    selectedDescedents.put(descendentKey, value);
+                    validateCloneKey(KEY_FIELD_PREFIX + descendantKey, value, seenKeys, textProvider);
+                    selectedDescedents.put(descendantKey, value);
                 }
             }
         }
@@ -200,7 +200,7 @@ public class CloneAction extends ToveFormActionSupport
                 addParentField(form, parameters);
             }
 
-            addDescendentFields(form);
+            addDescendantFields(form);
         }
     }
 
@@ -221,11 +221,11 @@ public class CloneAction extends ToveFormActionSupport
         form.add(field);
     }
 
-    private void addDescendentFields(final Form form)
+    private void addDescendantFields(final Form form)
     {
         final Map parameters = ActionContext.getContext().getParameters();
         TemplateNode templateNode = configurationTemplateManager.getTemplateNode(path);
-        templateNode.forEachDescendent(new TemplateNode.NodeHandler()
+        templateNode.forEachDescendant(new TemplateNode.NodeHandler()
         {
             public boolean handle(TemplateNode node)
             {
@@ -235,7 +235,7 @@ public class CloneAction extends ToveFormActionSupport
 
                 Field field = new Field(FieldType.CONTROLLING_CHECKBOX, CHECK_FIELD_PREFIX + key);
                 field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_CHECKED_FIELDS, getDependentFields(nameField, node));
-                field.setLabel(I18N.format("cloneDescendent.label", new Object[]{key}));
+                field.setLabel(I18N.format("cloneDescendant.label", new Object[]{key}));
                 if(parameters.containsKey(CHECK_FIELD_PREFIX + key))
                 {
                     field.setValue("true");

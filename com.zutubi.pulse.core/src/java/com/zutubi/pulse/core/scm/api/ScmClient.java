@@ -249,7 +249,7 @@ public interface ScmClient extends Closeable
     /**
      * Returns a list of all files/directories in the given path (which
      * should specify a directory).  This function is NOT recursive, i.e.
-     * only direct descendents should be listed.
+     * only direct descendants should be listed.
      * <p/>
      * Required for {@link ScmCapability#BROWSE}.
      *

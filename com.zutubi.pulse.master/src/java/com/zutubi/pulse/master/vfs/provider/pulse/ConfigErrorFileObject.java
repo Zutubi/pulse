@@ -10,7 +10,7 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
- * A file to represent the root of the server configuration.  Descendents of
+ * A file to represent the root of the server configuration.  Descendants of
  * this file represent paths into the config system.
  */
 public class ConfigErrorFileObject extends AbstractPulseFileObject

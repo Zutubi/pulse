@@ -36,17 +36,17 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
         super.tearDown();
     }
 
-    public void testBrowseViewDescendentsBuilding() throws Exception
+    public void testBrowseViewDescendantsBuilding() throws Exception
     {
-        descendentsBuildingHelper(browser.createPage(BrowsePage.class));
+        descendantsBuildingHelper(browser.createPage(BrowsePage.class));
     }
 
-    public void testDashboardDescendentsBuilding() throws Exception
+    public void testDashboardDescendantsBuilding() throws Exception
     {
-        descendentsBuildingHelper(browser.createPage(DashboardPage.class));
+        descendantsBuildingHelper(browser.createPage(DashboardPage.class));
     }
 
-    private void descendentsBuildingHelper(ProjectsSummaryPage summaryPage) throws Exception
+    private void descendantsBuildingHelper(ProjectsSummaryPage summaryPage) throws Exception
     {
         String templateProject = random + "-template";
         String childProject = random + "-child";

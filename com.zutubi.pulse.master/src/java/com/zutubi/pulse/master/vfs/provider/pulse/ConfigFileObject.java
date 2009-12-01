@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A file to represent the root of the server configuration.  Descendents of
+ * A file to represent the root of the server configuration.  Descendants of
  * this file represent paths into the config system.
  */
 public class ConfigFileObject extends AbstractPulseFileObject implements ComparatorProvider

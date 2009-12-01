@@ -924,7 +924,7 @@ public class RemoteApi
      * Clones a top-level templated item (e.g. a project or an agent) by
      * extracting its details into a parent template and adding a new empty
      * sibling (the clone) which will inherit identical configuration.  The
-     * item's descendents may also optionally be cloned, although those clones
+     * item's descendants may also optionally be cloned, although those clones
      * themselves will not be 'smart', their details will be copied.
      *
      * @param token                 authentication token (see {@link #login})
@@ -971,7 +971,7 @@ public class RemoteApi
      *   <li>Be in a templated scope</li>
      *   <li>Not be marked permanent</li>
      *   <li>Not be defined in any ancestor</li>
-     *   <li>Not be defined in any other descendent of the specified ancestor</li>
+     *   <li>Not be defined in any other descendant of the specified ancestor</li>
      *   <li>Not contain any references to items not visible from the specified ancestor</li>
      * </ul>
      *
@@ -1119,7 +1119,7 @@ public class RemoteApi
      * <p/>
      * If the path refers to a collection item that is inherited from an ancestor template, the item
      * will actually be <em>hidden</em>.  This has the same effect as deleting it from this path
-     * (and all descendent paths), but the item will still exist in the template ancestor and may
+     * (and all descendant paths), but the item will still exist in the template ancestor and may
      * later be restored using {@link #restoreConfig(String, String)}.  Note that in this case
      * cleanup actions may still be run, and those actions are not undone by restoration.
      *
@@ -1914,7 +1914,7 @@ public class RemoteApi
      *
      * @param token           authentication token, see {@link #login}
      * @param projectName     name of the project to query the build results of; may be the name of
-     *                        a project template in which case all concrete descendents of that
+     *                        a project template in which case all concrete descendants of that
      *                        template will be queried
      * @param resultStates    if not empty, only return results with the given statuses (available
      *                        states are given on the [RemoteApi.BuildResult] page.
@@ -2142,7 +2142,7 @@ public class RemoteApi
      *
      * @param token         authentication token, see {@link #login}
      * @param projectName   name of the project to retrieve the build results of; may be the name of
-     *                      a project template in which case all concrete descendents of that
+     *                      a project template in which case all concrete descendants of that
      *                      template will be queried
      * @param completedOnly if true, only completed builds will be returned, if false the result may
      *                      contain in progress builds
@@ -2195,7 +2195,7 @@ public class RemoteApi
      *
      * @param token         authentication token, see {@link #login}
      * @param projectName   name of the project to retrieve the build results of; may be the name of
-     *                      a project template in which case all concrete descendents of that
+     *                      a project template in which case all concrete descendants of that
      *                      template will be queried
      * @param completedOnly if true, only completed builds will be considered, if false the result
      *                      may be an in progress build
@@ -2221,7 +2221,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project to retrieve the build results of; may be the name of
-     *                    a project template in which case all concrete descendents of that
+     *                    a project template in which case all concrete descendants of that
      *                    template will be queried
      * @param maxResults  the maximum number of builds to return
      * @return {@xtype array<[RemoteApi.BuildResult]>} the latest completed builds for the given
@@ -2263,7 +2263,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project to retrieve the build results of; may be the name of
-     *                    a project template in which case all concrete descendents of that
+     *                    a project template in which case all concrete descendants of that
      *                    template will be queried
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
      *         completed build for the given project in which warning features were detected, or an
@@ -3875,7 +3875,7 @@ public class RemoteApi
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
 
-        List<Project> projects = projectManager.getDescendentProjects(projectName, false, allowInvalid);
+        List<Project> projects = projectManager.getDescendantProjects(projectName, false, allowInvalid);
         return projects.toArray(new Project[projects.size()]);
     }
 

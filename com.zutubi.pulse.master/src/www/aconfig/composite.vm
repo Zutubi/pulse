@@ -98,15 +98,15 @@
             </div>
     #end
 
-    #if ($config.descendentActions.size() > 0)
-            <div class="config-panel" id="descendent.actions">
-            <h3 class="config-header">descendent actions</h3>
+    #if ($config.descendantActions.size() > 0)
+            <div class="config-panel" id="descendant.actions">
+            <h3 class="config-header">descendant actions</h3>
             <div class="config-container">
             <ul class="config-actions">
-        #foreach($action in $config.descendentActions)
+        #foreach($action in $config.descendantActions)
             #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, true); return false;")
                 <li>
-                    <a href="#" id='#id("descendent.action.${action.action}")' class="unadorned" onclick="#html($onclick)">
+                    <a href="#" id='#id("descendant.action.${action.action}")' class="unadorned" onclick="#html($onclick)">
                         <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
                     </a>
                 </li>
@@ -135,7 +135,7 @@
     ## by a wizard.
     #if($config.extensions.size() > 0)
         #if($config.writable)
-            #if($config.configuredDescendents.size() == 0)
+            #if($config.configuredDescendants.size() == 0)
                 #set($onclick = "addToPath('#jss(${path})'); return false;")
     <table class="template-actions" cellspacing="5px">
         <tr>
@@ -145,10 +145,10 @@
     </table>
             #else
     <p>
-        This path has been configured in the following descendents (and thus cannot be configured at this level):
+        This path has been configured in the following descendants (and thus cannot be configured at this level):
         <ul>
-                #foreach($descendent in $config.configuredDescendents)
-            <li id='#id("cd-$descendent")'>#html($descendent)</li>
+                #foreach($descendant in $config.configuredDescendants)
+            <li id='#id("cd-$descendant")'>#html($descendant)</li>
                 #end
         </ul>
             #end

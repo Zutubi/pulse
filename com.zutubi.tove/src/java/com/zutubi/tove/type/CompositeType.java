@@ -349,7 +349,7 @@ public class CompositeType extends AbstractType implements ComplexType
             throw new TypeException("Extension class '" + type.getClazz().getName() + "' is not a subtype of '" + getClazz().getName() + "'");
         }
 
-        // All of our concrete descendents get registered on the extensions
+        // All of our concrete descendants get registered on the extensions
         // list, but only if we are not concrete.
         if (isExtendable() && !type.isExtendable())
         {

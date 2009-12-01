@@ -47,8 +47,11 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.filter;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -859,9 +862,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return filter(result, ProjectPredicates.exists());
     }
 
-    public List<Project> getDescendentProjects(String project, boolean strict, boolean allowInvalid)
+    public List<Project> getDescendantProjects(String project, boolean strict, boolean allowInvalid)
     {
-        Set<ProjectConfiguration> projectConfigs = configurationProvider.getAllDescendents(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project), ProjectConfiguration.class, strict, true);
+        Set<ProjectConfiguration> projectConfigs = configurationProvider.getAllDescendants(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project), ProjectConfiguration.class, strict, true);
         List<Long> ids = CollectionUtils.map(projectConfigs, new Mapping<ProjectConfiguration, Long>()
         {
             public Long map(ProjectConfiguration projectConfiguration)

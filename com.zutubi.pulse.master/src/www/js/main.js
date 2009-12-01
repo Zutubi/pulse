@@ -628,16 +628,16 @@ function addToPath(path, template)
     runAjaxRequest(window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?wizard' + (template ? '=template' : ''));
 }
 
-function actionPath(path, action, fromParent, onDescendents)
+function actionPath(path, action, fromParent, onDescendants)
 {
     var url = window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?' + action + '=input';
     if (fromParent)
     {
         url += '&newPath=' + getParentPath(path);
     }
-    if (onDescendents)
+    if (onDescendants)
     {
-        url += '&descendents=true';
+        url += '&descendants=true';
     }
     runAjaxRequest(url);
 }

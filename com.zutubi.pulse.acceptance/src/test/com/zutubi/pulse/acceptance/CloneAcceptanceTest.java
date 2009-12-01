@@ -205,7 +205,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         hierarchyPage.clickClone();
 
         CloneForm cloneForm = browser.createForm(CloneForm.class, false);
-        cloneForm.addDescendent(childName);
+        cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(parentName + CLONE_PROPERTY_NAME, "false", null);
 
@@ -223,7 +223,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         hierarchyPage.clickClone();
 
         CloneForm cloneForm = browser.createForm(CloneForm.class, false);
-        cloneForm.addDescendent(childName);
+        cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         String childCloneName = childName + CLONE_PROPERTY_NAME;
@@ -248,7 +248,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         hierarchyPage.clickClone();
 
         CloneForm cloneForm = browser.createForm(CloneForm.class, false);
-        cloneForm.addDescendent(childName);
+        cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", "");
@@ -309,7 +309,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         hierarchyPage.clickSmartClone();
 
         CloneForm cloneForm = browser.createForm(CloneForm.class, true);
-        cloneForm.addDescendent(childName);
+        cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         String parentTemplateName = parentName + PARENT_PROPERTY_NAME;
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;

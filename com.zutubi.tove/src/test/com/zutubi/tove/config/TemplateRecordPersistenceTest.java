@@ -239,7 +239,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         failedInsertHelper("project", grandchild, "Cannot inherit from concrete path 'project/child'");
     }
 
-    public void testInsertPathAlreadyInDescendent()
+    public void testInsertPathAlreadyInDescendant()
     {
         insertGlobal();
         MutableRecord child = createChild();
@@ -248,7 +248,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         childStages.put(stageName, createStage(stageName));
         configurationTemplateManager.insertRecord("project", child);
 
-        failedInsertHelper("project/global/stages", createStage(stageName), "Unable to insert record with name 'test' into path 'project/global/stages': a record with this name already exists in descendents [child]");
+        failedInsertHelper("project/global/stages", createStage(stageName), "Unable to insert record with name 'test' into path 'project/global/stages': a record with this name already exists in descendants [child]");
     }
 
     public void testInsertPathAlreadyHidden()
@@ -558,7 +558,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("newname", template.get("name"));
     }
 
-    public void testRenameProjectLeavesDescendents()
+    public void testRenameProjectLeavesDescendants()
     {
         insertGlobal();
         insertChild();
@@ -655,7 +655,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(newOrder, getOrder(stagesPath));
     }
 
-    public void testRenameOrderedInDescendent()
+    public void testRenameOrderedInDescendant()
     {
         insertGlobal();
         insertChild();
@@ -693,7 +693,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertNull(configurationTemplateManager.getRecord("project/global"));
     }
 
-    public void testDeleteRemovesDescendents()
+    public void testDeleteRemovesDescendants()
     {
         insertGlobal();
         insertChild();
@@ -702,7 +702,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertNull(configurationTemplateManager.getRecord("project/child"));
     }
 
-    public void testDeleteCollectionItemRemovesDescendents()
+    public void testDeleteCollectionItemRemovesDescendants()
     {
         insertGlobal();
         insertChild();
@@ -893,7 +893,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         hideStageAndAssertEvents(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
-    public void testHideInheritedWithDescendent()
+    public void testHideInheritedWithDescendant()
     {
         insertToGrandchild();
 
@@ -901,7 +901,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
-    public void testHideDescendentOverridesSimpleProperty()
+    public void testHideDescendantOverridesSimpleProperty()
     {
         insertToGrandchild();
 
@@ -913,7 +913,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
-    public void testHideDescendentOverridesNestedItem()
+    public void testHideDescendantOverridesNestedItem()
     {
         insertToGrandchild();
 
@@ -925,7 +925,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE, PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
-    public void testHideDescendentAddsNewNestedItem()
+    public void testHideDescendantAddsNewNestedItem()
     {
         insertToGrandchild();
 
@@ -944,7 +944,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
-    public void testHideDescendentHidesNestedItem()
+    public void testHideDescendantHidesNestedItem()
     {
         insertToGrandchild();
 
@@ -956,7 +956,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
-    public void testHideDescendentAlreadyHidden()
+    public void testHideDescendantAlreadyHidden()
     {
         insertToGrandchild();
 
@@ -969,7 +969,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertDeletedStage(gcStagePath);
     }
 
-    public void testHideInheritedWithIndirectDescendent()
+    public void testHideInheritedWithIndirectDescendant()
     {
         insertGlobal();
         insertTemplateChild();
@@ -1109,7 +1109,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("value", configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class).getProperties().get("new").getValue());
     }
 
-    public void testRestoreWithDescendent()
+    public void testRestoreWithDescendant()
     {
         insertToGrandchild();
 
@@ -1121,7 +1121,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertStage(gcStagePath);
     }
 
-    public void testRestoreAfterHideWithDescendentAlreadyHidden()
+    public void testRestoreAfterHideWithDescendantAlreadyHidden()
     {
         insertToGrandchild();
 
@@ -1454,7 +1454,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(Arrays.asList("default2", "default", "default3", "childs"), getOrder(childStagesPath));
     }
 
-    public void testDeleteItemInDescendentOrder()
+    public void testDeleteItemInDescendantOrder()
     {
         insertGlobal();
         insertChild();
@@ -1499,7 +1499,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(Arrays.asList("default2", "childs", "default3", "default"), getOrder(childStagesPath));
     }
 
-    public void testHideItemInDescendentOrder()
+    public void testHideItemInDescendantOrder()
     {
         insertToGrandchild();
 

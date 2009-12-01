@@ -90,13 +90,13 @@ class DefaultInstanceCache implements InstanceCache
         return entry == null ? null : getEntry(entry, elements, index + 1, allowIncomplete, f);
     }
 
-    public Collection<Configuration> getAllDescendents(String path, boolean allowIncomplete)
+    public Collection<Configuration> getAllDescendants(String path, boolean allowIncomplete)
     {
         Collection<Configuration> result = new LinkedList<Configuration>();
         Entry entry = getEntry(path, allowIncomplete, null);
         if (entry != null)
         {
-            entry.getAllDescendents(result, allowIncomplete);
+            entry.getAllDescendants(result, allowIncomplete);
         }
         return result;
     }
@@ -312,7 +312,7 @@ class DefaultInstanceCache implements InstanceCache
             return child;
         }
 
-        public void getAllDescendents(Collection<Configuration> result, boolean allowIncomplete)
+        public void getAllDescendants(Collection<Configuration> result, boolean allowIncomplete)
         {
             if(instance != null && (complete || allowIncomplete))
             {
@@ -323,7 +323,7 @@ class DefaultInstanceCache implements InstanceCache
             {
                 for(Entry child: children.values())
                 {
-                    child.getAllDescendents(result, allowIncomplete);
+                    child.getAllDescendants(result, allowIncomplete);
                 }
             }
         }

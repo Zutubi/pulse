@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.master.tove.webwork.CloneAction;
 
 import java.util.LinkedList;
@@ -14,7 +13,7 @@ import java.util.List;
 public class CloneForm extends SeleniumForm
 {
     private boolean smart;
-    private List<String> descendents = new LinkedList<String>();
+    private List<String> descendants = new LinkedList<String>();
 
     public CloneForm(SeleniumBrowser browser, boolean smart)
     {
@@ -22,9 +21,9 @@ public class CloneForm extends SeleniumForm
         this.smart = smart;
     }
 
-    public void addDescendent(String s)
+    public void addDescendant(String s)
     {
-        descendents.add(s);
+        descendants.add(s);
     }
 
     public String getFormName()
@@ -35,7 +34,7 @@ public class CloneForm extends SeleniumForm
     public String[] getFieldNames()
     {
         int offset = smart ? 2 : 1;
-        String[] fieldNames = new String[descendents.size() * 2 + offset];
+        String[] fieldNames = new String[descendants.size() * 2 + offset];
         fieldNames[0] = "cloneKey";
 
         if(smart)
@@ -43,10 +42,10 @@ public class CloneForm extends SeleniumForm
             fieldNames[1] = "parentKey";
         }
 
-        for(int i = 0; i < descendents.size(); i++)
+        for(int i = 0; i < descendants.size(); i++)
         {
-            fieldNames[i * 2 + offset] = CloneAction.CHECK_FIELD_PREFIX + descendents.get(i);
-            fieldNames[i * 2 + offset + 1] = CloneAction.KEY_FIELD_PREFIX + descendents.get(i);
+            fieldNames[i * 2 + offset] = CloneAction.CHECK_FIELD_PREFIX + descendants.get(i);
+            fieldNames[i * 2 + offset + 1] = CloneAction.KEY_FIELD_PREFIX + descendants.get(i);
         }
 
         return fieldNames;
@@ -55,7 +54,7 @@ public class CloneForm extends SeleniumForm
     public int[] getFieldTypes()
     {
         int offset = smart ? 2 : 1;
-        int fieldTypes[] = new int[descendents.size() * 2 + offset];
+        int fieldTypes[] = new int[descendants.size() * 2 + offset];
         fieldTypes[0] = TEXTFIELD;
 
         if (smart)
@@ -63,7 +62,7 @@ public class CloneForm extends SeleniumForm
             fieldTypes[1] = TEXTFIELD;
         }
 
-        for(int i = 0; i < descendents.size(); i++)
+        for(int i = 0; i < descendants.size(); i++)
         {
             fieldTypes[i * 2 + offset] = CHECKBOX;
             fieldTypes[i * 2 + offset + 1] = TEXTFIELD;

@@ -39,7 +39,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         cache.put("baz", c3, true);
 
         DefaultInstanceCache copy = cache.copyStructure();
-        assertEquals(3, copy.getAllDescendents("", true).size());
+        assertEquals(3, copy.getAllDescendants("", true).size());
 
         // The copy should hold the same instances.
         assertSame(c1, copy.get("foo", true));
@@ -421,7 +421,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     private void assertSize(int size, DefaultInstanceCache cache)
     {
-        assertEquals(size, cache.getAllDescendents("", true).size());
+        assertEquals(size, cache.getAllDescendants("", true).size());
     }
 
     private List<CollectingHandler.Entry> forAllHelper(CollectingHandler.Entry... expected)

@@ -355,7 +355,7 @@ ZUTUBI.ProjectContainer.prototype = {
     collapse: function() {
         if (!this.model.collapsed)
         {
-            this.hideDescendents();
+            this.hideDescendants();
             this.model.collapsed = true;
             this.el.addClass('project-collapsed');
         }
@@ -382,11 +382,11 @@ ZUTUBI.ProjectContainer.prototype = {
 
         if (!this.model.collapsed)
         {
-            this.hideDescendents();
+            this.hideDescendants();
         }
     },
 
-    hideDescendents: function() {
+    hideDescendants: function() {
         for (var i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];
@@ -402,7 +402,7 @@ ZUTUBI.ProjectContainer.prototype = {
                 this.renderChildren();
             }
             
-            this.showDescendents();
+            this.showDescendants();
             this.model.collapsed = false;
             this.el.removeClass('project-collapsed');
         }
@@ -429,11 +429,11 @@ ZUTUBI.ProjectContainer.prototype = {
 
         if (!this.model.collapsed)
         {
-            this.showDescendents();
+            this.showDescendants();
         }
     },
 
-    showDescendents: function() {
+    showDescendants: function() {
         for(var i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];

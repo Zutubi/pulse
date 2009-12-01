@@ -32,10 +32,10 @@ public class GenericAction extends ToveActionSupport
      */
     private String actionName;
     /**
-     * If set to true, execute the action on all concrete descendents for which
+     * If set to true, execute the action on all concrete descendants for which
      * it is enabled.
      */
-    private boolean descendents = false;
+    private boolean descendants = false;
     private String customAction;
     private String newPath;
     private ConfigurationPanel newPanel;
@@ -51,9 +51,9 @@ public class GenericAction extends ToveActionSupport
         this.actionName = actionName;
     }
 
-    public void setDescendents(boolean descendents)
+    public void setDescendants(boolean descendants)
     {
-        this.descendents = descendents;
+        this.descendants = descendants;
     }
 
     public String getCustomAction()
@@ -114,9 +114,9 @@ public class GenericAction extends ToveActionSupport
 
         configurationType = (CompositeType) configurationTemplateManager.getType(path);
 
-        if (descendents)
+        if (descendants)
         {
-            return executeDescendentsAction(config);
+            return executeDescendantsAction(config);
         }
         else
         {
@@ -124,26 +124,26 @@ public class GenericAction extends ToveActionSupport
         }
     }
 
-    private String executeDescendentsAction(Configuration config)
+    private String executeDescendantsAction(Configuration config)
     {
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
         if (templateOwnerPath == null)
         {
-            addActionError("Requested descendents action for path '" + path + "' not in a templated scope");
+            addActionError("Requested descendants action for path '" + path + "' not in a templated scope");
             return ERROR;
         }
 
         response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
-        List<String> concreteDescendentPaths = configurationTemplateManager.getDescendentPaths(path, true, true, false);
+        List<String> concreteDescendantPaths = configurationTemplateManager.getDescendantPaths(path, true, true, false);
         int failureCount = 0;
         int totalCount = 0;
-        for (String descendentPath: concreteDescendentPaths)
+        for (String descendantPath: concreteDescendantPaths)
         {
-            Configuration descendent = configurationTemplateManager.getInstance(descendentPath);
-            if (descendent != null && actionManager.getActions(descendent, false, false).contains(actionName))
+            Configuration descendant = configurationTemplateManager.getInstance(descendantPath);
+            if (descendant != null && actionManager.getActions(descendant, false, false).contains(actionName))
             {
                 totalCount++;
-                ActionResult result = actionManager.execute(actionName, descendent, null);
+                ActionResult result = actionManager.execute(actionName, descendant, null);
                 if (result.getStatus() == ActionResult.Status.FAILURE)
                 {
                     failureCount++;
@@ -159,12 +159,12 @@ public class GenericAction extends ToveActionSupport
 
         if (failureCount == 0)
         {
-            String messageKey = "descendents.triggered." + (totalCount == 1 ? "single" : "multiple");
+            String messageKey = "descendants.triggered." + (totalCount == 1 ? "single" : "multiple");
             response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format(messageKey, new Object[]{actionLabel, totalCount})));
         }
         else
         {
-            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendents.failed", new Object[]{actionLabel, failureCount, totalCount})));
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendants.failed", new Object[]{actionLabel, failureCount, totalCount})));
         }
 
         return SUCCESS;

@@ -137,13 +137,13 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return getAncestorOfType(instance, clazz);
     }
 
-    public <T extends Configuration> Set<T> getAllDescendents(String path, Class<T> clazz, boolean strict, boolean concreteOnly)
+    public <T extends Configuration> Set<T> getAllDescendants(String path, Class<T> clazz, boolean strict, boolean concreteOnly)
     {
-        List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(path, strict, concreteOnly, false);
-        Set<T> result = new HashSet<T>(descendentPaths.size());
-        for (String descendentPath: descendentPaths)
+        List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(path, strict, concreteOnly, false);
+        Set<T> result = new HashSet<T>(descendantPaths.size());
+        for (String descendantPath: descendantPaths)
         {
-            result.add(get(descendentPath, clazz));
+            result.add(get(descendantPath, clazz));
         }
 
         return result;

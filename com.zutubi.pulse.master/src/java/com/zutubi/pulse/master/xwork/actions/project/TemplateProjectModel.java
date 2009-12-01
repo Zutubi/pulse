@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * JSON-encodable object representing the current state of a template project
- * and its descendents.
+ * and its descendants.
  */
 public class TemplateProjectModel extends ProjectModel
 {

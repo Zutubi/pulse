@@ -220,7 +220,7 @@ public class ConfigurationRefactoringManager
     /**
      * Clones a templated map item by extracting its details into a parent
      * template and adding a skeletal sibling (the clone).  The item's
-     * descendents may also optionally be cloned, although those clones
+     * descendants may also optionally be cloned, although those clones
      * themselves will not be 'smart'.
      *
      * @param parentPath            path to the templated collection that
@@ -306,7 +306,7 @@ public class ConfigurationRefactoringManager
      *   <li>Be in a templated scope</li>
      *   <li>Not be marked permanent</li>
      *   <li>Not be defined in any ancestor</li>
-     *   <li>Not be defined in any other descendent of the specified ancestor</li>
+     *   <li>Not be defined in any other descendant of the specified ancestor</li>
      *   <li>Not contain any references to items not visible from the specified ancestor</li>
      * </ul>
      *
@@ -1111,7 +1111,7 @@ public class ConfigurationRefactoringManager
 
                 // All the other keys are essentially being renamed to the
                 // first one, meaning we need to update the parent and its
-                // template descendents.  We also need to skeletonise the
+                // template descendants.  We also need to skeletonise the
                 // list item manually as normal scrubbing cannot handle
                 // complex values.
                 ComplexType itemType = typeRegistry.getType(common.record.getSymbolicName());
@@ -1580,7 +1580,7 @@ public class ConfigurationRefactoringManager
             }
 
             // We must be able to insert the composite into the ancestor.
-            // Requires checking the descendents of this ancestor -
+            // Requires checking the descendants of this ancestor -
             // ignoring the subtree where the composite is currently
             // defined.
             String scope = PathUtils.getPrefix(path, 1);
@@ -1591,12 +1591,12 @@ public class ConfigurationRefactoringManager
             }
 
             String ancestorPath = PathUtils.getPath(scope, ancestorKey, remainderPath);
-            List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(ancestorPath, true, false, false);
-            List<String> existingDescendentPaths = configurationTemplateManager.getDescendentPaths(path, false, false, false);
-            descendentPaths.removeAll(existingDescendentPaths);
-            if (descendentPaths.size() > 0)
+            List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(ancestorPath, true, false, false);
+            List<String> existingDescendantPaths = configurationTemplateManager.getDescendantPaths(path, false, false, false);
+            descendantPaths.removeAll(existingDescendantPaths);
+            if (descendantPaths.size() > 0)
             {
-                throw new IllegalArgumentException("Ancestor '" + ancestorKey + "' already has descendents " + descendentPaths + " that define this path");
+                throw new IllegalArgumentException("Ancestor '" + ancestorKey + "' already has descendants " + descendantPaths + " that define this path");
             }
 
             // We cannot have any references to items defined in our template
@@ -1664,7 +1664,7 @@ public class ConfigurationRefactoringManager
         {
             String insertPath;
 
-            List<String> existingConcreteDescendents = configurationTemplateManager.getDescendentPaths(path, false, true, false);
+            List<String> existingConcreteDescendants = configurationTemplateManager.getDescendantPaths(path, false, true, false);
             configurationTemplateManager.suspendInstanceCache();
             try
             {
@@ -1712,19 +1712,19 @@ public class ConfigurationRefactoringManager
                 });
                 deepCopy.forEach(new DeepUpdateFunction(insertPath));
 
-                // If any descendent had an internal reference to something
+                // If any descendant had an internal reference to something
                 // defined in the pulled up path it will need to be
                 // canonicalised.
                 node = node.getChild(PathUtils.getElement(path, 1));
                 final CompositeType templateOwnerType = (CompositeType) configurationTemplateManager.getType(node.getPath());
-                node.forEachDescendent(new TemplateNode.NodeHandler()
+                node.forEachDescendant(new TemplateNode.NodeHandler()
                 {
                     public boolean handle(TemplateNode node)
                     {
-                        String descendentPath = node.getPath();
-                        MutableRecord deepCopy = recordManager.select(descendentPath).copy(true, true);
-                        deepCopy.forEach(new CanonicaliseReferencesFunction(templateOwnerType, deepCopy, descendentPath));
-                        deepCopy.forEach(new DeepUpdateFunction(descendentPath));
+                        String descendantPath = node.getPath();
+                        MutableRecord deepCopy = recordManager.select(descendantPath).copy(true, true);
+                        deepCopy.forEach(new CanonicaliseReferencesFunction(templateOwnerType, deepCopy, descendantPath));
+                        deepCopy.forEach(new DeepUpdateFunction(descendantPath));
                         return true;
                     }
                 }, false);
@@ -1738,9 +1738,9 @@ public class ConfigurationRefactoringManager
                 configurationTemplateManager.resumeInstanceCache();
             }
 
-            List<String> newConcreteDescendents = configurationTemplateManager.getDescendentPaths(insertPath, false, true, false);
-            newConcreteDescendents.removeAll(existingConcreteDescendents);
-            configurationTemplateManager.raiseInsertEvents(newConcreteDescendents);
+            List<String> newConcreteDescendants = configurationTemplateManager.getDescendantPaths(insertPath, false, true, false);
+            newConcreteDescendants.removeAll(existingConcreteDescendants);
+            configurationTemplateManager.raiseInsertEvents(newConcreteDescendants);
 
             return insertPath;
         }

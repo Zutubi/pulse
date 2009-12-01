@@ -24,7 +24,7 @@ public interface InstanceCache
 
     boolean isValid(String path, boolean allowIncomplete);
 
-    Collection<Configuration> getAllDescendents(String path, boolean allowIncomplete);
+    Collection<Configuration> getAllDescendants(String path, boolean allowIncomplete);
 
     /**
      * Retrieves the instance at the given path, if one exists.

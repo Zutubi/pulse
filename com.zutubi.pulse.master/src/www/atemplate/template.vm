@@ -16,11 +16,11 @@
 #auth("path=$path" "action=create")
     <tr>
         #actionHeader("clone" "clone" "page_copy" "actionPath('#jss(${path})', 'clone', false, false)")
-        <td>clone this #i18n("key=label") and optionally its descendents</td>
+        <td>clone this #i18n("key=label") and optionally its descendants</td>
     </tr>
     <tr>
         #actionHeader("smartclone" "smart clone" "smart-clone" "actionPath('#jss(${path})', 'smartclone', false, false)")
-        <td>smart clone this #i18n("key=label") by extracting a template parent and optionally clone its descendents</td>
+        <td>smart clone this #i18n("key=label") by extracting a template parent and optionally clone its descendants</td>
     </tr>
 #end
 #end

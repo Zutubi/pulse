@@ -160,7 +160,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         listener.assertNoMoreEvents();
     }
 
-    public void testGetAllDescendents() throws TypeException
+    public void testGetAllDescendants() throws TypeException
     {
         MutableRecord record = unstantiate(new A("global"));
         configurationTemplateManager.markAsTemplate(record);
@@ -180,20 +180,20 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         String grandchild1Path = insertConcreteChild(templateHandle, "concrete-grandchild1");
         String grandchild2Path = insertConcreteChild(templateHandle, "concrete-grandchild2");
 
-        assertEquals(new HashSet<String>(asList(childPath, templatePath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, true, false));
-        assertEquals(new HashSet<String>(asList(globalPath, childPath, templatePath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, false, false));
-        assertEquals(new HashSet<String>(asList(childPath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, true, true));
-        assertEquals(new HashSet<String>(asList(childPath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, false, true));
+        assertEquals(new HashSet<String>(asList(childPath, templatePath, grandchild1Path, grandchild2Path)), getAllDescendantPaths(globalPath, true, false));
+        assertEquals(new HashSet<String>(asList(globalPath, childPath, templatePath, grandchild1Path, grandchild2Path)), getAllDescendantPaths(globalPath, false, false));
+        assertEquals(new HashSet<String>(asList(childPath, grandchild1Path, grandchild2Path)), getAllDescendantPaths(globalPath, true, true));
+        assertEquals(new HashSet<String>(asList(childPath, grandchild1Path, grandchild2Path)), getAllDescendantPaths(globalPath, false, true));
 
-        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, true, false));
-        assertEquals(new HashSet<String>(asList(templatePath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, false, false));
-        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, true, true));
-        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, false, true));
+        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendantPaths(templatePath, true, false));
+        assertEquals(new HashSet<String>(asList(templatePath, grandchild1Path, grandchild2Path)), getAllDescendantPaths(templatePath, false, false));
+        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendantPaths(templatePath, true, true));
+        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendantPaths(templatePath, false, true));
         
-        assertEquals(new HashSet<String>(), getAllDescendentPaths(childPath, true, false));
-        assertEquals(new HashSet<String>(asList(childPath)), getAllDescendentPaths(childPath, false, false));
-        assertEquals(new HashSet<String>(), getAllDescendentPaths(childPath, true, true));
-        assertEquals(new HashSet<String>(asList(childPath)), getAllDescendentPaths(childPath, false, true));
+        assertEquals(new HashSet<String>(), getAllDescendantPaths(childPath, true, false));
+        assertEquals(new HashSet<String>(asList(childPath)), getAllDescendantPaths(childPath, false, false));
+        assertEquals(new HashSet<String>(), getAllDescendantPaths(childPath, true, true));
+        assertEquals(new HashSet<String>(asList(childPath)), getAllDescendantPaths(childPath, false, true));
     }
 
     private String insertConcreteChild(long parentHandle, String name) throws TypeException
@@ -203,9 +203,9 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         return configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
     }
 
-    private Set<String> getAllDescendentPaths(String path, boolean strict, boolean concreteOnly)
+    private Set<String> getAllDescendantPaths(String path, boolean strict, boolean concreteOnly)
     {
-        Set<A> instances = configurationProvider.getAllDescendents(path, A.class, strict, concreteOnly);
+        Set<A> instances = configurationProvider.getAllDescendants(path, A.class, strict, concreteOnly);
         return CollectionUtils.map(instances, new Mapping<A, String>()
         {
             public String map(A a)

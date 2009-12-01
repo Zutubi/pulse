@@ -95,14 +95,14 @@ public interface ConfigurationProvider
     <T extends Configuration> T getAncestorOfType(String path, Class<T> clazz);
 
     /**
-     * Retrieves all descendents of a given path, which should all be of the specified type.  If the
+     * Retrieves all descendants of a given path, which should all be of the specified type.  If the
      * path is within a templated scope, all instances that descend from the given path are
      * returned, potentially including the instance at that path (see the {@code strict} parameter).
      * If the path is not in a templated scope, either the empty set is returned (strict) or a set
      * containing the instance at the path (non-strict).  If the path does not exist, the empty set
      * is returned.
      *
-     * @param path         path to retrieve all descendents of
+     * @param path         path to retrieve all descendants of
      * @param clazz        type of the instances to retrieve
      * @param strict       if true, the instance at path is not included, otherwise it is included
      * @param concreteOnly if true, only concrete instances are returned
@@ -111,7 +111,7 @@ public interface ConfigurationProvider
      * @throws IllegalArgumentException if the given path references an invalid scope or any of the
      *         located instances do not match the given type
      */
-    <T extends Configuration> Set<T> getAllDescendents(String path, Class<T> clazz, boolean strict, boolean concreteOnly); 
+    <T extends Configuration> Set<T> getAllDescendants(String path, Class<T> clazz, boolean strict, boolean concreteOnly);
 
     /**
      * Indicates if an instance and all instances reachable via its

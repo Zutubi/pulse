@@ -125,13 +125,13 @@ public class TemplateNode
         }
     }
 
-    public void forEachDescendent(NodeHandler callback, boolean strict)
+    public void forEachDescendant(NodeHandler callback, boolean strict)
     {
         if(strict || callback.handle(this))
         {
             for(TemplateNode node: children)
             {
-                node.forEachDescendent(callback, false);
+                node.forEachDescendant(callback, false);
             }
         }
     }
@@ -140,10 +140,10 @@ public class TemplateNode
     {
         /**
          * Called with a node to be processed.  May optionally abort
-         * processing the descendents of this node.
+         * processing the descendants of this node.
          *
          * @param node the node to process
-         * @return true to process this node's descendents
+         * @return true to process this node's descendants
          */
         boolean handle(TemplateNode node);
     }

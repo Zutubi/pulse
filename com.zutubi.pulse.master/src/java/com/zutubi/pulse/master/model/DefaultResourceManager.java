@@ -252,9 +252,9 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                     String agentPath = config.getConfigurationPath();
                     for (ResourceConfiguration discoveredResource : discoveredResources)
                     {
-                        // Check that no descendent defines the resource, so we
+                        // Check that no descendant defines the resource, so we
                         // don't conflict with those definitions.
-                        if (noDescendentDefinesResource(agentPath, discoveredResource.getName()))
+                        if (noDescendantDefinesResource(agentPath, discoveredResource.getName()))
                         {
                             Map<String, ResourceConfiguration> agentResources = config.getResources();
                             addResource(agentPath, discoveredResource, agentResources.get(discoveredResource.getName()));
@@ -272,12 +272,12 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         });
     }
 
-    private boolean noDescendentDefinesResource(String agentPath, String resourceName)
+    private boolean noDescendantDefinesResource(String agentPath, String resourceName)
     {
-        Set<AgentConfiguration> descendents = configurationProvider.getAllDescendents(agentPath, AgentConfiguration.class, true, false);
-        for (AgentConfiguration descendent: descendents)
+        Set<AgentConfiguration> descendants = configurationProvider.getAllDescendants(agentPath, AgentConfiguration.class, true, false);
+        for (AgentConfiguration descendant: descendants)
         {
-            if (descendent.getResources().containsKey(resourceName))
+            if (descendant.getResources().containsKey(resourceName))
             {
                 return false;
             }

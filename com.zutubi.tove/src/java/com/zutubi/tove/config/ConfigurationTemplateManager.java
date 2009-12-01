@@ -392,7 +392,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 //   - Inserting a new entry in the top collection (e.g. a project).
                 //     In this case we need to build a skeleton out of the parent.
                 //   - Inserting within an existing template.  In this case we need
-                //     to add matching skeletons to our descendents.
+                //     to add matching skeletons to our descendants.
                 final String[] elements = PathUtils.getPathElements(newPath);
                 final String scope = elements[0];
                 ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
@@ -419,7 +419,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                 recordManager.insert(newPath, record);
                 refreshCaches();
-                raiseInsertEvents(getDescendentPaths(newPath, false, true, false));
+                raiseInsertEvents(getDescendantPaths(newPath, false, true, false));
 
                 return newPath;
             }
@@ -434,18 +434,18 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             throw new IllegalArgumentException("Unable to insert record with name '" + name + "' into path '" + path + "': a record with this name already exists in ancestor '" + PathUtils.getPathElements(ancestorPath)[1] + "'");
         }
 
-        List<String> descendentPaths = getDescendentPaths(newPath, true, false, false);
-        if(descendentPaths.size() > 0)
+        List<String> descendantPaths = getDescendantPaths(newPath, true, false, false);
+        if(descendantPaths.size() > 0)
         {
-            List<String> descendentNames = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
+            List<String> descendantNames = CollectionUtils.map(descendantPaths, new Mapping<String, String>()
             {
-                public String map(String descendentPath)
+                public String map(String descendantPath)
                 {
-                    return PathUtils.getPathElements(descendentPath)[1];
+                    return PathUtils.getPathElements(descendantPath)[1];
                 }
             });
 
-            throw new IllegalArgumentException("Unable to insert record with name '" + name + "' into path '" + path + "': a record with this name already exists in descendents " + descendentNames);
+            throw new IllegalArgumentException("Unable to insert record with name '" + name + "' into path '" + path + "': a record with this name already exists in descendants " + descendantNames);
         }
     }
 
@@ -522,14 +522,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         final Record skeleton = createSkeletonRecord(actualType, record);
 
-        node.forEachDescendent(new TemplateNode.NodeHandler()
+        node.forEachDescendant(new TemplateNode.NodeHandler()
         {
             public boolean handle(TemplateNode templateNode)
             {
-                String descendentPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
-                if (recordManager.select(descendentPath) == null && recordManager.select(PathUtils.getParentPath(descendentPath)) != null)
+                String descendantPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
+                if (recordManager.select(descendantPath) == null && recordManager.select(PathUtils.getParentPath(descendantPath)) != null)
                 {
-                    recordManager.insert(descendentPath, skeleton);
+                    recordManager.insert(descendantPath, skeleton);
                     return true;
                 }
                 else
@@ -563,7 +563,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         for (String concretePath : concretePaths)
         {
             // Raise an event for all the config instances under this path.
-            for (Object instance : state.instances.getAllDescendents(concretePath, false))
+            for (Object instance : state.instances.getAllDescendants(concretePath, false))
             {
                 if (isComposite(instance))
                 {
@@ -797,7 +797,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     }
 
     /**
-     * Tests if the given path is overridden in any template descendent.
+     * Tests if the given path is overridden in any template descendant.
      * Overrides may be indirect - for example if you have a template parent
      * and child "myscope/parent" and "myscope/child" that are identical
      * apart from an override at path "myscope/child/some/nested/value", then
@@ -809,7 +809,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * method will return false.
      *
      * @param path the path to test
-     * @return true if the path is overridden in any template descendent
+     * @return true if the path is overridden in any template descendant
      */
     public boolean isOverridden(final String path)
     {
@@ -832,8 +832,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
                 String pathOwner = parentRecord.getOwner(baseName);
 
-                List<String> descendentPaths = getDescendentPaths(parentPath, true, false, false);
-                for(String descedentPath: descendentPaths)
+                List<String> descendantPaths = getDescendantPaths(parentPath, true, false, false);
+                for(String descedentPath: descendantPaths)
                 {
                     parentRecord = (TemplateRecord) getRecord(descedentPath);
                     if(!StringUtils.equals(pathOwner, parentRecord.getOwner(baseName)))
@@ -1424,7 +1424,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     // means also moving all children, *except* at the top level.
                     if (existingRecord instanceof TemplateRecord)
                     {
-                        moveDescendents(path, newPath);
+                        moveDescendants(path, newPath);
                     }
 
                     recordManager.move(path, newPath);
@@ -1468,7 +1468,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     void updateCollectionReferences(CollectionType collectionType, String collectionPath, String oldKey, String newKey)
     {
-        for(String path: getDescendentPaths(collectionPath, false, false, false))
+        for(String path: getDescendantPaths(collectionPath, false, false, false))
         {
             MutableRecord record = recordManager.select(path).copy(false, true);
             if(collectionType.updateKeyReferences(record, oldKey, newKey))
@@ -1485,7 +1485,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         // Pile up the events before raising any, as the handlers may make
         // their own changes!
         List<SaveEvent> saveEvents = new LinkedList<SaveEvent>();
-        for (String concretePath : getDescendentPaths(path, false, true, false))
+        for (String concretePath : getDescendantPaths(path, false, true, false))
         {
             Configuration instance = state.instances.get(concretePath, false);
             if (isComposite(instance))
@@ -1574,7 +1574,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return newRecord;
     }
 
-    private void moveDescendents(String path, String newPath)
+    private void moveDescendants(String path, String newPath)
     {
         String[] elements = PathUtils.getPathElements(path);
         if (elements.length > 2)
@@ -1587,13 +1587,13 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
             TemplateNode node = hierarchy.getNodeById(elements[1]);
 
-            node.forEachDescendent(new TemplateNode.NodeHandler()
+            node.forEachDescendant(new TemplateNode.NodeHandler()
             {
                 public boolean handle(TemplateNode templateNode)
                 {
-                    String oldDescendentPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
-                    String newDescendentPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
-                    recordManager.move(oldDescendentPath, newDescendentPath);
+                    String oldDescendantPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
+                    String newDescendantPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
+                    recordManager.move(oldDescendantPath, newDescendantPath);
                     return true;
                 }
             }, true);
@@ -1689,7 +1689,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return null;
     }
 
-    public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly, final boolean includeHidden)
+    public List<String> getDescendantPaths(String path, boolean strict, final boolean concreteOnly, final boolean includeHidden)
     {
         String[] elements = PathUtils.getPathElements(path);
         if (elements.length > 1)
@@ -1708,16 +1708,16 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
                 final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
 
-                node.forEachDescendent(new TemplateNode.NodeHandler()
+                node.forEachDescendant(new TemplateNode.NodeHandler()
                 {
                     public boolean handle(TemplateNode node)
                     {
                         if (!concreteOnly || node.isConcrete())
                         {
-                            String descendentPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
-                            if(includeHidden || pathExists(descendentPath))
+                            String descendantPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
+                            if(includeHidden || pathExists(descendantPath))
                             {
-                                result.add(descendentPath);
+                                result.add(descendantPath);
                             }
                         }
                         return true;
@@ -1741,7 +1741,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     /**
      * Validates that a new name is unique in a collection.  This takes into
-     * account names in template ancestors and descendents: the name must be
+     * account names in template ancestors and descendants: the name must be
      * unique in the entire hierarchy.
      *
      * @param parentPath   path of the collection to test
@@ -1769,26 +1769,26 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             }
             else
             {
-                List<String> descendentPaths = getDescendentPaths(path, true, false, false);
-                if(descendentPaths.size() > 0)
+                List<String> descendantPaths = getDescendantPaths(path, true, false, false);
+                if(descendantPaths.size() > 0)
                 {
-                    List<String> descendentNames = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
+                    List<String> descendantNames = CollectionUtils.map(descendantPaths, new Mapping<String, String>()
                     {
-                        public String map(String descendentPath)
+                        public String map(String descendantPath)
                         {
-                            return PathUtils.getPathElements(descendentPath)[1];
+                            return PathUtils.getPathElements(descendantPath)[1];
                         }
                     });
 
                     String message;
-                    if(descendentNames.size() == 1)
+                    if(descendantNames.size() == 1)
                     {
-                        message = textProvider.getText(".indescendent", fieldName, descendentNames.get(0));
+                        message = textProvider.getText(".indescendant", fieldName, descendantNames.get(0));
                     }
                     else
                     {
-                        Collections.sort(descendentNames, new Sort.StringComparator());
-                        message = textProvider.getText(".indescendents", fieldName, descendentNames.toString());
+                        Collections.sort(descendantNames, new Sort.StringComparator());
+                        message = textProvider.getText(".indescendants", fieldName, descendantNames.toString());
                     }
 
                     throw new ValidationException(message);
@@ -1940,11 +1940,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                     addAdditionalTasks(path, result);
 
-                    // All descendents must be deleted.
-                    List<String> descendentPaths = getDescendentPaths(path, true, false, true);
-                    for (String descendentPath : descendentPaths)
+                    // All descendants must be deleted.
+                    List<String> descendantPaths = getDescendantPaths(path, true, false, true);
+                    for (String descendantPath : descendantPaths)
                     {
-                        result.addCascaded(getDescendentCleanupTask(descendentPath));
+                        result.addCascaded(getDescendantCleanupTask(descendantPath));
                     }
 
                     return result;
@@ -1961,7 +1961,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         });
     }
 
-    private RecordCleanupTask getDescendentCleanupTask(String path)
+    private RecordCleanupTask getDescendantCleanupTask(String path)
     {
         if(pathExists(path))
         {
@@ -2039,9 +2039,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         List<ConfigurationEvent> result = new LinkedList<ConfigurationEvent>();
         State state = getState();
-        for (String concretePath : getDescendentPaths(path, false, true, false))
+        for (String concretePath : getDescendantPaths(path, false, true, false))
         {
-            for (Object instance : state.instances.getAllDescendents(concretePath, false))
+            for (Object instance : state.instances.getAllDescendants(concretePath, false))
             {
                 if (isComposite(instance))
                 {
@@ -2091,8 +2091,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     /**
      * Restores a hidden collection item.  The path given must refer to a
      * collection item that is currently hidden.  Restoring the item causes
-     * it to reappear at the restored and all descendent levels, which will
-     * lead to insert events for concrete descendents.
+     * it to reappear at the restored and all descendant levels, which will
+     * lead to insert events for concrete descendants.
      * 
      * @param path the path to restore: must be currently hidden
      * @throws IllegalArgumentException if path does not refer to a
@@ -2137,14 +2137,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 recordManager.update(parentPath, parentCopy);
 
                 // Now we need to restore the skeletons at this path and all
-                // descendents.
+                // descendants.
                 TemplateRecord templateParent = getTemplateParentRecord(pathElements);
                 TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = templateHierarchy.getNodeById(pathElements[1]);
                 addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node, false);
 
                 refreshCaches();
-                raiseInsertEvents(getDescendentPaths(path, false, true, false));
+                raiseInsertEvents(getDescendantPaths(path, false, true, false));
                 return null;
             }
         });
@@ -2708,9 +2708,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 markDirty(referencingPath);
             }
 
-            for (String descendentPath: getDescendentPaths(path, true, false, true))
+            for (String descendantPath: getDescendantPaths(path, true, false, true))
             {
-                markDirty(descendentPath);
+                markDirty(descendantPath);
             }
         }
 
@@ -2740,8 +2740,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             DefaultInstanceCache cache = getState().instances;
             if (cache != null)
             {
-                Collection<Configuration> descendents = cache.getAllDescendents(((RecordDeletedEvent) event).getPath(), true);
-                for (Configuration c: descendents)
+                Collection<Configuration> descendants = cache.getAllDescendants(((RecordDeletedEvent) event).getPath(), true);
+                for (Configuration c: descendants)
                 {
                     markDirty(c.getConfigurationPath());
                 }

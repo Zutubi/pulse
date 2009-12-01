@@ -41,7 +41,7 @@ public interface ProjectManager extends EntityManager<Project>
      * Returns all concrete projects that descend from the project or project
      * template of the given name.
      *
-     * @param project      the project to get descendents of, may be the name
+     * @param project      the project to get descendants of, may be the name
      *                     of a project template
      * @param strict       if true, the project itself is not considered for
      *                     inclusion in the result
@@ -50,7 +50,7 @@ public interface ProjectManager extends EntityManager<Project>
      * @return all concrete projects that descend from the given project
      */
     @SecureResult
-    List<Project> getDescendentProjects(String project, boolean strict, boolean allowInvalid);
+    List<Project> getDescendantProjects(String project, boolean strict, boolean allowInvalid);
 
     /**
      * Return the accessible list of project instances from the given set of

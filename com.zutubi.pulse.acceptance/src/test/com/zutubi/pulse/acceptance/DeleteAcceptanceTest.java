@@ -292,7 +292,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
     }
 
-    public void testHideMapItemWithSkeletonDescendent() throws Exception
+    public void testHideMapItemWithSkeletonDescendant() throws Exception
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
@@ -319,7 +319,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertFalse(xmlRpcHelper.configPathExists(childCleanupPath));
     }
 
-    public void testHideMapItemWithDescendentOverride() throws Exception
+    public void testHideMapItemWithDescendantOverride() throws Exception
     {
         String parentName = random + "-parent";
         String childName = random + "-child";

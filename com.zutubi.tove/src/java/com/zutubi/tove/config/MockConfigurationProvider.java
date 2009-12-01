@@ -76,7 +76,7 @@ public class MockConfigurationProvider implements ConfigurationProvider
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public <T extends Configuration> Set<T> getAllDescendents(String path, Class<T> clazz, boolean strict, boolean concrete)
+    public <T extends Configuration> Set<T> getAllDescendants(String path, Class<T> clazz, boolean strict, boolean concrete)
     {
         throw new RuntimeException("Not implemented");
     }
