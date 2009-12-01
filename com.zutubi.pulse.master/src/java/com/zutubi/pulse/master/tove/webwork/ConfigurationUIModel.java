@@ -4,6 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.pulse.master.tove.model.ActionLinkComparator;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
@@ -21,10 +22,7 @@ import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Analyses a configuration path, extracting information that is used to
@@ -69,6 +67,7 @@ public class ConfigurationUIModel
 
     private List<ConfigurationLink> links = new LinkedList<ConfigurationLink>();
     private List<ActionLink> actions = new LinkedList<ActionLink>();
+    private List<ActionLink> descendentActions = new LinkedList<ActionLink>();
 
     private List<String> displayFields = new LinkedList<String>();
 
@@ -176,14 +175,16 @@ public class ConfigurationUIModel
         }
         else
         {
+            // Is this path configured in any descendents?
+            List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(path, true, false, false);
+
             determineActions(parentType);
+            determineDescendentActions(descendentPaths);
 
             displayFields = stateDisplayManager.getDisplayFields(instance);
             
             if(instance == null)
             {
-                // Is this path configured in any descendents?
-                List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(path, true, false, false);
                 configuredDescendents = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
                 {
                     public String map(String s)
@@ -216,6 +217,7 @@ public class ConfigurationUIModel
         displayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
     }
 
+    @SuppressWarnings({"unchecked"})
     private Collection<? extends Configuration> instanceToItems()
     {
         Collection<? extends Configuration> items;
@@ -242,7 +244,7 @@ public class ConfigurationUIModel
     private void determineActions(ComplexType parentType)
     {
         final Messages messages = Messages.getInstance(type.getClazz());
-        List<String> actionNames = actionManager.getActions(instance, true);
+        List<String> actionNames = actionManager.getActions(instance, true, true);
         actionNames.remove(AccessManager.ACTION_VIEW);
         actionNames.remove(ConfigurationRefactoringManager.ACTION_CLONE);
 
@@ -268,6 +270,27 @@ public class ConfigurationUIModel
         {
             actions = Collections.emptyList();
         }
+    }
+
+    private void determineDescendentActions(List<String> configuredDescendents)
+    {
+        final Messages messages = Messages.getInstance(type.getClazz());
+        Set<String> actionSet = new HashSet<String>();
+        for (String descendentPath: configuredDescendents)
+        {
+            Configuration instance = configurationTemplateManager.getInstance(descendentPath);
+            if (instance != null && instance.isConcrete())
+            {
+                actionSet.addAll(actionManager.getActions(instance, false, false));
+            }
+        }
+
+        for (String action: actionSet)
+        {
+            descendentActions.add(ToveUtils.getActionLink(action, messages, systemPaths.getContentRoot()));
+        }
+
+        Collections.sort(descendentActions, new ActionLinkComparator());
     }
 
     public Object format(String fieldName)
@@ -414,6 +437,11 @@ public class ConfigurationUIModel
     public List<ActionLink> getActions()
     {
         return actions;
+    }
+
+    public List<ActionLink> getDescendentActions()
+    {
+        return descendentActions;
     }
 
     public List<String> getDisplayFields()

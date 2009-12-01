@@ -1271,7 +1271,7 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
-            return new Vector<String>(actionManager.getActions(instance, false));
+            return new Vector<String>(actionManager.getActions(instance, false, true));
         }
         finally
         {

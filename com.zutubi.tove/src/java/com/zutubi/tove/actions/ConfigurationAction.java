@@ -81,6 +81,11 @@ public class ConfigurationAction
         return customiseMethod;
     }
 
+    public boolean isCustomised()
+    {
+        return customiseMethod != null;
+    }
+
     public Method getPrepareMethod()
     {
         return prepareMethod;

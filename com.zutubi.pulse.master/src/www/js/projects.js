@@ -194,7 +194,7 @@ ZUTUBI.ConcreteProject.prototype = {
                 }
                 else
                 {
-                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
+                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false, false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
                 }
 
                 items.push(item);
@@ -205,7 +205,7 @@ ZUTUBI.ConcreteProject.prototype = {
                 items.push({
                     id: 'with dependencies',
                     image: 'lightning.gif',
-                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
+                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false, false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
                 });
             }
 

@@ -81,7 +81,7 @@ public class ViewAgentsAction extends ActionSupport
 
                 Messages messages = Messages.getInstance(AgentConfiguration.class);
                 File contentRoot = systemPaths.getContentRoot();
-                for(String actionName: actionManager.getActions(agent.getConfig(), false))
+                for(String actionName: actionManager.getActions(agent.getConfig(), false, true))
                 {
                     rowModel.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
                 }

@@ -38,7 +38,7 @@ public class ActionManager
     private ConfigurationRefactoringManager configurationRefactoringManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public List<String> getActions(Configuration configurationInstance, boolean includeDefault)
+    public List<String> getActions(Configuration configurationInstance, boolean includeDefault, boolean includeNonSimple)
     {
         List<String> result = new LinkedList<String>();
 
@@ -52,19 +52,22 @@ public class ActionManager
                     result.add(AccessManager.ACTION_VIEW);
                 }
 
-                if (configurationRefactoringManager.canClone(path) && configurationSecurityManager.hasPermission(PathUtils.getParentPath(path), AccessManager.ACTION_CREATE))
+                if (includeNonSimple)
                 {
-                    result.add(ConfigurationRefactoringManager.ACTION_CLONE);
-                }
+                    if (configurationRefactoringManager.canClone(path) && configurationSecurityManager.hasPermission(PathUtils.getParentPath(path), AccessManager.ACTION_CREATE))
+                    {
+                        result.add(ConfigurationRefactoringManager.ACTION_CLONE);
+                    }
 
-                if (configurationRefactoringManager.canPullUp(path))
-                {
-                    result.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
-                }
+                    if (configurationRefactoringManager.canPullUp(path))
+                    {
+                        result.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
+                    }
 
-                if (configurationRefactoringManager.canPushDown(path))
-                {
-                    result.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
+                    if (configurationRefactoringManager.canPushDown(path))
+                    {
+                        result.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
+                    }
                 }
 
                 if (configurationTemplateManager.canDelete(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
@@ -83,7 +86,7 @@ public class ActionManager
                     List<ConfigurationAction> actions = configurationActions.getActions(configurationInstance);
                     for (ConfigurationAction action : actions)
                     {
-                        if (configurationSecurityManager.hasPermission(path, action.getPermissionName()))
+                        if ((includeNonSimple || isSimple(action)) && configurationSecurityManager.hasPermission(path, action.getPermissionName()))
                         {
                             result.add(action.getName());
                         }
@@ -97,6 +100,11 @@ public class ActionManager
         }
 
         return result;
+    }
+
+    private boolean isSimple(ConfigurationAction action)
+    {
+        return !action.hasArgument() && !action.isCustomised();
     }
 
     public void ensurePermission(String path, String actionName)

@@ -190,7 +190,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     {
         try
         {
-            List<String> actionNames = actionManager.getActions((Configuration) instance, true);
+            List<String> actionNames = actionManager.getActions((Configuration) instance, true, true);
             return CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
             {
                 public ActionLink map(String actionName)

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.i18n.Messages;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;
@@ -12,10 +14,15 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
+import java.util.List;
+
 /**
+ * Executes configuration actions on instances, where the action name is passed
+ * in as part of the request.
  */
 public class GenericAction extends ToveActionSupport
 {
+    private static final Messages I18N = Messages.getInstance(GenericAction.class);
     private static final Logger LOG = Logger.getLogger(GenericAction.class);
 
     private ActionManager actionManager;
@@ -24,6 +31,11 @@ public class GenericAction extends ToveActionSupport
      * The action that should be executed.
      */
     private String actionName;
+    /**
+     * If set to true, execute the action on all concrete descendents for which
+     * it is enabled.
+     */
+    private boolean descendents = false;
     private String customAction;
     private String newPath;
     private ConfigurationPanel newPanel;
@@ -37,6 +49,11 @@ public class GenericAction extends ToveActionSupport
     public void setActionName(String actionName)
     {
         this.actionName = actionName;
+    }
+
+    public void setDescendents(boolean descendents)
+    {
+        this.descendents = descendents;
     }
 
     public String getCustomAction()
@@ -96,6 +113,65 @@ public class GenericAction extends ToveActionSupport
         }
 
         configurationType = (CompositeType) configurationTemplateManager.getType(path);
+
+        if (descendents)
+        {
+            return executeDescendentsAction(config);
+        }
+        else
+        {
+            return executeSingleAction(config);
+        }
+    }
+
+    private String executeDescendentsAction(Configuration config)
+    {
+        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+        if (templateOwnerPath == null)
+        {
+            addActionError("Requested descendents action for path '" + path + "' not in a templated scope");
+            return ERROR;
+        }
+
+        response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+        List<String> concreteDescendentPaths = configurationTemplateManager.getDescendentPaths(path, true, true, false);
+        int failureCount = 0;
+        int totalCount = 0;
+        for (String descendentPath: concreteDescendentPaths)
+        {
+            Configuration descendent = configurationTemplateManager.getInstance(descendentPath);
+            if (descendent != null && actionManager.getActions(descendent, false, false).contains(actionName))
+            {
+                totalCount++;
+                ActionResult result = actionManager.execute(actionName, descendent, null);
+                if (result.getStatus() == ActionResult.Status.FAILURE)
+                {
+                    failureCount++;
+                }
+
+                recordInvalidatedPaths(result);
+            }
+        }
+
+        Messages messages = Messages.getInstance(config.getClass());
+        String key = actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL;
+        String actionLabel = messages.isKeyDefined(key) ? messages.format(key) : actionName;
+
+        if (failureCount == 0)
+        {
+            String messageKey = "descendents.triggered." + (totalCount == 1 ? "single" : "multiple");
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format(messageKey, new Object[]{actionLabel, totalCount})));
+        }
+        else
+        {
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendents.failed", new Object[]{actionLabel, failureCount, totalCount})));
+        }
+
+        return SUCCESS;
+    }
+
+    private String executeSingleAction(Configuration config)
+    {
         ConfigurationActions configurationActions = actionManager.getConfigurationActions(configurationType);
         ConfigurationAction configurationAction = configurationActions.getAction(actionName);
 
@@ -169,7 +245,7 @@ public class GenericAction extends ToveActionSupport
         }
 
         // All clear to execute action.
-        ActionResult actionResult = null;
+        ActionResult actionResult;
         try
         {
             actionResult = actionManager.execute(actionName, config, argument);
@@ -193,14 +269,19 @@ public class GenericAction extends ToveActionSupport
             response.setStatus(new ConfigurationResponse.Status(mapStatus(actionResult.getStatus()), actionResult.getMessage()));
         }
 
+        recordInvalidatedPaths(actionResult);
+
+        return SUCCESS;
+    }
+
+    private void recordInvalidatedPaths(ActionResult actionResult)
+    {
         for(String invalidatedPath: actionResult.getInvalidatedPaths())
         {
             String newDisplayName = ToveUtils.getDisplayName(invalidatedPath, configurationTemplateManager);
             String collapsedCollection = ToveUtils.getCollapsedCollection(invalidatedPath, configurationTemplateManager.getType(invalidatedPath), configurationSecurityManager);
             response.addRenamedPath(new ConfigurationResponse.Rename(invalidatedPath, invalidatedPath, newDisplayName, collapsedCollection));
         }
-        
-        return SUCCESS;
     }
 
     private ConfigurationResponse.Status.Type mapStatus(ActionResult.Status status)

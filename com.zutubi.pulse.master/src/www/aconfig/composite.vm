@@ -85,13 +85,31 @@
             #if($action.action == "delete")
                 #set($onclick = "deletePath('#jss(${path})'); return false;")
             #else
-                #set($onclick = "actionPath('#jss(${path})', '${action.action}', false); return false;")
+                #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, false); return false;")
             #end
                     <li>
                         <a href="#" id='#id("action.${action.action}")' class="unadorned" onclick="#html($onclick)">
                             <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
                         </a>
                     </li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+
+    #if ($config.descendentActions.size() > 0)
+            <div class="config-panel" id="descendent.actions">
+            <h3 class="config-header">descendent actions</h3>
+            <div class="config-container">
+            <ul class="config-actions">
+        #foreach($action in $config.descendentActions)
+            #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, true); return false;")
+                <li>
+                    <a href="#" id='#id("descendent.action.${action.action}")' class="unadorned" onclick="#html($onclick)">
+                        <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
+                    </a>
+                </li>
         #end
             </ul>
             </div>

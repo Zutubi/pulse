@@ -65,6 +65,37 @@ public class CompositePage extends ConfigPage
     public void clickActionAndWait(String action)
     {
         clickAction(action);
+        waitForAction();
+    }
+
+    public boolean isDescendentActionsPresent()
+    {
+        return browser.isElementPresent("descendent.actions");
+    }
+
+    public String getDescendentActionId(String action)
+    {
+        return "descendent.action." + action;
+    }
+
+    public boolean isDescendentActionPresent(String action)
+    {
+        return browser.isElementPresent(getDescendentActionId(action));
+    }
+
+    public void clickDescendentAction(String action)
+    {
+        browser.click(getDescendentActionId(action));
+    }
+
+    public void clickDescendentActionAndWait(String action)
+    {
+        clickDescendentAction(action);
+        waitForAction();
+    }
+
+    private void waitForAction()
+    {
         browser.waitForVariable("actionInProgress", true);
         waitFor();
     }

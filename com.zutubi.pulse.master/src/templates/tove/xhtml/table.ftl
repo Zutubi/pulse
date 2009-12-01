@@ -56,11 +56,11 @@
         <#else>
             <#if !table.isLastVisible(row)>
                 <#assign actionId = "down:${row.baseName}"/>
-            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'down', true); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'down', true, false); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
             </#if>
             <#if !table.isFirstVisible(row)>
                 <#assign actionId = "up:${row.baseName}"/>
-            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'up', true); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'up', true, false); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
             </#if>
         </#if>
         </td>
@@ -104,7 +104,7 @@
             <#elseif actionLink.action == "delete">
                 onclick="deletePath('${row.path?js_string?html}'); return false;">
             <#else>
-                onclick="actionPath('${row.path?js_string?html}', '${actionLink.action}', true); return false;">
+                onclick="actionPath('${row.path?js_string?html}', '${actionLink.action}', true, false); return false;">
             </#if>
             <#if actionLink.icon?exists>
                 <img alt="${actionLink.label?html}" src="${base}/images/config/actions/${actionLink.icon}.gif"/>

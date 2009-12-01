@@ -8,9 +8,12 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.config.ConfigurationRefactoringManager;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
@@ -224,5 +227,56 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
+    }
+
+    public void testDescendentActions() throws Exception
+    {
+        String parentName = random + "-parent";
+        String child1Name = random + "-child1";
+        String child2Name = random + "-child2";
+
+        xmlRpcHelper.insertSimpleProject(parentName, true);
+
+        loginAsAdmin();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentName, true);
+        assertFalse(projectPage.isDescendentActionsPresent());
+
+        String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
+        xmlRpcHelper.insertTrivialProject(child2Name, parentName, false);
+
+        projectPage.openAndWaitFor();
+        assertTrue(projectPage.isDescendentActionsPresent());
+        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+        assertDefaultAndComplexActionsNotShown(projectPage);
+
+        projectPage.clickDescendentActionAndWait(ProjectConfigurationActions.ACTION_PAUSE);
+        assertTextPresent("action 'pause' triggered on 2 descendents");
+        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+
+        assertEquals(Project.State.PAUSED, xmlRpcHelper.getProjectState(child1Name));
+        assertEquals(Project.State.PAUSED, xmlRpcHelper.getProjectState(child2Name));
+
+        xmlRpcHelper.doConfigAction(child1Path, ProjectConfigurationActions.ACTION_RESUME);
+        projectPage.openAndWaitFor();
+        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+
+        projectPage.clickDescendentActionAndWait(ProjectConfigurationActions.ACTION_RESUME);
+        assertTextPresent("action 'resume' triggered on 1 descendent");
+        assertTrue(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
+        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_RESUME));
+    }
+
+    private void assertDefaultAndComplexActionsNotShown(ProjectConfigPage projectPage)
+    {
+        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
+        assertFalse(projectPage.isDescendentActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
+        assertFalse(projectPage.isDescendentActionPresent(ConfigurationRefactoringManager.ACTION_CLONE));
+        assertFalse(projectPage.isDescendentActionPresent(ConfigurationRefactoringManager.ACTION_PULL_UP));
+        assertFalse(projectPage.isDescendentActionPresent(ConfigurationRefactoringManager.ACTION_PUSH_DOWN));
+        assertFalse(projectPage.isDescendentActionPresent(AccessManager.ACTION_DELETE));
+        assertFalse(projectPage.isDescendentActionPresent(AccessManager.ACTION_VIEW));
     }
 }
