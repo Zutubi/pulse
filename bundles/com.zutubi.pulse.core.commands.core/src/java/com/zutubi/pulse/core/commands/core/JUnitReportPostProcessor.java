@@ -43,7 +43,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
     protected void processSuites(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
         expectStartTag(ELEMENT_SUITES, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         while (nextSiblingTag(reader, getConfig().getSuiteElement()))
         {
@@ -69,7 +69,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         TestSuiteResult suite = new TestSuiteResult(name, duration);
         tests.addSuite(suite);
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         while (nextSiblingTag(reader, getConfig().getSuiteElement(), getConfig().getCaseElement()))
         {
@@ -125,7 +125,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         long duration = getDuration(attributes);
         TestCaseResult caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
         suite.addCase(caseResult);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         if (nextSiblingTag(reader, getConfig().getErrorElement(), getConfig().getFailureElement(), getConfig().getSkippedElement()))
         {
@@ -134,13 +134,13 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
             {
                 caseResult.setStatus(TestStatus.ERROR);
                 caseResult.setMessage(getMessage(reader));
-                reader.nextTag();
+                nextTagOrEnd(reader);
             }
             else if (tagName.equals(getConfig().getFailureElement()))
             {
                 caseResult.setStatus(TestStatus.FAILURE);
                 caseResult.setMessage(getMessage(reader));
-                reader.nextTag();
+                nextTagOrEnd(reader);
             }
             else if (tagName.equals(getConfig().getSkippedElement()))
             {
@@ -156,7 +156,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         }
 
         expectEndTag(getConfig().getCaseElement(), reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private String getMessage(XMLStreamReader reader) throws XMLStreamException

@@ -36,7 +36,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
     protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
         expectStartTag(ELEMENT_TEST_RUN, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
 
@@ -60,7 +60,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
     private void handleSuccessfulTests(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
         expectStartTag(ELEMENT_SUCCESSFUL_TESTS, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         while (nextSiblingTag(reader, ELEMENT_TEST))
         {
@@ -68,13 +68,13 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         }
 
         expectEndTag(ELEMENT_SUCCESSFUL_TESTS, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void handleSuccessfulTest(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
         expectStartTag(ELEMENT_TEST, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         String[] name = new String[0];
         while (nextSiblingTag(reader, ELEMENT_NAME))
@@ -90,13 +90,13 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         }
 
         expectEndTag(ELEMENT_TEST, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void handleFailedTests(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
         expectStartTag(ELEMENT_FAILED_TESTS, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         while (nextSiblingTag(reader, ELEMENT_FAILED_TEST))
         {
@@ -104,13 +104,13 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         }
 
         expectEndTag(ELEMENT_FAILED_TESTS, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void handleFailedTest(Map<String, TestSuiteResult> suites, XMLStreamReader reader) throws XMLStreamException
     {
         expectStartTag(ELEMENT_FAILED_TEST, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         String[] name = new String[0];
         Map<String, String> location = null;
@@ -147,18 +147,18 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         }
 
         expectEndTag(ELEMENT_FAILED_TEST, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private Map<String, String> handleGetLocation(XMLStreamReader reader) throws XMLStreamException
     {
         expectStartTag(ELEMENT_LOCATION, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         Map<String, String> location = readElements(reader);
 
         expectEndTag(ELEMENT_LOCATION, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         return location;
     }
@@ -169,7 +169,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         String messageText = reader.getElementText().trim();
 
         expectEndTag(ELEMENT_MESSAGE, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         return messageText;
     }
@@ -205,7 +205,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         String typeText = reader.getElementText().trim();
         TestStatus status = typeText.equals(FAILURE_TYPE_ERROR) ? TestStatus.ERROR : TestStatus.FAILURE;
         expectEndTag(ELEMENT_FAILURE_TYPE, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         return status;
     }
@@ -217,7 +217,7 @@ public class CppUnitReportPostProcessor extends StAXTestReportPostProcessorSuppo
         String[] bits = nameText.split("::", 2);
         String[] name = (bits.length == 1) ? new String[]{ "[unknown]", bits[0] } : bits;
         expectEndTag(ELEMENT_NAME, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         return name;
     }

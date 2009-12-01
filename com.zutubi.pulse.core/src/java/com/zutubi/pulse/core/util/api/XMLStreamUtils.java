@@ -63,8 +63,11 @@ public class XMLStreamUtils
     }
 
     /**
-     * Identical to {@link javax.xml.stream.XMLStreamReader#nextTag()}, but
-     * will not throw an error if the end of the document is reached.
+     * Similar to {@link javax.xml.stream.XMLStreamReader#nextTag()}, but:
+     * <ul>
+     *     <li>instead of throwing errors, uninteresting events are skipped</li>
+     *     <li>no error is thrown if the end of the document is reached</li>
+     * </ul>
      *
      * @param reader the reader
      * @return the type of event that the reader has reached (one of
@@ -74,33 +77,17 @@ public class XMLStreamUtils
     public static int nextTagOrEnd(XMLStreamReader reader) throws XMLStreamException
     {
         int eventType = reader.next();
-        while(isWhitespaceCommentOrPI(reader, eventType))
+        while(!isTagOrEnd(reader))
         {
             eventType = reader.next();
-        }
-
-        if (!(reader.isStartElement() || reader.isEndElement() || !reader.hasNext()))
-        {
-            throw new XMLStreamException("expected start or end tag or end of document", reader.getLocation());
         }
 
         return eventType;
     }
 
-    private static boolean isWhitespaceCommentOrPI(XMLStreamReader reader, int eventType)
+    private static boolean isTagOrEnd(XMLStreamReader reader) throws XMLStreamException
     {
-        switch (eventType)
-        {
-            case XMLStreamConstants.CDATA:
-            case XMLStreamConstants.CHARACTERS:
-                return reader.isWhiteSpace();
-            case XMLStreamConstants.COMMENT:
-            case XMLStreamConstants.SPACE:
-            case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                return true;
-            default:
-                return false;
-        }
+        return reader.isStartElement() || reader.isEndElement() || !reader.hasNext();
     }
 
     /**

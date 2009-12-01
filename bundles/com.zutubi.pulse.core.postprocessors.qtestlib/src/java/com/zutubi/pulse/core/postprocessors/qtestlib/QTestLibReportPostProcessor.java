@@ -57,7 +57,7 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
             return;
         }
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         TestSuiteResult suite = new TestSuiteResult(name);
         tests.addSuite(suite);
@@ -80,7 +80,7 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
             return;
         }
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         TestCaseResult caseResult = new TestCaseResult(name);
         suite.addCase(caseResult);
@@ -90,11 +90,11 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
             String element = reader.getLocalName();
             extractStatusAndMessage(reader, caseResult);
             expectEndTag(element, reader);
-            reader.nextTag();
+            nextTagOrEnd(reader);
         }
 
         expectEndTag(ELEMENT_TEST_FUNCTION, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void extractStatusAndMessage(XMLStreamReader reader, TestCaseResult caseResult) throws XMLStreamException
@@ -131,7 +131,7 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
             return;
         }
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_DESCRIPTION, ELEMENT_DATA_TAG))
         {
             if (reader.getLocalName().equals(ELEMENT_DATA_TAG))
@@ -143,7 +143,7 @@ public class QTestLibReportPostProcessor extends StAXTestReportPostProcessorSupp
                 message += getElementText(reader);
             }
             
-            reader.nextTag();
+            nextTagOrEnd(reader);
         }
 
         if (StringUtils.stringSet(message))

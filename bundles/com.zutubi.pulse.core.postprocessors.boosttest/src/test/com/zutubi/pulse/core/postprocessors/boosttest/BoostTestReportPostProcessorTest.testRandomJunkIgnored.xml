@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestLog>
+
+    textual junk
+
     <junk>
       <nested-junk>textual junk</nested-junk>
     </junk>
   <TestSuite
       name="PulseTest">
+
+      textual junk
+
       <junk>
         <nested-junk>textual junk</nested-junk>
       </junk>
+
+      textual junk
+
     <TestSuite
         name="VariantsSuite">
         <junk>
@@ -15,6 +24,9 @@
         </junk>
       <TestCase
           name="simplePass">
+
+          textual junk
+
           <junk>
             <nested-junk>textual junk</nested-junk>
           </junk>
@@ -48,6 +60,9 @@
             file="main.cpp"
             line="25">check add(2, 2) == 1 failed
         </Error>
+
+          textual junk
+
           <junk>
             <nested-junk>textual junk</nested-junk>
           </junk>
@@ -97,15 +112,27 @@
           <junk>
             <nested-junk>textual junk</nested-junk>
           </junk>
+
+          textual junk
+
         <FatalError
             file="main.cpp"
             line="42">Failure message
         </FatalError>
+
+          textual junk
+
           <junk>
             <nested-junk>textual junk</nested-junk>
           </junk>
+
+          textual junk
+
         <TestingTime>0
         </TestingTime>
+
+          textual junk
+
       </TestCase>
         <junk>
           <nested-junk>textual junk</nested-junk>

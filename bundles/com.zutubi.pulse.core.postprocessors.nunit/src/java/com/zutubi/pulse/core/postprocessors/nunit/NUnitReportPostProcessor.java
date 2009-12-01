@@ -40,19 +40,19 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
     protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
         expectStartTag(ELEMENT_ROOT, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_SUITE))
         {
             // We skip over the top-level suite tag, which contains
             // information about the assembly the tests were in.
-            reader.nextTag();
+            nextTagOrEnd(reader);
             while (nextSiblingTag(reader, ELEMENT_RESULTS))
             {
                 processTopSuiteResults(tests, reader);
             }
 
             expectEndTag(ELEMENT_SUITE, reader);
-            reader.nextTag();
+            nextTagOrEnd(reader);
         }
 
         expectEndTag(ELEMENT_ROOT, reader);
@@ -60,31 +60,31 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
 
     private void processTopSuiteResults(TestSuiteResult tests, XMLStreamReader reader) throws XMLStreamException
     {
-        reader.nextTag();
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_SUITE))
         {
             processSuite(tests, "", reader);
         }
 
         expectEndTag(ELEMENT_RESULTS, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void processSuite(TestSuiteResult parentSuite, String parentPath, XMLStreamReader reader) throws XMLStreamException
     {
         Map<String, String> attributes = getAttributes(reader);
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_RESULTS))
         {
             processSuiteResults(parentSuite, parentPath, reader, attributes);
 
             expectEndTag(ELEMENT_RESULTS, reader);
-            reader.nextTag();
+            nextTagOrEnd(reader);
         }
 
         expectEndTag(ELEMENT_SUITE, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void processSuiteResults(TestSuiteResult parentSuite, String parentPath, XMLStreamReader reader, Map<String, String> attributes) throws XMLStreamException
@@ -101,7 +101,7 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         TestSuiteResult suite = addSuite(parentSuite, name, getDuration(attributes));
         String suitePath = appendPath(parentPath, suite.getName());
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_SUITE, ELEMENT_CASE))
         {
             if (reader.getLocalName().equals(ELEMENT_SUITE))
@@ -169,26 +169,26 @@ public class NUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         suite.addCase(caseResult);
 
         expectEndTag(ELEMENT_CASE, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private String getMessage(XMLStreamReader reader, String tagName) throws XMLStreamException
     {
         StringBuilder message = new StringBuilder();
 
-        reader.nextTag();
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, tagName))
         {
-            reader.nextTag();
+            nextTagOrEnd(reader);
 
             while (nextSiblingTag(reader, ELEMENT_MESSAGE, ELEMENT_STACK_TRACE))
             {
                 appendToMessage(reader, message);
-                reader.nextTag();
+                nextTagOrEnd(reader);
             }
 
             expectEndTag(tagName, reader);
-            reader.nextTag();
+            nextTagOrEnd(reader);
         }
 
         return message.toString().trim();

@@ -55,7 +55,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
     protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
         expectStartTag(ELEMENT_TEST_LOG, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         while (nextSiblingTag(reader, ELEMENT_TEST_SUITE))
         {
@@ -77,7 +77,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
         }
 
         TestSuiteResult suiteResult = new TestSuiteResult(attributes.get(ATTRIBUTE_NAME));
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         while (nextSiblingTag(reader, ELEMENT_TEST_SUITE, ELEMENT_TEST_CASE))
         {
@@ -95,7 +95,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
         parentSuite.addSuite(suiteResult);
 
         expectEndTag(ELEMENT_TEST_SUITE, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void processCase(XMLStreamReader reader, TestSuiteResult parentSuite) throws XMLStreamException
@@ -108,7 +108,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
             nextElement(reader);
             return;
         }
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         long duration = TestResult.DURATION_UNKNOWN;
         TestStatus status = TestStatus.PASS;
@@ -127,7 +127,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
                 {
                     // the default value will have to do.
                 }
-                reader.nextTag();
+                nextTagOrEnd(reader);
             }
             else
             {
@@ -140,7 +140,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
                     {
                         appendMessage(reader, builder);
                         expectEndTag(name, reader);
-                        reader.nextTag();
+                        nextTagOrEnd(reader);
                     }
                     else
                     {
@@ -156,7 +156,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
 
                     appendMessage(reader, builder);
                     expectEndTag(name, reader);
-                    reader.nextTag();
+                    nextTagOrEnd(reader);
                 }
             }
         }
@@ -164,7 +164,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
         parentSuite.addCase(new TestCaseResult(attributes.get(ATTRIBUTE_NAME), duration, status, builder.length() > 0 ? builder.toString() : null));
 
         expectEndTag(ELEMENT_TEST_CASE, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private void appendMessage(XMLStreamReader reader, StringBuilder builder) throws XMLStreamException

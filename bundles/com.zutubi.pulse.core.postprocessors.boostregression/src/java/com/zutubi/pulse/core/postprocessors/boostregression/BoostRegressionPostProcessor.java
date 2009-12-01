@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.postprocessors.boostregression;
 import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.pulse.core.util.api.XMLStreamUtils;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.nextSiblingTag;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -53,7 +52,7 @@ public class BoostRegressionPostProcessor extends StAXTestReportPostProcessorSup
             String name = attributes.get(ATTRIBUTE_TEST_NAME);
             TestSuiteResult suiteResult = getSuite(suite, tests);
 
-            reader.nextTag();
+            nextTagOrEnd(reader);
 
             TestStatus status = TestStatus.PASS;
             StringBuilder detailsBuilder = new StringBuilder();
@@ -73,7 +72,7 @@ public class BoostRegressionPostProcessor extends StAXTestReportPostProcessorSup
                     detailsBuilder.append(content);
                     detailsBuilder.append(String.format(ACTION_CONTENT_SUFFIX, localname));
                 }
-                reader.nextTag();
+                nextTagOrEnd(reader);
             }
 
             String details = (status != TestStatus.PASS) ? detailsBuilder.toString() : null;

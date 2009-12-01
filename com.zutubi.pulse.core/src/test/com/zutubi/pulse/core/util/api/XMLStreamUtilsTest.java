@@ -48,18 +48,6 @@ public class XMLStreamUtilsTest extends PulseTestCase
     {
         XMLStreamReader reader = getXMLStreamReader(getName());
 
-        try
-        {
-            XMLStreamUtils.nextTagOrEnd(reader);
-            fail("Can't ask for next tag on text");
-        }
-        catch (XMLStreamException e)
-        {
-            // Continue
-        }
-        
-        reader.getText();
-
         assertEquals(END_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));
         assertEquals("a", reader.getLocalName());
         assertEquals(START_ELEMENT, XMLStreamUtils.nextTagOrEnd(reader));

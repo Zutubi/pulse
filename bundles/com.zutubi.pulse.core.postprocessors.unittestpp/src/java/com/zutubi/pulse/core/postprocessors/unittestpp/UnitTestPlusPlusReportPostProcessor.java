@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.postprocessors.unittestpp;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.pulse.core.util.api.XMLStreamUtils;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -32,7 +32,7 @@ public class UnitTestPlusPlusReportPostProcessor extends StAXTestReportPostProce
     protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
         expectStartTag(ELEMENT_RESULTS, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
 
         Map<String, TestSuiteResult> suites = new TreeMap<String, TestSuiteResult>();
 
@@ -57,7 +57,7 @@ public class UnitTestPlusPlusReportPostProcessor extends StAXTestReportPostProce
 
         if(suite != null && name != null)
         {
-            reader.nextTag();
+            nextTagOrEnd(reader);
 
             TestSuiteResult suiteResult = getSuite(suite, suites);
 
@@ -85,7 +85,7 @@ public class UnitTestPlusPlusReportPostProcessor extends StAXTestReportPostProce
         }
 
         expectEndTag(ELEMENT_TEST, reader);
-        reader.nextTag();
+        nextTagOrEnd(reader);
     }
 
     private long getDuration(Map<String, String> attributes)
