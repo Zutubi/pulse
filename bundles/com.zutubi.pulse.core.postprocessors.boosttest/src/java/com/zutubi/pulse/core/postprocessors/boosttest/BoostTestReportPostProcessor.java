@@ -54,9 +54,15 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
 
     protected void process(XMLStreamReader reader, TestSuiteResult tests) throws XMLStreamException
     {
-        expectStartTag(ELEMENT_TEST_LOG, reader);
-        nextTagOrEnd(reader);
+        while (!(reader.isStartElement() && isElement(ELEMENT_TEST_LOG, reader)))
+        {
+            if (nextTagOrEnd(reader) == XMLStreamReader.END_DOCUMENT)
+            {
+                return;
+            }
+        }
 
+        nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_TEST_SUITE))
         {
             processSuite(reader, tests);

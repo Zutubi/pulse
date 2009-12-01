@@ -142,4 +142,9 @@ public class BoostTestReportPostProcessorTest extends XMLTestPostProcessorTestCa
                         new TestCaseResult("universeInOrder", 0, TestStatus.FAILURE, "error: hello.cpp:12: check add(2, 2) == 5 failed")));
         assertEquals(expected, runProcessorAndGetTests(new BoostTestReportPostProcessor(new BoostTestReportPostProcessorConfiguration())));
     }
+
+    public void testIgnoresResultFiles() throws IOException
+    {
+        assertEquals(buildSuite(null), runProcessorAndGetTests(new BoostTestReportPostProcessor(new BoostTestReportPostProcessorConfiguration())));
+    }
 }
