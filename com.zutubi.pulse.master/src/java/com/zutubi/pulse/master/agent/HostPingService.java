@@ -77,13 +77,13 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
     public boolean requestPing(Host host, HostService hostService)
     {
         inProgressLock.lock();
-        if (!systemStarted)
-        {
-            return false;
-        }
-
         try
         {
+            if (!systemStarted)
+            {
+                return false;
+            }
+
             // Ignore duplicate requests.  If there is ping result pending
             // for this agent, don't request another one.
             if (isPingInProgress(host))
