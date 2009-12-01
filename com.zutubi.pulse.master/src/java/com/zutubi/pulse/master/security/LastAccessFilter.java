@@ -16,6 +16,8 @@ import java.io.IOException;
  */
 public class LastAccessFilter implements Filter
 {
+    private static final String BEAN_LAST_ACCESS_MANAGER = "lastAccessManager";
+    
     private LastAccessManager lastAccessManager;
 
     public void init(FilterConfig filterConfig) throws ServletException
@@ -44,9 +46,9 @@ public class LastAccessFilter implements Filter
     public LastAccessManager getLastAccessManager()
     {
         // Sadly this class defies wiring as it is initialised too early.
-        if (lastAccessManager == null)
+        if (lastAccessManager == null && SpringComponentContext.containsBean(BEAN_LAST_ACCESS_MANAGER))
         {
-            lastAccessManager = SpringComponentContext.getBean("lastAccessManager");
+            lastAccessManager = SpringComponentContext.getBean(BEAN_LAST_ACCESS_MANAGER);
         }
         return lastAccessManager;
     }
