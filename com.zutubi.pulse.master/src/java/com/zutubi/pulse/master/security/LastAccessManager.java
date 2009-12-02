@@ -87,7 +87,13 @@ public class LastAccessManager
             }
             else
             {
-                return user.getLastAccessTime();
+                long time = user.getLastAccessTime();
+                synchronized (idToTime)
+                {
+                    idToTime.put(id, time);
+                }
+                
+                return time;
             }
         }
         else
@@ -116,7 +122,6 @@ public class LastAccessManager
         synchronized (idToTime)
         {
             copy = new HashMap<Long, Long>(idToTime);
-            idToTime.clear();
         }
 
         Session session = sessionFactory.openSession();

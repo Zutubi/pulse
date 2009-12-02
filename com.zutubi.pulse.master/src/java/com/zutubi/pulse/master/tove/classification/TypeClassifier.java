@@ -53,8 +53,8 @@ public class TypeClassifier
         if (classifierClass != null)
         {
             try
-        {
-            if (Classifier.class.isAssignableFrom(classifierClass))
+            {
+                if (Classifier.class.isAssignableFrom(classifierClass))
                 {
                     classifier = (Classifier<Configuration>) objectFactory.buildBean(classifierClass);
                 }
