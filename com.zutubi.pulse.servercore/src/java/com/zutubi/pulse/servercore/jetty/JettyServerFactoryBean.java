@@ -20,7 +20,9 @@ public class JettyServerFactoryBean implements FactoryBean
 
     private static final String PROPERTY_IDLE_TIMEOUT = "pulse.jetty.idle.timeout";
     private static final int DEFAULT_IDLE_TIMEOUT = (int) (60 * Constants.SECOND);
-    
+    private static final String PROPERTY_MIN_THREADS = "pulse.jetty.min.threads";
+    private static final String PROPERTY_MAX_THREADS = "pulse.jetty.max.threads";
+
     private Server instance;
 
     private ConfigurationManager configManager = null;
@@ -37,50 +39,55 @@ public class JettyServerFactoryBean implements FactoryBean
 
                     // configuration of the server depends upon the configmanager.
                     SystemConfiguration systemConfiguration = configManager.getSystemConfig();
-                    if(systemConfiguration.isSslEnabled())
+                    SocketListener listener;
+                    if (systemConfiguration.isSslEnabled())
                     {
-                        SslListener sslListener = new SslListener();
-                        sslListener.setHost(systemConfiguration.getBindAddress());
-                        sslListener.setPort(systemConfiguration.getServerPort());
-                        sslListener.setMaxIdleTimeMs(getIdleTimeout());
-
-                        if(TextUtils.stringSet(systemConfiguration.getSslKeystore()))
-                        {
-                            sslListener.setKeystore(systemConfiguration.getSslKeystore());
-                        }
-
-                        if(TextUtils.stringSet(systemConfiguration.getSslPassword()))
-                        {
-                            sslListener.setPassword(systemConfiguration.getSslPassword());
-                        }
-                        else
-                        {
-                            throw new PulseRuntimeException("SSL enabled but ssl.password not set");
-                        }
-
-                        if(TextUtils.stringSet(systemConfiguration.getSslKeyPassword()))
-                        {
-                            sslListener.setKeyPassword(systemConfiguration.getSslKeyPassword());
-                        }
-                        else
-                        {
-                            throw new PulseRuntimeException("SSL enabled but ssl.keyPassword not set");
-                        }
-
-                        instance.addListener(sslListener);
+                        listener = createSSLListener(systemConfiguration);
                     }
                     else
                     {
-                        SocketListener listener = new SocketListener();
-                        listener.setHost(systemConfiguration.getBindAddress());
-                        listener.setPort(systemConfiguration.getServerPort());
-                        listener.setMaxIdleTimeMs(getIdleTimeout());
-                        instance.addListener(listener);
+                        listener = new SocketListener();
                     }
+
+                    listener.setHost(systemConfiguration.getBindAddress());
+                    listener.setPort(systemConfiguration.getServerPort());
+                    listener.setMaxIdleTimeMs(getIdleTimeout());
+                    listener.setMinThreads(Integer.getInteger(PROPERTY_MIN_THREADS, listener.getMinThreads()));
+                    listener.setMaxThreads(Integer.getInteger(PROPERTY_MAX_THREADS, listener.getMaxThreads()));
+                    instance.addListener(listener);
                 }
             }
         }
         return instance;
+    }
+
+    private SocketListener createSSLListener(SystemConfiguration systemConfiguration)
+    {
+        SslListener sslListener = new SslListener();
+        if (TextUtils.stringSet(systemConfiguration.getSslKeystore()))
+        {
+            sslListener.setKeystore(systemConfiguration.getSslKeystore());
+        }
+
+        if (TextUtils.stringSet(systemConfiguration.getSslPassword()))
+        {
+            sslListener.setPassword(systemConfiguration.getSslPassword());
+        }
+        else
+        {
+            throw new PulseRuntimeException("SSL enabled but ssl.password not set");
+        }
+
+        if (TextUtils.stringSet(systemConfiguration.getSslKeyPassword()))
+        {
+            sslListener.setKeyPassword(systemConfiguration.getSslKeyPassword());
+        }
+        else
+        {
+            throw new PulseRuntimeException("SSL enabled but ssl.keyPassword not set");
+        }
+
+        return sslListener;
     }
 
     private int getIdleTimeout()
