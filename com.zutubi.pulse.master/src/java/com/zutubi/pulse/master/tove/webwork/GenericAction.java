@@ -14,7 +14,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Executes configuration actions on instances, where the action name is passed
@@ -134,23 +134,16 @@ public class GenericAction extends ToveActionSupport
         }
 
         response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
-        List<String> concreteDescendantPaths = configurationTemplateManager.getDescendantPaths(path, true, true, false);
+        Map<String, ActionResult> results = actionManager.executeOnDescendants(actionName, path);
         int failureCount = 0;
-        int totalCount = 0;
-        for (String descendantPath: concreteDescendantPaths)
+        for (ActionResult result: results.values())
         {
-            Configuration descendant = configurationTemplateManager.getInstance(descendantPath);
-            if (descendant != null && actionManager.getActions(descendant, false, false).contains(actionName))
+            if (result.getStatus() == ActionResult.Status.FAILURE)
             {
-                totalCount++;
-                ActionResult result = actionManager.execute(actionName, descendant, null);
-                if (result.getStatus() == ActionResult.Status.FAILURE)
-                {
-                    failureCount++;
-                }
-
-                recordInvalidatedPaths(result);
+                failureCount++;
             }
+
+            recordInvalidatedPaths(result);
         }
 
         Messages messages = Messages.getInstance(config.getClass());
@@ -159,12 +152,12 @@ public class GenericAction extends ToveActionSupport
 
         if (failureCount == 0)
         {
-            String messageKey = "descendants.triggered." + (totalCount == 1 ? "single" : "multiple");
-            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format(messageKey, new Object[]{actionLabel, totalCount})));
+            String messageKey = "descendants.triggered." + (results.size() == 1 ? "single" : "multiple");
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format(messageKey, new Object[]{actionLabel, results.size()})));
         }
         else
         {
-            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendants.failed", new Object[]{actionLabel, failureCount, totalCount})));
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendants.failed", new Object[]{actionLabel, failureCount, results.size()})));
         }
 
         return SUCCESS;

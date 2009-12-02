@@ -156,6 +156,32 @@ public class ActionManager
         });
     }
 
+    /**
+     * Executes the given action on all concrete descendants of the given path
+     * that have the action currently avaialable.  The action must be simple -
+     * i.e. it cannot require an argument or use a custom UI.
+     *
+     * @param actionName name of the action to execute
+     * @param path       path to process the concrete descendants of
+     * @return a mapping from path to result for all concrete descendants on
+     *         which the action was performed
+     */
+    public Map<String, ActionResult> executeOnDescendants(String actionName, String path)
+    {
+        Map<String, ActionResult> results = new HashMap<String, ActionResult>();
+        List<String> concreteDescendantPaths = configurationTemplateManager.getDescendantPaths(path, true, true, false);
+        for (String descendantPath: concreteDescendantPaths)
+        {
+            Configuration descendant = configurationTemplateManager.getInstance(descendantPath);
+            if (descendant != null && getActions(descendant, false, false).contains(actionName))
+            {
+                results.put(descendantPath, execute(actionName, descendant, null));
+            }
+        }
+
+        return results;
+    }
+
     private <T> T processAction(String actionName, Configuration configurationInstance, UnaryFunctionE<ConfigurationActions, T, Exception> f)
     {
         CompositeType type = getType(configurationInstance);
