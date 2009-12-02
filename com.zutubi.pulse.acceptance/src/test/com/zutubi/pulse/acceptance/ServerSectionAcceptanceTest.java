@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.server.ServerInfoPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerMessagesPage;
+import com.zutubi.util.SystemUtils;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
@@ -53,6 +54,12 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         assertTextPresent("data directory");
         assertTextPresent("all system properties");
         assertTextPresent("path.separator");
+
+        assertTextPresent("all environment variables");
+        if (SystemUtils.IS_LINUX)
+        {
+            assertTextPresent("PATH");
+        }
     }
 
     private void assertPagingLinks(ServerMessagesPage page, int pageCount)

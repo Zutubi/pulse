@@ -122,7 +122,7 @@ public class PerforceCore
         }
         catch (IOException e)
         {
-            throw new ScmException("Could not start p4 process: " + e.getMessage(), e);
+            throw new ScmException(getProcessErrorMessage(e), e);
         }
 
         if (input != null)
@@ -195,6 +195,41 @@ public class PerforceCore
         {
             async.destroy();
         }
+    }
+
+    private String getProcessErrorMessage(IOException e)
+    {
+        String message = "Could not start p4 process: " + e.getMessage() + " (";
+        Map<String, String> env = p4Builder.environment();
+        String pathKey = findPathKey(env);
+        if (pathKey == null)
+        {
+            message += "No PATH found in environment";
+        }
+        else
+        {
+            message += "PATH: '" + env.get(pathKey) + "'";
+        }
+
+        if (p4Builder.directory() != null)
+        {
+            message += "; Working Directory: '" + p4Builder.directory().getAbsolutePath() + "'";
+        }
+        message += ")";
+        return message;
+    }
+
+    private String findPathKey(Map<String, String> environment)
+    {
+        for (String key: environment.keySet())
+        {
+            if (key.equalsIgnoreCase("PATH"))
+            {
+                return key;
+            }
+        }
+
+        return null;
     }
 
     public List<String> getAllWorkspaceNames() throws ScmException

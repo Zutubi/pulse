@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.RecipeUtils;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -15,7 +16,10 @@ import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The executable command represents a os command invocation.
@@ -25,8 +29,6 @@ import java.util.*;
  */
 public class ExecutableCommand extends OutputProducingCommandSupport
 {
-    private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
-
     /**
      * The name of the execution environment artifact.
      */
@@ -41,7 +43,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     private CancellableReader writer;
     private volatile boolean terminated = false;
 
-    private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +"));
+    private List<String> suppressedEnvironment = RecipeUtils.getSuppressedEnvironment();
 
     public ExecutableCommand(ExecutableCommandConfiguration configuration)
     {
@@ -328,7 +330,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     {
         if (suppressedEnvironment.contains(key.toUpperCase()))
         {
-            value = SUPPRESSED_VALUE;
+            value = RecipeUtils.SUPPRESSED_VALUE;
         }
         buffer.append(key).append("=").append(value).append(separator);
     }

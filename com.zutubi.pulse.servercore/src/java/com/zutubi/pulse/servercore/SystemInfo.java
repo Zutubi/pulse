@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.RecipeUtils;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.util.Constants;
@@ -9,6 +10,7 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,6 +21,7 @@ public class SystemInfo
     private Properties systemProperties;
     private Map<String, String> coreProperties;
     private Version version;
+    private Map<String, String> environment;
     private long totalMemory;
     private long usedMemory;
     private long freeMemory;
@@ -51,6 +54,16 @@ public class SystemInfo
         info.systemProperties.put("memory.total", info.totalMemory);
 
         info.version = Version.getVersion();
+        
+        info.environment = new HashMap<String, String>(System.getenv());
+        for (String suppressed: RecipeUtils.getSuppressedEnvironment())
+        {
+            if (info.environment.containsKey(suppressed))
+            {
+                info.environment.put(suppressed, RecipeUtils.SUPPRESSED_VALUE);
+            }
+        }
+
         return info;
     }
 
@@ -84,6 +97,11 @@ public class SystemInfo
     public Version getVersion()
     {
         return version;
+    }
+
+    public Map<String, String> getEnvironment()
+    {
+        return environment;
     }
 
     public long getTotalMemory()

@@ -109,8 +109,31 @@
                 </table>
             </td>
         </tr>
+#auth("action=ADMINISTER")
+        <tr>
+            <td colspan="2">
+                <table class="fill-content">
+                    #headingRow("system.environment" 2)
+    #set($envMap = $info.environment)
+    #foreach ($key in $sortedEnvironmentKeys)
+                    <tr>
+                        #dynamicHeading($key)
+                        <td class="content">
+        #set($propertyValue = $envMap.get($key))
+        #if($propertyValue.length() > 100)
+                        <span title="#html($propertyValue)">
+                            #html($propertyValue.substring(0, 97))...
+                        </span>
+        #else
+                            #html($propertyValue)
+        #end
+                    </tr>
+    #end
+                </table>
+            </td>
+        </tr>
+#end
     </table>
-
 #end
 
 

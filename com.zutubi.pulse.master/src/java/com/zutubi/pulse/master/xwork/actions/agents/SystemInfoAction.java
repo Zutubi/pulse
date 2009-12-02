@@ -77,7 +77,14 @@ public class SystemInfoAction extends AgentActionBase
         {
             keys.add((String) o);
         }
-        
+
+        Collections.sort(keys, new Sort.StringComparator());
+        return keys;
+    }
+
+    public List<String> getSortedEnvironmentKeys()
+    {
+        List<String> keys = new LinkedList<String>(info.getEnvironment().keySet());
         Collections.sort(keys, new Sort.StringComparator());
         return keys;
     }
