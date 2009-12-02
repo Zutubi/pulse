@@ -24,8 +24,6 @@ public class GitClient implements ScmClient
 {
     private static final Logger LOG = Logger.getLogger(GitClient.class);
 
-    private static final Revision HEAD = new Revision("HEAD");
-
     static final Messages I18N = Messages.getInstance(GitClient.class);
 
     static final String KEY_INCOMPLETE_CHECKOUT = "incomplete.checkout.warning";
@@ -50,8 +48,6 @@ public class GitClient implements ScmClient
      * operation and are subsequently deleted.
      */
     private static final String TMP_BRANCH_PREFIX = "tmp.";
-
-    private static final FileFilter GIT_DIRECTORY_FILTER = new GitDirectoryFilter();
 
     private static final Set<ScmCapability> CAPABILITIES = EnumSet.complementOf(EnumSet.of(ScmCapability.EMAIL));
 
@@ -126,14 +122,6 @@ public class GitClient implements ScmClient
         handler.status("Initialising clone of git repository '" + repository + "'...");
         git.clone(handler, repository, workingDir.getName());
         handler.status("Repository cloned.");
-
-        // cd into git repository.
-        git.setWorkingDirectory(workingDir);
-
-        // git checkout -b local origin/<branch>
-        handler.status("Creating local checkout...");
-        git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
-        handler.status("Checkout complete.");
     }
 
     public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
@@ -221,7 +209,7 @@ public class GitClient implements ScmClient
             git.setWorkingDirectory(workingDir);
         }
 
-        git.checkout(handler, REMOTE_ORIGIN + "/" + branch, LOCAL_BRANCH_NAME);
+        git.checkout(handler, getRemoteBranchRef(), LOCAL_BRANCH_NAME);
 
         // if we are after a specific revision, check it out to a temporary branch.  This also updates
         // the working copy to that branch.
@@ -279,7 +267,7 @@ public class GitClient implements ScmClient
 
         String fromRevision = git.revisionParse(REVISION_HEAD);
         git.fetch(handler);
-        String remote = REMOTE_ORIGIN + "/" + branch;
+        String remote = getRemoteBranchRef();
         String mergeBaseSha = git.mergeBase(REVISION_HEAD, remote);
         if (!fromRevision.equals(mergeBaseSha))
         {
@@ -320,21 +308,8 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            File workingDir = context.getPersistentWorkingDir();
-
-            preparePersistentDirectory(workingDir, null);
-
-            NativeGit git = new NativeGit(inactivityTimeout);
-            git.setWorkingDirectory(workingDir);
-
-            if (revision == null)
-            {
-                return git.show(path);
-            }
-            else
-            {
-                return git.show(revision.getRevisionString(), path);
-            }
+            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+            return git.show(getRevisionString(revision), path);
         }
         finally
         {
@@ -357,15 +332,8 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            File workingDir = context.getPersistentWorkingDir();
-
-            preparePersistentDirectory(workingDir, null);
-
-            NativeGit git = new NativeGit(inactivityTimeout);
-            git.setWorkingDirectory(workingDir);
-
-            GitLogEntry entry = git.log(1).get(0);
-
+            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+            GitLogEntry entry = git.log(null, getRemoteBranchRef(), 1).get(0);
             return new Revision(entry.getId());
         }
         finally
@@ -374,13 +342,8 @@ public class GitClient implements ScmClient
         }
     }
 
-    private void preparePersistentDirectory(File workingDir, ScmFeedbackHandler handler) throws ScmException
+    private NativeGit preparePersistentDirectory(File workingDir) throws ScmException
     {
-        if (handler == null)
-        {
-            handler = new ScmFeedbackAdapter();
-        }
-
         NativeGit git = new NativeGit(inactivityTimeout);
         if (!isGitRepository(workingDir))
         {
@@ -400,35 +363,19 @@ public class GitClient implements ScmClient
         {
             git.setWorkingDirectory(workingDir);
 
-            boolean localBranchExists = false;
-            for (GitBranchEntry branch : git.branch())
+            String remote = getRemoteBranchRef();
+            String originalSha = git.revisionParse(remote);
+            git.fetch(new ScmFeedbackAdapter());
+            String newSha = git.revisionParse(remote);
+            String mergeBaseSha = git.mergeBase(originalSha, newSha);
+            if (!originalSha.equals(mergeBaseSha))
             {
-                if (LOCAL_BRANCH_NAME.equals(branch.getName()))
-                {
-                    localBranchExists = true;
-                    break;
-                }
+                GitException exception = new GitException("Fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.");
+                exception.setReinitialiseRequired();
+                throw exception;
             }
 
-            String remote = REMOTE_ORIGIN + "/" + branch;
-            if (localBranchExists)
-            {
-                git.fetch(handler);
-                String headSha = git.revisionParse(REVISION_HEAD);
-                String mergeBaseSha = git.mergeBase(REVISION_HEAD, remote);
-                if (!headSha.equals(mergeBaseSha))
-                {
-                    GitException exception = new GitException("Merge after fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.");
-                    exception.setReinitialiseRequired();
-                    throw exception;
-                }
-
-                git.merge(handler, remote);
-            }
-            else
-            {
-                git.checkout(handler, remote, LOCAL_BRANCH_NAME);
-            }
+            return git;
         }
     }
 
@@ -442,19 +389,8 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            File workingDir = context.getPersistentWorkingDir();
-
-            preparePersistentDirectory(workingDir, null);
-
-            if (to == null)
-            {
-                to = HEAD;
-            }
-
-            NativeGit git = new NativeGit(inactivityTimeout);
-            git.setWorkingDirectory(workingDir);
-
-            List<GitLogEntry> entries = git.log(from.getRevisionString(), to.getRevisionString());
+            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+            List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
 
             List<Revision> revisions = new LinkedList<Revision>();
             for (GitLogEntry entry : entries)
@@ -474,19 +410,8 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            if (to == null)
-            {
-                to = HEAD;
-            }
-
-            File workingDir = context.getPersistentWorkingDir();
-
-            preparePersistentDirectory(workingDir, null);
-
-            NativeGit git = new NativeGit(inactivityTimeout);
-            git.setWorkingDirectory(workingDir);
-
-            List<GitLogEntry> entries = git.log(from.getRevisionString(), to.getRevisionString());
+            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+            List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
 
             // be aware, the log contains duplicate file entries for the edit/delete case.
 
@@ -541,26 +466,23 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            File workingDir = context.getPersistentWorkingDir();
-
-            preparePersistentDirectory(workingDir, null);
-
-            ScmFile parent = new ScmFile(path);
-            File base = new File(workingDir, path);
-            if (base.isFile())
+            NativeGit nativeGit = preparePersistentDirectory(context.getPersistentWorkingDir());
+            String treeish = getRevisionString(revision);
+            if (StringUtils.stringSet(path))
             {
-                return Arrays.asList(new ScmFile(path));
-            }
-            List<ScmFile> listing = new LinkedList<ScmFile>();
-            if (base.isDirectory())
-            {
-                for (File file : base.listFiles(GIT_DIRECTORY_FILTER))
+                // We need to determine if it is a directory, in which case we
+                // need to append a slash for git to list the contenst.  If we
+                // get no output, the file doesn't exist.
+                List<ScmFile> singleList = nativeGit.lsTree(treeish, path);
+                if (singleList.isEmpty() || !singleList.get(0).isDirectory())
                 {
-                    ScmFile f = new ScmFile(parent, file.getName(), file.isDirectory());
-                    listing.add(f);
+                    return singleList;
                 }
+
+                path += "/";
             }
-            return listing;
+
+            return nativeGit.lsTree(treeish, path);
         }
         finally
         {
@@ -606,6 +528,23 @@ public class GitClient implements ScmClient
         throw new ScmException("Operation not supported");
     }
 
+    private String getRemoteBranchRef()
+    {
+        return REMOTE_ORIGIN + "/" + branch;
+    }
+
+    private String getRevisionString(Revision revision)
+    {
+        if (revision == null)
+        {
+            return getRemoteBranchRef();
+        }
+        else
+        {
+            return revision.getRevisionString();
+        }
+    }
+    
     public void setRepository(String repository)
     {
         this.repository = repository;

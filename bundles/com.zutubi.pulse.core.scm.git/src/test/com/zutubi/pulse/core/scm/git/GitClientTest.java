@@ -28,7 +28,7 @@ public class GitClientTest extends GitClientTestBase
 
         assertEquals(REVISION_MASTER_LATEST, rev.getRevisionString());
 
-        assertHeadCheckedOut();
+        assertLatestCheckedOut();
 
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
     }
@@ -138,7 +138,7 @@ public class GitClientTest extends GitClientTestBase
         }
         catch (ScmException e)
         {
-            assertEquals("Merge after fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.", e.getMessage());
+            assertEquals("Fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.", e.getMessage());
         }
     }
 
@@ -287,7 +287,7 @@ public class GitClientTest extends GitClientTestBase
     {
         client.update(context, null, handler);
         assertThat(handler.getStatusMessages(), hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT)));
-        assertHeadCheckedOut();
+        assertLatestCheckedOut();
     }
 
     public void testUpdateIncompleteCheckout() throws ScmException
@@ -300,7 +300,7 @@ public class GitClientTest extends GitClientTestBase
 
         client.update(context, null, handler);
         assertThat(handler.getStatusMessages(), hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT)));
-        assertHeadCheckedOut();
+        assertLatestCheckedOut();
     }
 
     public void testUpdateAfterRewritingHistory() throws ScmException, IOException
@@ -318,15 +318,15 @@ public class GitClientTest extends GitClientTestBase
     public void testChanges() throws ScmException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~2"), null);
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~2"), null);
         assertEquals(2, changes.size());
     }
 
-    public void testHeadChanges() throws ScmException
+    public void testLatestChanges() throws ScmException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
 
-        List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~1"), new Revision(REVISION_HEAD));
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~1"), new Revision(REVISION_MASTER_LATEST));
         assertEquals(1, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("Edit, add and remove on master.", changelist.getComment());
@@ -356,7 +356,7 @@ public class GitClientTest extends GitClientTestBase
         // Log over the whole branch history as the interesting cases happen
         // when there are multiple log entries in a single output stream that
         // we need to pull apart.
-        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_INITIAL), new Revision(REVISION_HEAD));
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_INITIAL), new Revision(REVISION_DEV_MERGE_CONFLICTS));
 
         Changelist changelist = assertChangelist(changes, REVISION_DEV_MERGE_NO_CONFLICTS);
         assertEquals("Merge branch 'master' into devbranch", changelist.getComment());
@@ -378,7 +378,7 @@ public class GitClientTest extends GitClientTestBase
         client.setBranch(BRANCH_MERGES);
         client.init(scmContext, new ScmFeedbackAdapter());
 
-        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_INITIAL), new Revision(REVISION_HEAD));
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_INITIAL), new Revision(REVISION_MULTILINE_COMMENT));
 
         Changelist changelist = assertChangelist(changes, REVISION_MULTILINE_COMMENT);
         // Some versions of git are more aggressive at collapsing the "subject"
@@ -422,6 +422,27 @@ public class GitClientTest extends GitClientTestBase
         assertEquals("a.txt", files.get(0).getName());
         assertEquals("b.txt", files.get(1).getName());
         assertEquals("d.txt", files.get(2).getName());
+    }
+
+    public void testBrowseAtRevision() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+
+        List<ScmFile> files = client.browse(scmContext, "", new Revision(REVISION_INITIAL));
+        assertEquals(3, files.size());
+        Collections.sort(files, new ScmFileComparator());
+        assertEquals("a.txt", files.get(0).getName());
+        assertEquals("b.txt", files.get(1).getName());
+        assertEquals("c.txt", files.get(2).getName());
+    }
+
+    public void testBrowseFile() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+
+        List<ScmFile> files = client.browse(scmContext, "a.txt", null);
+        assertEquals(1, files.size());
+        assertEquals("a.txt", files.get(0).getName());
     }
 
     public void testBrowseNotAvailableWhenContextNotAvailable()
@@ -496,7 +517,7 @@ public class GitClientTest extends GitClientTestBase
         assertThat(info, containsString("Edit, add and remove on master"));
     }
 
-    private void assertHeadCheckedOut()
+    private void assertLatestCheckedOut()
     {
         assertFiles(workingDir, "a.txt", "b.txt", "d.txt");
         assertGitDir(workingDir);

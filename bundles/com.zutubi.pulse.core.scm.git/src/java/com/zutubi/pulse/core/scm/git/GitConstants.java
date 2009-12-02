@@ -26,6 +26,7 @@ public class GitConstants
     public static final String COMMAND_SHOW = "show";
     public static final String COMMAND_DIFF = "diff";
     public static final String COMMAND_LS_REMOTE = "ls-remote";
+    public static final String COMMAND_LS_TREE = "ls-tree";
     public static final String COMMAND_INIT = "init";
     public static final String COMMAND_REMOTE = "remote";
     public static final String COMMAND_MERGE = "merge";
@@ -70,7 +71,9 @@ public class GitConstants
     public static final String REMOTE_ORIGIN = "origin";
 
     public static final String REVISION_HEAD = "HEAD";
-    public static final String REVISION_FETCH_HEAD = "HEAD";
+
+    public static final String TYPE_BLOB = "blob";
+    public static final String TYPE_TREE = "tree";
 
     /**
      * File has conflicts after a merge

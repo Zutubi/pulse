@@ -11,7 +11,6 @@ import java.net.URL;
 
 public abstract class GitClientTestBase extends PulseTestCase
 {
-    protected static final String REVISION_HEAD = "HEAD";
     protected static final String REVISION_INITIAL = "96e8d45dd7627d9e3cab980e90948e3ae1c99c62";
     protected static final String REVISION_MASTER_LATEST = "a495e21cd263d9dca25379dfbff733461f0d9873";
     protected static final String REVISION_MASTER_PREVIOUS = "2d1ce48a43c5c675c618f915af43e76ed7dac253";

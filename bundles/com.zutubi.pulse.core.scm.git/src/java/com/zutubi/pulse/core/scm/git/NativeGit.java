@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.ScmFile;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
@@ -119,11 +120,6 @@ public class NativeGit
         return capturingHandler.getSingleOutputLine();
     }
 
-    public InputStream show(String file) throws GitException
-    {
-        return show(REVISION_HEAD, file);
-    }
-
     public InputStream show(String revision, String object) throws GitException
     {
         List<String> commands = new LinkedList<String>();
@@ -181,9 +177,16 @@ public class NativeGit
             command.add(FLAG_CHANGES);
             command.add(Integer.toString(changes));
         }
-        if (from != null && to != null)
+        if (to != null)
         {
-            command.add(from + ".." + to);
+            if (from == null)
+            {
+                command.add(to);
+            }
+            else
+            {
+                command.add(from + ".." + to);
+            }
         }
 
         LogOutputHandler handler = new LogOutputHandler();
@@ -262,6 +265,13 @@ public class NativeGit
         OutputCapturingHandler handler = new OutputCapturingHandler();
         runWithHandler(handler, null, false, getGitCommand(), COMMAND_CONFIG, name);
         return handler.getOutputLines();
+    }
+
+    public List<ScmFile> lsTree(String treeish, String path) throws GitException
+    {
+        LsTreeOutputHandler handler = new LsTreeOutputHandler();
+        runWithHandler(handler, null, true, getGitCommand(), COMMAND_LS_TREE, treeish, path);
+        return handler.getFiles();
     }
 
     public String getSingleConfig(String name) throws GitException
@@ -750,6 +760,25 @@ public class NativeGit
         }
     }
 
+    static class LsTreeOutputHandler extends OutputHandlerAdapter
+    {
+        private List<ScmFile> files = new LinkedList<ScmFile>();
+
+        @Override
+        public void handleStdout(String line)
+        {
+            String[] parts = line.split("\\s+", 4);
+            if (parts.length == 4)
+            {
+                files.add(new ScmFile(parts[3], parts[1].trim().equals(TYPE_TREE)));
+            }
+        }
+
+        public List<ScmFile> getFiles()
+        {
+            return files;
+        }
+    }
     /**
      * Provide command line style access to running git commands for testing.
      * @param argv command line arguments
