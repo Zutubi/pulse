@@ -225,11 +225,15 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
             init();
             refreshSettings(eventSystemStartedEvent.getConfigurationProvider().get(AgentPingConfiguration.class));
         }
-        else
+        else if (event instanceof SystemStartedEvent)
         {
             inProgressLock.lock();
             systemStarted = true;
             inProgressLock.unlock();
+        }
+        else
+        {
+            LOG.warning("Unexpected event type '" + event.getClass().getName() + "' ignored.");
         }
     }
 
