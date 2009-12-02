@@ -21,6 +21,8 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
     private static final String[] LOGGING_IGNORE_PATHS = new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"};
     private static final String PROPERTY_IDLE_TIMEOUT = "pulse.jetty.idle.timeout";
     private static final int DEFAULT_IDLE_TIMEOUT = (int) (60 * Constants.SECOND);
+    private static final String PROPERTY_MIN_THREADS = "pulse.jetty.min.threads";
+    private static final String PROPERTY_MAX_THREADS = "pulse.jetty.max.threads";
 
     private ConfigurationManager configurationManager;
 
@@ -60,6 +62,8 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
         listener.setHost(config.getBindAddress());
         listener.setPort(config.getServerPort());
         listener.setMaxIdleTimeMs(getIdleTimeout());
+        listener.setMinThreads(Integer.getInteger(PROPERTY_MIN_THREADS, listener.getMinThreads()));
+        listener.setMaxThreads(Integer.getInteger(PROPERTY_MAX_THREADS, listener.getMaxThreads()));
         server.addListener(listener);
 
     }
