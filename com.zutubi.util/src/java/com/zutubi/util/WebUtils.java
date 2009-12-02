@@ -464,7 +464,7 @@ public class WebUtils
     {
         if(s.length() != 2)
         {
-            throw new NumberFormatException("Expecting two-character string to conver to a single byte");
+            throw new NumberFormatException("Expecting two-character string to convert to a single byte");
         }
 
         int v = Integer.parseInt(s, 16);
