@@ -10,7 +10,6 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -575,14 +574,6 @@ public class GitClient implements ScmClient
         if (!StringUtils.stringSet(handler.getStdout()))
         {
             throw new GitException("Branch '" + branch + "' does not exist");
-        }
-    }
-
-    private static class GitDirectoryFilter implements FileFilter
-    {
-        public boolean accept(File file)
-        {
-            return !(file.isDirectory() && file.getName().equals(GIT_REPOSITORY_DIRECTORY));
         }
     }
 

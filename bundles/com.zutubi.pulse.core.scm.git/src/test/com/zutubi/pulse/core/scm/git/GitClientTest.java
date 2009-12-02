@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
@@ -22,6 +24,53 @@ import java.util.List;
 
 public class GitClientTest extends GitClientTestBase
 {
+    public void testGetUid() throws ScmException
+    {
+        assertEquals(repository, client.getUid());
+    }
+
+    public void testGetLocation() throws ScmException
+    {
+        assertEquals(repository, client.getLocation());
+    }
+
+    public void testClose()
+    {
+        client.close();
+    }
+
+    public void testDestroy() throws ScmException
+    {
+        ScmFeedbackAdapter handler = new ScmFeedbackAdapter();
+        client.init(scmContext, handler);
+        client.destroy(scmContext, handler);
+    }
+
+    public void testStoreConnectionDetails() throws IOException, ScmException
+    {
+        client.storeConnectionDetails(new PulseExecutionContext(), workingDir);
+    }
+    
+    public void testGetEOLStyle() throws ScmException
+    {
+        assertEquals(EOLStyle.BINARY, client.getEOLPolicy(scmContext));
+    }
+
+    public void testGetProperties() throws ScmException
+    {
+        List<ResourceProperty> properties = client.getProperties(new PulseExecutionContext());
+        assertEquals(2, properties.size());
+        ResourceProperty repositoryProperty = CollectionUtils.find(properties, new Predicate<ResourceProperty>()
+        {
+            public boolean satisfied(ResourceProperty resourceProperty)
+            {
+                return resourceProperty.getName().equals("git.repository");
+            }
+        });
+        assertNotNull(repositoryProperty);
+        assertEquals(repository, repositoryProperty.getValue());
+    }
+
     public void testCheckout() throws ScmException, ParseException
     {
         Revision rev = client.checkout(context, null, handler);
@@ -228,7 +277,7 @@ public class GitClientTest extends GitClientTestBase
         client.setBranch(BRANCH_SIMPLE);
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
-        assertThat(handler.getStatusMessages(), hasItem(startsWith("Branch local set up")));
+        assertThat(handler.getStatusMessages(), anyOf(hasItem(startsWith("Branch local set up")), hasItem(startsWith("Switched to a new branch 'local'"))));
 
         handler.reset();
 
