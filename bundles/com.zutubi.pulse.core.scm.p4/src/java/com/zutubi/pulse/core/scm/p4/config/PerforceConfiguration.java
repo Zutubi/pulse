@@ -5,12 +5,13 @@ import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.tove.annotations.ConfigurationCheck;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.validation.annotations.Required;
 
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" , "timeOffset"})
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -23,6 +24,8 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @Required
     private String spec;
     private boolean useTicketAuth = false;
+    @Wizard.Ignore
+    private int timeOffset= 0;
 
     public PerforceConfiguration()
     {
@@ -89,5 +92,15 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setUseTicketAuth(boolean useTicketAuth)
     {
         this.useTicketAuth = useTicketAuth;
+    }
+
+    public int getTimeOffset()
+    {
+        return timeOffset;
+    }
+
+    public void setTimeOffset(int timeOffset)
+    {
+        this.timeOffset = timeOffset;
     }
 }

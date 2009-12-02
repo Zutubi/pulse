@@ -69,6 +69,7 @@
                 <ref local="addJabberServiceName"/>
                 <ref local="ensureAgentPingConfigPermanent"/>
                 <ref local="deleteUnknownHiddenReferences"/>
+                <ref local="addPerforceTimeOffset"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -272,4 +273,7 @@
         <property name="buildNumber" value="200041003"/>
     </bean>
 
+    <bean id="addPerforceTimeOffset" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceTimeOffsetUpgradeTask">
+        <property name="buildNumber" value="200046001"/>
+    </bean>
 </beans>
