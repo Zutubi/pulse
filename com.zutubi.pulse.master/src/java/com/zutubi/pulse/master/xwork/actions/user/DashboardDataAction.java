@@ -18,6 +18,7 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
 
@@ -174,10 +175,17 @@ public class DashboardDataAction extends ActionSupport
             List<BuildResult> buildResults = new LinkedList<BuildResult>();
             for (Long id : ids)
             {
-                BuildResult buildResult = buildManager.getBuildResult(id);
-                if (buildResult != null)
+                try
                 {
-                    buildResults.add(buildResult);
+                    BuildResult buildResult = buildManager.getBuildResult(id);
+                    if (buildResult != null)
+                    {
+                        buildResults.add(buildResult);
+                    }
+                }
+                catch (AccessDeniedException e)
+                {
+                    // User can't view this project, carry on with others.
                 }
             }
 
