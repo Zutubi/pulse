@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern" })
+@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern", "timeOffset" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -28,6 +28,8 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private boolean useTicketAuth = false;
     @Wizard.Ignore
     private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(agent.handle)";
+    @Wizard.Ignore
+    private int timeOffset= 0;
 
     public PerforceConfiguration()
     {
@@ -124,5 +126,15 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setSyncWorkspacePattern(String syncWorkspacePattern)
     {
         this.syncWorkspacePattern = syncWorkspacePattern;
+    }
+
+    public int getTimeOffset()
+    {
+        return timeOffset;
+    }
+
+    public void setTimeOffset(int timeOffset)
+    {
+        this.timeOffset = timeOffset;
     }
 }

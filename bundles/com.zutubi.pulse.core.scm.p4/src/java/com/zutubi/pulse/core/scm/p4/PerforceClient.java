@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
+import com.zutubi.util.Constants;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.StringUtils;
@@ -182,7 +183,12 @@ public class PerforceClient extends CachingScmClient
             return null;
         }
 
-        return new Changelist(revision, date.getTime(), user, comment, changes);
+        return new Changelist(revision, offset(date), user, comment, changes);
+    }
+
+    private long offset(Date date)
+    {
+        return date.getTime() + configuration.getTimeOffset() * Constants.MINUTE;
     }
 
     private FileChange getChangelistChange(String line) throws ScmException
