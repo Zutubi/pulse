@@ -546,6 +546,7 @@ public class ConfigurationRefactoringManager
 
             // Now rewrite all internal references that fall inside the clone set
             rewriteReferences(parentPath, originalKeyToCloneKey);
+            configurationTemplateManager.refreshCaches();
             return null;
         }
 
@@ -681,7 +682,7 @@ public class ConfigurationRefactoringManager
 
                 if (mutableRecord != null)
                 {
-                    configurationTemplateManager.saveRecord(path, mutableRecord);
+                    recordManager.update(path, mutableRecord);
                 }
             }
 
