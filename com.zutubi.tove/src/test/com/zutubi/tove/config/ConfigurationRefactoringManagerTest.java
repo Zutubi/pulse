@@ -306,6 +306,33 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         templateHierarchyHelper(asMap(asPair("child", "clone of child"), asPair("parent", "clone of parent")));
     }
 
+    public void testMultipleCloneWithReferenceBetweenInInheritedMapItem() throws TypeException
+    {
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        configurationTemplateManager.getInstance(parentPath, MockA.class);
+        String child1Path = insertTemplateAInstance(parentPath, createAInstance("child1"), false);
+        String child2Path = insertTemplateAInstance(parentPath, createAInstance("child2"), false);
+
+        MockA child1Instance = configurationTemplateManager.getInstance(child1Path, MockA.class);
+        MockA child2Instance = configurationTemplateManager.getInstance(child2Path, MockA.class);
+
+        // Set up a reference from map item in child1 to child2
+        MockB mapItem = child1Instance.getBmap().get("colby");
+        mapItem.setRefToA(child2Instance);
+        configurationTemplateManager.save(mapItem);
+
+        configurationRefactoringManager.clone(TEMPLATE_SCOPE, asMap(asPair("child1", "clone1"), asPair("child2", "clone2")));
+
+        child1Instance = configurationTemplateManager.getInstance(child1Path, MockA.class);
+        child2Instance = configurationTemplateManager.getInstance(child2Path, MockA.class);
+        assertSame(child2Instance, child1Instance.getBmap().get("colby").getRefToA());
+
+        MockA clone1Instance = configurationTemplateManager.getInstance(PathUtils.getPath(TEMPLATE_SCOPE, "clone1"), MockA.class);
+        MockA clone2Instance = configurationTemplateManager.getInstance(PathUtils.getPath(TEMPLATE_SCOPE, "clone2"), MockA.class);
+        assertNotSame(child1Instance.getBmap().get("colby").getRefToA(), clone1Instance.getBmap().get("colby").getRefToA());
+        assertSame(clone2Instance, clone1Instance.getBmap().get("colby").getRefToA());
+    }
+
     public void testCloneWithInheritedItem() throws TypeException
     {
         String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
@@ -848,6 +875,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         private int y;
         @Reference
         private Referee refToRef;
+        @Reference
+        private MockA refToA;
 
         public MockB()
         {
@@ -876,6 +905,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setRefToRef(Referee refToRef)
         {
             this.refToRef = refToRef;
+        }
+
+        public MockA getRefToA()
+        {
+            return refToA;
+        }
+
+        public void setRefToA(MockA refToA)
+        {
+            this.refToA = refToA;
         }
     }
 
