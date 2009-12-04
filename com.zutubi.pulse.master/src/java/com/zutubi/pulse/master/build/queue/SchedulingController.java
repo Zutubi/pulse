@@ -114,23 +114,27 @@ public class SchedulingController implements EventListener
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (requestHandler)
         {
-            // if all requests are finished, return true, else return false.
-            BuildResult result = event.getBuildResult();
-            Project completedProject = result.getProject();
-
-            ActivatedRequest requestToComplete = CollectionUtils.find(buildQueue.getActivatedRequests(),
-                    new RequestsByMetaIdAndOwnerPredicate(requestHandler.getMetaBuildId(), completedProject)
-            );
-
-            List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
-            requestsToComplete.add(requestToComplete);
-
-            if (!result.succeeded())
+            //noinspection SynchronizeOnNonFinalField
+            synchronized (buildQueue)
             {
-                requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new RequestsByMetaIdPredicate(requestHandler.getMetaBuildId())));
-            }
+                // if all requests are finished, return true, else return false.
+                BuildResult result = event.getBuildResult();
+                Object owner = result.getOwner();
 
-            internalCompleteRequests(requestHandler, requestsToComplete);
+                ActivatedRequest requestToComplete = CollectionUtils.find(buildQueue.getActivatedRequests(),
+                        new RequestsByMetaIdAndOwnerPredicate(requestHandler.getMetaBuildId(), owner)
+                );
+
+                List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
+                requestsToComplete.add(requestToComplete);
+
+                if (!result.succeeded())
+                {
+                    requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new RequestsByMetaIdPredicate(requestHandler.getMetaBuildId())));
+                }
+
+                internalCompleteRequests(requestHandler, requestsToComplete);
+            }
         }
     }
 

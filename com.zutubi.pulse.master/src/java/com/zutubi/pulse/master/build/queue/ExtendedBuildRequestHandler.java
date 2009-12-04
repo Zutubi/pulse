@@ -93,7 +93,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 Project owner = node.getData().getProject();
                 if (!ownerRequests.containsKey(owner))
                 {
-                    BuildRequestEvent newRequest = (request.getOwner() == owner) ? request : cloneRequest(request, owner);
+                    BuildRequestEvent newRequest = (request.getOwner().equals(owner)) ? request : cloneRequest(request, owner);
                     buildRequestRegistry.register(newRequest);
 
                     DependentBuildTriggerConfiguration trigger = getTrigger(owner);
@@ -158,7 +158,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
 
                 if (!ownerRequests.containsKey(owner))
                 {
-                    BuildRequestEvent newRequest = (request.getOwner() == owner) ? request : cloneRequest(request, owner);
+                    BuildRequestEvent newRequest = (request.getOwner().equals(owner)) ? request : cloneRequest(request, owner);
                     buildRequestRegistry.register(newRequest);
 
                     // create queued request.
