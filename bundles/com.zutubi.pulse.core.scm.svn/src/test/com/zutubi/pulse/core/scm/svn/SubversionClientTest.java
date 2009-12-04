@@ -11,10 +11,8 @@ import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNCopyClient;
-import org.tmatesoft.svn.core.wc.SVNCopySource;
-import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.auth.SVNAuthentication;
+import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -144,7 +142,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetLatestRevisionNewBranch() throws ScmException, SVNException
     {
-        SVNCopyClient client = SVNClientManager.newInstance().getCopyClient();
+        SVNCopyClient client = SVNClientManager.newInstance(null, SVNWCUtil.createDefaultAuthenticationManager(USER, PASSWORD)).getCopyClient();
         SVNCopySource[] copySource = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(TRUNK_PATH))};
         SVNCommitInfo info = client.doCopy(copySource, SVNURL.parseURIDecoded(BRANCH_PATH), false, true, true, "Create a branch", null);
 
