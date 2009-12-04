@@ -590,6 +590,12 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return state;
     }
 
+    @SuppressWarnings({"UnusedDeclaration"}) // Used by testing
+    private void setState(State state)
+    {
+        this.state = state;
+    }
+
     @SuppressWarnings({"UnusedDeclaration"}) // Used by hibernate
     private String getStateName()
     {

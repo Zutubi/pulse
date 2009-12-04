@@ -1,6 +1,9 @@
 package com.zutubi.util;
 
+import com.zutubi.util.logging.Logger;
+
 import java.util.concurrent.*;
+import java.util.List;
 
 /**
  * Utilities built on top of java.util.concurrent classes.
@@ -16,7 +19,7 @@ public class ConcurrentUtils
      * @param timeout      the timeout magnitude
      * @param timeUnit     the timeout units
      * @param defaultValue the value to reutrn in the case of timeout
-     * @param <T> the return type of the task
+     * @param <T>          the return type of the task
      * @return the result of the task if it completes in time, otherwise
      *         defaultValue
      * @throws RuntimeException if the task throws an exception
@@ -41,6 +44,50 @@ public class ConcurrentUtils
         {
             future.cancel(true);
             return defaultValue;
+        }
+    }
+
+    /**
+     * Wait for the provided list of futures to complete before returning.
+     *
+     * @param futures   the futures we are waiting on
+     *
+     * @throws InterruptedException if the thread waiting for the futures is interrupted.
+     */
+    public static void join(List<Future> futures) throws InterruptedException
+    {
+        join(futures, null);        
+    }
+
+    /**
+     * Wait for the provided list of futures to complete before returning.
+     *
+     * @param futures   the futures we are waiting on
+     * @param log       the logger to received details of any exceptions encountered during
+     * the execution of the tasks.
+     *
+     * @throws InterruptedException if the thread waiting for the futures is interrupted.
+     */
+    public static void join(List<Future> futures, Logger log) throws InterruptedException
+    {
+        for (Future task : futures)
+        {
+            try
+            {
+                task.get();
+            }
+            catch (CancellationException e)
+            {
+                // the task was cancelled, and hence is complete.  Lets keep going.
+            }
+            catch (ExecutionException e)
+            {
+                // the task generated an exception during execution. Log it and continue.
+                if (log != null)
+                {
+                    log.severe(e);
+                }
+            }
         }
     }
 }

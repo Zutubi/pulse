@@ -58,20 +58,10 @@ public class TriggerOptions
     private boolean resolveVersion = true;
 
     /**
-     * Indicates whether or not this is a dependent build.
-     */
-    private boolean dependent = false;
-
-    /**
      * Indicates whether or not this is a request to rebuild this project and
      * all of its dependencies.
      */
     private boolean rebuild = false;
-
-    /**
-     * The id of the meta build that triggered this build request, if any.
-     */
-    private long metaBuildId;
 
     public TriggerOptions(TriggerOptions other)
     {
@@ -83,9 +73,7 @@ public class TriggerOptions
         this.status = other.status;
         this.version = other.version;
         this.resolveVersion = other.resolveVersion;
-        this.dependent = other.dependent;
         this.rebuild = other.rebuild;
-        this.metaBuildId = other.metaBuildId;
     }
 
     public TriggerOptions(BuildReason reason, String source)
@@ -179,16 +167,6 @@ public class TriggerOptions
         this.resolveVersion = resolveVersion;
     }
 
-    public boolean isDependent()
-    {
-        return dependent;
-    }
-
-    public void setDependent(boolean dependent)
-    {
-        this.dependent = dependent;
-    }
-
     public boolean isRebuild()
     {
         return rebuild;
@@ -197,15 +175,5 @@ public class TriggerOptions
     public void setRebuild(boolean rebuild)
     {
         this.rebuild = rebuild;
-    }
-
-    public long getMetaBuildId()
-    {
-        return metaBuildId;
-    }
-
-    public void setMetaBuildId(long metaBuildId)
-    {
-        this.metaBuildId = metaBuildId;
     }
 }

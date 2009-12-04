@@ -163,6 +163,19 @@ public interface BuildManager
     BuildResult getByUserAndVirtualId(User user, String buildId);
 
     /**
+     * Get the build result that is associated with the build of the specified project
+     * as part of the metabuild.
+     *
+     * @param project       the project associated with the build
+     * @param metaBuildId   the metabuild that the build was a part of.
+     * 
+     * @return the build result for the project build assocaited with the metabuild, or
+     * null if it is not found.
+     */
+    @SecureResult
+    BuildResult getByProjectAndMetabuildId(Project project, long metaBuildId);
+
+    /**
      * Retrieve the build result that occured immediately before the specified build result.
      *
      * @param result
@@ -251,4 +264,12 @@ public interface BuildManager
      */
     @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
     void cleanup(BuildResult result, BuildCleanupOptions options);
+
+    /**
+     * Request that the specified build be terminated.
+     *
+     * @param buildResult   the build to terminate
+     * @param reason        the human readable reason for the termination request.
+     */
+    void terminateBuild(BuildResult buildResult, String reason);
 }

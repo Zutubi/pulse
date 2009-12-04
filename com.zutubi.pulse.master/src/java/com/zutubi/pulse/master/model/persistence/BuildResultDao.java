@@ -99,4 +99,14 @@ public interface BuildResultDao extends EntityDao<BuildResult>
      * @return the build containing the recipe, or null if not found
      */
     BuildResult findByRecipeId(long id);
+
+    /**
+     * Find the build of the specified project that was part of the
+     * metabuild.
+     *
+     * @param project       the project associated with the requested build
+     * @param metaBuildId   the metabuild id of the requested build.
+     * @return the build result, or null if none could be located.
+     */
+    BuildResult findByProjectAndMetabuildId(Project project, long metaBuildId);
 }

@@ -57,4 +57,19 @@ public class IvyStatus
     {
         return STATUS_INTEGRATION;
     }
+
+    /**
+     * Returns true if the specified status string is a valid
+     * status string.
+     *
+     * @param status    the string being tested.
+     *
+     * @return true if the status string is one of the valid status's
+     *
+     * @see #getStatuses()
+     */
+    public static boolean isValidStatus(String status)
+    {
+        return getStatuses().contains(status);
+    }
 }

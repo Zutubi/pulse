@@ -119,6 +119,14 @@
                         <br/>$totalBuilds builds (s: $successfulBuilds, f: $failedBuilds, e: $errorBuilds)
                     </td>
                 </tr>
+                <tr>
+                    <th class="content-row">
+                        #wwtext("name=project.queue")
+                    </th>
+                    <td class="content">
+                        #if($queuedBuilds == 0) #wwtext("name=project.queue.empty") #else ${queuedBuilds} (#wwtext("name=builds")) #end
+                    </td>
+                </tr>
             </table>
 
             <table class="fill-content">

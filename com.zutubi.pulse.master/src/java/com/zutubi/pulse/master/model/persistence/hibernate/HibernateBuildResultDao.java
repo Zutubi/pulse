@@ -155,6 +155,21 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public BuildResult findByProjectAndMetabuildId(final Project project, final long metaBuildId)
+    {
+        return (BuildResult)getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, project, new ResultState[]{ResultState.SUCCESS}, false);
+                criteria.add(Expression.eq("metaBuildId", metaBuildId));
+                criteria.setMaxResults(1);
+                criteria.addOrder(Order.desc("number"));
+                return criteria.uniqueResult();
+            }
+        });
+    }
+
     public BuildResult findByProjectAndNumber(final Project project, final long number)
     {
         List results = (List) getHibernateTemplate().execute(new HibernateCallback()

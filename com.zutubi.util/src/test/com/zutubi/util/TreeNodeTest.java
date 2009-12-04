@@ -82,4 +82,13 @@ public class TreeNodeTest extends ZutubiTestCase
         return order;
     }
 
+    public void testParents()
+    {
+        TreeNode<String> node = root.getChildren().get(0).getChildren().get(1).getChildren().get(0);
+        assertEquals("1-2-1", node.getData());
+        assertEquals("1-2", node.getParent().getData());
+        assertEquals("1", node.getParent().getParent().getData());
+        assertEquals("0", node.getParent().getParent().getParent().getData());
+        assertNull(root.getParent());
+    }
 }

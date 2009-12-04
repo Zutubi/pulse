@@ -9,6 +9,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.build.queue.SchedulingController;
+import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
@@ -29,6 +31,7 @@ public class ProjectHomeAction extends ProjectActionBase
     private int totalBuilds;
     private int successfulBuilds;
     private int failedBuilds;
+    private int queuedBuilds;
     private boolean paused;
     private boolean pausable;
     private boolean resumable;
@@ -45,6 +48,7 @@ public class ProjectHomeAction extends ProjectActionBase
     private ActionManager actionManager;
     private SystemPaths systemPaths;
     private TypeRegistry typeRegistry;
+    private SchedulingController schedulingController;
 
     public int getTotalBuilds()
     {
@@ -64,6 +68,11 @@ public class ProjectHomeAction extends ProjectActionBase
     public int getErrorBuilds()
     {
         return totalBuilds - successfulBuilds - failedBuilds;
+    }
+
+    public int getQueuedBuilds()
+    {
+        return queuedBuilds;
     }
 
     public boolean isPaused()
@@ -229,6 +238,8 @@ public class ProjectHomeAction extends ProjectActionBase
             }
         }
 
+        BuildQueueSnapshot snapshot = schedulingController.getSnapshot();
+        queuedBuilds = snapshot.getQueuedRequestsByOwner(project).size();
 
         return SUCCESS;
     }
@@ -246,5 +257,10 @@ public class ProjectHomeAction extends ProjectActionBase
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setSchedulingController(SchedulingController schedulingController)
+    {
+        this.schedulingController = schedulingController;
     }
 }

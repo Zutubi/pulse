@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -18,12 +19,10 @@ import java.util.List;
 @Form(fieldOrder = {"project", "revision", "customRevision", "transitive", "allStages", "stages"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
-    public static final String LATEST = "latest.";
-
     public static final String ALL_STAGES = "*";
-    public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyStatus.STATUS_INTEGRATION;
-    public static final String REVISION_LATEST_MILESTONE = LATEST + IvyStatus.STATUS_MILESTONE;
-    public static final String REVISION_LATEST_RELEASE = LATEST + IvyStatus.STATUS_RELEASE;
+    public static final String REVISION_LATEST_INTEGRATION = LATEST + "." + IvyStatus.STATUS_INTEGRATION;
+    public static final String REVISION_LATEST_MILESTONE = LATEST + "." + IvyStatus.STATUS_MILESTONE;
+    public static final String REVISION_LATEST_RELEASE = LATEST + "." + IvyStatus.STATUS_RELEASE;
     public static final String REVISION_CUSTOM = "custom";
 
     /**

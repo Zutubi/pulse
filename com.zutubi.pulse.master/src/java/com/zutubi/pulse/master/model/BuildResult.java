@@ -185,7 +185,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     public void addDependsOn(BuildResult result)
     {
-        this.dependsOn.add(result);        
+        this.dependsOn.add(result);
     }
 
     /**

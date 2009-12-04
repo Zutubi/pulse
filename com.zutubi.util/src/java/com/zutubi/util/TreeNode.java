@@ -11,6 +11,7 @@ import java.util.*;
  */
 public class TreeNode<T> implements Iterable<TreeNode<T>>
 {
+    private TreeNode<T> parent;
     private T data;
     private List<TreeNode<T>> children;
 
@@ -24,6 +25,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
     {
         this.data = data;
         this.children = new LinkedList<TreeNode<T>>(asList(children));
+        setParent(this, this.children);
     }
 
     /**
@@ -33,17 +35,19 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      */
     public void add(TreeNode<T> child)
     {
+        setParent(this, Arrays.asList(child));
         children.add(child);
     }
 
     /**
      * Appends the given nodes as children of this node.
      *
-     * @param ch the children to append
+     * @param children the children to append
      */
-    public void addAll(Collection<TreeNode<T>> ch)
+    public void addAll(Collection<TreeNode<T>> children)
     {
-        children.addAll(ch);
+        setParent(this, children);
+        this.children.addAll(children);
     }
 
     /**
@@ -51,7 +55,27 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      */
     public void clear()
     {
+        setParent(null, children);
         children.clear();
+    }
+
+    private void setParent(TreeNode<T> parent, Collection<TreeNode<T>> children)
+    {
+        for (TreeNode<T> child : children)
+        {
+            child.parent = parent;
+        }
+    }
+
+    /**
+     * Returns true if this node is the root of the tree.  The root
+     * of a tree is defined as the node without a parent.
+     *
+     * @return true if this node is the root, false otherwise.
+     */
+    public boolean isRoot()
+    {
+        return this.parent == null;
     }
 
     /**
@@ -72,6 +96,16 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
     public void setData(T data)
     {
         this.data = data;
+    }
+
+    /**
+     * Retrieves the parent of this node, or null if it is the root.
+     *
+     * @return the nodes parent in the tree.
+     */
+    public TreeNode<T> getParent()
+    {
+        return this.parent;
     }
 
     /**

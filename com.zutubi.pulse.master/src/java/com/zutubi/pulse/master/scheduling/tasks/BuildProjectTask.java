@@ -49,13 +49,6 @@ public class BuildProjectTask implements Task
      * a previous build.
      */
     public static final String PARAM_VERSION_PROPAGATED = "version.propagated";
-    /**
-     * Indicates if this build project task is triggered as a result of
-     * a dependency relationship by the completion of a dependent projects build.
-     */
-    public static final String PARAM_DEPENDENT = "dependent";
-
-    public static final String PARAM_META_BUILD_ID = "metaBuildId";
 
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
@@ -84,16 +77,10 @@ public class BuildProjectTask implements Task
         boolean replaceable = replaceableValue == null || replaceableValue;
         String status = (String) context.get(PARAM_STATUS);
 
-        Boolean dependentValue = (Boolean) context.get(PARAM_DEPENDENT);
-        boolean dependent = dependentValue != null && dependentValue;
-
         Boolean versionPropagatedValue = (Boolean) context.get(PARAM_VERSION_PROPAGATED);
         boolean versionPropagated = versionPropagatedValue != null && versionPropagatedValue;
 
         String version = (String) context.get(PARAM_VERSION);
-
-        Long metaBuildIdValue = (Long) context.get(PARAM_META_BUILD_ID);
-        long metaBuildId = (metaBuildIdValue != null) ? metaBuildIdValue : 0;
 
         Collection<ResourcePropertyConfiguration> properties;
         if (triggerConfig == null)
@@ -113,8 +100,6 @@ public class BuildProjectTask implements Task
         options.setStatus(status);
         options.setResolveVersion(!versionPropagated);
         options.setVersion(version);
-        options.setDependent(dependent);
-        options.setMetaBuildId(metaBuildId);
         projectManager.triggerBuild(project.getConfig(), options, revision);
     }
 

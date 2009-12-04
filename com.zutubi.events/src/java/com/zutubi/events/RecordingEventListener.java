@@ -35,9 +35,9 @@ public class RecordingEventListener implements EventListener
         return events;
     }
 
-    public <T extends Event> List<Event> getEventsReceived(final Class<T> type)
+    public <T extends Event> List<T> getEventsReceived(final Class<T> type)
     {
-        return CollectionUtils.filter(events, new Predicate<Event>()
+        return (List<T>) CollectionUtils.filter(events, new Predicate<Event>()
         {
             public boolean satisfied(Event event)
             {

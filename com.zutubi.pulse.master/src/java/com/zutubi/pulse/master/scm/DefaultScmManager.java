@@ -177,22 +177,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
         try
         {
-            for (Future task : pollingTasks)
-            {
-                try
-                {
-                    task.get();
-                }
-                catch (CancellationException e)
-                {
-                    // the task was cancelled, and hence is complete.  Lets keep going.
-                }
-                catch (ExecutionException e)
-                {
-                    // the task generated an exception during execution. Log it and continue.
-                    LOG.severe(e);
-                }
-            }
+            ConcurrentUtils.join(pollingTasks, LOG);
         }
         catch (InterruptedException e)
         {

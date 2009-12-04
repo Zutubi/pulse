@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.DefaultEventManager;
-import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
@@ -174,9 +173,9 @@ public class DefaultScmManagerTest extends PulseTestCase
         assertEquals(0, events.getReceivedCount(ScmChangeEvent.class));
 
         scmManagerHandle.pollAndWait();
-        List<Event> changeEvents = events.getEventsReceived(ScmChangeEvent.class);
+        List<ScmChangeEvent> changeEvents = events.getEventsReceived(ScmChangeEvent.class);
         assertEquals(1, changeEvents.size());
-        ScmChangeEvent change = (ScmChangeEvent) changeEvents.get(0);
+        ScmChangeEvent change = changeEvents.get(0);
         assertEquals(new Revision(0), change.getPreviousRevision());
         assertEquals(new Revision(1), change.getNewRevision());
     }

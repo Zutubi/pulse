@@ -995,6 +995,18 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertNull(buildResultDao.findByRecipeId(11223344L));
     }
 
+    public void testFindByProjectAndMetabuildId()
+    {
+        BuildResult result = createResultWithRecipes();
+        result.setMetaBuildId(123);
+        buildResultDao.save(result);
+
+        BuildResult found = buildResultDao.findByProjectAndMetabuildId(projectA, 123);
+        assertEquals(result, found);
+
+        assertNull(buildResultDao.findByProjectAndMetabuildId(projectA, 11223344L));
+    }
+
     private BuildResult createResultWithRecipes()
     {
         BuildResult result = createCompletedBuild(projectA, 1);

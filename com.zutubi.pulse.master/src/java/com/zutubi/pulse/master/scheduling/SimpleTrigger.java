@@ -73,7 +73,7 @@ public class SimpleTrigger extends Trigger
         return interval;
     }
 
-    private void setInterval(long interval)
+    public void setInterval(long interval) // public for testing
     {
         this.interval = interval;
     }

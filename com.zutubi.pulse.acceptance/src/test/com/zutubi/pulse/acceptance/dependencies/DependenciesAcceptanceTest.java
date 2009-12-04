@@ -1,10 +1,11 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
+import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.SystemUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -484,14 +485,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         DependencyConfiguration dependency = projectB.addDependency(projectA.getConfig());
-        dependency.setRevision("latest." + STATUS_INTEGRATION);
+        dependency.setRevision(LATEST + "." + STATUS_INTEGRATION);
         projectB.addExpectedFiles("lib/artifact-1.jar");
         projectB.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
         insertProject(projectB);
 
         buildRunner.triggerSuccessfulBuild(projectB);
 
-        dependency.setRevision("latest." + STATUS_RELEASE);
+        dependency.setRevision(LATEST + "." + STATUS_RELEASE);
         updateProject(projectB);
 
         buildRunner.triggerFailedBuild(projectB);

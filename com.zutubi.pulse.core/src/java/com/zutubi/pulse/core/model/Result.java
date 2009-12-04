@@ -44,7 +44,7 @@ public abstract class Result extends Entity
      */
     public boolean pending()
     {
-        return (ResultState.PENDING == getState()) || (ResultState.PENDING_DEPENDENCY == getState());
+        return ResultState.PENDING == getState();
     }
 
     public boolean inProgress()

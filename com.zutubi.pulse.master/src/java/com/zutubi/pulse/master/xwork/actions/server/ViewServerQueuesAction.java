@@ -1,8 +1,11 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
-import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.build.control.BuildController;
-import com.zutubi.pulse.master.build.queue.*;
+import com.zutubi.pulse.master.build.queue.FatController;
+import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.build.queue.RecipeQueue;
+import com.zutubi.pulse.master.build.queue.ActivatedRequest;
+import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -11,7 +14,10 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Action to show the build and recipe queues.
@@ -74,22 +80,16 @@ public class ViewServerQueuesAction extends ActionSupport
                 buildQueue = new LinkedList<BuildRequestEvent>();
                 executingBuilds = new LinkedList<BuildResult>();
 
-                BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
-                for (Map.Entry<Entity, List<BuildRequestEvent>>  entityQueue: snapshot.getQueuedBuilds().entrySet())
-                {
-                    buildQueue.addAll(entityQueue.getValue());
-                }
+                BuildQueueSnapshot snapshot = fatController.snapshotBuildQueue();
+                buildQueue.addAll(snapshot.getQueuedBuildRequests());
 
-                for (List<EntityBuildQueue.ActiveBuild> activeForEntity: snapshot.getActiveBuilds().values())
+                for (ActivatedRequest activatedRequest: snapshot.getActivatedRequests())
                 {
-                    for (EntityBuildQueue.ActiveBuild activeBuild: activeForEntity)
+                    BuildController controller = activatedRequest.getController();
+                    BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
+                    if (buildResult != null && !buildResult.completed())
                     {
-                        BuildController controller = activeBuild.getController();
-                        BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
-                        if (buildResult != null && !buildResult.completed())
-                        {
-                            executingBuilds.add(buildResult);
-                        }
+                        executingBuilds.add(buildResult);
                     }
                 }
             }

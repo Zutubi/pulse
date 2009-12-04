@@ -173,4 +173,88 @@ public class CollectionUtilsTest extends ZutubiTestCase
         int result = CollectionUtils.reduce(asList(1, 2, 3), 4, new IntegerAddition());
         assertEquals(10, result);
     }
+
+    public void testDepthFirstFindTraversal()
+    {
+        TreeNode<String> root = setupTestTree();
+
+        assertEquals(asList("1-1", "1-2-1", "1-2", "1", "2-1", "2-2", "2-3", "2", "0"), depthFirstSearchOrder(root));
+    }
+
+    public void testDepthFirstContains()
+    {
+        TreeNode<String> root = setupTestTree();
+        assertFalse(CollectionUtils.depthFirstContains(root, new StringComparisonPredicate("a")));
+        assertTrue(CollectionUtils.depthFirstContains(root, new StringComparisonPredicate("1")));
+    }
+
+    public void testBreadthFirstFindTraversal()
+    {
+        TreeNode<String> root = setupTestTree();
+
+        assertEquals(asList("0", "1", "2", "1-1", "1-2", "2-1", "2-2", "2-3", "1-2-1"), breadthFirstSearchOrder(root));
+    }
+
+    public void testBreadthFirstContains()
+    {
+        TreeNode<String> root = setupTestTree();
+        assertFalse(CollectionUtils.breadthFirstContains(root, new StringComparisonPredicate("a")));
+        assertTrue(CollectionUtils.breadthFirstContains(root, new StringComparisonPredicate("1")));
+    }
+
+    private static class StringComparisonPredicate implements Predicate<String>
+    {
+        private String subject;
+
+        private StringComparisonPredicate(String str)
+        {
+            this.subject = str;
+        }
+
+        public boolean satisfied(String s)
+        {
+            return subject.equals(s);
+        }
+    }
+
+    private List<String> depthFirstSearchOrder(TreeNode<String> root)
+    {
+        final List<String> searchOrder = new LinkedList<String>();
+        CollectionUtils.depthFirstFind(root, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                searchOrder.add(s);
+                return false;
+            }
+        });
+        return searchOrder;
+    }
+
+    private List<String> breadthFirstSearchOrder(TreeNode<String> root)
+    {
+        final List<String> searchOrder = new LinkedList<String>();
+        CollectionUtils.breadthFirstFind(root, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                searchOrder.add(s);
+                return false;
+            }
+        });
+        return searchOrder;
+    }
+
+    private TreeNode<String> setupTestTree()
+    {
+        return new TreeNode<String>("0",
+                new TreeNode<String>("1",
+                        new TreeNode<String>("1-1"),
+                        new TreeNode<String>("1-2",
+                                new TreeNode<String>("1-2-1"))),
+                new TreeNode<String>("2",
+                        new TreeNode<String>("2-1"),
+                        new TreeNode<String>("2-2"),
+                        new TreeNode<String>("2-3")));
+    }
 }

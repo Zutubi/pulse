@@ -124,4 +124,20 @@ public class ProjectPredicates
     {
         return exists().satisfied(project);
     }
+
+    /**
+     * A predicate that accepts only project that are initialised.
+     *
+     * @return a predicate that accepts any project that is initialised.
+     */
+    public static Predicate<Project> initialised()
+    {
+        return new Predicate<Project>()
+        {
+            public boolean satisfied(Project project)
+            {
+                return project.isInitialised();
+            }
+        };
+    }
 }

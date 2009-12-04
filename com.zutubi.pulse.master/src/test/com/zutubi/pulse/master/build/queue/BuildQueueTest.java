@@ -1,250 +1,279 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.build.control.BuildController;
+import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static org.mockito.Mockito.*;
 
-import static java.util.Arrays.asList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-public class BuildQueueTest extends BuildQueueTestCase
+public class BuildQueueTest extends BaseQueueTestCase
 {
-    private BuildQueue queue;
+    private BuildQueue buildQueue;
 
-    private Project project1;
-    private Project project2;
-
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        project1 = createProject("project1");
-        project2 = createProject("project2");
-
-        queue = new BuildQueue();
-        queue.setObjectFactory(objectFactory);
-        queue.setBuildRequestRegistry(buildRequestRegistry);
-
-        objectFactory.initProperties(this);
+        buildQueue = objectFactory.buildBean(BuildQueue.class);
     }
 
-    public void testSimpleQueue()
+    public void testRequestsAreQueuedInOrder()
     {
-        final int BUILD_ID = nextId.getAndIncrement();
+        QueuedRequest r1 = activeRequest("a");
+        QueuedRequest r2 = queueRequest("b");
+        QueuedRequest r3 = queueRequest("c");
+        QueuedRequest r4 = queueRequest("d");
 
-        final BuildRequestEvent request = createRequest(project1, BUILD_ID, "source", false, null);
+        buildQueue.enqueue(r1, r2, r3, r4);
 
-        queue.buildRequested(request);
-        assertActive(project1, request);
-        assertActive(project2);
-
-        queue.buildCompleted(project1, BUILD_ID);
-        assertActive(project1);
-        assertActive(project2);
+        List<QueuedRequest> queuedRequests = buildQueue.getQueuedRequests();
+        assertEquals(r4, queuedRequests.get(0));
+        assertEquals(r3, queuedRequests.get(1));
+        assertEquals(r2, queuedRequests.get(2));
     }
 
-    public void testQueueTwice()
+    public void testCancelQueuedRequest()
     {
-        final int BUILD_ID1 = nextId.getAndIncrement();
-        final int BUILD_ID2 = nextId.getAndIncrement();
+        QueuedRequest r1 = queueRequest("a");
 
-        final BuildRequestEvent request1 = createRequest(project1, BUILD_ID1, "source", false, null);
-        final BuildRequestEvent request2 = createRequest(project1, BUILD_ID2, "source", false, null);
+        buildQueue.enqueue(r1);
+        assertQueued(r1.getRequest());
 
-        queue.buildRequested(request1);
-        assertActive(project1, request1);
-
-        queue.buildCompleted(project1, BUILD_ID1);
-        assertActive(project1);
-
-        queue.buildRequested(request2);
-        assertActive(project1, request2);
-
-        queue.buildCompleted(project1, BUILD_ID2);
-        assertActive(project1);
+        assertTrue(buildQueue.cancel(r1.getRequest().getId()));
+        assertQueued();
     }
 
-    public void testQueueBehind()
+    public void testCancelActivatedRequest()
     {
-        final int BUILD_ID1 = nextId.getAndIncrement();
-        final int BUILD_ID2 = nextId.getAndIncrement();
+        QueuedRequest r1 = activeRequest("a");
 
-        final BuildRequestEvent request1 = createRequest(project1, BUILD_ID1, "source", false, null);
-        final BuildRequestEvent request2 = createRequest(project1, BUILD_ID2, "source", false, null);
+        buildQueue.enqueue(r1);
+        assertActivated(r1.getRequest());
 
-        queue.buildRequested(request1);
-        queue.buildRequested(request2);
-        assertActive(project1, request1);
-        assertQueued(project1, request2);
-
-        queue.buildCompleted(project1, BUILD_ID1);
-        assertActive(project1, request2);
-        assertQueued(project1);
-
-        queue.buildCompleted(project1, BUILD_ID2);
-        assertActive(project1);
-        assertQueued(project1);
+        assertFalse(buildQueue.cancel(r1.getRequest().getId()));
+        assertActivated(r1.getRequest());
     }
 
-    public void testMultiProjects()
+    public void testCancelUnknownRequest()
     {
-        final int BUILD_ID1 = nextId.getAndIncrement();
-        final int BUILD_ID2 = nextId.getAndIncrement();
-
-        final BuildRequestEvent request1 = createRequest(project1, BUILD_ID1, "source", false, null);
-        final BuildRequestEvent request2 = createRequest(project2, BUILD_ID2, "source", false, null);
-
-        queue.buildRequested(request1);
-        assertActive(project1, request1);
-        assertActive(project2);
-
-        queue.buildRequested(request2);
-        assertActive(project1, request1);
-        assertActive(project2, request2);
-
-        queue.buildCompleted(project1, BUILD_ID1);
-        assertActive(project1);
-        assertActive(project2, request2);
-
-        queue.buildCompleted(project2, BUILD_ID2);
-        assertActive(project1);
-        assertActive(project2);
+        assertFalse(buildQueue.cancel(123));
     }
 
-    public void testGetActiveBuildCount()
+    public void testCompleteQueuedRequest()
     {
-        final BuildRequestEvent requestProject1_1 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
-        final BuildRequestEvent requestProject2_1 = createRequest(project2, nextId.getAndIncrement(), "source", false, null);
-        final BuildRequestEvent requestProject1_2 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+        QueuedRequest r1 = queueRequest("a");
 
-        queue.buildRequested(requestProject1_1);
-        assertEquals(1, queue.getActiveBuildCount());
+        buildQueue.enqueue(r1);
+        assertQueued(r1.getRequest());
 
-        queue.buildRequested(requestProject2_1);
-        assertEquals(2, queue.getActiveBuildCount());
-
-        queue.buildRequested(requestProject1_2);
-        assertEquals(2, queue.getActiveBuildCount());
+        assertFalse(buildQueue.complete(r1.getRequest().getId()));
+        assertQueued(r1.getRequest());
     }
 
-    public void testCancelActive()
+    public void testCompleteActivatedRequest()
     {
-        final BuildRequestEvent request = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+        QueuedRequest r1 = activeRequest("a");
 
-        queue.buildRequested(request);
-        assertActive(project1, request);
+        buildQueue.enqueue(r1);
+        assertActivated(r1.getRequest());
 
-        queue.cancelBuild(request.getId());
-        assertActive(project1, request);
+        assertTrue(buildQueue.complete(r1.getRequest().getId()));
+        assertActivated();
     }
 
-    public void testCancelFirst()
+    public void testCompleteUnknownRequest()
     {
-        cancelHelper(1);
+        assertFalse(buildQueue.complete(123));
     }
 
-    public void testCancelMiddle()
+    public void testBuildRegistryUpdatedOnQueue()
     {
-        cancelHelper(2);
+        QueuedRequest r1 = queueRequest("a");
+        buildQueue.enqueue(r1);
+        verify(buildRequestRegistry, times(1)).requestQueued(r1.getRequest());
     }
 
-    public void testCancelLast()
+    public void testBuildRegistryUpdatedOnActivation()
     {
-        cancelHelper(3);
+        QueuedRequest r1 = activeRequest("a");
+        buildQueue.enqueue(r1);
+        verify(buildRequestRegistry, times(1)).requestActivated(r1.getRequest(), r1.getRequest().getId());
     }
 
-    private void cancelHelper(final int indexToCancel)
+    public void testBuildRegistryUpdatedOnCancel()
     {
-        final BuildRequestEvent[] requests = new BuildRequestEvent[] {
-                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
-                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
-                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
-                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
-        };
+        QueuedRequest r1 = queueRequest("a");
+        buildQueue.enqueue(r1);
+        buildQueue.cancel(r1.getRequest().getId());
+        verify(buildRequestRegistry, times(1)).requestCancelled(r1.getRequest());
+    }
 
-        for (BuildRequestEvent request: requests)
+    public void testPauseQueueHaltsActivation()
+    {
+        QueuedRequest r1 = activeRequest("a");
+        QueuedRequest r2 = activeRequest("b");
+        QueuedRequest r3 = activeRequest("c");
+
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (buildQueue)
         {
-            queue.buildRequested(request);
+            buildQueue.pauseActivation();
+            buildQueue.enqueue(r1, r2, r3);
+            assertQueued(r1.getRequest(), r2.getRequest(), r3.getRequest());
+            assertActivated();
+
+            buildQueue.resumeActivation();
+            assertQueued();
+            assertActivated(r1.getRequest(), r2.getRequest(), r3.getRequest());
+        }
+    }
+
+    public void testMustHaveQueueSynchronisedToPause()
+    {
+        try
+        {
+            buildQueue.pauseActivation();
+            fail("expected illegal state exception");
+        }
+        catch (IllegalStateException e)
+        {
+            // noop.
+        }
+    }
+
+    public void testMustHaveQueueSynchronisedToResume()
+    {
+        try
+        {
+            buildQueue.resumeActivation();
+            fail("expected illegal state exception");
+        }
+        catch (IllegalStateException e)
+        {
+            // noop.
+        }
+    }
+
+    public void testRequestActivationGeneratesEvent()
+    {
+        QueuedRequest r1 = activeRequest("a");
+
+        assertEquals(0, listener.getReceivedCount());
+        buildQueue.enqueue(r1);
+        assertEquals(1, listener.getReceivedCount());
+        BuildActivatedEvent activatedEvent = listener.getEventsReceived(BuildActivatedEvent.class).get(0);
+        assertEquals(r1.getRequest(), activatedEvent.getEvent());
+    }
+
+    public void testAssimilationOfNewQueueRequestIntoActivatedRequest()
+    {
+        Project projectA = createProject("a");
+
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, new Revision("2"));
+
+        BuildController controller = controllers.get(requestA);
+        doReturn(true).when(controller).updateRevisionIfNotFixed(new Revision("2"));
+
+        buildQueue.enqueue(active(requestA));
+        buildQueue.enqueue(queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued();
+
+        verify(buildRequestRegistry, times(1)).requestAssimilated(requestB, requestA.getId());
+        verify(controller, times(1)).updateRevisionIfNotFixed(new Revision("2"));
+    }
+
+    public void testAssimilationOfQueuedRequestsDuringActivation()
+    {
+        Project projectA = createProject("a");
+
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, new Revision("2"));
+
+        BuildController controller = controllers.get(requestA);
+        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+
+        buildQueue.enqueue(active(requestA), queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued();
+
+        verify(buildRequestRegistry, times(1)).requestAssimilated(requestB, requestA.getId());
+    }
+
+    public void testAssimilationRequiresSameSource()
+    {
+        Project projectA = createProject("a");
+
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(projectA, "sourceB", true, new Revision("2"));
+
+        BuildController controller = controllers.get(requestA);
+        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+
+        buildQueue.enqueue(active(requestA), queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued(requestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated((BuildRequestEvent) anyObject(), anyLong());
+    }
+
+    public void testRequestsFromDifferentOwnersNotAssimilated()
+    {
+        BuildRequestEvent requestA = createRequest(createProject("A"), "sourceA", true, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(createProject("B"), "sourceA", true, new Revision("2"));
+
+        BuildController controller = controllers.get(requestA);
+        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+
+        buildQueue.enqueue(active(requestA), queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued(requestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated(requestB, requestA.getId());
+    }
+
+    public void testSimultaniousSingleProjectRequestProcessedSerially()
+    {
+        QueuedRequest r1 = new QueuedRequest(createRequest("a"), new ActivateIfIdlePredicate(buildQueue));
+        QueuedRequest r2 = new QueuedRequest(createRequest("a"), new ActivateIfIdlePredicate(buildQueue));
+
+        buildQueue.enqueue(r1, r2);
+
+        assertActivated(r1.getRequest());
+        assertQueued(r2.getRequest());
+    }
+
+    private void assertQueued(BuildRequestEvent... requests)
+    {
+        assertItemsEqual(buildQueue.getSnapshot().getQueuedBuildRequests(), requests);
+    }
+
+    private void assertActivated(BuildRequestEvent... requests)
+    {
+        assertItemsEqual(buildQueue.getSnapshot().getActivatedBuildRequests(), requests);
+    }
+
+    private static class ActivateIfIdlePredicate implements QueuedRequestPredicate
+    {
+        private BuildQueue queue;
+
+        private ActivateIfIdlePredicate(BuildQueue queue)
+        {
+            this.queue = queue;
         }
 
-        // The queue is in reverse order, and does not have the first (active)
-        // request.
-        final List<BuildRequestEvent> queuedList = new LinkedList<BuildRequestEvent>(asList(requests));
-        queuedList.remove(0);
-        Collections.reverse(queuedList);
-        final BuildRequestEvent[] queued = queuedList.toArray(new BuildRequestEvent[queuedList.size()]);
-
-        assertActive(project1, requests[0]);
-        assertQueued(project1, queued);
-
-        final BuildRequestEvent cancelledRequest = requests[indexToCancel];
-        queue.cancelBuild(cancelledRequest.getId());
-
-        assertActive(project1, requests[0]);
-        
-        // The queue should be the same, minus the cancelled request.
-        assertQueued(project1, CollectionUtils.filterToArray(queued, new Predicate<BuildRequestEvent>()
+        public boolean satisfied(QueuedRequest queuedRequest)
         {
-            public boolean satisfied(BuildRequestEvent event)
-            {
-                return event.getId() != cancelledRequest.getId();
-            }
-        }));
-
-        assertCancelled(cancelledRequest);
-    }
-
-    public void testGetRequestsForEntityNoRequests()
-    {
-        assertEquals(0, queue.getRequestsForEntity(project1).size());
-    }
-
-    public void testGetRequestsForEntity()
-    {
-        int id1 = nextId.getAndIncrement();
-        BuildRequestEvent request1 = createRequest(project1, id1, "source", false, null);
-        BuildRequestEvent request2 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
-        BuildRequestEvent request3 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
-
-        queue.buildRequested(request1);
-        queue.buildRequested(request2);
-
-        List<BuildRequestEvent> requests = queue.getRequestsForEntity(project1);
-        assertEquals(asList(request2, request1), requests);
-
-        queue.buildRequested(request3);
-
-        requests = queue.getRequestsForEntity(project1);
-        assertEquals(asList(request3, request2, request1), requests);
-
-        queue.buildCompleted(project1, id1);
-
-        requests = queue.getRequestsForEntity(project1);
-        assertEquals(asList(request3, request2), requests);
-    }
-
-
-    public void testStop()
-    {
-        queue.stop();
-        BuildRequestEvent requestEvent = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
-        queue.buildRequested(requestEvent);
-        assertEquals(0, queue.getActiveBuildCount());
-        assertActive(project1);
-        assertQueued(project1);
-        assertRejected(requestEvent);
-    }
-
-    private void assertActive(Project project, BuildRequestEvent... events)
-    {
-        assertActive(queue.takeSnapshot().getActiveBuilds().get(project), events);
-    }
-
-    private void assertQueued(Project project, BuildRequestEvent... events)
-    {
-        assertQueued(queue.takeSnapshot().getQueuedBuilds().get(project), events);
+            return queue.getActivatedRequestCount() == 0;
+        }
     }
 }

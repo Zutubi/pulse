@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
@@ -16,12 +17,15 @@ import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
+import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
@@ -40,6 +44,8 @@ public class DefaultBuildManager implements BuildManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
 
+    private AccessManager accessManager;
+    private EventManager eventManager;
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
     private FileArtifactDao fileArtifactDao;
@@ -259,6 +265,11 @@ public class DefaultBuildManager implements BuildManager
     public BuildResult getByUserAndNumber(User user, long id)
     {
         return buildResultDao.findByUserAndNumber(user, id);
+    }
+
+    public BuildResult getByProjectAndMetabuildId(Project project, long metaBuildId)
+    {
+        return buildResultDao.findByProjectAndMetabuildId(project, metaBuildId);
     }
 
     public BuildResult getByUserAndVirtualId(User user, String buildId)
@@ -599,6 +610,14 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
+    public void terminateBuild(BuildResult buildResult, String reason)
+    {
+        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult);
+        // note, this will only terminate a build if the build still has an active controller (ie it is
+        // not yet completed).  should we be checking this?
+        eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason));
+    }
+
     private List<File> getRepositoryFilesFor(final BuildResult build) throws Exception
     {
         final List<File> repositoryFiles = new LinkedList<File>();
@@ -662,6 +681,16 @@ public class DefaultBuildManager implements BuildManager
     public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
     {
         this.repositoryAttributes = repositoryAttributes;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 
     /**

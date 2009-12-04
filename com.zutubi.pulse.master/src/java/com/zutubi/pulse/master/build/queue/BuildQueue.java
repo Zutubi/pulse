@@ -1,187 +1,432 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.zutubi.events.EventManager;
+import com.zutubi.events.PublishFlag;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.NamedEntity;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.master.build.control.BuildController;
+import com.zutubi.pulse.master.build.control.BuildControllerFactory;
+import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * The build queue manages {@link EntityBuildQueue} instances for each
- * project and user.  As build requests come in they are sent to the
- * appropriate queue.
+ * The build queue tracks queued and active build requests.
+ * <p/>
+ * Requests will be stored as queued until all of the queued requests
+ * predicates are satisfied, at which point it will be activated.
  */
 public class BuildQueue
 {
     private static final Messages I18N = Messages.getInstance(BuildQueue.class);
-    
-    /**
-     * Map from entity to a specific queue for that entity.  The entity is
-     * either a project or a user (for personal builds).
-     */
-    private Map<NamedEntity, EntityBuildQueue> entityQueues = new HashMap<NamedEntity, EntityBuildQueue>();
-    private boolean stopped = false;
 
-    private ObjectFactory objectFactory;
+    private BuildControllerFactory buildControllerFactory;
     private BuildRequestRegistry buildRequestRegistry;
+    private EventManager eventManager;
 
     /**
-     * Adds the request to the queue.  The request will be activated if the
-     * number of active builds for the owner is not yet at the limit.
-     *
-     * @param event the request to add
+     * The list of currently queued requests.
      */
-    public void buildRequested(BuildRequestEvent event)
-    {
-        if (!stopped)
-        {
-            lookupQueueForOwner(event.getOwner()).handleRequest(event);
-        }
-        else
-        {
-            buildRequestRegistry.requestRejected(event, I18N.format("rejected.queue.stopped"));
-        }
-    }
+    private LinkedList<QueuedRequest> queuedRequests = new LinkedList<QueuedRequest>();
 
     /**
-     * Notifies the queue that a build has completed.  The build is removed
-     * from the active builds.
-     *
-     * @param owner   owner (project or user) of the build
-     * @param buildId the build result id (<strong>not</strong> the number)
+     * The list of activated requests.
      */
-    public void buildCompleted(NamedEntity owner, long buildId)
-    {
-        lookupQueueForOwner(owner).handleBuildCompleted(buildId);
-    }
-
-    private EntityBuildQueue lookupQueueForOwner(NamedEntity owner)
-    {
-        EntityBuildQueue queue = entityQueues.get(owner);
-        if (queue == null)
-        {
-            queue = objectFactory.buildBean(EntityBuildQueue.class, new Class[] { Entity.class, Integer.TYPE }, new Object[] { owner, 1 });
-            entityQueues.put(owner, queue);
-        }
-
-        return queue;
-    }
+    private LinkedList<ActivatedRequest> activatedRequests = new LinkedList<ActivatedRequest>();
 
     /**
-     * Lookup the number of active builds for an entity.
-     *
-     * @param owner the entity to look up by
-     * @return the number of active builds for the given entity
+     * When paused, this build queue will not activated any requests.
      */
-    public int getActiveBuildCount(NamedEntity owner)
-    {
-        return lookupQueueForOwner(owner).getActiveBuildCount();
-    }
+    private volatile boolean paused = false;
 
     /**
-     * @return the total number of active builds for all owners
+     * When stopped, this build queue will not activate any requests.
      */
-    public int getActiveBuildCount()
-    {
-        int total = 0;
-        for (EntityBuildQueue queue: entityQueues.values())
-        {
-            total += queue.getActiveBuildCount();
-        }
-
-        return total;
-    }
+    private volatile boolean stopped = false;
 
     /**
-     * Returns a consistent view of this queue at a point in time.
+     * Enqueue the requests.
+     * <p/>
+     * Those requests that are placed earlier in the list will be given the opportunity
+     * to be activated ahead of those that appear later in the list.
      *
-     * @see Snapshot
-     *
-     * @return the current state of the quue
+     * @param requests the requests to be enqueued.
      */
-    public Snapshot takeSnapshot()
+    public synchronized void enqueue(List<QueuedRequest> requests)
     {
-        Snapshot snapshot = new Snapshot();
-        for (EntityBuildQueue queue: entityQueues.values())
+        for (QueuedRequest request : requests)
         {
-            snapshot.addEntityQueue(queue);
-        }
-
-        return snapshot;
-    }
-
-    /**
-     * Returns a list of all queued and active build requests for a given
-     * entity.  The latest request is first in the queue.
-     *
-     * @param entity the entity to get requests for
-     * @return all queued and active requests for the given entity
-     */
-    public List<BuildRequestEvent> getRequestsForEntity(NamedEntity entity)
-    {
-        EntityBuildQueue queue = entityQueues.get(entity);
-        if (queue == null)
-        {
-            return Collections.emptyList();
-        }
-        else
-        {
-            List<BuildRequestEvent> result = new LinkedList<BuildRequestEvent>(queue.getQueuedBuildsSnapshot());
-            CollectionUtils.map(queue.getActiveBuildsSnapshot(), new Mapping<EntityBuildQueue.ActiveBuild, BuildRequestEvent>()
+            if (onNewlyQueued(request))
             {
-                public BuildRequestEvent map(EntityBuildQueue.ActiveBuild activeBuild)
-                {
-                    return activeBuild.getEvent();
-                }
-            }, result);
-
-            return result;
-        }
-    }
-
-    /**
-     * Cancels a queued build by the request event id.  If the build is already
-     * active, or no longer queued, this is a no-op.
-     *
-     * @param requestEventId event identifier of the request to cancel
-     * @return true if the request was found and cancelled, false if it was not
-     *         found or already active
-     */
-    public boolean cancelBuild(long requestEventId)
-    {
-        boolean found = false;
-        for (EntityBuildQueue queue: entityQueues.values())
-        {
-            if (queue.cancelQueuedRequest(requestEventId))
-            {
-                found = true;
-                break;
+                queuedRequests.add(0, request);
+                buildRequestRegistry.requestQueued(request.getRequest());
             }
         }
 
-        return found;
+        activateWhatWeCan();
     }
 
     /**
-     * Notifies this queue that we are stopping, so no further requests should
-     * be accepted or activated.
+     * Enqueue the requests.
+     *
+     * @param requests the requests to enqueue.
+     *
+     * @see #enqueue(java.util.List)
      */
-    public void stop()
+    public synchronized void enqueue(QueuedRequest... requests)
     {
-        this.stopped = true;
-        for (EntityBuildQueue queue: entityQueues.values())
+        enqueue(Arrays.asList(requests));
+    }
+
+    /**
+     * Cancel the queued request with the specified id.  If no such queued request exists,
+     * or if the request has been activated, no change is made and false is returned.
+     *
+     * @param requestId the id of the request to be cancelled.
+     *
+     * @return true if a queued request matching the request id was located and cancelled,
+     * false otherwise.
+     */
+    public synchronized boolean cancel(long requestId)
+    {
+        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new RequestsByIdPredicate(requestId));
+
+        if (requestToCancel != null)
         {
-            queue.stop();
+            queuedRequests.remove(requestToCancel);
+            buildRequestRegistry.requestCancelled(requestToCancel.getRequest());
+
+            activateWhatWeCan();
+        }
+
+        return requestToCancel != null;
+    }
+
+    /**
+     * Complete the activated request with the specified id.  If no such activated request exists,
+     * or if the request has is still queued, no change is made and false is returned.
+     *
+     * @param requestId the id of the request to be completed
+     *
+     * @return true if an activated request matching the request is was located and completed,
+     * false otherwise.
+     */
+    public synchronized boolean complete(long requestId)
+    {
+        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new RequestsByIdPredicate(requestId));
+
+        if (completedRequest != null)
+        {
+            activatedRequests.remove(completedRequest);
+
+            activateWhatWeCan();
+        }
+
+        return completedRequest != null;
+    }
+
+    /**
+     * Stop the queue from activating any further requests.
+     */
+    public synchronized void stop()
+    {
+        stopped = true;
+    }
+
+    /**
+     * Pause the activation of the build queue.  This will allow multiple related
+     * actions to be taken without for accidental activation of a request.
+     * <p/>
+     * Important note.  To ensure that access to this queue is thread safe during
+     * the extended processing, make sure that you synchronise on this instance.
+     * <p/>
+     * For example:
+     * <code>
+     * synchronized(buildQueue)
+     * {
+     * try
+     * {
+     * buildQueue.pauseActivation();
+     * buildQueue.cancel(request1);
+     * buildQueue.cancel(request2);
+     * ....
+     * }
+     * finally
+     * {
+     * buildQueue.resumeActivation();
+     * }
+     * }
+     * </code>
+     *
+     * @throws IllegalStateException if the current thread does not hold a lock on the build queue.
+     * @throws IllegalArgumentException if the build queue is already paused.
+     */
+    public void pauseActivation()
+    {
+        if (!Thread.holdsLock(this))
+        {
+            throw new IllegalStateException(I18N.format("queue.lock.required"));
+        }
+
+        if (paused)
+        {
+            throw new IllegalStateException(I18N.format("queue.already.paused"));
+        }
+
+        this.paused = true;
+    }
+
+    /**
+     * Unpause the activation of this build queue.
+     *
+     * @throws IllegalStateException if the current thread does not hold a lock on the build queue.
+     * @throws IllegalArgumentException if the build queue is not already paused.
+     *
+     * @see #pauseActivation()
+     */
+    public void resumeActivation()
+    {
+        if (!Thread.holdsLock(this))
+        {
+            throw new IllegalStateException(I18N.format("queue.lock.required"));
+        }
+
+        if (!paused)
+        {
+            throw new IllegalStateException(I18N.format("queue.not.paused"));
+        }
+
+        this.paused = false;
+
+        activateWhatWeCan();
+    }
+
+    private synchronized void activateWhatWeCan()
+    {
+        // activation has been disabled either temporarily or permanently
+        if (paused || stopped)
+        {
+            return;
+        }
+
+        List<ActivatedRequest> toActivateRequests = new LinkedList<ActivatedRequest>();
+        List<QueuedRequest> queueSnapshot = new LinkedList<QueuedRequest>();
+        queueSnapshot.addAll(queuedRequests);
+
+        // We need to update the queuedRequest and activatedRequest lists as we go to
+        // ensure that subsequent .satisfied() checks have an accurate state to work with.
+        for (QueuedRequest queuedRequest : CollectionUtils.reverse(queueSnapshot))
+        {
+            if (queuedRequest.satisfied())
+            {
+                queuedRequests.remove(queuedRequest);
+
+                ActivatedRequest activatedRequest = new ActivatedRequest(queuedRequest.getRequest());
+                activatedRequests.add(0, activatedRequest);
+                toActivateRequests.add(activatedRequest);
+            }
+        }
+
+        // Now we go through and finish activating the newly activated requests.
+        for (ActivatedRequest activatedRequest : toActivateRequests)
+        {
+            onNewlyActivated(activatedRequest);
+
+            // it may be worth taking this startup processing outside the synchronisation block since it may take some time.
+            BuildController controller = buildControllerFactory.create(activatedRequest.getRequest());
+            long buildNumber = controller.start();
+
+            activatedRequest.setController(controller);
+
+            buildRequestRegistry.requestActivated(activatedRequest.getRequest(), buildNumber);
+            eventManager.publish(new BuildActivatedEvent(this, activatedRequest.getRequest()), PublishFlag.DEFERRED);
         }
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    /**
+     * The assimilation processing is delayed to as late as possible to avoid assimilating into
+     * a build request that is later cancelled.  As such, we only assimilate into activated requests.
+     * <p/>
+     * When we receive a new queued request, check if we can assimilate into any of the currently
+     * activated requests.
+     *
+     * @param queuedRequest the request to be compared to the existing activated requests for
+     *                      assimilation.
+     * @return true if we can continue to queue this request, false otherwise.
+     */
+    private boolean onNewlyQueued(final QueuedRequest queuedRequest)
     {
-        this.objectFactory = objectFactory;
+        // find the first activated request that we can assimilate into.
+        List<ActivatedRequest> assimilationCandidates = CollectionUtils.filter(activatedRequests, new Predicate<ActivatedRequest>()
+        {
+            public boolean satisfied(ActivatedRequest activated)
+            {
+                return queuedRequest.getRequest().getOwner() == activated.getRequest().getOwner() &&
+                        StringUtils.equals(queuedRequest.getRequest().getOptions().getSource(), activated.getRequest().getOptions().getSource());
+            }
+        });
+        if (assimilationCandidates.size() > 0)
+        {
+            ActivatedRequest activatedRequest = CollectionUtils.find(assimilationCandidates, new Predicate<ActivatedRequest>()
+            {
+                public boolean satisfied(ActivatedRequest activatedRequest)
+                {
+                    // is revision fixed?
+                    BuildRevision buildRevision = queuedRequest.getRequest().getRevision();
+                    return activatedRequest.getController().updateRevisionIfNotFixed(buildRevision.getRevision());
+                }
+            });
+
+            // if we located an active request we can assimilate with, do so.
+            if (activatedRequest != null)
+            {
+                buildRequestRegistry.requestAssimilated(queuedRequest.getRequest(), activatedRequest.getRequest().getId());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void onNewlyActivated(final ActivatedRequest activated)
+    {
+        // on newly assimilated, it is like two queued items merging, so we keep it simple and do not need to
+        // include any crazy business with the controller.
+
+        if (activated.getRequest().getOptions().isReplaceable())
+        {
+            List<QueuedRequest> assimilationCandidates = CollectionUtils.filter(queuedRequests, new Predicate<QueuedRequest>()
+            {
+                public boolean satisfied(QueuedRequest queued)
+                {
+                    return queued.getRequest().getOwner() == activated.getRequest().getOwner() &&
+                            StringUtils.equals(activated.getRequest().getOptions().getSource(), queued.getRequest().getOptions().getSource());
+                }
+            });
+
+            if (assimilationCandidates.size() > 0)
+            {
+                BuildRequestEvent latestQueuedRequest = assimilationCandidates.get(0).getRequest();
+                activated.getRequest().setRevision(latestQueuedRequest.getRevision());
+
+                for (QueuedRequest assimilationTarget : assimilationCandidates)
+                {
+                    buildRequestRegistry.requestAssimilated(assimilationTarget.getRequest(), activated.getRequest().getId());
+                    queuedRequests.remove(assimilationTarget);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the list of queued requests.
+     *
+     * @return the list of queued requests.
+     */
+    public synchronized List<QueuedRequest> getQueuedRequests()
+    {
+        return new LinkedList<QueuedRequest>(queuedRequests);
+    }
+
+    /**
+     * Get the list of activated requests.
+     *
+     * @return the list of activated requests.
+     */
+    public synchronized List<ActivatedRequest> getActivatedRequests()
+    {
+        return new LinkedList<ActivatedRequest>(activatedRequests);
+    }
+
+    /**
+     * Return a count of the number of actived requests.
+     *
+     * @return the number of activated requests.
+     */
+    public synchronized int getActivatedRequestCount()
+    {
+        return getActivatedRequests().size();
+    }
+
+    /**
+     * Get the list of requests, both activated and queued, that are
+     * associated with the specified meta build id.
+     *
+     * @param metaBuildId the meta build id identifying the requests to be retrieved.
+     * @return a list of requests associated with the specified meta build id.
+     */
+    public synchronized List<RequestHolder> getMetaBuildRequests(long metaBuildId)
+    {
+        LinkedList<RequestHolder> requests = new LinkedList<RequestHolder>();
+        requests.addAll(CollectionUtils.filter(queuedRequests, new RequestsByMetaIdPredicate(metaBuildId)));
+        requests.addAll(CollectionUtils.filter(activatedRequests, new RequestsByMetaIdPredicate(metaBuildId)));
+        return requests;
+    }
+
+    /**
+     * Get the identified request.
+     *
+     * @param requestId the identifier of the request to be retrieved.
+     *
+     * @return the retrieved
+     */
+    public synchronized BuildRequestEvent getRequest(long requestId)
+    {
+        RequestHolder request = CollectionUtils.find(queuedRequests, new RequestsByIdPredicate(requestId));
+        if (request == null)
+        {
+            request = CollectionUtils.find(activatedRequests, new RequestsByIdPredicate(requestId));
+        }
+        if (request != null)
+        {
+            return request.getRequest();
+        }
+        return null;
+    }
+
+    /**
+     * Returns true if the specified owner has an active or queued request.
+     *
+     * @param owner the owner of the request
+     *
+     * @return true if the specified owner has a request in the queue, false otherwise
+     */
+    public synchronized boolean hasRequest(Object owner)
+    {
+        return getRequestsByOwner(owner).size() > 0;
+    }
+
+    /**
+     * Returns a list of build requests for the specified owner.
+     *
+     * @param owner the owner of the request
+     *
+     * @return a list of build request event instances associated with the specified owner.
+     */
+    public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)
+    {
+        List<BuildRequestEvent> byOwner = new LinkedList<BuildRequestEvent>();
+        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(queuedRequests, new RequestsByOwnerPredicate(owner)), new ExtractRequestMapping()));
+        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(activatedRequests, new RequestsByOwnerPredicate(owner)), new ExtractRequestMapping()));
+        return byOwner;
+    }
+
+    /**
+     * Get a snapshot of the internal state of the build queue as it is right now.
+     *
+     * @return the queue snapshot.
+     */
+    public synchronized BuildQueueSnapshot getSnapshot()
+    {
+        BuildQueueSnapshot snapshot = new BuildQueueSnapshot();
+        snapshot.addAllActivatedRequests(activatedRequests);
+        snapshot.addAllQueuedRequests(queuedRequests);
+        return snapshot;
     }
 
     public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
@@ -189,37 +434,13 @@ public class BuildQueue
         this.buildRequestRegistry = buildRequestRegistry;
     }
 
-    /**
-     * Used to hold a consistent snapshot across all queues.
-     */
-    public static class Snapshot
+    public void setBuildControllerFactory(BuildControllerFactory buildControllerFactory)
     {
-        private Map<Entity, List<EntityBuildQueue.ActiveBuild>> activeBuilds = new HashMap<Entity, List<EntityBuildQueue.ActiveBuild>>();
-        private Map<Entity, List<BuildRequestEvent>> queuedBuilds = new HashMap<Entity, List<BuildRequestEvent>>();
+        this.buildControllerFactory = buildControllerFactory;
+    }
 
-        void addEntityQueue(EntityBuildQueue queue)
-        {
-            activeBuilds.put(queue.getOwner(), queue.getActiveBuildsSnapshot());
-            queuedBuilds.put(queue.getOwner(), queue.getQueuedBuildsSnapshot());
-        }
-
-        /**
-         * @return a map from an entity (project or user) to the active builds
-         * for that entity.  Builds activated first are last in the list.
-         */
-        public Map<Entity, List<EntityBuildQueue.ActiveBuild>> getActiveBuilds()
-        {
-            return Collections.unmodifiableMap(activeBuilds);
-        }
-
-        /**
-         * @return a map from an entity (project or user) to the queued build
-         * requests for that entity.  Builds requested first are last in the
-         * list.
-         */
-        public Map<Entity, List<BuildRequestEvent>> getQueuedBuilds()
-        {
-            return Collections.unmodifiableMap(queuedBuilds);
-        }
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

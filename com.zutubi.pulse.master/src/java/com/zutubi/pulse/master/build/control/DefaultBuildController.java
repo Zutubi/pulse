@@ -114,6 +114,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private IvyManager ivyManager;
     private RepositoryAttributes repositoryAttributes;
+    private ModuleDescriptorFactory moduleDescriptorFactory;
 
     public DefaultBuildController(BuildRequestEvent event)
     {
@@ -125,6 +126,8 @@ public class DefaultBuildController implements EventListener, BuildController
     {
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
+
+        moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration());
 
         createBuildTree();
 
@@ -173,16 +176,12 @@ public class DefaultBuildController implements EventListener, BuildController
             buildContext.add(requestProperty);
         }
 
-        String version = projectConfig.getDependencies().getVersion();
-        TriggerOptions options = request.getOptions();
-        if (options.hasVersion())
-        {
-            version = options.getVersion();
-        }
-        if (options.isResolveVersion())
+        String version = request.getVersion();
+        if (request.getOptions().isResolveVersion())
         {
             version = buildContext.resolveVariables(version);
         }
+        
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, version);
         buildResult.setVersion(version);
 
@@ -282,7 +281,6 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
     {
-        ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration());
         DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createRetrieveDescriptor(project, buildResult);
         descriptor.setStatus(buildResult.getStatus());
         return descriptor;
@@ -967,7 +965,6 @@ public class DefaultBuildController implements EventListener, BuildController
 
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);
 
-            ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration());
             DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version, configurationManager);
             IvyModuleDescriptor.setBuildNumber(descriptor, buildResult.getNumber());
 

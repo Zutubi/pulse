@@ -37,14 +37,22 @@ public class SingleBuildRequestEvent extends BuildRequestEvent
         return status;
     }
 
-    public BuildResult createResult(ProjectManager projectManager, BuildManager buildManger)
+    public BuildResult createResult(ProjectManager projectManager, BuildManager buildManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false); // can we use the 'owner' project instance instead of loading here?
         BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project, true), getRevision().isUser());
         result.setStatus(getStatus());
         result.setMetaBuildId(getMetaBuildId());
 
-        buildManger.save(result);
+        // how safe is updating all of the related build results at this stage?  (the depends on relation
+        // is tracked by an id on the dependentResult)
+        for (Project dependentProject : dependentProjects)
+        {
+            BuildResult dependentResult = buildManager.getByProjectAndMetabuildId(dependentProject,  getMetaBuildId());
+            result.addDependsOn(dependentResult);
+        }
+
+        buildManager.save(result);
 
         return result;
     }

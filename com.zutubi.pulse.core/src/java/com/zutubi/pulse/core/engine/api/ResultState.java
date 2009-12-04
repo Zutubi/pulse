@@ -25,22 +25,6 @@ public enum ResultState
                 }
             },
     /**
-     * The result has not yet commenced and is waiting on a dependency to complete
-     * before it can commence.
-     */
-    PENDING_DEPENDENCY
-            {
-                public boolean isBroken()
-                {
-                    return false;
-                }
-
-                public boolean isCompleted()
-                {
-                    return false;
-                }
-            },
-    /**
      * The result has commenced and is in progress (not yet completed).
      */
     IN_PROGRESS

@@ -12,9 +12,9 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.build.queue.BuildQueue;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.build.queue.FatController;
+import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
 import com.zutubi.pulse.master.charting.model.DataPoint;
@@ -3018,17 +3018,14 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
+            BuildQueueSnapshot snapshot = fatController.snapshotBuildQueue();
             List<BuildRequestEvent> filteredQueue = new LinkedList<BuildRequestEvent>();
-            for (List<BuildRequestEvent> entityQueue: snapshot.getQueuedBuilds().values())
+            for (BuildRequestEvent e: snapshot.getQueuedBuildRequests())
             {
-                CollectionUtils.filter(entityQueue, new Predicate<BuildRequestEvent>()
+                if (accessManager.hasPermission(AccessManager.ACTION_VIEW, e.getOwner()))
                 {
-                    public boolean satisfied(BuildRequestEvent e)
-                    {
-                        return accessManager.hasPermission(AccessManager.ACTION_VIEW, e.getOwner());
-                    }
-                }, filteredQueue);
+                    filteredQueue.add(e);
+                }
             }
 
             return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildRequestEvent, Hashtable<String, Object>>()
@@ -3543,7 +3540,7 @@ public class RemoteApi
             }
             else
             {
-                fatController.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API");
+                buildManager.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API");
                 return true;
             }
         }

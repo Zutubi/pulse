@@ -129,7 +129,7 @@ public class BuildRequestRegistry
      * @param event  request to mark
      * @param reason human-readable reason for the rejection
      */
-    void requestRejected(BuildRequestEvent event, final String reason)
+    public void requestRejected(BuildRequestEvent event, final String reason)
     {
         transition(event, RequestStatus.REJECTED, new UnaryProcedure<RegEntry>()
         {
@@ -146,7 +146,7 @@ public class BuildRequestRegistry
      * @param event         request to mark
      * @param intoRequestId id of the request that it was assimilated into
      */
-    void requestAssimilated(BuildRequestEvent event, final long intoRequestId)
+    public void requestAssimilated(BuildRequestEvent event, final long intoRequestId)
     {
         transition(event, RequestStatus.ASSIMILATED, new UnaryProcedure<RegEntry>()
         {
@@ -162,7 +162,7 @@ public class BuildRequestRegistry
      *
      * @param event the request to mark
      */
-    void requestQueued(BuildRequestEvent event)
+    public void requestQueued(BuildRequestEvent event)
     {
         transition(event, RequestStatus.QUEUED, new UnaryProcedure<RegEntry>()
         {
@@ -178,7 +178,7 @@ public class BuildRequestRegistry
      *
      * @param event the request to mark
      */
-    void requestCancelled(BuildRequestEvent event)
+    public void requestCancelled(BuildRequestEvent event)
     {
         transition(event, RequestStatus.CANCELLED, new UnaryProcedure<RegEntry>()
         {
@@ -195,7 +195,7 @@ public class BuildRequestRegistry
      * @param event       the request to mark
      * @param buildNumber number of the build launched by the request
      */
-    void requestActivated(BuildRequestEvent event, final long buildNumber)
+    public void requestActivated(BuildRequestEvent event, final long buildNumber)
     {
         transition(event, RequestStatus.ACTIVATED, new UnaryProcedure<RegEntry>()
         {

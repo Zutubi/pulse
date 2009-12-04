@@ -632,7 +632,6 @@ public class ToveUtils
             case IN_PROGRESS:
                 return "inprogress.gif";
             case PENDING:
-            case PENDING_DEPENDENCY:
                 return "hourglass.gif";
             case TERMINATING:
                 return "stop.gif";

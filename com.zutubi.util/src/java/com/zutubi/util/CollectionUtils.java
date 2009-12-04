@@ -338,6 +338,23 @@ public class CollectionUtils
     }
 
     /**
+     * Get a new list with the items in the original list in reverse order.
+     *
+     * @param l     the list to be reversed.
+     * @param <T>   the type contained by the list
+     * @return  a new list with the elements of the original list in reverse order.
+     */
+    public static <T> List<T> reverse(List<T> l)
+    {
+        LinkedList<T> result = new LinkedList<T>();
+        for (T t : l)
+        {
+            result.addFirst(t);
+        }
+        return result;
+    }
+
+    /**
      * Return a copy of the list c that has no duplicates.
      *
      * @param l the list from which duplicates will be removed.
@@ -453,4 +470,100 @@ public class CollectionUtils
         return result;
     }
 
+    /**
+     * This method carries out a depth first traversal of the tree, using the predicate
+     * to identify the node of interest.  If a node is found that satisfies the predicate,
+     * true is returned.
+     *
+     * @param root          the tree to be searched.
+     * @param predicate     the predicate identifying the node being searched for.
+     * @param <T>           the type of the collection items
+     * 
+     * @return true if one of the tree nodes satisfies the predicate, false otherwise.
+     */
+    public static <T> boolean depthFirstContains(TreeNode<T> root, Predicate<T> predicate)
+    {
+        return depthFirstFind(root, predicate) != null;
+    }
+
+    /**
+     * This method carries out a depth first traversal of the tree, using the predicate
+     * to identify the node of interest.  The first node to satisfy the predicate is returned.
+     *
+     * @param root          the tree to be searched.
+     * @param predicate     the predicate identifying the node being searched for.
+     * @param <T>           the type of the collection items
+     *
+     * @return the first node that satisfies the predicate, null if no nodes satisfy the predicate.
+     */
+    public static <T> T depthFirstFind(TreeNode<T> root, Predicate<T> predicate)
+    {
+        for (TreeNode<T> child: root.getChildren())
+        {
+            T found = depthFirstFind(child, predicate);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        if (predicate.satisfied(root.getData()))
+        {
+            return root.getData();
+        }
+
+        return null;
+    }
+
+    /**
+     * This method carries out a breadth first traversal of the tree, using the predicate
+     * to identify the node of interest.  If a node is found that satisfies the predicate,
+     * true is returned.
+     *
+     * @param root          the tree to be searched.
+     * @param predicate     the predicate identifying the node being searched for.
+     * @param <T>           the type of the collection items
+     *
+     * @return true if one of the tree nodes satisfies the predicate, false otherwise.
+     */
+    public static <T> boolean breadthFirstContains(TreeNode<T> root, Predicate<T> predicate)
+    {
+        return breadthFirstFind(root, predicate) != null;
+    }
+
+    /**
+     * This method carries out a breadth first traversal of the tree, using the predicate
+     * to identify the node of interest.  The first node to satisfy the predicate is returned.
+     *
+     * @param root          the tree to be searched.
+     * @param predicate     the predicate identifying the node being searched for.
+     * @param <T>           the type of the collection items
+     *
+     * @return the first node that satisfies the predicate, null if no nodes satisfy the predicate.
+     */
+    public static <T> T breadthFirstFind(TreeNode<T> root, Predicate<T> predicate)
+    {
+        Queue<TreeNode<T>> toProcess = new LinkedList<TreeNode<T>>();
+        toProcess.offer(root);
+
+        return breadthFirstFind(toProcess, predicate);
+    }
+
+    private static <T> T breadthFirstFind(Queue<TreeNode<T>> toProcess, Predicate<T> predicate)
+    {
+        while (!toProcess.isEmpty())
+        {
+            TreeNode<T> next = toProcess.remove();
+            if (predicate.satisfied(next.getData()))
+            {
+                return next.getData();
+            }
+
+            for (TreeNode<T> child: next.getChildren())
+            {
+                toProcess.offer(child);
+            }
+        }
+        return null;
+    }
 }

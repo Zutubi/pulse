@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
-import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -12,7 +11,6 @@ public class CancelBuildAction extends ActionSupport
 {
     private long buildId;
     private boolean fromBuild = false;
-    private FatController fatController;
     private BuildManager buildManager;
 
     public void setBuildId(long buildId)
@@ -55,14 +53,9 @@ public class CancelBuildAction extends ActionSupport
         }
 
         String user = getPrinciple();
-        fatController.terminateBuild(build, user == null ? null : "requested by '" + user + "'");
+        buildManager.terminateBuild(build, user == null ? null : "requested by '" + user + "'");
         pauseForDramaticEffect();
         return SUCCESS;
-    }
-
-    public void setFatController(FatController fatController)
-    {
-        this.fatController = fatController;
     }
 
     public void setBuildManager(BuildManager buildManager)
