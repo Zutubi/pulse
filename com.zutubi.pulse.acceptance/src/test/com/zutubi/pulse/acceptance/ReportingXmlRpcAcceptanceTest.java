@@ -11,6 +11,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -20,9 +21,11 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
+import com.zutubi.util.ToStringMapping;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 import java.util.Arrays;
 import static java.util.Arrays.asList;
@@ -536,7 +539,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Vector<String> ids = insertAndTriggerProject(projectName);
 
         Hashtable<String, Object> status = xmlRpcHelper.waitForBuildRequestToBeHandled(ids.get(0), REQUEST_TIMEOUT);
-        assertFirstActivatedBuild(status);
+        assertRequestStatusIn(status, BuildRequestRegistry.RequestStatus.ACTIVATED, BuildRequestRegistry.RequestStatus.QUEUED);
         xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
     }
 
@@ -586,8 +589,13 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private void assertFirstActivatedBuild(Hashtable<String, Object> status)
     {
-        assertEquals("ACTIVATED", status.get("status"));
+        assertRequestStatusIn(status, BuildRequestRegistry.RequestStatus.ACTIVATED);
         assertEquals("1", status.get("buildId"));
+    }
+
+    private void assertRequestStatusIn(Hashtable<String, Object> status, BuildRequestRegistry.RequestStatus... allowedStatuses)
+    {
+        assertThat(CollectionUtils.map(allowedStatuses, new ToStringMapping<BuildRequestRegistry.RequestStatus>()), hasItem((String) status.get("status")));
     }
 
     private void ensureProjectHierarchy() throws Exception

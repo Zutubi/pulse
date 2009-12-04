@@ -10,8 +10,6 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
-import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
@@ -205,6 +203,10 @@ public class FatController implements EventListener, Stoppable
         try
         {
             schedulingController.handleEvent(event);
+            if (schedulingController.getActivedRequestCount() == 0)
+            {
+                stoppedCondition.signalAll();
+            }
         }
         finally
         {

@@ -208,25 +208,23 @@ public class BuildRequestRegistry
 
     private void transition(BuildRequestEvent event, RequestStatus newStatus, UnaryProcedure<RegEntry> p)
     {
+        lock.lock();
+        try
         {
-            lock.lock();
-            try
+            RegEntry entry = lookupEntry(event.getId());
+            if (entry == null)
             {
-                RegEntry entry = lookupEntry(event.getId());
-                if (entry == null)
-                {
-                    LOG.warning(capitalise(newStatus.toString()) + " notification for unknown build request " + event.getId() + " project " + event.getProjectConfig().getName());
-                }
-                else
-                {
-                    p.process(entry);
-                    lockCondition.signalAll();
-                }
+                LOG.warning(capitalise(newStatus.toString()) + " notification for unknown build request " + event.getId() + " project " + event.getProjectConfig().getName());
             }
-            finally
+            else
             {
-                lock.unlock();
+                p.process(entry);
+                lockCondition.signalAll();
             }
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 

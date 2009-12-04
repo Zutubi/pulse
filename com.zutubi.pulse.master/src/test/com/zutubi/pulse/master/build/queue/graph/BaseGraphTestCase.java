@@ -1,19 +1,19 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.util.TreeNode;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.TreeNode;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.*;
 
-public class BaseGraphTestCase extends ZutubiTestCase
+public abstract class BaseGraphTestCase extends ZutubiTestCase
 {
     private long nextId = 1;
     protected ProjectManager projectManager;

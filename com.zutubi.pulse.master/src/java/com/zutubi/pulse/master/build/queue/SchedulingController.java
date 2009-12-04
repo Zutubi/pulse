@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.InstanceOfPredicate;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,7 +28,6 @@ public class SchedulingController implements EventListener
 {
     protected static final String SEQUENCE_BUILD_ID = "BUILD_ID";
 
-    private static final Logger LOG = Logger.getLogger(SchedulingController.class);
     private static final Messages I18N = Messages.getInstance(SchedulingController.class);
 
     private ObjectFactory objectFactory;
@@ -53,7 +51,7 @@ public class SchedulingController implements EventListener
         {
             List<QueuedRequest> requestsToQueue = requestHandler.prepare(request);
 
-            List<BuildRequestEvent> preparedRequests = CollectionUtils.map(requestsToQueue, new ExtractRequestMapping());
+            List<BuildRequestEvent> preparedRequests = CollectionUtils.map(requestsToQueue, new ExtractRequestMapping<QueuedRequest>());
 
             // a) lock the necessary projects before moving on.
             lockProjectStates(preparedRequests);
@@ -122,7 +120,7 @@ public class SchedulingController implements EventListener
                 Object owner = result.getOwner();
 
                 ActivatedRequest requestToComplete = CollectionUtils.find(buildQueue.getActivatedRequests(),
-                        new RequestsByMetaIdAndOwnerPredicate(requestHandler.getMetaBuildId(), owner)
+                        new RequestsByMetaIdAndOwnerPredicate<ActivatedRequest>(requestHandler.getMetaBuildId(), owner)
                 );
 
                 List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
@@ -130,7 +128,7 @@ public class SchedulingController implements EventListener
 
                 if (!result.succeeded())
                 {
-                    requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new RequestsByMetaIdPredicate(requestHandler.getMetaBuildId())));
+                    requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new RequestsByMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId())));
                 }
 
                 internalCompleteRequests(requestHandler, requestsToComplete);
@@ -140,7 +138,7 @@ public class SchedulingController implements EventListener
 
     private void internalCompleteRequests(BuildRequestHandler requestHandler, List<RequestHolder> completedRequests)
     {
-        List<BuildRequestEvent> requestEvents = CollectionUtils.map(completedRequests, new ExtractRequestMapping());
+        List<BuildRequestEvent> requestEvents = CollectionUtils.map(completedRequests, new ExtractRequestMapping<RequestHolder>());
 
         // a) lock the necessary projects before moving on.
         lockProjectStates(requestEvents);
@@ -338,7 +336,7 @@ public class SchedulingController implements EventListener
             synchronized (buildQueue)
             {
                 List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-                List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate(QueuedRequest.class));
+                List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
                 internalCompleteRequests(requestHandler, queuedRequests);
                 return queuedRequests.size() > 0;
             }

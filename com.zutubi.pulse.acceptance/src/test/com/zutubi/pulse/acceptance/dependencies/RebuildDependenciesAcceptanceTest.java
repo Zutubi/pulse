@@ -2,17 +2,17 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
+import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.io.File;
@@ -303,7 +303,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // because projectA failed. 
     }
 
-    public void testTransitentArtifactDeliveryForMetaBuild() throws Exception
+    public void testTransientArtifactDeliveryForMetaBuild() throws Exception
     {
         // require 2 agents for concurrent builds of project A and project B.
         xmlRpcHelper.ensureAgent(SeleniumTestBase.AGENT_NAME);
@@ -344,7 +344,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
 
-        // ensure that project C uses project A buid 1 artifacts.
+        // ensure that project C uses project A build 1 artifacts.
         assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectC, 1));
     }
 

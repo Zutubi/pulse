@@ -14,15 +14,15 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.Trigger;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.reflection.ReflectionUtils;
@@ -45,6 +45,7 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
     protected WiringObjectFactory objectFactory;
 
     protected Scheduler scheduler;
+    private BuildManager buildManager;
     protected ProjectManager projectManager;
     protected BuildRequestRegistry buildRequestRegistry;
     protected BuildControllerFactory buildControllerFactory;
@@ -62,6 +63,7 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
         objectFactory = new WiringObjectFactory();
         
         buildRequestRegistry = mock(BuildRequestRegistry.class);
+        buildManager = mock(BuildManager.class);
         projectManager = mock(ProjectManager.class);
         stub(projectManager.getAllProjectConfigs(anyBoolean())).toReturn(allConfigs);
         stub(projectManager.getDownstreamDependencies((ProjectConfiguration) anyObject())).toAnswer(new Answer<List<ProjectConfiguration>>()
@@ -108,6 +110,8 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
                 return idToProject.get(projectId);
             }
         });
+
+        stub(projectManager.getNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
 
         buildControllerFactory = mock(BuildControllerFactory.class);
         stub(buildControllerFactory.create((BuildRequestEvent)anyObject())).toAnswer(new Answer()
@@ -324,7 +328,8 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
 
     private BuildCompletedEvent createCompletedEvent(BuildRequestEvent request)
     {
-        BuildResult result = new BuildResult(request.getReason(), (Project)request.getOwner(), nextId.getAndIncrement(), request.getRevision().isUser());
+        BuildResult result = request.createResult(projectManager, buildManager);
+
         result.setMetaBuildId(request.getMetaBuildId());
         PulseExecutionContext ctx = new PulseExecutionContext();
         return new BuildCompletedEvent(this, result, ctx);

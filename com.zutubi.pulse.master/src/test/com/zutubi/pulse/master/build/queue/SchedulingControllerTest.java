@@ -98,6 +98,20 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
     }
 
+    public void testCompletionOfPersonalBuild()
+    {
+        Project project = createProject("a", State.IDLE);
+        BuildRequestEvent request = createPersonalRequest(project);
+        controller.handleEvent(request);
+
+        assertActivated(request);
+        verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
+
+        BuildCompletedEvent completed = createSuccessful(request);
+        controller.handleEvent(completed);
+        verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
+    }
+
     // -- requests are dropped when project is paused.
 
     public void testPausedProjectRequestsIgnored()
