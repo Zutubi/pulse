@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import org.apache.velocity.context.Context;
 
@@ -29,11 +30,20 @@ public class CustomVelocityManager extends VelocityManager
     private AgentManager agentManager;
     private UserManager userManager;
     private ConfigurationProvider configurationProvider;
+
     private boolean systemStarted = false;
 
     public CustomVelocityManager()
     {
         SpringComponentContext.autowire(this);
+
+        // Since this managers lifecycle is controlled via velocity, we need to ensure
+        // that if a new instance is created after the startup that we are aware of it.
+        StartupManager startupManager = SpringComponentContext.getBean("startupManager");
+        if (startupManager != null)
+        {
+            systemStarted = startupManager.isSystemStarted();
+        }
     }
 
     public synchronized Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
