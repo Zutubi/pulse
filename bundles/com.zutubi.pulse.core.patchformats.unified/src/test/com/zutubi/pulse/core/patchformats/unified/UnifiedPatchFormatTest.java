@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.patchformats.unified;
 
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -29,7 +28,7 @@ public class UnifiedPatchFormatTest extends PulseTestCase
             File file = copyInputToDirectory("original", "txt", tempDir);
             File patchFile = copyInputToDirectory("patch", "txt", tempDir);
 
-            List<Feature> features = patchFormat.applyPatch(null, patchFile, tempDir, EOLStyle.BINARY, null);
+            List<Feature> features = patchFormat.applyPatch(null, patchFile, tempDir, null, null);
             assertEquals(0, features.size());
 
             if (SystemUtils.IS_WINDOWS)

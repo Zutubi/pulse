@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.Matchers;
@@ -19,7 +18,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         client.checkout(context, null, handler);
         handler.reset();
         GitPatchFormat patchFormat = new GitPatchFormat();
-        patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+        patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
         assertEquals("edited by " + getName() + "\n", IOUtils.fileToString(new File(workingDir, "a.txt")));
         assertCleanPatch();
     }
@@ -29,7 +28,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         client.checkout(context, null, handler);
         handler.reset();
         GitPatchFormat patchFormat = new GitPatchFormat();
-        patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+        patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
         assertEquals(CONTENT_A_TXT + "\n", IOUtils.fileToString(new File(workingDir, "ren.txt")));
         assertCleanPatch();
     }
@@ -39,7 +38,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         client.checkout(context, null, handler);
         handler.reset();
         GitPatchFormat patchFormat = new GitPatchFormat();
-        patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+        patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
         assertTrue(new File(workingDir, "binfile").exists());
         assertCleanPatch();
     }
@@ -56,7 +55,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         try
         {
             GitPatchFormat patchFormat = new GitPatchFormat();
-            patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+            patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
             fail("Patch should not apply");
         }
         catch (ScmException e)

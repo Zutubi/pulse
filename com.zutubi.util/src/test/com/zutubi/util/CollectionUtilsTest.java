@@ -257,4 +257,54 @@ public class CollectionUtilsTest extends ZutubiTestCase
                         new TreeNode<String>("2-2"),
                         new TreeNode<String>("2-3")));
     }
+
+    public void testPartitionEmpty()
+    {
+        assertEquals(new LinkedList<List<Integer>>(), CollectionUtils.partition(1, Arrays.<Integer>asList()));
+    }
+
+    public void testPartitionOneSingle()
+    {
+        assertEquals(asList(asList(1)), CollectionUtils.partition(1, asList(1)));
+    }
+
+    public void testPartitionTwoSingle()
+    {
+        assertEquals(asList(asList(1)), CollectionUtils.partition(1, asList(1)));
+    }
+
+    public void testPartitionOneSeveral()
+    {
+        assertEquals(asList(asList(1), asList(2), asList(3), asList(4)), CollectionUtils.partition(1, asList(1, 2, 3, 4)));
+    }
+
+    public void testPartitionTwoEven()
+    {
+        assertEquals(asList(asList(1, 2), asList(3, 4)), CollectionUtils.partition(2, asList(1, 2, 3, 4)));
+    }
+
+    public void testPartitionThreeTwo()
+    {
+        assertEquals(asList(asList(1, 2)), CollectionUtils.partition(3, asList(1, 2)));
+    }
+
+    public void testPartitionThreeThree()
+    {
+        assertEquals(asList(asList(1, 2, 3)), CollectionUtils.partition(3, asList(1, 2, 3)));
+    }
+
+    public void testPartitionThreeFour()
+    {
+        assertEquals(asList(asList(1, 2, 3), asList(4)), CollectionUtils.partition(3, asList(1, 2, 3, 4)));
+    }
+
+    public void testPartitionThreeFive()
+    {
+        assertEquals(asList(asList(1, 2, 3), asList(4, 5)), CollectionUtils.partition(3, asList(1, 2, 3, 4, 5)));
+    }
+
+    public void testPartitionThreeSix()
+    {
+        assertEquals(asList(asList(1, 2, 3), asList(4, 5, 6)), CollectionUtils.partition(3, asList(1, 2, 3, 4, 5, 6)));
+    }
 }

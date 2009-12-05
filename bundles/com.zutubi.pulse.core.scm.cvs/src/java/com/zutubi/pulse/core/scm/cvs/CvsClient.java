@@ -297,7 +297,7 @@ public class CvsClient implements ScmClient
         }
     }
 
-    public EOLStyle getEOLPolicy(ScmContext context)
+    public EOLStyle getEOLPolicy(ExecutionContext context)
     {
         return EOLStyle.BINARY;
     }

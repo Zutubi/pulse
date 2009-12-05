@@ -452,8 +452,13 @@ public class XmlRpcHelper
 
     public Hashtable<String, Object> getAntConfig()
     {
+        return getAntConfig("build.xml");
+    }
+
+    public Hashtable<String, Object> getAntConfig(String buildFile)
+    {
         Hashtable<String, Object> type = createEmptyConfig(AntCommandConfiguration.class);
-        type.put("buildFile", "build.xml");
+        type.put("buildFile", buildFile);
         return type;
     }
 

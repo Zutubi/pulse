@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
@@ -143,13 +142,11 @@ import java.util.Map;
  */
 public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectingHandler
 {
-    protected PersonalBuildUI ui;
     protected Map<String, String> currentItem = new HashMap<String, String>();
 
-    public AbstractPerforceFStatHandler(PersonalBuildUI ui)
+    public AbstractPerforceFStatHandler()
     {
         super(true);
-        this.ui = ui;
     }
 
     public void handleStdout(String line)
@@ -223,6 +220,29 @@ public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectin
     protected boolean fileIsText(String type)
     {
         return type.contains("text");
+    }
+
+    /**
+     * Converts a raw clientFile field from fstat output into a path relative
+     * to the client root.
+     *
+     * @param clientFile raw clientFile field from fstat
+     * @return the file path relative to the client root
+     */
+    protected String getPath(String clientFile)
+    {
+        // clientFile has form //<client>/<path>
+        int length = clientFile.length();
+        if(length > 3)
+        {
+            int index = clientFile.indexOf('/', 2);
+            if(index >= 0 && index < length - 1)
+            {
+                clientFile = clientFile.substring(index + 1);
+            }
+        }
+
+        return clientFile;
     }
 
     protected abstract void handleCurrentItem();

@@ -110,7 +110,7 @@ public class StandardPatchFormat implements PatchFormat
         {
             if (fs.getPayloadType() != FileStatus.PayloadType.NONE)
             {
-                String path = PatchArchive.FILES_PATH + fs.getTargetPath();
+                String path = PatchArchive.FILES_PATH + fs.getPath();
                 reportStatus(context.getUI(), path);
 
                 if (fs.getPayloadType() == FileStatus.PayloadType.DIFF)
@@ -169,12 +169,12 @@ public class StandardPatchFormat implements PatchFormat
         }
     }
 
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
+    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
     {
         try
         {
             PatchArchive archive = new PatchArchive(patchFile);
-            return archive.apply(baseDir, localEOL, scmFeedbackHandler);
+            return archive.apply(baseDir, context, scmClient, scmFeedbackHandler);
         }
         catch (PulseException e)
         {

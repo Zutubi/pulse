@@ -566,4 +566,36 @@ public class CollectionUtils
         }
         return null;
     }
+
+    /**
+     * Divides the input list into sublists of the given size that do not
+     * overlap.  Note that the last sublist returned may be shorter than the
+     * specified size.  The sublists are views into the original list -- not
+     * copies.
+     *
+     * @param size the size of each sublist
+     * @param in   the input collection to partition
+     * @param <T>  the collection element type
+     * @return the sublist views of the input
+     * @see List#subList(int, int)
+     */
+    public static <T> List<List<T>> partition(int size, List<T> in)
+    {
+        if (size < 0)
+        {
+            throw new IllegalArgumentException("Size must be strictly positive (got " + size + ")");
+        }
+
+        int offset = 0;
+        List<List<T>> result = new LinkedList<List<T>>();
+        int length = in.size();
+        while (offset < length)
+        {
+            int end = Math.min(length, offset + size);
+            result.add(in.subList(offset, end));
+            offset = end;
+        }
+
+        return result;
+    }
 }

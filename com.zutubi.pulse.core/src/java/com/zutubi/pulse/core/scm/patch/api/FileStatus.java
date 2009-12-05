@@ -607,7 +607,20 @@ public class FileStatus
     }
 
     /**
-     * @return a read-nly map of extra file properties, used to carry metadata
+     * Sets the target path.  May be used to update the target path based on
+     * extra information only available when applying the patch.
+     *
+     * @param targetPath path, relative to the working copy root, that this
+     *                   status should apply to
+     * @see #getTargetPath()
+     */
+    public void setTargetPath(String targetPath)
+    {
+        this.targetPath = FileSystemUtils.normaliseSeparators(targetPath);
+    }
+
+    /**
+     * @return a read-only map of extra file properties, used to carry metadata
      *         about the file which may affect how this status is applied.  See
      *         the PROPERTY_* constants for available properties and their
      *         meanings.

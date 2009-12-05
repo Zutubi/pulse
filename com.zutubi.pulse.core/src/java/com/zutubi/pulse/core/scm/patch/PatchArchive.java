@@ -8,11 +8,14 @@ import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.unified.UnifiedPatchParser;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -79,12 +82,16 @@ public class PatchArchive
         return metadata;
     }
 
-    public List<Feature> apply(File base, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws PulseException
+    public List<Feature> apply(File base, ExecutionContext context, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws PulseException
     {
         scmFeedbackHandler.status("Applying patch...");
         try
         {
             List<FileStatus> statuses = new LinkedList<FileStatus>(metadata.getFileStatuses());
+            if (scmClient instanceof PatchInterceptor)
+            {
+                ((PatchInterceptor)scmClient).beforePatch(context, statuses);
+            }
 
             // Sort the statuses so that we handle nested files before their parents.  So, for
             // example, if all files in a tree are marked for delete we can verify they all exist
@@ -106,10 +113,16 @@ public class PatchArchive
 
             unzip(base, scmFeedbackHandler);
 
+            EOLStyle localEOL = scmClient.getEOLPolicy(context);
             for (FileStatus fs : statuses)
             {
                 postApply(fs, base, localEOL);
                 scmFeedbackHandler.checkCancelled();
+            }
+
+            if (scmClient instanceof PatchInterceptor)
+            {
+                ((PatchInterceptor)scmClient).afterPatch(context, statuses);
             }
 
             scmFeedbackHandler.status("Patch applied.");
@@ -239,7 +252,7 @@ public class PatchArchive
 
         scmFeedbackHandler.status(status.toString());
 
-        File f = new File(base, path);
+        File f = new File(base, status.getTargetPath());
         if (entry.isDirectory())
         {
             if (!f.isDirectory() && !f.mkdirs())

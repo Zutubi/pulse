@@ -40,6 +40,7 @@ public class PerforceConstants
     public static final String COMMAND_SUBMIT = "submit";
     public static final String COMMAND_SYNC = "sync";
     public static final String COMMAND_USER = "user";
+    public static final String COMMAND_WHERE = "where";
     public static final String FLAG_AFFECTED_CHANGELIST = "-e";
     public static final String FLAG_AUTO_MERGE = "-am";
     public static final String FLAG_CHANGELIST = "-c";
@@ -112,7 +113,7 @@ public class PerforceConstants
             "xunicode"
     };
 
-    private static final String P4_COMMAND = System.getProperty("pulse.p4.command", "p4");
+    public static final String P4_COMMAND = System.getProperty("pulse.p4.command", "p4");
     private static final String P4_COMMAND_PREFIX = "pulse.p4.command.";
 
     /**

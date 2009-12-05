@@ -321,7 +321,7 @@ public class GitClient implements ScmClient
 
     }
 
-    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ExecutionContext context) throws ScmException
     {
         return EOLStyle.BINARY;
     }

@@ -8,10 +8,9 @@ import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
-import com.zutubi.util.Constants;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.SecurityUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
+import com.zutubi.util.*;
 
 import java.io.*;
 import java.text.ParseException;
@@ -20,7 +19,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PerforceClient extends CachingScmClient
+public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
     public static final String TYPE = "p4";
 
@@ -29,11 +28,15 @@ public class PerforceClient extends CachingScmClient
     //   <depot file>#<revision> - (refreshing|updating|added as|deleted as) <local file>
     //   ...
     private static final Pattern SYNC_PATTERN = Pattern.compile("^(.+)#([0-9]+) - (refreshing|updating|added as|deleted as) (.+)$", Pattern.MULTILINE);
+    /**
+     * Used to limit the number of files we'll pass as arguments to fstat in
+     * one go, lest we hit some command or OS limit.
+     */
+    private static final int FSTAT_FILE_LIMIT = 32;
 
     private PerforceConfiguration configuration;
     private PerforceCore core;
     private PerforceWorkspaceManager workspaceManager;
-
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
@@ -555,11 +558,11 @@ public class PerforceClient extends CachingScmClient
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
-    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ExecutionContext context) throws ScmException
     {
         final EOLStyle[] eol = new EOLStyle[]{EOLStyle.NATIVE};
 
-        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
+        PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
             core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
@@ -726,5 +729,80 @@ public class PerforceClient extends CachingScmClient
         {
             e.printStackTrace();
         }
+    }
+
+    public void beforePatch(ExecutionContext context, List<FileStatus> statuses) throws ScmException
+    {
+        PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
+        try
+        {
+            List<List<FileStatus>> partitioned = CollectionUtils.partition(FSTAT_FILE_LIMIT, statuses);
+            for (List<FileStatus> sublist: partitioned)
+            {
+                convertTargetPaths(workspace, sublist);
+            }
+        }
+        finally
+        {
+            workspaceManager.freeWorkspace(core, workspace);
+        }
+    }
+
+    private void convertTargetPaths(PerforceWorkspace workspace, List<FileStatus> statuses) throws ScmException
+    {
+        List<String> fstatCommand = new LinkedList<String>();
+        fstatCommand.add(getP4Command(COMMAND_FSTAT));
+        fstatCommand.add(FLAG_CLIENT);
+        fstatCommand.add(workspace.getName());
+        fstatCommand.add(COMMAND_FSTAT);
+        fstatCommand.add(FLAG_PATH_IN_DEPOT_FORMAT);
+
+        boolean fileToMap = false;
+        for (FileStatus status: statuses)
+        {
+            String targetPath = status.getTargetPath();
+            if (StringUtils.stringSet(targetPath) && targetPath.startsWith("//"))
+            {
+                fileToMap = true;
+                fstatCommand.add(targetPath);
+            }
+        }
+
+        if (fileToMap)
+        {
+            mapFiles(statuses, fstatCommand);
+        }
+    }
+
+    private void mapFiles(List<FileStatus> statuses, List<String> fstatCommand) throws ScmException
+    {
+        final Map<String, String> mappedPaths = new HashMap<String, String>();
+        core.runP4WithHandler(new AbstractPerforceFStatHandler()
+        {
+            @Override
+            protected void handleCurrentItem()
+            {
+                String depotFile = currentItem.get("depotFile");
+                String path = currentItem.get("clientFile");
+                if (StringUtils.stringSet(depotFile) && StringUtils.stringSet(path))
+                {
+                    mappedPaths.put(depotFile, getPath(path));
+                }
+            }
+        }, null, fstatCommand.toArray(new String[fstatCommand.size()]));
+
+        for (FileStatus status: statuses)
+        {
+            String mapped = mappedPaths.get(status.getTargetPath());
+            if (mapped != null)
+            {
+                status.setTargetPath(mapped);
+            }
+        }
+    }
+
+    public void afterPatch(ExecutionContext context, List<FileStatus> statuses)
+    {
+        // Do nothing.
     }
 }

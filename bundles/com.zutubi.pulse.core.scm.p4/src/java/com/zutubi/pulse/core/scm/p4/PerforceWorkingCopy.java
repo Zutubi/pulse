@@ -80,8 +80,6 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             }
         }
 
-        // TODO: check the client mapping?  This is difficult...many false positives methinks
-        
         return true;
     }
 
@@ -284,7 +282,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
     public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
     {
-        FileTypeFStatHandler handler = new FileTypeFStatHandler(context.getUI());
+        FileTypeFStatHandler handler = new FileTypeFStatHandler();
         PerforceCore core = createCore(context);
         File f = new File(context.getBase(), path);
         core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, f.getAbsolutePath());

@@ -129,7 +129,7 @@ public class GitPatchFormat implements PatchFormat
         return true;
     }
 
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
+    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
     {
         NativeGit git = new NativeGit();
         git.setWorkingDirectory(baseDir);

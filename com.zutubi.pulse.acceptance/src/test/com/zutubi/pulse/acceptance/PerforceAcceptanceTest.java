@@ -1,31 +1,19 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.p4.PerforceConstants;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
-import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Runs simple projects that use a Perforce depot.
  */
 public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
-    private static final String P4PORT = ":6777";
-    private static final String P4USER = "pulse";
-    private static final String P4PASSWD = "pulse";
-    private static final String P4CLIENT = "triviant";
-
-    private static final String MANUAL_VIEW = "//depot/triviant/trunk/... //pulse/...";
-
-    private static final String WORKSPACE_PREFIX = "pulse-";
-
     private static final long WORKSPACE_TIMEOUT = 30000;
 
     private PerforceCore core;
@@ -34,11 +22,8 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         super.setUp();
 
-        core = createCore();
-        for (String workspace: getAllPulseWorkspaces())
-        {
-            core.deleteWorkspace(workspace);
-        }
+        core = PerforceUtils.createCore();
+        PerforceUtils.deleteAllPulseWorkspaces(core);
 
         xmlRpcHelper.loginAsAdmin();
     }
@@ -51,12 +36,12 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testSimpleBuild() throws Exception
     {
-        simpleBuildTest(createSpecConfig());
+        simpleBuildTest(PerforceUtils.createSpecConfig(xmlRpcHelper));
     }
 
     public void testManualView() throws Exception
     {
-        simpleBuildTest(createViewConfig());
+        simpleBuildTest(PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.TRIVIAL_VIEW));
     }
 
     private void simpleBuildTest(Hashtable<String, Object> p4Config) throws Exception
@@ -70,13 +55,13 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testClientsCleanedUp() throws Exception
     {
-        assertTrue(getAllPulseWorkspaces().isEmpty());
+        assertTrue(PerforceUtils.getAllPulseWorkspaces(core).isEmpty());
 
         String project = randomName();
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createSpecConfig(), xmlRpcHelper.getAntConfig());
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(xmlRpcHelper), xmlRpcHelper.getAntConfig());
         xmlRpcHelper.runBuild(project);
 
-        assertFalse(getAllPulseWorkspaces().isEmpty());
+        assertFalse(PerforceUtils.getAllPulseWorkspaces(core).isEmpty());
 
         xmlRpcHelper.deleteConfig(projectPath);
 
@@ -86,7 +71,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 try
                 {
-                    return getAllPulseWorkspaces().isEmpty();
+                    return PerforceUtils.getAllPulseWorkspaces(core).isEmpty();
                 }
                 catch (ScmException e)
                 {
@@ -94,51 +79,5 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
                 }
             }
         }, WORKSPACE_TIMEOUT, "Workspaces to be cleaned up");
-    }
-
-    private List<String> getAllPulseWorkspaces() throws ScmException
-    {
-        return CollectionUtils.filter(core.getAllWorkspaceNames(), new Predicate<String>()
-        {
-            public boolean satisfied(String s)
-            {
-                return s.startsWith(WORKSPACE_PREFIX);
-            }
-        });
-    }
-
-    private PerforceCore createCore()
-    {
-        PerforceCore core = new PerforceCore();
-        core.setEnv(PerforceConstants.ENV_PORT, P4PORT);
-        core.setEnv(PerforceConstants.ENV_USER, P4USER);
-        core.setEnv(PerforceConstants.ENV_PASSWORD, P4PASSWD);
-        core.setEnv(PerforceConstants.ENV_CLIENT, P4CLIENT);
-        return core;
-    }
-
-    private Hashtable<String, Object> createSpecConfig() throws Exception
-    {
-        Hashtable<String, Object> p4Config = createPerforceConfig();
-        p4Config.put("spec", P4CLIENT);
-        return p4Config;
-    }
-
-    private Hashtable<String, Object> createViewConfig() throws Exception
-    {
-        Hashtable<String, Object> p4Config = createPerforceConfig();
-        p4Config.put("useTemplateClient", false);
-        p4Config.put("view", MANUAL_VIEW);
-        return p4Config;
-    }
-
-    private Hashtable<String, Object> createPerforceConfig() throws Exception
-    {
-        Hashtable<String, Object> p4Config = xmlRpcHelper.createDefaultConfig("zutubi.perforceConfig");
-        p4Config.put("port", P4PORT);
-        p4Config.put("user", P4USER);
-        p4Config.put("password", P4PASSWD);
-        p4Config.put("monitor", false);
-        return p4Config;
     }
 }

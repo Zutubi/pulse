@@ -748,7 +748,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public EOLStyle getEOLPolicy(ScmContext context)
+    public EOLStyle getEOLPolicy(ExecutionContext context)
     {
         return EOLStyle.BINARY;
     }

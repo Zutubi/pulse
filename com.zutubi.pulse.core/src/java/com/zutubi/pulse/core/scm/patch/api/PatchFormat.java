@@ -77,10 +77,7 @@ public interface PatchFormat
      * @param context            context of the build in which the patch is being applied
      * @param patchFile          the patch file to apply
      * @param baseDir            base of the working copy to which the patch should be applied
-     * @param localEOL           the local SCM configuration's end-of-line policy - the value
-     *                           returned by {@link com.zutubi.pulse.core.scm.api.ScmClient#getEOLPolicy(com.zutubi.pulse.core.scm.api.ScmContext)}
-     *                           for the project's ScmClient implementation (invoked on the master
-     *                           rather than during the build)
+     * @param scmClient          client for the SCM used to bootstrap this build
      * @param scmFeedbackHandler handler used to report status for long-running operations - the
      *                           implementation should also call {@link com.zutubi.pulse.core.scm.api.ScmFeedbackHandler#checkCancelled()}
      *                           on this handler as frequently as practical
@@ -89,7 +86,7 @@ public interface PatchFormat
      *                           or warnings about recoverable problems applying the patch.
      * @throws ScmException on any error, including problems with clean application of the patch
      */
-    List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException;
+    List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws ScmException;
 
     /**
      * Reads all file status information from the given patch file.  The returned list should

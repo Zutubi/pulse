@@ -195,12 +195,13 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for all implementations.
      *
-     * @param context  defines the scm context in which the operation is being run
+     * @param context defines the execution context in which the operation is
+     *                being run
      * @return the EOL policy, which will be EOLStyle.BINARY if no policy is
      *         in effect
      * @throws ScmException on error
      */
-    EOLStyle getEOLPolicy(ScmContext context) throws ScmException;
+    EOLStyle getEOLPolicy(ExecutionContext context) throws ScmException;
 
     /**
      * Returns the latest repository revision.

@@ -27,7 +27,7 @@ public class UnifiedPatchFormat implements PatchFormat
         throw new UnsupportedOperationException("Creation of unified patches is not supported.");
     }
 
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
+    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
     {
         PatchFile patch = parse(patchFile);
         try

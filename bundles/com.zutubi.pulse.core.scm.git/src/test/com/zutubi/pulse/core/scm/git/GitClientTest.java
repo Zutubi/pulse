@@ -53,7 +53,7 @@ public class GitClientTest extends GitClientTestBase
     
     public void testGetEOLStyle() throws ScmException
     {
-        assertEquals(EOLStyle.BINARY, client.getEOLPolicy(scmContext));
+        assertEquals(EOLStyle.BINARY, client.getEOLPolicy(context));
     }
 
     public void testGetProperties() throws ScmException

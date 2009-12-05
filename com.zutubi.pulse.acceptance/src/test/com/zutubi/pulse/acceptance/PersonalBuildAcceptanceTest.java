@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
+import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -11,6 +13,10 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.git.GitPatchFormat;
 import com.zutubi.pulse.core.scm.git.GitWorkingCopy;
+import com.zutubi.pulse.core.scm.p4.PerforceClient;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.pulse.core.scm.p4.PerforceCore;
+import com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy;
 import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
@@ -58,6 +64,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         WorkingCopyFactory.registerType("svn", SubversionWorkingCopy.class);
         WorkingCopyFactory.registerType("git", GitWorkingCopy.class);
+        WorkingCopyFactory.registerType("p4", PerforceWorkingCopy.class);
         workingCopyDir = FileSystemUtils.createTempDir("PersonalBuildAcceptanceTest", "");
 
         DAVRepositoryFactory.setup();
@@ -84,7 +91,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
+        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, AgentManager.MASTER_AGENT_NAME);
 
         PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
@@ -136,7 +143,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
-            verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
+            verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, AgentManager.MASTER_AGENT_NAME);
         }
         finally
         {
@@ -169,7 +176,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        verifyPersonalBuildTabs(buildNumber, AGENT_NAME);
+        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, AGENT_NAME);
     }
 
     public void testPersonalBuildWithHooks() throws Exception
@@ -313,6 +320,43 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         }
 
         SystemUtils.runCommandWithInput(null, pd);
+    }
+
+    public void testPerforcePersonalBuild() throws Exception
+    {
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(xmlRpcHelper), xmlRpcHelper.getAntConfig());
+        runPerforcePersonalBuild();
+    }
+
+    public void testPerforcePersonalBuildRemappedFile() throws Exception
+    {
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.MAPPED_VIEW), xmlRpcHelper.getAntConfig("mapped/build.xml"));
+        runPerforcePersonalBuild();
+    }
+
+    private void runPerforcePersonalBuild() throws Exception
+    {
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+
+        PerforceCore core = PerforceUtils.createCore();
+        String clientName = PerforceUtils.WORKSPACE_PREFIX + random;
+        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, clientName, "Test workspace", workingCopyDir.getAbsolutePath(), null);
+        try
+        {
+            core.setEnv(ENV_CLIENT, clientName);
+            core.runP4(null, P4_COMMAND, COMMAND_SYNC);
+            core.runP4(null, P4_COMMAND, COMMAND_EDIT, new File(workingCopyDir, "build.xml").getAbsolutePath());
+            makeChangeToBuildFile();
+            createConfigFile(random, asPair(PROPERTY_CLIENT, clientName), asPair(PROPERTY_PORT, P4PORT), asPair(PROPERTY_USER, P4USER), asPair(PROPERTY_PASSWORD, P4PASSWD));
+
+            loginAsAdmin();
+            long buildNumber = runPersonalBuild(ResultState.FAILURE);
+            verifyPersonalBuildTabs(random, buildNumber, AgentManager.MASTER_AGENT_NAME);
+        }
+        finally
+        {
+            PerforceUtils.deleteAllPulseWorkspaces(core);
+        }
     }
 
     public void testUnifiedPatch() throws Exception
@@ -463,6 +507,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         patchFormatFactory.registerFormatType("git", GitPatchFormat.class);
         patchFormatFactory.registerScm("git", "git");
         patchFormatFactory.registerFormatType("unified", UnifiedPatchFormat.class);
+        patchFormatFactory.registerScm(PerforceClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
         patchFormatFactory.setObjectFactory(new DefaultObjectFactory());
 
         PersonalBuildClient client = new PersonalBuildClient(config, ui);
@@ -473,12 +518,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         return ui;
     }
 
-    private void verifyPersonalBuildTabs(long buildNumber, String agent)
+    private void verifyPersonalBuildTabs(String projectName, long buildNumber, String agent)
     {
         // Verify each tab in turn
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("nosuchcommand");
-        assertEquals(agent, browser.getText(IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default")));
+        assertEquals(agent, browser.getText(IDs.stageAgentCell(projectName, buildNumber, "default")));
 
         browser.click(IDs.buildDetailsTab());
         PersonalBuildDetailedViewPage detailedViewPage = browser.createPage(PersonalBuildDetailedViewPage.class, buildNumber);

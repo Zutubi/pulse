@@ -1,10 +1,8 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,7 +123,7 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ExecutionContext context) throws ScmException
     {
         return EOLStyle.BINARY;
     }
@@ -141,16 +139,6 @@ public class MockScmClient implements ScmClient, DataCacheAware
     }
 
     public String getEmailAddress(ScmContext context, String user) throws ScmException
-    {
-        throw new RuntimeException("Not implemented");
-    }
-
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
-    {
-        throw new RuntimeException("Not implemented");
-    }
-
-    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
     {
         throw new RuntimeException("Not implemented");
     }

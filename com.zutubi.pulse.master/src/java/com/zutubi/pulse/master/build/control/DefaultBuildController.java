@@ -524,22 +524,8 @@ public class DefaultBuildController implements EventListener, BuildController
     private Bootstrapper createPersonalBuildBootstrapper(final Bootstrapper initialBootstrapper)
     {
         // TODO: preferrable to move this out (maybe to the request)
-        try
-        {
-            return withScmClient(projectConfig, scmManager, new ScmContextualAction<Bootstrapper>()
-            {
-                public Bootstrapper process(ScmClient client, ScmContext context) throws ScmException
-                {
-                    PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
-                    EOLStyle localEOL = client.getEOLPolicy(context);
-                    return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), pbr.getPatchFormat(), localEOL);
-                }
-            });
-        }
-        catch (ScmException e)
-        {
-            throw new BuildException("Unable to determine SCM end-of-line policy: " + e.getMessage(), e);
-        }
+        PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
+        return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), pbr.getPatchFormat());
     }
 
     private String getTriggerName(long recipeId)

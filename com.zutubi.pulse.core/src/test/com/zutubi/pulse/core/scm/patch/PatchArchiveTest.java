@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.scm.patch;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
@@ -166,6 +168,6 @@ public class PatchArchiveTest extends PulseTestCase
         StandardPatchFormat patchFormat = new StandardPatchFormat();
         patchFormat.writePatchFile(statusBuilder, context, archiveFile);
         PatchArchive archive = new PatchArchive(archiveFile);
-        return archive.apply(targetDir, EOLStyle.BINARY, new RecordingScmFeedbackHandler());
+        return archive.apply(targetDir, new PulseExecutionContext(), mock(ScmClient.class), new RecordingScmFeedbackHandler());
     }
 }

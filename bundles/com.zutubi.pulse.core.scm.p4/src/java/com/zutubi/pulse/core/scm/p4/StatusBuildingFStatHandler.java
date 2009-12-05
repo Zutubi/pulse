@@ -11,11 +11,13 @@ import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
  */
 public class StatusBuildingFStatHandler extends AbstractPerforceFStatHandler
 {
+    private PersonalBuildUI ui;
     private WorkingCopyStatus status;
 
     public StatusBuildingFStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
     {
-        super(ui);
+        super();
+        this.ui = ui;
         this.status = status;
     }
 
@@ -24,6 +26,7 @@ public class StatusBuildingFStatHandler extends AbstractPerforceFStatHandler
         if(currentItem.containsKey(FSTAT_CLIENT_FILE))
         {
             String path = getPath(currentItem.get(FSTAT_CLIENT_FILE));
+            String depotPath = currentItem.get(FSTAT_DEPOT_FILE);
             String action = currentItem.get(FSTAT_ACTION);
             FileStatus.State state = FileStatus.State.UNCHANGED;
 
@@ -45,7 +48,7 @@ public class StatusBuildingFStatHandler extends AbstractPerforceFStatHandler
                 }
             }
 
-            FileStatus fs = new FileStatus(path, state, false);
+            FileStatus fs = new FileStatus(path, state, false, depotPath);
 
             if(fs.isInteresting())
             {
@@ -120,22 +123,6 @@ public class StatusBuildingFStatHandler extends AbstractPerforceFStatHandler
             ui.warning("Unrecognised action '" + action + "': assuming file is modified.");
             return FileStatus.State.MODIFIED;
         }
-    }
-
-    private String getPath(String clientFile)
-    {
-        // clientFile has form //<client>/<path>
-        int length = clientFile.length();
-        if(length > 3)
-        {
-            int index = clientFile.indexOf('/', 2);
-            if(index >= 0 && index < length - 1)
-            {
-                clientFile = clientFile.substring(index + 1);
-            }
-        }
-
-        return clientFile;
     }
 
     private boolean fileIsExecutable(String type)
