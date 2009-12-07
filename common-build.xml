@@ -286,7 +286,7 @@
                     </fileset>
                     <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
                     <fileset dir="${3rd.party.extracted}">
-                        <exclude name="META-INF"/>
+                        <exclude name="META-INF/**"/>
                     </fileset>
                     <!-- include license text files. -->
                     <fileset dir="${3rd.party.jars}">
