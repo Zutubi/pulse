@@ -485,14 +485,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         DependencyConfiguration dependency = projectB.addDependency(projectA.getConfig());
-        dependency.setRevision(LATEST + "." + STATUS_INTEGRATION);
+        dependency.setRevision(LATEST + STATUS_INTEGRATION);
         projectB.addExpectedFiles("lib/artifact-1.jar");
         projectB.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
         insertProject(projectB);
 
         buildRunner.triggerSuccessfulBuild(projectB);
 
-        dependency.setRevision(LATEST + "." + STATUS_RELEASE);
+        dependency.setRevision(LATEST + STATUS_RELEASE);
         updateProject(projectB);
 
         buildRunner.triggerFailedBuild(projectB);

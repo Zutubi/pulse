@@ -35,7 +35,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      */
     public void add(TreeNode<T> child)
     {
-        setParent(this, Arrays.asList(child));
+        child.parent = this;
         children.add(child);
     }
 

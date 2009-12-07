@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
@@ -8,13 +7,13 @@ import java.util.List;
 /**
  * A predicate that requires another build request to be completed to be satisfied.
  */
-public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate
+public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate, OwnerDependencyPredicate
 {
-    private Project owner;
+    private Object owner;
 
     private BuildQueue buildQueue;
 
-    public OwnerCompleteQueuePredicate(BuildQueue buildQueue, Project owner)
+    public OwnerCompleteQueuePredicate(BuildQueue buildQueue, Object owner)
     {
         if (buildQueue == null)
         {
@@ -29,7 +28,7 @@ public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate
         this.buildQueue = buildQueue;
     }
 
-    public Project getOwner()
+    public Object getOwner()
     {
         return owner;
     }
@@ -39,7 +38,7 @@ public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate
         long metaBuildId = request.getRequest().getMetaBuildId();
 
         List<RequestHolder> existingRequests = buildQueue.getMetaBuildRequests(metaBuildId);
-        return CollectionUtils.find(existingRequests, new RequestsByOwnerPredicate(owner)) == null;
+        return !CollectionUtils.contains(existingRequests, new HasOwnerPredicate(owner));
     }
 
     @Override
@@ -50,7 +49,7 @@ public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate
 
         OwnerCompleteQueuePredicate that = (OwnerCompleteQueuePredicate) o;
 
-        return buildQueue.equals(that.buildQueue) && owner.equals(that.owner);
+        return buildQueue == that.buildQueue && owner.equals(that.owner);
     }
 
     @Override

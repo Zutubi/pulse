@@ -19,8 +19,8 @@ import java.util.List;
 /**
  * The build queue tracks queued and active build requests.
  * <p/>
- * Requests will be stored as queued until all of the queued requests
- * predicates are satisfied, at which point it will be activated.
+ * A request remains queued until all of its predicates are satisfied, at which point
+ * it is activated.
  */
 public class BuildQueue
 {
@@ -41,12 +41,13 @@ public class BuildQueue
     private LinkedList<ActivatedRequest> activatedRequests = new LinkedList<ActivatedRequest>();
 
     /**
-     * When paused, this build queue will not activated any requests.
+     * When paused, this build queue will suspend activating requests until
+     * the queue is unpaused.
      */
     private volatile boolean paused = false;
 
     /**
-     * When stopped, this build queue will not activate any requests.
+     * When stopped, this build queue will stop activating requests.
      */
     private volatile boolean stopped = false;
 
@@ -95,7 +96,7 @@ public class BuildQueue
      */
     public synchronized boolean cancel(long requestId)
     {
-        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new RequestsByIdPredicate(requestId));
+        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new HasIdPredicate(requestId));
 
         if (requestToCancel != null)
         {
@@ -119,7 +120,7 @@ public class BuildQueue
      */
     public synchronized boolean complete(long requestId)
     {
-        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new RequestsByIdPredicate(requestId));
+        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new HasIdPredicate(requestId));
 
         if (completedRequest != null)
         {
@@ -132,7 +133,10 @@ public class BuildQueue
     }
 
     /**
-     * Stop the queue from activating any further requests.
+     * Stop the queue from activating any further requests.  This is
+     * permanent.
+     *
+     * To temporarily stop the activation of requests, see {@link #pauseActivation()}
      */
     public synchronized void stop()
     {
@@ -263,25 +267,23 @@ public class BuildQueue
     private boolean onNewlyQueued(final QueuedRequest queuedRequest)
     {
         // find the first activated request that we can assimilate into.
-        List<ActivatedRequest> assimilationCandidates = CollectionUtils.filter(activatedRequests, new Predicate<ActivatedRequest>()
-        {
-            public boolean satisfied(ActivatedRequest activated)
-            {
-                return queuedRequest.getRequest().getOwner() == activated.getRequest().getOwner() &&
-                        StringUtils.equals(queuedRequest.getRequest().getOptions().getSource(), activated.getRequest().getOptions().getSource());
-            }
-        });
+        BuildRequestEvent event = queuedRequest.getRequest();
+        List<ActivatedRequest> assimilationCandidates = CollectionUtils.filter(activatedRequests,
+                new HasOwnerAndSource(event.getOwner(), event.getOptions().getSource())
+        );
         if (assimilationCandidates.size() > 0)
         {
-            ActivatedRequest activatedRequest = CollectionUtils.find(assimilationCandidates, new Predicate<ActivatedRequest>()
+            ActivatedRequest activatedRequest = null;
+            for (ActivatedRequest request : assimilationCandidates)
             {
-                public boolean satisfied(ActivatedRequest activatedRequest)
+                // is revision fixed?
+                BuildRevision buildRevision = queuedRequest.getRequest().getRevision();
+                if (request.getController().updateRevisionIfNotFixed(buildRevision.getRevision()))
                 {
-                    // is revision fixed?
-                    BuildRevision buildRevision = queuedRequest.getRequest().getRevision();
-                    return activatedRequest.getController().updateRevisionIfNotFixed(buildRevision.getRevision());
+                    activatedRequest = request;
+                    break;
                 }
-            });
+            }
 
             // if we located an active request we can assimilate with, do so.
             if (activatedRequest != null)
@@ -304,7 +306,7 @@ public class BuildQueue
             {
                 public boolean satisfied(QueuedRequest queued)
                 {
-                    return queued.getRequest().getOwner() == activated.getRequest().getOwner() &&
+                    return queued.getRequest().getOwner().equals(activated.getRequest().getOwner()) &&
                             StringUtils.equals(activated.getRequest().getOptions().getSource(), queued.getRequest().getOptions().getSource());
                 }
             });
@@ -363,8 +365,8 @@ public class BuildQueue
     public synchronized List<RequestHolder> getMetaBuildRequests(long metaBuildId)
     {
         LinkedList<RequestHolder> requests = new LinkedList<RequestHolder>();
-        requests.addAll(CollectionUtils.filter(queuedRequests, new RequestsByMetaIdPredicate(metaBuildId)));
-        requests.addAll(CollectionUtils.filter(activatedRequests, new RequestsByMetaIdPredicate(metaBuildId)));
+        requests.addAll(CollectionUtils.filter(queuedRequests, new HasMetaIdPredicate(metaBuildId)));
+        requests.addAll(CollectionUtils.filter(activatedRequests, new HasMetaIdPredicate(metaBuildId)));
         return requests;
     }
 
@@ -373,14 +375,14 @@ public class BuildQueue
      *
      * @param requestId the identifier of the request to be retrieved.
      *
-     * @return the retrieved
+     * @return the build request event matching the id.
      */
     public synchronized BuildRequestEvent getRequest(long requestId)
     {
-        RequestHolder request = CollectionUtils.find(queuedRequests, new RequestsByIdPredicate(requestId));
+        RequestHolder request = CollectionUtils.find(queuedRequests, new HasIdPredicate(requestId));
         if (request == null)
         {
-            request = CollectionUtils.find(activatedRequests, new RequestsByIdPredicate(requestId));
+            request = CollectionUtils.find(activatedRequests, new HasIdPredicate(requestId));
         }
         if (request != null)
         {
@@ -411,8 +413,8 @@ public class BuildQueue
     public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)
     {
         List<BuildRequestEvent> byOwner = new LinkedList<BuildRequestEvent>();
-        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(queuedRequests, new RequestsByOwnerPredicate(owner)), new ExtractRequestMapping()));
-        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(activatedRequests, new RequestsByOwnerPredicate(owner)), new ExtractRequestMapping()));
+        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(queuedRequests, new HasOwnerPredicate(owner)), new ExtractRequestMapping()));
+        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(activatedRequests, new HasOwnerPredicate(owner)), new ExtractRequestMapping()));
         return byOwner;
     }
 

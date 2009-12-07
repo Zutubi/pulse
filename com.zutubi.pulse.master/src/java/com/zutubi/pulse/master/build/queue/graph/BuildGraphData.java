@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 /**
  * The data contained by the dependency graph node.
  */
-public class GraphData
+public class BuildGraphData
 {
     /**
      * The project represented by the node itself.
@@ -21,7 +21,7 @@ public class GraphData
      */
     private DependencyConfiguration dependency;
 
-    public GraphData(Project project)
+    public BuildGraphData(Project project)
     {
         this.project = project;
     }

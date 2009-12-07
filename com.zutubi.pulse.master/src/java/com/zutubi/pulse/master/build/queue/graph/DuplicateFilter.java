@@ -14,11 +14,11 @@ import java.util.HashMap;
  */
 public class DuplicateFilter extends GraphFilter
 {
-    Map<Project, TreeNode<GraphData>> seenProjects = new HashMap<Project, TreeNode<GraphData>>();
+    Map<Project, TreeNode<BuildGraphData>> seenProjects = new HashMap<Project, TreeNode<BuildGraphData>>();
 
-    public void process(TreeNode<GraphData> node)
+    public void process(TreeNode<BuildGraphData> node)
     {
-        TreeNode<GraphData> lastSeen = seenProjects.get(node.getData().getProject());
+        TreeNode<BuildGraphData> lastSeen = seenProjects.get(node.getData().getProject());
         if (lastSeen != null)
         {
             toTrim.addAll(lastSeen.getChildren());

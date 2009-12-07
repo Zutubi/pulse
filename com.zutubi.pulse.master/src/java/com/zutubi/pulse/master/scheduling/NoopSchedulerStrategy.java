@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * This scheduler strategy is for triggers that do nothing.  These
+ * types of triggers exist for there configuration only.
  */
 public class NoopSchedulerStrategy implements SchedulerStrategy
 {
@@ -39,6 +40,5 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
 
     public void setTriggerHandler(TriggerHandler handler)
     {
-
     }
 }

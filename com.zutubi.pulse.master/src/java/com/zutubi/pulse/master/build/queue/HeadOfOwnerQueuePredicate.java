@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.ReverseListIterator;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -32,16 +34,14 @@ public class HeadOfOwnerQueuePredicate implements QueuedRequestPredicate
      */
     public boolean satisfied(final QueuedRequest request)
     {
-        List<QueuedRequest> queuedRequests = buildQueue.getQueuedRequests();
+        LinkedList<QueuedRequest> queuedRequests = new LinkedList<QueuedRequest>(buildQueue.getQueuedRequests());
 
         // are we at the head of the queue for our owner?
-        List<QueuedRequest> ownerQueue = CollectionUtils.filter(queuedRequests, new RequestsByOwnerPredicate(request.getRequest().getOwner()));
-        if (ownerQueue.size() > 0)
-        {
-            QueuedRequest headOfQueue = ownerQueue.get(ownerQueue.size() - 1);
-            return headOfQueue == request;
-        }
-        return false;
+        QueuedRequest headOfQueue = CollectionUtils.find(
+                new ReverseListIterator<QueuedRequest>(queuedRequests),
+                new HasOwnerPredicate(request.getOwner())
+        );
+        return headOfQueue.equals(request);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class HeadOfOwnerQueuePredicate implements QueuedRequestPredicate
 
         HeadOfOwnerQueuePredicate that = (HeadOfOwnerQueuePredicate) o;
 
-        return buildQueue.equals(that.buildQueue);
+        return buildQueue == that.buildQueue;
     }
 
     @Override

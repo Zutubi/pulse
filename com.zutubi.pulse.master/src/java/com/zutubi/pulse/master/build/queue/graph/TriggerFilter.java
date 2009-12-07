@@ -20,7 +20,7 @@ public class TriggerFilter extends GraphFilter
 {
     private Scheduler scheduler;
 
-    public void process(TreeNode<GraphData> node)
+    public void process(TreeNode<BuildGraphData> node)
     {
         if (isDownstream(node))
         {

@@ -44,8 +44,6 @@ public class SingleBuildRequestEvent extends BuildRequestEvent
         result.setStatus(getStatus());
         result.setMetaBuildId(getMetaBuildId());
 
-        // how safe is updating all of the related build results at this stage?  (the depends on relation
-        // is tracked by an id on the dependentResult)
         for (Project dependentProject : dependentProjects)
         {
             BuildResult dependentResult = buildManager.getByProjectAndMetabuildId(dependentProject,  getMetaBuildId());

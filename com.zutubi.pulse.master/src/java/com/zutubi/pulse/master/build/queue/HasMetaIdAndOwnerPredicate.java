@@ -9,15 +9,15 @@ import com.zutubi.util.ConjunctivePredicate;
  *
  * @param <T> the specific subclass of RequestHolder that is being searched.
  */
-public class RequestsByMetaIdAndOwnerPredicate<T extends RequestHolder> implements Predicate<T>
+public class HasMetaIdAndOwnerPredicate<T extends RequestHolder> implements Predicate<T>
 {
     private Predicate<T> delegate;
 
-    public RequestsByMetaIdAndOwnerPredicate(long metaBuildId, Object owner)
+    public HasMetaIdAndOwnerPredicate(long metaBuildId, Object owner)
     {
         this.delegate = new ConjunctivePredicate<T>(
-                new RequestsByMetaIdPredicate(metaBuildId),
-                new RequestsByOwnerPredicate(owner)
+                new HasMetaIdPredicate(metaBuildId),
+                new HasOwnerPredicate(owner)
         );
     }
 

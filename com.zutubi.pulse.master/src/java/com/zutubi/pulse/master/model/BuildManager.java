@@ -163,12 +163,11 @@ public interface BuildManager
     BuildResult getByUserAndVirtualId(User user, String buildId);
 
     /**
-     * Get the build result that is associated with the build of the specified project
-     * as part of the metabuild.
+     * Get the build result for the specified project and metabuild.
      *
      * @param project       the project associated with the build
      * @param metaBuildId   the metabuild that the build was a part of.
-     * 
+     *
      * @return the build result for the project build assocaited with the metabuild, or
      * null if it is not found.
      */

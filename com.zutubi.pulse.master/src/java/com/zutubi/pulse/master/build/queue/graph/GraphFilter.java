@@ -19,16 +19,16 @@ import java.util.LinkedList;
  *
  * @see com.zutubi.pulse.master.build.queue.graph.GraphBuilder
  */
-public abstract class GraphFilter implements  UnaryProcedure<TreeNode<GraphData>>
+public abstract class GraphFilter implements  UnaryProcedure<TreeNode<BuildGraphData>>
 {
-    protected List<TreeNode<GraphData>> toTrim = new LinkedList<TreeNode<GraphData>>();
+    protected List<TreeNode<BuildGraphData>> toTrim = new LinkedList<TreeNode<BuildGraphData>>();
 
-    public boolean contains(TreeNode<GraphData> node)
+    public boolean contains(TreeNode<BuildGraphData> node)
     {
         return toTrim.contains(node);
     }
 
-    public List<TreeNode<GraphData>> getToTrim()
+    public List<TreeNode<BuildGraphData>> getToTrim()
     {
         return toTrim;
     }
@@ -42,7 +42,7 @@ public abstract class GraphFilter implements  UnaryProcedure<TreeNode<GraphData>
      * @param node the node being checked.
      * @return true if the node is part of an upstream graph, false otherwise.
      */
-    protected boolean isUpstream(TreeNode<GraphData> node)
+    protected boolean isUpstream(TreeNode<BuildGraphData> node)
     {
         if (node.isRoot() && node.getData().getDependency() == null)
         {
@@ -63,7 +63,7 @@ public abstract class GraphFilter implements  UnaryProcedure<TreeNode<GraphData>
      *
      * @see #isUpstream(com.zutubi.util.TreeNode)
      */
-    protected boolean isDownstream(TreeNode<GraphData> node)
+    protected boolean isDownstream(TreeNode<BuildGraphData> node)
     {
         return !isUpstream(node);
     }

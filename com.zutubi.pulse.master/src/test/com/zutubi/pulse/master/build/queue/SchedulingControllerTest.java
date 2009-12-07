@@ -138,6 +138,47 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         assertQueued();
     }
 
+    public void testDownstreamProjectPausedDoesNotImpactRequest()
+    {
+        Project projectA = createProject("a");
+        Project projectB = createProject("b", State.PAUSED, dependency(projectA));
+        BuildRequestEvent request = createRequest(projectA);
+        controller.handleEvent(request);
+
+        assertActivated(request);
+        assertQueued();
+    }
+
+    public void testUpstreamProjectPausedHaltsRequest()
+    {
+        Project projectA = createProject("a", State.PAUSED);
+        Project projectB = createProject("b", dependency(projectA));
+        BuildRequestEvent request = createRebuildRequest(projectB);
+        controller.handleEvent(request);
+
+        assertActivated();
+        assertQueued();
+
+        verify(buildRequestRegistry, times(1)).requestRejected(request, I18N.format("rejected.related.project.state"));
+    }
+
+    public void testPausedProjectDependenciesDoNotQueue()
+    {
+        Project util = createProject("util");
+        Project lib = createProject("lib", State.PAUSED, dependency(util));
+        Project clientA = createProject("clientA", dependency(lib));
+        Project clientB = createProject("clientB", dependency(lib));
+
+        BuildRequestEvent request = createRequest(util);
+        controller.handleEvent(request);
+
+        assertActivated(request);
+        assertQueued();
+
+        verify(buildRequestRegistry, times(1)).requestQueued(request);
+        verify(buildRequestRegistry, times(1)).requestActivated(request, request.getId());
+    }
+
     // -- build request status reporting
 
     public void testActivatedRequestRegistryTransitions()

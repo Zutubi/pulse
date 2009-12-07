@@ -4,21 +4,21 @@ import com.zutubi.util.Predicate;
 
 /**
  * A predicate that matches a request holder containing a
- * build request event with a specified owner
+ * build request event with a specified meta id.
  *
  * @param <T> the specific subclass of RequestHolder that is being searched.
  */
-public class RequestsByOwnerPredicate<T extends RequestHolder> implements Predicate<T>
+public class HasMetaIdPredicate<T extends RequestHolder> implements Predicate<T>
 {
-    private Object owner;
+    private long metaBuildId;
 
-    public RequestsByOwnerPredicate(Object owner)
+    public HasMetaIdPredicate(long metaBuildId)
     {
-        this.owner = owner;
+        this.metaBuildId = metaBuildId;
     }
 
     public boolean satisfied(RequestHolder holder)
     {
-        return holder.getRequest().getOwner().equals(owner);
+        return holder.getMetaBuildId() == metaBuildId;
     }
 }

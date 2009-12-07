@@ -41,8 +41,3 @@ public interface BuildRequestHandler
      */
     List<QueuedRequest> prepare(BuildRequestEvent request);
 }
-
-// Implementation note: the handlers no longer hold any state information and so can be
-// phased out in terms of being a separate stored entity in the schedulingController.
-// Having such an entity does however allow for more complex interations, so it may be
-// worth keeping it around...?

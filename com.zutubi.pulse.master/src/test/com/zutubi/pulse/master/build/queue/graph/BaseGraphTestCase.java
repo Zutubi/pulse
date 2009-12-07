@@ -20,21 +20,21 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
     protected List<ProjectConfiguration> allConfigs = new LinkedList<ProjectConfiguration>();
     protected Map<Long, Project> idToProject = new HashMap<Long, Project>();
 
-    protected void assertEquals(TreeNode<GraphData> expected, TreeNode<GraphData> got)
+    protected void assertEquals(TreeNode<BuildGraphData> expected, TreeNode<BuildGraphData> got)
     {
         assertEquals(expected.getData().getProject(), got.getData().getProject());
 
-        List<TreeNode<GraphData>> expectedChildren = expected.getChildren();
-        List<TreeNode<GraphData>> gotChildren = got.getChildren();
+        List<TreeNode<BuildGraphData>> expectedChildren = expected.getChildren();
+        List<TreeNode<BuildGraphData>> gotChildren = got.getChildren();
         assertEquals(expectedChildren.size(), gotChildren.size());
 
         // Order of children does not matter.(
-        for (TreeNode<GraphData> expectedChild : expectedChildren)
+        for (TreeNode<BuildGraphData> expectedChild : expectedChildren)
         {
-            final GraphData childData = expectedChild.getData();
-            TreeNode<GraphData> gotChild = CollectionUtils.find(gotChildren, new Predicate<TreeNode<GraphData>>()
+            final BuildGraphData childData = expectedChild.getData();
+            TreeNode<BuildGraphData> gotChild = CollectionUtils.find(gotChildren, new Predicate<TreeNode<BuildGraphData>>()
             {
-                public boolean satisfied(TreeNode<GraphData> node)
+                public boolean satisfied(TreeNode<BuildGraphData> node)
                 {
                     return node.getData().getProject().equals(childData.getProject());
                 }
@@ -45,18 +45,18 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
         }
     }
 
-    protected TreeNode<GraphData> node(Project project, TreeNode<GraphData>... children)
+    protected TreeNode<BuildGraphData> node(Project project, TreeNode<BuildGraphData>... children)
     {
-        TreeNode<GraphData> node = new TreeNode<GraphData>(new GraphData(project));
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(project));
         node.addAll(java.util.Arrays.asList(children));
         return node;
     }
 
-    protected TreeNode<GraphData> node(Project project, DependencyConfiguration dependency, TreeNode<GraphData>... children)
+    protected TreeNode<BuildGraphData> node(Project project, DependencyConfiguration dependency, TreeNode<BuildGraphData>... children)
     {
-        GraphData data = new GraphData(project);
+        BuildGraphData data = new BuildGraphData(project);
         data.setDependency(dependency);
-        TreeNode<GraphData> node = new TreeNode<GraphData>(data);
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(data);
         node.addAll(java.util.Arrays.asList(children));
         return node;
     }

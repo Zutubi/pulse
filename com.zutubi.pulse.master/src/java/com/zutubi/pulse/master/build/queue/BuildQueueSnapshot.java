@@ -74,7 +74,7 @@ public class BuildQueueSnapshot
      */
     public List<QueuedRequest> getQueuedRequestsByOwner(Object owner)
     {
-        return Collections.unmodifiableList(CollectionUtils.filter(queuedRequests, new RequestsByOwnerPredicate<QueuedRequest>(owner)));
+        return Collections.unmodifiableList(CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)));
     }
 
     /**

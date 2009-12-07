@@ -15,15 +15,27 @@ public class TransitiveFilterTest extends GraphFilterTestCase
         filter = new TransitiveFilter();
     }
 
-    public void testTransitiveUpstream()
+    public void testNoneTransitiveDependenciesFilterChildren()
     {
         Project client = project("client");
         Project lib = project("lib");
         Project util = project("util");
 
-        TreeNode<GraphData> node = node(client, node(lib, dependency(lib, false), node(util, dependency(util))));
+        TreeNode<BuildGraphData> node = node(client, node(lib, dependency(lib, false), node(util, dependency(util))));
 
         applyFilter(filter, node);
         assertEquals(1, filter.getToTrim().size());
+    }
+
+    public void testTransitiveDependenciesDoNotFilter()
+    {
+        Project client = project("client");
+        Project lib = project("lib");
+        Project util = project("util");
+
+        TreeNode<BuildGraphData> node = node(client, node(lib, dependency(lib), node(util, dependency(util))));
+
+        applyFilter(filter, node);
+        assertEquals(0, filter.getToTrim().size());
     }
 }

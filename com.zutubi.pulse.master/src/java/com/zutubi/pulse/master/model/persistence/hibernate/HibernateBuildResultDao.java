@@ -155,13 +155,13 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public BuildResult findByProjectAndMetabuildId(final Project project, final long metaBuildId)
+    public BuildResult findByProjectAndMetabuildId(final Project project, final long metaBuildId, final ResultState... states)
     {
         return (BuildResult)getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Criteria criteria = getBuildResultCriteria(session, project, new ResultState[]{ResultState.SUCCESS}, false);
+                Criteria criteria = getBuildResultCriteria(session, project, states, false);
                 criteria.add(Expression.eq("metaBuildId", metaBuildId));
                 criteria.setMaxResults(1);
                 criteria.addOrder(Order.desc("number"));
@@ -598,7 +598,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addProjectsToCriteria(Project[] projects, Criteria criteria)
     {
-        if (projects != null)
+        if (projects != null && projects.length > 0)
         {
             criteria.add(Expression.in("project", projects));
         }
@@ -606,7 +606,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addStatesToCriteria(ResultState[] states, Criteria criteria)
     {
-        if (states != null)
+        if (states != null && states.length > 0)
         {
             criteria.add(Expression.in("stateName", getStateNames(states)));
         }
@@ -614,7 +614,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addStatusesToCriteria(String[] statuses, Criteria criteria)
     {
-        if (statuses != null)
+        if (statuses != null && statuses.length > 0)
         {
             criteria.add(Expression.in("status", statuses));
         }

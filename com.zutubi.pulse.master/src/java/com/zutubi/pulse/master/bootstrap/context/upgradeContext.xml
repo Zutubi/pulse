@@ -100,6 +100,7 @@
                 <ref local="fixExpectedFailureSeries"/>
                 <ref local="lastAccessTimes"/>
                 <ref local="addPerforceTimeOffset"/>
+                <ref local="dependentBuildTriggerUpdate"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -473,4 +474,9 @@
     <bean id="addPerforceTimeOffset" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceTimeOffsetUpgradeTask">
         <property name="buildNumber" value="201010002"/>
     </bean>
+
+    <bean id="dependentBuildTriggerUpdate" class="com.zutubi.pulse.master.upgrade.tasks.DependentBuildTriggerUpgradeTask">
+        <property name="buildNumber" value="201010003"/>
+    </bean>
+
 </beans>

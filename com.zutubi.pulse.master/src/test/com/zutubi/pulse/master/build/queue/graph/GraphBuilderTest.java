@@ -186,13 +186,4 @@ public class GraphBuilderTest extends BaseGraphTestCase
                                 node(clientB))),
                 builder.buildDownstreamGraph(util));
     }
-
-/*
-    public void testTransitiveDependencyDownstream()
-    {
-        // Client having a false transitive dependency means it cares not for changes to util.
-        // However, lib does care, and so is rebuilt.  Client cares about lib, so is also triggered,
-        // meaning that the transitive flag can be ignored for downstream graphs. 
-    }
-*/
 }

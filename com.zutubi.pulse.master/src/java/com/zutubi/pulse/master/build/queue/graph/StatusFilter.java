@@ -26,7 +26,7 @@ public class StatusFilter extends GraphFilter
         this.status = status;
     }
 
-    public void process(TreeNode<GraphData> node)
+    public void process(TreeNode<BuildGraphData> node)
     {
         if (!node.isRoot())
         {
@@ -39,8 +39,5 @@ public class StatusFilter extends GraphFilter
                 toTrim.add(node);
             }
         }
-        // if the revision is a fixed revision, we somehow need to get hold of what
-        // revision our dependency is being built at, and if it differs, then filter.
-        // Maybe this is a separate (revision) filter.
     }
 }

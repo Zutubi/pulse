@@ -152,18 +152,8 @@
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory"/>
 
     <bean id="fatController" class="com.zutubi.pulse.master.build.queue.FatController" init-method="init"/>
-    <bean id="schedulingController" class="com.zutubi.pulse.master.build.queue.SchedulingController">
-        <property name="buildRequestRegistry" ref="buildRequestRegistry"/>
-        <property name="objectFactory" ref="objectFactory"/>
-        <property name="projectManager" ref="projectManager"/>
-        <property name="sequenceManager" ref="sequenceManager"/>
-        <property name="buildQueue" ref="buildQueue"/>
-    </bean>
-    <bean id="buildQueue" class="com.zutubi.pulse.master.build.queue.BuildQueue">
-        <property name="buildControllerFactory" ref="buildControllerFactory"/>
-        <property name="buildRequestRegistry" ref="buildRequestRegistry"/>
-        <property name="eventManager" ref="eventManager"/>
-    </bean>
+    <bean id="schedulingController" class="com.zutubi.pulse.master.build.queue.SchedulingController"/>
+    <bean id="buildQueue" class="com.zutubi.pulse.master.build.queue.BuildQueue"/>
     <bean id="buildControllerFactory" class="com.zutubi.pulse.master.build.control.DefaultBuildControllerFactory" init-method="init"/>
     <bean id="sequenceManager" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSequenceManager"/>
 

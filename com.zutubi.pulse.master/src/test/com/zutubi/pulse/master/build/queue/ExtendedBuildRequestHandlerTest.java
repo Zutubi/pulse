@@ -110,9 +110,6 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         assertEquals(handler.getMetaBuildId(), requestEvent.getMetaBuildId());
     }
 
-    // more testing to do here, particularly relating to the original build request event
-    // and how it is tracked / reported.
-
     public void testOriginalRequestIsAssociatedWithAppropriateQueuedRequest()
     {
         BuildRequestEvent originalRequest = createRequest("a");

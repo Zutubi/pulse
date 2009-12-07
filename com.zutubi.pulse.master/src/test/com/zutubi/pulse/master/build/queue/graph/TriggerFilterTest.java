@@ -42,7 +42,7 @@ public class TriggerFilterTest extends GraphFilterTestCase
         Map triggers = (Map) util.getConfig().getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
         triggers.clear();
 
-        TreeNode<GraphData> node = node(util);
+        TreeNode<BuildGraphData> node = node(util);
 
         applyFilter(filter, node);
 
@@ -54,7 +54,7 @@ public class TriggerFilterTest extends GraphFilterTestCase
     {
         Project util = project("util");
 
-        TreeNode<GraphData> node = node(util);
+        TreeNode<BuildGraphData> node = node(util);
 
         stub(trigger.isActive()).toReturn(Boolean.TRUE);
 
@@ -67,7 +67,7 @@ public class TriggerFilterTest extends GraphFilterTestCase
     {
         Project util = project("util");
 
-        TreeNode<GraphData> node = node(util);
+        TreeNode<BuildGraphData> node = node(util);
         stub(trigger.isActive()).toReturn(Boolean.FALSE);
 
         applyFilter(filter, node);

@@ -21,7 +21,7 @@ public class DuplicateFilterTest extends GraphFilterTestCase
         Project lib = project("lib");
         Project client = project("client");
 
-        TreeNode<GraphData> root =
+        TreeNode<BuildGraphData> root =
                 node(client,
                         node(lib,
                                 node(util)));
@@ -37,7 +37,7 @@ public class DuplicateFilterTest extends GraphFilterTestCase
         Project lib = project("lib");
         Project client = project("client");
 
-        TreeNode<GraphData> root =
+        TreeNode<BuildGraphData> root =
                 node(util,
                         node(lib,
                                 node(client)));
@@ -54,7 +54,7 @@ public class DuplicateFilterTest extends GraphFilterTestCase
         Project libB = project("libB");
         Project client = project("client");
 
-        TreeNode<GraphData> root =
+        TreeNode<BuildGraphData> root =
                 node(client,
                         node(libA,
                                 node(util)),
@@ -75,7 +75,7 @@ public class DuplicateFilterTest extends GraphFilterTestCase
         Project libB = project("libB");
         Project client = project("client");
 
-        TreeNode<GraphData> root =
+        TreeNode<BuildGraphData> root =
                 node(client,
                         node(libA,
                                 node(util,
@@ -96,7 +96,7 @@ public class DuplicateFilterTest extends GraphFilterTestCase
         Project utilB = project("utilB");
         Project lib = project("lib");
 
-        TreeNode<GraphData> root =
+        TreeNode<BuildGraphData> root =
                 node(platform,
                         node(utilA,
                                 node(lib)),
@@ -116,7 +116,7 @@ public class DuplicateFilterTest extends GraphFilterTestCase
         Project lib = project("lib");
         Project client = project("client");
 
-        TreeNode<GraphData> root =
+        TreeNode<BuildGraphData> root =
                 node(platform,
                         node(utilA,
                                 node(lib,

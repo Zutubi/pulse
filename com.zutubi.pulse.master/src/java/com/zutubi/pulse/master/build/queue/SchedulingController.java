@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.InstanceOfPredicate;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
@@ -38,101 +39,137 @@ public class SchedulingController implements EventListener
 
     private Map<Long, BuildRequestHandler> handlers = new HashMap<Long, BuildRequestHandler>();
 
-    /**
-     * Handle a build request.
-     *
-     * @param request
-     */
     protected void handleBuildRequest(BuildRequestEvent request)
     {
         BuildRequestHandler requestHandler = getRequestHandler(request);
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (requestHandler)
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (buildQueue)
         {
-            List<QueuedRequest> requestsToQueue = requestHandler.prepare(request);
+            List<QueuedRequest> candidates = new LinkedList<QueuedRequest>(requestHandler.prepare(request));
 
-            List<BuildRequestEvent> preparedRequests = CollectionUtils.map(requestsToQueue, new ExtractRequestMapping<QueuedRequest>());
-
-            // a) lock the necessary projects before moving on.
-            lockProjectStates(preparedRequests);
+            List<BuildRequestEvent> allRequests = CollectionUtils.map(candidates, new ExtractRequestMapping<QueuedRequest>());
+            lockProjectStates(allRequests);
             try
             {
-                // Can this build proceed?
-                List<BuildRequestEvent> rejectedRequests = new LinkedList<BuildRequestEvent>();
-                List<BuildRequestEvent> acceptedRequests = new LinkedList<BuildRequestEvent>(preparedRequests);
+                CanBuildPredicate canBuild = objectFactory.buildBean(CanBuildPredicate.class);
 
-                filterCanBuild(acceptedRequests, rejectedRequests);
-                if (rejectedRequests.size() == 0) // yes it can.
+                List<QueuedRequest> accepted = filterCanBuildRequestsInplace(candidates);
+                List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
+
+                boolean canProceed = CollectionUtils.contains(accepted, new HasIdPredicate<QueuedRequest>(request.getId()));
+                if (!canProceed)
                 {
-                    // Send the requests on there way.
-                    buildQueue.enqueue(requestsToQueue);
+                    rejected.addAll(accepted);
+                }
 
-                    for (BuildRequestEvent preparedRequest : preparedRequests)
+                if (accepted.size() > 0)
+                {
+                    buildQueue.enqueue(accepted);
+
+                    for (QueuedRequest acceptedRequest : accepted)
                     {
-                        Project project = getProject(preparedRequest);
-                        if (buildQueue.hasRequest(preparedRequest.getOwner()) && !preparedRequest.isPersonal())
+                        Project project = getProject(acceptedRequest.getRequest());
+                        if (buildQueue.hasRequest(acceptedRequest.getOwner()) && !acceptedRequest.isPersonal())
                         {
                             if (project.isTransitionValid(Project.Transition.BUILDING))
                             {
-                                projectManager.makeStateTransition(preparedRequest.getProjectId(), Project.Transition.BUILDING);
+                                projectManager.makeStateTransition(acceptedRequest.getProjectId(), Project.Transition.BUILDING);
                             }
                         }
                     }
                 }
-                else
+
+                for (QueuedRequest rejectedRequest : rejected)
                 {
-                    // Update the build request registry.
-                    for (BuildRequestEvent acceptedRequest : acceptedRequests)
+                    BuildRequestEvent event = rejectedRequest.getRequest();
+                    Project project = projectManager.getProject(event.getProjectId(), false);
+                    if (canBuild.satisfied(rejectedRequest))
                     {
-                        buildRequestRegistry.requestRejected(acceptedRequest, I18N.format("rejected.related.project.state"));
+                        buildRequestRegistry.requestRejected(event, I18N.format("rejected.related.project.state"));
                     }
-                    for (BuildRequestEvent rejectedRequest : rejectedRequests)
+                    else
                     {
-                        Project project = projectManager.getProject(rejectedRequest.getProjectId(), false);
-                        buildRequestRegistry.requestRejected(rejectedRequest, I18N.format("rejected.project.state", new Object[]{project.getState().toString()}));
+                        buildRequestRegistry.requestRejected(event, I18N.format("rejected.project.state", new Object[]{project.getState().toString()}));
                     }
                 }
             }
             finally
             {
-                unlockProjectStates(preparedRequests);
+                unlockProjectStates(allRequests);
             }
         }
     }
 
-    /**
-     * Handle a build completed event.
-     *
-     * @param event
-     */
+    private List<QueuedRequest> filterCanBuildRequestsInplace(List<QueuedRequest> candidates)
+    {
+        CanBuildPredicate canBuild = objectFactory.buildBean(CanBuildPredicate.class);
+
+        // move the candidates that we can build from the rejected list to the accepted list.
+        List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
+        List<QueuedRequest> accepted = CollectionUtils.filterInplace(rejected, canBuild);
+
+        // Now we need to go through and move any requests that are in the accepted list that
+        // depend on a request in the rejected list into the rejected list.  We do this until
+        // we identify no new rejects.
+
+        while (true)
+        {
+            final List<Object> rejectedOwners = CollectionUtils.map(rejected, new ExtractOwnerMapping());
+            List<QueuedRequest> acceptedThatDependOnRejected = CollectionUtils.filter(accepted, new Predicate<QueuedRequest>()
+            {
+                public boolean satisfied(QueuedRequest queuedRequest)
+                {
+                    List<Object> dependsOn = queuedRequest.getDependentOwners();
+                    for (Object owner : dependsOn)
+                    {
+                        if (rejectedOwners.contains(owner))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+            if (acceptedThatDependOnRejected.size() == 0)
+            {
+                // We did not identify any new rejects this iteration, so we are done.
+                break;
+            }
+            else
+            {
+                rejected.addAll(acceptedThatDependOnRejected);
+                accepted.removeAll(acceptedThatDependOnRejected);
+            }
+        }
+
+        candidates.removeAll(accepted);
+        return accepted;
+    }
+
     protected void handleBuildCompleted(BuildCompletedEvent event)
     {
         BuildRequestHandler requestHandler = getRequestHandler(event);
-
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (requestHandler)
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (buildQueue)
         {
-            //noinspection SynchronizeOnNonFinalField
-            synchronized (buildQueue)
+            // if all requests are finished, return true, else return false.
+            BuildResult result = event.getBuildResult();
+            Object owner = result.getOwner();
+
+            ActivatedRequest requestToComplete = CollectionUtils.find(buildQueue.getActivatedRequests(),
+                    new HasMetaIdAndOwnerPredicate<ActivatedRequest>(requestHandler.getMetaBuildId(), owner)
+            );
+
+            List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
+            requestsToComplete.add(requestToComplete);
+
+            if (!result.succeeded())
             {
-                // if all requests are finished, return true, else return false.
-                BuildResult result = event.getBuildResult();
-                Object owner = result.getOwner();
-
-                ActivatedRequest requestToComplete = CollectionUtils.find(buildQueue.getActivatedRequests(),
-                        new RequestsByMetaIdAndOwnerPredicate<ActivatedRequest>(requestHandler.getMetaBuildId(), owner)
-                );
-
-                List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
-                requestsToComplete.add(requestToComplete);
-
-                if (!result.succeeded())
-                {
-                    requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new RequestsByMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId())));
-                }
-
-                internalCompleteRequests(requestHandler, requestsToComplete);
+                requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId())));
             }
+
+            internalCompleteRequests(requestHandler, requestsToComplete);
         }
     }
 
@@ -140,11 +177,10 @@ public class SchedulingController implements EventListener
     {
         List<BuildRequestEvent> requestEvents = CollectionUtils.map(completedRequests, new ExtractRequestMapping<RequestHolder>());
 
-        // a) lock the necessary projects before moving on.
         lockProjectStates(requestEvents);
         try
-            {
-                //noinspection SynchronizeOnNonFinalField
+        {
+            //noinspection SynchronizeOnNonFinalField
             synchronized (buildQueue)
             {
                 // pause the activation since we may be making multiple related changes.  We do not
@@ -175,7 +211,7 @@ public class SchedulingController implements EventListener
                 for (BuildRequestEvent completedRequest : requestEvents)
                 {
                     Project project = getProject(completedRequest);
-                    if (!buildQueue.hasRequest(completedRequest.getOwner()) && !completedRequest.isPersonal())
+                    if (!completedRequest.isPersonal() && !buildQueue.hasRequest(completedRequest.getOwner()))
                     {
                         if (project.isTransitionValid(Project.Transition.IDLE))
                         {
@@ -206,32 +242,9 @@ public class SchedulingController implements EventListener
         projectManager.unlockProjectStates(getAffectedProjectIds(requests));
     }
 
-    private void filterCanBuild(List<BuildRequestEvent> acceptedRequests, List<BuildRequestEvent> rejectedRequests)
-    {
-        for (BuildRequestEvent request : acceptedRequests)
-        {
-            if (!canBuild(request))
-            {
-                rejectedRequests.add(request);
-            }
-        }
-        acceptedRequests.removeAll(rejectedRequests);
-    }
-
     private Project getProject(BuildRequestEvent request)
     {
         return projectManager.getProject(request.getProjectConfig().getProjectId(), false);
-    }
-
-    private boolean canBuild(BuildRequestEvent request)
-    {
-        Project project = projectManager.getProject(request.getProjectConfig().getProjectId(), false);
-        return canBuild(project,  request);
-    }
-
-    private boolean canBuild(Project project, BuildRequestEvent request)
-    {
-        return project.getState().acceptTrigger(request.isPersonal());
     }
 
     private long[] getAffectedProjectIds(List<BuildRequestEvent> requests)
@@ -322,24 +335,19 @@ public class SchedulingController implements EventListener
      * Cancel the specified build request.  A build request can only be cancelled if it
      * is currently queued.
      *
-     * @param id    the id of the build request to be cancelled.
-     *
+     * @param id the id of the build request to be cancelled.
      * @return true if the request was cancelled, false otherwise.
      */
     public boolean cancelRequest(long id)
     {
         BuildRequestHandler requestHandler = getRequestHandler(id);
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (requestHandler)
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (buildQueue)
         {
-            //noinspection SynchronizeOnNonFinalField
-            synchronized (buildQueue)
-            {
-                List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-                List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
-                internalCompleteRequests(requestHandler, queuedRequests);
-                return queuedRequests.size() > 0;
-            }
+            List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
+            List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
+            internalCompleteRequests(requestHandler, queuedRequests);
+            return queuedRequests.size() > 0;
         }
     }
 
@@ -348,7 +356,7 @@ public class SchedulingController implements EventListener
      */
     public void stop()
     {
-        buildQueue.stop();    
+        buildQueue.stop();
     }
 
     /**
@@ -366,7 +374,6 @@ public class SchedulingController implements EventListener
      * that belong to the specified owner.
      *
      * @param owner the owner of the build requests.
-     *
      * @return a list of build requests.
      */
     public List<BuildRequestEvent> getRequestsByOwner(Object owner)

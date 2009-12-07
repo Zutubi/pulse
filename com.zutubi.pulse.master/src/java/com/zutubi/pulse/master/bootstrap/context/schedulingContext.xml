@@ -44,6 +44,7 @@ This context requires:
                 <ref local="cronSchedulerStrategy"/>
                 <ref local="simpleSchedulerStrategy"/>
                 <ref local="eventSchedulerStrategy"/>
+                <ref local="noopSchedulerStrategy"/>
             </list>
         </property>
     </bean>
@@ -74,6 +75,8 @@ This context requires:
         <property name="eventManager" ref="eventManager"/>
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
+
+    <bean id="noopSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.NoopSchedulerStrategy"/>
 
     <!--
     wrap the trigger handler in a transaction to ensure that whatever fires the trigger,

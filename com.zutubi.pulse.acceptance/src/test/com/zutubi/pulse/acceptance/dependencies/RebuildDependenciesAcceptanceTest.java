@@ -362,11 +362,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             throws Exception
     {
         Vector<Hashtable<String, Object>> snapshot = xmlRpcHelper.getBuildQueueSnapshot();
-        return (Hashtable<String, Object>) CollectionUtils.find(snapshot.toArray(), new Predicate()
+        return CollectionUtils.find(snapshot, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Object o)
+            public boolean satisfied(Hashtable<String, Object> build)
             {
-                Hashtable<String, Object> build = (Hashtable<String, Object>) o;
                 return build.get("project").equals(project.getName());
             }
         });

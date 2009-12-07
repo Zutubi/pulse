@@ -106,7 +106,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
      *
      * @param project       the project associated with the requested build
      * @param metaBuildId   the metabuild id of the requested build.
+     * @param states        the allowed states of the builds.  If no states are specified,
+     * all states are returned.
      * @return the build result, or null if none could be located.
      */
-    BuildResult findByProjectAndMetabuildId(Project project, long metaBuildId);
+    BuildResult findByProjectAndMetabuildId(Project project, long metaBuildId, ResultState... states);
 }

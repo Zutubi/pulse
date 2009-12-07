@@ -613,8 +613,6 @@ public class DefaultBuildManager implements BuildManager
     public void terminateBuild(BuildResult buildResult, String reason)
     {
         accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult);
-        // note, this will only terminate a build if the build still has an active controller (ie it is
-        // not yet completed).  should we be checking this?
         eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason));
     }
 

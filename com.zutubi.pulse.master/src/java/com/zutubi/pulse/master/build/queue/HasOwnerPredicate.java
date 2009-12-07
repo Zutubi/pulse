@@ -4,21 +4,21 @@ import com.zutubi.util.Predicate;
 
 /**
  * A predicate that matches a request holder containing a
- * build request event with a specified id.
+ * build request event with a specified owner
  *
  * @param <T> the specific subclass of RequestHolder that is being searched.
  */
-public class RequestsByIdPredicate<T extends RequestHolder> implements Predicate<T>
+public class HasOwnerPredicate<T extends RequestHolder> implements Predicate<T>
 {
-    private long id;
+    private Object owner;
 
-    public RequestsByIdPredicate(long id)
+    public HasOwnerPredicate(Object owner)
     {
-        this.id = id;
+        this.owner = owner;
     }
 
     public boolean satisfied(RequestHolder holder)
     {
-        return holder.getRequest().getId() == id;
+        return holder.getOwner().equals(owner);
     }
 }

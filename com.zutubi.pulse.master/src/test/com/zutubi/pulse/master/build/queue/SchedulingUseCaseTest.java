@@ -33,11 +33,11 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
      */
 
-    private Project A;
-    private Project B;
-    private Project C;
-    private Project D;
-    private Project E;
+    private Project standalone;
+    private Project utility;
+    private Project libraryA;
+    private Project libraryB;
+    private Project client;
 
     private SequenceManager sequenceManager;
     private SchedulingController controller;
@@ -47,11 +47,11 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
     {
         super.setUp();
 
-        A = createProject("A");
-        B = createProject("B");
-        C = createProject("C", dependency(B));
-        D = createProject("D", dependency(B));
-        E = createProject("E", dependency(C), dependency(D));
+        standalone = createProject("standalone");
+        utility = createProject("utility");
+        libraryA = createProject("libraryA", dependency(utility));
+        libraryB = createProject("libraryB", dependency(utility));
+        client = createProject("client", dependency(libraryA), dependency(libraryB));
 
         sequenceManager = mock(SequenceManager.class);
         stub(sequenceManager.getSequence(anyString())).toReturn(new Sequence()
@@ -69,11 +69,11 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
     public void testBuildRequestForIsolatedProject()
     {
-        BuildRequestEvent request = createRequest("A");
+        BuildRequestEvent request = createRequest(standalone);
 
         controller.handleEvent(request);
-        verify(projectManager, times(1)).makeStateTransition(A.getId(), Transition.BUILDING);
-        setProjectState(State.BUILDING, A);
+        verify(projectManager, times(1)).makeStateTransition(standalone.getId(), Transition.BUILDING);
+        setProjectState(State.BUILDING, standalone);
 
         assertQueued();
         assertActivated(request);
@@ -84,9 +84,9 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         controller.handleEvent(createSuccessful(request));
 
-        verify(projectManager, times(1)).makeStateTransition(A.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(standalone.getId(), Transition.IDLE);
         verify(projectManager, times(2)).makeStateTransition(anyLong(), (Project.Transition)anyObject()); // ensure only the two transitions.
-        setProjectState(State.IDLE, A);
+        setProjectState(State.IDLE, standalone);
 
         assertActivated();
         assertQueued();
@@ -94,17 +94,17 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
     public void testMultipleRequestsForSingleProject()
     {
-        BuildRequestEvent requestA = createRequest("A");
-        BuildRequestEvent requestB = createRequest("A");
-        BuildRequestEvent requestC = createRequest("A");
+        BuildRequestEvent requestA = createRequest(standalone);
+        BuildRequestEvent requestB = createRequest(standalone);
+        BuildRequestEvent requestC = createRequest(standalone);
 
         controller.handleEvent(requestA);
-        verify(projectManager, times(1)).makeStateTransition(A.getId(), Transition.BUILDING);
-        setProjectState(State.BUILDING, A);
+        verify(projectManager, times(1)).makeStateTransition(standalone.getId(), Transition.BUILDING);
+        setProjectState(State.BUILDING, standalone);
         
         controller.handleEvent(requestB);
         controller.handleEvent(requestC);
-        verify(projectManager, times(1)).makeStateTransition(A.getId(), Transition.BUILDING);
+        verify(projectManager, times(1)).makeStateTransition(standalone.getId(), Transition.BUILDING);
 
         // activated event was generated.
         assertQueued(requestB, requestC);
@@ -136,9 +136,9 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         controller.handleEvent(createSuccessful(requestC));
 
-        verify(projectManager, times(1)).makeStateTransition(A.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(standalone.getId(), Transition.IDLE);
         verify(projectManager, times(2)).makeStateTransition(anyLong(), (Project.Transition)anyObject()); // ensure only the two transitions.
-        setProjectState(State.IDLE, A);
+        setProjectState(State.IDLE, standalone);
 
         assertActivated();
         assertQueued();
@@ -146,69 +146,69 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
     public void testRebuildOfProjectTree()
     {
-        BuildRequestEvent request = createRebuildRequest(E);
+        BuildRequestEvent request = createRebuildRequest(client);
 
         controller.handleEvent(request);
 
         assertEquals(3, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
         verify(buildRequestRegistry, times(1)).requestQueued(request);
-        verify(projectManager, times(1)).makeStateTransition(C.getId(), Transition.BUILDING);
-        verify(projectManager, times(1)).makeStateTransition(B.getId(), Transition.BUILDING);
-        verify(projectManager, times(1)).makeStateTransition(D.getId(), Transition.BUILDING);
-        verify(projectManager, times(1)).makeStateTransition(E.getId(), Transition.BUILDING);
-        setProjectState(State.BUILDING, B, C, D, E);
+        verify(projectManager, times(1)).makeStateTransition(libraryA.getId(), Transition.BUILDING);
+        verify(projectManager, times(1)).makeStateTransition(utility.getId(), Transition.BUILDING);
+        verify(projectManager, times(1)).makeStateTransition(libraryB.getId(), Transition.BUILDING);
+        verify(projectManager, times(1)).makeStateTransition(client.getId(), Transition.BUILDING);
+        setProjectState(State.BUILDING, utility, libraryA, libraryB, client);
 
         // complete build B..., ensure that C and D are activated, E remains queued.
-        controller.handleEvent(createSuccessful(request.getMetaBuildId(), B));
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), utility));
 
         assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(B.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(utility.getId(), Transition.IDLE);
 
-        controller.handleEvent(createSuccessful(request.getMetaBuildId(), C));
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), libraryA));
 
         assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(C.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(libraryA.getId(), Transition.IDLE);
 
-        controller.handleEvent(createSuccessful(request.getMetaBuildId(), D));
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), libraryB));
 
         assertActivated(request);
         assertQueued();
-        verify(projectManager, times(1)).makeStateTransition(D.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(libraryB.getId(), Transition.IDLE);
 
-        controller.handleEvent(createSuccessful(request.getMetaBuildId(), E));
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), client));
         assertActivated();
         assertQueued();
-        verify(projectManager, times(1)).makeStateTransition(E.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(client.getId(), Transition.IDLE);
     }
 
     public void testRebuildOfProjectTreeHasFailure()
     {
-        BuildRequestEvent request = createRebuildRequest(E);
+        BuildRequestEvent request = createRebuildRequest(client);
         controller.handleEvent(request);
 
         assertEquals(3, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
-        setProjectState(State.BUILDING, B, C, D, E);
+        setProjectState(State.BUILDING, utility, libraryA, libraryB, client);
 
-        controller.handleEvent(createSuccessful(request.getMetaBuildId(), B));
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), utility));
 
         assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(B.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(utility.getId(), Transition.IDLE);
 
-        controller.handleEvent(createFailed(request.getMetaBuildId(), C));
+        controller.handleEvent(createFailed(request.getMetaBuildId(), libraryA));
 
         assertEquals(0, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(C.getId(), Transition.IDLE);
-        verify(projectManager, times(1)).makeStateTransition(E.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(libraryA.getId(), Transition.IDLE);
+        verify(projectManager, times(1)).makeStateTransition(client.getId(), Transition.IDLE);
         verify(buildRequestRegistry, times(1)).requestCancelled(request);
 
-        controller.handleEvent(createSuccessful(request.getMetaBuildId(), D));
-        verify(projectManager, times(1)).makeStateTransition(D.getId(), Transition.IDLE);
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), libraryB));
+        verify(projectManager, times(1)).makeStateTransition(libraryB.getId(), Transition.IDLE);
     }
 
 /*
@@ -257,8 +257,8 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
     public void testRebuildOfProjectRejectedBecauseProjectPaused()
     {
-        setProjectState(State.PAUSED, C);
-        BuildRequestEvent request = createRebuildRequest(E);
+        setProjectState(State.PAUSED, libraryA);
+        BuildRequestEvent request = createRebuildRequest(client);
         controller.handleEvent(request);
         verify(buildRequestRegistry, times(1)).requestRejected(eq(request), anyString());
     }

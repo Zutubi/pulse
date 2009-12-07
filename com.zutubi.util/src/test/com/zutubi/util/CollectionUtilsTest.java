@@ -184,8 +184,8 @@ public class CollectionUtilsTest extends ZutubiTestCase
     public void testDepthFirstContains()
     {
         TreeNode<String> root = setupTestTree();
-        assertFalse(CollectionUtils.depthFirstContains(root, new StringComparisonPredicate("a")));
-        assertTrue(CollectionUtils.depthFirstContains(root, new StringComparisonPredicate("1")));
+        assertFalse(CollectionUtils.depthFirstContains(root, new EqualsPredicate("a")));
+        assertTrue(CollectionUtils.depthFirstContains(root, new EqualsPredicate("1")));
     }
 
     public void testBreadthFirstFindTraversal()
@@ -198,23 +198,8 @@ public class CollectionUtilsTest extends ZutubiTestCase
     public void testBreadthFirstContains()
     {
         TreeNode<String> root = setupTestTree();
-        assertFalse(CollectionUtils.breadthFirstContains(root, new StringComparisonPredicate("a")));
-        assertTrue(CollectionUtils.breadthFirstContains(root, new StringComparisonPredicate("1")));
-    }
-
-    private static class StringComparisonPredicate implements Predicate<String>
-    {
-        private String subject;
-
-        private StringComparisonPredicate(String str)
-        {
-            this.subject = str;
-        }
-
-        public boolean satisfied(String s)
-        {
-            return subject.equals(s);
-        }
+        assertFalse(CollectionUtils.breadthFirstContains(root, new EqualsPredicate("a")));
+        assertTrue(CollectionUtils.breadthFirstContains(root, new EqualsPredicate("1")));
     }
 
     private List<String> depthFirstSearchOrder(TreeNode<String> root)
@@ -256,6 +241,27 @@ public class CollectionUtilsTest extends ZutubiTestCase
                         new TreeNode<String>("2-1"),
                         new TreeNode<String>("2-2"),
                         new TreeNode<String>("2-3")));
+    }
+
+    public void testFilterInplace()
+    {
+        List<Object> list = new LinkedList<Object>(Arrays.asList((Object)"a", 1, "b", 2));
+        List<Object> filtered = CollectionUtils.filterInplace(list, new InstanceOfPredicate(String.class));
+        assertEquals(2, list.size());
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(2, filtered.size());
+        assertEquals("a", filtered.get(0));
+        assertEquals("b", filtered.get(1));
+    }
+
+    public void testReverse()
+    {
+        List<String> list = Arrays.asList("a", "b", "c");
+        List<String> reversed = CollectionUtils.reverse(list);
+        assertEquals("c", reversed.get(0));
+        assertEquals("b", reversed.get(1));
+        assertEquals("a", reversed.get(2));
     }
 
     public void testPartitionEmpty()

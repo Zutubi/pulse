@@ -8,6 +8,22 @@ import java.util.*;
  */
 public class CollectionUtils
 {
+    /**
+     * Similar to filter except that the elements that are accepted by the
+     * predicate are also removed from the original collection.
+     *
+     * @param l     the list that will be filtered inplace
+     * @param p     the predicate identifying the items to be filtered
+     * @param <T>   the type of the item contained by the collection
+     * @return  a list of the items that were filtered.
+     */
+    public static <T> List<T> filterInplace(Collection<T> l, Predicate<T> p)
+    {
+        List<T> filteredList = filter(l, p);
+        l.removeAll(filteredList);
+        return filteredList;
+    }
+
     public static <T> List<T> filter(Collection<T> l, Predicate<T> p)
     {
         return filter(l, p, (List<T>) new LinkedList<T>());
@@ -471,7 +487,7 @@ public class CollectionUtils
     }
 
     /**
-     * This method carries out a depth first traversal of the tree, using the predicate
+     * Carries out a depth first traversal of the tree, using the predicate
      * to identify the node of interest.  If a node is found that satisfies the predicate,
      * true is returned.
      *
@@ -487,7 +503,7 @@ public class CollectionUtils
     }
 
     /**
-     * This method carries out a depth first traversal of the tree, using the predicate
+     * Carries out a depth first traversal of the tree, using the predicate
      * to identify the node of interest.  The first node to satisfy the predicate is returned.
      *
      * @param root          the tree to be searched.
@@ -516,7 +532,7 @@ public class CollectionUtils
     }
 
     /**
-     * This method carries out a breadth first traversal of the tree, using the predicate
+     * Carries out a breadth first traversal of the tree, using the predicate
      * to identify the node of interest.  If a node is found that satisfies the predicate,
      * true is returned.
      *
@@ -532,7 +548,7 @@ public class CollectionUtils
     }
 
     /**
-     * This method carries out a breadth first traversal of the tree, using the predicate
+     * Carries out a breadth first traversal of the tree, using the predicate
      * to identify the node of interest.  The first node to satisfy the predicate is returned.
      *
      * @param root          the tree to be searched.

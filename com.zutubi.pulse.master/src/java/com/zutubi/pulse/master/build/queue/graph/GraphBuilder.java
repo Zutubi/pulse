@@ -23,9 +23,9 @@ public class GraphBuilder
 {
     private ProjectManager projectManager;
 
-    public TreeNode<GraphData> buildUpstreamGraph(Project project, GraphFilter... filters)
+    public TreeNode<BuildGraphData> buildUpstreamGraph(Project project, GraphFilter... filters)
     {
-        TreeNode<GraphData> node = new TreeNode<GraphData>(new GraphData(project));
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(project));
 
         buildUpstreamGraph(project, node);
 
@@ -34,22 +34,22 @@ public class GraphBuilder
         return node;
     }
 
-    private void buildUpstreamGraph(Project project, TreeNode<GraphData> node)
+    private void buildUpstreamGraph(Project project, TreeNode<BuildGraphData> node)
     {
         List<DependencyConfiguration> dependencies = project.getConfig().getDependencies().getDependencies();
         for (DependencyConfiguration dependency : dependencies)
         {
             Project dependentProject = projectManager.getProject(dependency.getProject().getProjectId(), false);
-            TreeNode<GraphData> child = new TreeNode<GraphData>(new GraphData(dependentProject));
+            TreeNode<BuildGraphData> child = new TreeNode<BuildGraphData>(new BuildGraphData(dependentProject));
             buildUpstreamGraph(dependentProject, child);
             child.getData().setDependency(dependency);
             node.add(child);
         }
     }
 
-    public TreeNode<GraphData> buildDownstreamGraph(Project project, GraphFilter... filters)
+    public TreeNode<BuildGraphData> buildDownstreamGraph(Project project, GraphFilter... filters)
     {
-        TreeNode<GraphData> node = new TreeNode<GraphData>(new GraphData(project));
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(project));
 
         buildDownstreamGraph(project, node);
 
@@ -58,14 +58,14 @@ public class GraphBuilder
         return node;
     }
 
-    private void buildDownstreamGraph(Project project, TreeNode<GraphData> node)
+    private void buildDownstreamGraph(Project project, TreeNode<BuildGraphData> node)
     {
         List<ProjectConfiguration> downstreamProjectConfigs = projectManager.getDownstreamDependencies(project.getConfig());
         List<Project> downstreamProjects = projectManager.mapConfigsToProjects(downstreamProjectConfigs);
 
         for (Project downstream: downstreamProjects)
         {
-            TreeNode<GraphData> child = new TreeNode<GraphData>(new GraphData(downstream));
+            TreeNode<BuildGraphData> child = new TreeNode<BuildGraphData>(new BuildGraphData(downstream));
             buildDownstreamGraph(downstream, child);
             child.getData().setDependency(findDependency(downstream,  project));
             node.add(child);
@@ -83,14 +83,14 @@ public class GraphBuilder
         });
     }
 
-    private void applyFilters(TreeNode<GraphData> root, GraphFilter... filters)
+    private void applyFilters(TreeNode<BuildGraphData> root, GraphFilter... filters)
     {
         for (final GraphFilter filter : filters)
         {
             root.breadthFirstWalk(filter);
-            root.filteringWalk(new Predicate<TreeNode<GraphData>>()
+            root.filteringWalk(new Predicate<TreeNode<BuildGraphData>>()
             {
-                public boolean satisfied(TreeNode<GraphData> node)
+                public boolean satisfied(TreeNode<BuildGraphData> node)
                 {
                     return !filter.contains(node);
                 }

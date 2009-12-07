@@ -32,8 +32,7 @@ public class OneActiveBuildPerOwnerPredicate implements QueuedRequestPredicate
     public boolean satisfied(final QueuedRequest request)
     {
         List<ActivatedRequest> activatedRequests = buildQueue.getActivatedRequests();
-        ActivatedRequest activatedRequest = CollectionUtils.find(activatedRequests, new RequestsByOwnerPredicate(request.getRequest().getOwner()));
-        return activatedRequest == null;
+        return !CollectionUtils.contains(activatedRequests, new HasOwnerPredicate(request.getRequest().getOwner()));
     }
 
     @Override
@@ -44,7 +43,7 @@ public class OneActiveBuildPerOwnerPredicate implements QueuedRequestPredicate
 
         OneActiveBuildPerOwnerPredicate that = (OneActiveBuildPerOwnerPredicate) o;
 
-        return buildQueue.equals(that.buildQueue);
+        return buildQueue == that.buildQueue;
     }
 
     @Override

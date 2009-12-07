@@ -11,7 +11,7 @@ public class IvyLatestRevisionMatcher
     /**
      * The revision prefix that triggers the latest revision matching.
      */
-    public static final String LATEST = "latest";
+    public static final String LATEST = "latest.";
 
     /**
      * Returns true if this revision matcher can be applied to the revision.
@@ -22,7 +22,7 @@ public class IvyLatestRevisionMatcher
      */
     public boolean isApplicable(String revision)
     {
-        return revision.startsWith(LATEST + ".") && IvyStatus.isValidStatus(extractStatus(revision));
+        return revision.startsWith(LATEST) && IvyStatus.isValidStatus(extractStatus(revision));
     }
 
     /**
@@ -35,15 +35,13 @@ public class IvyLatestRevisionMatcher
      */
     public boolean accept(String requiredRevision, String targetStatus)
     {
-        // mrid, target descriptors status / target dependencies status.
-        
         String askedStatus = extractStatus(requiredRevision);
         return IvyStatus.getPriority(askedStatus) >= IvyStatus.getPriority(targetStatus);
     }
 
     private String extractStatus(String revision)
     {
-        return revision.substring((LATEST + ".").length());
+        return revision.substring(LATEST.length());
     }
 }
 

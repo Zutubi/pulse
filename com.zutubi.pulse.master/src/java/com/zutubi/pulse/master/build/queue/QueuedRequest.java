@@ -5,6 +5,7 @@ import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * The queued request holds the details of a build request that is
@@ -66,4 +67,18 @@ public class QueuedRequest extends RequestHolder
     {
         this.predicates.add(predicate);
     }
+
+    public List<Object> getDependentOwners()
+    {
+        List<Object> dependentOwners = new LinkedList<Object>();
+        for (Predicate predicate : predicates)
+        {
+            if (predicate instanceof OwnerDependencyPredicate)
+            {
+                dependentOwners.add(((OwnerDependencyPredicate)predicate).getOwner());
+            }
+        }
+        return dependentOwners;
+    }
+    
 }

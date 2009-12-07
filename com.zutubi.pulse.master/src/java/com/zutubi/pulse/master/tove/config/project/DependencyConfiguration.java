@@ -20,9 +20,9 @@ import java.util.List;
 public class DependencyConfiguration extends AbstractConfiguration
 {
     public static final String ALL_STAGES = "*";
-    public static final String REVISION_LATEST_INTEGRATION = LATEST + "." + IvyStatus.STATUS_INTEGRATION;
-    public static final String REVISION_LATEST_MILESTONE = LATEST + "." + IvyStatus.STATUS_MILESTONE;
-    public static final String REVISION_LATEST_RELEASE = LATEST + "." + IvyStatus.STATUS_RELEASE;
+    public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyStatus.STATUS_INTEGRATION;
+    public static final String REVISION_LATEST_MILESTONE = LATEST + IvyStatus.STATUS_MILESTONE;
+    public static final String REVISION_LATEST_RELEASE = LATEST + IvyStatus.STATUS_RELEASE;
     public static final String REVISION_CUSTOM = "custom";
 
     /**

@@ -35,4 +35,40 @@ public abstract class RequestHolder
     {
         return request;
     }
+
+    /**
+     * Convenience method that provides access to the held requests owner.
+     *
+     * @return the owner of the request
+     *
+     * @see com.zutubi.pulse.master.events.build.BuildRequestEvent#getOwner()
+     */
+    public Object getOwner()
+    {
+        return getRequest().getOwner();
+    }
+
+    /**
+     * Convenience method that provides access to the held requests is personal flag.
+     *
+     * @return the requests isPersonal flag
+     *
+     * @see com.zutubi.pulse.master.events.build.BuildRequestEvent#isPersonal()
+     */
+    public boolean isPersonal()
+    {
+        return getRequest().isPersonal();
+    }
+
+    /**
+     * Convenience method that provides access to held requests project id.
+     *
+     * @return the requests project id.
+     *
+     * @see com.zutubi.pulse.master.events.build.BuildRequestEvent#getProjectId() 
+     */
+    public long getProjectId()
+    {
+        return getRequest().getProjectId();
+    }
 }

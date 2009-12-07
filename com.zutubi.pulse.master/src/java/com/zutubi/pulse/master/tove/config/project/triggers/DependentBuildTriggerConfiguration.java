@@ -4,6 +4,8 @@ import com.zutubi.pulse.master.DependentBuildEventFilter;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.scheduling.EventTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.SimpleTrigger;
+import com.zutubi.pulse.master.scheduling.NoopTrigger;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 
@@ -28,6 +30,7 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
 
     public Trigger newTrigger()
     {
+//        return new NoopTrigger(getName(), Trigger.DEFAULT_GROUP);
         return new EventTrigger(BuildCompletedEvent.class, getName(), DependentBuildEventFilter.class);
     }
 
