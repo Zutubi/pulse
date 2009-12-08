@@ -2,9 +2,11 @@ package com.zutubi.pulse.master.model.persistence.mock;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.persistence.EntityDao;
+import com.zutubi.util.Predicate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +22,25 @@ public class MockEntityDao<T extends Entity> implements EntityDao<T>
     public void delete(T entity)
     {
         entities.remove(entity);
+    }
+
+    public int deleteAll(Collection<T> toDelete)
+    {
+        int deleted = 0;
+        for (T t: toDelete)
+        {
+            if (entities.remove(t))
+            {
+                deleted++;
+            }
+        }
+
+        return deleted;
+    }
+
+    public int deleteByPredicate(Predicate<T> p)
+    {
+        return deleteAll(findByPredicate(p));
     }
 
     public int count()
@@ -50,7 +71,7 @@ public class MockEntityDao<T extends Entity> implements EntityDao<T>
         {
             if (t.getId() == id)
             {
-                return (U) t;
+                return type.cast(t);
             }
         }
         return null;
@@ -77,12 +98,12 @@ public class MockEntityDao<T extends Entity> implements EntityDao<T>
         }
     }
 
-    protected List<T> findByFilter(Filter<T> f)
+    protected List<T> findByPredicate(Predicate<T> f)
     {
         LinkedList<T> findResults = new LinkedList<T>();
         for (T t : entities)
         {
-            if (f.include(t))
+            if (f.satisfied(t))
             {
                 findResults.add(t);
             }
@@ -90,9 +111,9 @@ public class MockEntityDao<T extends Entity> implements EntityDao<T>
         return findResults;
     }
 
-    protected T findUniqueByFilter(Filter<T> f)
+    protected T findUniqueByPredicate(Predicate<T> f)
     {
-        List<T> findResults = findByFilter(f);
+        List<T> findResults = findByPredicate(f);
         if (findResults.size() > 1)
         {
             throw new RuntimeException();
@@ -139,10 +160,5 @@ public class MockEntityDao<T extends Entity> implements EntityDao<T>
         {
             throw new RuntimeException(e);
         }
-    }
-
-    protected interface Filter<T>
-    {
-        boolean include(T o);
     }
 }

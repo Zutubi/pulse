@@ -51,7 +51,18 @@ public class ChartUtils
         return renderForWeb(chart.render(), config.getWidth(), config.getHeight());
     }
 
-    private static Map renderForWeb(JFreeChart chart, int width, int height) throws IOException
+    /**
+     * Renders a JFreeChart chart, ready for display via a servlet-rendered web
+     * page.  The chart is rendered into a PNG image of the given size.
+     *
+     * @param chart  the chart to render
+     * @param width  width of the image to create, in pixels
+     * @param height height of the image to create, in pixels
+     * @return a map containing the location, width, height, imageMap and
+     *         imageMapName
+     * @throws IOException if there is an error writing the image file
+     */
+    public static Map renderForWeb(JFreeChart chart, int width, int height) throws IOException
     {
         Map<String, Object> params = new HashMap<String, Object>();
         ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.master.model.AgentDailyStatistics" table="AGENT_DAILY_STATISTICS" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="agentId" column="AGENT_ID" type="long" index="AGENT_DAILY_STATISTICS_AGENT_ID"/>
+        <property name="dayStamp" column="DAY_STAMP" type="long" index="AGENT_DAILY_STATISTICS_DAY_STAMP"/>
+        <property name="recipeCount" column="RECIPE_COUNT" type="int"/>
+        <property name="disabledTime" column="DISABLED_TIME" type="int"/>
+        <property name="offlineTime" column="OFFLINE_TIME" type="int"/>
+        <property name="idleTime" column="IDLE_TIME" type="int"/>
+        <property name="busyTime" column="BUSY_TIME" type="int"/>
+    </class>
+</hibernate-mapping>

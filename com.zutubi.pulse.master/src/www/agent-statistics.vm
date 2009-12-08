@@ -1,0 +1,52 @@
+#helpTag("Agents+Section")
+#authorisationTags($principle)
+#agentTags()
+<html>
+<head>
+    <title>#wwtext("name=agents")</title>
+</head>
+<body>
+    #agentTabs("statistics")
+
+#if($action.hasErrors())
+    #parse("/agent-error.vm")
+#else
+    #if($statistics.empty)
+    <p>
+        #wwtext("name=statistics.empty")
+    </p>
+    #else
+    <table class="columns">
+        <tr>
+            <td class="columns">
+                <p>
+                    $action.blurb
+                </p>
+                <table class="content" width="100%">
+                    #headingRow("recipes.executed" 2)
+                    #dynamicRow("total.recipes" $statistics.totalRecipes)
+                    #dynamicRow("recipes.per.day" $action.renderValue($statistics.recipesPerDay))
+        #if($statistics.totalRecipes > 0)
+                    #dynamicRow("busy.per.recipe" $action.renderTime($statistics.busyTimePerRecipe))
+        #end
+                </table>
+
+                <table class="content"  width="100%">
+                    #headingRow("utilisation.statistics" 2)
+                    #dynamicRow("time.disabled" $action.renderTime($statistics.totalDisabledTime, $statistics.percentDisabledTime))
+                    #dynamicRow("time.offline" $action.renderTime($statistics.totalOfflineTime, $statistics.percentOfflineTime))
+                    #dynamicRow("time.idle" $action.renderTime($statistics.totalIdleTime, $statistics.percentIdleTime))
+                    #dynamicRow("time.busy" $action.renderTime($statistics.totalBusyTime, $statistics.percentBusyTime))
+                </table>
+            </td>
+            <td class="columns">
+                <div style="margin-left: 20px; margin-top: 10px">
+                    ${usageChart.imageMap}
+                    <img style="border:none" src="${base}/chart?filename=${usageChart.location}" border="1" height="${usageChart.height}" width="${usageChart.width}" usemap="${usageChart.imageMapName}"/>
+                </div>
+            </td>
+        </tr>
+    </table>
+    #end
+#end
+</html>

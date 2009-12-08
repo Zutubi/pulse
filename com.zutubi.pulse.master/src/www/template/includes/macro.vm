@@ -262,6 +262,7 @@
 #macro(agentTabs $selected)
     #openTabs()
         #agentTab("status" $selected)
+        #agentTab("statistics" $selected)
         #agentTab("messages" $selected)
         #agentTab("info" $selected)
     #closeTabs()

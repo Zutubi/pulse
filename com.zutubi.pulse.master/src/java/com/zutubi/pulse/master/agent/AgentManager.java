@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.security.SecureParameter;
 import com.zutubi.pulse.master.security.SecureResult;
@@ -36,4 +37,21 @@ public interface AgentManager extends AgentPersistentStatusManager
     void pingAgent(AgentConfiguration agentConfig);
 
     int getAgentCount();
+
+    /**
+     * Returns statistics gathered for the given agent.
+     *
+     * @param agent the agent to get statistics for
+     * @return statistics for the given agent
+     */
+    @SecureParameter(parameterType = Agent.class, action = AccessManager.ACTION_VIEW)
+    AgentStatistics getAgentStatistics(Agent agent);
+
+    /**
+     * Instructs the manager to update the agent statistics for this point in
+     * time.  Should be called regularly to keep statistics current.
+     *
+     * @see com.zutubi.pulse.master.agent.statistics.UpdateStatisticsTask
+     */
+    void updateStatistics();
 }

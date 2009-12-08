@@ -8,7 +8,6 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.agent.AgentStatus;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
@@ -81,7 +80,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
-        browser.refreshUntilText(agentsPage.getStatusId(AGENT), AgentStatus.OFFLINE.getPrettyString());
+        browser.refreshUntilText(agentsPage.getStatusId(AGENT), OFFLINE.getPrettyString());
         assertEquals(asList(ACTION_DISABLE, ACTION_PING), agentsPage.getActions(AGENT));
     }
 

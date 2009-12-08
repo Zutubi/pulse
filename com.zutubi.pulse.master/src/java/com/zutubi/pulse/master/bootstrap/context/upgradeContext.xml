@@ -101,6 +101,7 @@
                 <ref local="lastAccessTimes"/>
                 <ref local="addPerforceTimeOffset"/>
                 <ref local="dependentBuildTriggerUpdate"/>
+                <ref local="agentDailyStatistics"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -479,4 +480,12 @@
         <property name="buildNumber" value="201010003"/>
     </bean>
 
+    <bean id="agentDailyStatistics" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201010004"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.10-patch-02.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
 </beans>

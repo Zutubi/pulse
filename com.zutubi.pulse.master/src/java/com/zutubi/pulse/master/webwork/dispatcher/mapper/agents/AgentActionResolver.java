@@ -14,6 +14,7 @@ public class AgentActionResolver extends StaticMapActionResolver
         addParameter("agentName", agent);
         addMapping("actions", new AgentActionsActionResolver());
         addMapping("status", new ParameterisedActionResolver("viewAgentStatus"));
+        addMapping("statistics", new ParameterisedActionResolver("agentStatistics"));
         addMapping("messages", new PagedActionResolver("agentMessages"));
         addMapping("info", new ParameterisedActionResolver("viewSystemInfo"));
     }
