@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.dependencies.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.dependencies.WaitAntProject;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -221,6 +222,15 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         project.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+    }
+
+    public void testStatistics() throws Exception
+    {
+        loginAsAdmin();
+        AgentStatisticsPage statisticsPage = browser.openAndWaitFor(AgentStatisticsPage.class, AgentManager.MASTER_AGENT_NAME);
+        assertTrue(statisticsPage.isRecipeStatisticsPresent());
+        assertTrue(statisticsPage.isUsageStatisticsPresent());
+        assertTrue(statisticsPage.isUsageChartPresent());
     }
 
     private void assertBuildingStatus(String status)

@@ -522,6 +522,11 @@ public class Urls
         return agent(agent) + "status/";
     }
 
+    public String agentStatistics(Object agent)
+    {
+        return agent(agent) + "statistics/";
+    }
+
     public String agentMessages(Object agent)
     {
         return agent(agent) + "messages/";

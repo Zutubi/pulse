@@ -33,7 +33,6 @@ public class AgentStatisticsManager implements EventListener
     public synchronized void init()
     {
         calculateStamps(clock.getCurrentTimeMillis());
-        collectGarbage();
         // We rely on the transition from the initial state to bootstrap us for
         // each agent.
     }
