@@ -102,7 +102,7 @@ public class SchedulingController implements EventListener
 
     private List<QueuedRequest> filterCanBuildRequestsInplace(List<QueuedRequest> candidates)
     {
-        CanBuildPredicate canBuild = objectFactory.buildBean(CanBuildPredicate.class);
+        CanBuildPredicate<QueuedRequest> canBuild = objectFactory.buildBean(CanBuildPredicate.class);
 
         // move the candidates that we can build from the rejected list to the accepted list.
         List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
@@ -114,7 +114,7 @@ public class SchedulingController implements EventListener
 
         while (true)
         {
-            final List<Object> rejectedOwners = CollectionUtils.map(rejected, new ExtractOwnerMapping());
+            final List<Object> rejectedOwners = CollectionUtils.map(rejected, new ExtractOwnerMapping<QueuedRequest>());
             List<QueuedRequest> acceptedThatDependOnRejected = CollectionUtils.filter(accepted, new Predicate<QueuedRequest>()
             {
                 public boolean satisfied(QueuedRequest queuedRequest)
@@ -166,7 +166,7 @@ public class SchedulingController implements EventListener
 
             if (!result.succeeded())
             {
-                requestsToComplete.addAll(CollectionUtils.filter(buildQueue.getQueuedRequests(), new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId())));
+                CollectionUtils.filter(buildQueue.getQueuedRequests(), new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId()), requestsToComplete);
             }
 
             internalCompleteRequests(requestHandler, requestsToComplete);

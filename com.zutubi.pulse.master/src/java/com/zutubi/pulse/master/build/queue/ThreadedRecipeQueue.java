@@ -104,6 +104,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             {
                 throw new IllegalStateException("The queue is already running.");
             }
+
+            isRunning = true;
             executor = Executors.newSingleThreadExecutor(threadFactory);
             executor.execute(this);
             stopRequested = false;
@@ -318,8 +320,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
             lock.lock();
-            isRunning = true;
-
             // wait for changes to either of the inbound queues. When change detected,
             // copy the new data into the internal queue (to minimize locked time) and
             // start processing.  JS: extended lock time to simplify snapshotting:

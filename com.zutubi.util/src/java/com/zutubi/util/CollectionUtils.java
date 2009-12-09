@@ -29,7 +29,7 @@ public class CollectionUtils
         return filter(l, p, (List<T>) new LinkedList<T>());
     }
 
-    public static <T, U extends Collection<T>> U filter(Collection<T> in, Predicate<T> p, U out)
+    public static <T, U extends Collection<? super T>> U filter(Collection<T> in, Predicate<T> p, U out)
     {
         for(T t: in)
         {
