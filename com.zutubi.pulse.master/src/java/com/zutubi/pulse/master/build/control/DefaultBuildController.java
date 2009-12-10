@@ -4,6 +4,7 @@ import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -39,7 +39,6 @@ import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -47,7 +46,6 @@ import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
-import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
@@ -68,12 +66,16 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
  * build request.
  */
 public class DefaultBuildController implements EventListener, BuildController
 {
+    private static final Messages I18N = Messages.getInstance(DefaultBuildController.class);
     private static final Logger LOG = Logger.getLogger(DefaultBuildController.class);
 
     public static final String TIMEOUT_JOB_NAME = "build";
@@ -99,7 +101,6 @@ public class DefaultBuildController implements EventListener, BuildController
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private int pendingRecipes = 0;
     private Scheduler quartzScheduler;
-    private ServiceTokenManager serviceTokenManager;
     private BuildResult previousSuccessful;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
@@ -253,7 +254,6 @@ public class DefaultBuildController implements EventListener, BuildController
             RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
             rc.setRecipeQueue(recipeQueue);
             rc.setBuildManager(buildManager);
-            rc.setServiceTokenManager(serviceTokenManager);
             rc.setEventManager(eventManager);
             rc.setBuildHookManager(buildHookManager);
             rc.setConfigurationManager(configurationManager);
@@ -539,31 +539,36 @@ public class DefaultBuildController implements EventListener, BuildController
 
         if (id == buildResult.getId() || id == BuildTerminationRequestEvent.ALL_BUILDS)
         {
-            // Tell every running recipe to stop, and mark the build terminating
-            // (so it will go into the error state on completion).
-            buildResult.terminate(event.getMessage());
-            List<TreeNode<RecipeController>> completedNodes = new ArrayList<TreeNode<RecipeController>>(executingControllers.size());
+            terminateBuild(event.getMessage());
+        }
+    }
 
-            if (executingControllers.size() > 0)
+    private void terminateBuild(String message)
+    {
+        // Tell every running recipe to stop, and mark the build terminating
+        // (so it will go into the error state on completion).
+        buildResult.terminate(message);
+        List<TreeNode<RecipeController>> completedNodes = new ArrayList<TreeNode<RecipeController>>(executingControllers.size());
+
+        if (executingControllers.size() > 0)
+        {
+            for (TreeNode<RecipeController> controllerNode : executingControllers)
             {
-                for (TreeNode<RecipeController> controllerNode : executingControllers)
+                RecipeController controller = controllerNode.getData();
+                controller.terminateRecipe("Terminated");
+                if (checkControllerStatus(controller, false))
                 {
-                    RecipeController controller = controllerNode.getData();
-                    controller.terminateRecipe("Terminated");
-                    if (checkControllerStatus(controller, false))
-                    {
-                        completedNodes.add(controllerNode);
-                    }
+                    completedNodes.add(controllerNode);
                 }
-
-                buildManager.save(buildResult);
-                executingControllers.removeAll(completedNodes);
             }
 
-            if (executingControllers.size() == 0)
-            {
-                completeBuild();
-            }
+            buildManager.save(buildResult);
+            executingControllers.removeAll(completedNodes);
+        }
+
+        if (executingControllers.size() == 0)
+        {
+            completeBuild();
         }
     }
 
@@ -592,6 +597,10 @@ public class DefaultBuildController implements EventListener, BuildController
                 if (executingControllers.size() == 0)
                 {
                     completeBuild();
+                }
+                else
+                {
+                    checkForTermination(controller);
                 }
             }
         }
@@ -848,11 +857,58 @@ public class DefaultBuildController implements EventListener, BuildController
             }
 
             buildManager.save(buildResult);
-        }
 
-        if (executingControllers.size() == 0)
+            if (executingControllers.size() == 0)
+            {
+                completeBuild();
+            }
+            else
+            {
+                checkForTermination(controller);
+            }
+        }
+    }
+
+    private void checkForTermination(RecipeController controller)
+    {
+        RecipeResultNode recipeResultNode = controller.getResultNode();
+        if (!recipeResultNode.getResult().succeeded())
         {
-            completeBuild();
+            String stageName = recipeResultNode.getStageName();
+            if (projectConfig.getStage(stageName).isTerminateBuildOnFailure())
+            {
+                terminateBuild(I18N.format("terminate.stage.failure", new Object[]{stageName}));
+            }
+            else if (stageFailureLimitReached())
+            {
+                terminateBuild(I18N.format("terminate.multiple.failures", projectConfig.getOptions().getStageFailureLimit()));
+            }
+        }
+    }
+
+    private boolean stageFailureLimitReached()
+    {
+        int limit = projectConfig.getOptions().getStageFailureLimit();
+        if (limit == 0)
+        {
+            return false;
+        }
+        else
+        {
+            final int[] failures = new int[]{0};
+            buildResult.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+            {
+                public void process(RecipeResultNode recipeResultNode)
+                {
+                    RecipeResult result = recipeResultNode.getResult();
+                    if (result != null && result.completed() && !result.succeeded())
+                    {
+                        failures[0]++;
+                    }
+                }
+            });
+
+            return limit == failures[0];
         }
     }
 
@@ -1049,11 +1105,6 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
-    }
-
-    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
-    {
-        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void setScmManager(ScmManager scmManager)

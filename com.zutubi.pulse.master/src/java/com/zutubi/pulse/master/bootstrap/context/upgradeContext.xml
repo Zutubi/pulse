@@ -102,6 +102,8 @@
                 <ref local="addPerforceTimeOffset"/>
                 <ref local="dependentBuildTriggerUpdate"/>
                 <ref local="agentDailyStatistics"/>
+                <ref local="addStageFailures"/>
+                <ref local="addTerminateBuildOnFailure"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -487,5 +489,13 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.10-patch-02.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="addStageFailures" class="com.zutubi.pulse.master.upgrade.tasks.AddStageFailuresUpgradeTask">
+        <property name="buildNumber" value="201010005"/>
+    </bean>
+
+    <bean id="addTerminateBuildOnFailure" class="com.zutubi.pulse.master.upgrade.tasks.AddTerminateBuildOnFailureUpgradeTask">
+        <property name="buildNumber" value="201010006"/>
     </bean>
 </beans>

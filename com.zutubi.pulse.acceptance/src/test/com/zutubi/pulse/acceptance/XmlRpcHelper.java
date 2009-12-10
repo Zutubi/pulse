@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -25,7 +24,6 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Pair;
@@ -37,6 +35,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  */
@@ -225,6 +226,11 @@ public class XmlRpcHelper
     public void restoreConfig(String path) throws Exception
     {
         call("restoreConfig", path);
+    }
+
+    public boolean cloneConfig(String path, Hashtable<String, String> keyMap) throws Exception
+    {
+        return (Boolean) call("cloneConfig", path, keyMap);
     }
 
     public boolean canPullUpConfig(String path, String ancestorKey) throws Exception

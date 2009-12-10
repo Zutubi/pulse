@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
-@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout", "autoClearResponsibility", "idLeader", "persistentWorkDir"})
+@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout", "stageFailureLimit", "autoClearResponsibility", "idLeader", "persistentWorkDir"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
@@ -20,6 +20,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     @Numeric(min = 0)
     private int timeout = TIMEOUT_NEVER;
     private boolean prompt = false;
+    private int stageFailureLimit = 0;
     private boolean autoClearResponsibility = true;
     @Reference
     private ProjectConfiguration idLeader = null;
@@ -68,6 +69,16 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setPrompt(boolean b)
     {
         this.prompt = b;
+    }
+
+    public int getStageFailureLimit()
+    {
+        return stageFailureLimit;
+    }
+
+    public void setStageFailureLimit(int stageFailureLimit)
+    {
+        this.stageFailureLimit = stageFailureLimit;
     }
 
     public boolean isAutoClearResponsibility()

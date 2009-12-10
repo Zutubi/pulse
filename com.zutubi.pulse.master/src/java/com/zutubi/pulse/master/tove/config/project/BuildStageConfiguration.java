@@ -18,7 +18,7 @@ import java.util.Map;
  * results.
  */
 @SymbolicName("zutubi.stageConfig")
-@Form(fieldOrder = {"name", "recipe", "agent"})
+@Form(fieldOrder = {"name", "recipe", "agent", "terminateBuildOnFailure"})
 @Table(columns = {"name", "recipe"})
 @Wire
 public class BuildStageConfiguration extends AbstractNamedConfiguration
@@ -30,6 +30,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
     private List<ResourceRequirementConfiguration> requirements = new LinkedList<ResourceRequirementConfiguration>();
+    private boolean terminateBuildOnFailure;
 
     @Transient
     private ObjectFactory objectFactory;
@@ -86,6 +87,16 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     public void setRequirements(List<ResourceRequirementConfiguration> requirements)
     {
         this.requirements = requirements;
+    }
+
+    public boolean isTerminateBuildOnFailure()
+    {
+        return terminateBuildOnFailure;
+    }
+
+    public void setTerminateBuildOnFailure(boolean terminateBuildOnFailure)
+    {
+        this.terminateBuildOnFailure = terminateBuildOnFailure;
     }
 
     @Transient
