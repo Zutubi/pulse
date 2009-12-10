@@ -17,12 +17,12 @@ public class AcceptanceTestSuite
         //---( other acceptance tests )---
 
         TestSuite main = new TestSuite();
-//        main.addTestSuite(JythonPackageFactoryTest.class); // check the support code works before running the acceptance test suite.
-//        main.addTestSuite(StartupShutdownAcceptanceTest.class);
-//        main.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
-//        main.addTestSuite(PostProcessorPluginAcceptanceTest.class);
+        main.addTestSuite(JythonPackageFactoryTest.class); // check the support code works before running the acceptance test suite.
+        main.addTestSuite(StartupShutdownAcceptanceTest.class);
+        main.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
+        main.addTestSuite(PostProcessorPluginAcceptanceTest.class);
         main.addTest(new AcceptanceTestSuiteSetupTeardown(DevAcceptanceTestSuite.suite()));
-//        main.addTestSuite(AgentUpgradeAcceptanceTest.class);
+        main.addTestSuite(AgentUpgradeAcceptanceTest.class);
 
         return main;
     }
