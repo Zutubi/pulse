@@ -949,6 +949,14 @@ public class XmlRpcHelper
             else
             {
                 message += ": build status is '" + build.get("status") + "'";
+
+                @SuppressWarnings({"unchecked"})
+                Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+                for (Hashtable<String, Object> stage: stages)
+                {
+                    message += ", stage " + stage.get("name") + " status is '" + stage.get("status") + "'";
+                }
+
                 long startTimeMillis = Long.parseLong((String) build.get("startTimeMillis"));
                 if (startTimeMillis > 0)
                 {

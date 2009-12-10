@@ -213,6 +213,7 @@ public class RecipeProcessor
         catch (IOException e)
         {
             LOG.severe("Unable to write out test results", e);
+            recipeResult.error("Unable to write out test results: " + e.getMessage());
         }
         recipeResult.setTestSummary(testResults.getSummary());
         eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));

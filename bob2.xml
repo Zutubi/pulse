@@ -37,6 +37,19 @@
         </ant>
     </recipe>
 
+    <recipe name="acceptance debugging">
+        <ant name="build" targets="accept.master" args="-Dskip.tests=true">
+            <macro-ref macro="$(capture-junit)"/>
+            <dir-artifact name="acceptance output" base="working" fail-if-not-present="false">
+	        <include pattern="**/*"/>
+                <exclude pattern="pulse-accept/pulse-*"/>
+            </dir-artifact>
+            <dir-artifact name="pulse-data" base="data" fail-if-not-present="false">
+	        <include pattern="**/*"/>
+            </dir-artifact>
+        </ant>
+    </recipe>
+
     <recipe name="release">
         <executable name="prepare" exe="bash" args="prepare-release.sh $(pulse.version)"/>
         <ant name="build" targets="accept.master">
