@@ -246,7 +246,7 @@ public class CollectionUtilsTest extends ZutubiTestCase
     public void testFilterInplace()
     {
         List<Object> list = new LinkedList<Object>(Arrays.asList((Object)"a", 1, "b", 2));
-        List<Object> filtered = CollectionUtils.filterInplace(list, new InstanceOfPredicate(String.class));
+        List<Object> filtered = CollectionUtils.filterInPlace(list, new InstanceOfPredicate(String.class));
         assertEquals(2, list.size());
         assertEquals(1, list.get(0));
         assertEquals(2, list.get(1));

@@ -9,7 +9,7 @@ import java.util.*;
 public class CollectionUtils
 {
     /**
-     * Similar to filter except that the elements that are accepted by the
+     * Similar to {@link #filter(Object[], Predicate)}  except that the elements that are accepted by the
      * predicate are also removed from the original collection.
      *
      * @param l     the list that will be filtered inplace
@@ -17,7 +17,7 @@ public class CollectionUtils
      * @param <T>   the type of the item contained by the collection
      * @return  a list of the items that were filtered.
      */
-    public static <T> List<T> filterInplace(Collection<T> l, Predicate<T> p)
+    public static <T> List<T> filterInPlace(Collection<T> l, Predicate<T> p)
     {
         List<T> filteredList = filter(l, p);
         l.removeAll(filteredList);

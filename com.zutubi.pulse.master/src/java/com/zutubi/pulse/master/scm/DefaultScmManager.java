@@ -177,7 +177,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
         try
         {
-            ConcurrentUtils.join(pollingTasks, LOG);
+            ConcurrentUtils.waitForTasks(pollingTasks, LOG);
         }
         catch (InterruptedException e)
         {

@@ -48,7 +48,7 @@ public class FatController implements EventListener, Stoppable
     private AsynchronousDelegatingListener asyncListener;
     private ControllerStateListener controllerStateListener;
 
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
     private Condition stoppedCondition = lock.newCondition();
     private ThreadFactory threadFactory;
     private BuildRequestRegistry buildRequestRegistry;

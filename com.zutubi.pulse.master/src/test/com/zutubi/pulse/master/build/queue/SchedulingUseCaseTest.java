@@ -20,19 +20,6 @@ import java.util.List;
  */
 public class SchedulingUseCaseTest extends BaseQueueTestCase
 {
-    /* Project configuration is as follows:  The details of the dependency relationships
-       are modified as necessary by the individual tests.
-
-       A
-
-          - C -
-        /      \
-       B        E
-        \      /
-         - D -
-
-     */
-
     private Project standalone;
     private Project utility;
     private Project libraryA;
@@ -210,50 +197,6 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         controller.handleEvent(createSuccessful(request.getMetaBuildId(), libraryB));
         verify(projectManager, times(1)).makeStateTransition(libraryB.getId(), Transition.IDLE);
     }
-
-/*
-    public void testBuildJumpsQueueBecausePreviousBuildIsWaitingOnDependency()
-    {
-        // It doesnt jump the queue because the AmIAtTheHeadOfTheQueue fails.
-        // - maybe it should be, am i at the head of the queue of requests that are not waiting on a dependency...
-
-        BuildRequestEvent requestA = createRebuildRequest(C);
-        controller.handleEvent(requestA);
-
-        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(B.getId(), Transition.BUILDING);
-        verify(buildRequestRegistry, times(1)).requestQueued(requestA);
-        setProjectState(State.BUILDING, B);
-
-        BuildRequestEvent requestB = createRequest(C);
-        controller.handleEvent(requestB);
-
-        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(C.getId(), Transition.BUILDING);
-        verify(buildRequestRegistry, times(1)).requestQueued(requestB);
-        verify(buildRequestRegistry, times(1)).requestActivated(requestB, requestB.getId());
-        setProjectState(State.BUILDING, C);
-
-        controller.handleEvent(createSuccessful(requestA.getMetaBuildId(), B));
-
-        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(B.getId(), Transition.IDLE);
-
-        controller.handleEvent(createSuccessful(requestB.getMetaBuildId(), C));
-
-        assertEquals(0, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(buildRequestRegistry, times(1)).requestActivated(requestA, requestA.getId());
-
-        controller.handleEvent(createSuccessful(requestA.getMetaBuildId(), C));
-        assertEquals(0, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(0, controller.getSnapshot().getActivatedBuildRequests().size());
-        verify(projectManager, times(1)).makeStateTransition(C.getId(), Transition.IDLE);
-    }
-*/
 
     public void testRebuildOfProjectRejectedBecauseProjectPaused()
     {

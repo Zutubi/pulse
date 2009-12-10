@@ -54,9 +54,9 @@ public class ConcurrentUtils
      *
      * @throws InterruptedException if the thread waiting for the futures is interrupted.
      */
-    public static void join(List<Future> futures) throws InterruptedException
+    public static void waitForTasks(List<Future> futures) throws InterruptedException
     {
-        join(futures, null);        
+        waitForTasks(futures, null);        
     }
 
     /**
@@ -68,7 +68,7 @@ public class ConcurrentUtils
      *
      * @throws InterruptedException if the thread waiting for the futures is interrupted.
      */
-    public static void join(List<Future> futures, Logger log) throws InterruptedException
+    public static void waitForTasks(List<Future> futures, Logger log) throws InterruptedException
     {
         for (Future task : futures)
         {

@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The scheduling controller is the main component of the scheduling/queueing system.
@@ -31,6 +33,8 @@ public class SchedulingController implements EventListener
 
     private static final Messages I18N = Messages.getInstance(SchedulingController.class);
 
+    private final Lock lock = new ReentrantLock();
+
     private ObjectFactory objectFactory;
     private SequenceManager sequenceManager;
     private ProjectManager projectManager;
@@ -42,8 +46,8 @@ public class SchedulingController implements EventListener
     protected void handleBuildRequest(BuildRequestEvent request)
     {
         BuildRequestHandler requestHandler = getRequestHandler(request);
-        //noinspection SynchronizeOnNonFinalField
-        synchronized (buildQueue)
+        lock.lock();
+        try
         {
             List<QueuedRequest> candidates = new LinkedList<QueuedRequest>(requestHandler.prepare(request));
 
@@ -53,13 +57,14 @@ public class SchedulingController implements EventListener
             {
                 CanBuildPredicate canBuild = objectFactory.buildBean(CanBuildPredicate.class);
 
-                List<QueuedRequest> accepted = filterCanBuildRequestsInplace(candidates);
+                List<QueuedRequest> accepted = filterCanBuildRequestsInPlace(candidates);
                 List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
 
                 boolean canProceed = CollectionUtils.contains(accepted, new HasIdPredicate<QueuedRequest>(request.getId()));
                 if (!canProceed)
                 {
                     rejected.addAll(accepted);
+                    accepted.clear();
                 }
 
                 if (accepted.size() > 0)
@@ -98,15 +103,19 @@ public class SchedulingController implements EventListener
                 unlockProjectStates(allRequests);
             }
         }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
-    private List<QueuedRequest> filterCanBuildRequestsInplace(List<QueuedRequest> candidates)
+    private List<QueuedRequest> filterCanBuildRequestsInPlace(List<QueuedRequest> candidates)
     {
         CanBuildPredicate<QueuedRequest> canBuild = objectFactory.buildBean(CanBuildPredicate.class);
 
         // move the candidates that we can build from the rejected list to the accepted list.
         List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
-        List<QueuedRequest> accepted = CollectionUtils.filterInplace(rejected, canBuild);
+        List<QueuedRequest> accepted = CollectionUtils.filterInPlace(rejected, canBuild);
 
         // Now we need to go through and move any requests that are in the accepted list that
         // depend on a request in the rejected list into the rejected list.  We do this until
@@ -150,8 +159,9 @@ public class SchedulingController implements EventListener
     protected void handleBuildCompleted(BuildCompletedEvent event)
     {
         BuildRequestHandler requestHandler = getRequestHandler(event);
-        //noinspection SynchronizeOnNonFinalField
-        synchronized (buildQueue)
+
+        lock.lock();
+        try
         {
             // if all requests are finished, return true, else return false.
             BuildResult result = event.getBuildResult();
@@ -171,6 +181,10 @@ public class SchedulingController implements EventListener
 
             internalCompleteRequests(requestHandler, requestsToComplete);
         }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     private void internalCompleteRequests(BuildRequestHandler requestHandler, List<RequestHolder> completedRequests)
@@ -180,32 +194,35 @@ public class SchedulingController implements EventListener
         lockProjectStates(requestEvents);
         try
         {
-            //noinspection SynchronizeOnNonFinalField
-            synchronized (buildQueue)
+            lock.lock();
+            try
             {
                 // pause the activation since we may be making multiple related changes.  We do not
                 // accidentally want to activate a request when we cancel its remaining dependency.
-                try
+                synchronized (buildQueue)
                 {
-                    buildQueue.pauseActivation();
-
-                    // cancel all existing queued requests, complete actiated requests.
-                    for (RequestHolder request : completedRequests)
+                    try
                     {
-                        long requestId = request.getRequest().getId();
-                        if (request instanceof ActivatedRequest)
+                        buildQueue.pauseActivation();
+
+                        // cancel all existing queued requests, complete actiated requests.
+                        for (RequestHolder request : completedRequests)
                         {
-                            buildQueue.complete(requestId);
-                        }
-                        else
-                        {
-                            buildQueue.cancel(requestId);
+                            long requestId = request.getRequest().getId();
+                            if (request instanceof ActivatedRequest)
+                            {
+                                buildQueue.complete(requestId);
+                            }
+                            else
+                            {
+                                buildQueue.cancel(requestId);
+                            }
                         }
                     }
-                }
-                finally
-                {
-                    buildQueue.resumeActivation();
+                    finally
+                    {
+                        buildQueue.resumeActivation();
+                    }
                 }
 
                 for (BuildRequestEvent completedRequest : requestEvents)
@@ -224,6 +241,10 @@ public class SchedulingController implements EventListener
                 {
                     handlers.remove(metaBuildId);
                 }
+            }
+            finally
+            {
+                lock.unlock();
             }
         }
         finally
@@ -341,13 +362,18 @@ public class SchedulingController implements EventListener
     public boolean cancelRequest(long id)
     {
         BuildRequestHandler requestHandler = getRequestHandler(id);
-        //noinspection SynchronizeOnNonFinalField
-        synchronized (buildQueue)
+
+        lock.lock();
+        try
         {
             List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
             List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
             internalCompleteRequests(requestHandler, queuedRequests);
             return queuedRequests.size() > 0;
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 

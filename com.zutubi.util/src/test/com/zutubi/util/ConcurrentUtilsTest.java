@@ -58,7 +58,7 @@ public class ConcurrentUtilsTest extends ZutubiTestCase
         }
     }
 
-    public void testJoin() throws InterruptedException
+    public void testWaitForTasks() throws InterruptedException
     {
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
@@ -70,7 +70,7 @@ public class ConcurrentUtilsTest extends ZutubiTestCase
             futures.add(executor.submit(process));
         }
         // wait for them to complete before continuing.
-        ConcurrentUtils.join(futures, null);
+        ConcurrentUtils.waitForTasks(futures, null);
 
         // assert that they are completed as expected.
         for (SleepyProcess process : processes)
