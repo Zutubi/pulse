@@ -128,10 +128,10 @@ public class ExecutableCommand extends OutputProducingCommandSupport
                 readerComplete = reader.waitFor(10);
             }
 
-            if(readerComplete)
+            if (readerComplete)
             {
                 IOException ioe = reader.getIoError();
-                if(ioe != null)
+                if (ioe != null)
                 {
                     throw new BuildException(ioe);
                 }
@@ -538,11 +538,20 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
     class CancellableReader
     {
+        private static final long WAIT_LIMIT = 60 * Constants.SECOND;
+
         private Thread readerThread;
         private InputStream in;
         private OutputStream out;
         private IOException ioError = null;
         private boolean interrupted = false;
+        /**
+         * Set to the current time the first time that {@link #waitFor(long)}
+         * is called, as a base point to time out waits.  Updated when new
+         * output is read after this point, so if we actually do have a lot to
+         * drain we don't time out.
+         */
+        private long waitTimestamp = -1;
 
         public CancellableReader(InputStream in, OutputStream out)
         {
@@ -561,8 +570,16 @@ public class ExecutableCommand extends OutputProducingCommandSupport
                         byte[] buffer = new byte[1024];
                         int n;
 
-                        while (!interrupted && !Thread.interrupted() && (n = in.read(buffer)) > 0)
+                        while (!isCancelled() && (n = in.read(buffer)) > 0)
                         {
+                            synchronized (CancellableReader.this)
+                            {
+                                if (n > 0 && waitTimestamp > 0)
+                                {
+                                    waitTimestamp = System.currentTimeMillis();
+                                }
+                            }
+
                             out.write(buffer, 0, n);
                         }
                     }
@@ -590,8 +607,30 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             interrupted = true;
         }
 
+        private synchronized boolean isCancelled()
+        {
+            return interrupted || Thread.interrupted();
+        }
+
         public boolean waitFor(long seconds)
         {
+            synchronized (this)
+            {
+                long currentTime = System.currentTimeMillis();
+                if (waitTimestamp < 0)
+                {
+                    waitTimestamp = currentTime;
+                }
+                else if (currentTime - waitTimestamp > WAIT_LIMIT)
+                {
+                    // The process has exited, and we haven't seen any new
+                    // output for the timeout, so assume there is no more to
+                    // see.
+                    readerThread.interrupt();
+                    return true;
+                }
+            }
+
             try
             {
                 readerThread.join(Constants.SECOND * seconds);
