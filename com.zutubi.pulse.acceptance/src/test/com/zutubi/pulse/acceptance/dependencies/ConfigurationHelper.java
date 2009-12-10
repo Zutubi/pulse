@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -99,6 +100,7 @@ public class ConfigurationHelper
         // Configure the plugin configuration types that will be available to the acceptance
         // tests.
         configurationRegistry.registerConfigurationType(AntCommandConfiguration.class);
+        configurationRegistry.registerConfigurationType(ExecutableCommandConfiguration.class);
         configurationRegistry.registerConfigurationType(AntPostProcessorConfiguration.class);
         configurationRegistry.registerConfigurationType(SubversionConfiguration.class);
         configurationRegistry.registerConfigurationType(DependentBuildTriggerConfiguration.class);
