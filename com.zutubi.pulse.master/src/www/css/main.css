@@ -760,7 +760,7 @@ span.feature {
     margin-bottom: 3px;
 }
 
-li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {
+li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, li.report-artifact, li.link-artifact, li.task, li.explore {
     font-weight: normal;
     list-style: none;
     margin-top: 2px;
@@ -768,7 +768,7 @@ li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, l
     line-height: 20px;
 }
 
-li.error, li.warning, li.info, li.file-artifact, li.report-artifact, li.task, li.explore {
+li.error, li.warning, li.info, li.file-artifact, li.report-artifact, li.link-artifact, li.task, li.explore {
     padding-left: 20px;
 }
 
@@ -803,6 +803,10 @@ li.file-artifact {
 
 li.report-artifact {
     background: url( ../images/page_world.gif ) no-repeat 0 0;
+}
+
+li.link-artifact {
+    background: url( ../images/page_link.gif ) no-repeat 0 0;
 }
 
 li.header {
