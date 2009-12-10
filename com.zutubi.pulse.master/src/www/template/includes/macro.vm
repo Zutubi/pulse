@@ -1380,16 +1380,15 @@
         <table id="table.dependencies" width="150" class="content">
              <th colspan="4" class="heading">#wwtext("name=dependencies.header")</th>
             <tr>
-                <th class="content">#wwtext("name=dependencies.column.stage")</th>
                 <th class="content">#wwtext("name=dependencies.column.project")</th>
                 <th class="content">#wwtext("name=dependencies.column.build")</th>
+                <th class="content">#wwtext("name=dependencies.column.stage")</th>
                 <th class="content">#wwtext("name=dependencies.column.artifact")</th>
             </tr>
                 #foreach($detail in $dependencyDetails)
                     #if ($detail.reportAvailable)
                         #foreach($dependency in $detail.dependencies)
                 <tr>
-                    <td class="content">#html($detail.stageName)</td>
                             #if ($dependency.projectUrl)
                         <td class="content"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
                             #else
@@ -1400,6 +1399,7 @@
                             #else
                         <td class="content">#html($dependency.buildName)</td>
                             #end
+                    <td class="content">#html($dependency.stageName)</td>
                             #if ($dependency.artifactUrl)
                         <td class="content"><a id='#id("${dependency.projectName}-${detail.stageName}-${dependency.artifactName}")' href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
                             #else

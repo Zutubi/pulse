@@ -20,19 +20,19 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
     {
         super.setUp();
 
-        factory = new ModuleDescriptorFactory(new IvyConfiguration());
+        factory = new ModuleDescriptorFactory(new IvyConfiguration(), null);
     }
 
     public void testDefaultProjectConfiguration()
     {
         ProjectConfiguration project = newProject("organisation", "project");
 
-        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
+        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project).getDescriptor();
         assertEquals(0, descriptor.getConfigurationsNames().length);
         assertEquals(0, descriptor.getAllArtifacts().length);
         assertEquals(0, descriptor.getDependencies().length);
 
-        assertEquals(MasterIvyModuleRevisionId.newInstance(project, (String)null), descriptor.getModuleRevisionId());
+        assertEquals(MasterIvyModuleRevisionId.newInstance(project, null), descriptor.getModuleRevisionId());
     }
 
     private ProjectConfiguration newProject(String org, String name)
@@ -59,7 +59,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         ProjectConfiguration project = newProject("", "project");
         project.getDependencies().getDependencies().add(dependency);
 
-        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
+        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project).getDescriptor();
         assertEquals(1, descriptor.getDependencies().length);
         DependencyDescriptor dependencyDescriptor = descriptor.getDependencies()[0];
         assertEquals(MasterIvyModuleRevisionId.newInstance(dependency), dependencyDescriptor.getDependencyRevisionId());
@@ -69,11 +69,11 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
     {
         ProjectConfiguration project = newProject("", "project");
 
-        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project);
+        ModuleDescriptor descriptor = factory.createRetrieveDescriptor(project).getDescriptor();
         assertEquals(IvyStatus.STATUS_INTEGRATION, descriptor.getStatus());
 
         project.getDependencies().setStatus(IvyStatus.STATUS_MILESTONE);
-        descriptor = factory.createRetrieveDescriptor(project);
+        descriptor = factory.createRetrieveDescriptor(project).getDescriptor();
         assertEquals(IvyStatus.STATUS_MILESTONE, descriptor.getStatus());
     }
 }

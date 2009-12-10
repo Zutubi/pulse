@@ -5,11 +5,17 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 import java.util.Map;
 
 /**
- * A factory for the ivy ModuleRevisionId instance that provides a set of convenience methods
- * mapping Pulse data types to ModuleRevisionId.
+ * A local version of the factory methods used by ivy to create module revision ids.
+ *
+ * @see ModuleRevisionId
  */
 public class IvyModuleRevisionId
 {
+    private IvyModuleRevisionId()
+    {
+        // ensure that this class can not be instantiated.
+    }
+
     public static ModuleRevisionId newInstance(String org, String module, String revision)
     {
         return ModuleRevisionId.newInstance(org, module, revision);

@@ -6,18 +6,19 @@ import static com.zutubi.util.FileSystemUtils.rmdir;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.Ivy;
+import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
+import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
-import org.apache.ivy.core.report.ResolveReport;
-import org.apache.ivy.core.report.DownloadStatus;
 import org.apache.ivy.core.report.ConfigurationResolveReport;
-import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.core.report.DownloadStatus;
+import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.IvyNode;
+import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
@@ -49,7 +50,6 @@ public class IvyClient
     private static final Logger LOG = Logger.getLogger(IvyClient.class);
 
     private static final String RESOLVER_NAME = "pulse";
-    private static final String SOURCEFILE = "sourcefile";
 
     private Ivy ivy;
 
@@ -102,11 +102,11 @@ public class IvyClient
      * 'sourcefile' which needs to be defined for each artifact being published.
      *
      * @param descriptor the descriptor that defines the artifacts to be published.
-     * @param confNames  the configuration names identifying the set of artifacts to be published.  If
+     * @param stageNames the stage names identifying the set of artifacts to be published.  If
      *                   blank, all artifacts will be published.
      * @throws IOException if there is a failure to publish an artifact.
      */
-    public void publishArtifacts(DefaultModuleDescriptor descriptor, String... confNames) throws IOException
+    public void publishArtifacts(IvyModuleDescriptor descriptor, String... stageNames) throws IOException
     {
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
         ivy.pushContext();
@@ -121,18 +121,18 @@ public class IvyClient
             options.setUpdate(true);
             options.setHaltOnMissing(true);
 
-            if (confNames.length > 0)
+            if (stageNames.length > 0)
             {
-                options.setConfs(confNames);
+                options.setConfs(IvyEncoder.encodeStageNames(stageNames));
             }
 
-            Collection bad = checkCanPublishArtifacts(descriptor, confNames);
+            Collection bad = checkCanPublishArtifacts(descriptor, stageNames);
             if (bad.size() > 0)
             {
                 throw new IOException(I18N.format("failure.publish.missingSourcefile"));
             }
 
-            Collection missing = ivy.getPublishEngine().publish(descriptor, Arrays.asList("[" + SOURCEFILE + "]"), dependencyResolver, options);
+            Collection missing = ivy.getPublishEngine().publish(descriptor.getDescriptor(), Arrays.asList("[" + IvyModuleDescriptor.SOURCEFILE + "]"), dependencyResolver, options);
             if (missing.size() > 0)
             {
                 throw new IOException(I18N.format("failure.publish.general"));
@@ -146,14 +146,14 @@ public class IvyClient
     }
 
     // sanity check that 'sourcefile' is defined for the artifacts to be published.
-    private Collection<Artifact> checkCanPublishArtifacts(DefaultModuleDescriptor descriptor, String... confNames) throws IOException
+    private Collection<Artifact> checkCanPublishArtifacts(IvyModuleDescriptor descriptor, String... stageNames) throws IOException
     {
         List<Artifact> artifacts = new LinkedList<Artifact>();
-        if (confNames.length > 0)
+        if (stageNames.length > 0)
         {
-            for (String confName : confNames)
+            for (String stageName : stageNames)
             {
-                artifacts.addAll(Arrays.asList(descriptor.getArtifacts(confName)));
+                artifacts.addAll(Arrays.asList(descriptor.getArtifacts(stageName)));
             }
         }
         else
@@ -164,7 +164,7 @@ public class IvyClient
         List<Artifact> badArtifacts = new LinkedList<Artifact>();
         for (Artifact artifact : artifacts)
         {
-            if (!artifact.getId().getExtraAttributes().containsKey(SOURCEFILE))
+            if (!artifact.getId().getExtraAttributes().containsKey(IvyModuleDescriptor.SOURCEFILE))
             {
                 // we can not publish this artifact because we don't know what file to publish.
                 badArtifacts.add(artifact);
@@ -179,7 +179,7 @@ public class IvyClient
      * @param descriptor to be published
      * @throws IOException if there are any errors publishing the descriptor.
      */
-    public void publishDescriptor(DefaultModuleDescriptor descriptor) throws IOException
+    public void publishDescriptor(IvyModuleDescriptor descriptor) throws IOException
     {
         // we can only publish from a file, so we need to deliver the descriptor to a local file first.
         File tmp = null;
@@ -187,27 +187,29 @@ public class IvyClient
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
         try
         {
+            URLHandlerRegistry.setDefault(new CustomURLHandler());
+
             String revision = descriptor.getRevision();
+
+            DefaultModuleDescriptor moduleDescriptor = descriptor.getDescriptor();
 
             tmp = FileSystemUtils.createTempDir();
             File ivyFile = new File(tmp, "ivy.xml");
-            XmlModuleDescriptorWriter.write(descriptor, ivyFile);
+            XmlModuleDescriptorWriter.write(moduleDescriptor, ivyFile);
 
-            ModuleRevisionId mrid = descriptor.getModuleRevisionId();
+            ModuleRevisionId mrid = moduleDescriptor.getModuleRevisionId();
 
             PublishOptions options = new PublishOptions();
             options.setOverwrite(true);
             options.setUpdate(true);
             options.setHaltOnMissing(false); // we dont care about missing artifacts here, just that the ivy file gets published.
-            options.setConfs(new String[]{"*"});
+            options.setConfs(new String[]{IvyModuleDescriptor.ALL_STAGES});
             options.setSrcIvyPattern(ivyFile.getCanonicalPath());
 
             if (StringUtils.stringSet(revision))
             {
                 options.setPubrevision(revision);
             }
-
-            URLHandlerRegistry.setDefault(new CustomURLHandler());
             ivy.publish(mrid, Collections.emptySet(), RESOLVER_NAME, options);
         }
         finally
@@ -229,7 +231,8 @@ public class IvyClient
      * @param targetPattern the pattern defining where the artifacts will be written.  This pattern,
      *                      supports the usual ivy tokens.
      * @return a retrieval report containing details of the artifacts that were retrieved.
-     * @throws Exception if any problems are encountered.
+     * @throws java.io.IOException  on error
+     * @throws java.text.ParseException on error
      */
     public IvyRetrievalReport retrieveArtifacts(ModuleDescriptor descriptor, String targetPattern) throws IOException, ParseException
     {
@@ -237,11 +240,13 @@ public class IvyClient
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
         try
         {
+            URLHandlerRegistry.setDefault(new CustomURLHandler());
+
             IvyRetrievalReport report = new IvyRetrievalReport();
 
             ModuleRevisionId mrid = descriptor.getModuleRevisionId();
 
-            String conf = "build";
+            String conf = IvyModuleDescriptor.CONFIGURATION_BUILD;
             ResolveReport resolveReport = resolve(descriptor, conf);
             if (resolveReportHasProblems(resolveReport, report, conf))
             {
@@ -252,16 +257,37 @@ public class IvyClient
             options.setConfs(new String[]{conf});
             options.setSync(true); // important if the build directory is being re-used.
 
-            URLHandlerRegistry.setDefault(new CustomURLHandler());
             ivy.retrieve(mrid, targetPattern, options);
 
             recordDownloadedArtifacts(targetPattern, report, mrid, options);
+            decodeArtifactFilenames(targetPattern, report);
 
             return report;
         }
         finally
         {
             URLHandlerRegistry.setDefault(originalDefault);
+        }
+    }
+
+    private void decodeArtifactFilenames(String targetPattern, IvyRetrievalReport report)
+    {
+        for (Artifact decodedArtifact : report.getRetrievedArtifacts())
+        {
+            // The encoded artifact is what ivy will have been working with.
+            Artifact encodedArtifact = IvyEncoder.encode(decodedArtifact);
+            String decodedArtifactPath = IvyPatternHelper.substitute(targetPattern, decodedArtifact);
+            String encodedArtifactPath = IvyPatternHelper.substitute(targetPattern, encodedArtifact);
+            if (!encodedArtifactPath.equals(decodedArtifactPath))
+            {
+                // The encoded / decoded paths are different, so we need a rename.
+                File decodedArtifactFile = new File(decodedArtifactPath);
+                File encodedArtifactFile = new File(encodedArtifactPath);
+                if (encodedArtifactFile.exists() && !encodedArtifactFile.renameTo(decodedArtifactFile))
+                {
+                    LOG.warning("Failed to rename artifact from " + encodedArtifactPath + " to " + decodedArtifactPath);
+                }
+            }
         }
     }
 
@@ -287,7 +313,7 @@ public class IvyClient
                     {
                         artifactDownloadReport.setDownloadDetails("unresolved dependency: " + dependency.getId());
                     }
-                    report.addDownloadReports(artifactDownloadReport);
+                    report.addDownloadReports(IvyEncoder.decode(artifactDownloadReport));
                 }
                 else
                 {
@@ -296,7 +322,10 @@ public class IvyClient
                     ArtifactDownloadReport[] downloadReports = configurationResolveReport.getDownloadReports(dependency.getResolvedId());
                     if (downloadReports.length > 0)
                     {
-                        report.addDownloadReports(downloadReports);
+                        for (ArtifactDownloadReport downloadReport : downloadReports)
+                        {
+                            report.addDownloadReports(IvyEncoder.decode(downloadReport));
+                        }
                     }
                 }
             }
@@ -308,9 +337,9 @@ public class IvyClient
     private void recordDownloadedArtifacts(String targetPattern, IvyRetrievalReport report, ModuleRevisionId mrid, RetrieveOptions options) throws ParseException, IOException
     {
         Map<ArtifactDownloadReport, Set<String>> artifactDownloadReports = ivy.getRetrieveEngine().determineArtifactsToCopy(mrid, targetPattern, options);
-        for (final ArtifactDownloadReport artifactDownloadReport : artifactDownloadReports.keySet())
+        for (ArtifactDownloadReport artifactDownloadReport : artifactDownloadReports.keySet())
         {
-            report.addDownloadReports(artifactDownloadReport);
+            report.addDownloadReports(IvyEncoder.decode(artifactDownloadReport));
         }
     }
 
@@ -319,21 +348,23 @@ public class IvyClient
      * caching the result.
      *
      * @param descriptor the descriptor whos dependencies are being resovled.
-     * @param confNames  the configuration names that define the set of dependencies to be resolved.
+     * @param stageNames the stage names that define the set of dependencies to be resolved.
      * @return a resolve report.
-     * @throws Exception on error.
+     *
+     * @throws java.io.IOException  on error
+     * @throws java.text.ParseException on error
      */
-    public ResolveReport resolve(ModuleDescriptor descriptor, String... confNames) throws IOException, ParseException
+    public ResolveReport resolve(ModuleDescriptor descriptor, String... stageNames) throws IOException, ParseException
     {
         ResolveOptions options = new ResolveOptions();
         options.setValidate(ivy.getSettings().doValidate());
-        if (confNames.length > 0)
+        if (stageNames.length > 0)
         {
-            options.setConfs(confNames);
+            options.setConfs(IvyEncoder.encodeStageNames(stageNames));
         }
         else
         {
-            options.setConfs(new String[]{"*"});
+            options.setConfs(new String[]{IvyModuleDescriptor.ALL_STAGES});
         }
         options.setCheckIfChanged(true);
         options.setUseCacheOnly(false);

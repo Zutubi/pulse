@@ -36,6 +36,9 @@ import java.util.Map;
  * lists the artifacts that were retrieved to the local file system.
  *
  * This report can be persisted to xml format.
+ *
+ * Note that non of the contents of this report are encoded and so can
+ * be used directly.
  */
 public class IvyRetrievalReport
 {
@@ -281,6 +284,7 @@ public class IvyRetrievalReport
      *
      * @param output    the output stream to which this report is written.
      * @throws SAXException is thrown if there is a problem generating the xml output.
+     * @throws javax.xml.transform.TransformerConfigurationException
      */
     public void toXml(OutputStream output) throws TransformerConfigurationException, SAXException
     {
@@ -378,8 +382,7 @@ public class IvyRetrievalReport
     {
         for (ArtifactDownloadReport report : reports)
         {
-            Artifact artifact = report.getArtifact();
-            ModuleRevisionId mrid = artifact.getModuleRevisionId();
+            ModuleRevisionId mrid = report.getArtifact().getModuleRevisionId();
             if (!moduleArtifacts.containsKey(mrid))
             {
                 moduleArtifacts.put(mrid, new LinkedList<ArtifactDownloadReport>());

@@ -1,10 +1,8 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
-import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
-import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
-import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
-import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
+import com.zutubi.pulse.core.dependency.ivy.*;
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_STAGE;
 import com.zutubi.util.FileSystemUtils;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
@@ -109,6 +107,8 @@ public class Repository
      * @param revision  the revision of the ivy descriptor to be retrieved
      *
      * @return  a reference to the ivy descriptor
+     *
+     * @throws Exception on error
      */
     public IvyModuleDescriptor getIvyModuleDescriptor(String org, String name, Object revision) throws Exception
     {
@@ -119,7 +119,7 @@ public class Repository
     {
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
-        ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(orgString, name, null, revisionString);
+        ModuleRevisionId mrid = IvyEncoder.encode(IvyModuleRevisionId.newInstance(orgString, name, null, revisionString));
 
         return configuration.getIvyPath(mrid);
     }
@@ -134,8 +134,8 @@ public class Repository
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
         Map<String, String> extraAttributes = new HashMap<String, String>();
-        extraAttributes.put("e:stage", IvyUtils.ivyEncodeStageName(stageName));
-        ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(orgString, name, revisionString, extraAttributes);
+        extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, IvyEncoder.encodeStageName(stageName));
+        ModuleRevisionId mrid = IvyEncoder.encode(IvyModuleRevisionId.newInstance(orgString, name, revisionString, extraAttributes));
 
         return configuration.getArtifactPath(mrid, artifactName, artifactExtension);
     }
@@ -171,9 +171,10 @@ public class Repository
      * Create an empty file in the artifact repository at the specified path.
      * @param path  the path for the new file, relative to the root of the artifact
      * repository.
+     *
      * @throws IOException on error.
      */
-    protected boolean createFile(String path) throws IOException
+    protected void createFile(String path) throws IOException
     {
         File file = new File(getBase(), path);
         File parentFile = file.getParentFile();
@@ -185,7 +186,6 @@ public class Repository
         {
             throw new IOException("Failed to create file: " + file.getCanonicalPath());
         }
-        return true;
     }
 
     /**

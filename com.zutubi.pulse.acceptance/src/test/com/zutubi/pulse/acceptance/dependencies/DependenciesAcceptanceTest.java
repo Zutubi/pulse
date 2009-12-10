@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.util.SystemUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -180,7 +181,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
 
-        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig(), CollectionUtils.asPair("status", (Object)STATUS_MILESTONE));
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig(), CollectionUtils.asPair("status", (Object) STATUS_MILESTONE));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -396,7 +397,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.getConfig().getDependencies().setStatus(STATUS_INTEGRATION);
-        
+
         DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
         trigger.setPropagateStatus(true);
 
@@ -460,16 +461,12 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testUnusualCharactersInArtifactName() throws Exception
     {
-        // The criteria for artifact names is that they must be allowed in a URI.  This
-        // is because the internal artifact repository is accessed by ivy via HTTP.
-        
-        String validCharacters = "!()._-";
-        String invalidCharacters = "@#%^&";
+        String supportedCharacters = "!()._-@#%^&";
 
-        // $ is not allowed in an artifact name 
-
-        runBuildWithCharacterInArtifactName(validCharacters, ResultState.SUCCESS);
-        runBuildWithCharacterInArtifactName(invalidCharacters, ResultState.ERROR);
+        for (char c : supportedCharacters.toCharArray())
+        {
+            runTestForCharacterSupport(c);
+        }
     }
 
     // CIB-2171
@@ -533,34 +530,34 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
-    private void runBuildWithCharacterInArtifactName(String testCharacters, ResultState expected) throws Exception
+    private void runTestForCharacterSupport(char c) throws Exception
     {
-        for (char c : testCharacters.toCharArray())
-        {
-            DepAntProject project = projects.createDepAntProject(randomName());
-            project.addArtifacts("build/artifact-" + c + ".jar");
+        String projectName = getName() + c + RandomUtils.randomString(5);
+        DepAntProject projectA = projects.createDepAntProject(projectName + "A");
+        projectA.setOrganisation("org" + c + "name");
+        projectA.addArtifact("file", "build/artifactA-" + c + ".jar");
+        projectA.addDirArtifact("dir", "build/dir");
 
-            // The ant script on unix evals its arguments, so we need to escape
-            // these characters lest the shell choke on them.
-            String resolvedChar = SystemUtils.IS_WINDOWS ? Character.toString(c) : "\\" + c;
-            project.addFilesToCreate("build/artifact-" + resolvedChar + ".jar");
+        projectA.addStage("stage" + c + "name");
 
-            insertProject(project);
+        // The ant script on unix evals its arguments, so we need to escape
+        // these characters lest the shell choke on them.
+        String resolvedChar = SystemUtils.IS_WINDOWS ? Character.toString(c) : "\\" + c;
+        projectA.addFilesToCreate("build/artifactA-" + resolvedChar + ".jar", "build/dir/artifactB-" + resolvedChar + ".jar", "build/dir/artifactC-" + resolvedChar + ".jar");
 
-            int buildNumber = buildRunner.triggerAndWaitForBuild(project.getConfig());
-            assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getConfig().getName(), buildNumber));
+        insertProject(projectA);
 
-            if (expected == ResultState.SUCCESS)
-            {
-                assertIvyInRepository(project, buildNumber);
-                assertArtifactInRepository(project, "default", buildNumber, "artifact-" + c, "jar");
-            }
-            else
-            {
-                assertIvyNotInRepository(project, buildNumber);
-                assertArtifactNotInRepository(project, "default", buildNumber, "artifact-" + c, "jar");
-            }
-        }
+        long buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        assertIvyInRepository(projectA, buildNumber);
+
+        DepAntProject projectB = projects.createDepAntProject(projectName + "B");
+        projectB.addDependency(projectA, "stage" + c + "name");
+        projectB.addExpectedFiles("lib/artifactA-" + resolvedChar + ".jar", "lib/artifactB-" + resolvedChar + ".jar", "lib/artifactC-" + resolvedChar + ".jar");
+
+        insertProject(projectB);
+
+        buildRunner.triggerSuccessfulBuild(projectB.getConfig());
     }
 
     private void assertIvyStatus(String expectedStatus, ProjectConfigurationHelper project, int buildNumber) throws Exception
@@ -596,9 +593,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void assertInRepository(String baseArtifactName) throws IOException
     {
         // all artifacts are being published with .md5 and .sha1 hashes.
-        assertTrue(repository.waitUntilInRepository(baseArtifactName));
-        assertTrue(repository.waitUntilInRepository(baseArtifactName + ".md5"));
-        assertTrue(repository.waitUntilInRepository(baseArtifactName + ".sha1"));
+        assertTrue(baseArtifactName + " not found in repository", repository.waitUntilInRepository(baseArtifactName));
+        assertTrue(baseArtifactName + ".md5 not found in repository", repository.waitUntilInRepository(baseArtifactName + ".md5"));
+        assertTrue(baseArtifactName + ".sha1 not found in repository", repository.waitUntilInRepository(baseArtifactName + ".sha1"));
     }
 
     public void assertNotInRepository(String baseArtifactName) throws IOException

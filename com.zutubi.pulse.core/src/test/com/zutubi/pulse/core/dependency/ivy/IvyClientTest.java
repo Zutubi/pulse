@@ -47,7 +47,7 @@ public class IvyClientTest extends ZutubiTestCase
 
     public void testPublishNoArtifacts() throws IOException
     {
-        client.publishArtifacts(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
 
         assertEquals(null, repositoryBase.list());
     }
@@ -56,9 +56,9 @@ public class IvyClientTest extends ZutubiTestCase
     {
         descriptor.addArtifact(createArtifact("artifact.jar"), "build");
 
-        client.publishArtifacts(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
 
-        assertExists(repositoryBase, "org/module/jars/artifact-revision.jar");
+        assertExists(repositoryBase, "org/module/build/jars/artifact-revision.jar");
     }
 
     public void testPublishMultipleArtifacts() throws IOException
@@ -66,10 +66,10 @@ public class IvyClientTest extends ZutubiTestCase
         descriptor.addArtifact(createArtifact("artifactA.jar"), "build");
         descriptor.addArtifact(createArtifact("artifactB.jar"), "build");
 
-        client.publishArtifacts(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
 
-        assertExists(repositoryBase, "org/module/jars/artifactA-revision.jar");
-        assertExists(repositoryBase, "org/module/jars/artifactB-revision.jar");
+        assertExists(repositoryBase, "org/module/build/jars/artifactA-revision.jar");
+        assertExists(repositoryBase, "org/module/build/jars/artifactB-revision.jar");
     }
 
     public void testPublishArtifactByConf() throws IOException
@@ -77,15 +77,15 @@ public class IvyClientTest extends ZutubiTestCase
         descriptor.addArtifact(createArtifact("artifactA.jar"), "buildA");
         descriptor.addArtifact(createArtifact("artifactB.jar"), "buildB");
 
-        client.publishArtifacts(descriptor.getDescriptor(), "buildA");
+        client.publishArtifacts(descriptor, "buildA");
 
-        assertExists(repositoryBase, "org/module/jars/artifactA-revision.jar");
-        assertNotExists(repositoryBase, "org/module/jars/artifactB-revision.jar");
+        assertExists(repositoryBase, "org/module/buildA/jars/artifactA-revision.jar");
+        assertNotExists(repositoryBase, "org/module/buildB/jars/artifactB-revision.jar");
     }
 
     public void testPublishDescriptor() throws IOException, ParseException
     {
-        client.publishDescriptor(descriptor.getDescriptor());
+        client.publishDescriptor(descriptor);
         
         assertExists(repositoryBase, "org/module/ivy-revision.xml");
     }
@@ -93,8 +93,8 @@ public class IvyClientTest extends ZutubiTestCase
     public void testRetrieveArtifact() throws IOException, ParseException
     {
         descriptor.addArtifact(createArtifact("artifact.jar"), "build");
-        client.publishArtifacts(descriptor.getDescriptor());
-        client.publishDescriptor(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());
@@ -109,8 +109,8 @@ public class IvyClientTest extends ZutubiTestCase
     {
         descriptor.addArtifact(createArtifact("artifactA.jar"), "build");
         descriptor.addArtifact(createArtifact("artifactB.jar"), "build");
-        client.publishArtifacts(descriptor.getDescriptor());
-        client.publishDescriptor(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());
@@ -126,12 +126,12 @@ public class IvyClientTest extends ZutubiTestCase
     public void testTransitiveDependency() throws IOException, ParseException
     {
         descriptor.addArtifact(createArtifact("artifact.jar"), "build");
-        client.publishArtifacts(descriptor.getDescriptor());
-        client.publishDescriptor(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
 
         IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         descriptorB.addDependency(descriptor.getDescriptor().getModuleRevisionId(), true);
-        client.publishDescriptor(descriptorB.getDescriptor());
+        client.publishDescriptor(descriptorB);
 
         IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
         descriptorC.addDependency(descriptor.getDescriptor().getModuleRevisionId(), true);
@@ -146,7 +146,7 @@ public class IvyClientTest extends ZutubiTestCase
     public void testRetrievalFailure() throws IOException, ParseException
     {
         descriptor.addArtifact(createArtifact("artifact.jar"), "build");
-        client.publishDescriptor(descriptor.getDescriptor());
+        client.publishDescriptor(descriptor);
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());
@@ -174,13 +174,13 @@ public class IvyClientTest extends ZutubiTestCase
 
         IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         descriptorB.addDependency(descriptor.getDescriptor().getModuleRevisionId(), true);
-        client.publishDescriptor(descriptorB.getDescriptor());
+        client.publishDescriptor(descriptorB);
 
         IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
         descriptorC.addArtifact(createArtifact("artifactC.jar"), "build");
         descriptorC.addDependency(descriptorB.getDescriptor().getModuleRevisionId(), true);
-        client.publishArtifacts(descriptorC.getDescriptor());
-        client.publishDescriptor(descriptorC.getDescriptor());
+        client.publishArtifacts(descriptorC);
+        client.publishDescriptor(descriptorC);
 
         IvyModuleDescriptor descriptorD = new IvyModuleDescriptor("org", "moduleD", "revision", configuration);
         descriptorD.addDependency(descriptorC.getDescriptor().getModuleRevisionId(), true);
@@ -197,8 +197,8 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         descriptorB.addDependency(descriptor.getDescriptor().getModuleRevisionId(), false);
         descriptorB.addArtifact(createArtifact("artifactB.jar"), "build");
-        client.publishArtifacts(descriptorB.getDescriptor());
-        client.publishDescriptor(descriptorB.getDescriptor());
+        client.publishArtifacts(descriptorB);
+        client.publishDescriptor(descriptorB);
 
         IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
         descriptorC.addDependency(descriptorB.getDescriptor().getModuleRevisionId(), false);
@@ -211,8 +211,8 @@ public class IvyClientTest extends ZutubiTestCase
     public void testRetrieveWhereNoDownloadIsRequired() throws IOException, ParseException
     {
         descriptor.addArtifact(createArtifact("artifactB.jar"), "build");
-        client.publishArtifacts(descriptor.getDescriptor());
-        client.publishDescriptor(descriptor.getDescriptor());
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getDescriptor().getModuleRevisionId());

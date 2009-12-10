@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfigurationSupport;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -34,6 +35,34 @@ public class RecipeConfigurationHelper
         return config;
     }
 
+    public DirectoryArtifactConfiguration addDirArtifact(String name, String dir)
+    {
+        DirectoryArtifactConfiguration artifact = new DirectoryArtifactConfiguration();
+        artifact.setName(name);
+        artifact.setBase(dir);
+        artifact.setPublish(true);
+
+        Map<String, CommandConfiguration> commands = config.getCommands();
+        CommandConfigurationSupport buildCommand = (CommandConfigurationSupport) commands.get(COMMAND_BUILD);
+        buildCommand.addArtifact(artifact);
+
+        return artifact;
+    }
+
+    public FileArtifactConfiguration addArtifact(String name, String path)
+    {
+        FileArtifactConfiguration artifact = new FileArtifactConfiguration();
+        artifact.setName(name);
+        artifact.setFile(path);
+        artifact.setPublish(true);
+
+        Map<String, CommandConfiguration> commands = config.getCommands();
+        CommandConfigurationSupport buildCommand = (CommandConfigurationSupport) commands.get(COMMAND_BUILD);
+        buildCommand.addArtifact(artifact);
+
+        return artifact;
+    }
+
     public List<FileArtifactConfiguration> addArtifacts(String... paths)
     {
         List<FileArtifactConfiguration> artifacts = new LinkedList<FileArtifactConfiguration>();
@@ -49,17 +78,7 @@ public class RecipeConfigurationHelper
             }
 
             String name = m.group(1);
-
-            FileArtifactConfiguration artifact = new FileArtifactConfiguration();
-            artifact.setName(name);
-            artifact.setFile(path);
-            artifact.setPublish(true);
-            
-            Map<String, CommandConfiguration> commands = config.getCommands();
-            CommandConfigurationSupport buildCommand = (CommandConfigurationSupport) commands.get(COMMAND_BUILD);
-            buildCommand.addArtifact(artifact);
-
-            artifacts.add(artifact);
+            artifacts.add(addArtifact(name, path));
         }
         return artifacts;
     }

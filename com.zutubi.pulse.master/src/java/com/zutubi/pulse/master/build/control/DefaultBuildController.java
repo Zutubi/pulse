@@ -50,9 +50,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.util.url.CredentialsStore;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -128,7 +125,7 @@ public class DefaultBuildController implements EventListener, BuildController
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
 
-        moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration());
+        moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration(), configurationManager);
 
         createBuildTree();
 
@@ -170,7 +167,7 @@ public class DefaultBuildController implements EventListener, BuildController
         buildContext = new PulseExecutionContext();
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig));
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig).getDescriptor());
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
         for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
         {
@@ -279,9 +276,9 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
+    private IvyModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
     {
-        DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createRetrieveDescriptor(project, buildResult);
+        IvyModuleDescriptor descriptor = moduleDescriptorFactory.createRetrieveDescriptor(project, buildResult);
         descriptor.setStatus(buildResult.getStatus());
         return descriptor;
     }
@@ -1007,16 +1004,14 @@ public class DefaultBuildController implements EventListener, BuildController
 
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);
 
-            DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version, configurationManager);
-            IvyModuleDescriptor.setBuildNumber(descriptor, buildResult.getNumber());
-
-            final ModuleRevisionId mrid = descriptor.getModuleRevisionId();
+            IvyModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version);
+            descriptor.setBuildNumber(buildResult.getNumber());
 
             // add projecthandle attribute to the repository.
             long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
             if (projectHandle != 0)
             {
-                String path = configuration.getIvyPath(mrid, version);
+                String path = descriptor.getPath();
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 

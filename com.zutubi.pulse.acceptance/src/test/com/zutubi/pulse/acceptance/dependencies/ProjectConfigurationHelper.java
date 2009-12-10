@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -17,6 +18,7 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 /**
  * The project configuration helper is the base class for the various types
@@ -50,6 +52,18 @@ public abstract class ProjectConfigurationHelper
     {
         RecipeConfigurationHelper helper = getRecipe("default");
         return helper.addArtifacts(paths);
+    }
+
+    public FileArtifactConfiguration addArtifact(String name, String path)
+    {
+        RecipeConfigurationHelper helper = getRecipe("default");
+        return helper.addArtifact(name, path);
+    }
+
+    public DirectoryArtifactConfiguration addDirArtifact(String name, String path)
+    {
+        RecipeConfigurationHelper helper = getRecipe("default");
+        return helper.addDirArtifact(name, path);
     }
 
     /**
@@ -99,6 +113,14 @@ public abstract class ProjectConfigurationHelper
     public DependencyConfiguration addDependency(ProjectConfigurationHelper project)
     {
         return addDependency(project.getConfig());
+    }
+
+    public DependencyConfiguration addDependency(ProjectConfigurationHelper target, String stageName)
+    {
+        DependencyConfiguration dependency = addDependency(target);
+        dependency.setAllStages(false);
+        dependency.setStages(Arrays.asList(target.getStage(stageName)));
+        return dependency;
     }
     
     public DependencyConfiguration addDependency(ProjectConfiguration project)
@@ -165,5 +187,10 @@ public abstract class ProjectConfigurationHelper
             project.getExtensions().put(MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS, new HashMap<String, Object>());
         }
         return (HashMap<String, Object>) project.getExtensions().get(MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS);
+    }
+
+    public void setOrganisation(String org)
+    {
+        getConfig().setOrganisation(org);
     }
 }

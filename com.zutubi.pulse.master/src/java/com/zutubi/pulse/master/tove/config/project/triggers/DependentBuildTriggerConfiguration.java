@@ -30,8 +30,7 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
 
     public Trigger newTrigger()
     {
-//        return new NoopTrigger(getName(), Trigger.DEFAULT_GROUP);
-        return new EventTrigger(BuildCompletedEvent.class, getName(), DependentBuildEventFilter.class);
+        return new NoopTrigger(getName(), Trigger.DEFAULT_GROUP);
     }
 
     public boolean isPropagateStatus()

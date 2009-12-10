@@ -79,22 +79,17 @@ public class BuildSummaryPage extends ResponsibilityPage
 
     public class DependencyRow
     {
-        private String stage;
         private String project;
         private String build;
+        private String stage;
         private String artifact;
 
-        public DependencyRow(String stage, String project, String build, String artifact)
+        public DependencyRow(String project, String build, String stage, String artifact)
         {
-            this.stage = stage;
             this.project = project;
             this.build = build;
+            this.stage = stage;
             this.artifact = artifact;
-        }
-
-        public String getStage()
-        {
-            return stage;
         }
 
         public String getProject()
@@ -105,6 +100,11 @@ public class BuildSummaryPage extends ResponsibilityPage
         public String getBuild()
         {
             return build;
+        }
+
+        public String getStage()
+        {
+            return stage;
         }
 
         public String getArtifact()

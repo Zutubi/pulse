@@ -6,10 +6,7 @@ import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
 import com.zutubi.pulse.core.commands.api.*;
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
-import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommandConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -53,10 +50,10 @@ public class RecipeProcessor
     private static final String LABEL_EXECUTE = "execute";
 
     private EventManager eventManager;
-    private Lock runningLock = new ReentrantLock();
+    private final Lock runningLock = new ReentrantLock();
     private long runningRecipe = 0;
-    private Command runningCommand = null;
-    private boolean terminating = false;
+    private Command runningCommand;
+    private boolean terminating;
     private PulseFileLoaderFactory fileLoaderFactory;
     private CommandFactory commandFactory;
     private ArtifactFactory artifactFactory;

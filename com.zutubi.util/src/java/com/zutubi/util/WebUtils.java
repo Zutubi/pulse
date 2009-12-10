@@ -170,6 +170,11 @@ public class WebUtils
      */
     public static String percentEncode(String in, Predicate<Character> allowedCharacters)
     {
+        return encode('%', in, allowedCharacters);
+    }
+
+    public static String encode(char tag, String in, Predicate<Character> allowedCharacters)
+    {
         StringBuilder sb = null;
         for(int i = 0; i < in.length(); i++)
         {
@@ -193,7 +198,7 @@ public class WebUtils
                     byte[] bytes = in.substring(i, i + 1).getBytes("UTF-8");
                     for (byte b: bytes)
                     {
-                        sb.append('%');
+                        sb.append(tag);
                         sb.append(toHexString(b));
                     }
                 }
@@ -227,6 +232,11 @@ public class WebUtils
      */
     public static String percentDecode(String in)
     {
+        return decode('%', in);
+    }
+
+    public static String decode(char tag, String in)
+    {
         StringBuilder sb = null;
         byte[] bytes = null;
         int byteOffset = 0;
@@ -234,7 +244,7 @@ public class WebUtils
         for(int i = 0; i < in.length(); i++)
         {
             char c = in.charAt(i);
-            if(c == '%')
+            if(c == tag)
             {
                 if(sb == null)
                 {

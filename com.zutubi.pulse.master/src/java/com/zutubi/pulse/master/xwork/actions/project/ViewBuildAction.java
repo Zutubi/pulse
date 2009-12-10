@@ -155,17 +155,6 @@ public class ViewBuildAction extends CommandActionBase
         });
     }
     
-    public StageDependencyDetails getDependencyDetails(final String stageName)
-    {
-        return CollectionUtils.find(dependencyDetails, new Predicate<StageDependencyDetails>()
-        {
-            public boolean satisfied(StageDependencyDetails details)
-            {
-                return details.getStageName().equals(stageName);
-            }
-        });
-    }
-
     public String execute()
     {
         final BuildResult result = getRequiredBuildResult();
@@ -259,12 +248,12 @@ public class ViewBuildAction extends CommandActionBase
                 if (reportFile.isFile())
                 {
                     IvyRetrievalReport report = IvyRetrievalReport.fromXml(reportFile);
-                    dependencyDetails.add(new StageDependencyDetails(recipe.getStageName(), report));
+                    dependencyDetails.add(new StageDependencyDetails(report));
                 }
                 else
                 {
                     // The dependency details are no longer available, most likely due to a cleanup.
-                    dependencyDetails.add(new StageDependencyDetails(recipe.getStageName()));
+                    dependencyDetails.add(new StageDependencyDetails());
                 }
             }
             catch (Exception e)
@@ -328,17 +317,15 @@ public class ViewBuildAction extends CommandActionBase
     {
         private IvyRetrievalReport report;
 
-        private String stageName;
         private List<StageDependency> dependencies;
 
-        public StageDependencyDetails(String stageName) throws Exception
+        public StageDependencyDetails() throws Exception
         {
-            this(stageName, null);
+            this(null);
         }
 
-        public StageDependencyDetails(String stageName, IvyRetrievalReport report) throws Exception
+        public StageDependencyDetails(IvyRetrievalReport report) throws Exception
         {
-            this.stageName = stageName;
             this.report = report;
             if (this.report != null)
             {
@@ -354,7 +341,7 @@ public class ViewBuildAction extends CommandActionBase
                     dependencies.add(stageDependency);
 
                     stageDependency.setArtifactName(artifact.getName() + "." + artifact.getExt());
-
+                    stageDependency.setStageName(artifact.getExtraAttribute("stage"));
                     String repositoryPath = configuration.getArtifactPath(artifact);
                     String artifactUrl = PathUtils.getPath(masterLocation, WebManager.REPOSITORY_PATH, uriComponentEncode(repositoryPath));
 
@@ -391,14 +378,23 @@ public class ViewBuildAction extends CommandActionBase
                     }
                 }
 
-                // sort by project name.
                 Collections.sort(dependencies, new Comparator<StageDependency>()
                 {
                     private Comparator<String> comparator = new Sort.StringComparator();
 
                     public int compare(StageDependency dependencyA, StageDependency dependencyB)
                     {
-                        return comparator.compare(dependencyA.getProjectName(), dependencyB.getProjectName());
+                        int comparison = comparator.compare(dependencyA.getProjectName(), dependencyB.getProjectName());
+                        if (comparison != 0)
+                        {
+                            return comparison;
+                        }
+                        comparison = comparator.compare(dependencyA.getStageName(), dependencyB.getStageName());
+                        if (comparison != 0)
+                        {
+                            return comparison;
+                        }
+                        return comparator.compare(dependencyA.getArtifactName(), dependencyB.getArtifactName());
                     }
                 });
             }
@@ -407,11 +403,6 @@ public class ViewBuildAction extends CommandActionBase
         public List<StageDependency> getDependencies()
         {
             return dependencies;
-        }
-
-        public String getStageName()
-        {
-            return stageName;
         }
 
         public boolean isReportAvailable()
@@ -425,6 +416,7 @@ public class ViewBuildAction extends CommandActionBase
      */
     public class StageDependency
     {
+        private String stageName;
         private String projectName;
         private String projectUrl;
         private String buildName;
@@ -490,6 +482,16 @@ public class ViewBuildAction extends CommandActionBase
         public void setArtifactUrl(String artifactUrl)
         {
             this.artifactUrl = artifactUrl;
+        }
+
+        public String getStageName()
+        {
+            return stageName;
+        }
+
+        public void setStageName(String stageName)
+        {
+            this.stageName = stageName;
         }
     }
 }
