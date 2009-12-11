@@ -11,6 +11,7 @@ import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.dav.http.DefaultHTTPConnectionFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
@@ -106,16 +107,25 @@ public class SubversionClient implements ScmClient
      * Initialises a connection to the subversion repository.
      *
      * @param url the URL to connect to the server on
+     * @param enableHttpSpooling
      * @throws ScmException if an error occurs connecting to the server
      */
-    private void initialiseRepository(String url) throws ScmException
+    private void initialiseRepository(String url, boolean enableHttpSpooling) throws ScmException
     {
         // Workaround for CIB-1978, SvnKit bug 238:
         // http://svnkit.com/tracker/bug_view_advanced_page.php?bug_id=283
         System.setProperty("svnkit.http.methods", "Negotiate,Digest,Basic,NTLM");
 
         // Initialise SVN library
-        DAVRepositoryFactory.setup();
+        if (enableHttpSpooling)
+        {
+            DAVRepositoryFactory.setup(new DefaultHTTPConnectionFactory(null, true, null));   
+        }
+        else
+        {
+            DAVRepositoryFactory.setup();
+        }
+
         SVNRepositoryFactoryImpl.setup();
         FSRepositoryFactory.setup();
         SVNAdminAreaFactory.setUpgradeEnabled(false);
@@ -140,61 +150,65 @@ public class SubversionClient implements ScmClient
     /**
      * Creates a new SVNServer using the given location and default credentials.
      *
-     * @param url the url of the SVN repository
+     * @param url                the url of the SVN repository
+     * @param enableHttpSpooling if true, use spooling for HTTP connections
      * @throws com.zutubi.pulse.core.scm.api.ScmException on error
      */
-    public SubversionClient(String url) throws ScmException
+    public SubversionClient(String url, boolean enableHttpSpooling) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager();
-        initialiseRepository(url);
+        initialiseRepository(url, enableHttpSpooling);
     }
 
     /**
      * Creates a new SVNServer using the given location and credentials to
      * connect to the server.
      *
-     * @param url      url location of the server and module to use
-     * @param username username to provide on connection
-     * @param password password for the given user
+     * @param url                url location of the server and module to use
+     * @param enableHttpSpooling if true, use spooling for HTTP connections
+     * @param username           username to provide on connection
+     * @param password           password for the given user
      * @throws ScmException if a connection cannot be established
      */
-    public SubversionClient(String url, String username, String password) throws ScmException
+    public SubversionClient(String url, boolean enableHttpSpooling, String username, String password) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
-        initialiseRepository(url);
+        initialiseRepository(url, enableHttpSpooling);
     }
 
     /**
      * Creates a new SVNServer using the given location and credentials to
      * connect to the server.
      *
-     * @param url            url location of the server and module to use
-     * @param username       username to provide on connection
-     * @param password       password for the given user
-     * @param privateKeyFile location of the private key to provide on login
+     * @param url                url location of the server and module to use
+     * @param enableHttpSpooling if true, use spooling for HTTP connections
+     * @param username           username to provide on connection
+     * @param password           password for the given user
+     * @param privateKeyFile     location of the private key to provide on login
      * @throws ScmException if a connection cannot be established
      */
-    public SubversionClient(String url, final String username, final String password, final String privateKeyFile) throws ScmException
+    public SubversionClient(String url, boolean enableHttpSpooling, final String username, final String password, final String privateKeyFile) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(null, username, password, new File(privateKeyFile), null, getStoreFlag());
-        initialiseRepository(url);
+        initialiseRepository(url, enableHttpSpooling);
     }
 
     /**
      * Creates a new SVNServer using the given location and credentials to
      * connect to the server.
      *
-     * @param url            url location of the server and module to use
-     * @param username       username to provide on connection
-     * @param password       password for the given user
-     * @param privateKeyFile location of the private key to provide on login
-     * @param passphrase     passphrase for the given private key file
+     * @param url                url location of the server and module to use
+     * @param enableHttpSpooling if true, use spooling for HTTP connections
+     * @param username           username to provide on connection
+     * @param password           password for the given user
+     * @param privateKeyFile     location of the private key to provide on login
+     * @param passphrase         passphrase for the given private key file
      * @throws ScmException if a connection cannot be established
      */
-    public SubversionClient(String url, final String username, final String password, final String privateKeyFile, final String passphrase) throws ScmException
+    public SubversionClient(String url, boolean enableHttpSpooling, final String username, final String password, final String privateKeyFile, final String passphrase) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(null, username, password, new File(privateKeyFile), passphrase, getStoreFlag());
-        initialiseRepository(url);
+        initialiseRepository(url, enableHttpSpooling);
     }
 
     private boolean getStoreFlag()

@@ -250,6 +250,28 @@ public class PerforceClientTest extends PerforceTestBase
         assertEquals("4", (changes.get(0).getRevision()).getRevisionString());
     }
 
+    public void testGetChangesFiltersAllFiles() throws Exception
+    {
+        getServer(TEST_WORKSPACE, "//depot2/**");
+        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(5));
+        assertEquals(0, changes.size());
+    }
+
+    public void testGetChangesFiltersSomeFiles() throws Exception
+    {
+        getServer(TEST_WORKSPACE, "//depot2/test-branch/file1", "//depot2/test-branch/file5");
+        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(5));
+        assertEquals(1, changes.size());
+        assertEquals(7, changes.get(0).getChanges().size());
+    }
+    
+    public void testGetChangesFilterLeavesNoFilesInView() throws Exception
+    {
+        getServer(DEPOT_WORKSPACE, "//depot/**");
+        List<Changelist> changes = client.getChanges(null, createRevision(1), createRevision(7));
+        assertEquals(0, changes.size());
+    }
+
     public void testListNonExistent() throws ScmException
     {
         getServer(TEST_WORKSPACE);

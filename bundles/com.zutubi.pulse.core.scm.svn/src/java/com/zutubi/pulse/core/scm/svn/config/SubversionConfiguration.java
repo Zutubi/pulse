@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Subversion SCM configuration.
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration
@@ -31,6 +31,8 @@ public class SubversionConfiguration extends PollableScmConfiguration
     private List<String> externalMonitorPaths = new LinkedList<String>();
     @Wizard.Ignore
     private boolean verifyExternals;
+    @Wizard.Ignore
+    private boolean enableHttpSpooling;
 
     public SubversionConfiguration()
     {
@@ -116,5 +118,15 @@ public class SubversionConfiguration extends PollableScmConfiguration
     public void setVerifyExternals(boolean verifyExternals)
     {
         this.verifyExternals = verifyExternals;
+    }
+
+    public boolean isEnableHttpSpooling()
+    {
+        return enableHttpSpooling;
+    }
+
+    public void setEnableHttpSpooling(boolean enableHttpSpooling)
+    {
+        this.enableHttpSpooling = enableHttpSpooling;
     }
 }
