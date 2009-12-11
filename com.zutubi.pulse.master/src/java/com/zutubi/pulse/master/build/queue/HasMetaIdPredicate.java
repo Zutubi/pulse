@@ -17,7 +17,7 @@ public class HasMetaIdPredicate<T extends RequestHolder> implements Predicate<T>
         this.metaBuildId = metaBuildId;
     }
 
-    public boolean satisfied(RequestHolder holder)
+    public boolean satisfied(T holder)
     {
         return holder.getMetaBuildId() == metaBuildId;
     }

@@ -17,7 +17,7 @@ public class HasOwnerPredicate<T extends RequestHolder> implements Predicate<T>
         this.owner = owner;
     }
 
-    public boolean satisfied(RequestHolder holder)
+    public boolean satisfied(T holder)
     {
         return holder.getOwner().equals(owner);
     }

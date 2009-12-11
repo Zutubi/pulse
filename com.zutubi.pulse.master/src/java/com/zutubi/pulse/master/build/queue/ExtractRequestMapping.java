@@ -10,7 +10,7 @@ import com.zutubi.util.Mapping;
  */
 public class ExtractRequestMapping<T extends RequestHolder> implements Mapping<T, BuildRequestEvent>
 {
-    public BuildRequestEvent map(RequestHolder queuedRequest)
+    public BuildRequestEvent map(T queuedRequest)
     {
         return queuedRequest.getRequest();
     }

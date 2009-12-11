@@ -17,7 +17,7 @@ public class HasIdPredicate<T extends RequestHolder> implements Predicate<T>
         this.id = id;
     }
 
-    public boolean satisfied(RequestHolder holder)
+    public boolean satisfied(T holder)
     {
         return holder.getRequest().getId() == id;
     }

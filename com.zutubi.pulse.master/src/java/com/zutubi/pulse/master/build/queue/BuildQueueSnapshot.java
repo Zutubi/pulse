@@ -33,7 +33,7 @@ public class BuildQueueSnapshot
      */
     public List<BuildRequestEvent> getActivatedBuildRequests()
     {
-        return Collections.unmodifiableList(CollectionUtils.map(activatedRequests, new ExtractRequestMapping()));
+        return Collections.unmodifiableList(CollectionUtils.map(activatedRequests, new ExtractRequestMapping<ActivatedRequest>()));
     }
 
     /**
@@ -53,7 +53,7 @@ public class BuildQueueSnapshot
      */
     public List<BuildRequestEvent> getQueuedBuildRequests()
     {
-        return Collections.unmodifiableList(CollectionUtils.map(queuedRequests, new ExtractRequestMapping()));
+        return Collections.unmodifiableList(CollectionUtils.map(queuedRequests, new ExtractRequestMapping<QueuedRequest>()));
     }
 
     /**

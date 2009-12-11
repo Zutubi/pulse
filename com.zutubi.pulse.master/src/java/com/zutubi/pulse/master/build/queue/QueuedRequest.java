@@ -68,14 +68,35 @@ public class QueuedRequest extends RequestHolder
         this.predicates.add(predicate);
     }
 
+    /**
+     * Indicates whether or not this queued request is waiting on a dependency
+     * before it can be activated.
+     *
+     * @return true if we are waiting on a dependency, false otherwise.
+     */
+    public boolean isDependencyPending()
+    {
+        for (QueuedRequestPredicate predicate : predicates)
+        {
+            if (predicate instanceof DependencyPredicate)
+            {
+                if (!predicate.satisfied(this))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public List<Object> getDependentOwners()
     {
         List<Object> dependentOwners = new LinkedList<Object>();
         for (Predicate predicate : predicates)
         {
-            if (predicate instanceof OwnerDependencyPredicate)
+            if (predicate instanceof DependencyPredicate)
             {
-                dependentOwners.add(((OwnerDependencyPredicate)predicate).getOwner());
+                dependentOwners.add(((DependencyPredicate)predicate).getOwner());
             }
         }
         return dependentOwners;

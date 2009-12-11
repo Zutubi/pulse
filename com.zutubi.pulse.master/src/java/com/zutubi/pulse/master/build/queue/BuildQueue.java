@@ -96,7 +96,7 @@ public class BuildQueue
      */
     public synchronized boolean cancel(long requestId)
     {
-        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new HasIdPredicate(requestId));
+        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId));
 
         if (requestToCancel != null)
         {
@@ -120,7 +120,7 @@ public class BuildQueue
      */
     public synchronized boolean complete(long requestId)
     {
-        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new HasIdPredicate(requestId));
+        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId));
 
         if (completedRequest != null)
         {
@@ -269,7 +269,7 @@ public class BuildQueue
         // find the first activated request that we can assimilate into.
         BuildRequestEvent event = queuedRequest.getRequest();
         List<ActivatedRequest> assimilationCandidates = CollectionUtils.filter(activatedRequests,
-                new HasOwnerAndSource(event.getOwner(), event.getOptions().getSource())
+                new HasOwnerAndSource<ActivatedRequest>(event.getOwner(), event.getOptions().getSource())
         );
         if (assimilationCandidates.size() > 0)
         {
@@ -335,6 +335,11 @@ public class BuildQueue
         return new LinkedList<QueuedRequest>(queuedRequests);
     }
 
+    public synchronized List<QueuedRequest> getQueuedRequestsByOwner(Object owner)
+    {
+        return CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner));
+    }
+
     /**
      * Get the list of activated requests.
      *
@@ -343,6 +348,11 @@ public class BuildQueue
     public synchronized List<ActivatedRequest> getActivatedRequests()
     {
         return new LinkedList<ActivatedRequest>(activatedRequests);
+    }
+
+    public synchronized List<ActivatedRequest> getActivatedRequestsByOwner(Object owner)
+    {
+        return CollectionUtils.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner));
     }
 
     /**
@@ -365,8 +375,8 @@ public class BuildQueue
     public synchronized List<RequestHolder> getMetaBuildRequests(long metaBuildId)
     {
         LinkedList<RequestHolder> requests = new LinkedList<RequestHolder>();
-        requests.addAll(CollectionUtils.filter(queuedRequests, new HasMetaIdPredicate(metaBuildId)));
-        requests.addAll(CollectionUtils.filter(activatedRequests, new HasMetaIdPredicate(metaBuildId)));
+        requests.addAll(CollectionUtils.filter(queuedRequests, new HasMetaIdPredicate<QueuedRequest>(metaBuildId)));
+        requests.addAll(CollectionUtils.filter(activatedRequests, new HasMetaIdPredicate<ActivatedRequest>(metaBuildId)));
         return requests;
     }
 
@@ -379,10 +389,10 @@ public class BuildQueue
      */
     public synchronized BuildRequestEvent getRequest(long requestId)
     {
-        RequestHolder request = CollectionUtils.find(queuedRequests, new HasIdPredicate(requestId));
+        RequestHolder request = CollectionUtils.find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId));
         if (request == null)
         {
-            request = CollectionUtils.find(activatedRequests, new HasIdPredicate(requestId));
+            request = CollectionUtils.find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId));
         }
         if (request != null)
         {
@@ -413,8 +423,8 @@ public class BuildQueue
     public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)
     {
         List<BuildRequestEvent> byOwner = new LinkedList<BuildRequestEvent>();
-        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(queuedRequests, new HasOwnerPredicate(owner)), new ExtractRequestMapping()));
-        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(activatedRequests, new HasOwnerPredicate(owner)), new ExtractRequestMapping()));
+        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestMapping<QueuedRequest>()));
+        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestMapping<ActivatedRequest>()));
         return byOwner;
     }
 

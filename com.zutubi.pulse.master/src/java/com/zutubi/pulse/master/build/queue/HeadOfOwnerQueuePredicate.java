@@ -4,7 +4,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.ReverseListIterator;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This predicate ensures that the queued request is at the front of the
@@ -39,7 +38,7 @@ public class HeadOfOwnerQueuePredicate implements QueuedRequestPredicate
         // are we at the head of the queue for our owner?
         QueuedRequest headOfQueue = CollectionUtils.find(
                 new ReverseListIterator<QueuedRequest>(queuedRequests),
-                new HasOwnerPredicate(request.getOwner())
+                new HasOwnerPredicate<QueuedRequest>(request.getOwner())
         );
         return headOfQueue.equals(request);
     }

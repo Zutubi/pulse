@@ -161,9 +161,9 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
             // make sure that the dependency predicates map as expected.
             for (Predicate<QueuedRequest> predicate : predicates)
             {
-                if (predicate instanceof OwnerCompleteQueuePredicate)
+                if (predicate instanceof DependencyCompleteQueuePredicate)
                 {
-                    Object owner = ((OwnerCompleteQueuePredicate) predicate).getOwner();
+                    Object owner = ((DependencyCompleteQueuePredicate) predicate).getOwner();
                     //noinspection SuspiciousMethodCalls
                     dependencyOwners.remove(owner);
                 }

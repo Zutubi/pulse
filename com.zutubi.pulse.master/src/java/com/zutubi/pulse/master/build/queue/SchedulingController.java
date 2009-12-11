@@ -178,7 +178,6 @@ public class SchedulingController implements EventListener
             {
                 CollectionUtils.filter(buildQueue.getQueuedRequests(), new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId()), requestsToComplete);
             }
-
             internalCompleteRequests(requestHandler, requestsToComplete);
         }
         finally

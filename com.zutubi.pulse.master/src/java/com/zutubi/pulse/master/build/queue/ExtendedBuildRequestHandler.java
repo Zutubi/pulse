@@ -120,7 +120,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                     QueuedRequest queuedRequest = ownerRequests.get(owner);
                     Project dependentProject = node.getParent().getData().getProject();
                     queuedRequest.getRequest().addDependentOwner(dependentProject);
-                    queuedRequest.addPredicate(new OwnerCompleteQueuePredicate(buildQueue, dependentProject));
+                    queuedRequest.addPredicate(new DependencyCompleteQueuePredicate(buildQueue, dependentProject));
                 }
             }
         });
@@ -162,7 +162,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 {
                     Project childProject = child.getData().getProject();
                     queuedRequest.getRequest().addDependentOwner(childProject);
-                    queuedRequest.addPredicate(new OwnerCompleteQueuePredicate(buildQueue, childProject));
+                    queuedRequest.addPredicate(new DependencyCompleteQueuePredicate(buildQueue, childProject));
                 }
             }
         });
@@ -183,7 +183,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
     {
         List<QueuedRequestPredicate> defaultPredicates = new LinkedList<QueuedRequestPredicate>();
         defaultPredicates.add(new OneActiveBuildPerOwnerPredicate(buildQueue));
-        defaultPredicates.add(new HeadOfOwnerQueuePredicate(buildQueue));
+        defaultPredicates.add(new HeadOfOwnersCanBuildNowQueuePredicate(buildQueue));
         return new QueuedRequest(request, defaultPredicates);
     }
 }

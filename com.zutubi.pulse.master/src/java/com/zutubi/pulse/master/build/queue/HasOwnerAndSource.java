@@ -21,7 +21,7 @@ public class HasOwnerAndSource<T extends RequestHolder> implements Predicate<T>
         this.source = source;
     }
 
-    public boolean satisfied(RequestHolder holder)
+    public boolean satisfied(T holder)
     {
         BuildRequestEvent request = holder.getRequest();
         return request.getOwner().equals(owner) && StringUtils.equals(request.getOptions().getSource(), source);

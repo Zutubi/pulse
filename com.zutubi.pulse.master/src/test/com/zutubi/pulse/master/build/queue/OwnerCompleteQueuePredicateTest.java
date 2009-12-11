@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 
 public class OwnerCompleteQueuePredicateTest extends BaseQueueTestCase
 {
-    private OwnerCompleteQueuePredicate predicate;
+    private DependencyCompleteQueuePredicate predicate;
     private Project ownerA;
     private Project ownerB;
     private BuildQueue buildQueue;
@@ -25,7 +25,7 @@ public class OwnerCompleteQueuePredicateTest extends BaseQueueTestCase
         BuildRequestEvent requestEvent = createRequest(ownerA);
         buildQueue.enqueue(queue(requestEvent));
 
-        QueuedRequest qr = new QueuedRequest(createRequest(ownerB), new OwnerCompleteQueuePredicate(buildQueue, ownerA));
+        QueuedRequest qr = new QueuedRequest(createRequest(ownerB), new DependencyCompleteQueuePredicate(buildQueue, ownerA));
         assertFalse(qr.satisfied());
     }
 
@@ -34,13 +34,13 @@ public class OwnerCompleteQueuePredicateTest extends BaseQueueTestCase
         BuildRequestEvent requestEvent = createRequest(ownerA);
         buildQueue.enqueue(active(requestEvent));
 
-        QueuedRequest qr = new QueuedRequest(createRequest(ownerB), new OwnerCompleteQueuePredicate(buildQueue, ownerA));
+        QueuedRequest qr = new QueuedRequest(createRequest(ownerB), new DependencyCompleteQueuePredicate(buildQueue, ownerA));
         assertFalse(qr.satisfied());
     }
 
     public void testOwnerNotInQueue()
     {
-        QueuedRequest qr = new QueuedRequest(createRequest(ownerB), new OwnerCompleteQueuePredicate(buildQueue, ownerA));
+        QueuedRequest qr = new QueuedRequest(createRequest(ownerB), new DependencyCompleteQueuePredicate(buildQueue, ownerA));
         assertTrue(qr.satisfied());
     }
 }

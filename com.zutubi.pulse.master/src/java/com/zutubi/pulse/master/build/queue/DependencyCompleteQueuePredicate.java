@@ -7,13 +7,13 @@ import java.util.List;
 /**
  * A predicate that requires another build request to be completed to be satisfied.
  */
-public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate, OwnerDependencyPredicate
+public class DependencyCompleteQueuePredicate implements QueuedRequestPredicate, DependencyPredicate
 {
     private Object owner;
 
     private BuildQueue buildQueue;
 
-    public OwnerCompleteQueuePredicate(BuildQueue buildQueue, Object owner)
+    public DependencyCompleteQueuePredicate(BuildQueue buildQueue, Object owner)
     {
         if (buildQueue == null)
         {
@@ -38,7 +38,7 @@ public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate, Owne
         long metaBuildId = request.getRequest().getMetaBuildId();
 
         List<RequestHolder> existingRequests = buildQueue.getMetaBuildRequests(metaBuildId);
-        return !CollectionUtils.contains(existingRequests, new HasOwnerPredicate(owner));
+        return !CollectionUtils.contains(existingRequests, new HasOwnerPredicate<RequestHolder>(owner));
     }
 
     @Override
@@ -47,7 +47,7 @@ public class OwnerCompleteQueuePredicate implements QueuedRequestPredicate, Owne
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        OwnerCompleteQueuePredicate that = (OwnerCompleteQueuePredicate) o;
+        DependencyCompleteQueuePredicate that = (DependencyCompleteQueuePredicate) o;
 
         return buildQueue == that.buildQueue && owner.equals(that.owner);
     }
