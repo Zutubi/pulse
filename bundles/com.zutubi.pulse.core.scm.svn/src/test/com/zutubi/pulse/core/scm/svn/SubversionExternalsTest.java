@@ -129,7 +129,7 @@ public class SubversionExternalsTest extends PulseTestCase
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", "."}, null, repoDir);
         TestUtils.waitForServer(3690);
 
-        server = new SubversionClient("svn://localhost/bundle/trunk");
+        server = new SubversionClient("svn://localhost/bundle/trunk", false);
     }
 
     protected void tearDown() throws Exception
@@ -288,7 +288,7 @@ public class SubversionExternalsTest extends PulseTestCase
         SubversionClient server = null;
         try
         {
-            server = new SubversionClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
+            server = new SubversionClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk", false);
             server.addExternalPath(".");
             List<Changelist> changelists = server.getChanges(null, createRevision(6600), createRevision(6603));
             for(Changelist list: changelists)

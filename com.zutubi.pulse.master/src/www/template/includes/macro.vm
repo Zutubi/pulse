@@ -1208,34 +1208,40 @@
 ## Shows an artifact that is multi file, and possibly too many to display
 ##
 #macro(commandMultiArtifact $artifact $build $recipe $result $showFeatures $showArtifactLink)
-    #set($hasIndex = $artifact.hasIndexFile())
-    #if($hasIndex)
-        <li class="report-artifact">
+    #if($artifact.link)
+        <li class="link-artifact">
+            <a href="$artifact.url">$!webwork.htmlEncode($artifact.name)</a>
+        </li>
     #else
-        <li class="dir-artifact"><span class="open-folder" id="art_${artifact.id}_header" onclick="toggleFolderList('art_${artifact.id}');">
-    #end
-    #if($hasIndex && $showArtifactLink)
-        <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
-    #end
-            $!webwork.htmlEncode($artifact.name)
-    #if($hasIndex && $showArtifactLink)
-        </a>
-    #else
-        </span>
-    #end
-
-    #if($showArtifactLink)
-        <a class="unadorned" href="$base/downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="$base/images/compress.gif"></a>
-    #end
-
-    #if(!$hasIndex)
-        <ul id="art_${artifact.id}">
-        #foreach($fileArtifact in $artifact.children)
-            #commandFileArtifact($artifact $fileArtifact $build $recipe $result $showFeatures $showArtifactLink)
+        #set($hasIndex = $artifact.hasIndexFile())
+        #if($hasIndex)
+            <li class="report-artifact">
+        #else
+            <li class="dir-artifact"><span class="open-folder" id="art_${artifact.id}_header" onclick="toggleFolderList('art_${artifact.id}');">
         #end
-        </ul>
+        #if($hasIndex && $showArtifactLink)
+            <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
+        #end
+                $!webwork.htmlEncode($artifact.name)
+        #if($hasIndex && $showArtifactLink)
+            </a>
+        #else
+            </span>
+        #end
+
+        #if($showArtifactLink)
+            <a class="unadorned" href="$base/downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="$base/images/compress.gif"></a>
+        #end
+
+        #if(!$hasIndex)
+            <ul id="art_${artifact.id}">
+            #foreach($fileArtifact in $artifact.children)
+                #commandFileArtifact($artifact $fileArtifact $build $recipe $result $showFeatures $showArtifactLink)
+            #end
+            </ul>
+        #end
+        </li>
     #end
-    </li>
 #end
 
 ##

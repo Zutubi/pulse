@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
@@ -19,6 +18,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+
 public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
     public static final String TYPE = "p4";
@@ -29,10 +30,10 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
     //   ...
     private static final Pattern SYNC_PATTERN = Pattern.compile("^(.+)#([0-9]+) - (refreshing|updating|added as|deleted as) (.+)$", Pattern.MULTILINE);
     /**
-     * Used to limit the number of files we'll pass as arguments to fstat in
+     * Used to limit the number of files we'll pass as arguments to commands in
      * one go, lest we hit some command or OS limit.
      */
-    private static final int FSTAT_FILE_LIMIT = 32;
+    private static final int FILE_LIMIT = 32;
 
     private PerforceConfiguration configuration;
     private PerforceCore core;
@@ -171,6 +172,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         Revision revision = new Revision(Long.toString(number));
         ExcludePathFilter filter = new ExcludePathFilter(configuration.getFilterPaths());
         List<FileChange> changes = new LinkedList<FileChange>();
+        boolean fileExcluded = false;
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
             FileChange change = getChangelistChange(lines[i]);
@@ -178,10 +180,14 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
             {
                 changes.add(change);
             }
+            else
+            {
+                fileExcluded = true;
+            }
         }
 
         // if all of the changes have been filtered out, then there is no changelist so we return null.
-        if (changes.isEmpty())
+        if (changes.isEmpty() || (fileExcluded && noFilesInView(clientName, changes)))
         {
             return null;
         }
@@ -192,6 +198,57 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
     private long offset(Date date)
     {
         return date.getTime() + configuration.getTimeOffset() * Constants.MINUTE;
+    }
+
+    private boolean noFilesInView(String clientName, List<FileChange> changes) throws ScmException
+    {
+        List<List<FileChange>> partitioned = CollectionUtils.partition(FILE_LIMIT, changes);
+        for (List<FileChange> sublist: partitioned)
+        {
+            if (hasFilesInView(clientName, sublist))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean hasFilesInView(String clientName, List<FileChange> changes) throws ScmException
+    {
+        // p4 where <file1> <file2> ...
+        // For every file in the view, a line goes to stdout.  For files not in
+        // the view a line (<path> - file(s) not in client view) goes to
+        // stderr.  Hence any line on stdout means there was a file in our
+        // view.
+        List<String> command = new LinkedList<String>();
+        command.add(getP4Command(COMMAND_WHERE));
+        command.add(FLAG_CLIENT);
+        command.add(clientName);
+        command.add(COMMAND_WHERE);
+
+        CollectionUtils.map(changes, new Mapping<FileChange, String>()
+        {
+            public String map(FileChange fileChange)
+            {
+                return fileChange.getPath();
+            }
+        }, command);
+
+        final boolean[] stdoutSeen = new boolean[]{false};
+        core.runP4WithHandler(new PerforceErrorDetectingHandler(false)
+        {
+            public void handleStdout(String line)
+            {
+                stdoutSeen[0] = true;
+            }
+
+            public void checkCancelled() throws ScmCancelledException
+            {
+            }
+        }, null, command.toArray(new String[command.size()]));
+
+        return stdoutSeen[0];
     }
 
     private FileChange getChangelistChange(String line) throws ScmException
@@ -736,7 +793,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
-            List<List<FileStatus>> partitioned = CollectionUtils.partition(FSTAT_FILE_LIMIT, statuses);
+            List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, statuses);
             for (List<FileStatus> sublist: partitioned)
             {
                 convertTargetPaths(workspace, sublist);

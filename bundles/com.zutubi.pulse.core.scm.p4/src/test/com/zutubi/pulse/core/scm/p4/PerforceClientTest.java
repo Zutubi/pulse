@@ -4,19 +4,20 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.FLAG_CLIENT;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.FLAG_CLIENT;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class PerforceClientTest extends PerforceTestBase
 {
@@ -268,6 +269,28 @@ public class PerforceClientTest extends PerforceTestBase
         List<Changelist> changes = client.getChanges(null, createRevision(1), createRevision(7));
         assertEquals(1, changes.size());
         assertEquals("4", (changes.get(0).getRevision()).getRevisionString());
+    }
+
+    public void testGetChangesFiltersAllFiles() throws Exception
+    {
+        setupClient(TEST_WORKSPACE, "//depot2/**");
+        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(5));
+        assertEquals(0, changes.size());
+    }
+
+    public void testGetChangesFiltersSomeFiles() throws Exception
+    {
+        setupClient(TEST_WORKSPACE, "//depot2/test-branch/file1", "//depot2/test-branch/file5");
+        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(5));
+        assertEquals(1, changes.size());
+        assertEquals(7, changes.get(0).getChanges().size());
+    }
+    
+    public void testGetChangesFilterLeavesNoFilesInView() throws Exception
+    {
+        setupClient(DEPOT_WORKSPACE, "//depot/**");
+        List<Changelist> changes = client.getChanges(null, createRevision(1), createRevision(7));
+        assertEquals(0, changes.size());
     }
 
     public void testListNonExistent() throws ScmException

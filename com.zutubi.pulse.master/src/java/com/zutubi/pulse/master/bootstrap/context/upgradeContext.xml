@@ -104,6 +104,7 @@
                 <ref local="agentDailyStatistics"/>
                 <ref local="addStageFailures"/>
                 <ref local="addTerminateBuildOnFailure"/>
+                <ref local="addSubversionEnableHttpSpooling"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -497,5 +498,9 @@
 
     <bean id="addTerminateBuildOnFailure" class="com.zutubi.pulse.master.upgrade.tasks.AddTerminateBuildOnFailureUpgradeTask">
         <property name="buildNumber" value="201010006"/>
+    </bean>
+
+    <bean id="addSubversionEnableHttpSpooling" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionEnableHttpSpoolingUpgradeTask">
+        <property name="buildNumber" value="201010007"/>
     </bean>
 </beans>

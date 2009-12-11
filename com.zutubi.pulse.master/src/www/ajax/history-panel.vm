@@ -37,7 +37,7 @@
             <td>
 
             <table width="100%">
-                #pagingRow("$urls.projectHistory($u_projectName)"  $action.uriComponentEncode("stateFilter/$stateFilter/") $pagingSupport)
+                #pagingRow("$urls.projectHistory($u_projectName)"  "stateFilter/$action.uriComponentEncode($stateFilter)/" $pagingSupport)
                 <tr><th class="content-centre" colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
             </table>
 #else

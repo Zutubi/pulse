@@ -11,7 +11,6 @@ import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.auth.SVNAuthentication;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
@@ -116,7 +115,7 @@ public class SubversionClientTest extends PulseTestCase
 
         TestUtils.waitForServer(3690);
 
-        client = new SubversionClient(TRUNK_PATH, USER, PASSWORD);
+        client = new SubversionClient(TRUNK_PATH, false, USER, PASSWORD);
     }
 
     protected void tearDown() throws Exception
@@ -131,7 +130,7 @@ public class SubversionClientTest extends PulseTestCase
     public void testGetLatestRevision() throws ScmException
     {
         IOUtils.close(client);
-        client = new SubversionClient("svn://localhost/", USER, PASSWORD);
+        client = new SubversionClient("svn://localhost/", false, USER, PASSWORD);
         assertEquals("8", client.getLatestRevision(null).getRevisionString());
     }
 
@@ -146,7 +145,7 @@ public class SubversionClientTest extends PulseTestCase
         SVNCopySource[] copySource = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(TRUNK_PATH))};
         SVNCommitInfo info = client.doCopy(copySource, SVNURL.parseURIDecoded(BRANCH_PATH), false, true, true, "Create a branch", null);
 
-        SubversionClient branchClient = new SubversionClient(BRANCH_PATH);
+        SubversionClient branchClient = new SubversionClient(BRANCH_PATH, false);
         assertEquals(Long.toString(info.getNewRevision()), branchClient.getLatestRevision(null).getRevisionString());
     }
 
@@ -154,7 +153,7 @@ public class SubversionClientTest extends PulseTestCase
     {
         try
         {
-            client = new SubversionClient("svn://localhost/no/such/repo", USER, PASSWORD);
+            client = new SubversionClient("svn://localhost/no/such/repo", false, USER, PASSWORD);
             client.getLatestRevision(null);
             fail();
         }
@@ -193,7 +192,7 @@ public class SubversionClientTest extends PulseTestCase
 
         try
         {
-            confirmServer = new SubversionClient(TAG_PATH, USER, PASSWORD);
+            confirmServer = new SubversionClient(TAG_PATH, false, USER, PASSWORD);
             List<ScmFile> files = getSortedListing(confirmServer);
 
             assertEquals(3, files.size());
@@ -228,7 +227,7 @@ public class SubversionClientTest extends PulseTestCase
         SubversionClient confirmServer = null;
         try
         {
-            confirmServer = new SubversionClient(TAG_PATH, USER, PASSWORD);
+            confirmServer = new SubversionClient(TAG_PATH, false, USER, PASSWORD);
             List<ScmFile> files = getSortedListing(confirmServer);
 
             assertEquals(3, files.size());
@@ -356,7 +355,7 @@ public class SubversionClientTest extends PulseTestCase
         SubversionClient server = null;
         try
         {
-            server = new SubversionClient("https://svn.apache.org/repos/asf", "anonymous", "");
+            server = new SubversionClient("https://svn.apache.org/repos/asf", false, "anonymous", "");
             assertFalse(server.pathExists(SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
         }
         finally
