@@ -190,11 +190,14 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
         }
 
         message += ": " + reader.getElementText().trim();
-        if (builder.length() > 0)
+        if (builder.indexOf(message) == -1)
         {
-            builder.append("\n");
+            if (builder.length() > 0)
+            {
+                builder.append("\n");
+            }
+            builder.append(message);
         }
-        builder.append(message);
     }
 
     private long getTotalDuration(TestSuiteResult suiteResult)

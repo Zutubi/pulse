@@ -104,6 +104,23 @@ public class BoostTestReportPostProcessorTest extends XMLTestPostProcessorTestCa
         assertEquals(expected, runProcessorAndGetTests(new BoostTestReportPostProcessor(config)));
     }
 
+    public void testDuplicateMessages() throws IOException
+    {
+        TestSuiteResult expected =
+            buildSuite(null,
+                buildSuite("suite", 0,
+                    new TestCaseResult("message", 0, PASS, "message: suites.cpp:32: This is a message"),
+                    new TestCaseResult("passpassfail", 0, FAILURE, "info: suites.cpp:37: check 1 == 1 passed\ninfo: suites.cpp:39: check 2 == 2 passed\nerror: suites.cpp:40: check 1 == 2 failed")
+                )
+            );
+
+        BoostTestReportPostProcessorConfiguration config = new BoostTestReportPostProcessorConfiguration();
+        config.setProcessInfo(true);
+        config.setProcessMessages(true);
+        BoostTestReportPostProcessor processor = new BoostTestReportPostProcessor(config);
+        assertEquals(expected, runProcessorAndGetTests(processor));
+    }
+
     public void testMessagesDefaultSettings() throws IOException
     {
         TestSuiteResult expected =
