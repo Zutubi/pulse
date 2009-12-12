@@ -9,12 +9,15 @@ import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTrigge
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.StringUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.List;
+import java.util.LinkedList;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -463,10 +466,20 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String supportedCharacters = "!()._-@#%^&";
 
+        List<String> failedCharacters = new LinkedList<String>();
         for (char c : supportedCharacters.toCharArray())
         {
-            runTestForCharacterSupport(c);
+            try
+            {
+                runTestForCharacterSupport(c);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                failedCharacters.add(String.valueOf(c));
+            }
         }
+        assertEquals("Unexpected problems with characters: " + StringUtils.join("", failedCharacters.toArray(new String[failedCharacters.size()])), 0, failedCharacters.size());
     }
 
     // CIB-2171
