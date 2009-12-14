@@ -24,7 +24,7 @@ public class DependenciesTestSuite
         dependencySuite.addTestSuite(BuildVersionAcceptanceTest.class);
         dependencySuite.addTestSuite(RepositoryPermissionsAcceptanceTest.class);
 
-        // cleanup the artifact repository before continueing on.
+        // cleanup the artifact repository before continuing on.
         return new CleanArtifactRepository(dependencySuite);
     }
 

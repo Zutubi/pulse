@@ -26,6 +26,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -343,7 +344,7 @@ public class ViewBuildAction extends CommandActionBase
                     stageDependency.setArtifactName(artifact.getName() + "." + artifact.getExt());
                     stageDependency.setStageName(artifact.getExtraAttribute("stage"));
                     String repositoryPath = configuration.getArtifactPath(artifact);
-                    String artifactUrl = PathUtils.getPath(masterLocation, WebManager.REPOSITORY_PATH, uriComponentEncode(repositoryPath));
+                    String artifactUrl = PathUtils.getPath(masterLocation, WebManager.REPOSITORY_PATH, WebUtils.uriPathEncode(repositoryPath));
 
                     File artifactFile = new File(configurationManager.getUserPaths().getRepositoryRoot(), repositoryPath);
                     if (artifactFile.isFile())

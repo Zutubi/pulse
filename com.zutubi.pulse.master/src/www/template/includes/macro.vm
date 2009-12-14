@@ -1407,7 +1407,7 @@
                             #end
                     <td class="content">#html($dependency.stageName)</td>
                             #if ($dependency.artifactUrl)
-                        <td class="content"><a id='#id("${dependency.projectName}-${detail.stageName}-${dependency.artifactName}")' href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
+                        <td class="content"><a id='#id("${dependency.projectName}-${dependency.stageName}-${dependency.artifactName}")' href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
                             #else
                         <td class="content">#html($dependency.artifactName)</td>
                             #end
