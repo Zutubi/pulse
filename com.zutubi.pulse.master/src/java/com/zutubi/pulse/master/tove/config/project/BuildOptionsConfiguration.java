@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
-@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout", "stageFailureLimit", "autoClearResponsibility", "idLeader", "persistentWorkDir"})
+@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout", "stageFailureLimit", "autoClearResponsibility", "idLeader", "persistentWorkDir", "logCompressionEnabled"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
@@ -25,6 +25,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     @Reference
     private ProjectConfiguration idLeader = null;
     private String persistentWorkDir = "$(agent.data.dir)/work/$(project)/$(stage)";
+    private boolean logCompressionEnabled = true;
 
     public BuildOptionsConfiguration()
     {
@@ -109,5 +110,15 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setPersistentWorkDir(String persistentWorkDir)
     {
         this.persistentWorkDir = persistentWorkDir;
+    }
+
+    public boolean isLogCompressionEnabled()
+    {
+        return logCompressionEnabled;
+    }
+
+    public void setLogCompressionEnabled(boolean logCompressionEnabled)
+    {
+        this.logCompressionEnabled = logCompressionEnabled;
     }
 }

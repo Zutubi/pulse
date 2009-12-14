@@ -15,7 +15,6 @@ import java.util.List;
  */
 public class RecipeResult extends Result
 {
-    public static final String RECIPE_LOG = "recipe.log";
     public static final String TEST_DIR = "tests";
 
     private static final Logger LOG = Logger.getLogger(RecipeResult.class);

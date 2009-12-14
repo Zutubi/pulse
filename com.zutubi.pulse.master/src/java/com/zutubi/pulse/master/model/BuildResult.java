@@ -19,8 +19,6 @@ import java.util.List;
  */
 public class BuildResult extends Result implements AclObjectIdentityAware, Iterable<RecipeResultNode>
 {
-    public static final String BUILD_LOG = "build.log";
-
     public static final String ACTION_CANCEL = "cancel";
 
     private BuildReason reason;

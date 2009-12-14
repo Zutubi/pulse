@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.build.log;
 
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,11 +9,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 public class DefaultRecipeLoggerTest extends PulseTestCase
 {
     private static final String LINE_ENDING_UNIX = "\n";
     private static final String LINE_ENDING_WINDOWS = "\r\n";
     private static final String LINE_ENDING_MAC = "\r";
+    private static final long LOG_ID = 1;
 
     private File tmpDir;
     private File logFile;
@@ -28,7 +30,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         super.setUp();
         tmpDir = createTempDirectory();
         logFile = new File(tmpDir, "file.log");
-        logger = new DefaultRecipeLogger(logFile);
+        logger = new DefaultRecipeLogger(new LogFile(LOG_ID, logFile, true));
         logger.prepare();
     }
 
@@ -194,7 +196,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     {
         logger.logMarker("First line");
         logger.close();
-        logger = new DefaultRecipeLogger(logFile);
+        logger = new DefaultRecipeLogger(new LogFile(LOG_ID, logFile, true));
         logger.prepare();
         logger.logMarker("Second line");
 

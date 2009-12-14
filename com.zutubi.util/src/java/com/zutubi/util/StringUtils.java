@@ -632,14 +632,14 @@ public class StringUtils
     }
 
     /**
-     * Equivalent to {@link #join(String, String[])}, converts the given
+     * Equivalent to {@link #join(String, String...)}, converts the given
      * collection to an array to make the call.
      *
      * @param glue  glue used to join each part
      * @param parts parts to join
      * @return the joined string
      *
-     * @see #join(String, String[])
+     * @see #join(String, String...)
      */
     public static String join(String glue, Collection<String> parts)
     {

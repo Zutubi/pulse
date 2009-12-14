@@ -1,17 +1,15 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.log.LogFile;
+import com.zutubi.pulse.master.build.log.RecipeLogFile;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.util.io.Tail;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -77,7 +75,7 @@ public class TailRecipeLogAction extends StageActionBase
         BuildResult buildResult = getRequiredBuildResult();
         RecipeResultNode resultNode = getRequiredRecipeResultNode();
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File recipeLog = new File(paths.getRecipeDir(buildResult, resultNode.getResult().getId()), RecipeResult.RECIPE_LOG);
+        LogFile recipeLog = new RecipeLogFile(buildResult, resultNode.getResult().getId(), paths);
         if (recipeLog.exists())
         {
             logExists = true;
@@ -98,31 +96,30 @@ public class TailRecipeLogAction extends StageActionBase
         return "tail";
     }
 
-    protected String getRaw(File recipeLog)
+    protected String getRaw(LogFile recipeLog)
     {
         try
         {
-            inputStream = new FileInputStream(recipeLog);
+            inputStream = recipeLog.openInputStream();
         }
         catch (IOException e)
         {
-            addActionError("Unable to open recipe log '" + recipeLog.getAbsolutePath() + "': " + e.getMessage());
+            addActionError("Unable to open recipe log: " + e.getMessage());
             return ERROR;
         }
 
         return "raw";
     }
 
-    protected String getTail(File recipeLog) throws IOException
+    protected String getTail(LogFile recipeLog) throws IOException
     {
         try
         {
-            Tail tail = new Tail(maxLines, recipeLog);
-            this.tail = tail.getTail();
+            this.tail = recipeLog.getTail(maxLines);
         }
         catch (IOException e)
         {
-            addActionError("Error tailing log '" + recipeLog.getAbsolutePath() + "': " + e.getMessage());
+            addActionError("Error tailing log: " + e.getMessage());
             return ERROR;
         }
 

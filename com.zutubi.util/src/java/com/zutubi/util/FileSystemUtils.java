@@ -649,6 +649,14 @@ public class FileSystemUtils
         }
     }
 
+    /**
+     * Creates an empty temporary file within the given directory, creating the
+     * directory if necessary.
+     *
+     * @param dir the directory to create the file within
+     * @return the newly-created File
+     * @throws IOException if the directory or file cannot be created
+     */
     public static File createTempFile(File dir) throws IOException
     {
         if (!dir.exists() && !dir.mkdirs())

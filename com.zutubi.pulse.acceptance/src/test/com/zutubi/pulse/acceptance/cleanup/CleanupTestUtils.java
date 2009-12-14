@@ -2,6 +2,24 @@ package com.zutubi.pulse.acceptance.cleanup;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.dependencies.Repository;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.master.build.log.BuildLogFile;
+import com.zutubi.pulse.master.build.log.LogFile;
+import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
+import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
@@ -13,22 +31,6 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKING_COPY;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
-import com.zutubi.pulse.acceptance.dependencies.Repository;
-import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
-import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * A set of utility methods used by the cleanup acceptance tests.
@@ -111,7 +113,7 @@ public class CleanupTestUtils
     public boolean hasBuildLog(String projectName, int buildNumber) throws Exception
     {
         File buildDir = getBuildDirectory(projectName, buildNumber);
-        return new File(buildDir, BuildResult.BUILD_LOG).isFile();
+        return new LogFile(0, new File(buildDir, BuildLogFile.LOG_FILENAME), false).exists();
     }
 
     public boolean hasBuildWorkingCopy(String projectName, int buildNumber) throws Exception

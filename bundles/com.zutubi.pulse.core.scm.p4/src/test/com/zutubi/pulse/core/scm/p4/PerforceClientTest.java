@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
-import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.IOAssertions;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 

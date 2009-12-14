@@ -1,13 +1,12 @@
 package com.zutubi.pulse.master.build.log;
 
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
-import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.util.AbstractMessageLogger;
 import org.apache.ivy.util.MessageLogger;
 
-import java.io.File;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 
 public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogger
 {
@@ -16,7 +15,7 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     private int hookCount = 0;
 
-    public DefaultBuildLogger(File logFile)
+    public DefaultBuildLogger(LogFile logFile)
     {
         super(logFile);
     }

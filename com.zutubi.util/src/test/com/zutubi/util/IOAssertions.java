@@ -1,7 +1,5 @@
-package com.zutubi.pulse.core.test;
+package com.zutubi.util;
 
-import com.zutubi.util.IdentityFunction;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.io.IOUtils;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;

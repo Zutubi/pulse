@@ -1,14 +1,14 @@
 package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
-import static com.zutubi.util.io.IOUtils.joinStreams;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static com.zutubi.util.io.IOUtils.joinStreams;
 
 /**
  * Basic utilities for zip files.
@@ -16,10 +16,10 @@ import java.util.zip.ZipInputStream;
 public class ZipUtils
 {
     /**
-     * Extracts the files from teh given zip stream to into the given
+     * Extracts the files from the given zip stream to into the given
      * destination directory.
      *
-     * @param zin zip stream to exract files from
+     * @param zin zip stream to extract files from
      * @param dir destination directory
      * @throws IOException on error
      */
@@ -32,15 +32,19 @@ public class ZipUtils
 
             if (entry.isDirectory())
             {
-                file.mkdirs();
+                if (!file.isDirectory())
+                {
+                    FileSystemUtils.createDirectory(file);
+                }
             }
             else
             {
-                // ensure that the files parents already exist.
+                // Ensure that the file's parents already exist.
                 if (!file.getParentFile().isDirectory())
                 {
-                    file.getParentFile().mkdirs();
+                    FileSystemUtils.createDirectory(file.getParentFile());
                 }
+
                 unzip(zin, file);
             }
 
@@ -59,6 +63,58 @@ public class ZipUtils
         finally
         {
             IOUtils.close(out);
+        }
+    }
+
+    /**
+     * Compresses a single file using gzip.
+     *
+     * @param in  file to compress
+     * @param out file to store the compressed output in
+     * @throws IOException on an error reading the input or writing the output
+     *
+     * @see #uncompressFile(java.io.File, java.io.File)
+     */
+    public static void compressFile(File in, File out) throws IOException
+    {
+        InputStream is = null;
+        OutputStream os = null;
+        try
+        {
+            is = new FileInputStream(in);
+            os = new GZIPOutputStream(new FileOutputStream(out));
+            IOUtils.joinStreams(is, os);
+        }
+        finally
+        {
+            IOUtils.close(is);
+            IOUtils.close(os);
+        }
+    }
+
+    /**
+     * Uncompresses a single file using gzip.
+     *
+     * @param in  file to uncompress
+     * @param out file to store the uncompressed output in
+     * @throws IOException on an error reading the input or writing the output
+     *
+     * @see #compressFile(java.io.File, java.io.File)
+     */
+    public static void uncompressFile(File in, File out) throws IOException
+    {
+        InputStream is = null;
+        OutputStream os = null;
+        try
+        {
+            is = new GZIPInputStream(new FileInputStream(in));
+            os = new FileOutputStream(out);
+            IOUtils.joinStreams(is, os);
+        }
+        finally
+        {
+            IOUtils.close(is);
+            IOUtils.close(os);
         }
     }
 }

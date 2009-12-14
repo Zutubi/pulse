@@ -31,8 +31,10 @@ import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
+import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.DefaultBuildLogger;
 import com.zutubi.pulse.master.build.log.DefaultRecipeLogger;
+import com.zutubi.pulse.master.build.log.RecipeLogFile;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
@@ -162,7 +164,7 @@ public class DefaultBuildController implements EventListener, BuildController
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         buildDir = paths.getBuildDir(buildResult);
 
-        buildLogger = new DefaultBuildLogger(new File(buildDir, BuildResult.BUILD_LOG));
+        buildLogger = new DefaultBuildLogger(new BuildLogFile(buildResult, paths));
 
         buildContext = new PulseExecutionContext();
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
@@ -246,7 +248,7 @@ public class DefaultBuildController implements EventListener, BuildController
             recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
 
             RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
-            DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
+            DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
             RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
             rc.setRecipeQueue(recipeQueue);

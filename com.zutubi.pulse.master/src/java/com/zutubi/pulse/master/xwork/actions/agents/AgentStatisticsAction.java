@@ -58,12 +58,12 @@ public class AgentStatisticsAction extends AgentActionBase
     
     public String renderTime(long time)
     {
-        return TimeStamps.getPrettyElapsed(time);
+        return TimeStamps.getPrettyElapsed(time, 2);
     }
 
     public String renderTime(long total, double percent)
     {
-        return String.format("%s (%.2f%%)", TimeStamps.getPrettyElapsed(total), percent);
+        return String.format("%s (%.2f%%)", TimeStamps.getPrettyElapsed(total, 2), percent);
     }
 
     @Override

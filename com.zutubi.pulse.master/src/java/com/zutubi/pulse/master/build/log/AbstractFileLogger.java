@@ -3,8 +3,6 @@ package com.zutubi.pulse.master.build.log;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -19,13 +17,13 @@ public abstract class AbstractFileLogger implements OutputLogger
 {
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
-    private File logFile;
+    private LogFile logFile;
 
     private byte lastByte = '\n';
 
     protected PrintWriter writer;
 
-    public AbstractFileLogger(File logFile)
+    public AbstractFileLogger(LogFile logFile)
     {
         this.logFile = logFile;
     }
@@ -34,11 +32,11 @@ public abstract class AbstractFileLogger implements OutputLogger
     {
         try
         {
-            writer = new PrintWriter(new FileWriter(logFile, true));
+            writer = new PrintWriter(logFile.openWriter());
         }
         catch (IOException e)
         {
-            throw new BuildException("Unable to open build log file '" + logFile.getAbsolutePath() + "': " + e.getMessage(), e);
+            throw new BuildException("Unable to open build log file: " + e.getMessage(), e);
         }
     }
 

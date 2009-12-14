@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -14,6 +12,9 @@ import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
+import com.zutubi.pulse.master.build.log.BuildLogFile;
+import com.zutubi.pulse.master.build.log.LogFile;
+import com.zutubi.pulse.master.build.log.RecipeLogFile;
 import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
@@ -36,6 +37,9 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -771,15 +775,14 @@ public class DefaultBuildManager implements BuildManager
     private void cleanupBuildLogs(final BuildResult build)
     {
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildDir = paths.getBuildDir(build);
-        scheduleCleanup(new File(buildDir, BuildResult.BUILD_LOG));
+        new BuildLogFile(build, paths).scheduleCleanup(fileDeletionService);
 
         runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {
-                File recipeDir = paths.getRecipeDir(build, recipe.getId());
-                scheduleCleanup(new File(recipeDir, RecipeResult.RECIPE_LOG));
+                LogFile recipeLog = new RecipeLogFile(build, recipe.getId(), paths);
+                recipeLog.scheduleCleanup(fileDeletionService);
             }
         });
     }

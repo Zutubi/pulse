@@ -5,15 +5,12 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Result;
-import com.zutubi.pulse.master.*;
-import com.zutubi.pulse.master.build.log.DefaultBuildLogger;
-import com.zutubi.pulse.master.build.log.DefaultRecipeLogger;
-import com.zutubi.pulse.master.build.log.HookLogger;
-import com.zutubi.pulse.master.build.log.OutputLoggerOutputStream;
+import com.zutubi.pulse.master.MasterBuildPaths;
+import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.log.*;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.events.build.StageEvent;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -23,7 +20,6 @@ import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultD
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -114,7 +110,7 @@ public class BuildHookManager
     private DefaultBuildLogger createBuildLogger(BuildResult result)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        DefaultBuildLogger logger = new DefaultBuildLogger(new File(paths.getBuildDir(result), BuildResult.BUILD_LOG));
+        DefaultBuildLogger logger = new DefaultBuildLogger(new BuildLogFile(result, paths));
         logger.prepare();
         return logger;
     }
@@ -122,7 +118,7 @@ public class BuildHookManager
     private DefaultRecipeLogger createRecipeLogger(BuildResult buildResult, RecipeResultNode recipeResultNode)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResultNode.getResult().getId()), RecipeResult.RECIPE_LOG));
+        DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResultNode.getResult().getId(), paths));
         logger.prepare();
         return logger;
     }

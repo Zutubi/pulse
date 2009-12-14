@@ -1,13 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.master.MasterBuildPaths;
+import com.zutubi.pulse.master.build.log.BuildLogFile;
+import com.zutubi.pulse.master.build.log.LogFile;
 import com.zutubi.pulse.master.model.BuildResult;
 
-import java.io.File;
-
 /**
- *
- *
+ * Action to show the end of the build log.
  */
 public class TailBuildLogAction extends TailRecipeLogAction
 {
@@ -18,7 +17,7 @@ public class TailBuildLogAction extends TailRecipeLogAction
         BuildResult buildResult = getRequiredBuildResult();
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildLog = new File(paths.getBuildDir(buildResult), "build.log");
+        LogFile buildLog = new BuildLogFile(buildResult, paths);
         if (buildLog.exists())
         {
             logExists = true;

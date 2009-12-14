@@ -4,13 +4,13 @@ import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.marshal.types.*;
-import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.IOAssertions;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import nu.xom.Element;
 
@@ -19,10 +19,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 public class ToveFileStorerTest extends PulseTestCase
 {

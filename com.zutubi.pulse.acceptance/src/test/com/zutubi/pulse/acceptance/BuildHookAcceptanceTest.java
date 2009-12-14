@@ -8,14 +8,14 @@ import com.zutubi.pulse.acceptance.pages.browse.AbstractLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.build.log.BuildLogFile;
+import com.zutubi.pulse.master.build.log.LogFile;
+import com.zutubi.pulse.master.build.log.RecipeLogFile;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
@@ -95,8 +97,8 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         List<String> args = getArgs();
 
         // The build directory contains the build log.
-        File log = new File(args.get(0), BuildResult.BUILD_LOG);
-        assertTrue(log.isFile());
+        LogFile log = new LogFile(0, new File(args.get(0), BuildLogFile.LOG_FILENAME), false);
+        assertTrue(log.exists());
     }
 
     public void testPostBuildHookCanAccessProjectProperty() throws Exception
@@ -159,8 +161,8 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         List<String> args = getArgs();
 
         // The stage directory contains the recipe log.
-        File log = new File(args.get(0), RecipeResult.RECIPE_LOG);
-        assertTrue(log.isFile());
+        LogFile log = new LogFile(0, new File(args.get(0), RecipeLogFile.LOG_FILENAME), false);
+        assertTrue(log.exists());
     }
 
     public void testManualHook() throws Exception

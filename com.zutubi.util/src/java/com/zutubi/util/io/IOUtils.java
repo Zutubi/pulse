@@ -86,6 +86,15 @@ public class IOUtils
         }
     }
 
+    /**
+     * Reads all bytes from the input stream and writes them to the output
+     * stream.  Bytes are read and written in chunks.  The caller retains
+     * ownership of the streams - i.e. they are not closed by this method.
+     *
+     * @param input  stream to read from
+     * @param output stream to write to
+     * @throws IOException on any error
+     */
     public static void joinStreams(InputStream input, OutputStream output) throws IOException
     {
         byte[] buffer = new byte[8192];
@@ -97,13 +106,28 @@ public class IOUtils
         }
     }
 
+    /**
+     * Reads all bytes from the input stream and writes them to the output
+     * stream.  Bytes are read and written in chunks.
+     *
+     * @param input  stream to read from
+     * @param output stream to write to
+     * @param close  if true, the streams will be closed on completion or error
+     * @throws IOException on any error
+     */
     public static void joinStreams(InputStream input, OutputStream output, boolean close) throws IOException
     {
-        joinStreams(input, output);
-        if (close)
+        try
         {
-            close(input);
-            close(output);
+            joinStreams(input, output);
+        }
+        finally
+        {
+            if (close)
+            {
+                close(input);
+                close(output);
+            }
         }
     }
 

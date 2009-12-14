@@ -1,16 +1,17 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.IOAssertions;
 import com.zutubi.util.io.IOUtils;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class DataDirectoryArchiveTest extends PulseTestCase
 {

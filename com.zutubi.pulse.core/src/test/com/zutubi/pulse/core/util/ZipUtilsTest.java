@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.IOAssertions;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
@@ -14,8 +14,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-/**
- */
 public class ZipUtilsTest extends PulseTestCase
 {
     File tmpDir;

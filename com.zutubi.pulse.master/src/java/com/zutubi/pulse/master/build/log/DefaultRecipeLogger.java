@@ -8,7 +8,6 @@ import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -21,7 +20,7 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
 
     private int hookCount = 0;
 
-    public DefaultRecipeLogger(File logFile)
+    public DefaultRecipeLogger(LogFile logFile)
     {
         super(logFile);
     }
