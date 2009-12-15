@@ -427,6 +427,16 @@ public class IvyModuleDescriptor
         return decodeArtifacts(descriptor.getAllArtifacts());
     }
 
+    /**
+     * Get the module revision id associated with this descriptor.
+     *
+     * @return the module revision id.
+     */
+    public ModuleRevisionId getModuleRevisionId()
+    {
+        return IvyEncoder.decode(descriptor.getModuleRevisionId());
+    }
+
     private Artifact[] decodeArtifacts(Artifact... encodedArtifacts)
     {
         Artifact[] decodedArtifacts = new Artifact[encodedArtifacts.length];
