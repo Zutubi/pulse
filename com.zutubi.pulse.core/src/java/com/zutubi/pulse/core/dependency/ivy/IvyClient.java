@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.rmdir;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.Ivy;
@@ -36,6 +35,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
+
+import static com.zutubi.util.FileSystemUtils.rmdir;
 
 /**
  * The ivy client provides the core interface for interacting with ivy processes, encapsulating
@@ -123,7 +124,7 @@ public class IvyClient
 
             if (stageNames.length > 0)
             {
-                options.setConfs(IvyEncoder.encodeStageNames(stageNames));
+                options.setConfs(IvyEncoder.encodeNames(stageNames));
             }
 
             Collection bad = checkCanPublishArtifacts(descriptor, stageNames);
@@ -360,7 +361,7 @@ public class IvyClient
         options.setValidate(ivy.getSettings().doValidate());
         if (stageNames.length > 0)
         {
-            options.setConfs(IvyEncoder.encodeStageNames(stageNames));
+            options.setConfs(IvyEncoder.encodeNames(stageNames));
         }
         else
         {

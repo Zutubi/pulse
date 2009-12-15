@@ -1,23 +1,26 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.SystemUtils;
 import com.zutubi.util.StringUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import com.zutubi.util.SystemUtils;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Hashtable;
-import java.util.Vector;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -467,6 +470,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String supportedCharacters = "!()._-@#%^&";
 
         List<String> failedCharacters = new LinkedList<String>();
+        String message = "";
         for (char c : supportedCharacters.toCharArray())
         {
             try
@@ -475,11 +479,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                StringWriter sw = new StringWriter();
+                sw.append('\n');
+                e.printStackTrace(new PrintWriter(sw));
+                message += sw.toString();
                 failedCharacters.add(String.valueOf(c));
             }
         }
-        assertEquals("Unexpected problems with characters: " + StringUtils.join("", failedCharacters.toArray(new String[failedCharacters.size()])), 0, failedCharacters.size());
+        assertEquals("Unexpected problems with characters: " + StringUtils.join("", failedCharacters.toArray(new String[failedCharacters.size()])) + message, 0, failedCharacters.size());
     }
 
     // CIB-2171

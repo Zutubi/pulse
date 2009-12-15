@@ -392,7 +392,7 @@ public class IvyModuleDescriptor
 
     private String ensureConfigurationExists(String confName)
     {
-        String encodedConf = IvyEncoder.encodeStageName(confName);
+        String encodedConf = IvyEncoder.encode(confName);
         if (descriptor.getConfiguration(encodedConf) == null)
         {
             descriptor.addConfiguration(new Configuration(encodedConf));
@@ -414,7 +414,7 @@ public class IvyModuleDescriptor
      */
     public Artifact[] getArtifacts(String stageName)
     {
-        return decodeArtifacts(descriptor.getArtifacts(IvyEncoder.encodeStageName(stageName)));
+        return decodeArtifacts(descriptor.getArtifacts(IvyEncoder.encode(stageName)));
     }
 
     /**

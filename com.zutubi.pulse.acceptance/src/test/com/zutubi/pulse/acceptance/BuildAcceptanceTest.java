@@ -753,11 +753,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailure() throws Exception
     {
-        String projectPath = createProjectWithTwoFailingStages();
-        String defaultStagePath = PathUtils.getPath(projectPath, Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE);
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(defaultStagePath);
-        stage.put("terminateBuildOnFailure", true);
-        xmlRpcHelper.saveConfig(defaultStagePath, stage, false);
+        String projectPath = createProjectWithTwoAntStages("nosuchbuildfile.xml");
+        setTerminateStageOnFailure(projectPath);
 
         long buildId = xmlRpcHelper.runBuild(random, ResultState.ERROR.getPrettyString(), BUILD_TIMEOUT);
 
@@ -766,9 +763,21 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent(String.format("Build terminated due to failure of stage '%s'", ProjectConfigurationWizard.DEFAULT_STAGE));
     }
 
+    public void testTerminateOnStageFailureStageSucceeds() throws Exception
+    {
+        String projectPath = createProjectWithTwoAntStages("build.xml");
+        setTerminateStageOnFailure(projectPath);
+
+        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+        browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
+        assertTextNotPresent("terminated");
+    }
+
     public void testTerminateOnStageFailureLimit() throws Exception
     {
-        String projectPath = createProjectWithTwoFailingStages();
+        String projectPath = createProjectWithTwoAntStages("nosuchbuildfile.xml");
         String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
         Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
         options.put("stageFailureLimit", 1);
@@ -781,13 +790,21 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("Build terminated due to the stage failure limit (1) being reached");
     }
 
-    private String createProjectWithTwoFailingStages() throws Exception
+    private String createProjectWithTwoAntStages(String buildFile) throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig("nosuchbuildfile.xml"));
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
         Hashtable<String, String> keys = new Hashtable<String, String>();
         keys.put(ProjectConfigurationWizard.DEFAULT_STAGE, "another-stage");
         xmlRpcHelper.cloneConfig(PathUtils.getPath(projectPath, Project.STAGES), keys);
         return projectPath;
+    }
+
+    private void setTerminateStageOnFailure(String projectPath) throws Exception
+    {
+        String defaultStagePath = PathUtils.getPath(projectPath, Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE);
+        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(defaultStagePath);
+        stage.put("terminateBuildOnFailure", true);
+        xmlRpcHelper.saveConfig(defaultStagePath, stage, false);
     }
 
     private void insertTestCapture(String projectPath, String processorName) throws Exception

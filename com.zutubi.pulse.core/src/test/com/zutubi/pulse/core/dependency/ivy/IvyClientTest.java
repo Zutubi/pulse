@@ -58,7 +58,7 @@ public class IvyClientTest extends ZutubiTestCase
 
         client.publishArtifacts(descriptor);
 
-        assertExists(repositoryBase, "org/modu%21le/build/jars/artifact-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/build/jars/artifact-revision.jar");
     }
 
     public void testPublishMultipleArtifacts() throws IOException
@@ -68,8 +68,8 @@ public class IvyClientTest extends ZutubiTestCase
 
         client.publishArtifacts(descriptor);
 
-        assertExists(repositoryBase, "org/modu%21le/build/jars/artifactA-revision.jar");
-        assertExists(repositoryBase, "org/modu%21le/build/jars/artifactB-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/build/jars/artifactA-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/build/jars/artifactB-revision.jar");
     }
 
     public void testPublishArtifactByConf() throws IOException
@@ -79,15 +79,15 @@ public class IvyClientTest extends ZutubiTestCase
 
         client.publishArtifacts(descriptor, "buildA");
 
-        assertExists(repositoryBase, "org/modu%21le/buildA/jars/artifactA-revision.jar");
-        assertNotExists(repositoryBase, "org/modu%21le/buildB/jars/artifactB-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/buildA/jars/artifactA-revision.jar");
+        assertNotExists(repositoryBase, "org/modu$21le/buildB/jars/artifactB-revision.jar");
     }
 
     public void testPublishDescriptor() throws IOException, ParseException
     {
         client.publishDescriptor(descriptor);
         
-        assertExists(repositoryBase, "org/modu%21le/ivy-revision.xml");
+        assertExists(repositoryBase, "org/modu$21le/ivy-revision.xml");
     }
 
     public void testRetrieveArtifact() throws IOException, ParseException

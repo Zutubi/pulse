@@ -1,14 +1,13 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.i18n.Messages;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -22,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A command that handles retrieving the dependencies for a build.  This
@@ -98,6 +99,7 @@ public class RetrieveDependenciesCommand implements Command
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             throw new BuildException("Error running dependency retrieval: " + e.getMessage(), e);
         }
     }

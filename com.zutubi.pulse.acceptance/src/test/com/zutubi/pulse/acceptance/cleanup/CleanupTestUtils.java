@@ -113,7 +113,7 @@ public class CleanupTestUtils
     public boolean hasBuildLog(String projectName, int buildNumber) throws Exception
     {
         File buildDir = getBuildDirectory(projectName, buildNumber);
-        return new LogFile(0, new File(buildDir, BuildLogFile.LOG_FILENAME), false).exists();
+        return new LogFile(new File(buildDir, BuildLogFile.LOG_FILENAME), false).exists();
     }
 
     public boolean hasBuildWorkingCopy(String projectName, int buildNumber) throws Exception

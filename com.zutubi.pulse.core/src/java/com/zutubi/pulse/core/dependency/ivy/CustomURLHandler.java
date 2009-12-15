@@ -1,16 +1,14 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.util.WebUtils;
 import org.apache.ivy.util.CopyProgressListener;
 import org.apache.ivy.util.url.AbstractURLHandler;
 import org.apache.ivy.util.url.BasicURLHandler;
-import org.apache.ivy.util.url.URLHandler;
 import org.apache.ivy.util.url.HttpClientHandler;
+import org.apache.ivy.util.url.URLHandler;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -40,34 +38,20 @@ public class CustomURLHandler extends AbstractURLHandler
 
     public URLInfo getURLInfo(URL url)
     {
-        try
+        if (isFileProtocol(url) || isJarProtocol(url))
         {
-            if (isFileProtocol(url) || isJarProtocol(url))
-            {
-                return basicUrlHandler.getURLInfo(url);
-            }
-            return httpClientHandler.getURLInfo(encode(url));
+            return basicUrlHandler.getURLInfo(url);
         }
-        catch (MalformedURLException e)
-        {
-            return UNAVAILABLE;
-        }
+        return httpClientHandler.getURLInfo(url);
     }
 
     public URLInfo getURLInfo(URL url, int timeout)
     {
-        try
+        if (isFileProtocol(url) || isJarProtocol(url))
         {
-            if (isFileProtocol(url) || isJarProtocol(url))
-            {
-                return basicUrlHandler.getURLInfo(url, timeout);
-            }
-            return httpClientHandler.getURLInfo(encode(url), timeout);
+            return basicUrlHandler.getURLInfo(url, timeout);
         }
-        catch (MalformedURLException e)
-        {
-            return UNAVAILABLE;
-        }
+        return httpClientHandler.getURLInfo(url, timeout);
     }
 
     public void download(URL src, File dest, CopyProgressListener l) throws IOException
@@ -78,7 +62,7 @@ public class CustomURLHandler extends AbstractURLHandler
         }
         else
         {
-            httpClientHandler.download(encode(src), dest, l);
+            httpClientHandler.download(src, dest, l);
         }
     }
 
@@ -90,7 +74,7 @@ public class CustomURLHandler extends AbstractURLHandler
         }
         else
         {
-            httpClientHandler.upload(src, encode(dest), l);
+            httpClientHandler.upload(src, dest, l);
         }
     }
 
@@ -100,7 +84,7 @@ public class CustomURLHandler extends AbstractURLHandler
         {
             return basicUrlHandler.openStream(url);
         }
-        return httpClientHandler.openStream(encode(url));
+        return httpClientHandler.openStream(url);
     }
     
     private boolean isFileProtocol(URL url)
@@ -111,18 +95,5 @@ public class CustomURLHandler extends AbstractURLHandler
     private boolean isJarProtocol(URL url)
     {
         return url.getProtocol().equals("jar");
-    }
-
-    /**
-     * URL encode the path portion of the url.
-     *
-     * @param url   the url to be encoded.
-     * @return the encoded url.
-     *
-     * @throws MalformedURLException is thrown if the encoding produces an invalid url.
-     */
-    private URL encode(URL url) throws MalformedURLException
-    {
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), WebUtils.uriPathEncode(url.getFile()));
     }
 }

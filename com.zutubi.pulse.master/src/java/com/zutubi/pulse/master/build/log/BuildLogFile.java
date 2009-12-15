@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 
 import java.io.File;
 
- /**
+/**
   * Convenient specialisation of {@link LogFile} for accessing build logs.
   */
 public class BuildLogFile extends LogFile
@@ -20,6 +20,6 @@ public class BuildLogFile extends LogFile
      */
     public BuildLogFile(BuildResult build, MasterBuildPaths paths)
     {
-        super(build.getId(), new File(paths.getBuildDir(build), LOG_FILENAME), build.getProject().getConfig().getOptions().isLogCompressionEnabled());
+        super(new File(paths.getBuildDir(build), LOG_FILENAME), build.getProject().getConfig().getOptions().isLogCompressionEnabled());
     }
 }

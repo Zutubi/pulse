@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.*;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
@@ -10,6 +9,8 @@ import org.apache.ivy.core.report.ArtifactDownloadReport;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.*;
 
 /**
  * A utility class that handles the encoding and decoding needed within
@@ -26,69 +27,7 @@ import java.util.Map;
 public class IvyEncoder
 {
     /**
-     * Encode a pulse stage name for use as a configuration name within an
-     * ivy file.
-     *
-     * @param stageName the string to be encoded.
-     *
-     * @return the encoded string.
-     */
-    public static String encodeStageName(String stageName)
-    {
-        return WebUtils.encode('_', stageName, AllowedCharacters.STAGE_NAMES);
-    }
-
-    /**
-     * Decode a pulse stage name.
-     *
-     * @param stageName     the stage name to be decoded.
-     *
-     * @return the decoded string
-     *
-     * @see #decodeStageName(String)
-     */
-    public static String decodeStageName(String stageName)
-    {
-        return WebUtils.decode('_', stageName);
-    }
-
-    /**
-     * Encode the array of stage names.
-     *
-     * @param stageNames the stage names to be encoded.
-     * @return an array of encoded stage names
-     *
-     * @see #encodeStageName(String)
-     */
-    public static String[] encodeStageNames(String... stageNames)
-    {
-        String[] encoded = new String[stageNames.length];
-        for (int i = 0; i < stageNames.length; i++)
-        {
-            encoded[i] = encodeStageName(stageNames[i]);
-        }
-        return encoded;
-    }
-
-    /**
-     * Decode an array of stage names.
-     *
-     * @param stageNames    the stage names to be decoded.
-     *
-     * @return an array of encoded stage names
-     */
-    public static String[] decodeStageNames(String... stageNames)
-    {
-        String[] decoded = new String[stageNames.length];
-        for (int i = 0; i < stageNames.length; i++)
-        {
-            decoded[i] = decodeStageName(stageNames[i]);
-        }
-        return decoded;
-    }
-
-    /**
-     * Percentage encode the string.
+     * Encode the string.
      *
      * @param str   the string to be encoded.
      *
@@ -96,27 +35,54 @@ public class IvyEncoder
      */
     public static String encode(String str)
     {
-        if (str == null)
-        {
-            return null;
-        }
-        return WebUtils.percentEncode(str, AllowedCharacters.NAMES);
+        return WebUtils.encode('$', str, AllowedCharacters.NAMES);
     }
 
     /**
-     * Percentage decode the string.
+     * Decode the string.
      *
      * @param str   the string to be decoded.
-     * 
+     *
      * @return the decoded string.
      */
     public static String decode(String str)
     {
-        if (str == null)
+        return WebUtils.decode('$', str);
+    }
+
+    /**
+     * Encode the array of names.
+     *
+     * @param names the names to be encoded.
+     * @return an array of encoded names
+     *
+     * @see #encode(String)
+     */
+    public static String[] encodeNames(String... names)
+    {
+        String[] encoded = new String[names.length];
+        for (int i = 0; i < names.length; i++)
         {
-            return null;
+            encoded[i] = encode(names[i]);
         }
-        return WebUtils.percentDecode(str);
+        return encoded;
+    }
+
+    /**
+     * Decode an array of names.
+     *
+     * @param names    the names to be decoded.
+     *
+     * @return an array of encoded names
+     */
+    public static String[] decodeNames(String... names)
+    {
+        String[] decoded = new String[names.length];
+        for (int i = 0; i < names.length; i++)
+        {
+            decoded[i] = decode(names[i]);
+        }
+        return decoded;
     }
 
     /**
@@ -137,7 +103,7 @@ public class IvyEncoder
             // some will have the attribute prefix stripped, others will not.
             if (key.equals(EXTRA_ATTRIBUTE_STAGE) || key.equals(STAGE))
             {
-                encoded.put(key, encodeStageName(extraAttributes.get(key)));
+                encoded.put(key, encode(extraAttributes.get(key)));
             }
             else
             {
@@ -164,7 +130,7 @@ public class IvyEncoder
             // some will have the attribute prefix stripped, others will not.
             if (key.equals(EXTRA_ATTRIBUTE_STAGE) || key.equals(STAGE))
             {
-                decoded.put(key, decodeStageName(extraAttributes.get(key)));
+                decoded.put(key, decode(extraAttributes.get(key)));
             }
             else
             {
@@ -204,7 +170,7 @@ public class IvyEncoder
                 );
                 for (String conf : artifact.getConfigurations())
                 {
-                    encodedArtifact.addConfiguration(encodeStageName(conf));
+                    encodedArtifact.addConfiguration(encode(conf));
                 }
                 return encodedArtifact;
             }
@@ -258,7 +224,7 @@ public class IvyEncoder
                 );
                 for (String conf : artifact.getConfigurations())
                 {
-                    decodedArtifact.addConfiguration(decodeStageName(conf));
+                    decodedArtifact.addConfiguration(decode(conf));
                 }
                 return decodedArtifact;
             }
@@ -402,11 +368,11 @@ public class IvyEncoder
         String[] encoded;
         if (in.contains(glue))
         {
-            encoded = encodeStageNames(StringUtils.split(in, glue.charAt(0), true));
+            encoded = encodeNames(StringUtils.split(in, glue.charAt(0), true));
         }
         else
         {
-            encoded = new String[]{encodeStageName(in)};
+            encoded = new String[]{encode(in)};
         }
         return StringUtils.join(glue, encoded);
     }
@@ -416,11 +382,11 @@ public class IvyEncoder
         String[] decoded;
         if (in.contains(glue))
         {
-            decoded = decodeStageNames(StringUtils.split(in, glue.charAt(0), true));
+            decoded = decodeNames(StringUtils.split(in, glue.charAt(0), true));
         }
         else
         {
-            decoded = new String[]{decodeStageName(in)};
+            decoded = new String[]{decode(in)};
         }
         return StringUtils.join(glue, decoded);
     }

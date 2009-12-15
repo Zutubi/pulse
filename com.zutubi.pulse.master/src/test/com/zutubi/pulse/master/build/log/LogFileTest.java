@@ -11,12 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class LogFileTest extends PulseTestCase
 {
-    private static final AtomicLong NEXT_ID = new AtomicLong(123);
-
     private static final int COMPRESS_THRESHOLD = 1024;
     private static final int TAIL_LIMIT = 10;
 
@@ -33,7 +30,7 @@ public class LogFileTest extends PulseTestCase
         super.setUp();
         tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
         file = new File(tempDir, "test.log");
-        logFile = new LogFile(NEXT_ID.getAndIncrement(), file, COMPRESS_THRESHOLD, TAIL_LIMIT, true);
+        logFile = new LogFile(file, COMPRESS_THRESHOLD, TAIL_LIMIT, true);
     }
 
     @Override
@@ -65,6 +62,14 @@ public class LogFileTest extends PulseTestCase
     {
         String written = writeCompressed();
         assertTrue(logFile.isCompressed());
+        assertEquals(written, getContents());
+    }
+
+    public void testCompressionDisabled() throws IOException
+    {
+        logFile = new LogFile(file, COMPRESS_THRESHOLD, TAIL_LIMIT, false);
+        String written = writeCompressed();
+        assertFalse(logFile.isCompressed());
         assertEquals(written, getContents());
     }
 
@@ -118,7 +123,7 @@ public class LogFileTest extends PulseTestCase
     {
         writeLines(TEST_CONTENT);
         assertFalse(logFile.isCompressed());
-        LogFile other = new LogFile(logFile.getId(), file, COMPRESS_THRESHOLD, TAIL_LIMIT, true);
+        LogFile other = new LogFile(file, COMPRESS_THRESHOLD, TAIL_LIMIT, true);
         InputStream in = other.openInputStream();
 
         writeCompressed();
@@ -126,6 +131,33 @@ public class LogFileTest extends PulseTestCase
 
         in.close();
         assertTrue(logFile.isCompressed());
+    }
+
+    public void testOpenSecondWriterOnCompressedWhileReaderOpen() throws IOException
+    {
+        String compressedContent = writeCompressed();
+        InputStream is = logFile.openInputStream();
+        assertTrue(logFile.isCompressed());
+
+        Writer writer = logFile.openWriter();
+        assertFalse(logFile.isCompressed());
+
+        assertEquals(compressedContent, IOUtils.inputStreamToString(is));
+        is.close();
+        assertFalse(logFile.isCompressed());
+
+        writer.write(TEST_CONTENT);
+        writer.flush();
+        assertFalse(logFile.isCompressed());
+        
+        // A reader open now should see the fresh content, despite a stale
+        // gzip file.
+        assertEquals(compressedContent + TEST_CONTENT, getContents());
+
+        writer.close();
+        assertTrue(logFile.isCompressed());
+
+        assertEquals(compressedContent + TEST_CONTENT, getContents());
     }
 
     private String nTestLines(int n)
@@ -152,7 +184,15 @@ public class LogFileTest extends PulseTestCase
 
     private String getContents() throws IOException
     {
-        return IOUtils.inputStreamToString(logFile.openInputStream()).replace("\r\n", "\n");
+        InputStream is = logFile.openInputStream();
+        try
+        {
+            return IOUtils.inputStreamToString(is).replace("\r\n", "\n");
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
     }
 
 }

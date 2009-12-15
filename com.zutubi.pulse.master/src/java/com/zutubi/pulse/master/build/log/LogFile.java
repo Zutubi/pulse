@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Abstraction around the recipe log that provides:
+ * Abstraction around the build/recipe log files that provides:
  *
  * <ul>
  *   <li>the ability to tail the file</li>
@@ -42,13 +42,13 @@ public class LogFile
 
     public static final String EXTENSION_ZIP = ".gz";
     public static final String EXTENSION_TAIL = ".tail";
+    public static final String EXTENSION_NON_EXISTENT = ".non";
 
     private static final int DEFAULT_COMPRESS_THRESHOLD = 100 * 1024;
     private static final int DEFAULT_TAIL_LIMIT = 100;
 
-    private static final Map<Long, SharedData> idToData = new HashMap<Long, SharedData>();
+    private static final Map<String, SharedData> canonicalPathToData = new HashMap<String, SharedData>();
 
-    private long id;
     private SharedData data;
     private File file;
     private boolean compressionEnabled;
@@ -60,43 +60,47 @@ public class LogFile
      * unique for each different file, but the same for LogFiles that wrap the
      * same underlying file system file.
      *
-     * @param id                 unique identifier for LogFiles that wrap this
-     *                           underlying File
      * @param file               the file to read/write
      * @param compressionEnabled if true the underlying file may be compressed
      */
-    public LogFile(long id, File file, boolean compressionEnabled)
+    public LogFile(File file, boolean compressionEnabled)
     {
-        this(id, file, DEFAULT_COMPRESS_THRESHOLD, DEFAULT_TAIL_LIMIT, compressionEnabled);
+        this(file, DEFAULT_COMPRESS_THRESHOLD, DEFAULT_TAIL_LIMIT, compressionEnabled);
     }
 
-    LogFile(long id, File file, int compressThreshold, int tailLimit, boolean compressionEnabled)
+    LogFile(File file, int compressThreshold, int tailLimit, boolean compressionEnabled)
     {
-        this.id = id;
         this.file = file;
         this.compressThreshold = compressThreshold;
         this.tailLimit = tailLimit;
         this.compressionEnabled = compressionEnabled;
 
-        synchronized (idToData)
+        String canonicalPath = getCanonicalPath(file);
+        synchronized (canonicalPathToData)
         {
-            data = idToData.get(id);
+            data = canonicalPathToData.get(canonicalPath);
             if (data == null)
             {
                 data = new SharedData();
-                idToData.put(id, data);
+                canonicalPathToData.put(canonicalPath, data);
             }
         }
     }
 
-    /**
-     * Returns the unique identifier for the underlying File.
-     *
-     * @return the identifier shared by all LogFiles that wrap this File
-     */
-    public long getId()
+    private String getCanonicalPath(File file)
     {
-        return id;
+        // We use a unique path that never exists as canonical paths may change
+        // when the referred-to path is created/deleted.
+        File nonExistent = new File(file.getAbsolutePath() + EXTENSION_NON_EXISTENT);
+        try
+        {
+            return nonExistent.getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            LOG.warning(e);
+            return nonExistent.getAbsolutePath();
+        }
     }
 
     /**
@@ -158,7 +162,7 @@ public class LogFile
 
     private FileWriter prepareWriter() throws IOException
     {
-       data. lock.lock();
+       data.lock.lock();
         try
         {
             if (isCompressed())
@@ -187,7 +191,7 @@ public class LogFile
         data.lock.lock();
         try
         {
-            return getZipFile().exists();
+            return !file.exists() && getZipFile().exists();
         }
         finally
         {
@@ -199,8 +203,6 @@ public class LogFile
     {
         File zipFile = getZipFile();
         ZipUtils.uncompressFile(zipFile, file);
-        cleanUp(zipFile);
-        cleanUp(getTailFile());
     }
 
     private void onClose()
@@ -227,6 +229,10 @@ public class LogFile
         {
             File zipFile = getZipFile();
             File tailFile = getTailFile();
+
+            cleanUp(zipFile);
+            cleanUp(tailFile);
+
             try
             {
                 Tail tail = new Tail(tailLimit, file);

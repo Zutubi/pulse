@@ -1,37 +1,24 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.util.junit.ZutubiTestCase;
-import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_SOURCE_FILE;
-import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_STAGE;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_SOURCE_FILE;
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_STAGE;
 
 public class IvyEncoderTest extends ZutubiTestCase
 {
     private static final String KEY_VALUE_DELIMITER = ";";
-
-    public void testEncodeDecodeStageName()
-    {
-        assertStageNameEncoding("", "");
-        assertStageNameEncoding("abc", "abc");
-        assertStageNameEncoding("123", "123");
-        assertStageNameEncoding("*", "_2a");
-    }
-
-    private void assertStageNameEncoding(String raw, String expected)
-    {
-        assertEquals(expected, IvyEncoder.encodeStageName(raw));
-        assertEquals(raw, IvyEncoder.decodeStageName(expected));
-    }
 
     public void testGeneralEncoding()
     {
         assertGeneralEncoding("", "");
         assertGeneralEncoding("abc", "abc");
         assertGeneralEncoding("123", "123");
-        assertGeneralEncoding("*", "%2a");
+        assertGeneralEncoding("*", "$2a");
     }
 
     private void assertGeneralEncoding(String raw, String expected)
@@ -47,7 +34,7 @@ public class IvyEncoderTest extends ZutubiTestCase
         assertModuleRevisionIdEncoding(raw, expected);
 
         raw = ModuleRevisionId.newInstance("or*g", "na*me", "bra*nch", "revi*sion", createMap("k*ey;v*alue"));
-        expected = ModuleRevisionId.newInstance("or%2ag", "na%2ame", "bra*nch", "revi*sion", createMap("k*ey;v*alue"));
+        expected = ModuleRevisionId.newInstance("or$2ag", "na$2ame", "bra*nch", "revi*sion", createMap("k*ey;v*alue"));
         assertModuleRevisionIdEncoding(raw, expected);
     }
 
@@ -74,7 +61,7 @@ public class IvyEncoderTest extends ZutubiTestCase
     {
         assertExtraAttributeEncoding(pair("a", "b"), pair("a", "b"));
         assertExtraAttributeEncoding(pair(EXTRA_ATTRIBUTE_SOURCE_FILE, "*"), pair(EXTRA_ATTRIBUTE_SOURCE_FILE , "*"));
-        assertExtraAttributeEncoding(pair(EXTRA_ATTRIBUTE_STAGE , "*"), pair(EXTRA_ATTRIBUTE_STAGE, "_2a"));
+        assertExtraAttributeEncoding(pair(EXTRA_ATTRIBUTE_STAGE , "*"), pair(EXTRA_ATTRIBUTE_STAGE, "$2a"));
     }
 
     private void assertExtraAttributeEncoding(String raw, String expected)

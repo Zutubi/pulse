@@ -97,7 +97,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         List<String> args = getArgs();
 
         // The build directory contains the build log.
-        LogFile log = new LogFile(0, new File(args.get(0), BuildLogFile.LOG_FILENAME), false);
+        LogFile log = new LogFile(new File(args.get(0), BuildLogFile.LOG_FILENAME), false);
         assertTrue(log.exists());
     }
 
@@ -161,7 +161,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         List<String> args = getArgs();
 
         // The stage directory contains the recipe log.
-        LogFile log = new LogFile(0, new File(args.get(0), RecipeLogFile.LOG_FILENAME), false);
+        LogFile log = new LogFile(new File(args.get(0), RecipeLogFile.LOG_FILENAME), false);
         assertTrue(log.exists());
     }
 

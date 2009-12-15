@@ -1,8 +1,10 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
-import com.zutubi.pulse.core.dependency.ivy.*;
-import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_STAGE;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
 import com.zutubi.util.FileSystemUtils;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
@@ -10,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.EXTRA_ATTRIBUTE_STAGE;
 
 /**
  * The repository class provides tests with a simple way to interact with the
@@ -134,7 +138,7 @@ public class Repository
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
         Map<String, String> extraAttributes = new HashMap<String, String>();
-        extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, IvyEncoder.encodeStageName(stageName));
+        extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, IvyEncoder.encode(stageName));
         ModuleRevisionId mrid = IvyEncoder.encode(IvyModuleRevisionId.newInstance(orgString, name, revisionString, extraAttributes));
 
         return configuration.getArtifactPath(mrid, artifactName, artifactExtension);

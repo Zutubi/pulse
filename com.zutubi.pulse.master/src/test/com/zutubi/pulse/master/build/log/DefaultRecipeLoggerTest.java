@@ -18,7 +18,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     private static final String LINE_ENDING_UNIX = "\n";
     private static final String LINE_ENDING_WINDOWS = "\r\n";
     private static final String LINE_ENDING_MAC = "\r";
-    private static final long LOG_ID = 1;
 
     private File tmpDir;
     private File logFile;
@@ -30,7 +29,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         super.setUp();
         tmpDir = createTempDirectory();
         logFile = new File(tmpDir, "file.log");
-        logger = new DefaultRecipeLogger(new LogFile(LOG_ID, logFile, true));
+        logger = new DefaultRecipeLogger(new LogFile(logFile, true));
         logger.prepare();
     }
 
@@ -196,7 +195,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     {
         logger.logMarker("First line");
         logger.close();
-        logger = new DefaultRecipeLogger(new LogFile(LOG_ID, logFile, true));
+        logger = new DefaultRecipeLogger(new LogFile(logFile, true));
         logger.prepare();
         logger.logMarker("Second line");
 

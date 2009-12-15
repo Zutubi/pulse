@@ -21,6 +21,6 @@ public class RecipeLogFile extends LogFile
      */
     public RecipeLogFile(BuildResult build, long recipeId, MasterBuildPaths paths)
     {
-        super(recipeId, new File(paths.getRecipeDir(build, recipeId), LOG_FILENAME), build.getProject().getConfig().getOptions().isLogCompressionEnabled());
+        super(new File(paths.getRecipeDir(build, recipeId), LOG_FILENAME), build.getProject().getConfig().getOptions().isLogCompressionEnabled());
     }
 }

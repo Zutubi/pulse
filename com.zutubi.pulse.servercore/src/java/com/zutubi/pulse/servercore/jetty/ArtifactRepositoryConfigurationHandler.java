@@ -4,7 +4,6 @@ import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpHandler;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.handler.NotFoundHandler;
-import org.mortbay.util.FileResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +22,6 @@ public class ArtifactRepositoryConfigurationHandler implements ContextConfigurat
 
     public void configure(HttpContext context) throws IOException
     {
-        FileResource.setCheckAliases(false);
-
         context.setResourceBase(base.getCanonicalPath());
         context.addHandler(securityHandler);
 
