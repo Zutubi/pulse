@@ -335,6 +335,12 @@ public class BuildQueue
         return new LinkedList<QueuedRequest>(queuedRequests);
     }
 
+    /**
+     * Retrieve all of the queued requests that belong to the specified owner.
+     *
+     * @param owner the owner of the queued requests.
+     * @return a list of queued requests belonging to the specified owner.
+     */
     public synchronized List<QueuedRequest> getQueuedRequestsByOwner(Object owner)
     {
         return CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner));
@@ -350,6 +356,12 @@ public class BuildQueue
         return new LinkedList<ActivatedRequest>(activatedRequests);
     }
 
+    /**
+     * Retrieve all of teh activated requests that belong to the specified owner.
+     *
+     * @param owner the owner of the activated requests.
+     * @return a list of activated requests belonging to the specified owner.
+     */
     public synchronized List<ActivatedRequest> getActivatedRequestsByOwner(Object owner)
     {
         return CollectionUtils.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner));
