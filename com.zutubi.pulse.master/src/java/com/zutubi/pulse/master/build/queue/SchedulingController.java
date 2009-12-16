@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.InstanceOfPredicate;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
@@ -31,6 +32,7 @@ public class SchedulingController implements EventListener
 {
     protected static final String SEQUENCE_BUILD_ID = "BUILD_ID";
 
+    private static final Logger LOG = Logger.getLogger(SchedulingController.class);
     private static final Messages I18N = Messages.getInstance(SchedulingController.class);
 
     private final Lock lock = new ReentrantLock();
@@ -76,10 +78,7 @@ public class SchedulingController implements EventListener
                         Project project = getProject(acceptedRequest.getRequest());
                         if (buildQueue.hasRequest(acceptedRequest.getOwner()) && !acceptedRequest.isPersonal())
                         {
-                            if (project.isTransitionValid(Project.Transition.BUILDING))
-                            {
-                                projectManager.makeStateTransition(acceptedRequest.getProjectId(), Project.Transition.BUILDING);
-                            }
+                            transitionProjectState(project, Project.Transition.BUILDING);
                         }
                     }
                 }
@@ -106,6 +105,29 @@ public class SchedulingController implements EventListener
         finally
         {
             lock.unlock();
+        }
+    }
+
+    private void transitionProjectState(Project project, Project.Transition transition)
+    {
+        // Check if we need to make the transition.
+        if (transition == Project.Transition.BUILDING && project.getState() == Project.State.BUILDING)
+        {
+            return;
+        }
+
+        if (transition == Project.Transition.IDLE && project.getState() == Project.State.IDLE)
+        {
+            return;
+        }
+
+        if (project.isTransitionValid(transition))
+        {
+            projectManager.makeStateTransition(project.getId(), transition);
+        }
+        else
+        {
+            LOG.warning("Requested transition " + transition + " for project " + project.getName() + "("+project.getId()+") is invalid.");
         }
     }
 
@@ -229,10 +251,7 @@ public class SchedulingController implements EventListener
                     Project project = getProject(completedRequest);
                     if (!completedRequest.isPersonal() && !buildQueue.hasRequest(completedRequest.getOwner()))
                     {
-                        if (project.isTransitionValid(Project.Transition.IDLE))
-                        {
-                            projectManager.makeStateTransition(project.getId(), Project.Transition.IDLE);
-                        }
+                        transitionProjectState(project, Project.Transition.IDLE);
                     }
                 }
                 long metaBuildId = requestHandler.getMetaBuildId();
