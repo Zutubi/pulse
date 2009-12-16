@@ -11,11 +11,12 @@ import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
 import java.util.Hashtable;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Test for managing the server license and ensuring the licenses are
@@ -166,7 +167,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         usersPage.clickAdd();
         AddUserForm form = browser.createForm(AddUserForm.class);
         form.waitFor();
-        form.finishNamedFormElements(asPair("login", random), asPair("name", random));
+        form.finishNamedFormElements(asPair("login", random), asPair("name", random), asPair("emailAddress", random + "@example.com"));
         form.waitFor();
         assertTextPresent("Unable to add user: license limit exceeded");
     }

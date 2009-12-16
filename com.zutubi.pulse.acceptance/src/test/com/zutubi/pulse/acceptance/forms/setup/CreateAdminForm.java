@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.forms.setup;
 
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.master.tove.config.setup.AdminUserConfiguration;
 
 /**
@@ -20,6 +20,6 @@ public class CreateAdminForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"login", "name", "password", "confirm"};
+        return new String[]{"login", "name", "emailAddress", "password", "confirm"};
     }
 }

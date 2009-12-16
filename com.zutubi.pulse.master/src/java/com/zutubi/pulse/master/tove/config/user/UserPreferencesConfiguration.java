@@ -201,6 +201,11 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         return contacts;
     }
 
+    public void addContact(ContactConfiguration contactConfiguration)
+    {
+        contacts.put(contactConfiguration.getName(), contactConfiguration);
+    }
+
     public void setContacts(Map<String, ContactConfiguration> contacts)
     {
         this.contacts = contacts;

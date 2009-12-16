@@ -1,28 +1,37 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
+import com.zutubi.pulse.master.tove.format.MessagesAware;
+import com.zutubi.tove.config.ConfigurationList;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Shows a contact point error if one exists.
  */
-public class ContactConfigurationStateDisplay
+public class ContactConfigurationStateDisplay implements MessagesAware
 {
+    public static final String FIELD_LAST_ERROR = "lastError";
+    public static final String FIELD_PRIMARY = "primary";
+
     private ResultNotifier resultNotifier;
+    private Messages messages;
 
     public List<String> getFields(ContactConfiguration contactConfiguration)
     {
+        List<String> fields = new ConfigurationList<String>();
         if (resultNotifier.hasError(contactConfiguration))
         {
-            return Arrays.asList("lastError");
+            fields.add(FIELD_LAST_ERROR);
         }
-        else
+
+        if (contactConfiguration.isPrimary())
         {
-            return Collections.emptyList();
+            fields.add(FIELD_PRIMARY);
         }
+
+        return fields;
     }
 
     public String formatLastError(ContactConfiguration contactConfiguration)
@@ -30,8 +39,18 @@ public class ContactConfigurationStateDisplay
         return resultNotifier.getError(contactConfiguration);
     }
 
+    public String formatPrimary()
+    {
+        return messages.format("primary.blurb");
+    }
+
     public void setResultNotifier(ResultNotifier resultNotifier)
     {
         this.resultNotifier = resultNotifier;
+    }
+
+    public void setMessages(Messages messages)
+    {
+        this.messages = messages;
     }
 }

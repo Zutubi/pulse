@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -311,7 +312,8 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private void addContact(UserConfiguration user, LdapUserDetails details)
     {
         UserPreferencesConfiguration prefs = user.getPreferences();
-        if (!prefs.getContacts().containsKey(EMAIL_CONTACT_NAME))
+        Map<String, ContactConfiguration> contacts = prefs.getContacts();
+        if (!contacts.containsKey(EMAIL_CONTACT_NAME))
         {
             String email = getStringAttribute(details, emailAttribute, user.getLogin());
             if (email != null)
@@ -322,7 +324,8 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                     EmailContactConfiguration contact = new EmailContactConfiguration();
                     contact.setName(EMAIL_CONTACT_NAME);
                     contact.setAddress(email);
-                    prefs.getContacts().put(EMAIL_CONTACT_NAME, contact);
+                    contact.setPrimary(contacts.isEmpty());
+                    contacts.put(EMAIL_CONTACT_NAME, contact);
                 }
                 catch (AddressException e)
                 {

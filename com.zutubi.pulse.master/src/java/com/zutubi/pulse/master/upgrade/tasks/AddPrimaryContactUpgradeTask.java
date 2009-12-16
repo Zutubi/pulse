@@ -1,0 +1,100 @@
+package com.zutubi.pulse.master.upgrade.tasks;
+
+import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
+
+import java.util.Map;
+
+/**
+ * Upgrade task to set a primary contact point for all users.  In some cases a
+ * dummy point is created to ensure all users have primary contact points.
+ */
+public class AddPrimaryContactUpgradeTask extends AbstractUpgradeTask
+{
+    private static final String PATTERN_ALL_PREFERENCES = "users/*/preferences";
+
+    private static final String PROPERTY_CONTACTS = "contacts";
+    private static final String PROPERTY_NAME = "name";
+    private static final String PROPERTY_PRIMARY = "primary";
+    private static final String PROPERTY_PERMANENT = "permanent";
+
+    private static final String TYPE_EMAIL = "zutubi.emailContactConfig";
+
+    private RecordManager recordManager;
+
+    public boolean haltOnFailure()
+    {
+        return true;
+    }
+
+    public void execute() throws TaskException
+    {
+        Map<String, Record> allPreferences = recordManager.selectAll(PATTERN_ALL_PREFERENCES);
+        for (Map.Entry<String, Record> entry: allPreferences.entrySet())
+        {
+            upgradePreferences(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void upgradePreferences(String path, Record preferencesRecord)
+    {
+        Record contactsRecord = (Record) preferencesRecord.get(PROPERTY_CONTACTS);
+        String contactsPath = PathUtils.getPath(path, PROPERTY_CONTACTS);
+        if (contactsRecord.size() > 0)
+        {
+            String primaryContactName = markPrimaryContact(contactsPath, contactsRecord);
+            markOtherContacts(contactsPath, contactsRecord, primaryContactName);
+        }
+    }
+
+    private String markPrimaryContact(String contactsPath, Record contactsRecord)
+    {
+        Record chosenRecord = choosePrimaryContact(contactsRecord);
+        String chosenName = (String) chosenRecord.get(PROPERTY_NAME);
+
+        MutableRecord mutableRecord = chosenRecord.copy(false, true);
+        mutableRecord.put(PROPERTY_PRIMARY, "true");
+        mutableRecord.putMeta(PROPERTY_PERMANENT, "true");
+        recordManager.update(PathUtils.getPath(contactsPath, chosenName), mutableRecord);
+
+        return chosenName;
+    }
+
+    private Record choosePrimaryContact(Record contactsRecord)
+    {
+        // Prefer an email contact.
+        for (String childKey: contactsRecord.nestedKeySet())
+        {
+            Record contact = (Record) contactsRecord.get(childKey);
+            if (contact.getSymbolicName().equals(TYPE_EMAIL))
+            {
+                return contact;
+            }
+        }
+
+        // Just use the first contact.
+        return (Record) contactsRecord.get(contactsRecord.nestedKeySet().iterator().next());
+    }
+
+    private void markOtherContacts(String contactsPath, Record contactsRecord, String primaryContactName)
+    {
+        for (String childKey: contactsRecord.nestedKeySet())
+        {
+            if (!childKey.equals(primaryContactName))
+            {
+                Record contactRecord = (Record) contactsRecord.get(childKey);
+                MutableRecord mutableRecord = contactRecord.copy(false, true);
+                mutableRecord.put(PROPERTY_PRIMARY, "false");
+                recordManager.update(PathUtils.getPath(contactsPath, childKey), mutableRecord);
+            }
+        }
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
+    }
+}

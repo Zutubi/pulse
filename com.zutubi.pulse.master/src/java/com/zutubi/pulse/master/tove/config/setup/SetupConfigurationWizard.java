@@ -14,6 +14,8 @@ import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfigurationCreator;
+import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.master.tove.wizard.AbstractChainableState;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.WizardTransition;
@@ -21,6 +23,7 @@ import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
@@ -128,6 +131,12 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             adminUser.setName(adminConfig.getName());
             adminUser.setPassword(new Md5PasswordEncoder().encodePassword(adminConfig.getPassword(), null));
             adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
+            if (StringUtils.stringSet(adminConfig.getEmailAddress()))
+            {
+                EmailContactConfiguration emailContact = new EmailContactConfiguration(UserConfigurationCreator.CONTACT_NAME, adminConfig.getEmailAddress());
+                emailContact.setPrimary(true);
+                adminUser.getPreferences().addContact(emailContact);
+            }
             configurationTemplateManager.insert(MasterConfigurationRegistry.USERS_SCOPE, adminUser);
 
             // Special all-users group.

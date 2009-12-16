@@ -305,6 +305,11 @@ public abstract class SeleniumForm
             }
         }
 
+        if (i == names.length)
+        {
+            throw new IllegalArgumentException("Unknown field '" + name + "'");
+        }
+        
         return getActualFieldTypes()[i];
     }
 

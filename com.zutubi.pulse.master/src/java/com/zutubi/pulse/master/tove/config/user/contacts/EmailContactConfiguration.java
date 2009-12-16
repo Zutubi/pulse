@@ -47,6 +47,16 @@ public class EmailContactConfiguration extends ContactConfiguration
 
     private ConfigurationProvider configurationProvider;
 
+    public EmailContactConfiguration()
+    {
+    }
+
+    public EmailContactConfiguration(String name, String address)
+    {
+        setName(name);
+        setAddress(address);
+    }
+
     public String getAddress()
     {
         return address;

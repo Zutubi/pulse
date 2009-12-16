@@ -106,6 +106,7 @@
                 <ref local="addTerminateBuildOnFailure"/>
                 <ref local="addSubversionEnableHttpSpooling"/>
                 <ref local="addLogCompressionEnabled"/>
+                <ref local="addPrimaryContact"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -507,5 +508,9 @@
 
     <bean id="addLogCompressionEnabled" class="com.zutubi.pulse.master.upgrade.tasks.AddLogCompressionEnabledUpgradeTask">
         <property name="buildNumber" value="201010008"/>
+    </bean>
+
+    <bean id="addPrimaryContact" class="com.zutubi.pulse.master.upgrade.tasks.AddPrimaryContactUpgradeTask">
+        <property name="buildNumber" value="201011001"/>
     </bean>
 </beans>

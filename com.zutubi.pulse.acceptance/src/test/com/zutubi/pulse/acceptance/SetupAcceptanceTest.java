@@ -148,7 +148,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         // create admin.
         createAdminForm.waitFor();
-        createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
+        createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin@example.com", "admin", "admin");
     }
 
     private void checkServerSettings()
