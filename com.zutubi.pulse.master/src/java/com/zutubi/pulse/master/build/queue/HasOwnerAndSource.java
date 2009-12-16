@@ -15,6 +15,11 @@ public class HasOwnerAndSource<T extends RequestHolder> implements Predicate<T>
     private Object owner;
     private String source;
 
+    public HasOwnerAndSource(RequestHolder request)
+    {
+        this(request.getOwner(), request.getRequest().getRequestSource());
+    }
+
     public HasOwnerAndSource(Object owner, String source)
     {
         this.owner = owner;

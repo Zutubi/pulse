@@ -9,8 +9,8 @@ import com.zutubi.pulse.master.build.control.BuildControllerFactory;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.ConjunctivePredicate;
+import com.zutubi.util.InvertedPredicate;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -302,14 +302,10 @@ public class BuildQueue
 
         if (activated.getRequest().getOptions().isReplaceable())
         {
-            List<QueuedRequest> assimilationCandidates = CollectionUtils.filter(queuedRequests, new Predicate<QueuedRequest>()
-            {
-                public boolean satisfied(QueuedRequest queued)
-                {
-                    return queued.getRequest().getOwner().equals(activated.getRequest().getOwner()) &&
-                            StringUtils.equals(activated.getRequest().getOptions().getSource(), queued.getRequest().getOptions().getSource());
-                }
-            });
+            // can only assimilate builds that are themselves ready to build - not waiting on a dependency.
+            List<QueuedRequest> assimilationCandidates = CollectionUtils.filter(queuedRequests, new ConjunctivePredicate<QueuedRequest>(
+                        new HasOwnerAndSource<QueuedRequest>(activated),
+                        new InvertedPredicate<QueuedRequest>(new HasPendingDependencyPredicate())));
 
             if (assimilationCandidates.size() > 0)
             {

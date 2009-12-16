@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 
-public class OwnerCompleteQueuePredicateTest extends BaseQueueTestCase
+public class DependencyCompleteQueuePredicateTest extends BaseQueueTestCase
 {
     private DependencyCompleteQueuePredicate predicate;
     private Project ownerA;

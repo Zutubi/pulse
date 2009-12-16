@@ -37,7 +37,7 @@ public abstract class AbstractPersonalBuildTestCase extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
         super.tearDown();
     }
 

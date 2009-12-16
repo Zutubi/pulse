@@ -30,7 +30,7 @@ public class TriggerOptions
 
     /**
      * If true, while queue this build request may be replaced by
-     * another with the same source(has no effect if isolating changelists).
+     * another with the same source.
      */
     private boolean replaceable = false;
 
@@ -63,6 +63,13 @@ public class TriggerOptions
      */
     private boolean rebuild = false;
 
+    /**
+     * Indicates whether or not we can allow this build to jump the queue.  Builds that
+     * can jump the queue allow for optimising the build runtime by jumping past builds
+     * that are waiting on other builds. 
+     */
+    private boolean jumpQueueAllowed = true;
+
     public TriggerOptions(TriggerOptions other)
     {
         this.properties.addAll(other.properties);
@@ -74,6 +81,7 @@ public class TriggerOptions
         this.version = other.version;
         this.resolveVersion = other.resolveVersion;
         this.rebuild = other.rebuild;
+        this.jumpQueueAllowed = other.jumpQueueAllowed;
     }
 
     public TriggerOptions(BuildReason reason, String source)
@@ -175,5 +183,15 @@ public class TriggerOptions
     public void setRebuild(boolean rebuild)
     {
         this.rebuild = rebuild;
+    }
+
+    public boolean isJumpQueueAllowed()
+    {
+        return jumpQueueAllowed;
+    }
+
+    public void setJumpQueueAllowed(boolean b)
+    {
+        this.jumpQueueAllowed = b;
     }
 }

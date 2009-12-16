@@ -241,6 +241,26 @@ public class BuildQueueTest extends BaseQueueTestCase
         verify(buildRequestRegistry, never()).requestAssimilated(requestB, requestA.getId());
     }
 
+    public void testQueuedRequestsWithPendingDependenciesNotAssimilated()
+    {
+        Project projectA = createProject("a");
+        Project projectB = createProject("b");
+
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, new Revision("2"));
+        BuildRequestEvent requestX = createRequest(projectB, "sourceA", true, new Revision("3"));
+
+        BuildController controller = controllers.get(requestA);
+        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+
+        buildQueue.enqueue(active(requestX), active(requestA), queue(requestB, new DependencyCompleteQueuePredicate(buildQueue, projectB)));
+
+        assertActivated(requestX, requestA);
+        assertQueued(requestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated((BuildRequestEvent) anyObject(), anyLong());
+    }
+
     public void testSimultaniousSingleProjectRequestProcessedSerially()
     {
         QueuedRequest r1 = new QueuedRequest(createRequest("a"), new ActivateIfIdlePredicate(buildQueue));

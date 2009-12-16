@@ -92,7 +92,7 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
         {
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                List<ProjectConfiguration> configs = (List<ProjectConfiguration>) invocationOnMock.getArguments()[0];
+                Collection<ProjectConfiguration> configs = (Collection<ProjectConfiguration>) invocationOnMock.getArguments()[0];
                 return CollectionUtils.map(configs, new Mapping<ProjectConfiguration, Project>()
                 {
                     public Project map(ProjectConfiguration projectConfiguration)
@@ -172,6 +172,13 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
     protected BuildRequestEvent createRequest(Project project)
     {
         return createRequest(project, "source", false, new Revision(1234));
+    }
+
+    protected BuildRequestEvent createRequest(Project project, String source, boolean replaceable, boolean jumpQueueAllowed)
+    {
+        BuildRequestEvent request = createRequest(project, source, replaceable, new Revision(1234));
+        request.getOptions().setJumpQueueAllowed(jumpQueueAllowed);
+        return request;
     }
 
     protected BuildRequestEvent createRequest(Project project, String source, boolean replaceable, Revision revision)
@@ -262,7 +269,12 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
 
     protected QueuedRequest queue(BuildRequestEvent request)
     {
-        return new QueuedRequest(request, new QueueThisRequest());
+        return queue(request, new QueueThisRequest());
+    }
+
+    protected QueuedRequest queue(BuildRequestEvent request, QueuedRequestPredicate... predicates)
+    {
+        return new QueuedRequest(request, predicates);
     }
 
     protected QueuedRequest queueRequest(String projectName)
@@ -272,7 +284,12 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
 
     protected QueuedRequest active(BuildRequestEvent request)
     {
-        return new QueuedRequest(request, new ActivateThisRequest());
+        return active(request, new ActivateThisRequest());
+    }
+
+    protected QueuedRequest active(BuildRequestEvent request, QueuedRequestPredicate... predicates)
+    {
+        return new QueuedRequest(request, predicates);
     }
 
     protected QueuedRequest activeRequest(String projectName)

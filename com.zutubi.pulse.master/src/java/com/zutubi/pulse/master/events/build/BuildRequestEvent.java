@@ -200,4 +200,17 @@ public abstract class BuildRequestEvent extends Event implements Comparable
     {
         this.dependentProjects.add(project);
     }
+
+    /**
+     * Returns true if this request is allowed to jump the queue, false
+     * otherwise.
+     *
+     * @return true if this request is allowed to jump the queue.
+     *
+     * @see com.zutubi.pulse.master.model.TriggerOptions#isJumpQueueAllowed()
+     */
+    public boolean canJumpQueue()
+    {
+        return getOptions().isJumpQueueAllowed();
+    }
 }
