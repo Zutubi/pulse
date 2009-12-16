@@ -24,9 +24,6 @@ public class AgentStatusChangeEvent extends AgentEvent
         this.newStatus = newStatus;
     }
 
-
-
-
     /**
      * Gives the status of the agent before the change.
      *

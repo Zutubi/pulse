@@ -1,16 +1,12 @@
 package com.zutubi.pulse.master.agent;
 
-import com.zutubi.events.DefaultEventManager;
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
-import com.zutubi.events.EventManager;
+import com.zutubi.events.*;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
@@ -21,17 +17,19 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.variables.GenericVariable;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
@@ -41,7 +39,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private AgentStatusManager agentStatusManager;
     private AgentPingConfiguration agentPingConfiguration = new AgentPingConfiguration();
     private List<Event> receivedEvents = new LinkedList<Event>();
-    private List<AgentStatusChangeEvent> receivedStatusEvents = new LinkedList<AgentStatusChangeEvent>();
+    private RecordingEventListener statusEventListener;
     private List<Pair<Long, AgentState.EnableState>> enableStates = new LinkedList<Pair<Long, AgentState.EnableState>>();
 
     protected void setUp() throws Exception
@@ -52,18 +50,8 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         // Listen for status events separately: we don't care about the order
         // with respect to connectivity/availability events.
-        eventManager.register(new EventListener()
-        {
-            public void handleEvent(Event event)
-            {
-                receivedStatusEvents.add((AgentStatusChangeEvent) event);
-            }
-
-            public Class[] getHandledEvents()
-            {
-                return new Class[]{AgentStatusChangeEvent.class};
-            }
-        });
+        statusEventListener = new RecordingEventListener(AgentStatusChangeEvent.class);
+        eventManager.register(statusEventListener);
 
         AgentPersistentStatusManager agentPersistentStatusManager = new AgentPersistentStatusManager()
         {
@@ -1251,19 +1239,19 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     private void assertStatusChanges(AgentStatusChangeEvent... expected)
     {
-        assertEquals(asList(expected), receivedStatusEvents);
-        receivedStatusEvents.clear();
+        assertEquals(asList(expected), statusEventListener.getEventsReceived(AgentStatusChangeEvent.class));
+        statusEventListener.reset();
     }
 
     private void assertNoStatusChanges()
     {
-        assertTrue("Expected no status events, got: " + receivedStatusEvents, receivedStatusEvents.isEmpty());
+        assertEquals("Expected no status events, got: " + statusEventListener.getEventsReceived(), 0, statusEventListener.getReceivedCount());
     }
 
     private void clearEvents()
     {
         receivedEvents.clear();
-        receivedStatusEvents.clear();
+        statusEventListener.reset();
     }
 
     private void assertEnableState(Agent agent, AgentState.EnableState state)

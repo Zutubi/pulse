@@ -22,7 +22,8 @@ public interface AgentDailyStatisticsDao extends EntityDao<AgentDailyStatistics>
      * Finds the statistics for the given agent on the given day.
      *
      * @param agentId  id of the agent to get the statistics for
-     * @param dayStamp stamp of the day (millisecond time for midnight that day)
+     * @param dayStamp stamp of the day (millisecond time for midnight that
+     *                 starts the day)
      * @return the statistics for the given agent on the given day
      */
     AgentDailyStatistics findByAgentAndDay(long agentId, long dayStamp);

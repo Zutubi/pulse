@@ -5,7 +5,6 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.agent.statistics.AgentStatisticsManager;
-import com.zutubi.pulse.master.agent.statistics.UpdateStatisticsTask;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.events.AgentAddedEvent;
 import com.zutubi.pulse.master.events.AgentChangedEvent;
@@ -15,15 +14,7 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scheduling.SimpleTrigger;
-import com.zutubi.pulse.master.scheduling.Trigger;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
@@ -31,14 +22,12 @@ import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.ObjectFactory;
@@ -49,6 +38,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+
 /**
  */
 public class DefaultAgentManager implements AgentManager, ExternalStateManager<AgentConfiguration>, com.zutubi.events.EventListener
@@ -56,10 +51,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
 
     private static final int DEFAULT_AGENT_PORT = 8090;
-
-    private static final String STATISTICS_TRIGGER_GROUP = "services";
-    private static final String STATISTICS_TRIGGER_NAME = "statistics";
-    private static final long STATISTICS_TRIGGER_INTERVAL = 5 * Constants.MINUTE;
 
     private ReentrantLock lock = new ReentrantLock();
     private Map<Long, Agent> agents;
@@ -76,7 +67,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private AgentStateDao agentStateDao;
     private ProjectManager projectManager;
     private HostManager hostManager;
-    private Scheduler scheduler;
 
     private LicenseManager licenseManager;
 
@@ -138,21 +128,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         agentStatisticsManager = objectFactory.buildBean(AgentStatisticsManager.class);
         agentStatisticsManager.init();
         eventManager.register(new AsynchronousDelegatingListener(agentStatisticsManager, threadFactory));
-
-        Trigger statisticsTrigger = scheduler.getTrigger(STATISTICS_TRIGGER_GROUP, STATISTICS_TRIGGER_NAME);
-        if (statisticsTrigger == null)
-        {
-            statisticsTrigger = new SimpleTrigger(STATISTICS_TRIGGER_GROUP, STATISTICS_TRIGGER_NAME, STATISTICS_TRIGGER_INTERVAL);
-            statisticsTrigger.setTaskClass(UpdateStatisticsTask.class);
-            try
-            {
-                scheduler.schedule(statisticsTrigger);
-            }
-            catch (SchedulingException e)
-            {
-                LOG.severe(e);
-            }
-        }
     }
 
     private void ensureDefaultAgentsDefined()
@@ -553,10 +528,5 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public void setHostManager(HostManager hostManager)
     {
         this.hostManager = hostManager;
-    }
-
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
     }
 }

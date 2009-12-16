@@ -71,11 +71,11 @@ public class AgentStatisticsAction extends AgentActionBase
     {
         Agent agent = getRequiredAgent();
         statistics = agentManager.getAgentStatistics(agent);
-        usageChart = ChartUtils.renderForWeb(createChart(), 400, 400);
+        usageChart = ChartUtils.renderForWeb(createChart(statistics), 400, 400);
         return SUCCESS;
     }
 
-    private JFreeChart createChart()
+    private JFreeChart createChart(AgentStatistics statistics)
     {
         DefaultPieDataset dataset = new DefaultPieDataset();
         dataset.setValue(I18N.format("disabled"), statistics.getTotalDisabledTime());

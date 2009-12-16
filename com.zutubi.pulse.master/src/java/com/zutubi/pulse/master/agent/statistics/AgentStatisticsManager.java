@@ -8,10 +8,12 @@ import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
-import com.zutubi.util.Clock;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.SystemClock;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.SimpleTrigger;
+import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.util.*;
+import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
@@ -22,6 +24,12 @@ import java.util.*;
  */
 public class AgentStatisticsManager implements EventListener
 {
+    private static final Logger LOG = Logger.getLogger(AgentStatisticsManager.class);
+
+    private static final String TRIGGER_GROUP = "services";
+    private static final String TRIGGER_NAME = "statistics";
+    private static final long TRIGGER_INTERVAL = 5 * Constants.MINUTE;
+
     private Map<Long, StampedStatus> agentIdToStatus = new HashMap<Long, StampedStatus>();
     private long todayStamp;
     private long tomorrowStamp;
@@ -29,12 +37,33 @@ public class AgentStatisticsManager implements EventListener
     private AgentDailyStatisticsDao agentDailyStatisticsDao;
     private AgentManager agentManager;
     private Clock clock = new SystemClock();
+    private Scheduler scheduler;
 
     public synchronized void init()
     {
         calculateStamps(clock.getCurrentTimeMillis());
+        ensureTriggerScheduled();
+
         // We rely on the transition from the initial state to bootstrap us for
         // each agent.
+    }
+
+    private void ensureTriggerScheduled()
+    {
+        Trigger statisticsTrigger = scheduler.getTrigger(TRIGGER_GROUP, TRIGGER_NAME);
+        if (statisticsTrigger == null)
+        {
+            statisticsTrigger = new SimpleTrigger(TRIGGER_GROUP, TRIGGER_NAME, TRIGGER_INTERVAL);
+            statisticsTrigger.setTaskClass(UpdateStatisticsTask.class);
+            try
+            {
+                scheduler.schedule(statisticsTrigger);
+            }
+            catch (SchedulingException e)
+            {
+                LOG.severe(e);
+            }
+        }
     }
 
     public synchronized void update()
@@ -195,6 +224,11 @@ public class AgentStatisticsManager implements EventListener
     public void setClock(Clock clock)
     {
         this.clock = clock;
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
     }
 
     private static class StampedStatus

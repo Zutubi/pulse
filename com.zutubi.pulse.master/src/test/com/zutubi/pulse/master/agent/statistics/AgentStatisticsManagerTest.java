@@ -4,18 +4,20 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
+import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TestClock;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
-import static java.util.Arrays.asList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 public class AgentStatisticsManagerTest extends PulseTestCase
 {
@@ -58,6 +60,7 @@ public class AgentStatisticsManagerTest extends PulseTestCase
         agentStatisticsManager.setClock(clock);
         agentStatisticsManager.setAgentManager(agentManager);
         agentStatisticsManager.setAgentDailyStatisticsDao(agentDailyStatisticsDao);
+        agentStatisticsManager.setScheduler(mock(Scheduler.class));
         agentStatisticsManager.init();
     }
 
