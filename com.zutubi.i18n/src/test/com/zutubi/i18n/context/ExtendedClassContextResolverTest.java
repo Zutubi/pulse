@@ -1,12 +1,9 @@
 package com.zutubi.i18n.context;
 
+import com.zutubi.i18n.types.TestBook;
+import com.zutubi.i18n.types.TestSubClass;
 import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.i18n.mock.MockBook;
-import com.zutubi.i18n.mock.MockSubClass;
 
-/**
- * <class-comment/>
- */
 public class ExtendedClassContextResolverTest extends ZutubiTestCase
 {
     private ExtendedClassContextResolver resolver;
@@ -18,13 +15,6 @@ public class ExtendedClassContextResolverTest extends ZutubiTestCase
         resolver = new ExtendedClassContextResolver();
     }
 
-    protected void tearDown() throws Exception
-    {
-        resolver = null;
-
-        super.tearDown();
-    }
-
     public void testJavaLangObject()
     {
         String[] resolvedBundleNames = resolver.resolve(new ClassContext(Object.class));
@@ -32,21 +22,21 @@ public class ExtendedClassContextResolverTest extends ZutubiTestCase
         assertEquals("java/lang/Object", resolvedBundleNames[0]);
     }
 
-    public void testMockBook()
+    public void testBook()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(MockBook.class));
+        String[] resolvedBundleNames = resolver.resolve(new ClassContext(TestBook.class));
         assertEquals(2, resolvedBundleNames.length);
-        assertEquals("com/zutubi/i18n/mock/MockBook", resolvedBundleNames[0]);
+        assertEquals("com/zutubi/i18n/types/TestBook", resolvedBundleNames[0]);
         assertEquals("java/lang/Object", resolvedBundleNames[1]);
     }
 
-    public void testMockSubClass()
+    public void testSubClass()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(MockSubClass.class));
+        String[] resolvedBundleNames = resolver.resolve(new ClassContext(TestSubClass.class));
         assertEquals(4, resolvedBundleNames.length);
-        assertEquals("com/zutubi/i18n/mock/MockSubClass", resolvedBundleNames[0]);
-        assertEquals("com/zutubi/i18n/mock/MockClass", resolvedBundleNames[1]);
-        assertEquals("com/zutubi/i18n/mock/MockInterface", resolvedBundleNames[2]);
+        assertEquals("com/zutubi/i18n/types/TestSubClass", resolvedBundleNames[0]);
+        assertEquals("com/zutubi/i18n/types/TestClass", resolvedBundleNames[1]);
+        assertEquals("com/zutubi/i18n/types/TestInterface", resolvedBundleNames[2]);
         assertEquals("java/lang/Object", resolvedBundleNames[3]);
     }
 }

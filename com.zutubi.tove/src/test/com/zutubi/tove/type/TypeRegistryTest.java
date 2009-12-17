@@ -19,13 +19,13 @@ public class TypeRegistryTest extends ZutubiTestCase
 
     public void testSimpleObject() throws TypeException
     {
-        CompositeType type = typeRegistry.register(Mock.class);
+        CompositeType type = typeRegistry.register(FakeConfiguration.class);
 
         assertTrue(type.hasProperty("name"));
         assertTrue(type.hasProperty("names"));
-        assertTrue(type.hasProperty("mock"));
-        assertTrue(type.hasProperty("mocks"));
-        assertTrue(type.hasProperty("anotherMock"));
+        assertTrue(type.hasProperty("fake"));
+        assertTrue(type.hasProperty("fakes"));
+        assertTrue(type.hasProperty("anotherFake"));
     }
 
     public void testSimpleInterfaceHolder() throws TypeException
@@ -39,23 +39,23 @@ public class TypeRegistryTest extends ZutubiTestCase
     public void testAnnotations() throws TypeException
     {
         // Note that the registry also gathers meta-annotations.
-        CompositeType type = typeRegistry.register(Mock.class);
+        CompositeType type = typeRegistry.register(FakeConfiguration.class);
         assertEquals(1, type.getAnnotations(false).size());
         TypeProperty propertyType = type.getProperty("name");
         assertEquals(3, propertyType.getAnnotations().size());
-        propertyType = type.getProperty("mock");
+        propertyType = type.getProperty("fake");
         assertEquals(0, propertyType.getAnnotations().size());
-        propertyType = type.getProperty("anotherMock");
+        propertyType = type.getProperty("anotherFake");
         assertEquals(2, propertyType.getAnnotations().size());
     }
 
     public void testPropertyTypes() throws TypeException
     {
-        CompositeType type = typeRegistry.register(Mock.class);
+        CompositeType type = typeRegistry.register(FakeConfiguration.class);
 
         List<String> mapProperties = type.getPropertyNames(MapType.class);
         assertEquals(1, mapProperties.size());
-        assertEquals("mocks", mapProperties.get(0));
+        assertEquals("fakes", mapProperties.get(0));
 
         List<String> listProperties = type.getPropertyNames(ListType.class);
         assertEquals(1, listProperties.size());
@@ -67,8 +67,8 @@ public class TypeRegistryTest extends ZutubiTestCase
 
         List<String> nestedProperties = type.getPropertyNames(CompositeType.class);
         assertEquals(2, nestedProperties.size());
-        assertTrue(nestedProperties.contains("mock"));
-        assertTrue(nestedProperties.contains("anotherMock"));
+        assertTrue(nestedProperties.contains("fake"));
+        assertTrue(nestedProperties.contains("anotherFake"));
     }
 
     public void testRegistration() throws TypeException
@@ -303,19 +303,19 @@ public class TypeRegistryTest extends ZutubiTestCase
         }
     }
 
-    @SymbolicName("mockName")
-    public static class Mock extends AbstractConfiguration
+    @SymbolicName("fakeName")
+    public static class FakeConfiguration extends AbstractConfiguration
     {
         @ID
         private String name;
 
         private List<String> names;
 
-        private Mock mock;
+        private FakeConfiguration fake;
 
-        private Mock anotherMock;
+        private FakeConfiguration anotherFake;
 
-        private Map<String, Mock> mocks;
+        private Map<String, FakeConfiguration> fakes;
 
         public String getName()
         {
@@ -337,35 +337,35 @@ public class TypeRegistryTest extends ZutubiTestCase
             this.names = names;
         }
 
-        public Map<String, Mock> getMocks()
+        public Map<String, FakeConfiguration> getFakes()
         {
-            return mocks;
+            return fakes;
         }
 
-        public void setMocks(Map<String, Mock> mocks)
+        public void setFakes(Map<String, FakeConfiguration> fakes)
         {
-            this.mocks = mocks;
+            this.fakes = fakes;
         }
 
-        public Mock getMock()
+        public FakeConfiguration getFake()
         {
-            return mock;
+            return fake;
         }
 
-        public void setMock(Mock mock)
+        public void setFake(FakeConfiguration fakeConfiguration)
         {
-            this.mock = mock;
+            this.fake = fakeConfiguration;
         }
 
         @Required()
-        public Mock getAnotherMock()
+        public FakeConfiguration getAnotherFake()
         {
-            return anotherMock;
+            return anotherFake;
         }
 
-        public void setAnotherMock(Mock anotherMock)
+        public void setAnotherFake(FakeConfiguration anotherFakeConfiguration)
         {
-            this.anotherMock = anotherMock;
+            this.anotherFake = anotherFakeConfiguration;
         }
     }
 

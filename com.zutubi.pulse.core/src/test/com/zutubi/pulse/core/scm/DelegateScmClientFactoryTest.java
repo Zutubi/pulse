@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
+import com.zutubi.pulse.core.scm.config.TestScmConfiguration;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -20,7 +20,7 @@ public class DelegateScmClientFactoryTest extends ZutubiTestCase
 
         factory = new DelegateScmClientFactory();
         factory.setObjectFactory(new DefaultObjectFactory());
-        factory.register(MockScmConfiguration.class, MockScmClientFactory.class);
+        factory.register(TestScmConfiguration.class, TestScmClientFactory.class);
     }
 
     protected void tearDown() throws Exception
@@ -30,11 +30,11 @@ public class DelegateScmClientFactoryTest extends ZutubiTestCase
 
     public void testCreateClient() throws ScmException
     {
-        ScmClient client = factory.createClient(new MockScmConfiguration());
+        ScmClient client = factory.createClient(new TestScmConfiguration());
         assertNotNull(client);
         try
         {
-            assertTrue(client instanceof MockScmClient);
+            assertTrue(client instanceof TestScmClient);
         }
         finally
         {
@@ -44,11 +44,11 @@ public class DelegateScmClientFactoryTest extends ZutubiTestCase
 
     public void testDataCache() throws ScmException
     {
-        MockScmClient client = (MockScmClient) factory.createClient(new MockScmConfiguration());
+        TestScmClient client = (TestScmClient) factory.createClient(new TestScmConfiguration());
         assertNotNull(client.cache);
         client.cache.put("key", "value");
 
-        MockScmClient anotherClient = (MockScmClient) factory.createClient(new MockScmConfiguration());
+        TestScmClient anotherClient = (TestScmClient) factory.createClient(new TestScmConfiguration());
         assertNotNull(anotherClient.cache);
         assertEquals("value", anotherClient.cache.get("key"));
 

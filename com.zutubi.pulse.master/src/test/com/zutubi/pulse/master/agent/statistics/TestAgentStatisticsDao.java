@@ -2,13 +2,13 @@ package com.zutubi.pulse.master.agent.statistics;
 
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
-import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
+import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
 import com.zutubi.util.Predicate;
 
 import java.util.List;
 import java.util.Set;
 
-public class TestAgentStatisticsDao extends MockEntityDao<AgentDailyStatistics> implements AgentDailyStatisticsDao
+public class TestAgentStatisticsDao extends InMemoryEntityDao<AgentDailyStatistics> implements AgentDailyStatisticsDao
 {
     public List<AgentDailyStatistics> findByAgent(final long agentId)
     {

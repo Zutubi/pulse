@@ -49,7 +49,7 @@ public class DefaultEventManagerTest extends ZutubiTestCase
 
     public void testListenerRegisteredInCallbackDoesNotReceiveEvent()
     {
-        eventManager.register(new MockEventListener(Event.class)
+        eventManager.register(new IgnoringEventListener(Event.class)
         {
             public void handleEvent(Event evt)
             {
@@ -378,11 +378,11 @@ public class DefaultEventManagerTest extends ZutubiTestCase
         }
     }
 
-    private class MockEventListener implements EventListener
+    private class IgnoringEventListener implements EventListener
     {
         private final Class[] handledEvents;
 
-        public MockEventListener(Class... handledEvents)
+        public IgnoringEventListener(Class... handledEvents)
         {
             this.handledEvents = handledEvents;
         }

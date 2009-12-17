@@ -4,14 +4,14 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.Data;
-import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
+import com.zutubi.pulse.master.model.persistence.InMemoryTriggerDao;
 import com.zutubi.pulse.master.scheduling.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValidator;
-import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.config.events.PostSaveEvent;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Constants;
-import com.zutubi.validation.MockValidationContext;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.validation.FakeValidationContext;
 import com.zutubi.validation.ValidationException;
 
 import java.io.File;
@@ -23,7 +23,7 @@ public class BackupManagerTest extends PulseTestCase
 
     private DefaultRestoreManager restoreManager;
 
-    private MockConfigurationProvider configurationProvider;
+    private FakeConfigurationProvider configurationProvider;
 
     private EventManager eventManager;
 
@@ -41,11 +41,11 @@ public class BackupManagerTest extends PulseTestCase
         assertTrue(backupTmpDir.mkdirs());
 
         scheduler = new DefaultScheduler();
-        scheduler.setTriggerDao(new MockTriggerDao());
-        scheduler.setStrategies(new MockSchedulerStrategy());
+        scheduler.setTriggerDao(new InMemoryTriggerDao());
+        scheduler.setStrategies(new TestSchedulerStrategy());
         scheduler.start();
 
-        configurationProvider = new MockConfigurationProvider();
+        configurationProvider = new FakeConfigurationProvider();
         configurationProvider.insert("admin/settings/backup", new BackupConfiguration());
 
         restoreManager = new DefaultRestoreManager();
@@ -88,7 +88,7 @@ public class BackupManagerTest extends PulseTestCase
 
     public void testDefaultCronScheduleIsValid() throws ValidationException
     {
-        MockValidationContext validationContext = new MockValidationContext();
+        FakeValidationContext validationContext = new FakeValidationContext();
         CronExpressionValidator v = new CronExpressionValidator();
         v.setValidationContext(validationContext);
         v.validateStringField(BackupManager.DEFAULT.getCronSchedule());

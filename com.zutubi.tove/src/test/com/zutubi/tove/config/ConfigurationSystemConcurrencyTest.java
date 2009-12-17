@@ -27,7 +27,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
     {
         super.setUp();
 
-        CompositeType typeA = typeRegistry.register(MockA.class);
+        CompositeType typeA = typeRegistry.register(ConfigA.class);
         MapType mapA = new MapType(typeA, typeRegistry);
         configurationPersistenceManager.register(NORMAL_SCOPE, mapA);
     }
@@ -58,7 +58,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
         group.join();
     }
 
-    public static class VerifyingListener extends TypeListener<MockA>
+    public static class VerifyingListener extends TypeListener<ConfigA>
     {
         private Set<Long> existing = new HashSet<Long>();
         private Set<Long> postExisting = new HashSet<Long>();
@@ -66,10 +66,10 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
 
         public VerifyingListener()
         {
-            super(MockA.class);
+            super(ConfigA.class);
         }
 
-        public void insert(MockA instance)
+        public void insert(ConfigA instance)
         {
             if(!existing.add(instance.getHandle()))
             {
@@ -77,7 +77,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
             }
         }
 
-        public void postInsert(MockA instance)
+        public void postInsert(ConfigA instance)
         {
             if(!existing.contains(instance.getHandle()))
             {
@@ -90,7 +90,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
             }
         }
 
-        public void delete(MockA instance)
+        public void delete(ConfigA instance)
         {
             if(!existing.remove(instance.getHandle()))
             {
@@ -98,7 +98,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
             }
         }
 
-        public void postDelete(MockA instance)
+        public void postDelete(ConfigA instance)
         {
             if(postExisting.contains(instance.getHandle()))
             {
@@ -111,7 +111,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
             }
         }
 
-        public void save(MockA instance, boolean nested)
+        public void save(ConfigA instance, boolean nested)
         {
             if(!existing.contains(instance.getHandle()))
             {
@@ -119,7 +119,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
             }
         }
 
-        public void postSave(MockA instance, boolean nested)
+        public void postSave(ConfigA instance, boolean nested)
         {
             if(!postExisting.contains(instance.getHandle()))
             {
@@ -141,14 +141,14 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
         }
     }
 
-    @SymbolicName("MockA")
-    public static class MockA extends AbstractNamedConfiguration
+    @SymbolicName("ConfigA")
+    public static class ConfigA extends AbstractNamedConfiguration
     {
-        public MockA()
+        public ConfigA()
         {
         }
 
-        public MockA(String name)
+        public ConfigA(String name)
         {
             super(name);
         }
@@ -263,8 +263,8 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
     {
         public void doWorkUnit()
         {
-            Collection<MockA> instances = configurationTemplateManager.getAllInstances(MockA.class, false);
-            for (MockA a : instances)
+            Collection<ConfigA> instances = configurationTemplateManager.getAllInstances(ConfigA.class, false);
+            for (ConfigA a : instances)
             {
                 assertNotNull(a);
             }
@@ -275,7 +275,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
     {
         public void doWorkUnit()
         {
-            MockA a = new MockA(RandomUtils.randomString(20));
+            ConfigA a = new ConfigA(RandomUtils.randomString(20));
             configurationTemplateManager.insert(NORMAL_SCOPE, a);
         }
     }

@@ -1,9 +1,9 @@
 package com.zutubi.validation.validators;
 
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.DelegatingValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.InMemoryTextProvider;
-import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
@@ -108,7 +108,7 @@ public class FieldValidatorSupportTest extends ZutubiTestCase
 
     private void validateAndAssertMessage(FieldValidatorSupport support, String message) throws ValidationException
     {
-        support.validate(new Mock());
+        support.validate(new Fake());
         List<String> errors = validationContext.getFieldErrors(support.getFieldName());
         assertEquals(1, errors.size());
         assertEquals(message, errors.get(0));
@@ -131,7 +131,7 @@ public class FieldValidatorSupportTest extends ZutubiTestCase
         }
     }
 
-    public static class Mock
+    public static class Fake
     {
         private String field;
 

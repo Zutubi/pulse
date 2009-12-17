@@ -9,8 +9,6 @@ import com.zutubi.util.junit.ZutubiTestCase;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- */
 public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
 {
     private ObjectFactory objectFactory;
@@ -47,13 +45,13 @@ public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
 
     private List<RecordCleanupTask> getTasks(Class cleanupTasksClass) throws Exception
     {
-        ConfigurationCleanupTaskFinder finder = new ConfigurationCleanupTaskFinder(MockConfiguration.class, cleanupTasksClass, objectFactory);
-        return finder.getCleanupTasks(new MockConfiguration(getName()));
+        ConfigurationCleanupTaskFinder finder = new ConfigurationCleanupTaskFinder(TrivialConfiguration.class, cleanupTasksClass, objectFactory);
+        return finder.getCleanupTasks(new TrivialConfiguration(getName()));
     }
 
-    public static class MockConfiguration extends AbstractConfiguration
+    public static class TrivialConfiguration extends AbstractConfiguration
     {
-        public MockConfiguration(String path)
+        public TrivialConfiguration(String path)
         {
             setConfigurationPath(path);
         }
@@ -71,7 +69,7 @@ public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
             return null;
         }
 
-        public List<RecordCleanupTask> getTasks(MockConfiguration config, String s)
+        public List<RecordCleanupTask> getTasks(TrivialConfiguration config, String s)
         {
             return null;
         }
@@ -81,21 +79,21 @@ public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
     {
         public List<RecordCleanupTask> getTasks()
         {
-            return Arrays.<RecordCleanupTask>asList(new MockCleanupTask("no arg"));
+            return Arrays.<RecordCleanupTask>asList(new NoopCleanupTask("no arg"));
         }
     }
 
     public static class ArgCleanupTasksMethod
     {
-        public List<RecordCleanupTask> getTasks(MockConfiguration c)
+        public List<RecordCleanupTask> getTasks(TrivialConfiguration c)
         {
-            return Arrays.<RecordCleanupTask>asList(new MockCleanupTask(c.getConfigurationPath()));
+            return Arrays.<RecordCleanupTask>asList(new NoopCleanupTask(c.getConfigurationPath()));
         }
     }
 
-    public static class MockCleanupTask extends RecordCleanupTaskSupport
+    public static class NoopCleanupTask extends RecordCleanupTaskSupport
     {
-        public MockCleanupTask(String path)
+        public NoopCleanupTask(String path)
         {
             super(path);
         }

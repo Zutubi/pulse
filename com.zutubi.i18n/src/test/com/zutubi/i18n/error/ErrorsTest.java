@@ -1,8 +1,8 @@
 package com.zutubi.i18n.error;
 
+import com.zutubi.i18n.types.TestErrors;
+import com.zutubi.i18n.types.TestInvalidErrors;
 import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.i18n.mock.MockErrors;
-import com.zutubi.i18n.mock.MockInvalidErrors;
 
 /**
  * <class-comment/>
@@ -21,11 +21,11 @@ public class ErrorsTest extends ZutubiTestCase
 
     public void testValidErrorCodes()
     {
-        assertTrue(Errors.validateErrorCodes(MockErrors.class));
+        assertTrue(Errors.validateErrorCodes(TestErrors.class));
     }
 
     public void testInvalidErrorCodes()
     {
-        assertFalse(Errors.validateErrorCodes(MockInvalidErrors.class));
+        assertFalse(Errors.validateErrorCodes(TestInvalidErrors.class));
     }
 }

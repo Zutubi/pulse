@@ -106,7 +106,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInstanceInserted()
     {
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
         configurationTemplateManager.insert("sample", new A("a"));
         listener.assertInsert("sample/a");
         listener.assertPostInsert("sample/a");
@@ -116,7 +116,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testInstanceChanged()
     {
         String path = configurationTemplateManager.insert("sample", new A("a"));
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
 
         A clone = configurationTemplateManager.getCloneOfInstance(path, A.class);
         clone.setThing("edited");
@@ -129,7 +129,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testInstanceDeleted()
     {
         configurationTemplateManager.insert("sample", new A("a"));
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
         configurationTemplateManager.delete("sample/a");
         listener.assertDelete("sample/a");
         listener.assertPostDelete("sample/a");
@@ -139,7 +139,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testNestedInsertTriggersSave()
     {
         configurationTemplateManager.insert("sample", new A("a"));
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
         configurationTemplateManager.insert("sample/a/b", new B("b"));
         listener.assertSave("sample/a", true);
         listener.assertPostSave("sample/a", true);
@@ -150,7 +150,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     {
         configurationTemplateManager.insert("sample", new A("a"));
         String bPath = configurationTemplateManager.insert("sample/a/b", new B("b"));
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
         B clone = configurationTemplateManager.getCloneOfInstance(bPath, B.class);
         clone.setName("edited");
         configurationTemplateManager.save(clone);
@@ -163,7 +163,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     {
         configurationTemplateManager.insert("sample", new A("a"));
         configurationTemplateManager.insert("sample/a/b", new B("b"));
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
         configurationTemplateManager.delete("sample/a/b");
         listener.assertSave("sample/a", true);
         listener.assertPostSave("sample/a", true);
@@ -172,8 +172,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, true);
         la.assertDone();
         lb.assertDone();
@@ -182,8 +182,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testInsertTemplateAInheritingB()
     {
         insertB("nesty", "template/globalt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, true);
         la.assertDone();
         lb.assertDone();
@@ -191,8 +191,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertConcreteA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, false);
         la.assertInsert("template/test");
         la.assertPostInsert("template/test");
@@ -203,8 +203,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testInsertConcreteAInheritingB()
     {
         insertB("nesty", "template/globalt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, false);
         la.assertInsert("template/test");
         la.assertPostInsert("template/test");
@@ -217,8 +217,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testInsertConcreteAInheritingBFromCollection()
     {
         insertB("nesty", "template/globalt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, false);
         la.assertInsert("template/test");
         la.assertPostInsert("template/test");
@@ -230,8 +230,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertBIntoLeaf()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertB("test", "template/child/b");
         la.assertSave("template/child", true);
         la.assertPostSave("template/child", true);
@@ -243,8 +243,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertBIntoLeafCollection()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertB("test", "template/child/bees");
         la.assertSave("template/child", true);
         la.assertPostSave("template/child", true);
@@ -256,8 +256,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertBIntoIntermediate()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertB("test", "template/childt/b");
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -269,8 +269,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertBIntoIntermediateCollection()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertB("test", "template/childt/bees");
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -282,8 +282,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     
     public void testInsertBIntoRoot()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertB("test", "template/globalt/b");
         la.assertSave("template/grandchild", true);
         la.assertSave("template/child", true);
@@ -299,8 +299,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInsertBIntoRootCollection()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         insertB("test", "template/globalt/bees");
         la.assertSave("template/grandchild", true);
         la.assertSave("template/child", true);
@@ -316,8 +316,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testSaveConcreteA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child", createEditedA("child"));
         la.assertSave("template/child", false);
         la.assertPostSave("template/child", false);
@@ -327,8 +327,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testRenameConcreteA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child", createA("newname"));
         la.assertSave("template/newname", false);
         la.assertPostSave("template/newname", false);
@@ -338,8 +338,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testSaveLeafTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/grandchildt", createA("grandchildt"));
         la.assertDone();
         lb.assertDone();
@@ -347,8 +347,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testRenameLeafTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/grandchildt", createA("newname"));
         la.assertDone();
         lb.assertDone();
@@ -356,8 +356,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testSaveIntermediateTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt", createEditedA("childt"));
         la.assertSave("template/grandchild", false);
         la.assertPostSave("template/grandchild", false);
@@ -367,8 +367,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testRenameIntermediateTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt", createA("newname"));
         la.assertSave("template/grandchild", false);
         la.assertPostSave("template/grandchild", false);
@@ -378,8 +378,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testSaveRootTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt", createEditedA("globalt"));
         la.assertSave("template/grandchild", false);
         la.assertPostSave("template/grandchild", false);
@@ -391,8 +391,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testRenameRootTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt", createA("newname"));
         la.assertSave("template/grandchild", false);
         la.assertPostSave("template/grandchild", false);
@@ -405,8 +405,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInLeaf()
     {
         insertB("test", "template/child/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child/b", createEditedB("test"));
         la.assertSave("template/child", true);
         la.assertPostSave("template/child", true);
@@ -419,8 +419,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInLeafCollection()
     {
         insertB("test", "template/child/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child/bees/test", createEditedB("test"));
         la.assertSave("template/child", true);
         la.assertPostSave("template/child", true);
@@ -433,8 +433,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testRenameBInLeafCollection()
     {
         insertB("test", "template/child/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child/bees/test", createEditedB("newname"));
         la.assertSave("template/child", true);
         la.assertPostSave("template/child", true);
@@ -447,8 +447,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInIntermediate()
     {
         insertB("test", "template/childt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/b", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -461,8 +461,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInIntermediateCollection()
     {
         insertB("test", "template/childt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/bees/test", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -475,8 +475,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testRenameBInIntermediateCollection()
     {
         insertB("test", "template/childt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/bees/test", createB("newname"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -489,8 +489,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInRoot()
     {
         insertB("test", "template/globalt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt/b", createEditedB("test"));
         la.assertSave("template/grandchild",  true);
         la.assertSave("template/child", true);
@@ -507,8 +507,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInRootCollection()
     {
         insertB("test", "template/globalt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt/bees/test", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertSave("template/child", true);
@@ -525,8 +525,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testRenameBInRootCollection()
     {
         insertB("test", "template/globalt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt/bees/test", createEditedB("newname"));
         la.assertSave("template/grandchild", true);
         la.assertSave("template/child", true);
@@ -542,8 +542,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testDeleteConcreteA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/child");
         la.assertDelete("template/child");
         la.assertPostDelete("template/child");
@@ -554,8 +554,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteConcreteAIncludingB()
     {
         insertB("test", "template/child/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/child");
         la.assertDelete("template/child");
         la.assertPostDelete("template/child");
@@ -568,8 +568,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteConcreteAIncludingBInCollection()
     {
         insertB("test", "template/child/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/child");
         la.assertDelete("template/child");
         la.assertPostDelete("template/child");
@@ -581,8 +581,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testDeleteTemplateA()
     {
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchildt");
         la.assertDone();
         lb.assertDone();
@@ -591,8 +591,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteTemplateAIncludingB()
     {
         insertB("test", "template/grandchildt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchildt");
         la.assertDone();
         lb.assertDone();
@@ -601,8 +601,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteTemplateAIncludingBInCollection()
     {
         insertB("test", "template/grandchildt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchildt");
         la.assertDone();
         lb.assertDone();
@@ -611,8 +611,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteBFromLeaf()
     {
         insertB("test", "template/grandchild/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchild/b");
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -625,8 +625,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteBFromLeafCollection()
     {
         insertB("test", "template/grandchild/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchild/bees/test");
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -639,8 +639,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteBFromIntermediate()
     {
         insertB("test", "template/childt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/childt/b");
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -653,8 +653,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteBFromIntermediateCollection()
     {
         insertB("test", "template/childt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/childt/bees/test");
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -667,8 +667,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteBFromRoot()
     {
         insertB("test", "template/globalt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/globalt/b");
         la.assertSave("template/grandchild", true);
         la.assertSave("template/child", true);
@@ -685,8 +685,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testDeleteBFromRootCollection()
     {
         insertB("test", "template/globalt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/globalt/bees/test");
         la.assertSave("template/grandchild", true);
         la.assertSave("template/child", true);
@@ -703,8 +703,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInLeafOverridingIntermediate()
     {
         insertB("test", "template/childt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/grandchild/b", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -717,8 +717,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInLeafCollectionOverridingIntermediate()
     {
         insertB("test", "template/childt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/grandchild/bees/test", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -731,8 +731,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInIntermediateOverridingRoot()
     {
         insertB("test", "template/globalt/b");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/b", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -745,8 +745,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testSaveBInIntermediateCollectionOverridingRoot()
     {
         insertB("test", "template/globalt/bees");
-        MockTypeListener<A> la = register(A.class);
-        MockTypeListener<B> lb = register(B.class);
+        RecordingTypeListener<A> la = register(A.class);
+        RecordingTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/bees/test", createEditedB("test"));
         la.assertSave("template/grandchild", true);
         la.assertPostSave("template/grandchild", true);
@@ -799,7 +799,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         A a = new A("a");
         a.setB(new B("b"));
         String path = configurationTemplateManager.insert("sample", a);
-        MockTypeListener<A> listener = register(A.class);
+        RecordingTypeListener<A> listener = register(A.class);
         TypeListener<A> changingListener = new TypeAdapter<A>(A.class)
         {
             public void save(A instance, boolean nested)
@@ -830,14 +830,14 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         assertEquals(id, c.getId());
     }
 
-    private <T extends Configuration> MockTypeListener<T> register(Class<T> clazz)
+    private <T extends Configuration> RecordingTypeListener<T> register(Class<T> clazz)
     {
-        MockTypeListener<T> listener = new MockTypeListener<T>(clazz);
+        RecordingTypeListener<T> listener = new RecordingTypeListener<T>(clazz);
         listener.register(configurationProvider, true);
         return listener;
     }
 
-    private static class MockTypeListener<X extends Configuration> extends TypeListener<X>
+    private static class RecordingTypeListener<X extends Configuration> extends TypeListener<X>
     {
         private static class Event
         {
@@ -903,7 +903,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
         private List<Event> got = new LinkedList<Event>();
 
-        public MockTypeListener(Class<X> configurationClass)
+        public RecordingTypeListener(Class<X> configurationClass)
         {
             super(configurationClass);
         }
@@ -984,7 +984,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         }
     }
 
-    private static class IDAssigningListener<X extends EyeDee> extends MockTypeListener<X>
+    private static class IDAssigningListener<X extends EyeDee> extends RecordingTypeListener<X>
     {
         private long nextId = 1;
 

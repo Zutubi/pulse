@@ -5,7 +5,6 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.*;
@@ -27,7 +26,7 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.util.Constants;
@@ -39,13 +38,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+
 public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
     private ThreadedRecipeQueue queue;
     private Semaphore buildSemaphore;
     private Semaphore errorSemaphore;
     private Semaphore dispatchedSemaphore;
-    private MockAgentManager agentManager;
+    private FakeAgentManager agentManager;
     private Agent slave1000;
     private List<RecipeErrorEvent> recipeErrors;
     private DefaultEventManager eventManager;
@@ -72,9 +73,9 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         recipeDispatchService.setThreadFactory(new PulseThreadFactory());
         recipeDispatchService.init();
 
-        agentManager = new MockAgentManager();
+        agentManager = new FakeAgentManager();
 
-        MockConfigurationProvider configurationProvider = new MockConfigurationProvider();
+        FakeConfigurationProvider configurationProvider = new FakeConfigurationProvider();
         configurationProvider.insert("test", new GlobalConfiguration());
 
         queue = new ThreadedRecipeQueue();
@@ -375,7 +376,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     public void testAgentErrorOnBuild() throws Exception
     {
         Agent agent = createAvailableAgent(0);
-        MockAgentService service = (MockAgentService) agent.getService();
+        FakeAgentService service = (FakeAgentService) agent.getService();
 
         service.setThrowError(true);
         queue.enqueue(createAssignmentRequest(0));
@@ -637,7 +638,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         AgentConfiguration agentConfig = createAgentConfig(id);
         AgentState agentState = new AgentState();
         agentState.setId(id);
-        DefaultAgent agent = new DefaultAgent(agentConfig, agentState, new MockAgentService(type), new DefaultHost(new HostState()));
+        DefaultAgent agent = new DefaultAgent(agentConfig, agentState, new FakeAgentService(type), new DefaultHost(new HostState()));
         agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.IDLE, 0, false, null));
         agentManager.addAgent(agent);
         agentManager.online(agent);
@@ -657,7 +658,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         Project project = new Project();
         project.setConfig(projectConfig);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
-        AgentRequirements requirements = new MockAgentRequirements(type);
+        AgentRequirements requirements = new TypeMatchingAgentRequirements(type);
         PulseExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, "project");
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
@@ -702,7 +703,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         return new Class[]{RecipeErrorEvent.class, RecipeAssignedEvent.class};
     }
 
-    class MockAgentManager implements AgentManager
+    class FakeAgentManager implements AgentManager
     {
         private Map<Long, Agent> agents = new TreeMap<Long, Agent>();
         private List<Agent> onlineAgents = new LinkedList<Agent>();
@@ -809,13 +810,13 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         }
     }
 
-    class MockAgentService implements AgentService
+    class FakeAgentService implements AgentService
     {
         private long type;
         private boolean acceptBuild = true;
         private boolean throwError = false;
 
-        public MockAgentService(long type)
+        public FakeAgentService(long type)
         {
             this.type = type;
         }
@@ -871,24 +872,24 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         }
     }
 
-    class MockAgentRequirements implements AgentRequirements
+    class TypeMatchingAgentRequirements implements AgentRequirements
     {
         private long type;
 
-        public MockAgentRequirements(long type)
+        public TypeMatchingAgentRequirements(long type)
         {
             this.type = type;
         }
 
         public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
         {
-            return (((MockAgentService) service).getType() == type) &&
+            return (((FakeAgentService) service).getType() == type) &&
                     Long.valueOf(request.getRevision().getRevision().getRevisionString()) >= 0;
         }
 
         public String getSummary()
         {
-            return "mock";
+            return "type matching";
         }
     }
 

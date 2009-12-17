@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -8,10 +9,8 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
-/**
- *
- *
- */
+import static org.mockito.Mockito.mock;
+
 public class FormDescriptorFactoryTest extends ZutubiTestCase
 {
     private TypeRegistry typeRegistry;
@@ -23,20 +22,13 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
 
         typeRegistry = new TypeRegistry();
         descriptorFactory = new FormDescriptorFactory();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        typeRegistry = null;
-        descriptorFactory = null;
-
-        super.tearDown();
+        descriptorFactory.setConfigurationValidatorProvider(mock(ConfigurationValidatorProvider.class));
     }
 
     public void testPasswordField() throws TypeException
     {
-        typeRegistry.register(MockPassword.class);
-        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "basename", typeRegistry.getType(MockPassword.class), true, "form");
+        typeRegistry.register(PasswordConfig.class);
+        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "basename", typeRegistry.getType(PasswordConfig.class), true, "form");
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
@@ -45,16 +37,16 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
 
     public void testTextField() throws TypeException
     {
-        typeRegistry.register(MockText.class);
-        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "basename", typeRegistry.getType(MockText.class), true, "form");
+        typeRegistry.register(TextConfig.class);
+        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "basename", typeRegistry.getType(TextConfig.class), true, "form");
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
         assertEquals("text", fieldDescriptors.get(0).getType());
     }
 
-    @SymbolicName("mockText")
-    public static class MockText extends AbstractConfiguration
+    @SymbolicName("text")
+    public static class TextConfig extends AbstractConfiguration
     {
         private String text;
 
@@ -69,8 +61,8 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
         }
     }
 
-    @SymbolicName("mockPassword")
-    public static class MockPassword extends AbstractConfiguration
+    @SymbolicName("password")
+    public static class PasswordConfig extends AbstractConfiguration
     {
         private String password;
 
@@ -82,21 +74,6 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
         public void setPassword(String password)
         {
             this.password = password;
-        }
-    }
-
-    public static class MockWithReadOnlyField extends AbstractConfiguration
-    {
-        private String field;
-
-        public String getField()
-        {
-            return field;
-        }
-
-        public void setField(String field)
-        {
-            this.field = field;
         }
     }
 }

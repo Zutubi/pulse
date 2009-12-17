@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.validation;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.validation.MockValidationContext;
+import com.zutubi.validation.FakeValidationContext;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 
@@ -26,14 +26,14 @@ public abstract class AbstractValidationTestCase extends AbstractConfigurationSy
 
     protected void validateAndAssertValid(Configuration instance) throws ValidationException
     {
-        ValidationContext context = new MockValidationContext();
+        ValidationContext context = new FakeValidationContext();
         validationManager.validate(instance, context);
         assertFalse(context.hasErrors());
     }
 
     protected void validateAndAssertFieldErrors(Configuration instance, String field, String... expectedErrors) throws ValidationException
     {
-        ValidationContext context = new MockValidationContext();
+        ValidationContext context = new FakeValidationContext();
         validationManager.validate(instance, context);
         assertTrue(context.hasErrors());
         assertErrors(context.getFieldErrors(field), expectedErrors);
@@ -41,7 +41,7 @@ public abstract class AbstractValidationTestCase extends AbstractConfigurationSy
 
     protected void validateAndAssertInstanceErrors(Configuration instance, String... expectedErrors) throws ValidationException
     {
-        ValidationContext context = new MockValidationContext();
+        ValidationContext context = new FakeValidationContext();
         validationManager.validate(instance, context);
         assertTrue(context.hasErrors());
         assertErrors(CollectionUtils.asList(context.getActionErrors()), expectedErrors);

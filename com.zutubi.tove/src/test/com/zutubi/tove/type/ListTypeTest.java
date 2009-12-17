@@ -24,7 +24,7 @@ public class ListTypeTest extends TypeTestCase
     {
         super.setUp();
 
-        mockAType = typeRegistry.register(MockA.class);
+        mockAType = typeRegistry.register(ConfigA.class);
 
         listType = new ListType(recordManager, mockAType, typeRegistry);
 
@@ -43,27 +43,27 @@ public class ListTypeTest extends TypeTestCase
     public void testCompositeObjectList() throws TypeException
     {
         List<Object> list = new LinkedList<Object>();
-        list.add(new MockA("valueA"));
-        list.add(new MockA("valueB"));
+        list.add(new ConfigA("valueA"));
+        list.add(new ConfigA("valueB"));
 
         Record record = (Record) listType.unstantiate(list, null);
 
         SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         List newList = (List) instantiator.instantiate(listType, record);
         assertEquals(2, newList.size());
-        assertTrue(newList.get(0) instanceof MockA);
+        assertTrue(newList.get(0) instanceof ConfigA);
     }
 
     public void testGetItemKeyNoPath() throws TypeException
     {
         long lastHandle = recordManager.allocateHandle();
-        MutableRecord record = mockAType.unstantiate(new MockA("valueA"), null);
+        MutableRecord record = mockAType.unstantiate(new ConfigA("valueA"), null);
         assertEquals(Long.toString(lastHandle + 1), listType.getItemKey(null, record));
     }
 
     public void testGetItemKeyPath() throws TypeException
     {
-        MutableRecord record = mockAType.unstantiate(new MockA("valueA"), null);
+        MutableRecord record = mockAType.unstantiate(new ConfigA("valueA"), null);
         assertEquals("123", listType.getItemKey("any/123", record));
     }
 
@@ -83,9 +83,9 @@ public class ListTypeTest extends TypeTestCase
 
     public void testToXmlRpcRecord() throws TypeException
     {
-        List<MockA> l = new LinkedList<MockA>();
-        l.add(new MockA("one"));
-        l.add(new MockA("two"));
+        List<ConfigA> l = new LinkedList<ConfigA>();
+        l.add(new ConfigA("one"));
+        l.add(new ConfigA("two"));
         Record r = (Record) listType.unstantiate(l, null);
 
         Object rpcForm = listType.toXmlRpc(null, r);
@@ -121,7 +121,7 @@ public class ListTypeTest extends TypeTestCase
     public void testFromXmlRpc() throws TypeException
     {
         Hashtable<String, Object> entry = new Hashtable<String, Object>();
-        entry.put("meta.symbolicName", "mockA");
+        entry.put("meta.symbolicName", "configA");
         entry.put("a", "avalue");
 
         Vector<Hashtable<String, Object>> rpcForm = new Vector<Hashtable<String, Object>>();
@@ -134,7 +134,7 @@ public class ListTypeTest extends TypeTestCase
         o = record.values().iterator().next();
         assertTrue(o instanceof Record);
         record = (Record) o;
-        assertEquals("mockA", record.getSymbolicName());
+        assertEquals("configA", record.getSymbolicName());
         assertEquals(1, record.size());
         assertEquals("avalue", record.get("a"));
     }
@@ -229,35 +229,35 @@ public class ListTypeTest extends TypeTestCase
 
     public void testIsValid()
     {
-        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
-        list.add(new MockA("a"));
+        ConfigurationList<ConfigA> list = new ConfigurationList<ConfigA>();
+        list.add(new ConfigA("a"));
         assertTrue(listType.isValid(list));
     }
 
     public void testIsValidDirectlyInvalid()
     {
-        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
-        list.add(new MockA("a"));
+        ConfigurationList<ConfigA> list = new ConfigurationList<ConfigA>();
+        list.add(new ConfigA("a"));
         list.addInstanceError("error");
         assertFalse(listType.isValid(list));
     }
 
     public void testIsValidElementInvalid()
     {
-        MockA element = new MockA("a");
+        ConfigA element = new ConfigA("a");
         element.addInstanceError("error");
-        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
+        ConfigurationList<ConfigA> list = new ConfigurationList<ConfigA>();
         list.add(element);
         assertFalse(listType.isValid(list));
     }
 
     public void testIsValidElementIndirectlyInvalid()
     {
-        MockB nested = new MockB();
+        ConfigB nested = new ConfigB();
         nested.addInstanceError("error");
-        MockA element = new MockA("a");
-        element.setMockB(nested);
-        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
+        ConfigA element = new ConfigA("a");
+        element.setConfigB(nested);
+        ConfigurationList<ConfigA> list = new ConfigurationList<ConfigA>();
         list.add(element);
         assertFalse(listType.isValid(list));
     }
@@ -277,18 +277,18 @@ public class ListTypeTest extends TypeTestCase
         assertFalse(simpleListType.isValid(list));
     }
     
-    @SymbolicName("mockA")
-    public static class MockA extends AbstractConfiguration
+    @SymbolicName("configA")
+    public static class ConfigA extends AbstractConfiguration
     {
         @ID
         private String a;
-        private MockB mockB;
+        private ConfigB configB;
 
-        public MockA()
+        public ConfigA()
         {
         }
 
-        public MockA(String a)
+        public ConfigA(String a)
         {
             this.a = a;
         }
@@ -303,19 +303,19 @@ public class ListTypeTest extends TypeTestCase
             this.a = a;
         }
 
-        public MockB getMockB()
+        public ConfigB getConfigB()
         {
-            return mockB;
+            return configB;
         }
 
-        public void setMockB(MockB mockB)
+        public void setConfigB(ConfigB configB)
         {
-            this.mockB = mockB;
+            this.configB = configB;
         }
     }
 
-    @SymbolicName("mockB")
-    public static class MockB extends AbstractConfiguration
+    @SymbolicName("configB")
+    public static class ConfigB extends AbstractConfiguration
     {
     }
 }

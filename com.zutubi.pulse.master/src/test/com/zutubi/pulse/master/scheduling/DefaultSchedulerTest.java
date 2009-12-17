@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.scheduling;
 
+import com.zutubi.pulse.master.model.persistence.InMemoryTriggerDao;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
-import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 public class DefaultSchedulerTest extends ZutubiTestCase
@@ -23,7 +23,7 @@ public class DefaultSchedulerTest extends ZutubiTestCase
         scheduler = new DefaultScheduler();
         triggerHandler = new TestTriggerHandler();
         scheduler.setTriggerHandler(triggerHandler);
-        triggerDao = new MockTriggerDao();
+        triggerDao = new InMemoryTriggerDao();
         scheduler.setTriggerDao(triggerDao);
 
         scheduler.register(new NoopSchedulerStrategy());

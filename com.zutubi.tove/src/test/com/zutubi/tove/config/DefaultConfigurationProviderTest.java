@@ -12,12 +12,13 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
+
+import static java.util.Arrays.asList;
 
 public class DefaultConfigurationProviderTest extends AbstractConfigurationSystemTestCase
 {
@@ -59,7 +60,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     public void testRegisterListenerByClass()
     {
         // check that we receive the save events.
-        MockConfigurationEventListener listener = new MockConfigurationEventListener();
+        RecordingConfigurationEventListener listener = new RecordingConfigurationEventListener();
         provider.registerEventListener(listener, true, A.class);
 
         A a = new A("a");
@@ -88,10 +89,10 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     public void testRegisterListenerByPath()
     {
         // check that we receive the save events.
-        MockConfigurationEventListener includingChildren = new MockConfigurationEventListener();
+        RecordingConfigurationEventListener includingChildren = new RecordingConfigurationEventListener();
         provider.registerEventListener(includingChildren, true, true, SCOPE_SAMPLE);
 
-        MockConfigurationEventListener excludingChildren = new MockConfigurationEventListener();
+        RecordingConfigurationEventListener excludingChildren = new RecordingConfigurationEventListener();
         provider.registerEventListener(excludingChildren, true, false, SCOPE_SAMPLE);
 
         A a = new A("a");
@@ -142,7 +143,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     public void testNotificationsForNestedClassWhenAncestorIsModified()
     {
         // check that we receive the save events.
-        MockConfigurationEventListener listener = new MockConfigurationEventListener();
+        RecordingConfigurationEventListener listener = new RecordingConfigurationEventListener();
         provider.registerEventListener(listener, true, false, B.class);
 
         A a = new A("a");

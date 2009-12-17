@@ -2,17 +2,15 @@ package com.zutubi.pulse.servercore.jetty;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import org.mortbay.http.HttpHandler;
-import org.mortbay.http.HttpResponse;
 import org.mortbay.http.HttpRequest;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import org.mortbay.http.HttpResponse;
 
 import javax.servlet.*;
 import java.io.IOException;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.*;
 
 public class FilteringHandlerTest extends PulseTestCase
 {
@@ -44,7 +42,7 @@ public class FilteringHandlerTest extends PulseTestCase
     public void testOneFilter() throws IOException, ServletException
     {
         HttpHandler delegate = mock(HttpHandler.class);
-        MockFilter filter = new MockFilter(new ChainingFilter());
+        CountingFilter filter = new CountingFilter(new ChainingFilter());
 
         handle(delegate, filter);
 
@@ -55,9 +53,9 @@ public class FilteringHandlerTest extends PulseTestCase
     public void testMultileFilters() throws IOException
     {
         HttpHandler delegate = mock(HttpHandler.class);
-        MockFilter filter1 = new MockFilter(new ChainingFilter());
-        MockFilter filter2 = new MockFilter(new ChainingFilter());
-        MockFilter filter3 = new MockFilter(new ChainingFilter());
+        CountingFilter filter1 = new CountingFilter(new ChainingFilter());
+        CountingFilter filter2 = new CountingFilter(new ChainingFilter());
+        CountingFilter filter3 = new CountingFilter(new ChainingFilter());
 
         handle(delegate, filter1, filter2, filter3);
 
@@ -70,8 +68,8 @@ public class FilteringHandlerTest extends PulseTestCase
     public void testFilterAllowsBypass() throws IOException
     {
         HttpHandler delegate = mock(HttpHandler.class);
-        MockFilter filter1 = new MockFilter(new BypassingFilter());
-        MockFilter filter2 = new MockFilter(new ChainingFilter());
+        CountingFilter filter1 = new CountingFilter(new BypassingFilter());
+        CountingFilter filter2 = new CountingFilter(new ChainingFilter());
 
         handle(delegate, filter1, filter2);
 
@@ -80,7 +78,7 @@ public class FilteringHandlerTest extends PulseTestCase
         assertEquals(0, filter2.times());
     }
 
-    private void handle(HttpHandler delegate, MockFilter... filters) throws IOException
+    private void handle(HttpHandler delegate, CountingFilter... filters) throws IOException
     {
         FilteringHandler handler = new FilteringHandler();
         handler.setDelegate(delegate);
@@ -91,13 +89,13 @@ public class FilteringHandlerTest extends PulseTestCase
         handler.handle(context, params, request, response);
     }
 
-    private class MockFilter implements Filter
+    private class CountingFilter implements Filter
     {
         private int times = 0;
 
         private OnFilter handler;
 
-        protected MockFilter(OnFilter handler)
+        protected CountingFilter(OnFilter handler)
         {
             this.handler = handler;
         }

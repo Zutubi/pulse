@@ -46,14 +46,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         super.setUp();
 
-        typeA = typeRegistry.register(MockA.class);
-        typeB = typeRegistry.getType(MockB.class);
+        typeA = typeRegistry.register(ConfigA.class);
+        typeB = typeRegistry.getType(ConfigB.class);
         MapType mapA = new MapType(typeA, typeRegistry);
 
         MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
 
-        CompositeType typeReferer = typeRegistry.register(MockReferer.class);
-        CompositeType typeReferee = typeRegistry.getType(MockReferee.class);
+        CompositeType typeReferer = typeRegistry.register(Referer.class);
+        CompositeType typeReferee = typeRegistry.getType(Referee.class);
         MapType mapReferer = new MapType(typeReferer, typeRegistry);
         MapType mapReferee = new MapType(typeReferee, typeRegistry);
 
@@ -62,9 +62,9 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationPersistenceManager.register(SCOPE_REFERER, mapReferer);
         configurationPersistenceManager.register(SCOPE_REFEREE, mapReferee);
 
-        accessManager.registerAuthorityProvider(MockA.class, new AuthorityProvider<MockA>()
+        accessManager.registerAuthorityProvider(ConfigA.class, new AuthorityProvider<ConfigA>()
         {
-            public Set<String> getAllowedAuthorities(String action, MockA resource)
+            public Set<String> getAllowedAuthorities(String action, ConfigA resource)
             {
                 return new HashSet<String>(Arrays.asList(action));
             }
@@ -73,10 +73,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInsertIntoCollection()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        MockA loaded = (MockA) configurationTemplateManager.getInstance("sample/a");
+        ConfigA loaded = (ConfigA) configurationTemplateManager.getInstance("sample/a");
         assertNotNull(loaded);
         assertEquals("a", loaded.getName());
         assertEquals(null, loaded.getB());
@@ -84,33 +84,33 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInsertIntoObject()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        MockB b = new MockB("b");
-        configurationTemplateManager.insert("sample/a/mock", b);
+        ConfigB b = new ConfigB("b");
+        configurationTemplateManager.insert("sample/a/composite", b);
 
-        MockB loaded = (MockB) configurationTemplateManager.getInstance("sample/a/mock");
+        ConfigB loaded = (ConfigB) configurationTemplateManager.getInstance("sample/a/composite");
         assertNotNull(loaded);
         assertEquals("b", loaded.getB());
     }
 
     public void testInsertExistingPath()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        MockB b = new MockB("b");
-        configurationTemplateManager.insert("sample/a/mock", b);
+        ConfigB b = new ConfigB("b");
+        configurationTemplateManager.insert("sample/a/composite", b);
 
         try
         {
-            configurationTemplateManager.insert("sample/a/mock", b);
+            configurationTemplateManager.insert("sample/a/composite", b);
             fail();
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals("Invalid insertion path 'sample/a/mock': record already exists (use save to modify)", e.getMessage());
+            assertEquals("Invalid insertion path 'sample/a/composite': record already exists (use save to modify)", e.getMessage());
         }
     }
 
@@ -127,7 +127,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         try
         {
-            configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("a"));
+            configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("a"));
             fail();
         }
         catch (Exception e)
@@ -138,15 +138,15 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testSave()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         a = configurationTemplateManager.deepClone(a);
         a.setB("somevalue");
         configurationTemplateManager.save(a);
 
-        MockA loaded = (MockA) configurationTemplateManager.getInstance("sample/a");
+        ConfigA loaded = (ConfigA) configurationTemplateManager.getInstance("sample/a");
         assertNotNull(loaded);
         assertEquals("a", loaded.getName());
         assertEquals("somevalue", loaded.getB());
@@ -154,37 +154,37 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testSaveIsDeep()
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
-        assertEquals("b", a.getMock().getB());
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertEquals("b", a.getComposite().getB());
 
         a = configurationTemplateManager.deepClone(a);
-        a.getMock().setB("c");
+        a.getComposite().setB("c");
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
-        assertEquals("c", a.getMock().getB());
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertEquals("c", a.getComposite().getB());
     }
 
     public void testSaveInsertsTransitively()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(0, a.getCs().size());
 
         a = configurationTemplateManager.deepClone(a);
-        MockD d = new MockD("d");
-        MockC c = new MockC("c");
+        ConfigD d = new ConfigD("d");
+        ConfigC c = new ConfigC("c");
         c.setD(d);
         a.getCs().put("c", c);
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getCs().size());
         c = a.getCs().get("c");
         assertNotNull(c);
@@ -195,15 +195,15 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testSaveSavesTransitively()
     {
-        MockD d = new MockD("d");
-        MockC c = new MockC("c");
+        ConfigD d = new ConfigD("d");
+        ConfigC c = new ConfigC("c");
         c.setD(d);
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         a.getCs().put("c", c);
 
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getCs().size());
         c = a.getCs().get("c");
         assertNotNull(c);
@@ -215,69 +215,69 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.getCs().get("c").getD().setName("newname");
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals("newname", a.getCs().get("c").getD().getName());
     }
 
     public void testSaveChildObjectAdded()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
-        assertNull(a.getMock());
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertNull(a.getComposite());
 
         a = configurationTemplateManager.deepClone(a);
-        a.setMock(new MockB("b"));
+        a.setComposite(new ConfigB("b"));
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
-        assertNotNull(a.getMock());
-        assertEquals("b", a.getMock().getB());
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertNotNull(a.getComposite());
+        assertEquals("b", a.getComposite().getB());
     }
 
     public void testSaveChildObjectDeleted()
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
-        assertNotNull(a.getMock());
-        assertEquals("b", a.getMock().getB());
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertNotNull(a.getComposite());
+        assertEquals("b", a.getComposite().getB());
 
         a = configurationTemplateManager.deepClone(a);
-        a.setMock(null);
+        a.setComposite(null);
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
-        assertNull(a.getMock());
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertNull(a.getComposite());
     }
 
     public void testSaveCollectionElementAdded()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(0, a.getCs().size());
 
         a = configurationTemplateManager.deepClone(a);
-        a.getCs().put("jim", new MockC("jim"));
+        a.getCs().put("jim", new ConfigC("jim"));
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getCs().size());
         assertNotNull(a.getCs().get("jim"));
     }
 
     public void testSaveCollectionElementRemoved()
     {
-        MockA a = new MockA("a");
-        a.getCs().put("jim", new MockC("jim"));
+        ConfigA a = new ConfigA("a");
+        a.getCs().put("jim", new ConfigC("jim"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getCs().size());
         assertNotNull(a.getCs().get("jim"));
 
@@ -285,13 +285,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.getCs().remove("jim");
         configurationTemplateManager.save(a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(0, a.getCs().size());
     }
 
     public void testSaveNoPermission()
     {
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("a"));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("a"));
 
         accessManager.setActorProvider(new ActorProvider()
         {
@@ -316,10 +316,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testRename()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertNotNull(a);
 
         // change the ID field, effectively triggering a rename on save.
@@ -329,7 +329,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         assertNull(configurationTemplateManager.getInstance("sample/a"));
 
-        MockA loaded = (MockA) configurationTemplateManager.getInstance("sample/b");
+        ConfigA loaded = (ConfigA) configurationTemplateManager.getInstance("sample/b");
         assertNotNull(loaded);
 
         assertEquals("b", loaded.getName());
@@ -351,8 +351,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             }
         });
 
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
 
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
@@ -360,11 +360,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertTrue(events.get(0) instanceof InsertEvent);
         assertEquals("sample/a", events.get(0).getInstance().getConfigurationPath());
         assertTrue(events.get(1) instanceof InsertEvent);
-        assertEquals("sample/a/mock", events.get(1).getInstance().getConfigurationPath());
+        assertEquals("sample/a/composite", events.get(1).getInstance().getConfigurationPath());
         assertTrue(events.get(2) instanceof PostInsertEvent);
         assertEquals("sample/a", events.get(2).getInstance().getConfigurationPath());
         assertTrue(events.get(3) instanceof PostInsertEvent);
-        assertEquals("sample/a/mock", events.get(3).getInstance().getConfigurationPath());
+        assertEquals("sample/a/composite", events.get(3).getInstance().getConfigurationPath());
     }
 
     public void testSaveRecord()
@@ -441,38 +441,38 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeepClone()
     {
-        MockA a = new MockA("aburger");
-        MockB b = new MockB("bburger");
-        a.setMock(b);
+        ConfigA a = new ConfigA("aburger");
+        ConfigB b = new ConfigB("bburger");
+        a.setComposite(b);
 
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = configurationTemplateManager.getInstance("sample/aburger", MockA.class);
-        MockA aClone = configurationTemplateManager.deepClone(a);
+        a = configurationTemplateManager.getInstance("sample/aburger", ConfigA.class);
+        ConfigA aClone = configurationTemplateManager.deepClone(a);
 
         assertNotSame(a, aClone);
-        assertNotSame(a.getMock(), aClone.getMock());
+        assertNotSame(a.getComposite(), aClone.getComposite());
         assertEquals(a.getHandle(), aClone.getHandle());
         assertEquals(a.getConfigurationPath(), aClone.getConfigurationPath());
         assertEquals("aburger", aClone.getName());
-        assertEquals("bburger", aClone.getMock().getB());
+        assertEquals("bburger", aClone.getComposite().getB());
     }
 
     public void testDeepCloneWithReferences()
     {
-        MockReferee ee = new MockReferee("ee");
+        Referee ee = new Referee("ee");
         configurationTemplateManager.insert(SCOPE_REFEREE, ee);
-        ee = configurationTemplateManager.getInstance("referee/ee", MockReferee.class);
+        ee = configurationTemplateManager.getInstance("referee/ee", Referee.class);
 
-        MockReferer er = new MockReferer("er");
+        Referer er = new Referer("er");
         er.setRefToRef(ee);
         er.getRefToRefs().add(ee);
 
         configurationTemplateManager.insert(SCOPE_REFERER, er);
-        er = configurationTemplateManager.getInstance("referer/er", MockReferer.class);
-        ee = configurationTemplateManager.getInstance("referee/ee", MockReferee.class);
+        er = configurationTemplateManager.getInstance("referer/er", Referer.class);
+        ee = configurationTemplateManager.getInstance("referee/ee", Referee.class);
 
-        MockReferer clone = configurationTemplateManager.deepClone(er);
+        Referer clone = configurationTemplateManager.deepClone(er);
 
         assertNotSame(er, clone);
         assertSame(ee, clone.getRefToRef());
@@ -486,25 +486,25 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         // possible to set up a reference to something until it is saved.
         // Hence we need to insert the referer and nested referee first, and
         // then later we can add references to the nested referee.
-        MockReferee ee = new MockReferee("ee");
-        MockReferer er = new MockReferer("er");
+        Referee ee = new Referee("ee");
+        Referer er = new Referer("er");
         er.setRef(ee);
         configurationTemplateManager.insert(SCOPE_REFERER, er);
-        er = configurationTemplateManager.getInstance("referer/er", MockReferer.class);
+        er = configurationTemplateManager.getInstance("referer/er", Referer.class);
         er = configurationTemplateManager.deepClone(er);
         ee = er.getRef();
         er.setRefToRef(ee);
         er.getRefToRefs().add(ee);
         configurationTemplateManager.save(er);
 
-        er = configurationTemplateManager.getInstance("referer/er", MockReferer.class);
+        er = configurationTemplateManager.getInstance("referer/er", Referer.class);
         ee = er.getRef();
         assertSame(ee, er.getRefToRef());
         assertSame(ee, er.getRefToRefs().get(0));
 
         // Now we can actually clone and test.
-        MockReferer clone = configurationTemplateManager.deepClone(er);
-        MockReferee refClone = clone.getRef();
+        Referer clone = configurationTemplateManager.deepClone(er);
+        Referee refClone = clone.getRef();
 
         assertNotSame(er, clone);
         assertNotSame(ee, refClone);
@@ -514,41 +514,41 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeepClonePreservesPaths() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
-        a.getCs().put("c", new MockC("c"));
-        a.getDs().add(new MockD("d"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
+        a.getCs().put("c", new ConfigC("c"));
+        a.getDs().add(new ConfigD("d"));
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = (MockA) configurationTemplateManager.getInstance("sample/a");
+        a = (ConfigA) configurationTemplateManager.getInstance("sample/a");
 
-        MockA clone = configurationTemplateManager.deepClone(a);
+        ConfigA clone = configurationTemplateManager.deepClone(a);
         assertEquals(a.getConfigurationPath(), clone.getConfigurationPath());
-        assertEquals(a.getMock().getConfigurationPath(), clone.getMock().getConfigurationPath());
+        assertEquals(a.getComposite().getConfigurationPath(), clone.getComposite().getConfigurationPath());
         assertEquals(a.getCs().get("c").getConfigurationPath(), clone.getCs().get("c").getConfigurationPath());
         assertEquals(a.getDs().get(0).getConfigurationPath(), clone.getDs().get(0).getConfigurationPath());
     }
 
     public void testDeepClonePreservesHandles() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
-        a.getCs().put("c", new MockC("c"));
-        a.getDs().add(new MockD("d"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
+        a.getCs().put("c", new ConfigC("c"));
+        a.getDs().add(new ConfigD("d"));
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        a = (MockA) configurationTemplateManager.getInstance("sample/a");
+        a = (ConfigA) configurationTemplateManager.getInstance("sample/a");
 
-        MockA clone = configurationTemplateManager.deepClone(a);
+        ConfigA clone = configurationTemplateManager.deepClone(a);
         assertEquals(a.getHandle(), clone.getHandle());
-        assertEquals(a.getMock().getHandle(), clone.getMock().getHandle());
+        assertEquals(a.getComposite().getHandle(), clone.getComposite().getHandle());
         assertEquals(a.getCs().get("c").getHandle(), clone.getCs().get("c").getHandle());
         assertEquals(a.getDs().get(0).getHandle(), clone.getDs().get(0).getHandle());
     }
 
     public void testDeepCloneAndSavePreservesMeta() throws TypeException
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         MutableRecord record = unstantiate(a);
         record.putMeta("testkey", "value");
 
@@ -556,7 +556,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         Record savedRecord = configurationTemplateManager.getRecord(path);
         assertEquals("value", savedRecord.getMeta("testkey"));
 
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         a = configurationTemplateManager.deepClone(a);
         configurationTemplateManager.save(a);
 
@@ -597,7 +597,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
         record = typeB.createNewRecord(false);
-        MockB instance = configurationTemplateManager.validate("template/a", "mock", record, false, false);
+        ConfigB instance = configurationTemplateManager.validate("template/a", "composite", record, false, false);
         assertTrue(instance.isValid());
     }
 
@@ -605,7 +605,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MutableRecord record = typeA.createNewRecord(true);
         configurationTemplateManager.markAsTemplate(record);
-        MockA instance = configurationTemplateManager.validate(SCOPE_TEMPLATED, "", record, false, false);
+        ConfigA instance = configurationTemplateManager.validate(SCOPE_TEMPLATED, "", record, false, false);
         assertFalse(instance.isValid());
         final List<String> errors = instance.getFieldErrors("name");
         assertEquals(1, errors.size());
@@ -636,18 +636,18 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
         record = typeB.createNewRecord(true);
-        MockB instance = configurationTemplateManager.validate("template/a", "b", record, false, false);
+        ConfigB instance = configurationTemplateManager.validate("template/a", "b", record, false, false);
         assertTrue(instance.isValid());
         assertNull(instance.getB());
     }
 
     public void testCachedInstancesAreValidated() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB());
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB());
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
-        MockB instance = configurationTemplateManager.getInstance("sample/a/mock", MockB.class);
+        ConfigB instance = configurationTemplateManager.getInstance("sample/a/composite", ConfigB.class);
         final List<String> errors = instance.getFieldErrors("b");
         assertEquals(1, errors.size());
         assertEquals("b requires a value", errors.get(0));
@@ -660,7 +660,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        MockA instance = configurationTemplateManager.getInstance("template/a$", MockA.class);
+        ConfigA instance = configurationTemplateManager.getInstance("template/a$", ConfigA.class);
         final List<String> errors = instance.getFieldErrors("name");
         assertEquals(1, errors.size());
         assertTrue(errors.get(0), errors.get(0).contains("dollar sign"));
@@ -673,56 +673,56 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        configurationTemplateManager.insert("template/a/mock", new MockB());
+        configurationTemplateManager.insert("template/a/composite", new ConfigB());
 
-        MockB instance = configurationTemplateManager.getInstance("template/a/mock", MockB.class);
+        ConfigB instance = configurationTemplateManager.getInstance("template/a/composite", ConfigB.class);
         assertTrue(instance.isValid());
     }
 
     public void testValidateNotDeep() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB());
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB());
         MutableRecord record = unstantiate(a);
 
-        MockA instance = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, false);
+        ConfigA instance = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, false);
         assertTrue(instance.isValid());
-        assertTrue(instance.getMock().isValid());
+        assertTrue(instance.getComposite().isValid());
     }
 
     public void testValidateDeep() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB());
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB());
         MutableRecord record = unstantiate(a);
 
-        MockA instance = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
+        ConfigA instance = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
         assertTrue(instance.isValid());
-        assertFalse(instance.getMock().isValid());
+        assertFalse(instance.getComposite().isValid());
     }
 
     public void testValidateDeepNestedList() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.getDs().add(new MockD());
+        ConfigA a = new ConfigA("a");
+        a.getDs().add(new ConfigD());
         Record record = unstantiate(a);
 
-        MockA validated = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
+        ConfigA validated = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
         assertTrue(validated.isValid());
-        MockD mockD = validated.getDs().get(0);
-        assertMissingName(mockD);
+        ConfigD configD = validated.getDs().get(0);
+        assertMissingName(configD);
     }
 
     public void testValidateDeepNestedMap() throws TypeException
     {
-        MockA a = new MockA("a");
-        a.getCs().put("name", new MockC());
+        ConfigA a = new ConfigA("a");
+        a.getCs().put("name", new ConfigC());
         Record record = unstantiate(a);
 
-        MockA validated = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
+        ConfigA validated = configurationTemplateManager.validate(SCOPE_SAMPLE, null, record, true, true);
         assertTrue(validated.isValid());
-        MockC mockC = validated.getCs().get("name");
-        assertMissingName(mockC);
+        ConfigC configC = validated.getCs().get("name");
+        assertMissingName(configC);
     }
 
     public void testIsTemplatedCollection()
@@ -760,7 +760,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testCanDeletePermanent()
     {
-        MockA a = new MockA("mock");
+        ConfigA a = new ConfigA("test");
         a.setPermanent(true);
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         assertFalse(configurationTemplateManager.canDelete(path));
@@ -768,28 +768,28 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testCanDeleteInheritedComposite() throws TypeException
     {
-        assertFalse(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "mock")));
+        assertFalse(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "composite")));
     }
 
     public void testCanDeleteSimple()
     {
-        MockA a = new MockA("mock");
+        ConfigA a = new ConfigA("test");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.canDelete(path));
     }
 
     public void testCanDeleteCompositeChild()
     {
-        MockA a = new MockA("mock");
-        a.setMock(new MockB("b"));
+        ConfigA a = new ConfigA("test");
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "mock")));
+        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "composite")));
     }
 
     public void testCanDeleteMapItem()
     {
-        MockA a = new MockA("mock");
-        a.getCs().put("cee", new MockC("cee"));
+        ConfigA a = new ConfigA("test");
+        a.getCs().put("cee", new ConfigC("cee"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "cs/cee")));
     }
@@ -797,7 +797,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCanDeleteOwnedComposite() throws TypeException
     {
         insertInherited();
-        assertTrue(configurationTemplateManager.canDelete("template/mock/mock"));
+        assertTrue(configurationTemplateManager.canDelete("template/test/composite"));
     }
 
     public void testCanDeleteInheritedMapItem() throws TypeException
@@ -807,14 +807,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     private String insertInherited() throws TypeException
     {
-        MockA a = new MockA("mock");
-        a.setMock(new MockB("bee"));
-        a.getCs().put("cee", new MockC("cee"));
+        ConfigA a = new ConfigA("test");
+        a.setComposite(new ConfigB("bee"));
+        a.getCs().put("cee", new ConfigC("cee"));
         MutableRecord record = unstantiate(a);
         configurationTemplateManager.markAsTemplate(record);
         String path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        record = unstantiate(new MockA("child"));
+        record = unstantiate(new ConfigA("child"));
         configurationTemplateManager.setParentTemplate(record, recordManager.select(path).getHandle());
         path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         return path;
@@ -822,7 +822,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDelete()
     {
-        MockA a = new MockA("mock");
+        ConfigA a = new ConfigA("test");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         configurationTemplateManager.delete(path);
@@ -836,7 +836,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            MockA a = new MockA("mock");
+            ConfigA a = new ConfigA("test");
             a.setPermanent(true);
             String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
@@ -845,7 +845,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals("Cannot delete instance at path 'sample/mock': marked permanent", e.getMessage());
+            assertEquals("Cannot delete instance at path 'sample/test': marked permanent", e.getMessage());
         }
     }
 
@@ -856,13 +856,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteInheritedComposite() throws TypeException
     {
-        String path = PathUtils.getPath(insertInherited(), "mock");
-        failedDeleteHelper(path, "Invalid path 'template/child/mock': cannot delete an inherited composite property");
+        String path = PathUtils.getPath(insertInherited(), "composite");
+        failedDeleteHelper(path, "Invalid path 'template/child/composite': cannot delete an inherited composite property");
     }
 
     public void testDeleteNoPermission()
     {
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("a"));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("a"));
         configurationSecurityManager.registerGlobalPermission("sample/*", AccessManager.ACTION_DELETE, AccessManager.ACTION_DELETE);
         accessManager.setActorProvider(new ActorProvider()
         {
@@ -895,7 +895,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteAllTrivial()
     {
-        MockA a = new MockA("mock");
+        ConfigA a = new ConfigA("test");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         assertEquals(1, configurationTemplateManager.deleteAll(path));
@@ -912,8 +912,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteAllMultipleMatches()
     {
-        MockA a1 = new MockA("a1");
-        MockA a2 = new MockA("a2");
+        ConfigA a1 = new ConfigA("a1");
+        ConfigA a2 = new ConfigA("a2");
         String path1 = configurationTemplateManager.insert(SCOPE_SAMPLE, a1);
         String path2 = configurationTemplateManager.insert(SCOPE_SAMPLE, a2);
 
@@ -933,8 +933,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteAllPermanentItem()
     {
-        MockA tempA = new MockA("tempA");
-        MockA permA = new MockA("permA");
+        ConfigA tempA = new ConfigA("tempA");
+        ConfigA permA = new ConfigA("permA");
         permA.setPermanent(true);
         String path1 = configurationTemplateManager.insert(SCOPE_SAMPLE, tempA);
         String path2 = configurationTemplateManager.insert(SCOPE_SAMPLE, permA);
@@ -947,27 +947,27 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteAllInheritedComposite() throws TypeException
     {
-        String path = PathUtils.getPath(insertInherited(), "mock");
+        String path = PathUtils.getPath(insertInherited(), "composite");
         assertEquals(0, configurationTemplateManager.deleteAll(path));
         assertTrue(configurationTemplateManager.pathExists(path));
     }
 
     public void testDeleteListItem()
     {
-        MockA a = new MockA("a");
-        MockD d1 = new MockD("d1");
-        MockD d2 = new MockD("d2");
+        ConfigA a = new ConfigA("a");
+        ConfigD d1 = new ConfigD("d1");
+        ConfigD d2 = new ConfigD("d2");
         a.getDs().add(d1);
         a.getDs().add(d2);
 
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(2, a.getDs().size());
         assertEquals("d1", a.getDs().get(0).getName());
         assertEquals("d2", a.getDs().get(1).getName());
 
         configurationTemplateManager.delete(a.getDs().get(0).getConfigurationPath());
-        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getDs().size());
         assertEquals("d2", a.getDs().get(0).getName());
 
@@ -980,10 +980,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteListItemFromTemplateChild() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        MockA child = new MockA("child");
-        MockD parentD = new MockD("pd");
-        MockD childD = new MockD("cd");
+        ConfigA parent = new ConfigA("parent");
+        ConfigA child = new ConfigA("child");
+        ConfigD parentD = new ConfigD("pd");
+        ConfigD childD = new ConfigD("cd");
         parent.getDs().add(parentD);
         child.getDs().add(childD);
 
@@ -997,13 +997,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.setParentTemplate(childRecord, loadedParent.getHandle());
         String childPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, childRecord);
 
-        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         assertEquals(2, child.getDs().size());
         assertEquals("pd", child.getDs().get(0).getName());
         assertEquals("cd", child.getDs().get(1).getName());
 
         configurationTemplateManager.delete(child.getDs().get(1).getConfigurationPath());
-        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         assertEquals(1, child.getDs().size());
         assertEquals("pd", child.getDs().get(0).getName());
 
@@ -1036,14 +1036,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testPathExistsExistantPath()
     {
-        MockA a = new MockA("mock");
+        ConfigA a = new ConfigA("test");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.pathExists(path));
     }
 
     public void testEventGeneratedOnSave()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         RecordingEventListener listener = new RecordingEventListener();
@@ -1051,7 +1051,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         assertEquals(0, listener.getEvents().size());
 
-        MockA instance = (MockA) configurationTemplateManager.getInstance("sample/a");
+        ConfigA instance = (ConfigA) configurationTemplateManager.getInstance("sample/a");
         instance.setB("B");
 
         configurationTemplateManager.save(instance);
@@ -1068,7 +1068,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         RecordingEventListener listener = new RecordingEventListener();
         eventManager.register(listener);
 
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         assertEquals(2, listener.getEvents().size());
@@ -1080,7 +1080,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testEventsGeneratedOnDelete()
     {
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         RecordingEventListener listener = new RecordingEventListener();
@@ -1105,7 +1105,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         RecordingEventListener listener = new RecordingEventListener();
         eventManager.register(listener);
 
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         assertEquals(1, listener.getEvents().size());
@@ -1123,7 +1123,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         RecordingEventListener listener = new RecordingEventListener();
         eventManager.register(listener);
 
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         assertEquals(1, listener.getEvents().size());
@@ -1138,7 +1138,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         UserTransaction transaction = new UserTransaction(transactionManager);
         transaction.begin();
 
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         assertNotNull(configurationTemplateManager.getInstance("sample/a"));
@@ -1153,7 +1153,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         UserTransaction transaction = new UserTransaction(transactionManager);
         transaction.begin();
 
-        MockA a = new MockA("a");
+        ConfigA a = new ConfigA("a");
         configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         assertNotNull(configurationTemplateManager.getInstance("sample/a"));
@@ -1199,10 +1199,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInTemplateParentRegularRecord()
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "mock")));
+        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "composite")));
     }
 
     public void testInTemplateParentTemplateRecord()
@@ -1212,56 +1212,56 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         record.put("name", "a");
         String aPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        MockA a = configurationTemplateManager.getInstance(aPath, MockA.class);
-        a.setMock(new MockB("b"));
+        ConfigA a = configurationTemplateManager.getInstance(aPath, ConfigA.class);
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.save(a);
-        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "mock")));
+        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "composite")));
     }
 
     public void testInTemplateParentInheritedComposite() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.setMock(new MockB("inheritme"));
-        MockA child = new MockA("child");
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("inheritme"));
+        ConfigA child = new ConfigA("child");
         String childPath = insertParentAndChildA(parent, child).second;
-        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "mock")));
+        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "composite")));
     }
 
     public void testInTemplateParentOwnedComposite() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        MockA child = new MockA("child");
-        child.setMock(new MockB("ownme"));
+        ConfigA parent = new ConfigA("parent");
+        ConfigA child = new ConfigA("child");
+        child.setComposite(new ConfigB("ownme"));
         String childPath = insertParentAndChildA(parent, child).second;
-        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "mock")));
+        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "composite")));
     }
 
     public void testInTemplateParentOverriddenComposite() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.setMock(new MockB("overrideme"));
-        MockA child = new MockA("child");
-        MockB b = new MockB("overrideme");
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("overrideme"));
+        ConfigA child = new ConfigA("child");
+        ConfigB b = new ConfigB("overrideme");
         b.setB("hehe");
-        child.setMock(b);
+        child.setComposite(b);
         String childPath = insertParentAndChildA(parent, child).second;
-        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "mock")));
+        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "composite")));
     }
 
     public void testInTemplateParentInheritedValue() throws TypeException
     {
-        MockA parent = new MockA("parent");
+        ConfigA parent = new ConfigA("parent");
         parent.setB("pb");
-        MockA child = new MockA("child");
+        ConfigA child = new ConfigA("child");
         String childPath = insertParentAndChildA(parent, child).second;
         assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "b")));
     }
 
     public void testInTemplateParentOwnedValue() throws TypeException
     {
-        MockA parent = new MockA("parent");
+        ConfigA parent = new ConfigA("parent");
         parent.setB("pb");
-        MockA child = new MockA("child");
+        ConfigA child = new ConfigA("child");
         child.setB("cb");
         String childPath = insertParentAndChildA(parent, child).second;
         assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "b")));
@@ -1289,10 +1289,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testIsOverriddenRegularRecord()
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB("b"));
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "composite")));
     }
 
     public void testIsOverriddenTemplateRecord()
@@ -1302,50 +1302,50 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         record.put("name", "a");
         String aPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        MockA a = configurationTemplateManager.getInstance(aPath, MockA.class);
-        a.setMock(new MockB("b"));
+        ConfigA a = configurationTemplateManager.getInstance(aPath, ConfigA.class);
+        a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.save(a);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "composite")));
     }
 
     public void testIsOverriddenInheritedComposite() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.setMock(new MockB("inheritme"));
-        MockA child = new MockA("child");
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("inheritme"));
+        ConfigA child = new ConfigA("child");
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "mock")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "composite")));
     }
 
     public void testIsOverriddenOwnedComposite() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        MockA child = new MockA("child");
-        child.setMock(new MockB("ownme"));
+        ConfigA parent = new ConfigA("parent");
+        ConfigA child = new ConfigA("child");
+        child.setComposite(new ConfigB("ownme"));
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "mock")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "mock")));
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "composite")));
     }
 
     public void testIsOverriddenOverriddenComposite() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.setMock(new MockB("overrideme"));
-        MockA child = new MockA("child");
-        MockB b = new MockB("overrideme");
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("overrideme"));
+        ConfigA child = new ConfigA("child");
+        ConfigB b = new ConfigB("overrideme");
         b.setB("hehe");
-        child.setMock(b);
+        child.setComposite(b);
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "mock")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "mock")));
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "composite")));
     }
 
     public void testIsOverriddenInheritedValue() throws TypeException
     {
-        MockA parent = new MockA("parent");
+        ConfigA parent = new ConfigA("parent");
         parent.setB("pb");
-        MockA child = new MockA("child");
+        ConfigA child = new ConfigA("child");
         Pair<String, String> paths = insertParentAndChildA(parent, child);
         assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "b")));
         assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "b")));
@@ -1353,9 +1353,9 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testIsOverriddenOverriddenValue() throws TypeException
     {
-        MockA parent = new MockA("parent");
+        ConfigA parent = new ConfigA("parent");
         parent.setB("pb");
-        MockA child = new MockA("child");
+        ConfigA child = new ConfigA("child");
         child.setB("cb");
         Pair<String, String> paths = insertParentAndChildA(parent, child);
         assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "b")));
@@ -1364,10 +1364,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testIsOverriddenOverriddenInGrandchild() throws TypeException
     {
-        MockA parent = new MockA("parent");
+        ConfigA parent = new ConfigA("parent");
         parent.setB("pb");
-        MockA child = new MockA("child");
-        MockA grandchild = new MockA("grandchild");
+        ConfigA child = new ConfigA("child");
+        ConfigA grandchild = new ConfigA("grandchild");
         grandchild.setB("cb");
         String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
         assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "b")));
@@ -1377,25 +1377,25 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testIsOverriddenCompositeOverriddenInGrandchild() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.setMock(new MockB("overrideme"));
-        MockA child = new MockA("child");
-        MockA grandchild = new MockA("grandchild");
-        MockB b = new MockB("overrideme");
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("overrideme"));
+        ConfigA child = new ConfigA("child");
+        ConfigA grandchild = new ConfigA("grandchild");
+        ConfigB b = new ConfigB("overrideme");
         b.setB("hehe");
-        grandchild.setMock(b);
+        grandchild.setComposite(b);
         String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "mock")));
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "mock")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "mock")));
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "composite")));
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "composite")));
     }
 
     public void testIsOverriddenCompositeHiddenInChild() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.getCs().put("hideme", new MockC("hideme"));
-        MockA child = new MockA("child");
-        MockA grandchild = new MockA("grandchild");
+        ConfigA parent = new ConfigA("parent");
+        parent.getCs().put("hideme", new ConfigC("hideme"));
+        ConfigA child = new ConfigA("child");
+        ConfigA grandchild = new ConfigA("grandchild");
         String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
 
         configurationTemplateManager.delete(PathUtils.getPath(paths[1], "cs", "hideme"));
@@ -1445,63 +1445,63 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testIsDeeplyCompleteDirectInstanceComplete()
     {
-        MockB b = new MockB();
+        ConfigB b = new ConfigB();
         b.setB("set");
         assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(b));
     }
 
     public void testIsDeeplyCompleteDirectInstanceIncomplete()
     {
-        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(new MockB()));
+        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(new ConfigB()));
     }
 
     public void testIsDeeplyCompleteDirectInstanceInvalid()
     {
-        MockB b = new MockB();
+        ConfigB b = new ConfigB();
         b.setB("set");
         b.addFieldError("b", "nasty");
-        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(new MockB()));
+        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(new ConfigB()));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceComplete()
     {
-        MockB b = new MockB();
+        ConfigB b = new ConfigB();
         b.setB("set");
-        MockA a = new MockA("a");
-        a.setMock(b);
+        ConfigA a = new ConfigA("a");
+        a.setComposite(b);
 
         assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(a));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceIncomplete()
     {
-        MockA a = new MockA("a");
-        a.setMock(new MockB());
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB());
 
         assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(a));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceInvalid()
     {
-        MockB b = new MockB();
+        ConfigB b = new ConfigB();
         b.setB("set");
         b.addFieldError("b", "nasty");
-        MockA a = new MockA("a");
-        a.setMock(b);
+        ConfigA a = new ConfigA("a");
+        a.setComposite(b);
 
         assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(a));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceNull()
     {
-        assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(new MockA("a")));
+        assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(new ConfigA("a")));
     }
 
     public void testGetRootInstanceNonTemplated()
     {
         try
         {
-            configurationTemplateManager.getRootInstance(SCOPE_SAMPLE, MockA.class);
+            configurationTemplateManager.getRootInstance(SCOPE_SAMPLE, ConfigA.class);
             fail("Can't get root of non-templated scope");
         }
         catch (IllegalArgumentException e)
@@ -1512,30 +1512,30 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testGetRootInstanceTemplatedEmpty() throws TypeException
     {
-        assertNull(configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class));
+        assertNull(configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, ConfigA.class));
     }
 
     public void testGetRootInstanceTemplated() throws TypeException
     {
-        insertParentAndChildA(new MockA("parent"), new MockA("child"));
-        assertEquals("parent", configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class).getName());
+        insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        assertEquals("parent", configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, ConfigA.class).getName());
     }
 
     public void testCacheInsertUpdatesParent()
     {
         // Inserting a new collection entry should refresh the parent instance.
         Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
         assertNotSame(collection, configurationTemplateManager.getInstance(SCOPE_SAMPLE));
     }
 
     public void testCacheUpdateUpdatesParent()
     {
         // Updating a collection entry should refresh the parent instance.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
         Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
 
-        MockA item = configurationTemplateManager.getInstance(path, MockA.class);
+        ConfigA item = configurationTemplateManager.getInstance(path, ConfigA.class);
         item = configurationTemplateManager.deepClone(item);
         item.setB("hooray");
         configurationTemplateManager.save(item);
@@ -1546,7 +1546,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCacheDeleteUpdatesParent()
     {
         // Deleting a collection entry should refresh the parent instance.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
         Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
 
         configurationTemplateManager.delete(path);
@@ -1558,49 +1558,49 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         // Inserting a new collection entry should not cause existing items in
         // that collection to refresh.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
-        MockA sibling = configurationTemplateManager.getInstance(path, MockA.class);
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
+        ConfigA sibling = configurationTemplateManager.getInstance(path, ConfigA.class);
 
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
-        assertSame(sibling, configurationTemplateManager.getInstance(path, MockA.class));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        assertSame(sibling, configurationTemplateManager.getInstance(path, ConfigA.class));
     }
 
     public void testCacheUpdateLeavesSibling()
     {
         // Updating a collection entry should not cause other items in that
         // collection to refresh.
-        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
-        String changedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
-        MockA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, MockA.class);
+        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
+        String changedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        ConfigA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, ConfigA.class);
 
-        MockA item = configurationTemplateManager.getInstance(changedPath, MockA.class);
+        ConfigA item = configurationTemplateManager.getInstance(changedPath, ConfigA.class);
         item = configurationTemplateManager.deepClone(item);
         item.setB("hooray");
         configurationTemplateManager.save(item);
 
-        assertSame(unchangedInstance, configurationTemplateManager.getInstance(unchangedPath, MockA.class));
+        assertSame(unchangedInstance, configurationTemplateManager.getInstance(unchangedPath, ConfigA.class));
     }
 
     public void testCacheDeleteLeavesSibling()
     {
         // Deleting a collection entry should not cause other items in that
         // collection to refresh.
-        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
-        String deletedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
-        MockA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, MockA.class);
+        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
+        String deletedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        ConfigA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, ConfigA.class);
 
         configurationTemplateManager.delete(deletedPath);
 
-        assertSame(unchangedInstance, configurationTemplateManager.getInstance(unchangedPath, MockA.class));
+        assertSame(unchangedInstance, configurationTemplateManager.getInstance(unchangedPath, ConfigA.class));
     }
 
     public void testCacheUpdateUpdatesReferers()
     {
-        MockReferee ee = new MockReferee("ee");
+        Referee ee = new Referee("ee");
         String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
-        ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+        ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
 
-        MockReferer er = new MockReferer("er");
+        Referer er = new Referer("er");
         er.setRefToRef(ee);
 
         String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
@@ -1609,11 +1609,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testCacheUpdateUpdatesReferersCollection()
     {
-        MockReferee ee = new MockReferee("ee");
+        Referee ee = new Referee("ee");
         String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
-        ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+        ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
 
-        MockReferer er = new MockReferer("er");
+        Referer er = new Referer("er");
         er.getRefToRefs().add(ee);
 
         String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
@@ -1623,76 +1623,76 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     private void updateRefereeAndCheck(String refereePath, String refererPath)
     {
         Configuration erCollection = configurationTemplateManager.getInstance(SCOPE_REFERER);
-        MockReferer er = configurationTemplateManager.getInstance(refererPath, MockReferer.class);
+        Referer er = configurationTemplateManager.getInstance(refererPath, Referer.class);
 
-        MockReferee ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+        Referee ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
         ee = configurationTemplateManager.deepClone(ee);
         ee.setName("new");
         configurationTemplateManager.save(ee);
 
-        assertNotSame(er, configurationTemplateManager.getInstance(refererPath, MockReferer.class));
+        assertNotSame(er, configurationTemplateManager.getInstance(refererPath, Referer.class));
         assertNotSame(erCollection, configurationTemplateManager.getInstance(SCOPE_REFERER));
     }
 
     public void testCacheDeleteUpdatesReferers()
     {
-        MockReferee ee = new MockReferee("ee");
+        Referee ee = new Referee("ee");
         String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
-        ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+        ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
 
-        MockReferer er = new MockReferer("er");
+        Referer er = new Referer("er");
         er.setRefToRef(ee);
 
         String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
         Configuration erCollection = configurationTemplateManager.getInstance(SCOPE_REFERER);
-        er = configurationTemplateManager.getInstance(refererPath, MockReferer.class);
+        er = configurationTemplateManager.getInstance(refererPath, Referer.class);
 
         configurationTemplateManager.delete(refereePath);
         
-        assertNotSame(er, configurationTemplateManager.getInstance(refererPath, MockReferer.class));
+        assertNotSame(er, configurationTemplateManager.getInstance(refererPath, Referer.class));
         assertNotSame(erCollection, configurationTemplateManager.getInstance(SCOPE_REFERER));
     }
 
     public void testCacheUpdateUpdatesDescendants() throws TypeException
     {
-        Pair<String, String> paths = insertParentAndChildA(new MockA("parent"), new MockA("child"));
-        MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
+        Pair<String, String> paths = insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        ConfigA child = configurationTemplateManager.getInstance(paths.second, ConfigA.class);
 
-        MockA parent = configurationTemplateManager.getInstance(paths.first, MockA.class);
+        ConfigA parent = configurationTemplateManager.getInstance(paths.first, ConfigA.class);
         parent = configurationTemplateManager.deepClone(parent);
         parent.setB("i haz change it");
         configurationTemplateManager.save(parent);
         
-        assertNotSame(child, configurationTemplateManager.getInstance(paths.second, MockA.class));
+        assertNotSame(child, configurationTemplateManager.getInstance(paths.second, ConfigA.class));
     }
 
     public void testCacheUpdateLeavesAncestors() throws TypeException
     {
-        Pair<String, String> paths = insertParentAndChildA(new MockA("parent"), new MockA("child"));
-        MockA parent = configurationTemplateManager.getInstance(paths.first, MockA.class);
+        Pair<String, String> paths = insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        ConfigA parent = configurationTemplateManager.getInstance(paths.first, ConfigA.class);
 
-        MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
+        ConfigA child = configurationTemplateManager.getInstance(paths.second, ConfigA.class);
         child = configurationTemplateManager.deepClone(child);
         child.setB("i haz change it");
         configurationTemplateManager.save(child);
         
-        assertSame(parent, configurationTemplateManager.getInstance(paths.first, MockA.class));
+        assertSame(parent, configurationTemplateManager.getInstance(paths.first, ConfigA.class));
     }
 
     public void testCacheNestedUpdateWithDescendants() throws TypeException
     {
-        MockA parent = new MockA("parent");
-        parent.getCs().put("c1", new MockC("c1"));
-        parent.getCs().put("c2", new MockC("c2"));
-        Pair<String, String> paths = insertParentAndChildA(parent, new MockA("child"));
-        MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
+        ConfigA parent = new ConfigA("parent");
+        parent.getCs().put("c1", new ConfigC("c1"));
+        parent.getCs().put("c2", new ConfigC("c2"));
+        Pair<String, String> paths = insertParentAndChildA(parent, new ConfigA("child"));
+        ConfigA child = configurationTemplateManager.getInstance(paths.second, ConfigA.class);
 
-        parent = configurationTemplateManager.getInstance(paths.first, MockA.class);
+        parent = configurationTemplateManager.getInstance(paths.first, ConfigA.class);
         parent = configurationTemplateManager.deepClone(parent);
-        parent.getCs().get("c1").setD(new MockD("new"));
+        parent.getCs().get("c1").setD(new ConfigD("new"));
         configurationTemplateManager.save(parent);
 
-        MockA newChild = configurationTemplateManager.getInstance(paths.second, MockA.class);
+        ConfigA newChild = configurationTemplateManager.getInstance(paths.second, ConfigA.class);
         assertNotSame(child, newChild);
         assertNotSame(child.getCs(), newChild.getCs());
         assertNotSame(child.getCs().get("c1"), newChild.getCs().get("c1"));
@@ -1701,28 +1701,28 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testGetHighestNoneSatisfy() throws TypeException
     {
-        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
-        assertEquals(0, configurationTemplateManager.getHighestInstancesSatisfying(new FalsePredicate<MockA>(), MockA.class).size());
+        insertParentChildAndGrandchildA(new ConfigA(GRANDPARENT_NAME), new ConfigA(CHILD_NAME), new ConfigA(GRANDCHILD_NAME));
+        assertEquals(0, configurationTemplateManager.getHighestInstancesSatisfying(new FalsePredicate<ConfigA>(), ConfigA.class).size());
     }
 
     public void testGetHighestAllSatisfy() throws TypeException
     {
-        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
-        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new TruePredicate<MockA>(), MockA.class);
+        insertParentChildAndGrandchildA(new ConfigA(GRANDPARENT_NAME), new ConfigA(CHILD_NAME), new ConfigA(GRANDCHILD_NAME));
+        List<ConfigA> results = configurationTemplateManager.getHighestInstancesSatisfying(new TruePredicate<ConfigA>(), ConfigA.class);
         assertEquals(1, results.size());
         assertEquals(GRANDPARENT_NAME, results.get(0).getName());
     }
 
     public void testGetHighestGranchildSatisfies() throws TypeException
     {
-        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
-        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<MockA>()
+        insertParentChildAndGrandchildA(new ConfigA(GRANDPARENT_NAME), new ConfigA(CHILD_NAME), new ConfigA(GRANDCHILD_NAME));
+        List<ConfigA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<ConfigA>()
         {
-            public boolean satisfied(MockA mockA)
+            public boolean satisfied(ConfigA mockA)
             {
                 return mockA.getName().equals(GRANDCHILD_NAME);
             }
-        }, MockA.class);
+        }, ConfigA.class);
         
         assertEquals(1, results.size());
         assertEquals(GRANDCHILD_NAME, results.get(0).getName());
@@ -1730,14 +1730,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testGetHighestChildSatisfies() throws TypeException
     {
-        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
-        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<MockA>()
+        insertParentChildAndGrandchildA(new ConfigA(GRANDPARENT_NAME), new ConfigA(CHILD_NAME), new ConfigA(GRANDCHILD_NAME));
+        List<ConfigA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<ConfigA>()
         {
-            public boolean satisfied(MockA mockA)
+            public boolean satisfied(ConfigA mockA)
             {
                 return mockA.getName().equals(CHILD_NAME);
             }
-        }, MockA.class);
+        }, ConfigA.class);
 
         assertEquals(1, results.size());
         assertEquals(CHILD_NAME, results.get(0).getName());
@@ -1745,20 +1745,20 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testGetHighestChildAndGrandchildSatisfies() throws TypeException
     {
-        insertParentChildAndGrandchildA(new MockA(GRANDPARENT_NAME), new MockA(CHILD_NAME), new MockA(GRANDCHILD_NAME));
-        List<MockA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<MockA>()
+        insertParentChildAndGrandchildA(new ConfigA(GRANDPARENT_NAME), new ConfigA(CHILD_NAME), new ConfigA(GRANDCHILD_NAME));
+        List<ConfigA> results = configurationTemplateManager.getHighestInstancesSatisfying(new Predicate<ConfigA>()
         {
-            public boolean satisfied(MockA mockA)
+            public boolean satisfied(ConfigA mockA)
             {
                 return !mockA.getName().equals(GRANDPARENT_NAME);
             }
-        }, MockA.class);
+        }, ConfigA.class);
 
         assertEquals(1, results.size());
         assertEquals(CHILD_NAME, results.get(0).getName());
     }
 
-    private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
+    private Pair<String, String> insertParentAndChildA(ConfigA parent, ConfigA child) throws TypeException
     {
         MutableRecord record = unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
@@ -1770,7 +1770,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         return new Pair<String, String>(parentPath, configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record));
     }
 
-    private String[] insertParentChildAndGrandchildA(MockA parent, MockA child, MockA grandchild) throws TypeException
+    private String[] insertParentChildAndGrandchildA(ConfigA parent, ConfigA child, ConfigA grandchild) throws TypeException
     {
         MutableRecord record = unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
@@ -1811,22 +1811,22 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("name requires a value", fieldErrors.get(0));
     }
 
-    @SymbolicName("mockA")
-    public static class MockA extends AbstractNamedConfiguration
+    @SymbolicName("configA")
+    public static class ConfigA extends AbstractNamedConfiguration
     {
         private String b;
         private String c;
 
-        private MockB mock;
-        private Map<String, MockC> cs = new HashMap<String, MockC>();
-        private List<MockD> ds = new LinkedList<MockD>();
+        private ConfigB composite;
+        private Map<String, ConfigC> cs = new HashMap<String, ConfigC>();
+        private List<ConfigD> ds = new LinkedList<ConfigD>();
         private List<String> pl = new LinkedList<String>();
 
-        public MockA()
+        public ConfigA()
         {
         }
 
-        public MockA(String name)
+        public ConfigA(String name)
         {
             super(name);
         }
@@ -1851,32 +1851,32 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             this.c = c;
         }
 
-        public MockB getMock()
+        public ConfigB getComposite()
         {
-            return mock;
+            return composite;
         }
 
-        public void setMock(MockB mock)
+        public void setComposite(ConfigB composite)
         {
-            this.mock = mock;
+            this.composite = composite;
         }
 
-        public Map<String, MockC> getCs()
+        public Map<String, ConfigC> getCs()
         {
             return cs;
         }
 
-        public void setCs(Map<String, MockC> cs)
+        public void setCs(Map<String, ConfigC> cs)
         {
             this.cs = cs;
         }
 
-        public List<MockD> getDs()
+        public List<ConfigD> getDs()
         {
             return ds;
         }
 
-        public void setDs(List<MockD> ds)
+        public void setDs(List<ConfigD> ds)
         {
             this.ds = ds;
         }
@@ -1892,17 +1892,17 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         }
     }
 
-    @SymbolicName("mockB")
-    public static class MockB extends AbstractConfiguration
+    @SymbolicName("configB")
+    public static class ConfigB extends AbstractConfiguration
     {
         @Required
         private String b;
 
-        public MockB()
+        public ConfigB()
         {
         }
 
-        public MockB(String b)
+        public ConfigB(String b)
         {
             this.b = b;
         }
@@ -1918,101 +1918,101 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         }
     }
 
-    @SymbolicName("mockC")
-    public static class MockC extends AbstractNamedConfiguration
+    @SymbolicName("configC")
+    public static class ConfigC extends AbstractNamedConfiguration
     {
-        private MockD d;
+        private ConfigD d;
 
-        public MockC()
+        public ConfigC()
         {
         }
 
-        public MockC(String name)
+        public ConfigC(String name)
         {
             super(name);
         }
 
-        public MockD getD()
+        public ConfigD getD()
         {
             return d;
         }
 
-        public void setD(MockD d)
+        public void setD(ConfigD d)
         {
             this.d = d;
         }
     }
 
-    @SymbolicName("mockD")
-    public static class MockD extends AbstractNamedConfiguration
+    @SymbolicName("configD")
+    public static class ConfigD extends AbstractNamedConfiguration
     {
-        public MockD()
+        public ConfigD()
         {
         }
 
-        public MockD(String name)
+        public ConfigD(String name)
         {
             super(name);
         }
     }
 
-    @SymbolicName("mockReferer")
-    public static class MockReferer extends AbstractNamedConfiguration
+    @SymbolicName("referer")
+    public static class Referer extends AbstractNamedConfiguration
     {
-        MockReferee ref;
+        Referee ref;
         @Reference
-        MockReferee refToRef;
+        Referee refToRef;
         @Reference
-        List<MockReferee> refToRefs = new LinkedList<MockReferee>();
+        List<Referee> refToRefs = new LinkedList<Referee>();
 
-        public MockReferer()
+        public Referer()
         {
         }
 
-        public MockReferer(String name)
+        public Referer(String name)
         {
             super(name);
         }
 
-        public MockReferee getRef()
+        public Referee getRef()
         {
             return ref;
         }
 
-        public void setRef(MockReferee ref)
+        public void setRef(Referee ref)
         {
             this.ref = ref;
         }
 
-        public MockReferee getRefToRef()
+        public Referee getRefToRef()
         {
             return refToRef;
         }
 
-        public void setRefToRef(MockReferee refToRef)
+        public void setRefToRef(Referee refToRef)
         {
             this.refToRef = refToRef;
         }
 
-        public List<MockReferee> getRefToRefs()
+        public List<Referee> getRefToRefs()
         {
             return refToRefs;
         }
 
-        public void setRefToRefs(List<MockReferee> refToRefs)
+        public void setRefToRefs(List<Referee> refToRefs)
         {
             this.refToRefs = refToRefs;
         }
     }
 
-    @SymbolicName("mockReferee")
-    public static class MockReferee extends AbstractNamedConfiguration
+    @SymbolicName("referee")
+    public static class Referee extends AbstractNamedConfiguration
     {
-        public MockReferee()
+        public Referee()
         {
         }
 
-        public MockReferee(String name)
+        public Referee(String name)
         {
             super(name);
         }

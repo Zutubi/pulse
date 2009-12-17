@@ -10,7 +10,7 @@ import java.util.Set;
 public class TransactionalWrapperTest extends AbstractTransactionTestCase
 {
     private TransactionManager transactionManager;
-    private MockTransactionalWrapper wrapper;
+    private FakeTransactionalWrapper wrapper;
 
     protected void setUp() throws Exception
     {
@@ -18,7 +18,7 @@ public class TransactionalWrapperTest extends AbstractTransactionTestCase
 
         transactionManager = new TransactionManager();
 
-        wrapper = new MockTransactionalWrapper(new HashSet<String>());
+        wrapper = new FakeTransactionalWrapper(new HashSet<String>());
         wrapper.setTransactionManager(transactionManager);
     }
 
@@ -119,9 +119,9 @@ public class TransactionalWrapperTest extends AbstractTransactionTestCase
         });
     }
 
-    private class MockTransactionalWrapper extends TransactionalWrapper<Set<String>>
+    private class FakeTransactionalWrapper extends TransactionalWrapper<Set<String>>
     {
-        public MockTransactionalWrapper(Set<String> global)
+        public FakeTransactionalWrapper(Set<String> global)
         {
             super(global);
         }

@@ -4,11 +4,12 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
-import static org.mockito.Mockito.*;
 
 import java.util.Collections;
+
+import static org.mockito.Mockito.*;
 
 public class FisheyeChangeViewerTest extends PulseTestCase
 {
@@ -44,7 +45,7 @@ public class FisheyeChangeViewerTest extends PulseTestCase
         };
         project.setScm(scmConfiguration);
         viewer = new FisheyeConfiguration(BASE, PATH);
-        viewer.setConfigurationProvider(new MockConfigurationProvider()
+        viewer.setConfigurationProvider(new FakeConfigurationProvider()
         {
             public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
             {

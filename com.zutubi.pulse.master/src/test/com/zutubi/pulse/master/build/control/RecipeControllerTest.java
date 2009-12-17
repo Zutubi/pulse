@@ -5,13 +5,12 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.scm.MockScmClient;
+import com.zutubi.pulse.core.scm.TestScmClient;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -35,16 +34,18 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.*;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static org.mockito.Mockito.*;
 
 public class RecipeControllerTest extends PulseTestCase
 {
     private File recipeDir;
 
-    private MockRecipeQueue recipeQueue;
+    private RecordingRecipeQueue recipeQueue;
     private BuildManager buildManager;
     private AgentService buildService;
 
@@ -59,8 +60,8 @@ public class RecipeControllerTest extends PulseTestCase
         super.setUp();
         recipeDir = FileSystemUtils.createTempDir(RecipeControllerTest.class.getName(), "");
 
-        MockRecipeResultCollector resultCollector = new MockRecipeResultCollector();
-        recipeQueue = new MockRecipeQueue();
+        RecordingRecipeResultCollector resultCollector = new RecordingRecipeResultCollector();
+        recipeQueue = new RecordingRecipeQueue();
         buildManager = mock(BuildManager.class);
         buildService = mock(AgentService.class);
         RecipeLogger logger = mock(RecipeLogger.class);
@@ -98,7 +99,7 @@ public class RecipeControllerTest extends PulseTestCase
         recipeDispatchService = mock(RecipeDispatchService.class);
 
         ScmManager scmManager = mock(ScmManager.class);
-        stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new MockScmClient());
+        stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new TestScmClient());
         recipeController = new RecipeController(projectConfig, build, rootNode, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
@@ -309,7 +310,7 @@ public class RecipeControllerTest extends PulseTestCase
         verify(buildManager, atLeastOnce()).save(rootResult);
     }
 
-    class MockRecipeResultCollector implements RecipeResultCollector
+    class RecordingRecipeResultCollector implements RecipeResultCollector
     {
         private Set<Long> preparedRecipes = new TreeSet<Long>();
         private Map<Long, AgentService> collectedRecipes = new TreeMap<Long, AgentService>();
@@ -351,7 +352,7 @@ public class RecipeControllerTest extends PulseTestCase
         }
     }
 
-    class MockRecipeQueue implements RecipeQueue
+    class RecordingRecipeQueue implements RecipeQueue
     {
         private Map<Long, RecipeAssignmentRequest> dispatched = new TreeMap<Long, RecipeAssignmentRequest>();
 

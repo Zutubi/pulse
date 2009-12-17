@@ -3,7 +3,7 @@ package com.zutubi.validation.providers;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.annotations.*;
-import com.zutubi.validation.mock.*;
+import com.zutubi.validation.types.*;
 import com.zutubi.validation.validators.*;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testPropertyConstraint()
     {
-        MockAnimal animal = new MockAnimal();
+        TestAnimal animal = new TestAnimal();
         List<Validator> validators = provider.getValidators(animal, null);
         assertNotNull(validators);
         assertEquals(1, validators.size());
@@ -31,7 +31,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testPropertyConstriantWithParameters()
     {
-        MockWall wall = new MockWall();
+        TestWall wall = new TestWall();
         List<Validator> validators = provider.getValidators(wall, null);
         assertNotNull(validators);
         assertEquals(1, validators.size());
@@ -43,7 +43,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testCustomKeySuffixDefinedOnConstraint()
     {
-        MockAnimal animal = new MockAnimal();
+        TestAnimal animal = new TestAnimal();
         List<Validator> validators = provider.getValidators(animal, null);
         RequiredValidator r = (RequiredValidator) validators.get(0);
         assertEquals("myrequired", r.getDefaultKeySuffix());
@@ -51,7 +51,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testNestedValidation()
     {
-        MockHouse house = new MockHouse();
+        TestHouse house = new TestHouse();
         List<Validator> validators = provider.getValidators(house, null);
 
         assertEquals(1, validators.size());
@@ -62,7 +62,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testValidationDefinedInSuperClass()
     {
-        MockMouse mouse = new MockMouse();
+        TestMouse mouse = new TestMouse();
         List<Validator> validators = provider.getValidators(mouse, null);
 
         assertEquals(1, validators.size());
@@ -73,14 +73,14 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     public void testValidationDefinedInImplementedInterface()
     {
         // the book implementes the readable interface with its validation.
-        MockBook book = new MockBook();
+        TestBook book = new TestBook();
         List<Validator> validators = provider.getValidators(book, null);
 
         assertEquals(2, validators.size());
 
         // ensure that the readable validator is picked up only once, even through the interface is
         // implemented multiple times.
-        MockNiceBook niceBook = new MockNiceBook();
+        TestNiceBook niceBook = new TestNiceBook();
         validators = provider.getValidators(niceBook, null);
 
         assertEquals(2, validators.size());
@@ -88,7 +88,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
 
     public void testValidatorOrdering()
     {
-        typedValidatorHelper(new MockStraightJacket(), RequiredValidator.class, EmailValidator.class, RegexValidator.class);
+        typedValidatorHelper(new TestStraightJacket(), RequiredValidator.class, EmailValidator.class, RegexValidator.class);
     }
 
     public void testIndirectConstraintsOnField()

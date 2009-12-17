@@ -1,13 +1,13 @@
 package com.zutubi.i18n.bundle;
 
-import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.i18n.context.*;
-import com.zutubi.i18n.mock.MockClass;
-import com.zutubi.i18n.mock.MockSubClass;
+import com.zutubi.i18n.types.TestClass;
+import com.zutubi.i18n.types.TestSubClass;
+import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.ResourceBundle;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * <class-comment/>
@@ -37,7 +37,7 @@ public class DefaultBundleManagerTest extends ZutubiTestCase
     public void testGetBundlesWithIdResolver()
     {
         IdContextResolver resolver = new IdContextResolver();
-        resolver.addBundle(new IdContext("sample"), "com/zutubi/i18n/mock/message");
+        resolver.addBundle(new IdContext("sample"), "com/zutubi/i18n/types/message");
         bundleManager.addResolver(resolver);
 
         List<ResourceBundle> bundles =  bundleManager.getBundles(new IdContext("sample"), locale);
@@ -51,7 +51,7 @@ public class DefaultBundleManagerTest extends ZutubiTestCase
     {
         bundleManager.addResolver(new XWorkContextResolver());
 
-        List<ResourceBundle> bundles =  bundleManager.getBundles(new ExtendedClassContext(MockClass.class), locale);
+        List<ResourceBundle> bundles =  bundleManager.getBundles(new ExtendedClassContext(TestClass.class), locale);
         assertEquals(2, bundles.size());
     }
 
@@ -59,14 +59,14 @@ public class DefaultBundleManagerTest extends ZutubiTestCase
     {
         bundleManager.addResolver(new ClassContextResolver());
 
-        List<ResourceBundle> bundles =  bundleManager.getBundles(new ClassContext(MockSubClass.class), locale);
+        List<ResourceBundle> bundles =  bundleManager.getBundles(new ClassContext(TestSubClass.class), locale);
         assertEquals(2, bundles.size());
     }
 
     public void testLocaleSpecificBundlesAreLoaded()
     {
         IdContextResolver resolver = new IdContextResolver();
-        resolver.addBundle(new IdContext("sample"), "com/zutubi/i18n/mock/german");
+        resolver.addBundle(new IdContext("sample"), "com/zutubi/i18n/types/german");
         bundleManager.addResolver(resolver);
 
         List<ResourceBundle> bundles =  bundleManager.getBundles(new IdContext("sample"), new Locale("de", "de", "ch"));

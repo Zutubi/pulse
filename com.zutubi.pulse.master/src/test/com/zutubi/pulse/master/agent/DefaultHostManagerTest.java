@@ -3,20 +3,21 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.HostState;
-import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
+import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collection;
+
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class DefaultHostManagerTest extends PulseTestCase
 {
@@ -28,7 +29,7 @@ public class DefaultHostManagerTest extends PulseTestCase
 
     private AgentManager agentManager;
     private DefaultHostManager hostManager;
-    private MockEntityDao<HostState> hostStateDao;
+    private InMemoryEntityDao<HostState> hostStateDao;
     private long nextHandle = 1;
     private Map<Long, Agent> agentsByHandle = new HashMap<Long, Agent>();
 
@@ -38,7 +39,7 @@ public class DefaultHostManagerTest extends PulseTestCase
         super.setUp();
 
         hostManager = new DefaultHostManager();
-        hostStateDao = new MockEntityDao<HostState>();
+        hostStateDao = new InMemoryEntityDao<HostState>();
         hostManager.setHostStateDao(hostStateDao);
         hostManager.setHostPingService(mock(HostPingService.class));
         hostManager.setObjectFactory(new DefaultObjectFactory());

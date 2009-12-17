@@ -1,11 +1,11 @@
 package com.zutubi.validation;
 
-import com.zutubi.validation.mock.MockAccount;
-import com.zutubi.validation.mock.MockAnimal;
-import com.zutubi.validation.mock.MockWallet;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
-import com.zutubi.util.junit.ZutubiTestCase;
+import com.zutubi.validation.types.TestAccount;
+import com.zutubi.validation.types.TestAnimal;
+import com.zutubi.validation.types.TestWallet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +38,7 @@ public class DefaultValidationManagerTest extends ZutubiTestCase
 
     public void testMockAnimal() throws ValidationException
     {
-        MockAnimal animal = new MockAnimal();
+        TestAnimal animal = new TestAnimal();
         validationManager.validate(animal, validationContext);
         assertTrue(validationContext.hasErrors());
         assertTrue(validationContext.hasFieldErrors());
@@ -51,7 +51,7 @@ public class DefaultValidationManagerTest extends ZutubiTestCase
 
     public void testIgnoredField() throws ValidationException
     {
-        MockAnimal animal = new MockAnimal();
+        TestAnimal animal = new TestAnimal();
         validationContext.addIgnoredField("head");
         validationManager.validate(animal, validationContext);
         assertFalse(validationContext.hasErrors());
@@ -60,7 +60,7 @@ public class DefaultValidationManagerTest extends ZutubiTestCase
 
     public void testMockWallet() throws ValidationException
     {
-        MockWallet wallet = new MockWallet();
+        TestWallet wallet = new TestWallet();
         validationManager.validate(wallet, validationContext);
 
         assertTrue(validationContext.hasErrors());
@@ -78,7 +78,7 @@ public class DefaultValidationManagerTest extends ZutubiTestCase
         // the email field is both required AND must be a valid email. Verify that if no email is specified,
         // that we do not bother with trying to ensure that it is also a valid email.
 
-        MockAccount account = new MockAccount();
+        TestAccount account = new TestAccount();
         validationManager.validate(account, validationContext);
 
         List<String> fieldErrors = validationContext.getFieldErrors("email");

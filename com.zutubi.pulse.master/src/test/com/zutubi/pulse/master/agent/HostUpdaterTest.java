@@ -15,10 +15,6 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.util.FileSystemUtils;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -26,6 +22,11 @@ import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class HostUpdaterTest extends PulseTestCase implements EventListener
 {
@@ -58,7 +59,7 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         eventManager.register(this);
 
         hostService = mock(HostService.class);
-        host = new MockHost(hostState);
+        host = new TestHost(hostState);
 
         updater = new HostUpdater(host, hostService);
         updater.setStatusTimeout(5);
@@ -259,9 +260,9 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         return new Class[] { HostUpgradeCompleteEvent.class };
     }
 
-    private class MockHost extends DefaultHost
+    private class TestHost extends DefaultHost
     {
-        private MockHost(HostState state)
+        private TestHost(HostState state)
         {
             super(state);
         }

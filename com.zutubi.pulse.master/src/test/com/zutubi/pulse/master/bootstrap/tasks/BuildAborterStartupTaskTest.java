@@ -2,17 +2,18 @@ package com.zutubi.pulse.master.bootstrap.tasks;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
-import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.RandomUtils;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 public class BuildAborterStartupTaskTest extends PulseTestCase
 {
@@ -26,7 +27,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
         buildManager = mock(BuildManager.class);
 
         projectManager = new DefaultProjectManager();
-        projectManager.setProjectDao(new MockProjectDao());
+        projectManager.setProjectDao(new InMemoryProjectDao());
         projectManager.setBuildManager(buildManager);
 
         aborter = new BuildAborterStartupTask();
@@ -144,7 +145,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
         return user;
     }
 
-    public static class MockProjectDao extends MockEntityDao<Project> implements ProjectDao
+    public static class InMemoryProjectDao extends InMemoryEntityDao<Project> implements ProjectDao
     {
         public List<Project> findByResponsible(User user)
         {

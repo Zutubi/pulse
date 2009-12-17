@@ -12,8 +12,6 @@ import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
 
-/**
- */
 public class ConfigurationSecurityManagerTest extends AbstractConfigurationSystemTestCase
 {
     private static final String SCOPE_A = "scopeA";
@@ -32,41 +30,41 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
     protected void setUp() throws Exception
     {
         super.setUp();
-        CompositeType typeA = registerMap(MockA.class, SCOPE_A, false);
-        registerMap(MockA.class, SCOPE_A_TEMPLATED, true);
-        registerMap(MockB.class, SCOPE_B, false);
+        CompositeType typeA = registerMap(ConfigA.class, SCOPE_A, false);
+        registerMap(ConfigA.class, SCOPE_A_TEMPLATED, true);
+        registerMap(ConfigB.class, SCOPE_B, false);
 
         configurationSecurityManager.registerGlobalPermission("scopeA", AccessManager.ACTION_CREATE, ACTION_CREATE_A);
         configurationSecurityManager.registerGlobalPermission("scopeA/*", AccessManager.ACTION_DELETE, ACTION_DELETE_A);
         configurationSecurityManager.registerOwnedScope(SCOPE_A);
         configurationSecurityManager.registerOwnedScope(SCOPE_A_TEMPLATED);
 
-        accessManager.registerAuthorityProvider(MockA.class, new AuthorityProvider<MockA>()
+        accessManager.registerAuthorityProvider(ConfigA.class, new AuthorityProvider<ConfigA>()
         {
-            public Set<String> getAllowedAuthorities(String action, MockA resource)
+            public Set<String> getAllowedAuthorities(String action, ConfigA resource)
             {
                 return new HashSet<String>(Arrays.asList(resource.getName() + ":" + action));
             }
         });
 
-        pathA1 = configurationTemplateManager.insert(SCOPE_A, new MockA("a1"));
-        pathA2 = configurationTemplateManager.insert(SCOPE_A, new MockA("a2"));
+        pathA1 = configurationTemplateManager.insert(SCOPE_A, new ConfigA("a1"));
+        pathA2 = configurationTemplateManager.insert(SCOPE_A, new ConfigA("a2"));
 
-        MockA a = new MockA("global");
+        ConfigA a = new ConfigA("global");
         MutableRecord record = unstantiate(a);
         configurationTemplateManager.markAsTemplate(record);
         pathGlobal = configurationTemplateManager.insertRecord(SCOPE_A_TEMPLATED, record);
         long handle = configurationTemplateManager.getRecord(pathGlobal).getHandle();
 
-        a = new MockA("child");
+        a = new ConfigA("child");
         record = unstantiate(a);
         configurationTemplateManager.setParentTemplate(record, handle);
         pathChild = configurationTemplateManager.insertRecord(SCOPE_A_TEMPLATED, record);
 
-        pathB1 = configurationTemplateManager.insert(SCOPE_B, new MockB("b1"));
-        configurationTemplateManager.insert(SCOPE_B, new MockB("b2"));
+        pathB1 = configurationTemplateManager.insert(SCOPE_B, new ConfigB("b1"));
+        configurationTemplateManager.insert(SCOPE_B, new ConfigB("b2"));
 
-        pathNestedB = ((MockA) configurationTemplateManager.getInstance(pathA1)).getB().getConfigurationPath();
+        pathNestedB = ((ConfigA) configurationTemplateManager.getInstance(pathA1)).getB().getConfigurationPath();
     }
 
     private CompositeType registerMap(Class clazz, String scope, boolean templated) throws TypeException
@@ -84,13 +82,13 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
 
     public void testFindOwningResourceSelfOwner()
     {
-        MockA a = (MockA) configurationSecurityManager.findOwningResource(pathA1);
+        ConfigA a = (ConfigA) configurationSecurityManager.findOwningResource(pathA1);
         assertEquals("a1", a.getName());
     }
 
     public void testFindOwningResourceOwner()
     {
-        MockA a = (MockA) configurationSecurityManager.findOwningResource(pathNestedB);
+        ConfigA a = (ConfigA) configurationSecurityManager.findOwningResource(pathNestedB);
         assertEquals("a1", a.getName());
     }
 
@@ -202,40 +200,40 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
         });
     }
 
-    @SymbolicName("mockA")
-    public static class MockA extends AbstractNamedConfiguration
+    @SymbolicName("configA")
+    public static class ConfigA extends AbstractNamedConfiguration
     {
-        private MockB b = new MockB();
+        private ConfigB b = new ConfigB();
 
-        public MockA()
+        public ConfigA()
         {
         }
 
-        public MockA(String name)
+        public ConfigA(String name)
         {
             super(name);
-            b = new MockB("b for " + name);
+            b = new ConfigB("b for " + name);
         }
 
-        public MockB getB()
+        public ConfigB getB()
         {
             return b;
         }
 
-        public void setB(MockB b)
+        public void setB(ConfigB b)
         {
             this.b = b;
         }
     }
 
-    @SymbolicName("mockB")
-    public static class MockB extends AbstractNamedConfiguration
+    @SymbolicName("configB")
+    public static class ConfigB extends AbstractNamedConfiguration
     {
-        public MockB()
+        public ConfigB()
         {
         }
 
-        public MockB(String name)
+        public ConfigB(String name)
         {
             super(name);
         }

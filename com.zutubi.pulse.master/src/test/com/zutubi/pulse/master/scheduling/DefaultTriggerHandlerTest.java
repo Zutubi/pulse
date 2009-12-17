@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
+import com.zutubi.pulse.master.model.persistence.InMemoryTriggerDao;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.util.concurrent.Executors;
@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class DefaultTriggerHandlerTest extends PulseTestCase
 {
     private DefaultTriggerHandler handler;
-    private MockTriggerDao triggerDao;
+    private InMemoryTriggerDao triggerDao;
     private ThreadPoolExecutor executor;
 
     /**
@@ -32,7 +32,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
 
         handler = new DefaultTriggerHandler();
         handler.setObjectFactory(new DefaultObjectFactory());
-        triggerDao = new MockTriggerDao();
+        triggerDao = new InMemoryTriggerDao();
         handler.setTriggerDao(triggerDao);
 
         executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);

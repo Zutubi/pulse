@@ -25,7 +25,7 @@ public class MapTypeTest extends TypeTestCase
     {
         super.setUp();
 
-        mockAType = typeRegistry.register(MockA.class);
+        mockAType = typeRegistry.register(ConfigA.class);
         mapType = new MapType(mockAType, typeRegistry);
         orderedMapType = new MapType(mockAType, typeRegistry);
         orderedMapType.setOrdered(true);
@@ -42,8 +42,8 @@ public class MapTypeTest extends TypeTestCase
     public void testCompositeObjectMap() throws TypeException
     {
         Map<String, Object> instance = new HashMap<String, Object>();
-        instance.put("keyA", new MockA("valueA"));
-        instance.put("keyB", new MockA("valueB"));
+        instance.put("keyA", new ConfigA("valueA"));
+        instance.put("keyB", new ConfigA("valueB"));
 
         Record record = mapType.unstantiate(instance, null);
         SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
@@ -56,13 +56,13 @@ public class MapTypeTest extends TypeTestCase
 
     public void testGetItemKeyNoPath() throws TypeException
     {
-        Record record = mockAType.unstantiate(new MockA("valueA"), null);
+        Record record = mockAType.unstantiate(new ConfigA("valueA"), null);
         assertEquals("valueA", mapType.getItemKey(null, record));
     }
 
     public void testGetItemKeyPath() throws TypeException
     {
-        Record record = mockAType.unstantiate(new MockA("valueA"), null);
+        Record record = mockAType.unstantiate(new ConfigA("valueA"), null);
         assertEquals("valueA", mapType.getItemKey("coll/oldkey", record));
     }
 
@@ -81,9 +81,9 @@ public class MapTypeTest extends TypeTestCase
 
     public void testToXmlRpc() throws TypeException
     {
-        Map<String, MockA> m = new HashMap<String, MockA>();
-        m.put("key1", new MockA("1"));
-        m.put("key2", new MockA("2"));
+        Map<String, ConfigA> m = new HashMap<String, ConfigA>();
+        m.put("key1", new ConfigA("1"));
+        m.put("key2", new ConfigA("2"));
         Record record = mapType.unstantiate(m, null);
         Object o = mapType.toXmlRpc(null, record);
         assertTrue(o instanceof Hashtable);
@@ -97,7 +97,7 @@ public class MapTypeTest extends TypeTestCase
     public void testFromXmlRpc() throws TypeException
     {
         Hashtable<String, Object> element = new Hashtable<String, Object>();
-        element.put("meta.symbolicName", "mockA");
+        element.put("meta.symbolicName", "configA");
         element.put("a", "avalue");
 
         Hashtable<String, Object> rpcForm = new Hashtable<String, Object>();
@@ -111,7 +111,7 @@ public class MapTypeTest extends TypeTestCase
         assertNotNull(o);
         assertTrue(o instanceof Record);
         record = (Record) o;
-        assertEquals("mockA", record.getSymbolicName());
+        assertEquals("configA", record.getSymbolicName());
         assertEquals("avalue", record.get("a"));
     }
 
@@ -170,45 +170,45 @@ public class MapTypeTest extends TypeTestCase
 
     public void testIsValid()
     {
-        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
-        map.put("a", new MockA("a"));
+        ConfigurationMap<ConfigA> map = new ConfigurationMap<ConfigA>();
+        map.put("a", new ConfigA("a"));
         assertTrue(mapType.isValid(map));
     }
 
     public void testIsValidDirectlyInvalid()
     {
-        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        ConfigurationMap<ConfigA> map = new ConfigurationMap<ConfigA>();
         map.addInstanceError("error");
-        map.put("a", new MockA("a"));
+        map.put("a", new ConfigA("a"));
         assertFalse(mapType.isValid(map));
     }
 
     public void testIsValidElementInvalid()
     {
-        MockA element = new MockA("a");
+        ConfigA element = new ConfigA("a");
         element.addInstanceError("error");
-        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        ConfigurationMap<ConfigA> map = new ConfigurationMap<ConfigA>();
         map.put("a", element);
         assertFalse(mapType.isValid(map));
     }
 
     public void testIsValidElementIndirectlyInvalid()
     {
-        MockB nested = new MockB();
+        ConfigB nested = new ConfigB();
         nested.addInstanceError("error");
-        MockA element = new MockA("a");
-        element.setMockB(nested);
-        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        ConfigA element = new ConfigA("a");
+        element.setConfigB(nested);
+        ConfigurationMap<ConfigA> map = new ConfigurationMap<ConfigA>();
         map.put("a", element);
         assertFalse(mapType.isValid(map));
     }
 
     public void testOrderPreserverOnUnstantiate() throws TypeException
     {
-        ConfigurationMap<MockA> aMap = new ConfigurationMap<MockA>();
-        aMap.put("foo", new MockA("foo"));
-        aMap.put("bar", new MockA("bar"));
-        aMap.put("baz", new MockA("baz"));
+        ConfigurationMap<ConfigA> aMap = new ConfigurationMap<ConfigA>();
+        aMap.put("foo", new ConfigA("foo"));
+        aMap.put("bar", new ConfigA("bar"));
+        aMap.put("baz", new ConfigA("baz"));
 
         MutableRecord record = orderedMapType.unstantiate(aMap, null);
         assertEquals(Arrays.asList("foo", "bar", "baz"), orderedMapType.getOrder(record));
@@ -216,26 +216,26 @@ public class MapTypeTest extends TypeTestCase
         // Trying a second order gurantees wwe don't get lucky by matching
         // whatever the unordered default is.
         aMap.clear();
-        aMap.put("baz", new MockA("baz"));
-        aMap.put("foo", new MockA("foo"));
-        aMap.put("bar", new MockA("bar"));
+        aMap.put("baz", new ConfigA("baz"));
+        aMap.put("foo", new ConfigA("foo"));
+        aMap.put("bar", new ConfigA("bar"));
 
         record = orderedMapType.unstantiate(aMap, null);
         assertEquals(Arrays.asList("baz", "foo", "bar"), orderedMapType.getOrder(record));
     }
 
-    @SymbolicName("mockA")
-    public static class MockA extends AbstractConfiguration
+    @SymbolicName("configA")
+    public static class ConfigA extends AbstractConfiguration
     {
         @ID
         private String a;
-        private MockB mockB;
+        private ConfigB configB;
 
-        public MockA()
+        public ConfigA()
         {
         }
 
-        public MockA(String a)
+        public ConfigA(String a)
         {
             this.a = a;
         }
@@ -255,9 +255,9 @@ public class MapTypeTest extends TypeTestCase
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            MockA mockA = (MockA) o;
+            ConfigA configA = (ConfigA) o;
 
-            return !(a != null ? !a.equals(mockA.a) : mockA.a != null);
+            return !(a != null ? !a.equals(configA.a) : configA.a != null);
 
         }
 
@@ -266,19 +266,19 @@ public class MapTypeTest extends TypeTestCase
             return (a != null ? a.hashCode() : 0);
         }
 
-        public MockB getMockB()
+        public ConfigB getConfigB()
         {
-            return mockB;
+            return configB;
         }
 
-        public void setMockB(MockB mockB)
+        public void setConfigB(ConfigB configB)
         {
-            this.mockB = mockB;
+            this.configB = configB;
         }
     }
 
-    @SymbolicName("mockB")
-    public static class MockB extends AbstractConfiguration
+    @SymbolicName("configB")
+    public static class ConfigB extends AbstractConfiguration
     {
     }
 }
