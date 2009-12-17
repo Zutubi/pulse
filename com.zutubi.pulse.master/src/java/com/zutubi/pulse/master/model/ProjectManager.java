@@ -11,6 +11,7 @@ import com.zutubi.tove.security.AccessManager;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -235,4 +236,19 @@ public interface ProjectManager extends EntityManager<Project>
      */
     @SecureResult
     List<ProjectConfiguration> getDownstreamDependencies(ProjectConfiguration projectConfig);
+
+    /**
+     * Retrieve a map of latest built revisions for each project.  If a project has not been
+     * built, then it will contain a null revision.
+     *
+     * @return a map of project id to latest built revision.
+     */
+    Map<Long, Revision> getLatestBuiltRevisions();
+
+    /**
+     * Retrieve the latest build revision for the specified project.
+     * @param project   the project for which the latest built revision is desired.
+     * @return the latest built revision, or null if this project has never been built.
+     */
+    Revision getLatestBuiltRevision(Project project);
 }

@@ -92,6 +92,9 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     "No scm polling is available.  See log for details.");
             LOG.severe(e);
         }
+
+        // initialise the latest built revision cache
+        latestRevisions.putAll(projectManager.getLatestBuiltRevisions());
     }
 
     private List<ProjectConfiguration> getActiveProjects()
