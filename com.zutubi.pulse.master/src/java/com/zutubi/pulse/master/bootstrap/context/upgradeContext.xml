@@ -107,6 +107,7 @@
                 <ref local="addSubversionEnableHttpSpooling"/>
                 <ref local="addLogCompressionEnabled"/>
                 <ref local="addPrimaryContact"/>
+                <ref local="addProjectContacts"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -512,5 +513,9 @@
 
     <bean id="addPrimaryContact" class="com.zutubi.pulse.master.upgrade.tasks.AddPrimaryContactUpgradeTask">
         <property name="buildNumber" value="201011001"/>
+    </bean>
+
+    <bean id="addProjectContacts" class="com.zutubi.pulse.master.upgrade.tasks.AddProjectContactsUpgradeTask">
+        <property name="buildNumber" value="201011002"/>
     </bean>
 </beans>

@@ -24,7 +24,7 @@ import java.util.*;
  * Pulse project for a nightly build and another for a continuous build.
  */
 @Form(fieldOrder = {"name", "organisation", "url", "description"})
-@Listing(order = {"type", "requirements", "properties", "stages", "options", "triggers", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions", "reportGroups", "cleanupRules"})
+@Listing(order = {"type", "requirements", "properties", "stages", "options", "triggers", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "contacts", "permissions", "reportGroups", "cleanupRules"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
 public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration
@@ -79,6 +79,8 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     @Ordered
     private Map<String, ReportGroupConfiguration> reportGroups = new LinkedHashMap<String, ReportGroupConfiguration>();
+
+    private ProjectContactsConfiguration contacts = new ProjectContactsConfiguration();
 
     public ProjectConfiguration()
     {
@@ -318,5 +320,15 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void addReportGroup(ReportGroupConfiguration reportGroup)
     {
         reportGroups.put(reportGroup.getName(), reportGroup);
+    }
+
+    public ProjectContactsConfiguration getContacts()
+    {
+        return contacts;
+    }
+
+    public void setContacts(ProjectContactsConfiguration contacts)
+    {
+        this.contacts = contacts;
     }
 }
