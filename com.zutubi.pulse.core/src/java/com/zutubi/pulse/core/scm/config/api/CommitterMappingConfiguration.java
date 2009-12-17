@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Maps from an SCM login to an email address for a specific committer.  The
  * email address may be complete (user@domain) or partial (user) in which case
- * the domain from the {@link com.zutubi.pulse.master.hook.email.EmailCommittersTaskConfiguration}
+ * the domain from the {@link com.zutubi.pulse.master.hook.email.SendEmailTaskConfiguration}
  * will be appended.
  */
 @SymbolicName("zutubi.committerMappingConfig")

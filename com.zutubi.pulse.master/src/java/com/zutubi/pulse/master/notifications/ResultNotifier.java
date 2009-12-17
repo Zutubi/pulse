@@ -4,28 +4,23 @@ import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.notifications.condition.UnsuccessfulCountBuildsValue;
-import com.zutubi.pulse.master.notifications.condition.UnsuccessfulCountDaysValue;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
+import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SubscriptionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
-import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
-import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
@@ -54,6 +49,7 @@ public class ResultNotifier implements EventListener
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
     private UserManager userManager;
+    private DefaultRenderService renderService = new DefaultRenderService();
 
     public void init()
     {
@@ -89,7 +85,7 @@ public class ResultNotifier implements EventListener
 
         Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
-        Map<String, Object> dataMap = getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = renderService.getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
 
         Collection<SubscriptionConfiguration> subscriptions = configurationProvider.getAll(SubscriptionConfiguration.class);
         for (SubscriptionConfiguration subscription : subscriptions)
@@ -108,7 +104,7 @@ public class ResultNotifier implements EventListener
                 if (canView(userConfig, buildResult))
                 {
                     String templateName = subscription.getTemplate();
-                    RenderedResult rendered = renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
+                    RenderedResult rendered = renderService.renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
                     notifiedContactPoints.add(contactPoint.getHandle());
 
                     notifyContactPoint(contactPoint, buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
@@ -128,7 +124,7 @@ public class ResultNotifier implements EventListener
         clearError(contactPoint);
         try
         {
-            contactPoint.notify(buildResult, rendered.subject, rendered.content, mimeType);
+            contactPoint.notify(buildResult, rendered.getSubject(), rendered.getContent(), mimeType);
         }
         catch (Exception e)
         {
@@ -186,83 +182,6 @@ public class ResultNotifier implements EventListener
         }
     }
 
-    public static Map<String, Object> getDataMap(BuildResult result, String baseUrl, BuildManager buildManager, BuildResultRenderer renderer)
-    {
-        Project project = result.getProject();
-
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        dataMap.put("renderer", renderer);
-        dataMap.put("baseUrl", baseUrl);
-        dataMap.put("externalUrls", new Urls(baseUrl));
-        dataMap.put("project", project);
-        dataMap.put("status", result.succeeded() ? "healthy" : "broken");
-        dataMap.put("result", result);
-        dataMap.put("model", result);
-        dataMap.put("changelists", buildManager.getChangesForBuild(result));
-        dataMap.put("errorLevel", Feature.Level.ERROR);
-        dataMap.put("infoLevel", Feature.Level.INFO);
-        dataMap.put("warningLevel", Feature.Level.WARNING);
-
-        if (!result.succeeded())
-        {
-            BuildResult lastSuccess = buildManager.getLatestSuccessfulBuildResult();
-            if (lastSuccess != null)
-            {
-                dataMap.put("lastSuccess", lastSuccess);
-            }
-
-            dataMap.put("unsuccessfulBuilds", UnsuccessfulCountBuildsValue.getValueForBuild(result, buildManager));
-            dataMap.put("unsuccessfulDays", UnsuccessfulCountDaysValue.getValueForBuild(result, buildManager));
-        }
-
-        return dataMap;
-    }
-
-    public static RenderedResult renderResult(BuildResult buildResult, String baseUrl, BuildManager buildManager, BuildResultRenderer buildResultRenderer, String template)
-    {
-        Map<String, Object> dataMap = getDataMap(buildResult, baseUrl, buildManager, buildResultRenderer);
-        return renderResult(buildResult, dataMap, buildResultRenderer, template, null);
-    }
-
-    private static RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, BuildResultRenderer buildResultRenderer, String template, Map<String, RenderedResult> cache)
-    {
-        RenderedResult rendered = cache == null ? null : cache.get(template);
-        if (rendered == null)
-        {
-            StringWriter w = new StringWriter();
-            buildResultRenderer.render(result, dataMap, template, w);
-            String content = w.toString();
-
-            String subject;
-            String subjectTemplate = template + "-subject";
-            if (buildResultRenderer.hasTemplate(subjectTemplate, result.isPersonal()))
-            {
-                w = new StringWriter();
-                buildResultRenderer.render(result, dataMap, subjectTemplate, w);
-                subject = w.toString().trim();
-            }
-            else
-            {
-                subject = getDefaultSubject(result);
-            }
-
-            rendered = new RenderedResult(subject, content);
-            if (cache != null)
-            {
-                cache.put(template, rendered);
-            }
-        }
-
-        return rendered;
-    }
-
-    private static String getDefaultSubject(BuildResult result)
-    {
-        ProjectConfiguration config = result.getProject().getConfig();
-        String prelude = result.isPersonal() ? "personal build " : (config.getName() + ": build ");
-        return prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-    }
-
     public Class[] getHandledEvents()
     {
         return new Class[]{BuildCompletedEvent.class};
@@ -306,27 +225,5 @@ public class ResultNotifier implements EventListener
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    public static class RenderedResult
-    {
-        String subject;
-        String content;
-
-        public RenderedResult(String subject, String content)
-        {
-            this.subject = subject;
-            this.content = content;
-        }
-
-        public String getSubject()
-        {
-            return subject;
-        }
-
-        public String getContent()
-        {
-            return content;
-        }
     }
 }

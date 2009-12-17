@@ -13,22 +13,27 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.notifications.ResultNotifier;
+import com.zutubi.pulse.master.notifications.email.DefaultEmailService;
+import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
+import com.zutubi.pulse.master.notifications.renderer.RenderService;
+import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectContactsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookTaskConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.CompatibleHooks;
 import com.zutubi.pulse.master.tove.config.project.hooks.ManualBuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.CollectionUtils;
@@ -36,26 +41,29 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 
-import static java.util.Arrays.asList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Arrays.asList;
+
 /**
- * A build hook task that emails users that committed changes that affected
- * the build.
+ * A build hook task that sends email notifications to project contacts and/or
+ * users that committed changes that affected the build.
  */
-@SymbolicName("zutubi.emailCommittersTaskConfig")
-@Form(fieldOrder = {"emailDomain", "template", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+@SymbolicName("zutubi.sendEmailTaskConfig")
+@Form(fieldOrder = {"template", "emailContacts", "emailCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
 @CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class})
 @Wire
-public class EmailCommittersTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
+public class SendEmailTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
+    @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
+    private String template;
+    private boolean emailContacts;
+    @ControllingCheckbox(checkedFields = {"emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+    private boolean emailCommitters;
     @Required
     private String emailDomain;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
-    private String template;
     private boolean sinceLastSuccess = false;
     private boolean ignorePulseUsers = false;
     private boolean useScmEmails = false;
@@ -65,16 +73,8 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     private BuildManager buildManager;
     private UserManager userManager;
     private ScmManager scmManager;
-
-    public String getEmailDomain()
-    {
-        return emailDomain;
-    }
-
-    public void setEmailDomain(String emailDomain)
-    {
-        this.emailDomain = emailDomain;
-    }
+    private EmailService emailService = new DefaultEmailService();
+    private RenderService renderService = new DefaultRenderService();
 
     public String getTemplate()
     {
@@ -84,6 +84,36 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     public void setTemplate(String template)
     {
         this.template = template;
+    }
+
+    public boolean isEmailContacts()
+    {
+        return emailContacts;
+    }
+
+    public void setEmailContacts(boolean emailContacts)
+    {
+        this.emailContacts = emailContacts;
+    }
+
+    public boolean isEmailCommitters()
+    {
+        return emailCommitters;
+    }
+
+    public void setEmailCommitters(boolean emailCommitters)
+    {
+        this.emailCommitters = emailCommitters;
+    }
+
+    public String getEmailDomain()
+    {
+        return emailDomain;
+    }
+
+    public void setEmailDomain(String emailDomain)
+    {
+        this.emailDomain = emailDomain;
     }
 
     public boolean isSinceLastSuccess()
@@ -129,15 +159,59 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             throw new PulseException("Cannot execute email build hook task as no SMTP host is configured.");
         }
 
-        GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
-        List<String> emails = getEmails(getBuilds(buildResult));
+        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
+        Set<String> emails = new HashSet<String>();
+        if (emailContacts)
+        {
+            addContactEmails(projectConfig, emails);
+        }
+
+        if (emailCommitters)
+        {
+            addCommitterEmails(projectConfig, getBuilds(buildResult), emails);
+        }
+
         if (emails.size() > 0)
         {
-            ResultNotifier.RenderedResult rendered = ResultNotifier.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
+            GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
+            RenderedResult rendered = renderService.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
 
-            EmailContactConfiguration.sendMail(emails, emailConfiguration, subject, mimeType, rendered.getContent());
+            emailService.sendMail(emails, subject, mimeType, rendered.getContent(), emailConfiguration);
+        }
+    }
+
+    private void addContactEmails(ProjectConfiguration projectConfig, Set<String> emails)
+    {
+        ProjectContactsConfiguration contacts = projectConfig.getContacts();
+        for (GroupConfiguration group: contacts.getGroups())
+        {
+            for (UserConfiguration user: userManager.getGroupMembers(group))
+            {
+                addContactEmail(user, emails);
+            }
+        }
+
+        for (UserConfiguration user: contacts.getUsers())
+        {
+            addContactEmail(user, emails);
+        }
+    }
+
+    private void addContactEmail(UserConfiguration user, Set<String> emails)
+    {
+        ContactConfiguration primaryContact = CollectionUtils.find(user.getPreferences().getContacts().values(), new Predicate<ContactConfiguration>()
+        {
+            public boolean satisfied(ContactConfiguration contactConfiguration)
+            {
+                return contactConfiguration.isPrimary();
+            }
+        });
+
+        if (primaryContact != null && primaryContact instanceof EmailContactConfiguration)
+        {
+            emails.add(((EmailContactConfiguration) primaryContact).getAddress());
         }
     }
 
@@ -157,9 +231,8 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
         }
     }
 
-    private List<String> getEmails(List<BuildResult> builds)
+    private void addCommitterEmails(ProjectConfiguration projectConfig, List<BuildResult> builds, Set<String> emails)
     {
-        List<String> emails = new LinkedList<String>();
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
         {
@@ -171,17 +244,15 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
                 {
                     if (StringUtils.stringSet(scmLogin) && (!ignorePulseUsers || userManager.getUser(scmLogin) == null))
                     {
-                        emails.add(getEmail(scmLogin));
+                        emails.add(getEmail(projectConfig, scmLogin));
                     }
                 }
             }
         }
-        return emails;
     }
 
-    private String getEmail(final String scmLogin)
+    private String getEmail(ProjectConfiguration projectConfig, final String scmLogin)
     {
-        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
         CommitterMappingConfiguration mapping = CollectionUtils.find(projectConfig.getScm().getCommitterMappings(), new Predicate<CommitterMappingConfiguration>()
         {
             public boolean satisfied(CommitterMappingConfiguration committerMappingConfiguration)
@@ -261,6 +332,16 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
+    }
+
+    public void setEmailService(EmailService emailService)
+    {
+        this.emailService = emailService;
+    }
+
+    public void setRenderService(RenderService renderService)
+    {
+        this.renderService = renderService;
     }
 }
 

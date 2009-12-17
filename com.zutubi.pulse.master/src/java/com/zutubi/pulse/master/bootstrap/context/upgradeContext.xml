@@ -108,6 +108,7 @@
                 <ref local="addLogCompressionEnabled"/>
                 <ref local="addPrimaryContact"/>
                 <ref local="addProjectContacts"/>
+                <ref local="convertEmailCommittersTasks"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -517,5 +518,9 @@
 
     <bean id="addProjectContacts" class="com.zutubi.pulse.master.upgrade.tasks.AddProjectContactsUpgradeTask">
         <property name="buildNumber" value="201011002"/>
+    </bean>
+
+    <bean id="convertEmailCommittersTasks" class="com.zutubi.pulse.master.upgrade.tasks.ConvertEmailCommittersTasksUpgradeTask">
+        <property name="buildNumber" value="201011003"/>
     </bean>
 </beans>

@@ -229,6 +229,22 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, name), UserGroupConfiguration.class);
     }
 
+    public Collection<UserConfiguration> getGroupMembers(GroupConfiguration group)
+    {
+        if (group instanceof UserGroupConfiguration)
+        {
+            return Collections.unmodifiableList(((UserGroupConfiguration) group).getMembers());
+        }
+        else if (group.getName().equals(ALL_USERS_GROUP_NAME))
+        {
+            return configurationProvider.getAll(PathUtils.getPath(MasterConfigurationRegistry.USERS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), UserConfiguration.class);
+        }
+        else
+        {
+            return Collections.emptyList();
+        }
+    }
+
     public Set<Project> getUserProjects(User user, final ProjectManager projectManager)
     {
         Set<Project> projects = new HashSet<Project>();

@@ -12,6 +12,8 @@ import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
+import com.zutubi.pulse.master.notifications.renderer.RenderService;
 import com.zutubi.pulse.master.search.BuildResultExpressions;
 import com.zutubi.pulse.master.search.Queries;
 import com.zutubi.pulse.master.search.SearchQuery;
@@ -22,12 +24,13 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.webwork.dispatcher.JITFeed;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
-import static com.zutubi.util.StringUtils.stringSet;
 import com.zutubi.util.WebUtils;
 import org.hibernate.criterion.Projections;
 
 import java.io.StringWriter;
 import java.util.*;
+
+import static com.zutubi.util.StringUtils.stringSet;
 
 /**
  * Generate a build results rss feed.
@@ -42,6 +45,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private BuildResultRenderer buildResultRenderer;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
+    private RenderService renderService = new DefaultRenderService();
 
     private Queries queries;
 
@@ -163,7 +167,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private String renderResult(BuildResult result)
     {
         StringWriter w = new StringWriter();
-        Map<String, Object> dataMap = ResultNotifier.getDataMap(result, getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = renderService.getDataMap(result, getBaseUrl(), buildManager, buildResultRenderer);
         buildResultRenderer.render(result, dataMap, "html-email", w);
         return w.toString();
     }

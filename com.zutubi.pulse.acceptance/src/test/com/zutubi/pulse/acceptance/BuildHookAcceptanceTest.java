@@ -403,7 +403,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     {
         SelectTypeState taskType = new SelectTypeState(browser);
         taskType.waitFor();
-        assertEquals(Arrays.asList("zutubi.emailCommittersTaskConfig", "zutubi.runExecutableTaskConfig", "zutubi.tagTaskConfig"), taskType.getSortedOptionList());
+        assertEquals(Arrays.asList("zutubi.runExecutableTaskConfig", "zutubi.sendEmailTaskConfig", "zutubi.tagTaskConfig"), taskType.getSortedOptionList());
         taskType.nextFormElements("zutubi.runExecutableTaskConfig");
     }
 

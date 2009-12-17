@@ -8,6 +8,20 @@ import com.zutubi.util.UnaryFunction;
 public class RecordUpgraders
 {
     /**
+     * Creates a new upgrader that will change all occurrences of the given old
+     * name to the given new name.  Records that do not have the old symbolic
+     * name will be unchanged.
+     *
+     * @param oldSymbolicName the symbolic name to rename
+     * @param newSymbolicName the new symbolic name
+     * @return the new upgrader
+     */
+    public static RecordUpgrader newChangeSymbolicName(String oldSymbolicName, String newSymbolicName)
+    {
+        return new ChangeSymbolicNameRecordUpgrader(oldSymbolicName, newSymbolicName);
+    }
+
+    /**
      * Create a new upgrader that will add a simple property to records.
      *
      * @param name  the name of the property to add

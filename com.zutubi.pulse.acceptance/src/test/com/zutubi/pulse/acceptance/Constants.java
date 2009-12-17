@@ -89,6 +89,7 @@ public class Constants
         public static final String REPORT_GROUPS = "reportGroups";
         public static final String ORGANISATION = "organisation";
         public static final String POST_PROCESSORS = "postProcessors";
+        public static final String CONTACTS = "contacts";
 
         /**
          * Property names in the multi recipe type class.

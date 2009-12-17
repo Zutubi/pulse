@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
-import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.pulse.master.notifications.email.DefaultEmailService;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 import com.zutubi.validation.annotations.Required;
@@ -29,6 +29,6 @@ public class ServerSettingsConfigurationCheckHandler extends AbstractConfigurati
 
     public void test(ServerSettingsConfiguration configuration) throws MessagingException
     {
-        EmailContactConfiguration.sendMail(Arrays.asList(testAddress), configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
+        new DefaultEmailService().sendMail(Arrays.asList(testAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration);
     }
 }

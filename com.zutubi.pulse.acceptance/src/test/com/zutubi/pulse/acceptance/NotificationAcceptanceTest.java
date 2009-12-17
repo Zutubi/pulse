@@ -2,23 +2,28 @@ package com.zutubi.pulse.acceptance;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.AllBuildsConditionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.CustomConditionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectSubscriptionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SelectedBuildsConditionConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
 
 import java.util.*;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static java.util.Arrays.asList;
 
 /**
  * Sanity acceptance tests for notifications.
@@ -59,8 +64,8 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.loginAsAdmin();
         random = getName() + "-" + RandomUtils.randomString(10);
 
-        server = SimpleSmtpServer.start(DEFAULT_PORT);
         ensureDefaultEmailSettings();
+        server = SimpleSmtpServer.start(DEFAULT_PORT);
     }
 
     protected void tearDown() throws Exception
@@ -69,9 +74,21 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.deleteAllConfigs("users/*/preferences/subscriptions/*");
         xmlRpcHelper.logout();
 
-        server.stop();
+        stopSmtpServer();
 
         super.tearDown();
+    }
+
+    private void stopSmtpServer() throws InterruptedException
+    {
+        server.stop();
+        Thread.sleep(1000);
+    }
+
+    private void clearSmtpServer() throws InterruptedException
+    {
+        stopSmtpServer();
+        server = SimpleSmtpServer.start(DEFAULT_PORT);
     }
 
     private void ensureDefaultEmailSettings() throws Exception
@@ -93,19 +110,13 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerAndCheckFailedBuild();
     }
 
-    private void clearSmtpServer()
-    {
-        server.stop();
-        server = SimpleSmtpServer.start(DEFAULT_PORT);
-    }
-
     private void triggerAndCheckSuccessfulBuild() throws Exception
     {
         String projectName = random + "project" + PROJECT_SUCCESS;
         int buildNumber = xmlRpcHelper.runBuild(projectName);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
         assertEquals("success", build.get("status"));
-        assertEmailsFrom(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS);
+        assertIndividualEmailsTo(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS);
     }
 
     private void triggerAndCheckFailedBuild() throws Exception
@@ -114,32 +125,84 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = xmlRpcHelper.runBuild(projectName);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
         assertEquals("failure", build.get("status"));
-        assertEmailsFrom(BUILDS_ALL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
+        assertIndividualEmailsTo(BUILDS_ALL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
     }
 
-    private void assertEmailsFrom(final String... recipients)
+    public void testSendEmailHook() throws Exception
     {
-        // wait for emails to arrive.
+        String user1 = random + "-user1";
+        String user2 = random + "-user2";
+        String group = random + "-group";
+        String project = random + "-project";
+
+        String user1Path = insertUserWithPrimaryContact(user1);
+        insertUserWithPrimaryContact(user2);
+        String groupPath = createGroup(group, user2);
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(project);
+        String contactsPath = PathUtils.getPath(projectPath, Constants.Project.CONTACTS);
+        Hashtable<String, Object> contacts = xmlRpcHelper.getConfig(contactsPath);
+        contacts.put("groups", new Vector<String>(asList(groupPath)));
+        contacts.put("users", new Vector<String>(asList(user1Path)));
+        xmlRpcHelper.saveConfig(contactsPath, contacts, false);
+
+        Hashtable<String, Object> hook = xmlRpcHelper.createDefaultConfig(PostBuildHookConfiguration.class);
+        hook.put("name", random);
+        Hashtable<String, Object> task = xmlRpcHelper.createDefaultConfig("zutubi.sendEmailTaskConfig");
+        task.put("template", "plain-text-email");
+        task.put("emailContacts", true);
+        hook.put("task", task);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, Constants.Project.HOOKS), hook);
+
+        xmlRpcHelper.runBuild(project);
+
+        assertEmailsTo(1, user1, user2);
+    }
+
+    private String insertUserWithPrimaryContact(String login) throws Exception
+    {
+        String userPath = xmlRpcHelper.insertTrivialUser(login);
+        Hashtable<String, Object> emailContact = xmlRpcHelper.createDefaultConfig(EmailContactConfiguration.class);
+        emailContact.put("address", login + EMAIL_DOMAIN);
+        emailContact.put("name", "primary email");
+        String contactPath = xmlRpcHelper.insertConfig(PathUtils.getPath(userPath, "preferences", "contacts"), emailContact);
+        xmlRpcHelper.doConfigAction(contactPath, ContactConfigurationActions.ACTION_MARK_PRIMARY);
+        return userPath;
+    }
+
+    private void assertIndividualEmailsTo(String... suffixes)
+    {
+        assertEmailsTo(suffixes.length, CollectionUtils.mapToArray(suffixes, new Mapping<String, String>()
+        {
+            public String map(String s)
+            {
+                return random + "user" + s;
+            }
+        }, new String[suffixes.length]));
+    }
+
+    private void assertEmailsTo(final int emailCount, final String... recipients)
+    {
         waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return server.getReceivedEmailSize() == recipients.length;
+                return server.getReceivedEmailSize() == emailCount;
             }
-        }, EMAIL_TIMEOUT, "Expected " + recipients.length + " emails.");
+        }, EMAIL_TIMEOUT, " " + emailCount + " emails.");
 
-        assertEquals(recipients.length, server.getReceivedEmailSize());
+        assertEquals(emailCount, server.getReceivedEmailSize());
         Set<String> emailRecipients = new HashSet<String>();
         Iterator receivedEmails = server.getReceivedEmail();
         while (receivedEmails.hasNext())
         {
             SmtpMessage email = (SmtpMessage) receivedEmails.next();
-            emailRecipients.add(email.getHeaderValue("To"));
+            emailRecipients.addAll(asList(email.getHeaderValues("To")));
         }
 
-        for (String nameSuffix : recipients)
+        for (String login : recipients)
         {
-            assertTrue(emailRecipients.contains(random + "user" + nameSuffix + EMAIL_DOMAIN));
+            assertTrue(emailRecipients.contains(login + EMAIL_DOMAIN));
         }
     }
 
@@ -209,9 +272,9 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.insertConfig(userPath + "/preferences/subscriptions", projectSubscription);
     }
 
-    private void createGroup(String group, String... users) throws Exception
+    private String createGroup(String group, String... users) throws Exception
     {
-        xmlRpcHelper.insertGroup(group, CollectionUtils.map(users, new Mapping<String, String>()
+        return xmlRpcHelper.insertGroup(group, CollectionUtils.map(users, new Mapping<String, String>()
         {
             public String map(String name)
             {
@@ -244,9 +307,8 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
             acl.put("group", "groups/"+random + "group" + groupNameSuffix);
-            acl.put("allowedActions", new Vector<String>(Arrays.asList(AccessManager.ACTION_VIEW)));
+            acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_VIEW)));
             xmlRpcHelper.insertConfig("projects/" + name + "/permissions", acl);
         }
     }
-
 }

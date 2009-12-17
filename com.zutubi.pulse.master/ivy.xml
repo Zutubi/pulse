@@ -22,6 +22,7 @@
     <publications>
         <artifact name="com.zutubi.pulse.master" type="jar" conf="release,build"/>
         <artifact name="com.zutubi.pulse.master-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.master-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
