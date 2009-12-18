@@ -362,6 +362,20 @@ public class WebUtilsTest extends ZutubiTestCase
         toValidHtmlNameHelper("foo.bar.baz", "foo/bar/baz");
     }
 
+    public void testEncodeWithTag()
+    {
+        assertEquals("%21", WebUtils.encode('%', "!", new FalsePredicate<Character>()));
+        assertEquals("%25", WebUtils.encode('%', "%", new FalsePredicate<Character>()));
+        assertEquals("^", WebUtils.encode('%', "^", new TruePredicate<Character>()));
+    }
+
+    public void testDecodeWithTag()
+    {
+        assertEquals("!", WebUtils.decode('%', "%21"));
+        assertEquals("%", WebUtils.decode('%', "%25"));
+        assertEquals("^", WebUtils.decode('%', "^"));
+    }
+
     private void toValidHtmlNameHelper(String expected, String in)
     {
         assertEquals(expected, WebUtils.toValidHtmlName(in));

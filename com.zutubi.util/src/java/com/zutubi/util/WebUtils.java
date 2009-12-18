@@ -173,6 +173,18 @@ public class WebUtils
         return encode('%', in, allowedCharacters);
     }
 
+    /**
+     * Encode the given string based on the given set of allowed characters.
+     * Non-allowed characters are encoded to UTF-8 and then represented in the
+     * result as encoded bytes, tagged by the given tag.
+     *
+     * @param tag               the tag used to mark encoded bytes
+     * @param in                the string to encode
+     * @param allowedCharacters a condition that is true for characters that are
+     *                          allowed in the result verbatim (i.e. not encoded)
+     *
+     * @return  the input string encoded.
+     */
     public static String encode(char tag, String in, Predicate<Character> allowedCharacters)
     {
         StringBuilder sb = null;
@@ -235,6 +247,16 @@ public class WebUtils
         return decode('%', in);
     }
 
+    /**
+     * Decodes an encoded string into a java string.  The decode
+     * searches for encoded bytes that are marked by the specified tag,
+     * sequences of such bytes are decoded using UTF-8 to give a
+     * Java string.
+     *
+     * @param tag   the tag marking encoded bytes.
+     * @param in    the string to decode
+     * @return  a decoded version of the input string
+     */
     public static String decode(char tag, String in)
     {
         StringBuilder sb = null;
