@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class BuildResult extends Result implements AclObjectIdentityAware, Iterable<RecipeResultNode>
 {
+    public static final String ACTION_ADD_COMMENT = "addComment";
     public static final String ACTION_CANCEL = "cancel";
 
     private BuildReason reason;
@@ -58,6 +59,8 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
      * results that needed to be completed before this result's build could commence.
      */
     private List<BuildResult> dependsOn =  new LinkedList<BuildResult>();
+
+    private List<Comment> comments = new LinkedList<Comment>();
 
     public BuildResult()
     {
@@ -184,6 +187,26 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public void addDependsOn(BuildResult result)
     {
         this.dependsOn.add(result);
+    }
+
+    public List<Comment> getComments()
+    {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments)
+    {
+        this.comments = comments;
+    }
+
+    public void addComment(Comment comment)
+    {
+        comments.add(comment);
+    }
+
+    public boolean removeComment(Comment comment)
+    {
+        return comments.remove(comment);
     }
 
     /**

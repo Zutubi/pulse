@@ -518,6 +518,16 @@
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
+
+        <action name="addComment" class="com.zutubi.pulse.master.xwork.actions.ajax.AddCommentAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
+
+        <action name="deleteComment" class="com.zutubi.pulse.master.xwork.actions.ajax.DeleteCommentAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
     </package>
 
     <package name="configAjax" namespace="/aconfig" extends="default">

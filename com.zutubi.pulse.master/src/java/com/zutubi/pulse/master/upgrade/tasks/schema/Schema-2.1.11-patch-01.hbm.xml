@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.master.model.BuildResult" table="BUILD_RESULT" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <list name="comments" cascade="all,delete-orphan" lazy="false">
+            <key column="BUILD_RESULT_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.master.model.Comment"/>
+        </list>
+    </class>
+
+    <class name="com.zutubi.pulse.master.model.Comment" table="BUILD_COMMENT" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="author" column="COMMENT_AUTHOR" type="string" length="255"/>
+
+        <property name="time" column="COMMENT_TIME" type="long"/>
+
+        <property name="message" column="COMMENT_MESSAGE" type="string" length="4095"/>
+    </class>
+</hibernate-mapping>

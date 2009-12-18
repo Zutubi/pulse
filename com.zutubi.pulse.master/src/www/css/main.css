@@ -824,6 +824,29 @@ li.header {
     font-weight: bold;
 }
 
+ul.comments {
+    padding: 4px 0 0 6px;
+    background: #f8f8ff;
+    border: 1px solid #dde;
+}
+
+ul.comments li {
+    background: url( ../images/comment.gif ) no-repeat 0 0;
+    padding-left: 24px;
+    margin: 0 0 12px 0;
+}
+
+.comment-body {
+    margin: 6px 0 6px 0;
+}
+
+.comment-author {
+    border-top: solid 1px #dde;
+    padding-top: 4px;
+    color: #555;
+    font-style: italic;
+}
+
 span.expanded-list, span.collapsed-list, span.open-folder, span.closed-folder {
     padding-left: 20px;
 }

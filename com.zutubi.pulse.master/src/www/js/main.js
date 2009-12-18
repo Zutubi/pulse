@@ -698,7 +698,7 @@ function addFieldHelp(form, field, message)
     helpEl.on('click', function() { showFieldHelp(field.getName()); });
 }
 
-function handleResponsibilityResponse(options, success, response)
+function handleDialogResponse(options, success, response)
 {
     if (success)
     {
@@ -732,7 +732,7 @@ function takeResponsibility(projectId)
                     Ext.Ajax.request({
                         url: window.baseUrl + '/ajax/takeResponsibility.action',
                         params: { projectId: projectId, comment: text },
-                        callback: handleResponsibilityResponse
+                        callback: handleDialogResponse
                     });
                 }
         },
@@ -748,7 +748,52 @@ function clearResponsibility(projectId)
     Ext.Ajax.request({
         url: window.baseUrl + '/ajax/clearResponsibility.action',
         params: { projectId: projectId },
-        callback: handleResponsibilityResponse
+        callback: handleDialogResponse
+    });
+}
+
+function addComment(buildId)
+{
+    window.dialogBox = Ext.Msg.show({
+        title: 'Add Comment',
+        msg: 'Comment:',
+        fn: function(btn, text) {
+                window.dialogBox = null;
+                if (btn == 'ok')
+                {
+                    showStatus('Adding comment...', 'working');
+                    Ext.Ajax.request({
+                        url: window.baseUrl + '/ajax/addComment.action',
+                        params: { buildId: buildId, message: text },
+                        callback: handleDialogResponse
+                    });
+                }
+        },
+        prompt: true,
+        multiline: true,
+        width: 400,
+        buttons: Ext.Msg.OKCANCEL
+    });
+}
+
+function deleteComment(buildId, commentId)
+{
+    window.dialogBox = Ext.Msg.show({
+        title: 'Delete Comment',
+        msg: 'Are you sure you want to delete this comment?',
+        fn: function(btn, text) {
+                window.dialogBox = null;
+                if (btn == 'ok')
+                {
+                    showStatus('Deleting comment...', 'working');
+                    Ext.Ajax.request({
+                        url: window.baseUrl + '/ajax/deleteComment.action',
+                        params: { buildId: buildId, commentId: commentId },
+                        callback: handleDialogResponse
+                    });
+                }
+        },
+        buttons: Ext.Msg.OKCANCEL
     });
 }
 

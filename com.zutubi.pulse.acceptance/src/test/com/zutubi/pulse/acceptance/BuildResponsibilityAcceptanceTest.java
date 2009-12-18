@@ -1,16 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
@@ -32,7 +33,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.ensureProject(TEST_PROJECT);
         xmlRpcHelper.ensureUser(TEST_USER);
-        ensureBuild(TEST_PROJECT);
+        xmlRpcHelper.ensureBuild(TEST_PROJECT, BUILD_NUMBER);
         xmlRpcHelper.clearResponsibility(TEST_PROJECT);
     }
 
@@ -77,7 +78,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         TakeResponsibilityDialog dialog = new TakeResponsibilityDialog(browser);
         dialog.waitFor();
-        dialog.typeComment(TEST_COMMENT);
+        dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
 
         browser.waitForPageToLoad(LOAD_TIMEOUT);
@@ -248,14 +249,6 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         finally
         {
             helper.logout();
-        }
-    }
-
-    private void ensureBuild(String project) throws Exception
-    {
-        if (xmlRpcHelper.getBuild(project, BUILD_NUMBER) == null)
-        {
-            xmlRpcHelper.runBuild(project);
         }
     }
 }

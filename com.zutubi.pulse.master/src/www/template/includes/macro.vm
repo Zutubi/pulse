@@ -1381,6 +1381,25 @@
     #end
 
     #if(!$detailedView && !$projectHome)
+        #if($buildResult.comments.size() > 0)
+    <h2 class="section">#wwtext("name=build.comments")</h2>
+    <ul id="build.comments" class="comments">
+            #foreach($comment in $buildResult.comments)
+        <li>
+            <div class="comment-body">
+                $action.plainToHtml($comment.message)
+            </div>
+            <div class="comment-author">
+                by #html($comment.author), $comment.prettyTime ($comment.getPrettyDate($action.locale))
+                #if($action.canDeleteComment($comment.id))
+                [<a id="delete.comment.$velocityCount" href="#" onclick="deleteComment($buildResult.id, $comment.id); return false;">delete</a>]
+                #end
+            </div>
+        </li>
+            #end
+    </ul>
+        #end
+
         #if($dependencyDetailsPresent)
     <div id='#id("${result.ownerName}-build-${result.number}-dependencies")'>
         <table id="table.dependencies" width="150" class="content">

@@ -130,6 +130,17 @@ public class ViewBuildAction extends CommandActionBase
         return canClearResponsible;
     }
 
+    public boolean canDeleteComment(final long id)
+    {
+        Comment comment = CollectionUtils.find(getBuildResult().getComments(), new EntityWithIdPredicate<Comment>(id));
+        if (comment == null)
+        {
+            return false;
+        }
+
+        return accessManager.hasPermission(AccessManager.ACTION_DELETE, comment);
+    }
+
     public List<ActionLink> getActions()
     {
         return actions;
@@ -211,6 +222,11 @@ public class ViewBuildAction extends CommandActionBase
                 canClearResponsible = true;
                 actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
             }
+        }
+
+        if (getLoggedInUser() != null)
+        {
+            actions.add(ToveUtils.getActionLink(BuildResult.ACTION_ADD_COMMENT, messages, contentRoot));
         }
 
         // Initialise detail down to the command level (optional)
@@ -495,4 +511,5 @@ public class ViewBuildAction extends CommandActionBase
             this.stageName = stageName;
         }
     }
+
 }

@@ -109,6 +109,7 @@
                 <ref local="addPrimaryContact"/>
                 <ref local="addProjectContacts"/>
                 <ref local="convertEmailCommittersTasks"/>
+                <ref local="addBuildComments"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -522,5 +523,14 @@
 
     <bean id="convertEmailCommittersTasks" class="com.zutubi.pulse.master.upgrade.tasks.ConvertEmailCommittersTasksUpgradeTask">
         <property name="buildNumber" value="201011003"/>
+    </bean>
+
+    <bean id="addBuildComments" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201011004"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.11-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

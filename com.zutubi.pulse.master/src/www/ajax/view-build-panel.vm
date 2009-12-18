@@ -26,6 +26,8 @@
                         href="#" onclick="takeResponsibility('$result.project.id'); return false"
             #elseif($actionLink.action == "clearResponsibility")
                         href="#" onclick="clearResponsibility('$result.project.id'); return false"
+            #elseif($actionLink.action == "addComment")
+                        href="#" onclick="addComment('$result.id'); return false"                       
             #end
                     >$actionLink.label</a>
                 </td>

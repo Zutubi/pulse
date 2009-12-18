@@ -9,6 +9,7 @@
                 <value>com/zutubi/pulse/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Changelist.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/CommandResult.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Comment.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Feature.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>

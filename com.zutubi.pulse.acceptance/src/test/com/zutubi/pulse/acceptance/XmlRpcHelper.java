@@ -870,6 +870,22 @@ public class XmlRpcHelper
         return number;
     }
 
+    /**
+     * Runs builds of the given project until a build with the given number
+     * exists.
+     *
+     * @param project the project to build
+     * @param number  the build number to build up to
+     * @throws Exception on any error
+     */
+    public void ensureBuild(String project, int number) throws Exception
+    {
+        while (getBuild(project, number) == null)
+        {
+            runBuild(project);
+        }
+    }
+
     public void waitForBuildInProgress(final String projectName, final int number) throws Exception
     {
         waitForBuildInProgress(projectName, number, BUILD_TIMEOUT);

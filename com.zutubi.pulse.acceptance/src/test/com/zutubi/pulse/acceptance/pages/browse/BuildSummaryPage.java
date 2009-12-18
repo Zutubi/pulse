@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
 
@@ -10,6 +11,7 @@ import com.zutubi.util.WebUtils;
 public class BuildSummaryPage extends ResponsibilityPage
 {
     private static final String DEPENDENTY_TABLE_ID = "table.dependencies";
+    private static final String COMMENTS_LIST_ID = "build.comments";
 
     private String projectName;
     private long buildId;
@@ -75,6 +77,27 @@ public class BuildSummaryPage extends ResponsibilityPage
     public int getDependencyCount()
     {
         return 0;
+    }
+
+    public boolean isCommentsPresent()
+    {
+        return browser.isElementPresent(COMMENTS_LIST_ID);
+    }
+
+    public boolean isDeleteCommentLinkPresent(int commentNumber)
+    {
+        return browser.isElementPresent(getDeleteCommentLinkId(commentNumber));
+    }
+
+    public ConfirmDialog clickDeleteComment(int commentNumber)
+    {
+        browser.click(getDeleteCommentLinkId(commentNumber));
+        return new ConfirmDialog(browser);
+    }
+
+    private String getDeleteCommentLinkId(int commentNumber)
+    {
+        return "delete.comment." + commentNumber;
     }
 
     public class DependencyRow
