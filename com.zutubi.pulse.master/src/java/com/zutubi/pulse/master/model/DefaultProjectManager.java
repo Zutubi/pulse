@@ -8,7 +8,6 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.model.TestCaseIndex;
-import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -24,7 +23,6 @@ import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
-import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.project.ProjectInitialisationService;
 import com.zutubi.pulse.master.project.events.ProjectDestructionCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
@@ -75,7 +73,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private static final Map<Project.Transition, String> TRANSITION_TO_ACTION_MAP = new HashMap<Project.Transition, String>();
 
     private ProjectDao projectDao;
-    private ChangelistDao changelistDao;
     private TestCaseIndexDao testCaseIndexDao;
     private BuildManager buildManager;
     private EventManager eventManager;
@@ -1435,20 +1432,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         List<Project> projects = getProjects(true);
         for (Project project : projects)
         {
-            results.put(project.getId(), getLatestBuiltRevision(project));
+            results.put(project.getId(), buildManager.getPreviousRevision(project));
         }
         return results;
-    }
-
-    public Revision getLatestBuiltRevision(Project project)
-    {
-        List<PersistentChangelist> changelists = changelistDao.findLatestByProject(project, 1);
-        if (changelists.size() > 0)
-        {
-            PersistentChangelist latest = changelists.get(0);
-            return latest.getRevision();
-        }
-        return null;
     }
 
     public void setLicenseManager(LicenseManager licenseManager)
@@ -1500,11 +1486,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setAgentStateDao(AgentStateDao agentStateDao)
     {
         this.agentStateDao = agentStateDao;
-    }
-
-    public void setChangelistDao(ChangelistDao changelistDao)
-    {
-        this.changelistDao = changelistDao;
     }
 
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)

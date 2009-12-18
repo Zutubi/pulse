@@ -196,6 +196,14 @@ public interface BuildManager
     @SecureResult
     BuildResult getPreviousBuildResultWithRevision(BuildResult result, ResultState[] states);
 
+    /**
+     * Returns the latest non user revision used to run a build for the
+     * specified project.
+     *
+     * @param project   the project of interest.
+     * @return  the latest non user defined revision used to build the
+     * project.  
+     */
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     Revision getPreviousRevision(Project project);
 
