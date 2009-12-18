@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
 import com.zutubi.pulse.master.notifications.email.DefaultEmailService;
+import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 import com.zutubi.validation.annotations.Required;
@@ -14,10 +15,12 @@ public class EmailConfigurationCheckHandler extends AbstractConfigurationCheckHa
 {
     @Required
     private String emailAddress;
+    
+    private EmailService emailService = new DefaultEmailService();
 
     public void test(EmailConfiguration configuration) throws Exception
     {
-        new DefaultEmailService().sendMail(Arrays.asList(emailAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration);
+        emailService.sendMail(Arrays.asList(emailAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration);
     }
 
     public String getEmailAddress()
