@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
 import com.zutubi.tove.config.ConfigurationValidationContext;
-import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.FieldValidatorSupport;
 
@@ -27,15 +26,11 @@ public class OnePrimaryContactValidator extends FieldValidatorSupport
         boolean primary = (Boolean) value;
         if (primary)
         {
-            ValidationContext context = getValidationContext();
-            if (context instanceof ConfigurationValidationContext)
+            ConfigurationValidationContext configContext = (ConfigurationValidationContext) getValidationContext();
+            String parentPath = configContext.getParentPath();
+            if (parentPath != null)
             {
-                ConfigurationValidationContext configContext = (ConfigurationValidationContext) context;
-                String parentPath = configContext.getParentPath();
-                if (parentPath != null)
-                {
-                    checkForExistingPrimaryContact(parentPath, configContext);
-                }
+                checkForExistingPrimaryContact(parentPath, configContext);
             }
         }
     }

@@ -9,8 +9,8 @@ import com.zutubi.tove.type.record.RecordManager;
 import java.util.Map;
 
 /**
- * Upgrade task to set a primary contact point for all users.  In some cases a
- * dummy point is created to ensure all users have primary contact points.
+ * Upgrade task to set a primary contact point for all users that have at least
+ * one contact point defined.
  */
 public class AddPrimaryContactUpgradeTask extends AbstractUpgradeTask
 {
