@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -180,6 +181,29 @@ public class DefaultScmManagerTest extends PulseTestCase
         assertEquals(new Revision(1), change.getNewRevision());
     }
 
+    public void testEnsureScmChangesRaisedInDependencyOrder() throws ScmException, InterruptedException
+    {
+        ScmServer serverA = new ScmServer("a");
+        stubClientWithServer(createProject(1, true, true), serverA);
+        stubClientWithServer(createProject(3, true, true), serverA);
+        stubClientWithServer(createProject(2, true, true), serverA);
+
+        // project 1 -> depends on project 2 -> depends on project 3
+        addDependency(1, 2);
+        addDependency(2, 3);
+
+        // need to call poll twice since by default this test is not providing initialisation values
+        // for the latest built revision.
+        scmManagerHandle.pollAndWait();
+        scmManagerHandle.pollAndWait();
+
+        // expect project 3s change, then project 2s change, the project 1s change.
+        List<ScmChangeEvent> changeEvents = events.getEventsReceived(ScmChangeEvent.class);
+        assertEquals(3, changeEvents.get(0).getProjectConfiguration().getProjectId());
+        assertEquals(2, changeEvents.get(1).getProjectConfiguration().getProjectId());
+        assertEquals(1, changeEvents.get(2).getProjectConfiguration().getProjectId());
+    }
+
     private ScmClient stubClientWithServer(final ScmClient client, final ScmServer server) throws ScmException
     {
         stub(client.getUid()).toAnswer(new Answer<Object>()
@@ -220,6 +244,7 @@ public class DefaultScmManagerTest extends PulseTestCase
         config.setProjectId(id);
         config.setName(Long.toString(id));
         config.setScm(scm);
+        config.setHandle(id);
 
         Project project = mock(Project.class);
         stub(project.getId()).toReturn(id);
@@ -230,6 +255,16 @@ public class DefaultScmManagerTest extends PulseTestCase
         stub(projectManager.getProject(id, false)).toReturn(project);
 
         return client;
+    }
+
+    private void addDependency(long projectId, long dependentId)
+    {
+        Project project = projectManager.getProject(projectId, false);
+        Project dependent = projectManager.getProject(dependentId, false);
+
+        DependencyConfiguration dependency = new DependencyConfiguration();
+        dependency.setProject(dependent.getConfig());
+        project.getConfig().getDependencies().getDependencies().add(dependency);
     }
 
     /**

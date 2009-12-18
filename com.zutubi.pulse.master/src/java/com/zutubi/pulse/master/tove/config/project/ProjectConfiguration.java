@@ -297,6 +297,28 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         return dependencies != null && dependencies.getDependencies() != null && dependencies.getDependencies().size() > 0;
     }
 
+    /**
+     * Returns true if this project is dependent on the other project.
+     *
+     * @param other another project
+     * @return true iff this project is dependent on the other project.
+     */
+    public boolean isDependentOn(ProjectConfiguration other)
+    {
+        if (hasDependencies())
+        {
+            for (DependencyConfiguration dependency : dependencies.getDependencies())
+            {
+                ProjectConfiguration dependent = dependency.getProject();
+                if (dependent.equals(other) || dependent.isDependentOn(other))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public String getOrganisation()
     {
         return organisation;

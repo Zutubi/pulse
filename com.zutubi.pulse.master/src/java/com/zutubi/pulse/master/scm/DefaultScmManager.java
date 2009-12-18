@@ -21,10 +21,7 @@ import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class DefaultScmManager implements ScmManager, Stoppable
@@ -163,6 +160,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
         }
 
+        final List<ScmChangeEvent> scmChanges = Collections.synchronizedList(new LinkedList<ScmChangeEvent>());
         List<Future> pollingTasks = new LinkedList<Future>();
         for (final List<ProjectConfiguration> queue : serverQueues.values())
         {
@@ -172,7 +170,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 {
                     for (ProjectConfiguration project : queue)
                     {
-                        process(project);
+                        process(project, scmChanges);
                     }
                 }
             }));
@@ -187,9 +185,26 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // we have been interrupted while waiting.  Time to continue.
             LOG.warning(e);
         }
+
+        // order the scm changes by dependency ordering of the associated projects.  That is,
+        // a project that is dependenty another project will come after the other project.
+        Collections.sort(scmChanges, new Comparator<ScmChangeEvent>()
+        {
+            public int compare(ScmChangeEvent first, ScmChangeEvent second)
+            {
+                return (second.getProjectConfiguration().isDependentOn(first.getProjectConfiguration())) ? -1 : 1;
+            }
+        });
+
+        // publish the new scm change events and record the latest encountered revisions.
+        for (ScmChangeEvent change : scmChanges)
+        {
+            eventManager.publish(change);
+            latestRevisions.put(change.getProjectConfiguration().getProjectId(), change.getNewRevision());
+        }
     }
 
-    private void process(ProjectConfiguration projectConfig)
+    private void process(ProjectConfiguration projectConfig, List<ScmChangeEvent> changes)
     {
         Pollable pollable = (Pollable) projectConfig.getScm();
         long projectId = projectConfig.getProjectId();
@@ -259,7 +274,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                         {
                             // there have been no commits during the 'quiet period', trigger a change.
                             eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Quiet period completed without additional changes."));
-                            sendScmChangeEvent(projectConfig, lastChange, previous);
+                            changes.add(new ScmChangeEvent(projectConfig, latest, previous));
                             waiting.remove(projectId);
                         }
                     }
@@ -280,7 +295,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                         }
                         else
                         {
-                            sendScmChangeEvent(projectConfig, latest, previous);
+                            changes.add(new ScmChangeEvent(projectConfig, latest, previous));
                         }
                     }
                 }
@@ -290,7 +305,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 Revision latest = getLatestRevisionSince(previous, client, context);
                 if (latest != null)
                 {
-                    sendScmChangeEvent(projectConfig, latest, previous);
+                    changes.add(new ScmChangeEvent(projectConfig, latest, previous));
                 }
             }
 
@@ -322,12 +337,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
             return revisions.get(revisions.size() - 1);
         }
         return null;
-    }
-
-    private void sendScmChangeEvent(ProjectConfiguration projectConfig, Revision latest, Revision previous)
-    {
-        eventManager.publish(new ScmChangeEvent(projectConfig, latest, previous));
-        latestRevisions.put(projectConfig.getProjectId(), latest);
     }
 
     private boolean checkPollingInterval(Project project, Pollable scm, long now)
