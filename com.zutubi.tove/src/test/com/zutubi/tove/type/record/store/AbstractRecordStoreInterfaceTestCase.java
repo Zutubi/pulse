@@ -4,10 +4,6 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 
-/**
- *
- *
- */
 public abstract class AbstractRecordStoreInterfaceTestCase extends RecordStoreTestCase
 {
     private RecordStore recordStore;
@@ -17,13 +13,6 @@ public abstract class AbstractRecordStoreInterfaceTestCase extends RecordStoreTe
         super.setUp();
 
         recordStore = createRecordStore();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        recordStore = null;
-
-        super.tearDown();
     }
 
     public abstract RecordStore createRecordStore() throws Exception;

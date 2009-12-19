@@ -67,10 +67,15 @@ public class LogConfigurationManager
         });
     }
 
+    public LogConfiguration getLogConfig()
+    {
+        return logConfig;
+    }
+
     public void applyConfig()
     {
         updateConfiguration(logConfig.getLoggingLevel());
-        setEventLoggingEnabled(logConfig.isEventLoggingEnabled());
+        setLoggingEnabled(Loggers.getEventLogger(), logConfig.isEventLoggingEnabled());
     }
 
     private void updateConfiguration(String config)
@@ -86,11 +91,10 @@ public class LogConfigurationManager
         logManager.configure(configFile);
     }
 
-    private void setEventLoggingEnabled(boolean b)
+    protected void setLoggingEnabled(Logger logger, boolean enabled)
     {
-        Logger evtLogger = Loggers.getEventLogger();
-        Handler[] handlers = evtLogger.getDelegate().getHandlers();
-        Level handlerLevel = (b)? Level.ALL : Level.OFF;
+        Handler[] handlers = logger.getDelegate().getHandlers();
+        Level handlerLevel = enabled ? Level.ALL : Level.OFF;
         for (Handler h : handlers)
         {
             h.setLevel(handlerLevel);

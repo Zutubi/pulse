@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.tove.config.admin.LoggingConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.pulse.servercore.util.logging.LogConfiguration;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
@@ -13,7 +13,7 @@ import com.zutubi.tove.config.TypeListener;
 /**
  * Master implementation of the log configuration interface, which is just a
  * thin wrapper around the configuration object.  The minor complication is
- * that this may be accessed *before* the configufation subsystem has
+ * that this may be accessed *before* the configuration subsystem has
  * started, when we have not yet got a data directory.  In this situation,
  * defaults apply.
  */
@@ -63,6 +63,11 @@ public class MasterLogConfiguration implements LogConfiguration
     public boolean isEventLoggingEnabled()
     {
         return getLoggingConfiguration().isEventLoggingEnabled();
+    }
+
+    public boolean isConfigAuditLoggingEnabled()
+    {
+        return getLoggingConfiguration().isConfigAuditLoggingEnabled();
     }
 
     private LoggingConfiguration getLoggingConfiguration()

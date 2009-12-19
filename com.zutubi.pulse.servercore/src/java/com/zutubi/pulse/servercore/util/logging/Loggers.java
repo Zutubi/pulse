@@ -6,6 +6,8 @@ import com.zutubi.util.logging.Logger;
  */
 public class Loggers
 {
+    private static final String NAME_EVENTS = "com.zutubi.pulse.master.events";
+
     private static Logger eventLogger;
 
     /**
@@ -22,7 +24,7 @@ public class Loggers
             // The logger for the com.zutubi.pulse.master.events package.  Note, that
             // to ensure the events end up in the events log file, the event handler
             // needs to be bound to the same package.
-            eventLogger = Logger.getLogger("com.zutubi.pulse.master.events");
+            eventLogger = Logger.getLogger(NAME_EVENTS);
 
             // events should only go to the event log.
             eventLogger.setUseParentHandlers(false);

@@ -7,10 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-/**
- *
- *
- */
 public class XmlRecordSerialiserTest extends ZutubiTestCase
 {
     private XmlRecordSerialiser serialiser;
@@ -29,7 +25,6 @@ public class XmlRecordSerialiserTest extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        serialiser = null;
         assertTrue(FileSystemUtils.rmdir(tmpDir));
 
         super.tearDown();

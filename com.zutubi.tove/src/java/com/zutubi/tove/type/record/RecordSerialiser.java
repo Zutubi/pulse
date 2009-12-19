@@ -2,7 +2,6 @@ package com.zutubi.tove.type.record;
 
 /**
  * An interface for storing and loading records from permanent storage.
- *
  */
 public interface RecordSerialiser
 {

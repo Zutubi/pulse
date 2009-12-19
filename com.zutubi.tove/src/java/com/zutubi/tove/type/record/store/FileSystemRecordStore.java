@@ -63,13 +63,11 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private File snapshotDirectory;
     private File backupSnapshotDirectory;
     private File newSnapshotDirectory;
-    private File snapshotJournalIdFile;
 
     private File journalIndexFile;
     private File newJournalIndexFile;
     private File backupJournalIndexFile;
 
-    private Thread autoCompaction;
     private boolean stopRequested = false;
 
     private long compactionInterval = 60;
@@ -106,7 +104,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     protected void startAutoCompaction()
     {
         stopRequested = false;
-        autoCompaction = new Thread(new Runnable()
+        Thread autoCompaction = new Thread(new Runnable()
         {
             public void run()
             {
@@ -168,7 +166,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         snapshotDirectory = new File(persistenceDirectory, "snapshot");
         backupSnapshotDirectory = new File(persistenceDirectory, "snapshot.backup");
         newSnapshotDirectory = new File(persistenceDirectory, "snapshot.new");
-        snapshotJournalIdFile = new File(snapshotDirectory, "snapshot_id.txt");
+        File snapshotJournalIdFile = new File(snapshotDirectory, "snapshot_id.txt");
 
         newJournalIndexFile = new File(persistenceDirectory, "index.new");
         journalIndexFile = new File(persistenceDirectory, "index");
@@ -627,7 +625,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             // what is the snapshot data to be persisted?  We synchronize on this so that we can ensure that
             // no commits occur when we are taking the data snapshot.
             Record newSnapshot;
-            long snapshotJournalId = -1;
+            long snapshotJournalId;
             synchronized(this)
             {
                 newSnapshot = inMemoryDelegate.select();
@@ -928,5 +926,4 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             return buffer.toString();
         }
     }
-
 }

@@ -4,10 +4,6 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
-/**
- *
- *
- */
 public class RecordQueriesTest extends ZutubiTestCase
 {
     private MutableRecord base;
@@ -19,12 +15,6 @@ public class RecordQueriesTest extends ZutubiTestCase
 
         base = new MutableRecordImpl();
         queries = new RecordQueries(base);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        base = null;
-        super.tearDown();
     }
 
     public void testSelectRecordsOnly()

@@ -4,8 +4,6 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Set;
 
-/**
- */
 public class TemplateRecordTest extends ZutubiTestCase
 {
     public void testMetaKeySet()

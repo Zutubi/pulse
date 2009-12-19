@@ -165,7 +165,7 @@ public class RecordManager implements HandleAllocator
         // sanity check - we expect the states handle/path to match that of the
         // record we are updating.  If not we fail early.
         Record originalRecord = select(path);
-        if (originalRecord != null) // out aim is to check the handle, not if a record exists.
+        if (originalRecord != null) // our aim is to check the handle, not if a record exists.
         {
             if (values.getHandle() != originalRecord.getHandle())
             {
@@ -182,7 +182,7 @@ public class RecordManager implements HandleAllocator
             }
         });
 
-        eventManager.publish(new RecordUpdatedEvent(this, path));
+        eventManager.publish(new RecordUpdatedEvent(this, path, values));
     }
 
     /**
@@ -295,18 +295,6 @@ public class RecordManager implements HandleAllocator
     private RecordManagerState getState()
     {
         return stateWrapper.get();
-    }
-
-    private void clearHandles(MutableRecord record)
-    {
-        record.setHandle(UNDEFINED);
-        for (Object child : record.values())
-        {
-            if (child instanceof MutableRecord)
-            {
-                clearHandles((MutableRecord) child);
-            }
-        }
     }
 
     private void allocateHandles(MutableRecord record)

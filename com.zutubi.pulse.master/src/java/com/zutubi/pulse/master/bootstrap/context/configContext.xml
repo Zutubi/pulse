@@ -66,4 +66,6 @@
     <bean id="userAuthorityProvider" class="com.zutubi.pulse.master.security.UserAuthorityProvider" autowire="byName"/>
 
     <bean id="securityInterceptor" class="com.zutubi.pulse.master.security.SecurityInterceptor" autowire="byName"/>
+
+    <bean id="configAuditLogger" class="com.zutubi.pulse.master.logging.ConfigAuditLogger"/>    
 </beans>

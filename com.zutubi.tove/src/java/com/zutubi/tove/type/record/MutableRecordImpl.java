@@ -180,6 +180,7 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     protected Object clone() throws CloneNotSupportedException
     {
+        super.clone();
         return copy(true, true);
     }
 }

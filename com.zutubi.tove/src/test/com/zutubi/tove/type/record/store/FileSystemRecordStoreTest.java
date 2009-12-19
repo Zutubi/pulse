@@ -1,6 +1,5 @@
 package com.zutubi.tove.type.record.store;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.tove.transaction.Transaction;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionStatus;
@@ -9,12 +8,12 @@ import com.zutubi.tove.type.record.DefaultRecordSerialiser;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-@SuppressWarnings({"JavaDoc"})
 public class FileSystemRecordStoreTest extends RecordStoreTestCase
 {
     private FileSystemRecordStore recordStore = null;
@@ -41,8 +40,6 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
     protected void tearDown() throws Exception
     {
-        transactionManager = null;
-        recordStore = null;
         assertTrue(FileSystemUtils.rmdir(persistentDirectory));
 
         super.tearDown();

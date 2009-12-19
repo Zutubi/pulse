@@ -11,32 +11,28 @@ import java.util.logging.LogRecord;
  */
 public class EventLogFormatter extends Formatter
 {
-    Date date = new Date();
-    private final static String format = "{0,date} {0,time}";
-    private MessageFormat formatter;
+    private final static String FORMAT = "{0,date} {0,time}";
+
+    private Date date = new Date();
+    private MessageFormat formatter = new MessageFormat(FORMAT);
 
     private Object args[] = new Object[1];
 
     public String format(LogRecord record)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
 
         // Minimize memory allocations here.
         date.setTime(record.getMillis());
         args[0] = date;
-        StringBuffer text = new StringBuffer();
 
-        if (formatter == null)
-        {
-            formatter = new MessageFormat(format);
-        }
-
-        formatter.format(args, text, null);
-        sb.append(text);
-        sb.append(": ");
+        StringBuffer formatBuffer = new StringBuffer();
+        formatter.format(args, formatBuffer, null);
+        builder.append(formatBuffer);
+        builder.append(": ");
         String message = formatMessage(record);
-        sb.append(message);
-        sb.append(Constants.LINE_SEPARATOR);
-        return sb.toString();
+        builder.append(message);
+        builder.append(Constants.LINE_SEPARATOR);
+        return builder.toString();
     }
 }

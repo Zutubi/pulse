@@ -6,8 +6,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- *
- *
+ * Immutable wrapper around a record.
  */
 public class ImmutableRecord implements Record
 {

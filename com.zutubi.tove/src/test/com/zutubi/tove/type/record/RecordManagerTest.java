@@ -46,9 +46,6 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
     protected void tearDown() throws Exception
     {
-        userTransaction = null;
-        transactionManager = null;
-        recordManager = null;
         if (!FileSystemUtils.rmdir(tempDir))
         {
             throw new RuntimeException("Unable to remove '" + tempDir + "' because your OS is not brown enough");
@@ -534,7 +531,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
         eventListener.reset();
         recordManager.update("path", record);
-        assertEvents(new RecordUpdatedEvent(recordManager, "path"));
+        assertEvents(new RecordUpdatedEvent(recordManager, "path", record));
 
         loaded = recordManager.select("path");
         assertEquals(0, loaded.size());
@@ -555,7 +552,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
         eventListener.reset();
         recordManager.update("path", record);
-        assertEvents(new RecordUpdatedEvent(recordManager, "path"));
+        assertEvents(new RecordUpdatedEvent(recordManager, "path", record));
 
         loaded = recordManager.select("path");
         assertEquals(1, loaded.size());

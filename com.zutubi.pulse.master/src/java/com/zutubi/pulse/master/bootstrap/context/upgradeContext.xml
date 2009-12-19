@@ -110,6 +110,7 @@
                 <ref local="addProjectContacts"/>
                 <ref local="convertEmailCommittersTasks"/>
                 <ref local="addBuildComments"/>
+                <ref local="addConfigAuditLoggingEnabled"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -532,5 +533,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.11-patch-01.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="addConfigAuditLoggingEnabled" class="com.zutubi.pulse.master.upgrade.tasks.AddConfigAuditLoggingEnabledUpgradeTask">
+        <property name="buildNumber" value="201011005"/>
     </bean>
 </beans>
