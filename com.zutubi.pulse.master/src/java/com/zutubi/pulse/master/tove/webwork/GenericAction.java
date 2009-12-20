@@ -153,11 +153,11 @@ public class GenericAction extends ToveActionSupport
         if (failureCount == 0)
         {
             String messageKey = "descendants.triggered." + (results.size() == 1 ? "single" : "multiple");
-            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format(messageKey, new Object[]{actionLabel, results.size()})));
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.SUCCESS, I18N.format(messageKey, actionLabel, results.size())));
         }
         else
         {
-            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendants.failed", new Object[]{actionLabel, failureCount, results.size()})));
+            response.setStatus(new ConfigurationResponse.Status(ConfigurationResponse.Status.Type.FAILURE, I18N.format("descendants.failed", actionLabel, failureCount, results.size())));
         }
 
         return SUCCESS;

@@ -7,20 +7,15 @@ import com.zutubi.i18n.Messages;
  */
 public class MessagesTextProvider extends TextProviderSupport
 {
-    private Object context;
+    private Messages messages;
 
     public MessagesTextProvider(Object context)
     {
-        this.context = context;
-    }
-
-    public MessagesTextProvider(Class context)
-    {
-        this.context = context;
+        messages = Messages.getInstance(context);
     }
 
     protected String lookupText(String key, Object... args)
     {
-        return Messages.format(context, key, args);
+        return messages.format(key, args);
     }
 }

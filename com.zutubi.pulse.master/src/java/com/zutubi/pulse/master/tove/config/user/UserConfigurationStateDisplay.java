@@ -39,7 +39,7 @@ public class UserConfigurationStateDisplay implements MessagesAware
                 dayAndTime = LAST_ACCESS_FORMAT.format(new Date(time));
             }
 
-            return messages.format("lastAccess.format", new Object[]{ dayAndTime, TimeStamps.getPrettyElapsed(System.currentTimeMillis() - time)});
+            return messages.format("lastAccess.format", dayAndTime, TimeStamps.getPrettyElapsed(System.currentTimeMillis() - time));
         }
 
         return messages.format("lastAccess.never");

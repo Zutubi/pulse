@@ -158,7 +158,7 @@ public class OptionsAction extends ActionSupport
         {
             HttpServletResponse response = ServletActionContext.getResponse();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errorMessage = I18N.format("unable.to.load", new Object[]{e.getMessage()});
+            errorMessage = I18N.format("unable.to.load", e.getMessage());
             return ERROR;
         }
     }

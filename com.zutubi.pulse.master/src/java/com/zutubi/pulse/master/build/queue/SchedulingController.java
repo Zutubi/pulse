@@ -12,8 +12,8 @@ import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.InstanceOfPredicate;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -93,7 +93,7 @@ public class SchedulingController implements EventListener
                     }
                     else
                     {
-                        buildRequestRegistry.requestRejected(event, I18N.format("rejected.project.state", new Object[]{project.getState().toString()}));
+                        buildRequestRegistry.requestRejected(event, I18N.format("rejected.project.state", project.getState().toString()));
                     }
                 }
             }

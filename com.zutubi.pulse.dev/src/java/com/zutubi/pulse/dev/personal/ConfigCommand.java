@@ -59,7 +59,7 @@ public class ConfigCommand implements Command
         String pulseURL = getPulseURL(ui);
         String pulseUser = getPulseUser(ui);
 
-        ui.status(I18N.format("status.storing.server", new Object[]{config.getUserConfigFile().getAbsolutePath()}));
+        ui.status(I18N.format("status.storing.server", config.getUserConfigFile().getAbsolutePath()));
         config.setProperty(PersonalBuildConfig.PROPERTY_PULSE_URL, pulseURL);
         config.setProperty(PersonalBuildConfig.PROPERTY_PULSE_USER, pulseUser);
     }

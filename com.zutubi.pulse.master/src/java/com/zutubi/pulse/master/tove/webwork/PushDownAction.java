@@ -69,7 +69,7 @@ public class PushDownAction extends ToveFormActionSupport
     {
         if (!configurationRefactoringManager.canPushDown(path))
         {
-            throw new IllegalArgumentException(I18N.format("path.invalid", new Object[]{path}));
+            throw new IllegalArgumentException(I18N.format("path.invalid", path));
         }
 
         type = configurationTemplateManager.getType(path);
@@ -110,7 +110,7 @@ public class PushDownAction extends ToveFormActionSupport
             {
                 if (!configurationRefactoringManager.canPushDown(path, childKey))
                 {
-                    addFieldError(FIELD_CHILD_KEYS, I18N.format(FIELD_CHILD_KEYS + ".invalid", new Object[]{childKey}));
+                    addFieldError(FIELD_CHILD_KEYS, I18N.format(FIELD_CHILD_KEYS + ".invalid", childKey));
                 }
             }
         }

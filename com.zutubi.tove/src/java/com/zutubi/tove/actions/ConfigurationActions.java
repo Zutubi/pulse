@@ -1,16 +1,15 @@
 package com.zutubi.tove.actions;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.ConventionSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -18,6 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.util.reflection.MethodPredicates.*;
 
 /**
  * Describes a bunch of available actions for a configuration type.
@@ -355,7 +356,7 @@ public class ConfigurationActions
 
         if (messages.isKeyDefined(key))
         {
-            feedback = messages.format(key, new Object[]{name});
+            feedback = messages.format(key, name);
         }
         else
         {
@@ -366,7 +367,7 @@ public class ConfigurationActions
             }
 
             messages = Messages.getInstance(ConfigurationActions.class);
-            feedback = messages.format(I18N_KEY_DEFAULT_FEEDBACK, new Object[]{actionLabel});
+            feedback = messages.format(I18N_KEY_DEFAULT_FEEDBACK, actionLabel);
         }
         return feedback;
     }

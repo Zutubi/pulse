@@ -74,7 +74,7 @@ public class ResourceConfigurationStateDisplay implements MessagesAware
                     }
                 }
 
-                TreeNode<String> projectNode = new TreeNode<String>(messages.format("compatibleStages.project", new Object[]{project.getName(), stagePart}));
+                TreeNode<String> projectNode = new TreeNode<String>(messages.format("compatibleStages.project", project.getName(), stagePart));
                 result.add(projectNode);
                 if (compatibleStageCount > 0 && compatibleStageCount < projectStageCount)
                 {

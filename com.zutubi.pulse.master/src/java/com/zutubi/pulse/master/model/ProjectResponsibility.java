@@ -9,6 +9,8 @@ import com.zutubi.i18n.Messages;
  */
 public class ProjectResponsibility
 {
+    private static final Messages I18N = Messages.getInstance(ProjectResponsibility.class);
+
     private User user;
     private String comment;
 
@@ -54,11 +56,11 @@ public class ProjectResponsibility
     {
         if (user.equals(loggedInUser))
         {
-            return Messages.format(ProjectResponsibility.class, "responsible.self");
+            return I18N.format("responsible.self");
         }
         else
         {
-            return Messages.format(ProjectResponsibility.class, "responsible.other", user.getLogin());
+            return I18N.format("responsible.other", user.getLogin());
         }
     }
 }

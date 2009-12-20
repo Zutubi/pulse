@@ -82,9 +82,7 @@ public class RetrieveDependenciesCommand implements Command
                             {
                                 ModuleRevisionId mrid = artifact.getModuleRevisionId();
                                 String targetPath = IvyPatternHelper.substitute(targetPattern, artifact);
-                                String feedback = I18N.format("retrieve.feedback", new Object[]{
-                                        mrid.getName(), artifact.getName(), mrid.getRevision(), targetPath
-                                });
+                                String feedback = I18N.format("retrieve.feedback", mrid.getName(), artifact.getName(), mrid.getRevision(), targetPath);
                                 outputWriter.println(feedback);
                             }
                         }

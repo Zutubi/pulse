@@ -876,7 +876,7 @@ public class DefaultBuildController implements EventListener, BuildController
             String stageName = recipeResultNode.getStageName();
             if (projectConfig.getStage(stageName).isTerminateBuildOnFailure())
             {
-                terminateBuild(I18N.format("terminate.stage.failure", new Object[]{stageName}));
+                terminateBuild(I18N.format("terminate.stage.failure", stageName));
             }
             else if (stageFailureLimitReached())
             {

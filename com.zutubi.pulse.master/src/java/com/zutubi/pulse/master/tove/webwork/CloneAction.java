@@ -90,13 +90,13 @@ public class CloneAction extends ToveFormActionSupport
         parentPath = PathUtils.getParentPath(path);
         if(parentPath == null)
         {
-            throw new IllegalArgumentException(I18N.format("path.noParent", new Object[]{path}));
+            throw new IllegalArgumentException(I18N.format("path.noParent", path));
         }
 
         Type parentType = configurationTemplateManager.getType(parentPath);
         if(!(parentType instanceof MapType))
         {
-            throw new IllegalArgumentException(I18N.format("path.notMapElement", new Object[]{path}));
+            throw new IllegalArgumentException(I18N.format("path.notMapElement", path));
         }
 
         mapType = (MapType) parentType;
@@ -211,7 +211,7 @@ public class CloneAction extends ToveFormActionSupport
         field.setLabel(I18N.format("extractedParent.label"));
         if (isInputSelected())
         {
-            field.setValue(I18N.format("extractedParent.default", new Object[]{getKey(record)}));
+            field.setValue(I18N.format("extractedParent.default", getKey(record)));
         }
         else
         {
@@ -235,7 +235,7 @@ public class CloneAction extends ToveFormActionSupport
 
                 Field field = new Field(FieldType.CONTROLLING_CHECKBOX, CHECK_FIELD_PREFIX + key);
                 field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_CHECKED_FIELDS, getDependentFields(nameField, node));
-                field.setLabel(I18N.format("cloneDescendant.label", new Object[]{key}));
+                field.setLabel(I18N.format("cloneDescendant.label", key));
                 if(parameters.containsKey(CHECK_FIELD_PREFIX + key))
                 {
                     field.setValue("true");
@@ -269,7 +269,7 @@ public class CloneAction extends ToveFormActionSupport
     {
         if (isInputSelected())
         {
-            return I18N.format("cloneName.default", new Object[]{key});
+            return I18N.format("cloneName.default", key);
         }
         else
         {

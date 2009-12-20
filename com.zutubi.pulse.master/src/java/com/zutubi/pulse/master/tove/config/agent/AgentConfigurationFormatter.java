@@ -41,7 +41,7 @@ public class AgentConfigurationFormatter
             }
             else
             {
-                return messages.format("host.upgrading", new Object[]{EnumUtils.toPrettyString(host.getUpgradeState())});
+                return messages.format("host.upgrading", EnumUtils.toPrettyString(host.getUpgradeState()));
             }
         }
         else

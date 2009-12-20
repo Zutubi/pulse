@@ -20,10 +20,10 @@ import com.zutubi.pulse.master.xwork.TextProviderSupport;
 import com.zutubi.pulse.master.xwork.interceptor.Cancelable;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
 
@@ -274,9 +274,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return Messages.getInstance(instance).format(key);
     }
 
-    public String getMessage(Object instance, String key, String... args)
+    public String getMessage(Object instance, String key, Object... args)
     {
-        return Messages.getInstance(instance).format(key, (Object[])args);
+        return Messages.getInstance(instance).format(key, args);
     }
 
     public CommitMessageSupport getCommitMessageSupport(PersistentChangelist changelist)

@@ -18,8 +18,6 @@ public class Messages
 {
     private static DefaultMessageHandler handler;
 
-    private static StaticPackageContextResolver packages;
-
     private Object context;
 
     private Messages(Object context)
@@ -43,12 +41,10 @@ public class Messages
     {
         if (handler == null)
         {
-            packages = new StaticPackageContextResolver();
-
             DefaultBundleManager bundleManager = new DefaultBundleManager();
             bundleManager.addResolver(new ExtendedClassContextResolver());
             bundleManager.addResolver(new ExtendedPackageContextResolver());
-            bundleManager.addResolver(packages);
+            bundleManager.addResolver(new StaticPackageContextResolver());
             bundleManager.setContextCache(getContextCache());
             handler = new DefaultMessageHandler(bundleManager);
         }
@@ -73,19 +69,14 @@ public class Messages
         return getHandler().isKeyDefined(getContext(context), key);
     }
 
-    public static String format(Object context, String key)
+    public static String formatInContext(Object context, String key)
     {
         return getHandler().format(getContext(context), key);
     }
 
-    public static String format(Object context, String key, Object... args)
+    public static String formatInContext(Object context, String key, Object... args)
     {
         return getHandler().format(getContext(context), key, args);
-    }
-
-    public static void setBundle(String bundleName, String packageName)
-    {
-        packages.addBundle(new PackageContext(packageName), bundleName);
     }
 
     private static Context getContext(Object obj)
@@ -116,11 +107,11 @@ public class Messages
 
     public String format(String key)
     {
-        return Messages.format(context, key);
+        return Messages.formatInContext(context, key);
     }
 
     public String format(String key, Object... args)
     {
-        return Messages.format(context, key, args);
+        return Messages.formatInContext(context, key, args);
     }
 }

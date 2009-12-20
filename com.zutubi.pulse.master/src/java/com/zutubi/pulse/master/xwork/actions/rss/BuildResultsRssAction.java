@@ -109,8 +109,8 @@ public class BuildResultsRssAction extends ProjectActionSupport
             else
             {
                 feedTemplate = new ErrorResultTemplate(
-                        I18N.format("unknown.project.title", new Object[]{projectName}),
-                        I18N.format("unknown.project.description", new Object[]{projectName})
+                        I18N.format("unknown.project.title", projectName),
+                        I18N.format("unknown.project.description", projectName)
                 );
             }
         }
@@ -124,8 +124,8 @@ public class BuildResultsRssAction extends ProjectActionSupport
             else
             {
                 feedTemplate = new ErrorResultTemplate(
-                        I18N.format("unknown.group.title", new Object[]{groupName}),
-                        I18N.format("unknown.group.description", new Object[]{groupName})
+                        I18N.format("unknown.group.title", groupName),
+                        I18N.format("unknown.group.description", groupName)
                 );
             }
         }
@@ -152,16 +152,6 @@ public class BuildResultsRssAction extends ProjectActionSupport
         feed = new BuildJITFeed(feedTemplate);
 
         return "rss";
-    }
-
-    private <X> List<X> asList(X... objs)
-    {
-        List<X> l = new LinkedList<X>();
-        for (X x : objs)
-        {
-            l.add(x);
-        }
-        return l;
     }
 
     private String renderResult(BuildResult result)
@@ -588,9 +578,9 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
                     ContentModule content = new ContentModuleImpl();
 
-                    //NOTE: Do not use Arrays.asList here. The entry.setPublishedDate will fail if you do.
-                    content.setEncodeds(asList(renderResult(result)));
-                    entry.setModules(asList(content));
+                    // NOTE: We wrap in mutable lists else entry.setPublishedDate will fail.
+                    content.setEncodeds(new LinkedList<String>(Arrays.asList(renderResult(result))));
+                    entry.setModules(new LinkedList<ContentModule>(Arrays.asList(content)));
 
                     // NOTES:
                     // calling setLink is effectively setting guid without a isPermaLink reference.

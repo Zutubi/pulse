@@ -38,7 +38,7 @@ public class AgentStatisticsAction extends AgentActionBase
     {
         DateFormat format = SimpleDateFormat.getDateInstance();
         String firstDay = format.format(statistics.getFirstDayStamp());
-        return I18N.format("statistics.blurb", new Object[]{firstDay});
+        return I18N.format("statistics.blurb", firstDay);
     }
 
     public Map getUsageChart()

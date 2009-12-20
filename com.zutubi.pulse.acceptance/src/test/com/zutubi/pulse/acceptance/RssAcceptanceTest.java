@@ -14,13 +14,14 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 public class RssAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -49,8 +50,8 @@ public class RssAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = randomName();
 
         SyndFeed feed = readFeed("rss.action?projectName=" + projectName);
-        assertThat(feed.getTitle(), equalTo(I18N.format("unknown.project.title", new Object[]{projectName})));
-        assertThat(feed.getDescription(), equalTo(I18N.format("unknown.project.description", new Object[]{projectName})));
+        assertThat(feed.getTitle(), equalTo(I18N.format("unknown.project.title", projectName)));
+        assertThat(feed.getDescription(), equalTo(I18N.format("unknown.project.description", projectName)));
         assertEquals(0, feed.getEntries().size());
     }
 
@@ -79,8 +80,8 @@ public class RssAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String groupName = randomName();
 
         SyndFeed feed = readFeed("rss.action?groupName=" + groupName);
-        assertThat(feed.getTitle(), equalTo(I18N.format("unknown.group.title", new Object[]{groupName})));
-        assertThat(feed.getDescription(), equalTo(I18N.format("unknown.group.description", new Object[]{groupName})));
+        assertThat(feed.getTitle(), equalTo(I18N.format("unknown.group.title", groupName)));
+        assertThat(feed.getDescription(), equalTo(I18N.format("unknown.group.description", groupName)));
         assertEquals(0, feed.getEntries().size());
     }
 

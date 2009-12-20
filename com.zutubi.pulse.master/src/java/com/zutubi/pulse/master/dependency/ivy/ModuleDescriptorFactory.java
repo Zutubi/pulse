@@ -21,9 +21,9 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -222,20 +222,20 @@ public class ModuleDescriptorFactory
         {
             if (m.groupCount() < 2)
             {
-                result.warning(I18N.format("pattern.match.unexpectedGroupCount", (Object) artifactDetail.getArtifactPattern(), artifactFilename));
+                result.warning(I18N.format("pattern.match.unexpectedGroupCount", artifactDetail.getArtifactPattern(), artifactFilename));
                 return false;
             }
             String artifactName = m.group(1);
             if (artifactName == null || artifactName.trim().length() == 0)
             {
-                result.warning(I18N.format("pattern.match.missingArtifactName", (Object) artifactDetail.getArtifactPattern(), artifactFilename));
+                result.warning(I18N.format("pattern.match.missingArtifactName", artifactDetail.getArtifactPattern(), artifactFilename));
                 return false;
             }
 
             String artifactExt = m.group(2);
             if (artifactExt == null || artifactExt.trim().length() == 0)
             {
-                result.warning(I18N.format("pattern.match.missingArtifactExtension", (Object) artifactDetail.getArtifactPattern(), artifactFilename));
+                result.warning(I18N.format("pattern.match.missingArtifactExtension", artifactDetail.getArtifactPattern(), artifactFilename));
                 return false;
             }
 
@@ -244,7 +244,7 @@ public class ModuleDescriptorFactory
         }
         else
         {
-            result.warning(I18N.format("pattern.match.failed", (Object) artifactDetail.getArtifactPattern(), artifactFilename));
+            result.warning(I18N.format("pattern.match.failed", artifactDetail.getArtifactPattern(), artifactFilename));
             return false;
         }
     }

@@ -152,7 +152,7 @@ public class PersonalBuildClient
                     }
                     else
                     {
-                        question = I18N.format("prompt.version.mismatch", new Object[]{serverVersion, ourVersion});
+                        question = I18N.format("prompt.version.mismatch", serverVersion, ourVersion);
                     }
 
                     YesNoResponse response = ui.yesNoPrompt(question, true, false, YesNoResponse.NO);
@@ -253,7 +253,7 @@ public class PersonalBuildClient
             ui.debug("Checking working copy matches project SCM configuration");
             if (!wc.matchesLocation(context, scmLocation.getLocation()))
             {
-                YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.wc.mismatch", new Object[]{ config.getProject() }), true, false, YesNoResponse.NO);
+                YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.wc.mismatch", config.getProject()), true, false, YesNoResponse.NO);
                 if (response.isPersistent())
                 {
                     config.setCheckRepository(!response.isAffirmative());
@@ -390,7 +390,7 @@ public class PersonalBuildClient
             ui.exitContext();
         }
 
-        ui.status(I18N.format("status.guessed.revision", new Object[]{revision.getRevisionString()}));
+        ui.status(I18N.format("status.guessed.revision", revision.getRevisionString()));
         return new PersonalBuildRevision(revision, true);
     }
 
@@ -411,7 +411,7 @@ public class PersonalBuildClient
             ui.exitContext();
         }
 
-        ui.status(I18N.format("status.got.latest.revision", new Object[]{revision.getRevisionString()}));
+        ui.status(I18N.format("status.got.latest.revision", revision.getRevisionString()));
         return new PersonalBuildRevision(revision, true);
     }
 

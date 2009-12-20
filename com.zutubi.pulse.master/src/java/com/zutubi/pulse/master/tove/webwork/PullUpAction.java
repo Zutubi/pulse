@@ -62,7 +62,7 @@ public class PullUpAction extends ToveFormActionSupport
     {
         if (!configurationRefactoringManager.canPullUp(path))
         {
-            throw new IllegalArgumentException(I18N.format("path.invalid", new Object[]{path}));
+            throw new IllegalArgumentException(I18N.format("path.invalid", path));
         }
 
         if (newPath == null)

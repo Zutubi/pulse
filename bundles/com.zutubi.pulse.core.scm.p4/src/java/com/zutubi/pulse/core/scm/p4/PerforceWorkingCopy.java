@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.util.StringUtils;
@@ -18,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
+
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * Implementation of {@link WorkingCopy} that interfaces with Perforce by
@@ -73,7 +74,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
                     if(!value.equals(pieces[1]))
                     {
-                        context.getUI().warning(I18N.format("warning.p4.port", new Object[]{value, pieces[1]}));
+                        context.getUI().warning(I18N.format("warning.p4.port", value, pieces[1]));
                         return false;
                     }
                 }

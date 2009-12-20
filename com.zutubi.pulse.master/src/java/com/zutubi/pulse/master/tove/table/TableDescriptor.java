@@ -117,7 +117,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                             // we are dealing with a unknown hidden entry.  Provide feedback to the user of this situation and continue.
                             List<ActionLink> actions = new LinkedList<ActionLink>();
                             Row row = new Row(PathUtils.getPath(path, hidden), true, actions);
-                            row.addCell(new Cell(columns.size(), messages.format("unknown.hidden.reference", new Object[]{parentItemPath})));
+                            row.addCell(new Cell(columns.size(), messages.format("unknown.hidden.reference", parentItemPath)));
                             row.addParameter("cls", "item-hidden");
                             table.addRow(row);
                         }
