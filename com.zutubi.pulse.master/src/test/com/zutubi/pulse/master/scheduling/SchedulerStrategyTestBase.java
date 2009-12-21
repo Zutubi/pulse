@@ -2,9 +2,6 @@ package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 
-/**
- * <class-comment/>
- */
 public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
 {
     protected SchedulerStrategy scheduler = null;
@@ -19,14 +16,6 @@ public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
     {
         super.setUp();
         triggerHandler = new TestTriggerHandler();
-        // add setup code here.
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-
-        super.tearDown();
     }
 
     public void testTaskExecutedOnTrigger() throws SchedulingException

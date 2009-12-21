@@ -7,9 +7,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
-/**
- * <class-comment/>
- */
 public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private org.quartz.Scheduler quartzScheduler = null;
@@ -23,7 +20,6 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
     {
         super.setUp();
 
-        // add setup code here.
         SchedulerFactory schedFact = new StdSchedulerFactory();
         quartzScheduler = schedFact.getScheduler();
         quartzScheduler.setJobFactory(new QuartzTaskJobFactory(triggerHandler));
@@ -34,11 +30,7 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
 
     public void tearDown() throws Exception
     {
-        // add tear down code here.
-        scheduler = null;
         quartzScheduler.shutdown();
-        quartzScheduler = null;
-
         super.tearDown();
     }
 
@@ -46,8 +38,8 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
     {
         try
         {
-            String name = Long.toString(trigger.getId());
-            String group = CronSchedulerStrategy.QUARTZ_GROUP;
+            String name = trigger.getName();
+            String group = trigger.getGroup();
             org.quartz.Trigger t = quartzScheduler.getTrigger(name, group);
             if (t != null)
             {
@@ -95,6 +87,6 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
         // create a new quartz trigger. Ideally, this trigger would not possibly trigger
         // during the course of this test case since we are 'manually' handling the triggering
         // via the activateTrigger method.
-        return new CronTrigger("0 0 12 ? * WED", "default");
+        return new CronTrigger("0 0 12 ? * WED", getName());
     }
 }

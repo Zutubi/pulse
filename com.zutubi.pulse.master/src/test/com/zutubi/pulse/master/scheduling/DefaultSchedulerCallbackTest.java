@@ -5,11 +5,12 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static org.mockito.Mockito.*;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.util.Date;
+
+import static org.mockito.Mockito.*;
 
 public class DefaultSchedulerCallbackTest extends ZutubiTestCase
 {
@@ -81,9 +82,9 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
         scheduler.registerCallback(callback, 100);
         Thread.sleep(500 * Constants.MILLISECOND);
         assertTrue(scheduler.unregisterCallback(callback));
-        assertEquals(5, callback.getCount());
+        assertTrue(callback.getCount() >= 5);
 
-        // verify that unregister does infact stop the callbacks.
+        // verify that unregister does in fact stop the callbacks.
         Thread.sleep(300 * Constants.MILLISECOND);
         assertEquals(5, callback.getCount());
     }

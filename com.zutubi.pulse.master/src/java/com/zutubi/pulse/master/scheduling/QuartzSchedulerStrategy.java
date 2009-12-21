@@ -16,8 +16,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     protected static final String CALLBACK_JOB_GROUP = "cron.trigger.job.group";
 
-    protected static final String QUARTZ_GROUP = Scheduler.DEFAULT_GROUP;
-
     private Scheduler quartzScheduler;
 
     public void setQuartzScheduler(Scheduler quartzScheduler)
@@ -35,12 +33,12 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         try
         {
             // if trigger is not scheduled, then schedule it first before pausing.
-            org.quartz.Trigger t = getQuartzScheduler().getTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
+            org.quartz.Trigger t = getQuartzScheduler().getTrigger(trigger.getName(), trigger.getGroup());
             if (t == null)
             {
                 schedule(trigger);
             }
-            getQuartzScheduler().pauseTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
+            getQuartzScheduler().pauseTrigger(trigger.getName(), trigger.getGroup());
         }
         catch (SchedulerException e)
         {
@@ -52,7 +50,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().resumeTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
+            getQuartzScheduler().resumeTrigger(trigger.getName(), trigger.getGroup());
         }
         catch (SchedulerException e)
         {
@@ -64,7 +62,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            // Quartz shceduler stop takes an argument indicating if we
+            // Quartz scheduler stop takes an argument indicating if we
             // should wait for scheduled tasks to complete first (hence the
             // inversion of force).
             getQuartzScheduler().shutdown(!force);
