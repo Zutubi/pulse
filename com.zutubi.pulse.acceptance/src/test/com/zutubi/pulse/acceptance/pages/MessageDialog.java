@@ -26,6 +26,11 @@ public class MessageDialog
         browser.waitForLocator(LOCATOR_OK);
     }
 
+    public boolean isVisible()
+    {
+        return browser.isVisible(LOCATOR_OK);
+    }
+
     public void typeInput(String text)
     {
         browser.type(getInputLocator(), text);

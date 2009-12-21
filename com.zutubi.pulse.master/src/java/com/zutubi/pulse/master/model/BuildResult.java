@@ -59,7 +59,9 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
      * results that needed to be completed before this result's build could commence.
      */
     private List<BuildResult> dependsOn =  new LinkedList<BuildResult>();
-
+    /**
+     * Descriptive comments left by users on this build.
+     */
     private List<Comment> comments = new LinkedList<Comment>();
 
     public BuildResult()

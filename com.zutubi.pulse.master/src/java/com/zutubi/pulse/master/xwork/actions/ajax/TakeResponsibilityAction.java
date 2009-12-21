@@ -7,18 +7,18 @@ import com.zutubi.pulse.master.model.User;
  */
 public class TakeResponsibilityAction extends ResponsibilityActionBase
 {
-    private String comment;
+    private String message;
 
-    public void setComment(String comment)
+    public void setMessage(String message)
     {
-        this.comment = comment;
+        this.message = message;
     }
 
     @Override
     public SimpleResult doExecute()
     {
         User user = getLoggedInUser();
-        projectManager.takeResponsibility(getProject(), user, comment);
-        return new SimpleResult(true, comment);
+        projectManager.takeResponsibility(getProject(), user, message);
+        return new SimpleResult(true, message);
     }
 }

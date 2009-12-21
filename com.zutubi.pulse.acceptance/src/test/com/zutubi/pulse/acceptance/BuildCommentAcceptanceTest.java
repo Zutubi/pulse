@@ -43,6 +43,21 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         addCommentHelper();
     }
 
+    public void testCancelComment() throws Exception
+    {
+        int buildId = xmlRpcHelper.runBuild(TEST_PROJECT);
+
+        login(TEST_USER, "");
+        BuildSummaryPage page = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, (long) buildId);
+        page.clickAction(BuildResult.ACTION_ADD_COMMENT);
+
+        AddCommentDialog dialog = new AddCommentDialog(browser);
+        dialog.waitFor();
+        dialog.clickCancel();
+        assertFalse(dialog.isVisible());
+        assertFalse(page.isCommentsPresent());
+    }
+
     public void testDeleteComment() throws Exception
     {
         xmlRpcHelper.insertTrivialUser(random);

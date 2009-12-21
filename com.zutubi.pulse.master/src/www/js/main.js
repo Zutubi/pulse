@@ -719,27 +719,44 @@ function handleDialogResponse(options, success, response)
     }
 }
 
-function takeResponsibility(projectId)
+function showPromptDialog(title, message, prompt, multiline, statusMesage, url, params)
 {
     window.dialogBox = Ext.Msg.show({
-        title: 'Take Responsibility',
-        msg: 'Comment (optional):',
+        title: title,
+        msg: message,
         fn: function(btn, text) {
                 window.dialogBox = null;
                 if (btn == 'ok')
                 {
-                    showStatus('Taking responsibility...', 'working');
+                    if (prompt)
+                    {
+                        params['message'] = text;
+                    }
+
+                    showStatus(statusMesage , 'working');
                     Ext.Ajax.request({
-                        url: window.baseUrl + '/ajax/takeResponsibility.action',
-                        params: { projectId: projectId, comment: text },
+                        url: window.baseUrl + url,
+                        params: params,
                         callback: handleDialogResponse
                     });
                 }
         },
-        prompt: true,
+        prompt: prompt,
         width: 400,
+        multiline: multiline,
         buttons: Ext.Msg.OKCANCEL
     });
+}
+
+function takeResponsibility(projectId)
+{
+    showPromptDialog('Take Responsibility',
+                     'Comment (optional):',
+                     true,
+                     false,
+                     'Taking responsibility...',
+                     '/ajax/takeResponsibility.action',
+                     { projectId: projectId });
 }
 
 function clearResponsibility(projectId)
@@ -754,47 +771,24 @@ function clearResponsibility(projectId)
 
 function addComment(buildId)
 {
-    window.dialogBox = Ext.Msg.show({
-        title: 'Add Comment',
-        msg: 'Comment:',
-        fn: function(btn, text) {
-                window.dialogBox = null;
-                if (btn == 'ok')
-                {
-                    showStatus('Adding comment...', 'working');
-                    Ext.Ajax.request({
-                        url: window.baseUrl + '/ajax/addComment.action',
-                        params: { buildId: buildId, message: text },
-                        callback: handleDialogResponse
-                    });
-                }
-        },
-        prompt: true,
-        multiline: true,
-        width: 400,
-        buttons: Ext.Msg.OKCANCEL
-    });
+    showPromptDialog('Add Comment',
+                     'Comment:',
+                     true,
+                     true,
+                     'Adding comment...',
+                     '/ajax/addComment.action',
+                     { buildId: buildId });
 }
 
 function deleteComment(buildId, commentId)
 {
-    window.dialogBox = Ext.Msg.show({
-        title: 'Delete Comment',
-        msg: 'Are you sure you want to delete this comment?',
-        fn: function(btn, text) {
-                window.dialogBox = null;
-                if (btn == 'ok')
-                {
-                    showStatus('Deleting comment...', 'working');
-                    Ext.Ajax.request({
-                        url: window.baseUrl + '/ajax/deleteComment.action',
-                        params: { buildId: buildId, commentId: commentId },
-                        callback: handleDialogResponse
-                    });
-                }
-        },
-        buttons: Ext.Msg.OKCANCEL
-    });
+    showPromptDialog('Delete Comment',
+                     'Are you sure you want to delete this comment?',
+                     false,
+                     false,
+                     'Deleting comment...',
+                     '/ajax/deleteComment.action',
+                     { buildId: buildId, commentId: commentId });
 }
 
 function handleMarkForCleanResponse(options, success, response)
