@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.api;
 
-import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.servercore.api.APIAuthenticationToken;
@@ -34,14 +34,6 @@ public class DefaultTokenManager implements TokenManager
         return login(username, password, Constants.MINUTE * 30);
     }
 
-    /**
-     * Init method used to initialise any post creation resource requirements.
-     */
-    public void init()
-    {
-
-    }
-
     public synchronized String login(String username, String password, long expiry) throws AuthenticationException
     {
         checkTokenAccessEnabled();
@@ -65,9 +57,8 @@ public class DefaultTokenManager implements TokenManager
 
             return encoded;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            e.printStackTrace();
             throw new AuthenticationException(e.getMessage());
         }
     }

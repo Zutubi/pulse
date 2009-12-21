@@ -82,11 +82,12 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
         scheduler.registerCallback(callback, 100);
         Thread.sleep(500 * Constants.MILLISECOND);
         assertTrue(scheduler.unregisterCallback(callback));
-        assertTrue(callback.getCount() >= 5);
+        int countAfterUnregister = callback.getCount();
+        assertTrue(countAfterUnregister >= 5);
 
         // verify that unregister does in fact stop the callbacks.
         Thread.sleep(300 * Constants.MILLISECOND);
-        assertEquals(5, callback.getCount());
+        assertEquals(countAfterUnregister, callback.getCount());
     }
 
     public void testCallbackDate() throws InterruptedException, SchedulingException

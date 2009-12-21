@@ -106,7 +106,7 @@ public class AgentFileSystem extends AbstractFileSystem
         }
         catch (FileSystemException e)
         {
-            e.printStackTrace();
+            LOG.severe(e);
         }
         return false;
     }

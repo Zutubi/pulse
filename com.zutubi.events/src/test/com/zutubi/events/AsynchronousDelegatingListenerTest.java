@@ -11,28 +11,9 @@ public class AsynchronousDelegatingListenerTest extends ZutubiTestCase
     private Semaphore eventSemaphore = new Semaphore(0);
     private Semaphore doneSemaphore = new Semaphore(0);
 
-    public AsynchronousDelegatingListenerTest()
-    {
-    }
-
-    public AsynchronousDelegatingListenerTest(String name)
-    {
-        super(name);
-    }
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testEventsExecutedOnSeparateThread() throws InterruptedException
     {
-        WatiListener delegate = new WatiListener();
+        WaitListener delegate = new WaitListener();
         AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate, Executors.defaultThreadFactory());
 
         l.handleEvent(new Event(this));
@@ -44,7 +25,7 @@ public class AsynchronousDelegatingListenerTest extends ZutubiTestCase
         assertTrue(delegate.acquired);
     }
 
-    private class WatiListener implements EventListener
+    private class WaitListener implements EventListener
     {
         private boolean acquired;
 

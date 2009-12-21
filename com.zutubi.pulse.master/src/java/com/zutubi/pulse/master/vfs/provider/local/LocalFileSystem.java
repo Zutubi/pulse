@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.local;
 
+import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -20,6 +21,8 @@ import java.util.List;
  */
 public class LocalFileSystem extends org.apache.commons.vfs.provider.local.LocalFileSystem
 {
+    private static final Logger LOG = Logger.getLogger(LocalFileSystem.class);
+
     private List<FileName> rootNames;
 
     private final String rootFile;
@@ -75,7 +78,7 @@ public class LocalFileSystem extends org.apache.commons.vfs.provider.local.Local
         }
         catch (FileSystemException e)
         {
-            e.printStackTrace();
+            LOG.severe(e);
         }
         return false;
     }

@@ -70,7 +70,6 @@ public class JarFilePlugin extends LocalPlugin
         }
         catch (IOException e)
         {
-            e.printStackTrace();
             return false;
         }
     }

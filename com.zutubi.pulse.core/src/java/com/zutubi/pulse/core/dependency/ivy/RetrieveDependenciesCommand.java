@@ -97,7 +97,6 @@ public class RetrieveDependenciesCommand implements Command
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             throw new BuildException("Error running dependency retrieval: " + e.getMessage(), e);
         }
     }

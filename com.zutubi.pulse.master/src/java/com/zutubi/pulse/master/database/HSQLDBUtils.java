@@ -30,7 +30,7 @@ public class HSQLDBUtils
         JDBCUtils.execute(dataSource, "SHUTDOWN SCRIPT");
     }
 
-    public static boolean updateMaxSizeRequired(DataSource dataSource)
+    public static boolean updateMaxSizeRequired(DataSource dataSource) throws SQLException
     {
         Connection con = null;
         PreparedStatement stmt = null;
@@ -50,10 +50,6 @@ public class HSQLDBUtils
                 }
             }
         }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
         finally
         {
             JDBCUtils.close(rs);
@@ -64,12 +60,7 @@ public class HSQLDBUtils
         return false;
     }
 
-    public static boolean isHsqldb(String url)
-    {
-        return url.contains(":hsqldb:");
-    }
-
-    public static void updateMaxSize(String url)
+    public static void updateMaxSize(String url) throws IOException
     {
         if (!url.startsWith("jdbc:hsqldb:"))
         {
@@ -90,10 +81,6 @@ public class HSQLDBUtils
 
             outStream = new FileOutputStream(databasePropertiesFile);
             properties.store(outStream, "Updated cache_file_scale");
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
         }
         finally
         {

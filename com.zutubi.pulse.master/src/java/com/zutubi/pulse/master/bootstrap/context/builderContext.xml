@@ -183,7 +183,7 @@
         </property>
     </bean>
 
-    <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager" init-method="init"/>
+    <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager"/>
 
     <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory">
         <property name="objectFactory" ref="objectFactory"/>

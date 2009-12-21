@@ -66,16 +66,15 @@ public class ConfigDecoratorMapper extends AbstractDecoratorMapper
             thisPath = request.getRequestURI();
         }
 
-        String name = null;
+        String name;
         try
         {
             name = configLoader.getMappedName(thisPath);
         }
         catch (ServletException e)
         {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
         Decorator result = getNamedDecorator(request, name);
         return result == null ? super.getDecorator(request, page) : result;
     }
@@ -85,14 +84,14 @@ public class ConfigDecoratorMapper extends AbstractDecoratorMapper
      */
     public Decorator getNamedDecorator(HttpServletRequest request, String name)
     {
-        Decorator result = null;
+        Decorator result;
         try
         {
             result = configLoader.getDecoratorByName(name);
         }
         catch (ServletException e)
         {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         if (result == null || (result.getRole() != null && !request.isUserInRole(result.getRole())))
