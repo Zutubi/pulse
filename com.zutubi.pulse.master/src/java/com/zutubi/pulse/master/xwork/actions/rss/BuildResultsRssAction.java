@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
-import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
 import com.zutubi.pulse.master.notifications.renderer.RenderService;
 import com.zutubi.pulse.master.search.BuildResultExpressions;
 import com.zutubi.pulse.master.search.Queries;
@@ -45,7 +44,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private BuildResultRenderer buildResultRenderer;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
-    private RenderService renderService = new DefaultRenderService();
+    private RenderService renderService;
 
     private Queries queries;
 
@@ -195,6 +194,11 @@ public class BuildResultsRssAction extends ProjectActionSupport
     public String getProjectName(Project project)
     {
         return projectManager.getProjectConfig(project.getId(), true).getName();
+    }
+
+    public void setRenderService(RenderService renderService)
+    {
+        this.renderService = renderService;
     }
 
     /**

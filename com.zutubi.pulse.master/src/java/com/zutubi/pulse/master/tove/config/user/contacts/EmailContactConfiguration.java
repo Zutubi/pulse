@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.config.user.contacts;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.NotificationException;
-import com.zutubi.pulse.master.notifications.email.DefaultEmailService;
 import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.tove.annotations.Classification;
@@ -34,7 +33,7 @@ public class EmailContactConfiguration extends ContactConfiguration
     private String address;
 
     private ConfigurationProvider configurationProvider;
-    private EmailService emailService = new DefaultEmailService();
+    private EmailService emailService;
 
     public EmailContactConfiguration()
     {
@@ -85,5 +84,10 @@ public class EmailContactConfiguration extends ContactConfiguration
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setEmailService(EmailService emailService)
+    {
+        this.emailService = emailService;
     }
 }

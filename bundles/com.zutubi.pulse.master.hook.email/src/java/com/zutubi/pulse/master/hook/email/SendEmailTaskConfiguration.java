@@ -13,10 +13,8 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.notifications.email.DefaultEmailService;
 import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
-import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
 import com.zutubi.pulse.master.notifications.renderer.RenderService;
 import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
@@ -73,8 +71,8 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     private BuildManager buildManager;
     private UserManager userManager;
     private ScmManager scmManager;
-    private EmailService emailService = new DefaultEmailService();
-    private RenderService renderService = new DefaultRenderService();
+    private EmailService emailService;
+    private RenderService renderService;
 
     public String getTemplate()
     {
