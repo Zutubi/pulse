@@ -10,8 +10,6 @@ import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scheduling.SimpleTrigger;
-import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -26,8 +24,6 @@ public class AgentStatisticsManager implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(AgentStatisticsManager.class);
 
-    private static final String TRIGGER_GROUP = "services";
-    private static final String TRIGGER_NAME = "statistics";
     private static final long TRIGGER_INTERVAL = 5 * Constants.MINUTE;
 
     private Map<Long, StampedStatus> agentIdToStatus = new HashMap<Long, StampedStatus>();
@@ -50,19 +46,19 @@ public class AgentStatisticsManager implements EventListener
 
     private void ensureTriggerScheduled()
     {
-        Trigger statisticsTrigger = scheduler.getTrigger(TRIGGER_GROUP, TRIGGER_NAME);
-        if (statisticsTrigger == null)
+        try
         {
-            statisticsTrigger = new SimpleTrigger(TRIGGER_GROUP, TRIGGER_NAME, TRIGGER_INTERVAL);
-            statisticsTrigger.setTaskClass(UpdateStatisticsTask.class);
-            try
+            scheduler.registerCallback(new NullaryProcedure()
             {
-                scheduler.schedule(statisticsTrigger);
-            }
-            catch (SchedulingException e)
-            {
-                LOG.severe(e);
-            }
+                public void process()
+                {
+                    agentManager.updateStatistics();
+                }
+            }, TRIGGER_INTERVAL);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
         }
     }
 

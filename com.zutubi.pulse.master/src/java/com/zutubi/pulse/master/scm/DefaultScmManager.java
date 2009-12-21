@@ -10,8 +10,6 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scheduling.SimpleTrigger;
-import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -22,14 +20,15 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class DefaultScmManager implements ScmManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);
 
-    private static final String MONITOR_NAME = "poll";
-    private static final String MONITOR_GROUP = "scm";
     private static final long POLLING_FREQUENCY = Constants.MINUTE;
 
     private ProjectManager projectManager;
@@ -70,22 +69,17 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
         try
         {
-            // check if the trigger exists. if not, create and schedule.
-            Trigger trigger = scheduler.getTrigger(MONITOR_NAME, MONITOR_GROUP);
-            if (trigger == null)
+            scheduler.registerCallback(new NullaryProcedure()
             {
-                trigger = new SimpleTrigger(MONITOR_NAME, MONITOR_GROUP, POLLING_FREQUENCY);
-                trigger.setTaskClass(MonitorScms.class);
-            }
-
-            if (!trigger.isScheduled())
-            {
-                scheduler.schedule(trigger);
-            }
+                public void process()
+                {
+                    pollActiveScms();
+                }
+            }, POLLING_FREQUENCY);
         }
         catch (SchedulingException e)
         {
-            LOG.severe("Failed to schedule scm polling trigger. Cause: " + e.getMessage() + ".  " +
+            LOG.severe("Failed to register scm pollingn callback. Cause: " + e.getMessage() + ".  " +
                     "No scm polling is available.  See log for details.");
             LOG.severe(e);
         }

@@ -9,6 +9,10 @@ import java.util.Set;
 
 /**
  * The default trigger handler handles the details of firing a trigger.
+ *
+ * This trigger handler ensures that a trigger can only be firing once,
+ * and all trigger attempts that are raised whist the trigger is already
+ * executing its task are dropped.
  */
 public class DefaultTriggerHandler implements TriggerHandler
 {

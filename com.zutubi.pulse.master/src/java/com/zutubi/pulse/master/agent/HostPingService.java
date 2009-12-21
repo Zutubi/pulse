@@ -7,9 +7,6 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.events.HostPingEvent;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scheduling.SimpleTrigger;
-import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.scheduling.tasks.PingSlaves;
 import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
@@ -19,6 +16,7 @@ import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashSet;
@@ -40,9 +38,6 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
 {
     private static final Logger LOG = Logger.getLogger(HostPingService.class);
 
-    private static final String PING_NAME = "ping";
-    private static final String PING_GROUP = "services";
-
     private static final int DEFAULT_POOL_SIZE = 24;
 
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
@@ -53,6 +48,8 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
     private Scheduler scheduler;
+    private HostManager hostManager;
+    private PingHostsCallback pingHostsCallback;
 
     public HostPingService()
     {
@@ -190,21 +187,17 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
 
         try
         {
-            Trigger trigger = scheduler.getTrigger(PING_NAME, PING_GROUP);
-            if (trigger != null)
+            if (pingHostsCallback != null)
             {
-                scheduler.unschedule(trigger);
+                scheduler.unregisterCallback(pingHostsCallback);
             }
-
-            trigger = new SimpleTrigger(PING_NAME, PING_GROUP, agentPingConfig.getPingInterval() * Constants.SECOND);
-            trigger.setTaskClass(PingSlaves.class);
-            scheduler.schedule(trigger);
+            pingHostsCallback = new PingHostsCallback();
+            scheduler.registerCallback(pingHostsCallback, agentPingConfig.getPingInterval() * Constants.SECOND);
         }
         catch (SchedulingException e)
         {
             LOG.severe(e);
         }
-
     }
 
     public void handleEvent(Event event)
@@ -256,5 +249,19 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
+    }
+
+    public void setHostManager(HostManager hostManager)
+    {
+        this.hostManager = hostManager;
+    }
+
+    private class PingHostsCallback implements NullaryProcedure
+    {
+        public void process()
+        {
+            LOG.info("Pinging hosts");
+            HostPingService.this.hostManager.pingHosts();
+        }
     }
 }

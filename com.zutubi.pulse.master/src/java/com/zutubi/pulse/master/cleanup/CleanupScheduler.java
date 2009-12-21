@@ -9,13 +9,12 @@ import com.zutubi.pulse.master.cleanup.requests.UserCleanupRequest;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scheduling.SimpleTrigger;
-import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.util.Constants;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -37,9 +36,6 @@ public class CleanupScheduler implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(CleanupScheduler.class);
 
-    private static final String TRIGGER_NAME = "cleanup";
-    private static final String TRIGGER_GROUP = "services";
-
     private EventManager eventManager;
     private EventListener eventListener;
     private Scheduler scheduler;
@@ -55,21 +51,19 @@ public class CleanupScheduler implements Stoppable
 
     protected void initPeriodicScheduling()
     {
-        Trigger trigger = scheduler.getTrigger(TRIGGER_NAME, TRIGGER_GROUP);
-        if (trigger == null)
+        try
         {
-            // initialise the trigger.
-            trigger = new SimpleTrigger(TRIGGER_NAME, TRIGGER_GROUP, Constants.DAY);
-            trigger.setTaskClass(CleanupBuilds.class);
-
-            try
+            scheduler.registerCallback(new NullaryProcedure()
             {
-                scheduler.schedule(trigger);
-            }
-            catch (SchedulingException e)
-            {
-                LOG.severe(e);
-            }
+                public void process()
+                {
+                    scheduleProjectCleanup();
+                }
+            }, Constants.DAY);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
         }
     }
 

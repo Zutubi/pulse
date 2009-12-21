@@ -7,13 +7,7 @@ import com.zutubi.util.junit.ZutubiTestCase;
 public class DefaultSchedulerTest extends ZutubiTestCase
 {
     private DefaultScheduler scheduler;
-    private TestTriggerHandler triggerHandler;
     private TriggerDao triggerDao;
-
-    public DefaultSchedulerTest(String testName)
-    {
-        super(testName);
-    }
 
     public void setUp() throws Exception
     {
@@ -21,23 +15,13 @@ public class DefaultSchedulerTest extends ZutubiTestCase
 
         // add setup code here.
         scheduler = new DefaultScheduler();
-        triggerHandler = new TestTriggerHandler();
+        TestTriggerHandler triggerHandler = new TestTriggerHandler();
         scheduler.setTriggerHandler(triggerHandler);
         triggerDao = new InMemoryTriggerDao();
         scheduler.setTriggerDao(triggerDao);
 
         scheduler.register(new NoopSchedulerStrategy());
         scheduler.start();
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-        scheduler = null;
-        triggerHandler = null;
-        triggerDao = null;
-
-        super.tearDown();
     }
 
     public void testPersistence() throws SchedulingException
@@ -81,17 +65,13 @@ public class DefaultSchedulerTest extends ZutubiTestCase
     public void testPauseGroup() throws SchedulingException
     {
         scheduler.schedule(new NoopTrigger("a"));
-
         assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
 
         scheduler.pause(Trigger.DEFAULT_GROUP);
-
         assertEquals(TriggerState.PAUSED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
 
         scheduler.resume(Trigger.DEFAULT_GROUP);
-
         assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
-
     }
 
     /**

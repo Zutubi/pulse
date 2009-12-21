@@ -109,6 +109,7 @@
                 <ref local="addPrimaryContact"/>
                 <ref local="addProjectContacts"/>
                 <ref local="convertEmailCommittersTasks"/>
+                <ref local="deleteOldCallbackTriggers"/>
                 <ref local="addBuildComments"/>
                 <ref local="addConfigAuditLoggingEnabled"/>
             </list>
@@ -538,4 +539,9 @@
     <bean id="addConfigAuditLoggingEnabled" class="com.zutubi.pulse.master.upgrade.tasks.AddConfigAuditLoggingEnabledUpgradeTask">
         <property name="buildNumber" value="201011005"/>
     </bean>
+
+    <bean id="deleteOldCallbackTriggers" class="com.zutubi.pulse.master.upgrade.tasks.DeleteOldCallbackTriggersUpgradeTask">
+        <property name="buildNumber" value="201011006"/>
+    </bean>
+
 </beans>

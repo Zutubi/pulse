@@ -3,15 +3,24 @@ package com.zutubi.pulse.master.scheduling;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
+import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.NullaryProcedure;
+import com.zutubi.util.Pair;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
+/**
+ * The implementation of the scheduler interface.  It provides persistence of
+ * triggers and delegates the handling of the triggers to the appropriate
+ * registered SchedulerStrategy instances.
+ */
 public class DefaultScheduler implements Scheduler
 {
+    private static final String CALLBACK_TRIGGER_GROUP = "callback-triggers";
+
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
 
     private Map<String, SchedulerStrategy> strategies = new TreeMap<String, SchedulerStrategy>();
@@ -19,6 +28,10 @@ public class DefaultScheduler implements Scheduler
     private TriggerHandler triggerHandler;
 
     private TriggerDao triggerDao;
+
+    private Map<String, Pair<NullaryProcedure, Trigger>> registeredCallbacks = new HashMap<String, Pair<NullaryProcedure, Trigger>>();
+    private List<Pair<NullaryProcedure, Trigger>> callbacksToRegister = new LinkedList<Pair<NullaryProcedure, Trigger>>();
+    private long nextCallbackId = 1;
 
     private volatile boolean started = false;
 
@@ -36,15 +49,29 @@ public class DefaultScheduler implements Scheduler
         strategy.setTriggerHandler(triggerHandler);
     }
 
-    public void setStrategies(SchedulerStrategy... schedulerStrategies)
+    /**
+     * Update the list of registered strategies to be the list of strategies specified.
+     * Any strategies previously registered will be dropped.
+     *
+     * @param strategies the new list of strategies to be registered.
+     * @see #register(SchedulerStrategy)
+     */
+    public void setStrategies(SchedulerStrategy... strategies)
     {
-        setStrategies(Arrays.asList(schedulerStrategies));
+        setStrategies(Arrays.asList(strategies));
     }
-    
-    public void setStrategies(List<SchedulerStrategy> schedulerStrategies)
+
+    /**
+     * Update the list of registered strategies to be the list of strategies specified.
+     * Any strategies previously registered will be dropped.
+     *
+     * @param strategies the new list of strategies to be registered.
+     * @see #register(SchedulerStrategy)
+     */
+    public void setStrategies(List<SchedulerStrategy> strategies)
     {
-        strategies.clear();
-        for (SchedulerStrategy strategy : schedulerStrategies)
+        this.strategies.clear();
+        for (SchedulerStrategy strategy : strategies)
         {
             register(strategy);
         }
@@ -73,6 +100,21 @@ public class DefaultScheduler implements Scheduler
                     // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
                     // being initialised.
                     LOG.severe("Failed to initialise a trigger (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
+                }
+            }
+
+            // initialise the already registered callbacks.
+            for (Pair<NullaryProcedure, Trigger> value : callbacksToRegister)
+            {
+                Trigger trigger = value.getSecond();
+                try
+                {
+                    registeredCallbacks.put(trigger.getName(), value);
+                    getStrategy(trigger).schedule(trigger);
+                }
+                catch (SchedulingException e)
+                {
+                    LOG.severe("Failed to initialise callback (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
                 }
             }
         }
@@ -131,31 +173,24 @@ public class DefaultScheduler implements Scheduler
             if (started)
             {
                 SchedulerStrategy impl = getStrategy(trigger);
+                if (impl == null)
+                {
+                    throw new SchedulingException("No strategy associated with trigger of type " + trigger.getType());
+                }
                 impl.schedule(trigger);
             }
         }
         catch (SchedulingException e)
         {
             triggerDao.delete(trigger);
-            throw new SchedulingException(e);
+            throw e;
         }
     }
 
-    public void trigger(Trigger trigger) throws SchedulingException
-    {
-        triggerHandler.fire(trigger);
-    }
-
-    /**
-     * Unschedule a trigger. Only scheduled triggers can be unscheduled.
-     *
-     * @param trigger instance to be unscheduled.
-     * @throws SchedulingException
-     */
     public void unschedule(final Trigger trigger) throws SchedulingException
     {
         assertScheduled(trigger);
-        
+
         trigger.setState(TriggerState.NONE);
         triggerDao.save(trigger);
 
@@ -233,6 +268,79 @@ public class DefaultScheduler implements Scheduler
         impl.resume(trigger);
     }
 
+    public void registerCallback(NullaryProcedure callback, Date when) throws SchedulingException
+    {
+        SimpleTrigger trigger = new SimpleTrigger(String.valueOf(nextCallbackId++), CALLBACK_TRIGGER_GROUP, when);
+        trigger.setTaskClass(CallbackTask.class);
+
+        registerCallbackTrigger(callback, trigger);
+    }
+
+    public void registerCallback(NullaryProcedure callback, long interval) throws SchedulingException
+    {
+        SimpleTrigger trigger = new SimpleTrigger(String.valueOf(nextCallbackId++), CALLBACK_TRIGGER_GROUP, interval);
+        trigger.setTaskClass(CallbackTask.class);
+
+        registerCallbackTrigger(callback, trigger);
+    }
+
+    private void registerCallbackTrigger(NullaryProcedure callback, Trigger trigger) throws SchedulingException
+    {
+        SchedulerStrategy impl = getStrategy(trigger);
+        if (impl == null)
+        {
+            throw new SchedulingException("No strategy associated with trigger of type " + trigger.getType());
+        }
+
+        Pair<NullaryProcedure, Trigger> value = asPair(callback, trigger);
+        if (started)
+        {
+            registeredCallbacks.put(trigger.getName(), value);
+            impl.schedule(trigger);
+        }
+        else
+        {
+            // defer the scheduling of this trigger till we start the scheduler.
+            callbacksToRegister.add(value);
+        }
+    }
+
+    public NullaryProcedure getCallback(String name)
+    {
+        if (registeredCallbacks.containsKey(name))
+        {
+            return registeredCallbacks.get(name).getFirst();
+        }
+        return null;
+    }
+
+    public boolean unregisterCallback(NullaryProcedure callback) throws SchedulingException
+    {
+        if (callback == null)
+        {
+            return false;
+        }
+        
+        HasCallbackPredicate hasCallbackPredicate = new HasCallbackPredicate(callback);
+        Pair<NullaryProcedure, Trigger> found = CollectionUtils.find(registeredCallbacks.values(), hasCallbackPredicate);
+        if (found == null)
+        {
+            found = CollectionUtils.find(callbacksToRegister, hasCallbackPredicate);
+        }
+        if (found == null)
+        {
+            return false;
+        }
+
+        Trigger trigger = found.getSecond();
+        getStrategy(trigger).unschedule(trigger);
+
+        registeredCallbacks.remove(trigger.getName());
+        callbacksToRegister.remove(found);
+
+        return true;
+    }
+
     /**
      * Retrieve the first registered strategy that is able to handle this trigger.
      *
@@ -296,6 +404,40 @@ public class DefaultScheduler implements Scheduler
         finally
         {
             started = false;
+        }
+    }
+
+    private static class HasCallbackPredicate implements Predicate<Pair<NullaryProcedure, Trigger>>
+    {
+        private NullaryProcedure callback;
+
+        private HasCallbackPredicate(NullaryProcedure callback)
+        {
+            this.callback = callback;
+        }
+
+        public boolean satisfied(Pair<NullaryProcedure, Trigger> pair)
+        {
+            return pair.getFirst() == callback;
+        }
+    }
+
+    public static class CallbackTask implements Task
+    {
+        private Scheduler scheduler;
+
+        public void execute(TaskExecutionContext context)
+        {
+            NullaryProcedure callback = scheduler.getCallback(context.getTrigger().getName());
+            if (callback != null)
+            {
+                callback.process();
+            }
+        }
+
+        public void setScheduler(Scheduler scheduler)
+        {
+            this.scheduler = scheduler;
         }
     }
 }

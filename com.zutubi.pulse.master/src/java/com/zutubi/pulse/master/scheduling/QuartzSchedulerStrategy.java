@@ -79,7 +79,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().unscheduleJob(Long.toString(trigger.getId()), QUARTZ_GROUP);
+            getQuartzScheduler().unscheduleJob(trigger.getName(), trigger.getGroup());
         }
         catch (SchedulerException e)
         {

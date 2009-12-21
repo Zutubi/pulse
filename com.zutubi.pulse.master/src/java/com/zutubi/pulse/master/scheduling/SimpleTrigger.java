@@ -10,8 +10,6 @@ public class SimpleTrigger extends Trigger
 {
     public static final int REPEAT_INDEFINITELY = org.quartz.SimpleTrigger.REPEAT_INDEFINITELY;
 
-    public static final Date NEVER = new Date(0);
-
     protected static final String TYPE = "simple";
 
     private Date startTime;
@@ -75,7 +73,7 @@ public class SimpleTrigger extends Trigger
         return interval;
     }
 
-    public void setInterval(long interval) // public for testing
+    private void setInterval(long interval)
     {
         this.interval = interval;
     }

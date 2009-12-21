@@ -40,7 +40,9 @@ import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
+import com.zutubi.pulse.master.scheduling.DefaultScheduler;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -53,10 +55,6 @@ import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.util.url.CredentialsStore;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -77,10 +75,6 @@ public class DefaultBuildController implements EventListener, BuildController
     private static final Messages I18N = Messages.getInstance(DefaultBuildController.class);
     private static final Logger LOG = Logger.getLogger(DefaultBuildController.class);
 
-    public static final String TIMEOUT_JOB_NAME = "build";
-    public static final String TIMEOUT_JOB_GROUP = "timeout";
-    private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
-
     private BuildRequestEvent request;
     private Project project;
     private ProjectConfiguration projectConfig;
@@ -99,7 +93,8 @@ public class DefaultBuildController implements EventListener, BuildController
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private int pendingRecipes = 0;
-    private Scheduler quartzScheduler;
+    private Scheduler scheduler;
+
     private BuildResult previousSuccessful;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
@@ -115,6 +110,10 @@ public class DefaultBuildController implements EventListener, BuildController
     private IvyManager ivyManager;
     private RepositoryAttributes repositoryAttributes;
     private ModuleDescriptorFactory moduleDescriptorFactory;
+    /**
+     * A map of the recipe timeout callbacks.
+     */
+    private Map<Long, RecipeTimeoutCallback> timeoutCallbacks = new HashMap<Long, RecipeTimeoutCallback>();
 
     public DefaultBuildController(BuildRequestEvent event)
     {
@@ -527,11 +526,6 @@ public class DefaultBuildController implements EventListener, BuildController
         return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), pbr.getPatchFormat());
     }
 
-    private String getTriggerName(long recipeId)
-    {
-        return String.format("recipe-%d", recipeId);
-    }
-
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
     {
         long id = event.getBuildId();
@@ -672,14 +666,13 @@ public class DefaultBuildController implements EventListener, BuildController
             {
                 try
                 {
-                    // during a system shutdown, the scheduler is shutdown before the
-                    // builds are completed. This makes it unnecessary to unschedule the job.
-                    if (!quartzScheduler.isShutdown())
+                    RecipeTimeoutCallback callback = timeoutCallbacks.get(e.getRecipeId());
+                    if (callback != null)
                     {
-                        quartzScheduler.unscheduleJob(getTriggerName(e.getRecipeId()), TIMEOUT_TRIGGER_GROUP);
+                        scheduler.unregisterCallback(callback);
                     }
                 }
-                catch (SchedulerException ex)
+                catch (SchedulingException ex)
                 {
                     LOG.warning("Unable to unschedule timeout trigger: " + ex.getMessage(), ex);
                 }
@@ -797,23 +790,18 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void scheduleTimeout(long recipeId)
     {
-        String name = getTriggerName(recipeId);
-        Date time = new Date(System.currentTimeMillis() + projectConfig.getOptions().getTimeout() * Constants.MINUTE);
+        Date timeoutAt = new Date(System.currentTimeMillis() + projectConfig.getOptions().getTimeout() * Constants.MINUTE);
 
-        Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
-        timeoutTrigger.setJobName(TIMEOUT_JOB_NAME);
-        timeoutTrigger.setJobGroup(TIMEOUT_JOB_GROUP);
-        timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_BUILD_ID, buildResult.getId());
-        timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_RECIPE_ID, recipeId);
-
+        DefaultScheduler scheduler = new DefaultScheduler();
         try
         {
-            LOG.debug("Scheduling timeout for build " + buildResult.getId() + ", recipe " + recipeId + " at " + time.toString());
-            quartzScheduler.scheduleJob(timeoutTrigger);
+            RecipeTimeoutCallback timeoutCallback = new RecipeTimeoutCallback(buildResult.getId(), recipeId);
+            timeoutCallbacks.put(recipeId, timeoutCallback);
+            scheduler.registerCallback(timeoutCallback, timeoutAt);
         }
-        catch (SchedulerException e)
+        catch (SchedulingException e)
         {
-            LOG.severe("Unable to schedule build timeout trigger: " + e.getMessage(), e);
+            LOG.severe("Unable to schedule build timeout callback: " + e.getMessage(), e);
         }
     }
 
@@ -1099,9 +1087,9 @@ public class DefaultBuildController implements EventListener, BuildController
         this.collector = collector;
     }
 
-    public void setQuartzScheduler(Scheduler quartzScheduler)
+    public void setScheduler(Scheduler scheduler)
     {
-        this.quartzScheduler = quartzScheduler;
+        this.scheduler = scheduler;
     }
 
     public void setScmManager(ScmManager scmManager)
@@ -1152,5 +1140,22 @@ public class DefaultBuildController implements EventListener, BuildController
     private static interface BootstrapperCreator
     {
         Bootstrapper create();
+    }
+
+    private class RecipeTimeoutCallback implements NullaryProcedure
+    {
+        private long buildResultId;
+        private long recipeId;
+
+        private RecipeTimeoutCallback(long buildResultId, long recipeId)
+        {
+            this.buildResultId = buildResultId;
+            this.recipeId = recipeId;
+        }
+
+        public void process()
+        {
+            eventManager.publish(new RecipeTimeoutEvent(DefaultBuildController.this, buildResultId, recipeId));
+        }
     }
 }
