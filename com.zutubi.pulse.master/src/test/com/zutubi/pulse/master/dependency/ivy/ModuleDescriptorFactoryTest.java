@@ -43,14 +43,6 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         return project;
     }
 
-    public BuildStageConfiguration addStage(ProjectConfiguration project, String stageName)
-    {
-        BuildStageConfiguration stage = new BuildStageConfiguration(stageName);
-        stage.setHandle(nexthandle++);
-        project.getStages().put(stage.getName(), stage);
-        return stage;
-    }
-
     public void testDependencies()
     {
         ProjectConfiguration dependentProject = newProject("", "dependent");
