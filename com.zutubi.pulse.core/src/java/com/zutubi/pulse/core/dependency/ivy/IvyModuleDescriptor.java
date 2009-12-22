@@ -13,9 +13,9 @@ import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorParser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 
 /**
  * The ivy module descriptor provides a wrapper around ivy's ModuleDescriptor and
@@ -39,11 +39,11 @@ public class IvyModuleDescriptor
      */
     private IvyConfiguration configuration;
 
-    public static final String CONFIGURATION_BUILD = "build";
     public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e:";
 
-    public static final String STAGE_NAME_GLUE = ",";
+    public static final String NAME_GLUE = ",";
     public static final String ALL_STAGES = "*";
+    public static final String CORRESPONDING_STAGE = "#";
     public static final String SOURCEFILE = "sourcefile";
     public static final String STAGE = "stage";
 
@@ -63,6 +63,13 @@ public class IvyModuleDescriptor
      * described by this module descriptor.
      */
     public static final String EXTRA_INFO_BUILD_NUMBER = NAMESPACE_EXTRA_ATTRIBUTES + "buildNumber";
+
+    /**
+     * Maps to a comma-separated list of module names for upstream projects on which our
+     * dependency is optional.  If we fail to find a configuration in an optional dependency
+     * it is not considered fatal.
+     */
+    public static final String EXTRA_INFO_OPTIONAL = NAMESPACE_EXTRA_ATTRIBUTES + "optional";
 
     /**
      * If there is no build number associated with a module descriptor, this value will be returned
@@ -178,8 +185,8 @@ public class IvyModuleDescriptor
      */
     public IvyModuleDescriptor(ModuleRevisionId mrid, String status, IvyConfiguration configuration)
     {
-        this.descriptor = new DefaultModuleDescriptor(IvyEncoder.encode(mrid), status, null);
-        this.descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
+        descriptor = new DefaultModuleDescriptor(IvyEncoder.encode(mrid), status, null);
+        descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
         this.configuration = configuration;
     }
 
@@ -250,30 +257,30 @@ public class IvyModuleDescriptor
      * of this dependency is false.
      *
      * @param mrid          the module revision id defining the dependency.
+     * @param conf          the local configuration that this dependency belongs to
      * @param stageNames    the dependent modules stage mappings.  If not defined,
      * '*' is used to refer to all stages.
      */
-    public void addDependency(ModuleRevisionId mrid, String... stageNames)
+    public void addDependency(ModuleRevisionId mrid, String conf, String... stageNames)
     {
-        addDependency(mrid, false, stageNames);
+        addDependency(mrid, conf, false, stageNames);
     }
 
     /**
      * Add a new dependency to this module descriptor.
      *
      * @param mrid          the module revision id defining the dependency
+     * @param conf          the local configuration that this dependency belongs to
      * @param transitive    indicating whether or not the dependency is transitive
      * @param stageNames    the remote module stage mappings. If not defined,
-     * '*' will be used to refer to all stages.
      */
-    public void addDependency(ModuleRevisionId mrid, boolean transitive, String... stageNames)
+    public void addDependency(ModuleRevisionId mrid, String conf, boolean transitive, String... stageNames)
     {
-        String masterConf = ensureConfigurationExists(CONFIGURATION_BUILD);
+        String masterConf = ensureConfigurationExists(conf);
 
-        String dependencyConf = (stageNames.length > 0) ? StringUtils.join(STAGE_NAME_GLUE, stageNames) : ALL_STAGES;
+        String dependencyConf = (stageNames.length > 0) ? StringUtils.join(NAME_GLUE, stageNames) : ALL_STAGES;
         DefaultDependencyDescriptor dependencyDescriptor = new DefaultDependencyDescriptor(descriptor, mrid, true, false, transitive);
         dependencyDescriptor.addDependencyConfiguration(masterConf, dependencyConf);
-
         descriptor.addDependency(IvyEncoder.encode(dependencyDescriptor));
     }
 
@@ -303,8 +310,63 @@ public class IvyModuleDescriptor
      */
     public void setBuildNumber(long buildNumber)
     {
+        @SuppressWarnings({"unchecked"})
         Map<String, String> extraInfo = descriptor.getExtraInfo();
         extraInfo.put(EXTRA_INFO_BUILD_NUMBER, String.valueOf(buildNumber));
+    }
+
+    /**
+     * Adds the given module to the set of optional dependencies in this
+     * descriptor.
+     *
+     * @param module the (decoded) name of the module to add
+     */
+    public void addOptionalDependency(String module)
+    {
+        @SuppressWarnings({"unchecked"})
+        Map<String, String> extraInfo = descriptor.getExtraInfo();
+        String current = extraInfo.get(EXTRA_INFO_OPTIONAL);
+        module = IvyEncoder.encode(module);
+        if (current == null)
+        {
+            current = module;
+        }
+        else
+        {
+            current = current + NAME_GLUE + module;
+        }
+
+        extraInfo.put(EXTRA_INFO_OPTIONAL, current);
+    }
+
+    /**
+     * Retrieves the optional dependencies for this descriptor.
+     *
+     * @return set of all modules that are optional dependencies (decoded)
+     */
+    public Set<String> getOptionalDependencies()
+    {
+        return getOptionalDependencies(descriptor);
+    }
+
+    /**
+     * Retrieves the optional dependencies from the given descriptor.
+     *
+     * @param descriptor descriptor to retrieve from
+     * @return set of all modules that are optional dependencies (decoded)
+     */
+    public static Set<String> getOptionalDependencies(ModuleDescriptor descriptor)
+    {
+        String confs = (String) descriptor.getExtraInfo().get(EXTRA_INFO_OPTIONAL);
+        if (confs == null)
+        {
+            return Collections.emptySet();
+        }
+        else
+        {
+            String[] decoded = IvyEncoder.decodeNames(StringUtils.split(confs, NAME_GLUE.charAt(0)));
+            return new HashSet<String>(asList(decoded));
+        }
     }
 
     /**

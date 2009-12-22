@@ -3,7 +3,10 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
-import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
+import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 
 import static java.lang.String.valueOf;
@@ -58,7 +61,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         browser.loginAsAdmin();
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A", true);
         projectA.addArtifacts("build/artifactA.jar");
         projectA.addFilesToCreate("build/artifactA.jar");
         insertProject(projectA);
@@ -67,13 +70,13 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, projectA.getName(), projectABuildNumber);
         assertFalse(summaryPage.hasDependencies());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B", true);
         projectB.addArtifacts("build/artifactB.jar");
         projectB.addFilesToCreate("build/artifactB.jar");
         insertProject(projectB);
         long projectBBuildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C");
+        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C", true);
         dependentProject.addDependency(projectA);
         dependentProject.addDependency(projectB);
         insertProject(dependentProject);
@@ -101,13 +104,13 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         browser.loginAsAdmin();
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A", true);
         projectA.addArtifacts("build/artifactA.jar");
         projectA.addFilesToCreate("build/artifactA.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C");
+        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C", true);
         dependentProject.addDependency(projectA);
         insertProject(dependentProject);
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
@@ -126,12 +129,12 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         browser.loginAsAdmin();
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A", true);
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B", true);
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar");
         insertProject(projectB);
@@ -149,14 +152,14 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testProjectDependenciesTab() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A", true);
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B", true);
         projectB.addDependency(projectA).setTransitive(true);
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        DepAntProject projectC = projects.createDepAntProject(randomName + "C", true);
         projectC.addDependency(projectB);
         insertProject(projectC);
 

@@ -39,6 +39,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
     {
         ProjectConfiguration project = new ProjectConfiguration(org, name);
         project.setHandle(nexthandle++);
+        project.getStages().put("default", new BuildStageConfiguration("default"));
         return project;
     }
 

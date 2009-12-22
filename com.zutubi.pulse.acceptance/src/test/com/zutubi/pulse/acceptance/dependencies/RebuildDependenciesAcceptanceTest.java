@@ -5,12 +5,8 @@ import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.master.model.Project.State.IDLE;
-import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
@@ -18,6 +14,11 @@ import com.zutubi.util.Predicate;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
+import static com.zutubi.pulse.master.model.Project.State.IDLE;
+import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -312,7 +313,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForAgentToBeIdle(SeleniumTestBase.AGENT_NAME);
 
         // project A -> project B -> project C
-        DepAntProject projectA = projects.createDepAntProject(projectName + "A");
+        DepAntProject projectA = projects.createDepAntProject(projectName + "A", true);
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.clearTriggers();                   // do not want dependency trigger firing.
@@ -324,7 +325,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.clearTriggers();                   // do not want dependency trigger firing.
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(projectName + "C");
+        DepAntProject projectC = projects.createDepAntProject(projectName + "C", true);
         projectC.addDependency(projectB);
          // ensure we see the revision of the artifact being delivered
         projectC.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");

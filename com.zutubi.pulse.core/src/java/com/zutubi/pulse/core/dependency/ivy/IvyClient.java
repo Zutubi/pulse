@@ -229,13 +229,14 @@ public class IvyClient
      * file system according to the target pattern.
      *
      * @param descriptor    the descriptor defining the dependencies to be retrieved.
+     * @param stageName     the name of the stage doing the retrieval
      * @param targetPattern the pattern defining where the artifacts will be written.  This pattern,
      *                      supports the usual ivy tokens.
      * @return a retrieval report containing details of the artifacts that were retrieved.
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    public IvyRetrievalReport retrieveArtifacts(ModuleDescriptor descriptor, String targetPattern) throws IOException, ParseException
+    public IvyRetrievalReport retrieveArtifacts(ModuleDescriptor descriptor, String stageName, String targetPattern) throws IOException, ParseException
     {
         // annoying but necessary.  See CustomURLHandler for details.
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
@@ -247,9 +248,9 @@ public class IvyClient
 
             ModuleRevisionId mrid = descriptor.getModuleRevisionId();
 
-            String conf = IvyModuleDescriptor.CONFIGURATION_BUILD;
+            String conf = IvyEncoder.encode(stageName);
             ResolveReport resolveReport = resolve(descriptor, conf);
-            if (resolveReportHasProblems(resolveReport, report, conf))
+            if (resolveReportHasProblems(resolveReport, report, conf, IvyModuleDescriptor.getOptionalDependencies(descriptor)))
             {
                 return report;
             }
@@ -292,7 +293,7 @@ public class IvyClient
         }
     }
 
-    private boolean resolveReportHasProblems(ResolveReport resolveReport, IvyRetrievalReport report, String confName)
+    private boolean resolveReportHasProblems(ResolveReport resolveReport, IvyRetrievalReport report, String confName, Set<String> optionalDependencies)
     {
         ConfigurationResolveReport configurationResolveReport = resolveReport.getConfigurationReport(confName);
         if (configurationResolveReport.hasError())
@@ -302,19 +303,22 @@ public class IvyClient
             {
                 if (dependency.hasProblem()) // this problem flag seems to be isolated to resolution problems.
                 {
-                    Artifact artifact = new DefaultArtifact(dependency.getResolvedId(), null, "?", "?", "?");
-                    ArtifactDownloadReport artifactDownloadReport = new ArtifactDownloadReport(artifact);
-                    artifactDownloadReport.setDownloadStatus(DownloadStatus.FAILED);
                     String errMsg = dependency.getProblemMessage();
-                    if (errMsg.length() > 0)
+                    if (!optionalDependencies.contains(IvyEncoder.decode(dependency.getId().getName())) || !isConfigurationMissingMessage(errMsg))
                     {
-                        artifactDownloadReport.setDownloadDetails("unresolved dependency: " + dependency.getId() + ": " + errMsg);
+                        Artifact artifact = new DefaultArtifact(dependency.getResolvedId(), null, "?", "?", "?");
+                        ArtifactDownloadReport artifactDownloadReport = new ArtifactDownloadReport(artifact);
+                        artifactDownloadReport.setDownloadStatus(DownloadStatus.FAILED);
+                        if (errMsg.length() > 0)
+                        {
+                            artifactDownloadReport.setDownloadDetails("unresolved dependency: " + dependency.getId() + ": " + errMsg);
+                        }
+                        else
+                        {
+                            artifactDownloadReport.setDownloadDetails("unresolved dependency: " + dependency.getId());
+                        }
+                        report.addDownloadReports(IvyEncoder.decode(artifactDownloadReport));
                     }
-                    else
-                    {
-                        artifactDownloadReport.setDownloadDetails("unresolved dependency: " + dependency.getId());
-                    }
-                    report.addDownloadReports(IvyEncoder.decode(artifactDownloadReport));
                 }
                 else
                 {
@@ -330,9 +334,23 @@ public class IvyClient
                     }
                 }
             }
-            return true;
         }
-        return false;
+
+        return report.hasFailures();
+    }
+
+    private boolean isConfigurationMissingMessage(String problemMessage)
+    {
+        // This is a hack, but there is no concept of an optional dependency in
+        // Ivy, and this gives us the desired result without either modifying
+        // Ivy or replicating a huge chunk of the resolve process ourselves  If
+        // this bites us then patching Ivy to support optional dependencies is
+        // probably the "nicer" way to achieve the same effect.
+        //
+        // To reduce the chance of this hack blowing up I have confirmed that
+        // Ivy only produces this string in this specific case, and there are
+        // relevant test cases.
+        return problemMessage.contains("configuration not found in");
     }
 
     private void recordDownloadedArtifacts(String targetPattern, IvyRetrievalReport report, ModuleRevisionId mrid, RetrieveOptions options) throws ParseException, IOException
@@ -348,25 +366,18 @@ public class IvyClient
      * Resolve the descriptors dependencies, identifying the artifacts described and
      * caching the result.
      *
-     * @param descriptor the descriptor whos dependencies are being resovled.
-     * @param stageNames the stage names that define the set of dependencies to be resolved.
+     * @param descriptor the descriptor whose dependencies are being resolved.
+     * @param conf       the (already encoded) name of the configuration to resolve
      * @return a resolve report.
      *
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    public ResolveReport resolve(ModuleDescriptor descriptor, String... stageNames) throws IOException, ParseException
+    private ResolveReport resolve(ModuleDescriptor descriptor, String conf) throws IOException, ParseException
     {
         ResolveOptions options = new ResolveOptions();
         options.setValidate(ivy.getSettings().doValidate());
-        if (stageNames.length > 0)
-        {
-            options.setConfs(IvyEncoder.encodeNames(stageNames));
-        }
-        else
-        {
-            options.setConfs(new String[]{IvyModuleDescriptor.ALL_STAGES});
-        }
+        options.setConfs(new String[]{conf});
         options.setCheckIfChanged(true);
         options.setUseCacheOnly(false);
         return ivy.resolve(descriptor, options);

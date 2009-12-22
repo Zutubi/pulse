@@ -127,12 +127,24 @@ public class ModuleDescriptorFactory
         {
             ModuleRevisionId dependencyMrid = getDependencyMRID(result, dependency);
             List<String> stageNames = new LinkedList<String>();
-            if (!dependency.isAllStages())
+            switch (dependency.getStageType())
             {
-                stageNames = CollectionUtils.map(dependency.getStages(), STAGE_NAME_MAPPING);
+                case ALL_STAGES:
+                    stageNames.add(IvyModuleDescriptor.ALL_STAGES);
+                    break;
+                case CORRESPONDING_STAGES:
+                    stageNames.add(IvyModuleDescriptor.CORRESPONDING_STAGE);
+                    ivyDescriptor.addOptionalDependency(dependencyMrid.getName());
+                    break;
+                case SELECTED_STAGES:
+                    CollectionUtils.map(dependency.getStages(), STAGE_NAME_MAPPING, stageNames);
+                    break;
             }
-            // else if dependency is relative stage - this will depend on the stage we are building now.
-            ivyDescriptor.addDependency(dependencyMrid, dependency.isTransitive(), stageNames.toArray(new String[stageNames.size()]));
+
+            for (BuildStageConfiguration stage: project.getStages().values())
+            {
+                ivyDescriptor.addDependency(dependencyMrid, stage.getName(), dependency.isTransitive(), stageNames.toArray(new String[stageNames.size()]));
+            }
         }
     }
 

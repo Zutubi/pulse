@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
-import com.zutubi.i18n.Messages;
 
 import java.util.List;
 
@@ -14,6 +14,12 @@ public class DependencyConfigurationFormatter
 {
     private static final Messages I18N = Messages.getInstance(DependencyConfigurationFormatter.class);
 
+    public String getProjectName(DependencyConfiguration config)
+    {
+        ProjectConfiguration project = config.getProject();
+        return project == null ? "" : project.getName();
+    }
+
     /**
      * Format the stages field, a comma separated list of stage names (trimmed to 15 characters), or
      * 'all stages' if the all stages checkbox is selected.
@@ -23,9 +29,12 @@ public class DependencyConfigurationFormatter
      */
     public String getStages(DependencyConfiguration config)
     {
-        if (config.isAllStages())
+        switch (config.getStageType())
         {
-            return I18N.format("all.label");
+            case ALL_STAGES:
+                return I18N.format("all.label");
+            case CORRESPONDING_STAGES:
+                return I18N.format("corresponding.label");
         }
         List<String> stageNames = CollectionUtils.map(config.getStages(), new Mapping<BuildStageConfiguration, String>()
         {

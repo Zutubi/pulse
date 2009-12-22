@@ -112,6 +112,7 @@
                 <ref local="deleteOldCallbackTriggers"/>
                 <ref local="addBuildComments"/>
                 <ref local="addConfigAuditLoggingEnabled"/>
+                <ref local="dependencyCorrespondingStages"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -544,4 +545,7 @@
         <property name="buildNumber" value="201011006"/>
     </bean>
 
+    <bean id="dependencyCorrespondingStages" class="com.zutubi.pulse.master.upgrade.tasks.DependencyCorrespondingStagesUpgradeTask">
+        <property name="buildNumber" value="201011007"/>
+    </bean>
 </beans>

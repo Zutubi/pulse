@@ -2,8 +2,8 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -15,10 +15,10 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 /**
  * The project configuration helper is the base class for the various types
@@ -118,7 +118,7 @@ public abstract class ProjectConfigurationHelper
     public DependencyConfiguration addDependency(ProjectConfigurationHelper target, String stageName)
     {
         DependencyConfiguration dependency = addDependency(target);
-        dependency.setAllStages(false);
+        dependency.setStageType(DependencyConfiguration.StageType.SELECTED_STAGES);
         dependency.setStages(Arrays.asList(target.getStage(stageName)));
         return dependency;
     }

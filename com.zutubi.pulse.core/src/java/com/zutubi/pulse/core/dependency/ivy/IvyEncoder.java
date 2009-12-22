@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.ivy.core.module.descriptor.*;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -137,7 +137,7 @@ public class IvyEncoder
 
     private static boolean isStageName(String key)
     {
-        // Note: ivy can be inconsistent with the contents of there extra attributes maps.
+        // Note: ivy can be inconsistent with the contents of extra attributes maps.
         // some will have the attribute prefix stripped, others will not.
         return key.equals(EXTRA_ATTRIBUTE_STAGE) || key.equals(STAGE);
     }
@@ -251,17 +251,16 @@ public class IvyEncoder
             String[] confs = dependency.getDependencyConfigurations(moduleConfiguration);
             for (String conf : confs)
             {
-                if (conf.equals(ALL_STAGES))
-                {
-                    mapped.addDependencyConfiguration(moduleConfiguration, ALL_STAGES);
-                }
-                else
-                {
-                    mapped.addDependencyConfiguration(moduleConfiguration, mapNames(STAGE_NAME_GLUE, conf, mapping));
-                }
+                String encodedConf = isBuiltinConf(conf) ? conf : mapNames(NAME_GLUE, conf, mapping);
+                mapped.addDependencyConfiguration(moduleConfiguration, encodedConf);
             }
         }
         return mapped;
+    }
+
+    private static boolean isBuiltinConf(String conf)
+    {
+        return conf.equals(ALL_STAGES) || conf.equals(CORRESPONDING_STAGE);
     }
 
     /**

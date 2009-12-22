@@ -8,14 +8,15 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 /**
  * A set of acceptance tests focused on the dependency systems UI.
@@ -103,7 +104,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
         form.finishNamedFormElements(
                 asPair("project", getProjectHandle(projectB)),
-                asPair("allStages", "false"),
+                asPair("stageType", DependencyConfiguration.StageType.SELECTED_STAGES.name()),
                 asPair("stages", getStageHandles(projectB, "b1")[0])
         );
         projectDependenciesPage.waitFor();
@@ -119,7 +120,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         assertExpectedStageOptions(form, projectA, "a1", "a2", "a3", "a4", "default");
         form.saveNamedFormElements(
                 asPair("project", getProjectHandle(projectA)),
-                asPair("allStages", "false"),
+                asPair("stageType", DependencyConfiguration.StageType.SELECTED_STAGES.name()),
                 asPair("stages", getStageHandles(projectA, "a1")[0])
         );
         projectDependenciesPage.waitFor();
@@ -129,14 +130,14 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     public void testCircularDependencyCheck() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(random + "A");
+        DepAntProject projectA = projects.createDepAntProject(random + "A", true);
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(random + "B");
+        DepAntProject projectB = projects.createDepAntProject(random + "B", true);
         projectB.addDependency(projectA).setTransitive(true);
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(random + "C");
+        DepAntProject projectC = projects.createDepAntProject(random + "C", true);
         projectC.addDependency(projectB);
         insertProject(projectC);
 

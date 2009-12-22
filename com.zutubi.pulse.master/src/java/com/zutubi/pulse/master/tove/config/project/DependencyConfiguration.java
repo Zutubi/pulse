@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -10,26 +9,28 @@ import com.zutubi.validation.annotations.Required;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
+
 /**
  * A dependency defines a project and the artifacts built by that project that this project requires
  * for building. 
  */
 @SymbolicName("zutubi.dependency")
-@Table(columns = {"module", "revision", "stages", "transitive"})
-@Form(fieldOrder = {"project", "revision", "customRevision", "transitive", "allStages", "stages"})
+@Table(columns = {"projectName", "revision", "stages", "transitive"})
+@Form(fieldOrder = {"project", "revision", "customRevision", "transitive", "stageType", "stages"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
-    public static final String ALL_STAGES = "*";
     public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyStatus.STATUS_INTEGRATION;
     public static final String REVISION_LATEST_MILESTONE = LATEST + IvyStatus.STATUS_MILESTONE;
     public static final String REVISION_LATEST_RELEASE = LATEST + IvyStatus.STATUS_RELEASE;
     public static final String REVISION_CUSTOM = "custom";
 
-    /**
-     * The organisation name of the dependency.
-     */
-    @Transient // not implemented as a separate concept at this stage.
-    private String org;
+    public enum StageType
+    {
+        ALL_STAGES,
+        CORRESPONDING_STAGES,
+        SELECTED_STAGES
+    }
 
     /**
      * The project being depended upon.
@@ -56,27 +57,12 @@ public class DependencyConfiguration extends AbstractConfiguration
      */
     private boolean transitive = true;
 
-    @ControllingCheckbox(uncheckedFields = {"stages"})
-    private boolean allStages = true;
+    @ControllingSelect(enableSet = {"SELECTED_STAGES"}, dependentFields = {"stages"})
+    @Required
+    private StageType stageType = StageType.ALL_STAGES;
 
     @Reference(dependentOn = "project", optionProvider = "DependencyStagesOptionProvider")
     private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
-
-    public String getOrg()
-    {
-        return org;
-    }
-
-    public void setOrg(String org)
-    {
-        this.org = org;
-    }
-
-    @Transient
-    public String getModule()
-    {
-        return project.getName();
-    }
 
     public ProjectConfiguration getProject()
     {
@@ -118,14 +104,14 @@ public class DependencyConfiguration extends AbstractConfiguration
         this.stages = stages;
     }
 
-    public boolean isAllStages()
+    public StageType getStageType()
     {
-        return allStages;
+        return stageType;
     }
 
-    public void setAllStages(boolean allStages)
+    public void setStageType(StageType stageType)
     {
-        this.allStages = allStages;
+        this.stageType = stageType;
     }
 
     public String getCustomRevision()

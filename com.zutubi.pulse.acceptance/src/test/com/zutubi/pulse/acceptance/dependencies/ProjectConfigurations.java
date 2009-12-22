@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
-import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 
 import java.io.File;
 
@@ -38,7 +38,7 @@ public class ProjectConfigurations
     public FailAntProject createFailAntProject(String projectName) throws Exception
     {
         FailAntProject project = new FailAntProject(new ProjectConfiguration(projectName));
-        configureBaseProject(project);
+        configureBaseProject(project, true);
         return project;
     }
 
@@ -47,16 +47,17 @@ public class ProjectConfigurations
      * non-existance of files in the build directories during execution, as well as the
      * creation of files as part of the execution of the build.
      *
-     * @param projectName   the name of the project.
+     * @param projectName     the name of the project.
+     * @param addDefaultStage if true, add a default build stage to the project
      * @return the project configuration helper instance to allow further configuration
      * of this project.
      *
      * @throws Exception thrown on error.
      */
-    public DepAntProject createDepAntProject(String projectName) throws Exception
+    public DepAntProject createDepAntProject(String projectName, boolean addDefaultStage) throws Exception
     {
         DepAntProject project = new DepAntProject(new ProjectConfiguration(projectName));
-        configureBaseProject(project);
+        configureBaseProject(project, addDefaultStage);
         return project;
     }
 
@@ -74,11 +75,11 @@ public class ProjectConfigurations
     public WaitAntProject createWaitAntProject(File dir, String projectName) throws Exception
     {
         WaitAntProject project = new WaitAntProject(new ProjectConfiguration(projectName), dir);
-        configureBaseProject(project);
+        configureBaseProject(project, true);
         return project;
     }
 
-    private void configureBaseProject(ProjectConfigurationHelper helper) throws Exception
+    private void configureBaseProject(ProjectConfigurationHelper helper, boolean addDefaultStage) throws Exception
     {
         AgentConfiguration master = configurationHelper.getMasterAgentReference();
 
@@ -87,8 +88,11 @@ public class ProjectConfigurations
         helper.getConfig().getPostProcessors().put(postProcessorReference.getName(), postProcessorReference);
 
         // setup the defaults:
-        BuildStageConfiguration stage = helper.addStage(ProjectConfigurationWizard.DEFAULT_STAGE);
-        stage.setAgent(master);
+        if (addDefaultStage)
+        {
+            BuildStageConfiguration stage = helper.addStage(ProjectConfigurationWizard.DEFAULT_STAGE);
+            stage.setAgent(master);
+        }
 
         MultiRecipeTypeConfiguration type = new MultiRecipeTypeConfiguration();
         type.setDefaultRecipe(ProjectConfigurationWizard.DEFAULT_RECIPE);

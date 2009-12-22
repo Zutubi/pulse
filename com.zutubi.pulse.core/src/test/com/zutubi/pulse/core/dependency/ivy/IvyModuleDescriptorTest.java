@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -134,6 +135,24 @@ public class IvyModuleDescriptorTest extends ZutubiTestCase
         Artifact b = descriptor.getArtifacts("b")[0];
         assertEquals("art.ifact", b.getName());
         assertEquals("jar", b.getExt());
+    }
+
+    public void testAddOptionalDependency()
+    {
+        final String MODULE_1 = "mod1";
+        final String MODULE_2 = "mod2";
+
+        IvyModuleDescriptor descriptor = new IvyModuleDescriptor("org", "module", "revision", configuration);
+        assertEquals(0, descriptor.getOptionalDependencies().size());
+
+        descriptor.addOptionalDependency(MODULE_1);
+        assertEquals(CollectionUtils.asSet(MODULE_1), descriptor.getOptionalDependencies());
+
+        descriptor.addOptionalDependency(MODULE_2);
+        assertEquals(CollectionUtils.asSet(MODULE_1, MODULE_2), descriptor.getOptionalDependencies());
+
+        descriptor.addOptionalDependency(MODULE_1);
+        assertEquals(CollectionUtils.asSet(MODULE_1, MODULE_2), descriptor.getOptionalDependencies());
     }
 
     private File writeToFile(IvyModuleDescriptor descriptor) throws IOException

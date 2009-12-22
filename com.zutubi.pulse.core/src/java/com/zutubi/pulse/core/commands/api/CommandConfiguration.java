@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.commands.api;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.NamedConfiguration;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  * to build from the configuration.
  */
 @SymbolicName("zutubi.commandConfig")
+@Table(columns = {"name", "force"})
 public interface CommandConfiguration extends NamedConfiguration
 {
     /**
