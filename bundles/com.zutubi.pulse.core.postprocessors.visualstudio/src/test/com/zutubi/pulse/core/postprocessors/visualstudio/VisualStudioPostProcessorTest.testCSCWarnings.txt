@@ -1,0 +1,19 @@
+Microsoft (R) Build Engine Version 3.5.21022.8
+[Microsoft .NET Framework, Version 2.0.50727.1434]
+Copyright (C) Microsoft Corporation 2007. All rights reserved.
+
+Build started 28/09/2008 2:53:41 PM.
+Project "C:\tools\cygwin\home\jsankey\repo\pulse\trunk\bundles\command-msbuild\src\test\com\zutubi\pulse\core\MsBuildCommandTest.csharp.xml" on node 0 (default targets).
+Test.cs(5,13): warning CS0168: The variable 'i' is declared but never used
+Done Building Project "C:\tools\cygwin\home\jsankey\repo\pulse\trunk\bundles\command-msbuild\src\test\com\zutubi\pulse\core\MsBuildCommandTest.csharp.xml" (default targets).
+
+Build succeeded.
+
+"C:\tools\cygwin\home\jsankey\repo\pulse\trunk\bundles\command-msbuild\src\test\com\zutubi\pulse\core\MsBuildCommandTest.csharp.xml" (default target) (1) ->
+(Build target) ->
+  Test.cs(5,13): warning CS0168: The variable 'i' is declared but never used
+
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.36
