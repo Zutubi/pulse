@@ -61,7 +61,6 @@ public class SeleniumBrowser
         this.browser = browser;
         baseUrl = "http://localhost:" + port + "/";
         selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
-        selenium.setTimeout(DEFAULT_TIMEOUT);
     }
 
     public String getBaseUrl()
@@ -91,6 +90,7 @@ public class SeleniumBrowser
         if (!started)
         {
             selenium.start();
+            selenium.setTimeout(DEFAULT_TIMEOUT);
             started = true;
         }
     }
