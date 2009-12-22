@@ -18,7 +18,6 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -31,7 +30,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +37,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static org.mockito.Mockito.*;
 
 public class RecipeProcessorTest extends PulseTestCase implements EventListener
 {
@@ -307,6 +308,15 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("command"), context));
         assertRecipeCommenced(1, "default");
         assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "nested-name", "outer-name");
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
+    }
+
+    public void testCommandNameHasSpecialCharacters() throws Exception
+    {
+        runBasicRecipe("specials");
+        assertRecipeCommenced(1, "specials");
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "special:characters here!");
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
     }

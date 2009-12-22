@@ -15,4 +15,8 @@
     <recipe name="unexpected exception">
         <unexpected-exception name="oops"/>
     </recipe>
+
+    <recipe name="specials">
+        <noop name="special:characters here!"/>
+    </recipe>
 </project>

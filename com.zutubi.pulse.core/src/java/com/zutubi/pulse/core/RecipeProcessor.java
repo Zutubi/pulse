@@ -1,17 +1,18 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
 import com.zutubi.pulse.core.commands.api.*;
-import com.zutubi.pulse.core.dependency.ivy.*;
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
+import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommandConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.*;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
@@ -36,6 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
@@ -346,12 +350,12 @@ public class RecipeProcessor
         }
     }
 
-    public static String getCommandDirName(int i, CommandResult result)
+    private String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:
         // a) we do not have an id for the command model
         // b) for local builds, this is a lot friendlier for the developer
-        return String.format("%08d-%s", i, result.getCommandName());
+        return String.format("%08d-%s", i, FileSystemUtils.encodeFilenameComponent(result.getCommandName()));
     }
 
     private boolean pushContextAndExecute(PulseExecutionContext context, CommandConfiguration commandConfig, File outputDir, RecipeStatus status)

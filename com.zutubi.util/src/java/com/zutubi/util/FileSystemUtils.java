@@ -1333,4 +1333,39 @@ public class FileSystemUtils
     {
         return path == null ? null : normaliseSeparators(path);
     }
+
+    /**
+     * Percent-encodes a single component of a filename ensuring that it is
+     * safe to create on all file systems.  Slashes are also encoded, so they
+     * will not be treated as separators.
+     *
+     * @param component the string to encode
+     * @return the given component with special characters, percent encoded
+     *         to avoid file system restrictions
+     */
+    public static String encodeFilenameComponent(String component)
+    {
+        return WebUtils.percentEncode(component, new Predicate<Character>()
+        {
+            public boolean satisfied(Character ch)
+            {
+                if (Character.isLetterOrDigit(ch))
+                {
+                    return true;
+                }
+                else
+                {
+                    switch (ch)
+                    {
+                        case '-':
+                        case '_':
+                        case '.':
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            }
+        });
+    }
 }

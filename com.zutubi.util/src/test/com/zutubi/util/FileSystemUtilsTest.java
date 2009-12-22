@@ -1,6 +1,5 @@
 package com.zutubi.util;
 
-import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
@@ -10,6 +9,8 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
 
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
@@ -1234,6 +1235,15 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     public void testAbsolutePathToNestedNested() throws Exception
     {
         assertEquals("/" + PATH_NESTED_NESTED, FileSystemUtils.appendAndCanonicalise(DIR_NESTED, "/" + PATH_NESTED_NESTED));
+    }
+
+    public void testEncodeFilenameComponent()
+    {
+        final String ALL_SAFE = "alphanumeric_is-123.ok";
+        final String UNTRUSTED = "% !@#$%^&*()'\";:\\//<>|`~,";
+        
+        assertEquals(ALL_SAFE, FileSystemUtils.encodeFilenameComponent(ALL_SAFE));
+        assertEquals("%25%20%21%40%23%24%25%5e%26%2a%28%29%27%22%3b%3a%5c%2f%2f%3c%3e%7c%60%7e%2c", FileSystemUtils.encodeFilenameComponent(UNTRUSTED));
     }
 
     private boolean notRoot()
