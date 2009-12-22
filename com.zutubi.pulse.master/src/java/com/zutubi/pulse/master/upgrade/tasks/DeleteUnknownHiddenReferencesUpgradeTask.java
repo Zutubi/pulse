@@ -26,7 +26,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
     {
         traverse("", recordManager.select(), new UnaryProcedure<String>()
         {
-            public void process(String path)
+            public void run(String path)
             {
                 Record record = recordManager.select(path);
                 Set<String> hiddenKeys = getHiddenKeys(record);
@@ -150,7 +150,7 @@ public class DeleteUnknownHiddenReferencesUpgradeTask extends AbstractUpgradeTas
     {
         if (path.length() != 0)
         {
-            procedure.process(path);
+            procedure.run(path);
         }
 
         for (String key : record.keySet())

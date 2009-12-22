@@ -292,7 +292,7 @@ public class RecipeResultNode extends Entity
 
     public void forEachNode(UnaryProcedure<RecipeResultNode> fn)
     {
-        fn.process(this);
+        fn.run(this);
 
         for(RecipeResultNode child: children)
         {

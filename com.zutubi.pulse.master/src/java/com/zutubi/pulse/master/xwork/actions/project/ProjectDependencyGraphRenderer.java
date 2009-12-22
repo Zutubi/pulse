@@ -37,7 +37,7 @@ public class ProjectDependencyGraphRenderer
         Grid<ProjectDependencyData> grid = render(graph.getUpstreamRoot());
         grid.flipHorizontal(new UnaryProcedure<ProjectDependencyData>()
         {
-            public void process(ProjectDependencyData dependencyData)
+            public void run(ProjectDependencyData dependencyData)
             {
                 dependencyData.flipHorizontal();
             }

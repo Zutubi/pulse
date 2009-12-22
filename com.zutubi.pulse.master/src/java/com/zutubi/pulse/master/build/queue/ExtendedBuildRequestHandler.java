@@ -85,7 +85,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
 
         downstream.breadthFirstWalk(new UnaryProcedure<TreeNode<BuildGraphData>>()
         {
-            public void process(TreeNode<BuildGraphData> node)
+            public void run(TreeNode<BuildGraphData> node)
             {
                 Project owner = node.getData().getProject();
                 if (!ownerRequests.containsKey(owner))
@@ -141,7 +141,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
 
         upstream.depthFirstWalk(new UnaryProcedure<TreeNode<BuildGraphData>>()
         {
-            public void process(TreeNode<BuildGraphData> node)
+            public void run(TreeNode<BuildGraphData> node)
             {
                 Project owner = node.getData().getProject();
 

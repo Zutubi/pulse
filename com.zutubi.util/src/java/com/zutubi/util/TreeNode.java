@@ -194,7 +194,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
             child.depthFirstWalk(fn);
         }
 
-        fn.process(this);
+        fn.run(this);
     }
 
     /**
@@ -221,7 +221,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
                 toProcess.offer(child);
             }
 
-            fn.process(next);
+            fn.run(next);
         }
     }
 

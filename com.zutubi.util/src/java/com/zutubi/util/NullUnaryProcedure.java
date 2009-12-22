@@ -5,7 +5,7 @@ package com.zutubi.util;
  */
 public class NullUnaryProcedure<T> implements UnaryProcedure<T>
 {
-    public void process(T t)
+    public void run(T t)
     {
     }
 }

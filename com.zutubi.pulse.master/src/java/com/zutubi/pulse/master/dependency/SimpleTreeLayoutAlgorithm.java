@@ -54,7 +54,7 @@ public class SimpleTreeLayoutAlgorithm<T>
 
         root.depthFirstWalk(new UnaryProcedure<TreeNode<Pair<T, Point>>>()
         {
-            public void process(TreeNode<Pair<T, Point>> node)
+            public void run(TreeNode<Pair<T, Point>> node)
             {
                 Point nodePosition = node.getData().second;
                 if (nodePosition.getX() > maxX[0])

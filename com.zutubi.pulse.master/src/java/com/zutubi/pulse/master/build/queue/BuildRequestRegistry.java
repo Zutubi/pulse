@@ -133,7 +133,7 @@ public class BuildRequestRegistry
     {
         transition(event, RequestStatus.REJECTED, new UnaryProcedure<RegEntry>()
         {
-            public void process(RegEntry regEntry)
+            public void run(RegEntry regEntry)
             {
                 regEntry.reject(reason);
             }
@@ -150,7 +150,7 @@ public class BuildRequestRegistry
     {
         transition(event, RequestStatus.ASSIMILATED, new UnaryProcedure<RegEntry>()
         {
-            public void process(RegEntry regEntry)
+            public void run(RegEntry regEntry)
             {
                 regEntry.assimilate(intoRequestId);
             }
@@ -166,7 +166,7 @@ public class BuildRequestRegistry
     {
         transition(event, RequestStatus.QUEUED, new UnaryProcedure<RegEntry>()
         {
-            public void process(RegEntry regEntry)
+            public void run(RegEntry regEntry)
             {
                 regEntry.queue();
             }
@@ -182,7 +182,7 @@ public class BuildRequestRegistry
     {
         transition(event, RequestStatus.CANCELLED, new UnaryProcedure<RegEntry>()
         {
-            public void process(RegEntry regEntry)
+            public void run(RegEntry regEntry)
             {
                 regEntry.cancel();
             }
@@ -199,7 +199,7 @@ public class BuildRequestRegistry
     {
         transition(event, RequestStatus.ACTIVATED, new UnaryProcedure<RegEntry>()
         {
-            public void process(RegEntry regEntry)
+            public void run(RegEntry regEntry)
             {
                 regEntry.activate(buildNumber);
             }
@@ -218,7 +218,7 @@ public class BuildRequestRegistry
             }
             else
             {
-                p.process(entry);
+                p.run(entry);
                 lockCondition.signalAll();
             }
         }

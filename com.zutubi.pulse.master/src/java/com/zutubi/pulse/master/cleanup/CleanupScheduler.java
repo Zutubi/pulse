@@ -55,7 +55,7 @@ public class CleanupScheduler implements Stoppable
         {
             scheduler.registerCallback(new NullaryProcedure()
             {
-                public void process()
+                public void run()
                 {
                     scheduleProjectCleanup();
                 }

@@ -26,7 +26,7 @@ public class StatusFilter extends GraphFilter
         this.status = status;
     }
 
-    public void process(TreeNode<BuildGraphData> node)
+    public void run(TreeNode<BuildGraphData> node)
     {
         if (!node.isRoot())
         {

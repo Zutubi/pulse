@@ -5,5 +5,5 @@ package com.zutubi.util;
  */
 public interface NullaryProcedureE<E extends Exception>
 {
-    void process() throws E;
+    void run() throws E;
 }

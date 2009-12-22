@@ -42,7 +42,7 @@ public class TreeNodeTest extends ZutubiTestCase
         final List<String> order = new LinkedList<String>();
         root.depthFirstWalk(new UnaryProcedure<TreeNode<String>>()
         {
-            public void process(TreeNode<String> node)
+            public void run(TreeNode<String> node)
             {
                 order.add(node.getData());
             }
@@ -74,7 +74,7 @@ public class TreeNodeTest extends ZutubiTestCase
         final List<String> order = new LinkedList<String>();
         root.breadthFirstWalk(new UnaryProcedure<TreeNode<String>>()
         {
-            public void process(TreeNode<String> node)
+            public void run(TreeNode<String> node)
             {
                 order.add(node.getData());
             }

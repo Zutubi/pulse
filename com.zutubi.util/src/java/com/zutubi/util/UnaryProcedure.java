@@ -5,5 +5,5 @@ package com.zutubi.util;
  */
 public interface UnaryProcedure<T>
 {
-    void process(T t);
+    void run(T t);
 }

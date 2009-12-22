@@ -5,5 +5,5 @@ package com.zutubi.util;
  */
 public interface BinaryProcedure<Input1Type, Input2Type>
 {
-    void process(Input1Type input1, Input2Type input2);
+    void run(Input1Type input1, Input2Type input2);
 }

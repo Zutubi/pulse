@@ -16,7 +16,7 @@ public class DuplicateFilter extends GraphFilter
 {
     Map<Project, TreeNode<BuildGraphData>> seenProjects = new HashMap<Project, TreeNode<BuildGraphData>>();
 
-    public void process(TreeNode<BuildGraphData> node)
+    public void run(TreeNode<BuildGraphData> node)
     {
         TreeNode<BuildGraphData> lastSeen = seenProjects.get(node.getData().getProject());
         if (lastSeen != null)

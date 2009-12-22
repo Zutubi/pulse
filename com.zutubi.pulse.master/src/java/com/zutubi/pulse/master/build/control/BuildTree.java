@@ -28,7 +28,7 @@ public class BuildTree implements Iterable<RecipeController>
     {
         apply(new UnaryProcedure<TreeNode<RecipeController>>()
         {
-            public void process(TreeNode<RecipeController> node)
+            public void run(TreeNode<RecipeController> node)
             {
                 node.getData().prepare(buildResult);
             }
@@ -44,7 +44,7 @@ public class BuildTree implements Iterable<RecipeController>
     {
         for (TreeNode<RecipeController> child : node)
         {
-            op.process(child);
+            op.run(child);
             apply(op, child);
         }
     }
@@ -65,7 +65,7 @@ public class BuildTree implements Iterable<RecipeController>
             return controllers;
         }
 
-        public void process(TreeNode<RecipeController> node)
+        public void run(TreeNode<RecipeController> node)
         {
             controllers.add(node.getData());
         }

@@ -9,7 +9,7 @@ import com.zutubi.util.TreeNode;
  */
 public class TransitiveFilter extends GraphFilter
 {
-    public void process(TreeNode<BuildGraphData> node)
+    public void run(TreeNode<BuildGraphData> node)
     {
         if (!node.isRoot())
         {

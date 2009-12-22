@@ -38,7 +38,7 @@ public class LastAccessManager
         {
             scheduler.registerCallback(new NullaryProcedure()
             {
-                public void process()
+                public void run()
                 {
                     flush();
                 }

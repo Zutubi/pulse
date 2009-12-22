@@ -62,7 +62,7 @@ public class GridTest extends ZutubiTestCase
         final int[] count = {0};
         grid.flipHorizontal(new UnaryProcedure<String>()
         {
-            public void process(String s)
+            public void run(String s)
             {
                 count[0]++;
             }

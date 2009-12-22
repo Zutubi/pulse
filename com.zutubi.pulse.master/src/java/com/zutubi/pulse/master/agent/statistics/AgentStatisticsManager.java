@@ -50,7 +50,7 @@ public class AgentStatisticsManager implements EventListener
         {
             scheduler.registerCallback(new NullaryProcedure()
             {
-                public void process()
+                public void run()
                 {
                     agentManager.updateStatistics();
                 }

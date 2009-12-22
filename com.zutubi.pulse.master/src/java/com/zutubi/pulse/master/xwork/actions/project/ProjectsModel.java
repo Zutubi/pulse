@@ -49,7 +49,7 @@ public class ProjectsModel
         final List<ProjectModel> result = new LinkedList<ProjectModel>();
         root.forEach(new UnaryProcedure<ProjectModel>()
         {
-            public void process(ProjectModel projectModel)
+            public void run(ProjectModel projectModel)
             {
                 if(projectModel != root)
                 {

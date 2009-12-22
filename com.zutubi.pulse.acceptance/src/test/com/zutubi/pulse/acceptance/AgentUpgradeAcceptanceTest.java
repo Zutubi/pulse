@@ -52,7 +52,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     {
         runAgentUpgrade(new UnaryProcedure<Pulse>()
         {
-            public void process(Pulse agent)
+            public void run(Pulse agent)
             {
                 try
                 {
@@ -82,7 +82,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     {
         prepareMaster();
         prepareAgent();
-        agentCallback.process(agent);
+        agentCallback.run(agent);
 
         // test
         // a) check that the agent build number is as expected.

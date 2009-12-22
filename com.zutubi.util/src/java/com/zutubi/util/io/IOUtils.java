@@ -220,7 +220,7 @@ public class IOUtils
         String line;
         while ((line = reader.readLine()) != null)
         {
-            p.process(line);
+            p.run(line);
         }
     }
 

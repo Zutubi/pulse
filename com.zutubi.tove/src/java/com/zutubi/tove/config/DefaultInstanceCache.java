@@ -45,7 +45,7 @@ class DefaultInstanceCache implements InstanceCache
     {
         getEntry(path, true, new UnaryProcedure<Entry>()
         {
-            public void process(Entry entry)
+            public void run(Entry entry)
             {
                 entry.markInvalid();
             }
@@ -78,7 +78,7 @@ class DefaultInstanceCache implements InstanceCache
         }
         if (f != null)
         {
-            f.process(entry);
+            f.run(entry);
         }
 
         if (index == elements.length)

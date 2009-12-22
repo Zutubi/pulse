@@ -252,7 +252,7 @@ public class ReflectionUtils
 
         while (clazz != null)
         {
-            c.process(clazz);
+            c.run(clazz);
             checked.add(clazz);
 
             // for each class, analyse the interfaces.
@@ -260,7 +260,7 @@ public class ReflectionUtils
             {
                 if (!checked.contains(interfaceClazz))
                 {
-                    c.process(interfaceClazz);
+                    c.run(interfaceClazz);
                     checked.add(interfaceClazz);
                 }
             }

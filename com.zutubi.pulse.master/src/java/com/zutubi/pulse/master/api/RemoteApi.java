@@ -2653,7 +2653,7 @@ public class RemoteApi
 
                 build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
                 {
-                    public void process(RecipeResultNode recipeResultNode)
+                    public void run(RecipeResultNode recipeResultNode)
                     {
                         RecipeResult recipeResult = recipeResultNode.getResult();
                         if(recipeResult != null)
@@ -2843,7 +2843,7 @@ public class RemoteApi
 
                     build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
                     {
-                        public void process(RecipeResultNode recipeResultNode)
+                        public void run(RecipeResultNode recipeResultNode)
                         {
                             RecipeResult recipeResult = recipeResultNode.getResult();
                             if (recipeResult != null)

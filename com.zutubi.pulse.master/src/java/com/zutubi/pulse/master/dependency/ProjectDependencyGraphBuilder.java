@@ -126,7 +126,7 @@ public class ProjectDependencyGraphBuilder
 
             root.breadthFirstWalk(new UnaryProcedure<TreeNode<DependencyGraphData>>()
             {
-                public void process(TreeNode<DependencyGraphData> node)
+                public void run(TreeNode<DependencyGraphData> node)
                 {
                     TreeNode<DependencyGraphData> lastSeen = seenProjects.get(node.getData().getProject());
                     if (lastSeen != null)

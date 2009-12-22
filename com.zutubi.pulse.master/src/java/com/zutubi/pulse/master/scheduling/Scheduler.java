@@ -31,7 +31,7 @@ public interface Scheduler extends Stoppable
     Trigger getTrigger(long id);
 
     /**
-     * Retrieve the list of all the triggers scheduled triggers.
+     * Retrieve the list of all the scheduled triggers.
      *
      * @return a list of scheduled triggers.
      */
@@ -59,7 +59,7 @@ public interface Scheduler extends Stoppable
     /**
      * Schedule the specified trigger.
      *
-     * The name and group of the new trigger must be unique and the trigger
+     * The combination of name and group of the new trigger must be unique and the trigger
      * state not scheduled, else an exception will be thrown.
      *
      * @param trigger   the trigger to be scheduled.
@@ -132,7 +132,7 @@ public interface Scheduler extends Stoppable
      * Register a procedure that will be triggered at a regular interval.
      *
      * @param callback  the callback procedure to be triggered.
-     * @param interval  the interval at which the callback will be triggered.
+     * @param interval  the interval (in milliseconds) at which the callback will be triggered.
      * @throws SchedulingException if there is a problem scheduling the
      * regular callback.
      */

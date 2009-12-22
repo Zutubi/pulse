@@ -174,7 +174,7 @@ public class ModuleDescriptorFactory
 
         result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
         {
-            public void process(RecipeResultNode node)
+            public void run(RecipeResultNode node)
             {
                 if (node.getStageHandle() == 0) // skip the root.
                 {

@@ -86,7 +86,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
                 {
                     IOUtils.forEachLine(failureFile, new UnaryProcedure<String>()
                     {
-                        public void process(String s)
+                        public void run(String s)
                         {
                             processExpectedFailure(suite, s);
                         }

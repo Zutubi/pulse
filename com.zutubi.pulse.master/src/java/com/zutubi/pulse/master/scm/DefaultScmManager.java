@@ -71,7 +71,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         {
             scheduler.registerCallback(new NullaryProcedure()
             {
-                public void process()
+                public void run()
                 {
                     pollActiveScms();
                 }

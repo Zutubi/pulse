@@ -97,7 +97,7 @@ public class Grid<T> implements Iterable<Iterable<GridCell<T>>>
                 {
                     if (cell.getData() != null)
                     {
-                        dataFlipFn.process(cell.getData());
+                        dataFlipFn.run(cell.getData());
                     }
                 }
             }

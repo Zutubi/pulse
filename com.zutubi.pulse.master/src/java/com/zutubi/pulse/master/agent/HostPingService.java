@@ -258,10 +258,10 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
 
     private class PingHostsCallback implements NullaryProcedure
     {
-        public void process()
+        public void run()
         {
             LOG.info("Pinging hosts");
-            HostPingService.this.hostManager.pingHosts();
+            hostManager.pingHosts();
         }
     }
 }

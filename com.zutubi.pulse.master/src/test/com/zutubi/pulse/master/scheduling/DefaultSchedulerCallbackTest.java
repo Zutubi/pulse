@@ -60,7 +60,7 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
     {
         scheduler.start();
 
-        CallbackCounter callback = new CallbackCounter();
+        CountCallback callback = new CountCallback();
         scheduler.registerCallback(callback, 100);
 
         verify(triggerDao, never()).save((Trigger) anyObject());
@@ -68,7 +68,7 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
 
     public void testCallbacksBeforeStartAreNotPersistent() throws SchedulingException
     {
-        CallbackCounter callback = new CallbackCounter();
+        CountCallback callback = new CountCallback();
         scheduler.registerCallback(callback, 100);
 
         verify(triggerDao, never()).save((Trigger) anyObject());
@@ -76,27 +76,28 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
 
     public void testCallbackInterval() throws SchedulingException, InterruptedException
     {
-        scheduler.start();
-
-        CallbackCounter callback = new CallbackCounter();
+        CountCallback callback = new CountCallback();
         scheduler.registerCallback(callback, 100);
+        scheduler.start();
         Thread.sleep(500 * Constants.MILLISECOND);
         assertTrue(scheduler.unregisterCallback(callback));
         int countAfterUnregister = callback.getCount();
         assertTrue(countAfterUnregister >= 5);
 
-        // verify that unregister does in fact stop the callbacks.
+        int count = callback.getCount();
+        assertTrue(6 >= count && count >= 4);
+
+        // verify that unregister does infact stop the callbacks.
         Thread.sleep(300 * Constants.MILLISECOND);
         assertEquals(countAfterUnregister, callback.getCount());
     }
 
     public void testCallbackDate() throws InterruptedException, SchedulingException
     {
-        scheduler.start();
-
         Date time = new Date(System.currentTimeMillis() + (200 * Constants.MILLISECOND));
-        CallbackCounter callback = new CallbackCounter();
+        CountCallback callback = new CountCallback();
         scheduler.registerCallback(callback, time);
+        scheduler.start();
         Thread.sleep(400 * Constants.MILLISECOND);
         assertEquals(1, callback.getCount());
 
@@ -106,19 +107,19 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
 
     public void testRegisterCallbackBeforeSchedulerStart() throws SchedulingException, InterruptedException
     {
-        CallbackCounter callback = new CallbackCounter();
+        CountCallback callback = new CountCallback();
         scheduler.registerCallback(callback, 100);
         Thread.sleep(300 * Constants.MILLISECOND);
         assertEquals(0, callback.getCount());
 
         scheduler.start();
         Thread.sleep(300 * Constants.MILLISECOND);
-        assertTrue(callback.getCount() >= 3);
+        assertTrue(callback.getCount() >= 2);
     }
 
     public void testRegisterAndUnregisterCallbackBeforeSchedulerStart() throws InterruptedException, SchedulingException
     {
-        CallbackCounter callback = new CallbackCounter();
+        CountCallback callback = new CountCallback();
         scheduler.registerCallback(callback, 100);
         Thread.sleep(300 * Constants.MILLISECOND);
         assertEquals(0, callback.getCount());
@@ -129,10 +130,29 @@ public class DefaultSchedulerCallbackTest extends ZutubiTestCase
         assertEquals(0, callback.getCount());
     }
 
-    private static class CallbackCounter implements NullaryProcedure
+    public void testCallbackThrowingException() throws SchedulingException, InterruptedException
+    {
+        ExceptionCallback callback = new ExceptionCallback();
+        scheduler.registerCallback(callback, 100);
+        
+        scheduler.start();
+        Thread.sleep(300 * Constants.MILLISECOND);
+        assertTrue(callback.getCount() >= 2);
+    }
+
+    private static class ExceptionCallback extends CountCallback
+    {
+        public void run()
+        {
+            super.run();
+            throw new RuntimeException("boo");
+        }
+    }
+
+    private static class CountCallback implements NullaryProcedure
     {
         private int count = 0;
-        public void process()
+        public void run()
         {
             count++;
         }

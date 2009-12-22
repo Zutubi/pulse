@@ -18,7 +18,7 @@ public class ExtendedClassContextResolver implements ContextResolver<ClassContex
 
         ReflectionUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
-            public void process(Class clazz)
+            public void run(Class clazz)
             {
                 resolvedNames.add(resourceNameFor(clazz));
             }

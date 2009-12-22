@@ -334,7 +334,7 @@ public class CollectionUtils
     {
         for (T t : c)
         {
-            f.process(t);
+            f.run(t);
         }
     }
 

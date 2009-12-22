@@ -335,7 +335,7 @@ public class XMLUtils
         Elements elements = element.getChildElements(childName);
         for(int i = 0; i < elements.size(); i++)
         {
-            fn.process(elements.get(i));
+            fn.run(elements.get(i));
         }
     }
 

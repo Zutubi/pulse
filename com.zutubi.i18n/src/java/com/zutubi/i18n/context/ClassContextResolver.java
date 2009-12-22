@@ -17,7 +17,7 @@ public class ClassContextResolver implements ContextResolver<ClassContext>
 
         ReflectionUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
-            public void process(Class clazz)
+            public void run(Class clazz)
             {
                 // step a, the class name
                 String className = clazz.getCanonicalName().replace('.', '/');

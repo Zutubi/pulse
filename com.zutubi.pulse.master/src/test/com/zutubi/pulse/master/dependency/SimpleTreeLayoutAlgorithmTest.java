@@ -134,7 +134,7 @@ public class SimpleTreeLayoutAlgorithmTest extends PulseTestCase
         final Grid<String> grid = new Grid<String>(bounds.getX() + 1, bounds.getY() + 1);
         layedOut.depthFirstWalk(new UnaryProcedure<TreeNode<Pair<String, Point>>>()
         {
-            public void process(TreeNode<Pair<String, Point>> node)
+            public void run(TreeNode<Pair<String, Point>> node)
             {
                 Pair<String, Point> nodeData = node.getData();
                 grid.getCell(nodeData.second).setData(nodeData.first);

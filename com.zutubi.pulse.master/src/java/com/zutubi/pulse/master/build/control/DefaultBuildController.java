@@ -885,7 +885,7 @@ public class DefaultBuildController implements EventListener, BuildController
             final int[] failures = new int[]{0};
             buildResult.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
             {
-                public void process(RecipeResultNode recipeResultNode)
+                public void run(RecipeResultNode recipeResultNode)
                 {
                     RecipeResult result = recipeResultNode.getResult();
                     if (result != null && result.completed() && !result.succeeded())
@@ -1153,7 +1153,7 @@ public class DefaultBuildController implements EventListener, BuildController
             this.recipeId = recipeId;
         }
 
-        public void process()
+        public void run()
         {
             eventManager.publish(new RecipeTimeoutEvent(DefaultBuildController.this, buildResultId, recipeId));
         }

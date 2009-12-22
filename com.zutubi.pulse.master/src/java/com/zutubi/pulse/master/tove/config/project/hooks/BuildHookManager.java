@@ -83,7 +83,7 @@ public class BuildHookManager
 
                     result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
                     {
-                        public void process(RecipeResultNode recipeResultNode)
+                        public void run(RecipeResultNode recipeResultNode)
                         {
                             if (hook.appliesTo(recipeResultNode))
                             {

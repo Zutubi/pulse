@@ -155,6 +155,6 @@ public class ConcreteProjectModel extends ProjectModel
 
     public void forEach(UnaryProcedure<ProjectModel> proc)
     {
-        proc.process(this);
+        proc.run(this);
     }
 }

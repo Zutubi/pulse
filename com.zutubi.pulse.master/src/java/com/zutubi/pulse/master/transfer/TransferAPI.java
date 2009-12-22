@@ -304,7 +304,7 @@ public class TransferAPI
         {
             CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
-                public void process(TransferListener transferListener)
+                public void run(TransferListener transferListener)
                 {
                     transferListener.start();
                 }
@@ -316,7 +316,7 @@ public class TransferAPI
         {
             CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
-                public void process(TransferListener transferListener)
+                public void run(TransferListener transferListener)
                 {
                     transferListener.startTable(table);
                 }
@@ -328,7 +328,7 @@ public class TransferAPI
         {
             CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
-                public void process(TransferListener transferListener)
+                public void run(TransferListener transferListener)
                 {
                     transferListener.row(row);
                 }
@@ -343,7 +343,7 @@ public class TransferAPI
         {
             CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
-                public void process(TransferListener transferListener)
+                public void run(TransferListener transferListener)
                 {
                     transferListener.endTable();
                 }
@@ -355,7 +355,7 @@ public class TransferAPI
         {
             CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
-                public void process(TransferListener transferListener)
+                public void run(TransferListener transferListener)
                 {
                     transferListener.end();
                 }

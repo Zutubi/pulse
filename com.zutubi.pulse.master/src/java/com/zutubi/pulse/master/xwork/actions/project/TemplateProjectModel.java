@@ -123,7 +123,7 @@ public class TemplateProjectModel extends ProjectModel
 
     public void forEach(UnaryProcedure<ProjectModel> proc)
     {
-        proc.process(this);
+        proc.run(this);
         for(ProjectModel child: children)
         {
             child.forEach(proc);

@@ -21,7 +21,7 @@ public class ExtendedPackageContextResolver implements ContextResolver<ClassCont
 
         ReflectionUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
-            public void process(Class clazz)
+            public void run(Class clazz)
             {
                 resolvedNames.addAll(Arrays.asList(packageResolver.resolve(new PackageContext(clazz))));
             }
