@@ -24,5 +24,4 @@ public class AuthenticatedAction
             CredentialsStore.INSTANCE.addCredentials(REALM, host, USER, "");
         }
     }
-
 }

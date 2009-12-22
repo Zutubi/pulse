@@ -54,7 +54,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.ivy.util.url.CredentialsStore;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -977,27 +976,11 @@ public class DefaultBuildController implements EventListener, BuildController
         buildLogger.preIvyPublish();
         try
         {
-            String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
-            String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
-
-            IvyConfiguration configuration = new IvyConfiguration(repositoryUrl);
-            
-            final IvyClient ivy = ivyManager.createIvyClient(configuration);
-            ivy.pushMessageLogger(buildLogger.getMessageLogger());
-
-            String host = new URL(masterUrl).getHost();
-            String password = buildContext.getSecurityHash();
-
-            String user = AuthenticatedAction.USER;
-            String realm = AuthenticatedAction.REALM;
-            CredentialsStore.INSTANCE.addCredentials(realm, host, user, password);
-
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);
 
-            IvyModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version);
+            final IvyModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version);
             descriptor.setBuildNumber(buildResult.getNumber());
 
-            // add projecthandle attribute to the repository.
             long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
             if (projectHandle != 0)
             {
@@ -1005,12 +988,30 @@ public class DefaultBuildController implements EventListener, BuildController
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            ivy.publishArtifacts(descriptor);
-            ivy.publishDescriptor(descriptor);
+            String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
+            String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
+
+            IvyConfiguration configuration = new IvyConfiguration(repositoryUrl);
+
+            final IvyClient ivy = ivyManager.createIvyClient(configuration);
+            ivy.pushMessageLogger(buildLogger.getMessageLogger());
+
+            String host = new URL(masterUrl).getHost();
+            String password = buildContext.getSecurityHash();
+
+            AuthenticatedAction.execute(host, password, new NullaryFunctionE<Object, Exception>()
+            {
+                public Object process() throws Exception
+                {
+                    ivy.publishArtifacts(descriptor);
+                    ivy.publishDescriptor(descriptor);
+                    return null;
+                }
+            });
         }
         catch (Exception e)
         {
-            throw new BuildException("Failed to publish the builds ivy file to the repository. Cause: " + e.getMessage(), e);
+            throw new BuildException("Failed to publish the build's ivy file to the repository. Cause: " + e.getMessage(), e);
         }
         finally
         {
