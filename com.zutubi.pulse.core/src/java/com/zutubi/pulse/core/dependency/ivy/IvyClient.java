@@ -53,6 +53,7 @@ public class IvyClient
     private static final String RESOLVER_NAME = "pulse";
 
     private Ivy ivy;
+    private IvyConfiguration configuration;
 
     /**
      * Create a new instance of the ivy client using the specified ivy configuration.
@@ -66,6 +67,8 @@ public class IvyClient
         {
             throw new IllegalArgumentException(I18N.format("configuration.repositoryBase.required"));
         }
+
+        this.configuration = configuration;
 
         IvySettings settings = configuration.loadSettings();
 
@@ -236,7 +239,7 @@ public class IvyClient
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    public IvyRetrievalReport retrieveArtifacts(ModuleDescriptor descriptor, String stageName, String targetPattern) throws IOException, ParseException
+    public IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern) throws IOException, ParseException
     {
         // annoying but necessary.  See CustomURLHandler for details.
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
@@ -250,7 +253,8 @@ public class IvyClient
 
             String conf = IvyEncoder.encode(stageName);
             ResolveReport resolveReport = resolve(descriptor, conf);
-            if (resolveReportHasProblems(resolveReport, report, conf, IvyModuleDescriptor.getOptionalDependencies(descriptor)))
+            IvyModuleDescriptor ivyDescriptor = new IvyModuleDescriptor(descriptor, configuration);
+            if (resolveReportHasProblems(resolveReport, report, conf, ivyDescriptor.getOptionalDependencies()))
             {
                 return report;
             }

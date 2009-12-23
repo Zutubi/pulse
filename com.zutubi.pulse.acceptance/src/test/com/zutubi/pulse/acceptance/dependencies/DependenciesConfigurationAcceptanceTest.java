@@ -130,14 +130,14 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     public void testCircularDependencyCheck() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(random + "A", true);
+        DepAntProject projectA = projects.createDepAntProject(random + "A");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(random + "B", true);
+        DepAntProject projectB = projects.createDepAntProject(random + "B");
         projectB.addDependency(projectA).setTransitive(true);
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(random + "C", true);
+        DepAntProject projectC = projects.createDepAntProject(random + "C");
         projectC.addDependency(projectB);
         insertProject(projectC);
 

@@ -43,7 +43,23 @@ public class ProjectConfigurations
     }
 
     /**
-     * Create a project configuration that allows for the assertion of the existance and
+     * Create a project configuration that allows for the assertion of the existence and
+     * non-existence of files in the build directories during execution, as well as the
+     * creation of files as part of the execution of the build.
+     *
+     * @param projectName     the name of the project.
+     * @return the project configuration helper instance to allow further configuration
+     * of this project.
+     *
+     * @throws Exception thrown on error.
+     */
+    public DepAntProject createDepAntProject(String projectName) throws Exception
+    {
+        return createDepAntProject(projectName, true);
+    }
+
+    /**
+     * Create a project configuration that allows for the assertion of the existence and
      * non-existance of files in the build directories during execution, as well as the
      * creation of files as part of the execution of the build.
      *

@@ -346,17 +346,6 @@ public class IvyModuleDescriptor
      */
     public Set<String> getOptionalDependencies()
     {
-        return getOptionalDependencies(descriptor);
-    }
-
-    /**
-     * Retrieves the optional dependencies from the given descriptor.
-     *
-     * @param descriptor descriptor to retrieve from
-     * @return set of all modules that are optional dependencies (decoded)
-     */
-    public static Set<String> getOptionalDependencies(ModuleDescriptor descriptor)
-    {
         String confs = (String) descriptor.getExtraInfo().get(EXTRA_INFO_OPTIONAL);
         if (confs == null)
         {

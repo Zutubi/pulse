@@ -313,7 +313,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForAgentToBeIdle(SeleniumTestBase.AGENT_NAME);
 
         // project A -> project B -> project C
-        DepAntProject projectA = projects.createDepAntProject(projectName + "A", true);
+        DepAntProject projectA = projects.createDepAntProject(projectName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.clearTriggers();                   // do not want dependency trigger firing.
@@ -325,7 +325,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.clearTriggers();                   // do not want dependency trigger firing.
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(projectName + "C", true);
+        DepAntProject projectC = projects.createDepAntProject(projectName + "C");
         projectC.addDependency(projectB);
          // ensure we see the revision of the artifact being delivered
         projectC.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
