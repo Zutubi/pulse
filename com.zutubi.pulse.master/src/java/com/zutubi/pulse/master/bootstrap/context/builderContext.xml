@@ -37,6 +37,7 @@
     </bean>
 
     <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" init-method="init"/>
+    <bean id="pollingService" class="com.zutubi.pulse.master.scm.polling.PollingService"/>
 
     <bean id="projectInitialisationService" class="com.zutubi.pulse.master.project.ProjectInitialisationService" init-method="init"/>
 
