@@ -371,7 +371,26 @@ public class PollingService implements Stoppable
      */
     private class DependencyTree
     {
-        private Set<Project> projects = new HashSet<Project>();
+        private Set<Project> projects = new TreeSet<Project>(new Comparator<Project>()
+        {
+            public int compare(Project project1, Project project2)
+            {
+                // There is guaranteed to be a dependency relationship one way
+                // or the other, so we never return 0 for different projects.
+                if (project1.getConfig().isDependentOn(project2.getConfig()))
+                {
+                    return 1;
+                }
+                else if (project1.equals(project2))
+                {
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        });
 
         public void add(Project project)
         {

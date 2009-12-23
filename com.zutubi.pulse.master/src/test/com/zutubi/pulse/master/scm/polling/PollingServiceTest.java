@@ -9,9 +9,7 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
@@ -28,7 +26,6 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -37,6 +34,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.pulse.master.model.Project.State.INITIAL;
+import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
@@ -499,7 +500,7 @@ public class PollingServiceTest extends ZutubiTestCase
             }
             else
             {
-                assertFalse(scmServer.waitForInProgress(200));
+                assertFalse("Project " + project.getName() + " should not be polled", scmServer.waitForInProgress(200));
             }
         }
     }
