@@ -51,7 +51,7 @@ public class PollingService implements Stoppable
     private ScmManager scmManager;
 
     private ExecutorService executorService;
-    private final Map<Long, Pair<Long, Revision>> waiting = new HashMap<Long, Pair<Long, Revision>>();
+    private final Map<Long, Pair<Long, Revision>> waiting = Collections.synchronizedMap(new HashMap<Long, Pair<Long, Revision>>());
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
     private final PredicateRequestQueue<Project> requestQueue;
 

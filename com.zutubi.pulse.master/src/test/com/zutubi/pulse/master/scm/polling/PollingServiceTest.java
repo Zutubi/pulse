@@ -570,7 +570,6 @@ public class PollingServiceTest extends ZutubiTestCase
 
         ScmClient scmClient = mock(ScmClient.class);
         stub(scmManager.createClient(scmConfig)).toReturn(scmClient);
-        stub(scmClient.getLatestRevision((ScmContext) anyObject())).toReturn(new Revision(1));
 
         ScmContextImpl context = new ScmContextImpl();
         context.setProjectHandle(project.getConfig().getHandle());
