@@ -443,14 +443,18 @@ public class PollingService implements Stoppable
         @Override
         public boolean onActivation(final PredicateRequest<Project> request)
         {
-            futures.add(executorService.submit(new Runnable()
+            Future<?> future = executorService.submit(new Runnable()
             {
                 public void run()
                 {
                     checkForChanges(request.getData(), scmChanges);
                     requestQueue.complete(request);
                 }
-            }));
+            });
+            synchronized (futures)
+            {
+                futures.add(future);
+            }
             return true;
         }
 
