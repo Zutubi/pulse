@@ -345,7 +345,7 @@ public class PollingServiceTest extends ZutubiTestCase
         assertPolledForChanges(utilA, utilB, lib, clientA, clientB);
     }
 
-    public void testDependencyTreePolledIfOneProjectIsReadyToCheck() throws ScmException, InterruptedException
+    public void testDependencyTreePolledIfOneProjectIsReadyToCheck() throws ScmException, InterruptedException, ExecutionException
     {
         // UTIL would not normally be polled because its last poll time was recently. Because it is
         // part of the dependency tree with LIB, this is overridden because LIB is ready for polling.
@@ -666,7 +666,7 @@ public class PollingServiceTest extends ZutubiTestCase
             });
         }
 
-        public void pollAndWait() throws InterruptedException
+        public void pollAndWait() throws InterruptedException, ExecutionException
         {
             startPolling();
             waitForPollingComplete();
@@ -677,16 +677,9 @@ public class PollingServiceTest extends ZutubiTestCase
             return result.isDone();
         }
 
-        private boolean waitForPollingComplete()
+        private boolean waitForPollingComplete() throws ExecutionException, InterruptedException
         {
-            try
-            {
-                result.get();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            result.get();
             return result.isDone();
         }
 
@@ -727,12 +720,12 @@ public class PollingServiceTest extends ZutubiTestCase
             this.latestRevisionByProject = new HashMap<Project, Revision>();
         }
 
-        public String getUid()
+        public synchronized String getUid()
         {
             return uid;
         }
 
-        public void setLatestRevision(Project project, Revision revision)
+        public synchronized void setLatestRevision(Project project, Revision revision)
         {
             latestRevisionByProject.put(project, revision);
         }
@@ -743,7 +736,10 @@ public class PollingServiceTest extends ZutubiTestCase
             {
                 throw new RuntimeException("Request already in progress.");
             }
-            activeProject = project;
+            synchronized (this)
+            {
+                activeProject = project;
+            }
             try
             {
 
@@ -756,8 +752,11 @@ public class PollingServiceTest extends ZutubiTestCase
             }
             finally
             {
-                wasInactive = true;
-                activeProject = null;
+                synchronized (this)
+                {
+                    wasInactive = true;
+                    activeProject = null;
+                }
                 entrySemaphore.release();
             }
         }
@@ -768,7 +767,10 @@ public class PollingServiceTest extends ZutubiTestCase
             {
                 public Revision process()
                 {
-                    return latestRevisionByProject.get(project);
+                    synchronized (ScmServer.this)
+                    {
+                        return latestRevisionByProject.get(project);
+                    }
                 }
             }, project);
         }
@@ -779,7 +781,12 @@ public class PollingServiceTest extends ZutubiTestCase
             {
                 public List<Revision> process()
                 {
-                    Revision latestRevision = latestRevisionByProject.get(project);
+                    Revision latestRevision;
+                    synchronized (ScmServer.this)
+                    {
+                        latestRevision = latestRevisionByProject.get(project);
+                    }
+
                     if (latestRevision == null)
                     {
                         return Arrays.asList();
@@ -797,12 +804,12 @@ public class PollingServiceTest extends ZutubiTestCase
             }, project);
         }
 
-        public boolean isInProgress()
+        public synchronized boolean isInProgress()
         {
             return entrySemaphore.availablePermits() == 0;
         }
 
-        public Project getActiveProject()
+        public synchronized Project getActiveProject()
         {
             return activeProject;
         }
@@ -815,7 +822,10 @@ public class PollingServiceTest extends ZutubiTestCase
                 {
                     public boolean satisfied()
                     {
-                        return wasInactive;
+                        synchronized (ScmServer.this)
+                        {
+                            return wasInactive;
+                        }
                     }
                 }, TIMEOUT, "");
 
@@ -844,7 +854,10 @@ public class PollingServiceTest extends ZutubiTestCase
                     }
                 }, timeout, "");
 
-                wasInactive = false;
+                synchronized (this)
+                {
+                    wasInactive = false;
+                }
 
                 return true;
             }
@@ -854,7 +867,7 @@ public class PollingServiceTest extends ZutubiTestCase
             }
         }
 
-        public void releaseProcess()
+        public synchronized void releaseProcess()
         {
             if (!blocking)
             {
