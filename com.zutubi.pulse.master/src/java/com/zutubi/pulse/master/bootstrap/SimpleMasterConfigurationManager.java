@@ -27,6 +27,7 @@ import java.util.Properties;
 public class SimpleMasterConfigurationManager extends AbstractConfigurationManager implements MasterConfigurationManager
 {
     public static final String CORE_PROPERTY_PULSE_DATABASE_URL = "pulse.database.url";
+    public static final String CORE_PROPERTY_PULSE_LOG_DIR = "pulse.log.dir";
     public static final String DATABASE_CONFIG_FILE_PREFIX = "database";
 
     private static final Logger LOG = Logger.getLogger(SimpleMasterConfigurationManager.class);
@@ -184,6 +185,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         try
         {
             result.put(CORE_PROPERTY_PULSE_DATABASE_URL, getDatabaseConfig().getUrl());
+            result.put(CORE_PROPERTY_PULSE_LOG_DIR, getSystemPaths().getLogRoot().getAbsolutePath());
         }
         catch (IOException e)
         {
