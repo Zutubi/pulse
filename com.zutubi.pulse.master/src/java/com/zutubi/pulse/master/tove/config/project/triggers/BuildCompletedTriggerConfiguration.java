@@ -15,7 +15,7 @@ import java.util.List;
  * A trigger that fires when some project build completes, possibly filtered
  * by state.
  */
-@Form(fieldOrder = { "name", "project", "states"})
+@Form(fieldOrder = { "name", "project", "states", "propagateRevision", "supercedeQueued", "propagateStatus", "propagateVersion"})
 @SymbolicName("zutubi.buildCompletedConfig")
 public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 {
