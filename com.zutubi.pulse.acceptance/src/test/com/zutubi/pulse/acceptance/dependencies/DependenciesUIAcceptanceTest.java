@@ -149,7 +149,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         log.clickDownloadLink();
         browser.waitForPageToLoad();
         // check for a reference to the artifact retrieval in the log.
-        assertTrue(browser.isTextPresent(randomName + "A#artifact(1)"));
+        assertTrue(browser.getBodyText().contains(randomName + "A#artifact(1)"));
     }
 
     public void testProjectDependenciesTab() throws Exception
