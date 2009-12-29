@@ -91,7 +91,9 @@ public class RetrieveDependenciesCommand implements Command
                     }
                     finally
                     {
-                        IOUtils.close(outputWriter);
+                        // Don't close the writer: the underlying output stream
+                        // is used by subsequent commands.
+                        outputWriter.flush();
                     }
                 }
             });
