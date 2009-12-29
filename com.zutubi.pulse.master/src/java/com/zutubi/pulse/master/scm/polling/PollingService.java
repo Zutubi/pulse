@@ -24,6 +24,7 @@ import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.i18n.Messages;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -37,6 +38,7 @@ import java.util.concurrent.ThreadFactory;
 public class PollingService implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(PollingService.class);
+    private static final Messages I18N = Messages.getInstance(PollingService.class);
 
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
@@ -152,7 +154,7 @@ public class PollingService implements Stoppable
         {
             long now = System.currentTimeMillis();
 
-            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Polling SCM for changes..."));
+            publishStatusMessage(projectConfig, I18N.format("polling.start"));
             projectManager.updateLastPollTime(projectId, now);
 
             ScmContext context = createContext(projectConfig);
@@ -172,11 +174,11 @@ public class PollingService implements Stoppable
                     // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
                     if (previous == null)
                     {
-                        eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Scm failed to return latest revision."));
+                        publishStatusMessage(projectConfig, I18N.format("polling.error", "Failed to return latest revision."));
                         return;
                     }
                     latestRevisions.put(projectId, previous);
-                    eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Retrieved initial revision: " + previous.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
+                    publishStatusMessage(projectConfig, I18N.format("polling.initial", previous.getRevisionString()));
                 }
             }
             finally
@@ -197,20 +199,16 @@ public class PollingService implements Stoppable
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
-                            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Changes detected during quiet period, restarting wait..."));
+                            publishStatusMessage(projectConfig, I18N.format("polling.quiet.continue", latest.getRevisionString()));
                             waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
                             // there have been no commits during the 'quiet period', trigger a change.
-                            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Quiet period completed without additional changes."));
-                            changes.add(new ScmChangeEvent(projectConfig, latest, previous));
+                            publishStatusMessage(projectConfig, I18N.format("polling.quiet.end"));
+                            changes.add(new ScmChangeEvent(projectConfig, lastChange, previous));
                             waiting.remove(projectId);
                         }
-                    }
-                    else
-                    {
-                        eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Still within quiet period."));
                     }
                 }
                 else
@@ -220,7 +218,7 @@ public class PollingService implements Stoppable
                     {
                         if (pollable.getQuietPeriod() != 0)
                         {
-                            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Changes detected, starting quiet period wait..."));
+                            publishStatusMessage(projectConfig, I18N.format("polling.quiet.start", latest.getRevisionString()));
                             waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
@@ -232,6 +230,10 @@ public class PollingService implements Stoppable
             }
             else
             {
+                // if we have changed from quiet period to no quiet period, ensure that we reset
+                // any values we may have stored.
+                waiting.remove(projectId);
+
                 Revision latest = getLatestRevisionSince(previous, client, context);
                 if (latest != null)
                 {
@@ -239,11 +241,11 @@ public class PollingService implements Stoppable
                 }
             }
 
-            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "SCM polling completed (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
+            publishStatusMessage(projectConfig, I18N.format("polling.end", TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now)));
         }
         catch (ScmException e)
         {
-            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Error polling SCM: " + e.getMessage()));
+            publishStatusMessage(projectConfig, I18N.format("polling.error", e.getMessage()));
             LOG.debug(e);
 
             if (e.isReinitialiseRequired())
@@ -255,6 +257,11 @@ public class PollingService implements Stoppable
         {
             IOUtils.close(client);
         }
+    }
+
+    private void publishStatusMessage(ProjectConfiguration project, String message)
+    {
+        eventManager.publish(new ProjectStatusEvent(this, project, message));
     }
 
     private ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException

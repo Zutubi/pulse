@@ -9,7 +9,9 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
+import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
@@ -26,6 +28,7 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -34,10 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import static com.zutubi.pulse.master.model.Project.State.INITIAL;
-import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
@@ -189,7 +188,7 @@ public class PollingServiceTest extends ZutubiTestCase
 
         serviceHandle.pollAndWait();
 
-        assertScmChanges(change(project, new Revision(3), new Revision(2)));
+        assertScmChanges(change(project, 3, 2));
         assertPolledForChanges(project);
     }
 
@@ -443,11 +442,41 @@ public class PollingServiceTest extends ZutubiTestCase
         serviceHandle.pollAndWait();
 
         assertScmChanges(
-                change(util, new Revision(4), latestProjectRevision),
-                change(lib, new Revision(5), latestProjectRevision),
-                change(client, new Revision(3), latestProjectRevision)
+                change(util, 4, 1),
+                change(lib, 5, 1),
+                change(client, 3, 1)
         );
         assertPolledForChanges(util, lib, client);
+    }
+
+    public void testQuietPeriod() throws Exception
+    {
+        latestProjectRevision = new Revision(1);
+
+        Project util = createProject("util");
+        setQuietPeriod(util, 1);
+        serviceHandle.init();
+
+        setLatestRevision(util, new Revision(4));
+        serviceHandle.pollAndWait();
+
+        assertScmChanges(); // no scm change raised due to falling inside the waiting period.
+        assertPolledForChanges(util);
+    }
+
+    public void testQuietPeriodOfZeroIgnored() throws ScmException, ExecutionException, InterruptedException
+    {
+        latestProjectRevision = new Revision(1);
+
+        Project util = createProject("util");
+        setQuietPeriod(util, 0);
+        serviceHandle.init();
+
+        setLatestRevision(util, new Revision(4));
+        serviceHandle.pollAndWait();
+
+        assertScmChanges(change(util, 4, 1));
+        assertPolledForChanges(util);
     }
 
     private void releasePollingProcess(Project... projects)
@@ -615,6 +644,13 @@ public class PollingServiceTest extends ZutubiTestCase
         return project;
     }
 
+    private void setQuietPeriod(Project project, int period)
+    {
+        PollableScmConfiguration scm = (PollableScmConfiguration) project.getConfig().getScm();
+        stub(scm.getQuietPeriod()).toReturn(period);
+        stub(scm.isQuietPeriodEnabled()).toReturn(true);
+    }
+
     private void setLatestRevision(Project project, final Revision revision) throws ScmException
     {
         latestBuildRevisions.put(project.getId(), revision);
@@ -624,9 +660,9 @@ public class PollingServiceTest extends ZutubiTestCase
         server.setLatestRevision(project, revision);
     }
 
-    private ScmChangeEvent change(Project project, Revision newRevision, Revision oldRevision)
+    private ScmChangeEvent change(Project project, int newRevision, int oldRevision)
     {
-        return new ScmChangeEvent(project.getConfig(), newRevision, oldRevision);
+        return new ScmChangeEvent(project.getConfig(), new Revision(newRevision), new Revision(oldRevision));
     }
 
     private Long now()
