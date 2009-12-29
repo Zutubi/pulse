@@ -146,8 +146,10 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(page.isBuildLogLinkPresent());
         StageLogPage log = page.clickStageLogLink("default");
         assertTrue(log.isLogAvailable());
+        log.clickDownloadLink();
+        browser.waitForPageToLoad();
         // check for a reference to the artifact retrieval in the log.
-        assertTrue(log.getLog().contains(randomName + "A#artifact(1)"));
+        assertTrue(browser.isTextPresent(randomName + "A#artifact(1)"));
     }
 
     public void testProjectDependenciesTab() throws Exception
