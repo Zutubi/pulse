@@ -4,13 +4,14 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The implementation of the scheduler interface.  It provides persistence of
@@ -90,16 +91,19 @@ public class DefaultScheduler implements Scheduler
             // initialise the persisted triggers.
             for (Trigger trigger : triggerDao.findAll())
             {
-                SchedulerStrategy strategy = getStrategy(trigger);
-                try
+                if (isTriggerValid(trigger))
                 {
-                    strategy.init(trigger);
-                }
-                catch (SchedulingException e)
-                {
-                    // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
-                    // being initialised.
-                    LOG.severe("Failed to initialise a trigger (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
+                    SchedulerStrategy strategy = getStrategy(trigger);
+                    try
+                    {
+                        strategy.init(trigger);
+                    }
+                    catch (SchedulingException e)
+                    {
+                        // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
+                        // being initialised.
+                        LOG.severe("Failed to initialise a trigger (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
+                    }
                 }
             }
 
@@ -122,6 +126,17 @@ public class DefaultScheduler implements Scheduler
         {
             started = true;
         }
+    }
+
+    private boolean isTriggerValid(Trigger trigger)
+    {
+        if (trigger.getProjectId() != 0 && trigger.getConfig() == null)
+        {
+            LOG.warning("Project trigger '" + trigger.getName() + "' from group '" + trigger.getGroup() + "' has no configuration (id: " + trigger.getId() + ", project id: " + trigger.getProjectId() + ")");
+            return false;
+        }
+
+        return true;
     }
 
     public Trigger getTrigger(String name, String group)

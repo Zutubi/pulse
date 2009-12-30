@@ -136,6 +136,7 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
     {
         configurationInjector.registerSetter(CronTrigger.class, this);
         configurationInjector.registerSetter(EventTrigger.class, this);
+        configurationInjector.registerSetter(NoopTrigger.class, this);
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
