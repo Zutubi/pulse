@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
@@ -8,6 +9,7 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
+import com.zutubi.util.Condition;
 
 import static java.lang.String.valueOf;
 
@@ -148,7 +150,13 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(log.isLogAvailable());
         log.clickDownloadLink();
         // check for a reference to the artifact retrieval in the log.
-        assertTrue(browser.getBodyText().contains(randomName + "A#artifact(1)"));
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return browser.getBodyText().contains(randomName + "A#artifact(1)");
+            }
+        }, 30000, "artifact retrieval to appear in log");
     }
 
     public void testProjectDependenciesTab() throws Exception
