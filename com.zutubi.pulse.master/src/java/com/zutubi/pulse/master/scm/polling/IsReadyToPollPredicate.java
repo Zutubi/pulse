@@ -6,6 +6,8 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.Clock;
+import com.zutubi.util.SystemClock;
 
 /**
  * A predicate that is satisfied if the project is ready to be polled
@@ -17,12 +19,10 @@ import com.zutubi.util.Predicate;
 public class IsReadyToPollPredicate implements Predicate<Project>
 {
     private ConfigurationProvider configurationProvider;
+    private Clock clock = new SystemClock();
 
-    private long now;
-
-    public IsReadyToPollPredicate(long now)
+    public IsReadyToPollPredicate()
     {
-        this.now = now;
     }
     
     public boolean satisfied(Project project)
@@ -40,7 +40,7 @@ public class IsReadyToPollPredicate implements Predicate<Project>
             long lastPollTime = project.getLastPollTime();
             long nextPollTime = lastPollTime + Constants.MINUTE * pollingInterval;
 
-            if (now < nextPollTime)
+            if (clock.getCurrentTimeMillis() < nextPollTime)
             {
                 return false;
             }
@@ -56,5 +56,10 @@ public class IsReadyToPollPredicate implements Predicate<Project>
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
     }
 }

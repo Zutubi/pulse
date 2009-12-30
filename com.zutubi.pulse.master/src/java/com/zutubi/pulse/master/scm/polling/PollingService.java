@@ -52,6 +52,7 @@ public class PollingService implements Stoppable
 
     private ScmManager scmManager;
 
+    private Clock clock = new SystemClock();
     private ExecutorService executorService;
     private final Map<Long, Pair<Long, Revision>> waiting = Collections.synchronizedMap(new HashMap<Long, Pair<Long, Revision>>());
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
@@ -76,7 +77,7 @@ public class PollingService implements Stoppable
             {
                 public void run()
                 {
-                    checkForChanges();
+                    pollForChanges();
                 }
             }, Constants.MINUTE);
         }
@@ -102,7 +103,7 @@ public class PollingService implements Stoppable
         waiting.remove(projectId);
     }
 
-    public void checkForChanges()
+    public void pollForChanges()
     {
         List<DependencyTree> allDependencyTrees = generateDependencyTrees();
 
@@ -142,7 +143,14 @@ public class PollingService implements Stoppable
         }
     }
 
-    public void checkForChanges(Project project, List<ScmChangeEvent> changes)
+    /**
+     * Poll the specified project for changes, creating the relevant scm change events
+     * and adding them to the changes list.
+     *
+     * @param project   the project being checked for scm changes.
+     * @param changes   the list to which all raised change events are added.
+     */
+    private void poll(Project project, List<ScmChangeEvent> changes)
     {
         ProjectConfiguration projectConfig = project.getConfig();
         Pollable pollable = (Pollable) projectConfig.getScm();
@@ -152,7 +160,7 @@ public class PollingService implements Stoppable
 
         try
         {
-            long now = System.currentTimeMillis();
+            long now = clock.getCurrentTimeMillis();
 
             publishStatusMessage(projectConfig, I18N.format("polling.start"));
             projectManager.updateLastPollTime(projectId, now);
@@ -192,7 +200,7 @@ public class PollingService implements Stoppable
                 if (waiting.containsKey(projectId))
                 {
                     long quietTime = waiting.get(projectId).first;
-                    if (quietTime < System.currentTimeMillis())
+                    if (quietTime < clock.getCurrentTimeMillis())
                     {
                         Revision lastChange = waiting.get(projectId).second;
                         Revision latest = getLatestRevisionSince(lastChange, client, context);
@@ -200,7 +208,7 @@ public class PollingService implements Stoppable
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
                             publishStatusMessage(projectConfig, I18N.format("polling.quiet.continue", latest.getRevisionString()));
-                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
+                            waiting.put(projectId, new Pair<Long, Revision>(clock.getCurrentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
@@ -219,7 +227,7 @@ public class PollingService implements Stoppable
                         if (pollable.getQuietPeriod() != 0)
                         {
                             publishStatusMessage(projectConfig, I18N.format("polling.quiet.start", latest.getRevisionString()));
-                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
+                            waiting.put(projectId, new Pair<Long, Revision>(clock.getCurrentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
@@ -230,10 +238,6 @@ public class PollingService implements Stoppable
             }
             else
             {
-                // if we have changed from quiet period to no quiet period, ensure that we reset
-                // any values we may have stored.
-                waiting.remove(projectId);
-
                 Revision latest = getLatestRevisionSince(previous, client, context);
                 if (latest != null)
                 {
@@ -241,7 +245,7 @@ public class PollingService implements Stoppable
                 }
             }
 
-            publishStatusMessage(projectConfig, I18N.format("polling.end", TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now)));
+            publishStatusMessage(projectConfig, I18N.format("polling.end", TimeStamps.getPrettyElapsed(clock.getCurrentTimeMillis() - now)));
         }
         catch (ScmException e)
         {
@@ -371,6 +375,11 @@ public class PollingService implements Stoppable
         this.objectFactory = objectFactory;
     }
 
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
+    }
+
     /**
      * A value object that holds a set of projects that are related via
      * dependencies.  This object is also able to answer simple questions
@@ -430,12 +439,18 @@ public class PollingService implements Stoppable
                     new ConjunctivePredicate<Project>(
                             objectFactory.buildBean(IsInitialisedPredicate.class),
                             objectFactory.buildBean(IsMonitorablePredicate.class),
-                            objectFactory.buildBean(IsReadyToPollPredicate.class, new Class[]{Long.TYPE}, new Object[]{System.currentTimeMillis()})
+                            objectFactory.buildBean(IsReadyToPollPredicate.class)
                     )
             ) != null;
         }
     }
 
+    /**
+     * A simple implementation of the PredicateRequestQueueListener interface that
+     * triggers a check for changes when a request is activated.
+     *
+     * @see PollingService#pollForChanges()
+     */
     private class PollingRequestListener extends PredicateRequestQueueListenerAdapter<Project>
     {
         private final List<Future> futures;
@@ -454,7 +469,7 @@ public class PollingService implements Stoppable
             {
                 public void run()
                 {
-                    checkForChanges(request.getData(), scmChanges);
+                    poll(request.getData(), scmChanges);
                     requestQueue.complete(request);
                 }
             });

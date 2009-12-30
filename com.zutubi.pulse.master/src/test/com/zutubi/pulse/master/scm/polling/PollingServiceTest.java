@@ -20,14 +20,13 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.util.Condition;
-import com.zutubi.util.Constants;
-import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.NullaryProcedure;
+import com.zutubi.util.*;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
+import com.zutubi.i18n.Messages;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -40,6 +39,8 @@ import java.util.concurrent.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
+    private static final Messages I18N = Messages.getInstance(PollingService.class);
+
     private EventManager eventManager;
     private ThreadFactory threadFactory;
     private ShutdownManager shutdownManager;
@@ -51,6 +52,7 @@ public class PollingServiceTest extends ZutubiTestCase
     private GlobalConfiguration globalConfiguration;
     private PollingService service;
 
+    private TestClock clock;
     private PollingServiceHandle serviceHandle;
     private ProjectTestSupport testSupport;
     private ScmManager scmManager;
@@ -98,6 +100,8 @@ public class PollingServiceTest extends ZutubiTestCase
         stub(projectManager.getLatestBuiltRevisions()).toReturn(latestBuildRevisions);
 
         scmManager = mock(ScmManager.class);
+
+        clock = new TestClock();
 
         objectFactory = new WiringObjectFactory();
         objectFactory.initProperties(this);
@@ -237,11 +241,43 @@ public class PollingServiceTest extends ZutubiTestCase
         latestProjectRevision = new Revision(2);
 
         Project project = createProject("project");
-        project.setLastPollTime(now() - 10 * Constants.MINUTE);
+        project.setLastPollTime(now());
 
         serviceHandle.init();
+
+        clock.add(10 * Constants.MINUTE);
+
         serviceHandle.pollAndWait();
 
+        assertScmChanges();
+        assertPolledForChanges(project);
+    }
+
+    public void testCustomCheckInterval() throws Exception
+    {
+        latestProjectRevision = new Revision(2);
+
+        Project project = createProject("project");
+        project.setLastPollTime(now());
+        setCustomPollingInterval(project, 15);
+
+        serviceHandle.init();
+
+        clock.add(5 * Constants.MINUTE);
+
+        serviceHandle.pollAndWait();
+        assertScmChanges();
+        assertPolledForChanges();
+
+        clock.add(5 * Constants.MINUTE);
+
+        serviceHandle.pollAndWait();
+        assertScmChanges();
+        assertPolledForChanges();
+
+        clock.add(5 * Constants.MINUTE + 1);
+
+        serviceHandle.pollAndWait();
         assertScmChanges();
         assertPolledForChanges(project);
     }
@@ -460,8 +496,13 @@ public class PollingServiceTest extends ZutubiTestCase
         setLatestRevision(util, new Revision(4));
         serviceHandle.pollAndWait();
 
-        assertScmChanges(); // no scm change raised due to falling inside the waiting period.
+        assertScmChanges();
         assertPolledForChanges(util);
+
+        clock.add(1 * Constants.MINUTE + 1);
+        serviceHandle.pollAndWait();
+
+        assertScmChanges(change(util, 4, 1));
     }
 
     public void testQuietPeriodOfZeroIgnored() throws ScmException, ExecutionException, InterruptedException
@@ -477,6 +518,109 @@ public class PollingServiceTest extends ZutubiTestCase
 
         assertScmChanges(change(util, 4, 1));
         assertPolledForChanges(util);
+    }
+
+    public void testChangeDuringQuietPeriod() throws Exception
+    {
+        latestProjectRevision = new Revision(1);
+
+        Project project = createProject("project");
+        setQuietPeriod(project, 2);
+        serviceHandle.init();
+
+        setLatestRevision(project, new Revision(3));
+        serviceHandle.pollAndWait();
+        assertScmChanges();
+
+        clock.add(1 * Constants.MINUTE + 1);
+        serviceHandle.pollAndWait();
+        assertScmChanges();
+
+        setLatestRevision(project, new Revision(4));
+        clock.add(1 * Constants.MINUTE + 1);
+        serviceHandle.pollAndWait();
+        assertScmChanges();
+
+        clock.add(2 * Constants.MINUTE + 1);
+        serviceHandle.pollAndWait();
+        assertScmChanges(change(project, 4, 1));
+    }
+
+    public void testNoProjectStatusEvents() throws Exception
+    {
+        serviceHandle.init();
+        serviceHandle.pollAndWait();
+
+        assertStatusEvents();
+    }
+
+    public void testSingleProjectNoChangeStatusEvents() throws Exception
+    {
+        latestProjectRevision = new Revision(1);
+        Project project = createProject("project");
+
+        serviceHandle.init();
+        serviceHandle.pollAndWait();
+
+        assertStatusEvents(
+                status(project, "polling.start"),
+                status(project, "polling.end", "0 ms")
+        );
+    }
+
+    public void testSingleProjectWithChangeStatusEvents() throws Exception
+    {
+        latestProjectRevision = new Revision(1);
+        Project project = createProject("project");
+
+        serviceHandle.init();
+        setLatestRevision(project, new Revision(2));
+
+        serviceHandle.pollAndWait();
+
+        assertStatusEvents(
+                status(project, "polling.start"),
+                status(project, "polling.end", "0 ms")
+        );
+    }
+
+    public void testSingleProjectWithQuietPeriodStatusEvents() throws Exception
+    {
+        latestProjectRevision = new Revision(1);
+        Project project = createProject("project");
+        setQuietPeriod(project, 1);
+        serviceHandle.init();
+
+        setLatestRevision(project, new Revision(2));
+
+        serviceHandle.pollAndWait();
+
+        clock.add(1 * Constants.MINUTE + 1);
+
+        serviceHandle.pollAndWait();
+
+        assertStatusEvents(
+                status(project, "polling.start"),
+                status(project, "polling.quiet.start", "2"),
+                status(project, "polling.end", "0 ms"),
+                status(project, "polling.start"),
+                status(project, "polling.quiet.end"),
+                status(project, "polling.end", "0 ms")
+        );
+    }
+
+    private void assertStatusEvents(ProjectStatusEvent... expectedEvents)
+    {
+        List<ProjectStatusEvent> actualEvents = eventListener.getEventsReceived(ProjectStatusEvent.class);
+        assertEquals(expectedEvents.length, actualEvents.size());
+
+        for (int i = 0; i < expectedEvents.length; i++)
+        {
+            ProjectStatusEvent expectedEvent = expectedEvents[i];
+            ProjectStatusEvent actualEvent = actualEvents.get(i);
+            assertEquals(expectedEvent.getProjectConfiguration(), actualEvent.getProjectConfiguration());
+            assertEquals(expectedEvent.getMessage(), actualEvent.getMessage());
+        }
     }
 
     private void releasePollingProcess(Project... projects)
@@ -651,6 +795,13 @@ public class PollingServiceTest extends ZutubiTestCase
         stub(scm.isQuietPeriodEnabled()).toReturn(true);
     }
 
+    private void setCustomPollingInterval(Project project, int interval)
+    {
+        PollableScmConfiguration scm = (PollableScmConfiguration) project.getConfig().getScm();
+        stub(scm.getPollingInterval()).toReturn(interval);
+        stub(scm.isCustomPollingInterval()).toReturn(true);
+    }
+
     private void setLatestRevision(Project project, final Revision revision) throws ScmException
     {
         latestBuildRevisions.put(project.getId(), revision);
@@ -665,9 +816,14 @@ public class PollingServiceTest extends ZutubiTestCase
         return new ScmChangeEvent(project.getConfig(), new Revision(newRevision), new Revision(oldRevision));
     }
 
+    private ProjectStatusEvent status(Project project, String key, Object... args)
+    {
+        return new ProjectStatusEvent(this, project.getConfig(), I18N.format(key, args));
+    }
+
     private Long now()
     {
-        return System.currentTimeMillis();
+        return clock.getCurrentTimeMillis();
     }
 
     /**
@@ -697,7 +853,7 @@ public class PollingServiceTest extends ZutubiTestCase
             {
                 public void run()
                 {
-                    service.checkForChanges();
+                    service.pollForChanges();
                 }
             });
         }

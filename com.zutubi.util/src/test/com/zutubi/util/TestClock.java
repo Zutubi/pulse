@@ -7,6 +7,11 @@ public class TestClock implements Clock
 {
     private long time;
 
+    public TestClock()
+    {
+        this(0);
+    }
+
     public TestClock(long time)
     {
         this.time = time;

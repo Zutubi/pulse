@@ -50,8 +50,6 @@ public interface AgentManager extends AgentPersistentStatusManager
     /**
      * Instructs the manager to update the agent statistics for this point in
      * time.  Should be called regularly to keep statistics current.
-     *
-     * @see com.zutubi.pulse.master.agent.statistics.UpdateStatisticsTask
      */
     void updateStatistics();
 }
