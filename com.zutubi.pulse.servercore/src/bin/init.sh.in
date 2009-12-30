@@ -332,9 +332,15 @@ checkUser() {
             fi
         fi
 
+        SU_OPTS=""
+        if [ "$DIST_OS" != "solaris" ]
+        then
+            SU_OPTS="-m"
+        fi
+
         # Still want to change users, recurse.  This means that the user will only be
         #  prompted for a password once. Variables shifted by 1
-        su -m $RUN_AS_USER -c "\"$REALPATH\" $2"
+        su $SU_OPTS $RUN_AS_USER -c "\"$REALPATH\" $2"
 
         # Now that we are the original user again, we may need to clean up the lock file.
         if [ "X$LOCKPROP" != "X" ]
