@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
@@ -11,6 +10,7 @@ import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -148,15 +148,19 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(page.isBuildLogLinkPresent());
         StageLogPage log = page.clickStageLogLink("default");
         assertTrue(log.isLogAvailable());
-        log.clickDownloadLink();
-        // check for a reference to the artifact retrieval in the log.
-        waitForCondition(new Condition()
+
+        if (browser.isFirefox())
         {
-            public boolean satisfied()
+            log.clickDownloadLink();
+            // check for a reference to the artifact retrieval in the log.
+            waitForCondition(new Condition()
             {
-                return browser.getBodyText().contains(randomName + "A#artifact(1)");
-            }
-        }, 30000, "artifact retrieval to appear in log");
+                public boolean satisfied()
+                {
+                    return browser.getBodyText().contains(randomName + "A#artifact(1)");
+                }
+            }, 30000, "artifact retrieval to appear in log");
+        }
     }
 
     public void testProjectDependenciesTab() throws Exception
