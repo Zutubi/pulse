@@ -3,25 +3,23 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
+import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.pulse.master.build.queue.SchedulingController;
-import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.tove.actions.ConfigurationAction;
-import com.zutubi.tove.actions.ConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.type.TypeRegistry;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static java.util.Arrays.asList;
 
 /**
  * Action to display project home page - the latest project status.
@@ -47,7 +45,6 @@ public class ProjectHomeAction extends ProjectActionBase
 
     private ActionManager actionManager;
     private SystemPaths systemPaths;
-    private TypeRegistry typeRegistry;
     private SchedulingController schedulingController;
 
     public int getTotalBuilds()
@@ -198,32 +195,30 @@ public class ProjectHomeAction extends ProjectActionBase
         recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns(), accessManager);
 
         File contentRoot = systemPaths.getContentRoot();
-        ConfigurationActions configurationActions = actionManager.getConfigurationActions(typeRegistry.getType(ProjectConfiguration.class));
+        List<String> availabledActions = actionManager.getActions(project.getConfig(), false, true);
         Messages messages = Messages.getInstance(ProjectConfiguration.class);
-        for (String candidateAction: Arrays.asList(AccessManager.ACTION_WRITE, ProjectConfigurationActions.ACTION_MARK_CLEAN, ProjectConfigurationActions.ACTION_TRIGGER))
+        for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN, ACTION_TRIGGER, ACTION_REBUILD))
         {
-            String permission = candidateAction;
-            ConfigurationAction configurationAction = configurationActions.getAction(candidateAction);
-            if (configurationAction != null)
-            {
-                permission = configurationAction.getPermissionName();
-            }
-
-            if (accessManager.hasPermission(permission, project))
+            if (availabledActions.contains(candidateAction))
             {
                 actions.add(ToveUtils.getActionLink(candidateAction, messages, contentRoot));
             }
         }
 
-        if (project.getConfig().hasDependencies())
-        {
-            actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_REBUILD, messages, contentRoot));
-        }
+        addResponsibilityActions(project, messages, contentRoot);
 
+        BuildQueueSnapshot snapshot = schedulingController.getSnapshot();
+        queuedBuilds = snapshot.getQueuedRequestsByOwner(project).size();
+
+        return SUCCESS;
+    }
+
+    private void addResponsibilityActions(Project project, Messages messages, File contentRoot)
+    {
         ProjectResponsibility projectResponsibility = project.getResponsibility();
-        if (projectResponsibility == null && accessManager.hasPermission(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, project))
+        if (projectResponsibility == null && accessManager.hasPermission(ACTION_TAKE_RESPONSIBILITY, project))
         {
-            actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, messages, contentRoot));
+            actions.add(ToveUtils.getActionLink(ACTION_TAKE_RESPONSIBILITY, messages, contentRoot));
         }
 
         if (projectResponsibility != null)
@@ -231,17 +226,12 @@ public class ProjectHomeAction extends ProjectActionBase
             responsibleOwner = projectResponsibility.getMessage(getLoggedInUser());
             responsibleComment = projectResponsibility.getComment();
 
-            if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, project))
+            if (accessManager.hasPermission(ACTION_CLEAR_RESPONSIBILITY, project))
             {
                 canClearResponsible = true;
-                actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
+                actions.add(ToveUtils.getActionLink(ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
             }
         }
-
-        BuildQueueSnapshot snapshot = schedulingController.getSnapshot();
-        queuedBuilds = snapshot.getQueuedRequestsByOwner(project).size();
-
-        return SUCCESS;
     }
 
     public void setActionManager(ActionManager actionManager)
@@ -252,11 +242,6 @@ public class ProjectHomeAction extends ProjectActionBase
     public void setSystemPaths(SystemPaths systemPaths)
     {
         this.systemPaths = systemPaths;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 
     public void setSchedulingController(SchedulingController schedulingController)

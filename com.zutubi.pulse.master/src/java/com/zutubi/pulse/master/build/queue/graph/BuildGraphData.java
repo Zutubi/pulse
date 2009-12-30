@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**
  * The data contained by the dependency graph node.
@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 public class BuildGraphData
 {
     /**
-     * The project represented by the node itself.
+     * Configuration of the project represented by the node itself.
      */
-    private Project project;
+    private ProjectConfiguration projectConfig;
 
     /**
      * The dependency that was traversed to get to this node.
@@ -21,14 +21,14 @@ public class BuildGraphData
      */
     private DependencyConfiguration dependency;
 
-    public BuildGraphData(Project project)
+    public BuildGraphData(ProjectConfiguration projectConfig)
     {
-        this.project = project;
+        this.projectConfig = projectConfig;
     }
 
-    public Project getProject()
+    public ProjectConfiguration getProjectConfig()
     {
-        return project;
+        return projectConfig;
     }
 
     public DependencyConfiguration getDependency()

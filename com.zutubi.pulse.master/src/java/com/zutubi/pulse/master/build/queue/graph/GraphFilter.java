@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.util.TreeNode;
-import com.zutubi.util.UnaryProcedure;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.util.TreeNode;
+import com.zutubi.util.UnaryProcedure;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A graph filter is, as the name suggests, a class that provides some
@@ -51,7 +51,7 @@ public abstract class GraphFilter implements  UnaryProcedure<TreeNode<BuildGraph
         }
 
         DependencyConfiguration dependency = node.getData().getDependency();
-        ProjectConfiguration project = node.getData().getProject().getConfig();
+        ProjectConfiguration project = node.getData().getProjectConfig();
         return project.equals(dependency.getProject());
     }
 

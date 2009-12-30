@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectsModelTestBase extends PulseTestCase
+public abstract class ProjectsModelTestBase extends PulseTestCase
 {
     private long nextId = 1;
 
@@ -86,7 +86,7 @@ public class ProjectsModelTestBase extends PulseTestCase
 
     protected ConcreteProjectModel createConcrete(ProjectsModel group, Project project)
     {
-        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, true, true, true);
+        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, true, Collections.<String>emptySet());
     }
 
     protected TemplateProjectModel createTemplates(String label, String projectName, Object... members)

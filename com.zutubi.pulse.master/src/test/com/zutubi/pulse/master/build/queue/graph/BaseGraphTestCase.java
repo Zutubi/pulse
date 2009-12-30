@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.build.queue.graph;
 
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
@@ -13,6 +12,8 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.*;
 
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+
 public abstract class BaseGraphTestCase extends ZutubiTestCase
 {
     private long nextId = 1;
@@ -22,7 +23,7 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
 
     protected void assertEquals(TreeNode<BuildGraphData> expected, TreeNode<BuildGraphData> got)
     {
-        assertEquals(expected.getData().getProject(), got.getData().getProject());
+        assertEquals(expected.getData().getProjectConfig(), got.getData().getProjectConfig());
 
         List<TreeNode<BuildGraphData>> expectedChildren = expected.getChildren();
         List<TreeNode<BuildGraphData>> gotChildren = got.getChildren();
@@ -36,7 +37,7 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
             {
                 public boolean satisfied(TreeNode<BuildGraphData> node)
                 {
-                    return node.getData().getProject().equals(childData.getProject());
+                    return node.getData().getProjectConfig().equals(childData.getProjectConfig());
                 }
             });
 
@@ -45,44 +46,44 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
         }
     }
 
-    protected TreeNode<BuildGraphData> node(Project project, TreeNode<BuildGraphData>... children)
+    protected TreeNode<BuildGraphData> node(ProjectConfiguration projectConfig, TreeNode<BuildGraphData>... children)
     {
-        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(project));
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(projectConfig));
         node.addAll(java.util.Arrays.asList(children));
         return node;
     }
 
-    protected TreeNode<BuildGraphData> node(Project project, DependencyConfiguration dependency, TreeNode<BuildGraphData>... children)
+    protected TreeNode<BuildGraphData> node(ProjectConfiguration projectConfig, DependencyConfiguration dependency, TreeNode<BuildGraphData>... children)
     {
-        BuildGraphData data = new BuildGraphData(project);
+        BuildGraphData data = new BuildGraphData(projectConfig);
         data.setDependency(dependency);
         TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(data);
         node.addAll(java.util.Arrays.asList(children));
         return node;
     }
 
-    protected DependencyConfiguration dependency(Project project, boolean transitive)
+    protected DependencyConfiguration dependency(ProjectConfiguration projectConfig, boolean transitive)
     {
-        DependencyConfiguration dependency = dependency(project);
+        DependencyConfiguration dependency = dependency(projectConfig);
         dependency.setTransitive(transitive);
         return dependency;
     }
 
-    protected DependencyConfiguration dependency(Project project, String revision)
+    protected DependencyConfiguration dependency(ProjectConfiguration projectConfig, String revision)
     {
-        DependencyConfiguration dependency = dependency(project);
+        DependencyConfiguration dependency = dependency(projectConfig);
         dependency.setRevision(revision);
         return dependency;
     }
 
-    protected DependencyConfiguration dependency(Project project)
+    protected DependencyConfiguration dependency(ProjectConfiguration projectConfig)
     {
         DependencyConfiguration dependencyConfiguration = new DependencyConfiguration();
-        dependencyConfiguration.setProject(project.getConfig());
+        dependencyConfiguration.setProject(projectConfig);
         return dependencyConfiguration;
     }
 
-    protected Project project(String name, DependencyConfiguration... dependencies)
+    protected ProjectConfiguration project(String name, DependencyConfiguration... dependencies)
     {
         ProjectConfiguration config = new ProjectConfiguration(name);
         config.setHandle(nextId++);
@@ -103,12 +104,6 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
         allConfigs.add(config);
         idToProject.put(project.getId(), project);
 
-        return project;
-    }
-
-    protected void removeTriggers(Project project)
-    {
-        Map<String, Object> triggers = (Map<String, Object>) project.getConfig().getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
-        triggers.clear();
+        return config;
     }
 }

@@ -1,6 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
+import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
+import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -17,6 +20,8 @@ import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.TreeNode;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -48,6 +53,7 @@ public class ProjectConfigurationActions
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ScmManager scmManager;
+    private ObjectFactory objectFactory;
 
     public boolean actionsEnabled(ProjectConfiguration instance, boolean deeplyValid)
     {
@@ -70,8 +76,7 @@ public class ProjectConfigurationActions
                 {
                     result.add(ACTION_TRIGGER);
                     
-                    // If the project has dependencies, then we can also trigger a dependency rebuild.
-                    if (instance.hasDependencies())
+                    if (hasDependencyOfBuildableStatus(instance))
                     {
                         result.add(ACTION_REBUILD);
                     }
@@ -111,6 +116,29 @@ public class ProjectConfigurationActions
         }
 
         return result;
+    }
+
+    private boolean hasDependencyOfBuildableStatus(ProjectConfiguration projectConfig)
+    {
+        if (projectConfig.hasDependencies())
+        {
+            if (projectConfig.getOptions().getPrompt())
+            {
+                // The user can set a status for the build at the prompt.
+                return true;
+            }
+
+            String ourStatus = projectConfig.getDependencies().getStatus();
+            GraphBuilder builder = objectFactory.buildBean(GraphBuilder.class);
+            GraphFilters filters = objectFactory.buildBean(GraphFilters.class);
+            TreeNode<BuildGraphData> upstream = builder.buildUpstreamGraph(projectConfig,
+                    filters.status(ourStatus),
+                    filters.transitive(),
+                    filters.duplicate());
+            return upstream.getChildren().size() > 0;
+        }
+
+        return false;
     }
 
     private boolean canConvertType(ProjectConfiguration instance)
@@ -257,5 +285,10 @@ public class ProjectConfigurationActions
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

@@ -6,14 +6,15 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class GraphBuilderTest extends BaseGraphTestCase
 {
@@ -77,7 +78,7 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testSingleProject()
     {
-        Project project = project("projectA");
+        ProjectConfiguration project = project("projectA");
 
         assertEquals(node(project), builder.buildUpstreamGraph(project));
         assertEquals(node(project), builder.buildDownstreamGraph(project));
@@ -85,8 +86,8 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testSingleUpstreamProject()
     {
-        Project util = project("util");
-        Project client = project("client", dependency(util));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration client = project("client", dependency(util));
 
         assertEquals(
                 node(client,
@@ -96,9 +97,9 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testMultipleUpstreamProjects()
     {
-        Project util = project("util");
-        Project lib = project("lib");
-        Project client = project("client", dependency(util), dependency(lib));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
+        ProjectConfiguration client = project("client", dependency(util), dependency(lib));
 
         assertEquals(
                 node(client,
@@ -109,9 +110,9 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testTransitiveUpstreamProjects()
     {
-        Project util = project("util");
-        Project lib = project("lib", dependency(util));
-        Project client = project("client", dependency(lib));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib", dependency(util));
+        ProjectConfiguration client = project("client", dependency(lib));
 
         assertEquals(
                 node(client,
@@ -122,10 +123,10 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testMultipleTransitiveUpstreamProjects()
     {
-        Project utilA = project("utilA");
-        Project utilB = project("utilB");
-        Project lib = project("lib", dependency(utilA), dependency(utilB));
-        Project client = project("client", dependency(lib));
+        ProjectConfiguration utilA = project("utilA");
+        ProjectConfiguration utilB = project("utilB");
+        ProjectConfiguration lib = project("lib", dependency(utilA), dependency(utilB));
+        ProjectConfiguration client = project("client", dependency(lib));
 
         assertEquals(
                 node(client,
@@ -137,8 +138,8 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testSingleDownstreamProject()
     {
-        Project util = project("util");
-        Project client = project("client", dependency(util));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration client = project("client", dependency(util));
 
         assertEquals(
                 node(util,
@@ -148,9 +149,9 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testMultipleDownStreamProjects()
     {
-        Project util = project("util");
-        Project clientA = project("clientA", dependency(util));
-        Project clientB = project("clientB", dependency(util));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration clientA = project("clientA", dependency(util));
+        ProjectConfiguration clientB = project("clientB", dependency(util));
 
         assertEquals(
                 node(util,
@@ -161,9 +162,9 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testTransitiveDownstreamProjects()
     {
-        Project util = project("util");
-        Project lib = project("lib", dependency(util));
-        Project client = project("client", dependency(lib));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib", dependency(util));
+        ProjectConfiguration client = project("client", dependency(lib));
 
         assertEquals(
                 node(util,
@@ -174,10 +175,10 @@ public class GraphBuilderTest extends BaseGraphTestCase
 
     public void testMultipleTransitiveDownstreamProjects()
     {
-        Project util = project("util");
-        Project lib = project("lib", dependency(util));
-        Project clientA = project("clientA", dependency(lib));
-        Project clientB = project("clientB", dependency(lib));
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib", dependency(util));
+        ProjectConfiguration clientA = project("clientA", dependency(lib));
+        ProjectConfiguration clientB = project("clientB", dependency(lib));
 
         assertEquals(
                 node(util,

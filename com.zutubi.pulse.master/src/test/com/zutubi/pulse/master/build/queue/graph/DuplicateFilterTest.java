@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TreeNode;
 
 public class DuplicateFilterTest extends GraphFilterTestCase
@@ -17,9 +17,9 @@ public class DuplicateFilterTest extends GraphFilterTestCase
 
     public void testNoUpstreamDuplicates()
     {
-        Project util = project("util");
-        Project lib = project("lib");
-        Project client = project("client");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
+        ProjectConfiguration client = project("client");
 
         TreeNode<BuildGraphData> root =
                 node(client,
@@ -33,9 +33,9 @@ public class DuplicateFilterTest extends GraphFilterTestCase
 
     public void testNoDownstreamDuplicates()
     {
-        Project util = project("util");
-        Project lib = project("lib");
-        Project client = project("client");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
+        ProjectConfiguration client = project("client");
 
         TreeNode<BuildGraphData> root =
                 node(util,
@@ -49,10 +49,10 @@ public class DuplicateFilterTest extends GraphFilterTestCase
 
     public void testUpstreamDuplicate()
     {
-        Project util = project("util");
-        Project libA = project("libA");
-        Project libB = project("libB");
-        Project client = project("client");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration libA = project("libA");
+        ProjectConfiguration libB = project("libB");
+        ProjectConfiguration client = project("client");
 
         TreeNode<BuildGraphData> root =
                 node(client,
@@ -69,11 +69,11 @@ public class DuplicateFilterTest extends GraphFilterTestCase
 
     public void testUpstreamDuplicateWithChildren()
     {
-        Project platform = project("platform");
-        Project util = project("util");
-        Project libA = project("libA");
-        Project libB = project("libB");
-        Project client = project("client");
+        ProjectConfiguration platform = project("platform");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration libA = project("libA");
+        ProjectConfiguration libB = project("libB");
+        ProjectConfiguration client = project("client");
 
         TreeNode<BuildGraphData> root =
                 node(client,
@@ -91,10 +91,10 @@ public class DuplicateFilterTest extends GraphFilterTestCase
 
     public void testDownstreamDuplicate()
     {
-        Project platform = project("platform");
-        Project utilA = project("utilA");
-        Project utilB = project("utilB");
-        Project lib = project("lib");
+        ProjectConfiguration platform = project("platform");
+        ProjectConfiguration utilA = project("utilA");
+        ProjectConfiguration utilB = project("utilB");
+        ProjectConfiguration lib = project("lib");
 
         TreeNode<BuildGraphData> root =
                 node(platform,
@@ -110,11 +110,11 @@ public class DuplicateFilterTest extends GraphFilterTestCase
 
     public void testDownstreamDuplicateWithChildren()
     {
-        Project platform = project("platform");
-        Project utilA = project("utilA");
-        Project utilB = project("utilB");
-        Project lib = project("lib");
-        Project client = project("client");
+        ProjectConfiguration platform = project("platform");
+        ProjectConfiguration utilA = project("utilA");
+        ProjectConfiguration utilB = project("utilB");
+        ProjectConfiguration lib = project("lib");
+        ProjectConfiguration client = project("client");
 
         TreeNode<BuildGraphData> root =
                 node(platform,

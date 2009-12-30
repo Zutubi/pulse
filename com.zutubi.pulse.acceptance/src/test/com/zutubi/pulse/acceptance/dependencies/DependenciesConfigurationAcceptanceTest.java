@@ -1,13 +1,18 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher;
+import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -188,26 +193,50 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         return form.isRebuildCheckboxPresent();
     }
 
-    public void testRebuildOptionIsAvailableOnProjectHomePage() throws Exception
+    public void testRebuildOptionAvailabilityOnProjectHomePage() throws Exception
     {
-        String projectA = random + "A";
-        String projectB = random + "B";
+        String upstreamProject1 = random + "-upstream1";
+        String upstreamProject2 = random + "-upstream2";
+        String downstreamIntegrationProject = random + "-downstream-integration";
+        String downstreamMilestoneProject = random + "-downstream-milestone";
+        String downstreamBothProject = random + "-downstream-both";
 
-        addProject(projectA, true);
-        addProject(projectB, true);
+        addProject(upstreamProject1, true);
+        addProject(upstreamProject2, true);
 
-        addDependency(projectB, projectA);
+        addProject(downstreamIntegrationProject, true);
+        addDependency(downstreamIntegrationProject, upstreamProject1);
+
+        addProject(downstreamMilestoneProject, true);
+        addDependency(downstreamMilestoneProject, upstreamProject1, IvyStatus.STATUS_MILESTONE);
+
+        addProject(downstreamBothProject, true);
+        addDependency(downstreamBothProject, upstreamProject1);
+        addDependency(downstreamBothProject, upstreamProject2, IvyStatus.STATUS_MILESTONE);
 
         loginAsAdmin();
 
-        assertFalse(isRebuildActionAvailableOnProjectHomePage(projectA));
-        assertTrue(isRebuildActionAvailableOnProjectHomePage(projectB));
+        assertFalse(isRebuildActionAvailableOnProjectHomePage(upstreamProject1));
+        assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamIntegrationProject));
+        assertFalse(isRebuildActionAvailableOnProjectHomePage(downstreamMilestoneProject));
+        assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamBothProject));
+
+        turnOnPromptOption(downstreamMilestoneProject);
+        assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamMilestoneProject));
     }
 
     private boolean isRebuildActionAvailableOnProjectHomePage(String projectName)
     {
         ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
         return home.isRebuildActionPresent();
+    }
+
+    private void turnOnPromptOption(String project) throws Exception
+    {
+        String optionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.OPTIONS);
+        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        options.put("prompt", true);
+        xmlRpcHelper.saveConfig(optionsPath, options, false);
     }
 
     private void assertDependenciesTableRow(ProjectDependenciesPage page, int rowIndex, String project, String revision, String stages, String transitive)
@@ -257,6 +286,11 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     private void addDependency(String projectFrom, String projectTo) throws Exception
     {
+        addDependency(projectFrom, projectTo, IvyStatus.STATUS_INTEGRATION);
+    }
+
+    private void addDependency(String projectFrom, String projectTo, String status) throws Exception
+    {
         // configure the default stage.
         String projectDependenciesPath = "projects/" + projectFrom + "/dependencies";
 
@@ -270,7 +304,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
         Hashtable<String, Object> dependency = xmlRpcHelper.createEmptyConfig(DependencyConfiguration.class);
         dependency.put("project", "projects/" + projectTo);
-        dependency.put("revision", "latest.integration");
+        dependency.put("revision", IvyLatestRevisionMatcher.LATEST + status);
 
         dependencies.add(dependency);
 

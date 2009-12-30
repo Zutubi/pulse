@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
@@ -33,6 +34,7 @@ public class ProjectsModelsHelper
     private ConfigurationTemplateManager configurationTemplateManager;
     private RecordManager recordManager;
     private AccessManager accessManager;
+    private ActionManager actionManager;
 
     private ProjectsModelSorter sorter = new ProjectsModelSorter();
 
@@ -152,10 +154,8 @@ public class ProjectsModelsHelper
         {
             for (Project p : projects)
             {
-                boolean canTrigger = accessManager.hasPermission(ProjectConfigurationActions.ACTION_TRIGGER, p);
                 boolean prompt = p.getConfig().getOptions().getPrompt();
-                boolean canViewSource = accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, p);
-                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, canTrigger, prompt, canViewSource));
+                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, prompt, getAvailableActions(p)));
             }
         }
 
@@ -176,10 +176,8 @@ public class ProjectsModelsHelper
                     {
                         Project project = projectManager.getProject(name, true);
                         List<BuildResult> builds = getBuilds(project, configuration, buildCache);
-                        boolean canTrigger = accessManager.hasPermission(ProjectConfigurationActions.ACTION_TRIGGER, project);
                         boolean prompt = project.getConfig().getOptions().getPrompt();
-                        boolean canViewSource = accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project);
-                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, canTrigger, prompt, canViewSource);
+                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project));
                     }
                     else
                     {
@@ -197,6 +195,16 @@ public class ProjectsModelsHelper
                 processLevel(group, parentModel, node.getChildren(), depth + 1, includedInGroup, loggedInUser, configuration, collapsed, buildCache, urls);
             }
         }
+    }
+
+    private Set<String> getAvailableActions(Project project)
+    {
+        Set<String> availableActions = new HashSet<String>(actionManager.getActions(project.getConfig(), false, true));
+        if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project))
+        {
+            availableActions.add(ProjectConfigurationActions.ACTION_VIEW_SOURCE);
+        }
+        return availableActions;
     }
 
     /**
@@ -250,5 +258,10 @@ public class ProjectsModelsHelper
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
     }
 }

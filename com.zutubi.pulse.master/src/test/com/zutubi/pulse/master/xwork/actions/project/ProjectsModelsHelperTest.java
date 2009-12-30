@@ -4,17 +4,21 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
+import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static org.mockito.Mockito.*;
+import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
+
+import static org.mockito.Mockito.*;
 
 public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 {
@@ -101,6 +105,9 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         AccessManager accessManager = mock(AccessManager.class);
         stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(true);
 
+        ActionManager actionManager = mock(ActionManager.class);
+        stub(actionManager.getActions(Matchers.<Configuration>anyObject(), anyBoolean(), anyBoolean())).toReturn(Collections.<String>emptyList());
+
         config = new BrowseViewConfiguration();
 
         helper = new ProjectsModelsHelper();
@@ -108,6 +115,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         helper.setProjectManager(projectManager);
         helper.setBuildManager(buildManager);
         helper.setAccessManager(accessManager);
+        helper.setActionManager(actionManager);
     }
 
     private TemplateNode createNode(String name, boolean concrete)

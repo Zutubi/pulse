@@ -1,15 +1,16 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
-import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TreeNode;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 
 public class StatusFilterTest extends GraphFilterTestCase
 {
     public void testDownstreamStatusFiltering()
     {
-        Project util = project("util");
-        Project lib = project("lib");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
 
         TreeNode<BuildGraphData> root = node(util, node(lib, dependency(util, "latest.milestone")));
 
@@ -20,8 +21,8 @@ public class StatusFilterTest extends GraphFilterTestCase
 
     public void testDownstreamFixedRevision()
     {
-        Project util = project("util");
-        Project lib = project("lib");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
 
         TreeNode<BuildGraphData> root = node(util, node(lib, dependency(util, "FIXED")));
 
@@ -30,8 +31,8 @@ public class StatusFilterTest extends GraphFilterTestCase
 
     public void testUpstreamStatusFiltering()
     {
-        Project util = project("util");
-        Project lib = project("lib");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
 
         TreeNode<BuildGraphData> root = node(lib, node(util, dependency(util, "latest.milestone")));
 
@@ -42,8 +43,8 @@ public class StatusFilterTest extends GraphFilterTestCase
 
     public void testUpstreamFixedRevision()
     {
-        Project util = project("util");
-        Project lib = project("lib");
+        ProjectConfiguration util = project("util");
+        ProjectConfiguration lib = project("lib");
 
         TreeNode<BuildGraphData> root = node(lib, node(util, dependency(util, "FIXED")));
 

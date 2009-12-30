@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TreeNode;
 
 public class TransitiveFilterTest extends GraphFilterTestCase
@@ -17,9 +17,9 @@ public class TransitiveFilterTest extends GraphFilterTestCase
 
     public void testNoneTransitiveDependenciesFilterChildren()
     {
-        Project client = project("client");
-        Project lib = project("lib");
-        Project util = project("util");
+        ProjectConfiguration client = project("client");
+        ProjectConfiguration lib = project("lib");
+        ProjectConfiguration util = project("util");
 
         TreeNode<BuildGraphData> node = node(client, node(lib, dependency(lib, false), node(util, dependency(util))));
 
@@ -29,9 +29,9 @@ public class TransitiveFilterTest extends GraphFilterTestCase
 
     public void testTransitiveDependenciesDoNotFilter()
     {
-        Project client = project("client");
-        Project lib = project("lib");
-        Project util = project("util");
+        ProjectConfiguration client = project("client");
+        ProjectConfiguration lib = project("lib");
+        ProjectConfiguration util = project("util");
 
         TreeNode<BuildGraphData> node = node(client, node(lib, dependency(lib), node(util, dependency(util))));
 

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -23,62 +22,60 @@ public class GraphBuilder
 {
     private ProjectManager projectManager;
 
-    public TreeNode<BuildGraphData> buildUpstreamGraph(Project project, GraphFilter... filters)
+    public TreeNode<BuildGraphData> buildUpstreamGraph(ProjectConfiguration projectConfig, GraphFilter... filters)
     {
-        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(project));
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(projectConfig));
 
-        buildUpstreamGraph(project, node);
+        buildUpstreamGraph(projectConfig, node);
 
         applyFilters(node, filters);
 
         return node;
     }
 
-    private void buildUpstreamGraph(Project project, TreeNode<BuildGraphData> node)
+    private void buildUpstreamGraph(ProjectConfiguration projectConfig, TreeNode<BuildGraphData> node)
     {
-        List<DependencyConfiguration> dependencies = project.getConfig().getDependencies().getDependencies();
+        List<DependencyConfiguration> dependencies = projectConfig.getDependencies().getDependencies();
         for (DependencyConfiguration dependency : dependencies)
         {
-            Project dependentProject = projectManager.getProject(dependency.getProject().getProjectId(), false);
-            TreeNode<BuildGraphData> child = new TreeNode<BuildGraphData>(new BuildGraphData(dependentProject));
-            buildUpstreamGraph(dependentProject, child);
+            ProjectConfiguration dependentProjectConfig = dependency.getProject();
+            TreeNode<BuildGraphData> child = new TreeNode<BuildGraphData>(new BuildGraphData(dependentProjectConfig));
+            buildUpstreamGraph(dependentProjectConfig, child);
             child.getData().setDependency(dependency);
             node.add(child);
         }
     }
 
-    public TreeNode<BuildGraphData> buildDownstreamGraph(Project project, GraphFilter... filters)
+    public TreeNode<BuildGraphData> buildDownstreamGraph(ProjectConfiguration projectConfig, GraphFilter... filters)
     {
-        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(project));
+        TreeNode<BuildGraphData> node = new TreeNode<BuildGraphData>(new BuildGraphData(projectConfig));
 
-        buildDownstreamGraph(project, node);
+        buildDownstreamGraph(projectConfig, node);
 
         applyFilters(node, filters);
 
         return node;
     }
 
-    private void buildDownstreamGraph(Project project, TreeNode<BuildGraphData> node)
+    private void buildDownstreamGraph(ProjectConfiguration projectConfig, TreeNode<BuildGraphData> node)
     {
-        List<ProjectConfiguration> downstreamProjectConfigs = projectManager.getDownstreamDependencies(project.getConfig());
-        List<Project> downstreamProjects = projectManager.mapConfigsToProjects(downstreamProjectConfigs);
-
-        for (Project downstream: downstreamProjects)
+        List<ProjectConfiguration> downstreamProjectConfigs = projectManager.getDownstreamDependencies(projectConfig);
+        for (ProjectConfiguration downstream: downstreamProjectConfigs)
         {
             TreeNode<BuildGraphData> child = new TreeNode<BuildGraphData>(new BuildGraphData(downstream));
             buildDownstreamGraph(downstream, child);
-            child.getData().setDependency(findDependency(downstream,  project));
+            child.getData().setDependency(findDependency(downstream,  projectConfig));
             node.add(child);
         }
     }
 
-    private DependencyConfiguration findDependency(Project fromProject, final Project toProject)
+    private DependencyConfiguration findDependency(ProjectConfiguration fromProject, final ProjectConfiguration toProject)
     {
-        return CollectionUtils.find(fromProject.getConfig().getDependencies().getDependencies(), new Predicate<DependencyConfiguration>()
+        return CollectionUtils.find(fromProject.getDependencies().getDependencies(), new Predicate<DependencyConfiguration>()
         {
             public boolean satisfied(DependencyConfiguration dependency)
             {
-                return toProject.getConfig().equals(dependency.getProject()) ;
+                return toProject.equals(dependency.getProject()) ;
             }
         });
     }

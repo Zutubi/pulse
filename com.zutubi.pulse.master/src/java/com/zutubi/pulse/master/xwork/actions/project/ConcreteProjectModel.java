@@ -14,6 +14,9 @@ import com.zutubi.util.UnaryProcedure;
 import flexjson.JSON;
 
 import java.util.List;
+import java.util.Set;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 
 /**
  * JSON-encodable object representing the current state of a concrete project.
@@ -34,7 +37,7 @@ public class ConcreteProjectModel extends ProjectModel
     private boolean canViewSource;
     private long projectId;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean canTrigger, boolean prompt, boolean canViewSource)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean prompt, Set<String> availableActions)
     {
         super(group, project.getName());
 
@@ -64,10 +67,10 @@ public class ConcreteProjectModel extends ProjectModel
             }
         });
 
-        this.canTrigger = canTrigger;
         this.prompt = prompt;
-        this.canRebuild = canTrigger && project.getConfig().hasDependencies();
-        this.canViewSource = canViewSource;
+        canTrigger = availableActions.contains(ACTION_TRIGGER);
+        canRebuild = availableActions.contains(ACTION_REBUILD);
+        canViewSource = availableActions.contains(ACTION_VIEW_SOURCE); 
     }
 
     public String getName()

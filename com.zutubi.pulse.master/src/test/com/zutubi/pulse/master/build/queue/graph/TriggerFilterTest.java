@@ -1,15 +1,16 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TreeNode;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Map;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+import static org.mockito.Mockito.*;
 
 public class TriggerFilterTest extends GraphFilterTestCase
 {
@@ -38,8 +39,8 @@ public class TriggerFilterTest extends GraphFilterTestCase
 
     public void testNoTrigger()
     {
-        Project util = project("util");
-        Map triggers = (Map) util.getConfig().getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
+        ProjectConfiguration util = project("util");
+        Map triggers = (Map) util.getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
         triggers.clear();
 
         TreeNode<BuildGraphData> node = node(util);
@@ -52,7 +53,7 @@ public class TriggerFilterTest extends GraphFilterTestCase
 
     public void testActiveTrigger()
     {
-        Project util = project("util");
+        ProjectConfiguration util = project("util");
 
         TreeNode<BuildGraphData> node = node(util);
 
@@ -65,7 +66,7 @@ public class TriggerFilterTest extends GraphFilterTestCase
 
     public void testPausedTrigger()
     {
-        Project util = project("util");
+        ProjectConfiguration util = project("util");
 
         TreeNode<BuildGraphData> node = node(util);
         stub(trigger.isActive()).toReturn(Boolean.FALSE);
