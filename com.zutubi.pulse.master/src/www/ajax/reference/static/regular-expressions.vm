@@ -1,0 +1,146 @@
+#macro(examples)
+<table class="content">
+    <tr><th>expression</th><th>matches</th></tr>
+#end
+
+#macro(example $expression $matches)
+    <tr><td>$expression</td><td>$matches</td></tr>
+#end
+
+#macro(endExamples)
+</table>
+#end
+
+<h1>Regular Expressions</h1>
+<p>
+    Pulse uses regular expressions in a variety of areas, such as:
+</p>
+<ul>
+    <li>Extraction of error and warning messages using post-processors.</li>
+    <li>Extraction of test results from simple text formats using post-processing.</li>
+    <li>Determining artifact names and types from file names.</li>
+</ul>
+<p>
+    In all cases standard Java regular expression syntax is used.  This syntax should be familiar to
+    users of Perl-style regular expressions.  Some more details are given below.
+</p>
+<div class="highlight">
+    <h4>Escaping</h4>
+    <p>
+        Note that as the dollar sign character ($) and backslash character (\) have special meanings
+        both in Pulse files and in regular expressions, you must take care when writing expressions
+        that include these characters. See
+        <a href="#" onclick="selectNode('/reference/project/escaping-regular-expressions'); return false">Escaping Regular Expressions In Pulse Files</a>
+        for details.        
+    </p>
+</div>
+
+<h2>Commonly-Used Syntax Overview</h2>
+<p>
+    This section provides a brief overview of the regular expression syntax.  It does not cover any
+    advanced details.  For full details, see the
+    <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">javadoc</a>.
+</p>
+
+<h3>Literals</h3>
+<p>
+    Strings of characters match themselves.  That is, the expression 'foo' will only match the
+    string 'foo'.  Care must be taken when attempting to literally match characters with special
+    meaning in expressions (see Escaping below).
+</p>
+
+<h3>Character Classes</h3>
+<p>
+    A set of characters enclosed in square brackets matches any single character within the
+    brackets.  To match any character <em>not</em> within the brackets, begin the class with a carat
+    (^).  To match a range of characters, express the range using its endpoints separated by a
+    hyphen (-).  Multiple individual characters and ranges may be intermixed.
+
+    #examples()
+        #example("[abc]" "'a', 'b' or 'c'.")
+        #example("[^abc]" "Any single character that is not 'a', 'b' or 'c'.")
+        #example("[A-M]" "Any uppercase latin character between A and M inclusive.")
+        #example("[a-jz]" "Any lowercase latin character between a and j inclusive, or the character z.")
+    #endExamples()
+</p>
+
+<h4>Predefined Character Classes</h4>
+<p>
+    Some character classes are predefined for convenience.  In particular, a period (.) may be used
+    to match any character.
+
+    #examples()
+        #example("." "Any character.")
+        #example("&#92;d" "A digit [0-9].")
+        #example("&#92;D" "A non-digit [^0-9].")
+        #example("&#92;s" "A whitespace character.")
+        #example("&#92;S" "A non-whitespace character.")
+        #example("&#92;w" "A word character (letters, underscores or digits).")
+        #example("&#92;W" "A non-word character.")
+    #endExamples()
+</p>
+
+<h3>Boundaries</h3>
+<p>
+    To match a location (rather than a character) such as the beginning of a string, or the boundary
+    marking the start of a word, use a boundary matcher:
+
+    #examples()
+        #example("^" "The beginning of a line.")
+        #example("$" "The end of a line (take care when using in Pulse files).")
+        #example("&#92;b" "A word boundary (between a word and non-word character, in either order).")
+        #example("&#92;B" "Not a word boundary.")
+        #example("&#92;A" "The beginning of the input.")
+        #example("&#92;G" "The end of the previous match.")
+        #example("&#92;Z" "The end of the input (excluding a final line terminator).")
+        #example("&#92;z" "The end of the input.")
+    #endExamples()
+</p>
+
+<h3>Quantifiers</h3>
+<p>
+    Quantifiers are used to match repeated instances of the quantified expression.  By default,
+    quantifiers are <em>greedy</em>.  That is, a quantifier will consume as many characters of the
+    input string as possible without preventing an overall match.  This behaviour may be reversed by
+    adding a question mark (?) after the quantifier character (e.g. *?), making it reluctant.
+    Adding a plus (+) after the quantifier (e.g. *+) makes it possessive: it will consume as many
+    characters of the input string as possible even if this prevents an overall match.
+
+    #examples()
+        #example("X?" "X zero or one times.")
+        #example("X*" "X zero or more times.")
+        #example("X+" "X one or more times.")
+        #example("X{n}" "X exactly n times.")
+        #example("X{n,}" "X n or more times.")
+        #example("X{n,m}" "X between n and m times (inclusive).")
+    #endExamples()
+</p>
+
+<h3>Logical Operators</h3>
+<p>
+    The grouping operator (surrounding an expression in parentheses) is particularly useful in
+    Pulse.  When extracting information using expressions, groups can be used to pick out specific
+    parts of a match that have a particular meaning (e.g. the name of a test case).
+
+    #examples()
+        #example("X|Y" "Either X or Y.")
+        #example("(X)" "X, capturing it as a numbered group for later reference.")
+        #example("(?:X)" "X, grouped to override default precedence without capturing.")
+    #endExamples()
+</p>
+
+<h3>Escaping</h3>
+<p>
+   To include a character that normally has a special meaning literally within an expression, it
+   must be escaped with a backslash (&#92;).  As backslashes are given this special meaning (among
+   others), a literal backslash must itself be escaped (&#92;&#92;).
+</p>
+
+<h4>Escaping In Pulse Files</h4>
+<p>
+    Note that when you write a regular expression in a Pulse file, further care must be taken to
+    escape the special characters $ and &#92;, as they have meanings both to Pulse and in regular
+    expressions.  See
+    <a href="#" onclick="selectNode('/reference/project/escaping-regular-expressions'); return false">Escaping Regular Expressions In Pulse Files</a>
+    for details.
+</p>

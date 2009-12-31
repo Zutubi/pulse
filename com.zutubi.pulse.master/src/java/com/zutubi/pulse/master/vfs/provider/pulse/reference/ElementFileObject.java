@@ -5,7 +5,6 @@ import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.Collection;
@@ -14,7 +13,7 @@ import java.util.Collection;
  * A file object representing an {@link com.zutubi.pulse.core.marshal.doc.ElementDocs}
  * node in the tove file doc tree.
  */
-public class ElementFileObject extends AbstractPulseFileObject
+public class ElementFileObject extends AbstractReferenceFileObject
 {
     private ElementDocs elementDocs;
 
@@ -24,7 +23,19 @@ public class ElementFileObject extends AbstractPulseFileObject
         this.elementDocs = elementDocs;
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    protected String[] getDynamicChildren()
+    {
+        Collection<ChildNodeDocs> children = elementDocs.getChildren();
+        return CollectionUtils.mapToArray(children, new Mapping<ChildNodeDocs, String>()
+        {
+            public String map(ChildNodeDocs childNodeDocs)
+            {
+                return childNodeDocs.getName();
+            }
+        }, new String[children.size()]);
+    }
+
+    public AbstractPulseFileObject createDynamicFile(FileName fileName)
     {
         NodeDocs nodeDocs = elementDocs.getNode(fileName.getBaseName());
         if (nodeDocs == null)
@@ -50,23 +61,6 @@ public class ElementFileObject extends AbstractPulseFileObject
     public String getIconCls()
     {
         return "reference-element-icon";
-    }
-
-    protected FileType doGetType() throws Exception
-    {
-        return elementDocs.getChildren().size() == 0 ? FileType.FILE : FileType.FOLDER;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        Collection<ChildNodeDocs> children = elementDocs.getChildren();
-        return CollectionUtils.mapToArray(children, new Mapping<ChildNodeDocs, String>()
-        {
-            public String map(ChildNodeDocs childNodeDocs)
-            {
-                return childNodeDocs.getName();
-            }
-        }, new String[children.size()]);
     }
 
     public ElementDocs getElementDocs()

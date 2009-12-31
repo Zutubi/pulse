@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.api.PulseRuntimeException;
-import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.types.*;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.ReferenceType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeProperty;
+
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -66,7 +67,12 @@ public class ToveFileUtilsTest extends AbstractConfigurationSystemTestCase
 
     public void testToReference()
     {
-        assertEquals("${foo}", ToveFileUtils.toReference("foo"));
+        assertEquals("$(foo)", ToveFileUtils.toReference("foo"));
+    }
+
+    public void testToReferenceSpecialCharacter()
+    {
+        assertEquals("${fo|o}", ToveFileUtils.toReference("fo|o"));
     }
 
     public void testGetPropertyValueNull()
@@ -178,7 +184,7 @@ public class ToveFileUtilsTest extends AbstractConfigurationSystemTestCase
         ref.setName("foo");
         MixedConfiguration configuration = new MixedConfiguration();
         configuration.setReferenceProperty(ref);
-        assertEquals("${foo}", ToveFileUtils.convertAttribute(configuration, mixedType, mixedType.getProperty("referenceProperty")));
+        assertEquals("$(foo)", ToveFileUtils.convertAttribute(configuration, mixedType, mixedType.getProperty("referenceProperty")));
     }
 
     public void testConvertAttributeReferenceNull()

@@ -23,18 +23,18 @@
 </p>
 <div class="example-snippet">&lt;macro name="build-command"&gt;
     &lt;command name="build"&gt;
-        &lt;executable exe="build-it.sh" args="TARGET=${target}"/&gt;
-        &lt;artifact name="${target}" file="bin/${target}"/&gt;
+        &lt;executable exe="build-it.sh" args="TARGET=$(target)"/&gt;
+        &lt;artifact name="$(target)" file="bin/$(target)"/&gt;
     &lt;/command&gt;
 &lt;/macro&gt;
 
 &lt;recipe name="two targets"&gt;
     &lt;scope&gt;
         &lt;property name="target" value="t1"/&gt;
-        &lt;macro-ref macro="\${build-command}"/&gt;
+        &lt;macro-ref macro="$(build-command)"/&gt;
     &lt;/scope&gt;
     &lt;scope&gt;
         &lt;property name="target" value="t2"/&gt;
-        &lt;macro-ref macro="\${build-command}"/&gt;
+        &lt;macro-ref macro="$(build-command)"/&gt;
     &lt;/scope&gt;
 &lt;/recipe&gt;</div>

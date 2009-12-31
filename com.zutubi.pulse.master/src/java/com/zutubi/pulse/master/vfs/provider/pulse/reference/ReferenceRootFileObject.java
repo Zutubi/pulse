@@ -19,23 +19,29 @@ import java.util.Map;
  * pages with links to manuals etc, as well as generated documentation for
  * files, types etc.
  */
-public class ReferenceFileObject extends AbstractPulseFileObject implements ComparatorProvider
+public class ReferenceRootFileObject extends AbstractReferenceFileObject implements ComparatorProvider
 {
-    private static final Messages I18N = Messages.getInstance(ReferenceFileObject.class);
+    private static final Messages I18N = Messages.getInstance(ReferenceRootFileObject.class);
 
     private static final Map<String, String> FILE_TYPES = new HashMap<String, String>();
 
+    static
     {
         FILE_TYPES.put(PulseFileLoaderFactory.ROOT_ELEMENT, I18N.format("type.pulse"));
         FILE_TYPES.put(ResourceFileLoader.ROOT_ELEMENT, I18N.format("type.resource"));
     }
 
-    public ReferenceFileObject(final FileName name, final AbstractFileSystem fs)
+    public ReferenceRootFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    protected String[] getDynamicChildren()
+    {
+        return new String[]{ PulseFileLoaderFactory.ROOT_ELEMENT, ResourceFileLoader.ROOT_ELEMENT };
+    }
+
+    public AbstractPulseFileObject createDynamicFile(FileName fileName)
     {
         return objectFactory.buildBean(FileTypeFileObject.class, new Class[]{FileName.class, AbstractFileSystem.class, String.class}, new Object[]{fileName, getFileSystem(), FILE_TYPES.get(fileName.getBaseName())});
     }
@@ -49,11 +55,6 @@ public class ReferenceFileObject extends AbstractPulseFileObject implements Comp
     protected FileType doGetType() throws Exception
     {
         return FileType.FOLDER;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        return new String[]{ PulseFileLoaderFactory.ROOT_ELEMENT, ResourceFileLoader.ROOT_ELEMENT };
     }
 
     public Comparator<FileObject> getComparator()

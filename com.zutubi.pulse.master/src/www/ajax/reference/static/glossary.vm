@@ -1,0 +1,44 @@
+<h1>Glossary</h1>
+<p>
+    This page describes terminology used in Pulse to describe various concepts.  If you are unsure
+    of the meaning of a term in the documentation, the table below may help.
+</p>
+
+#macro(term $term $description)
+    <tr><td>$term</td><td>$description</td></tr>
+#end
+
+<table class="content">
+    <tr><th>term</th><th>description</th></tr>
+    #term("agent" "An agent is a pulse server that is capable of executing recipes. Agents can be either local, in which case they are embedded in the pulse master server, or remote, i.e. installed on remote machines. This allows builds to be distributed across multiple servers.")
+    #term("artifact" "A file or directory produced during a build that is captured and preserved as part of the build result.  This can include output from running commands, binaries, packages, reports, etc.")
+    #term("base directory" "The base directory for a recipe is the top-level directory in which the recipe is executed.")
+    #term("bootstrapping" "Bootstrapping refers to the process of obtaining an initial working copy when executing a recipe. How this is done depends on the checkout scheme for the project, but it generally involves synchronising the project source code from the appropriate SCM.")
+    #term("build" "A build refers to the process of checking out the source code for a project and executing a sequence of commands (known as a recipe) on a working copy of the code.")
+    #term("build hooks" "A build hook is a task that is executed at some hook point (e.g. pre-build, post-stage) during a build.  Unlike recipes and commands, hooks always execute on the Pulse master.")
+    #term("build stage" "A build stage is one component of a project build. A stage specifies a recipe to execute and the agent to executed the stage on. Stages are independent of one another and may be built in parallel. A typical use case for multiple stages is to test the project in multiple environments.")
+    #term("changelist" "A changelist is a single change committed to an SCM.  In general changelists may involve changes to several files.  Most SCMs support atomic changelists; where they do not Pulse emulates them.")
+    #term("changelist isolation" "Changelist isolation refers to running a separate build for each changelist that affects a project.")
+    #term("command" "A command is a single unit of work in a build. Builds are broken down into recipes, which are themselves sequences of commands.  An example command could launch a build tool like ant or make.")
+    #term("contact point" "A contact point is a description of how a user may be contacted for the purpose of build notifications. A common example is an email address.")
+    #term("data directory" "The data directory, sometimes referred to as $PULSE_DATA, is where your pulse server stores all file system data (i.e. data not kept in the database).")
+    #term("feature" "A feature is an interesting piece of information discovered in a build artifact during post-processing.  A common example is a compiler error or warning.")
+    #term("home directory" "The home directory is used to store the Pulse system files, such as the Pulse binaries and web interface. This is the directory created by unpacking a Pulse archive.")
+    #term("label" "Labels are simple tags that can be applied to instances to categorise them in a flexible way. All instances that have the same label can be viewed as belonging to a group named after that label.")
+    #term("local build" "A local build is an execution of the Pulse build engine in a developer's own working copy. The name refers to the fact that the build is executed on the developer's local machine, rather than the Pulse server.")
+    #term("notification" "A notification is a message sent by Pulse to a contact point to notify a user of a build event. For example, a user may be emailed when a build fails.")
+    #term("personal build" "A personal build is a build of a developer's current, uncommitted changes on the Pulse server. Personal builds can be used to test new changes before they are checked in to the SCM.")
+    #term("post-processor" "A post-processor is used to process an artifact in order to find interesting information (features and/or test results) in that artifact. Post-processors are commonly used to find information such as errors/warnings and test results.")
+    #term("property" "Properties are used throughout Pulse as a way to specify name-value pairs. The value can then be referenced in various contexts using the $(&lt;name&gt;) syntax.")
+    #term("publication" "Publication is the process of storing artifacts in the internal Pulse repository. Publication occurs at the end of a build. Artifacts that have been published may be retrieved by dependent projects.")
+    #term("recipe" "A recipe is a sequence of commands used to build a project. Projects may include multiple recipes, allowing different stages in the project's build to run different commands if desired.")
+    #term("repository" "The Pulse internal repository is used to store published artifacts. These artifacts may be retrieved by dependent projects to use in their builds.")
+    #term("resource" "Resources are external requirements for executing builds. For example, a resource may be a compiler required to build source code, or a specific type of operating system. A repository of resources is maintained on each Pulse agent.")
+    #term("resposibility" "Responsibility may be used to communicate among members on the same team. By taking responsibility for a project, with an optional comment, a user can indicate that they are working on something.")
+    #term("retrieval" "Retrieval is the process of obtaining artifacts from the internal Pulse repository. Retrieval occurs at the start of a recipe, just after bootstrapping.")
+    #term("SCM" "SCM is an acronym for Source Configuration Management, and is used in Pulse to refer to systems that store and version source code. SCM systems are sometimes referred to as Version Control systems. Examples include CVS, git, Perforce and Subversion.")
+    #term("status" "The status of a build refers to the maturity or stability of the build. There are three built-in statuses: integration, milestone and release.")
+    #term("subscription" "A subscription is a connection between a contact point and a project for the purposes of notification. Users create subscriptions to tell Pulse to send them notifications of build events.")
+    #term("trigger" "A trigger is used to prompt a build of a project. When a trigger fires, it queues a build for the project. The build will begin at the next available opportunity.")
+    #term("working copy" "A working copy refers to a set of project source files when they are checked out from the project's SCM. The term is used in a similar way to regular SCM nomenclature.")
+</table>

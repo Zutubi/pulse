@@ -19,22 +19,26 @@
 <h3>References</h3>
 <p>
     In addition to regular XML syntax, pulse files can also contain references to named values
-    within XML attributes and text between tags.  A reference is denoted with the syntax
-    ${&lt;name&gt;} where &lt;name&gt; is the name of the entity being referred to.  Such entities
-    may be simple <a href="#" onclick="selectNode('$path/project/property'); return false">property</a>
-    values:
+    within XML attributes and text between tags.  A reference is denoted with one of the following
+    two syntactic forms:
+</p>
+<div class="example-snippet">${&lt;name&gt;}</div>
+<div class="example-snippet">$(&lt;name&gt;)</div>
+<p>
+    where &lt;name&gt; is the name of the entity being referred to.  Such entities may be simple
+    <a href="#" onclick="selectNode('$path/project/property'); return false">property</a> values:
 </p>
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;property name="my.dir" value="bin/scripts"/&gt;
 
     &lt;recipe name="my-recipe"&gt;
-        &lt;executable exe="${my.dir}/doit.sh"/&gt;
+        &lt;executable exe="$(my.dir)/doit.sh"/&gt;
     &lt;/recipe&gt;
 &lt;/project&gt;
 </div>
 <p>
-    In this case the attribute value "${my.dir}/doit.sh" becomes "bin/scripts/doit.sh".  In other
+    In this case the attribute value "$(my.dir)/doit.sh" becomes "bin/scripts/doit.sh".  In other
     cases, the entity referred to may itself be a complex object, for example a post-processor:
 </p>
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;
@@ -45,13 +49,13 @@
 
     &lt;recipe name="my-recipe"&gt;
         &lt;executable exe="ls"&gt;
-            &lt;process processor="${my.pp}"/&gt;
+            &lt;process processor="$(my.pp)"/&gt;
         &lt;/executable&gt;
     &lt;/recipe&gt;
 &lt;/project&gt;
 </div>
 <p>
-    In this case ${my.pp} is used to refer to the post-processor defined earlier.  When the value
+    In this case $(my.pp) is used to refer to the post-processor defined earlier.  When the value
     referred to is a complex entity, only a single reference is allowed, with no surrounding string
     content in the attribute value.
 </p>
@@ -63,6 +67,71 @@
         must also preceed it with a backslash.
     </p>
 </div>
+
+<h4>Reserved Characters</h4>
+<p>
+    When using the ${&lt;name&gt;} syntax, only the } character is reserved, and may not be used in
+    the property name.
+</p>
+<p>
+    When using the $(&lt;name&gt;) syntax, the following characters are reserved and cannot be used
+    in the property name:
+</p>
+<div class="example-snippet">) ! # % & : ; | / ?
+</div>
+
+<h4>Filters</h4>
+<p>
+    The pipe (|) character can be used to apply a named filter to the reference value. For example:
+</p>
+<div class="example-snippet">$(my.property|upper)
+</div>
+<p>
+    will resolve to the value of my.property with all letters converted to upper case.
+    Multiple filters may be specified:
+</p>
+<div class="example-snippet">$(my.property|trim|upper)
+</div>
+<p>
+    in which case they are applied from left to right. Filters do not apply to default values, which
+    must be specified after all filters.
+</p>
+
+<table class="content">
+    <tr>
+        <th>filter</th><th>description</th>
+    </tr>
+    <tr>
+        <th>lower</th><td>Converts all letters in the value to lower case using the default locale.</td>
+    </tr>
+    <tr>
+        <th>name</th><td>Converts the property value to a valid name (recipe name, command name,
+        etc) by replacing any characters not valid in names (e.g. slashes) with periods (.) and
+        trimming any leading and trailing whitespace.</td>
+    </tr>
+    <tr>
+        <th>normalise</th><td>Normalises all forward and backslashes in the value to the
+        system-specific file separator character (i.e. backslash on Windows, forward slash on
+        Unix-like systems).</td>
+    </tr>
+    <tr>
+        <th>trim</th><td>Trims leading and trailing whitespace from the value.</td>
+    </tr>
+    <tr>
+        <th>upper</th><td>Converts all letters in the value to upper case using the default locale.</td>
+    </tr>
+</table>
+
+<h4>Default Values</h4>
+<p>
+    The question mark (?) character can be used to specify a default value for the reference if it
+    is not defined at the point where it is referenced. For example:
+</p>
+<div class="example-snippet">$(my.property?default)
+</div>
+<p>
+    will resolve to "default" if my.property is not defined.
+</p>
 
 <h3>Scopes</h3>
 <p>
@@ -78,12 +147,12 @@
     &lt;property name="cc" value="gcc"/&gt;
 
     &lt;recipe name="default-cc"&gt;
-        &lt;make args="CC=${cc}"/&gt;
+        &lt;make args="CC=$(cc)"/&gt;
     &lt;/recipe&gt;
 
     &lt;recipe name="new-cc"&gt;
         &lt;property name="cc" value="gcc4"/&gt;
-        &lt;make args="CC=${cc}"/&gt;
+        &lt;make args="CC=$(cc)"/&gt;
     &lt;/recipe&gt;
 &lt;/project&gt;
 </div>
@@ -96,17 +165,17 @@
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;macro name="make"&gt;
-        &lt;make name="make-${make.target}" makefile="GNUmakefile" targets="${make.target}"/&gt;
+        &lt;make name="make-$(make.target)" makefile="GNUmakefile" targets="$(make.target)"/&gt;
     &lt;/macro&gt;
 
     &lt;recipe name="default"&gt;
         &lt;scope&gt;
             &lt;property name="make.target" value="install"/&gt;
-            &lt;macro-ref macro="${make}"/&gt;
+            &lt;macro-ref macro="$(make)"/&gt;
         &lt;/scope&gt;
         &lt;scope&gt;
             &lt;property name="make.target" value="cppunit"/&gt;
-            &lt;macro-ref macro="${make}"/&gt;
+            &lt;macro-ref macro="$(make)"/&gt;
         &lt;/scope&gt;
     &lt;/recipe&gt;
 &lt;/project&gt;
@@ -132,7 +201,7 @@
     &lt;/macro&gt;
 
     &lt;recipe name="default"&gt;
-        &lt;macro-ref macro="${common-commands}"/&gt;
+        &lt;macro-ref macro="$(common-commands)"/&gt;
     &lt;/recipe&gt;
 &lt;/project&gt;
 </div>
@@ -158,7 +227,7 @@
     &lt;import path="import/macros.xml"/&gt;
 
     &lt;recipe name="default"&gt;
-        &lt;macro-ref macro="${common-commands}"/&gt;
+        &lt;macro-ref macro="$(common-commands)"/&gt;
     &lt;/recipe&gt;
 &lt;/project&gt;
 </div>

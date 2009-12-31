@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.master.vfs.provider.pulse.reference.ReferenceFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.reference.ReferenceRootFileObject;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
@@ -28,7 +28,7 @@ public class RootFileObject extends StaticMappingFileObject
         nodesDefinitions.put(NODE_PLUGINS, PluginsFileObject.class);
         nodesDefinitions.put(NODE_PROJECTS, ProjectsFileObject.class);
         nodesDefinitions.put(NODE_PROJECT_CONFIGS, ProjectConfigsFileObject.class);
-        nodesDefinitions.put(NODE_REFERENCE, ReferenceFileObject.class);
+        nodesDefinitions.put(NODE_REFERENCE, ReferenceRootFileObject.class);
         nodesDefinitions.put(NODE_TEMPLATES, TemplateScopesFileObject.class);
         nodesDefinitions.put(NODE_WIZARDS, WizardsFileObject.class);
     }

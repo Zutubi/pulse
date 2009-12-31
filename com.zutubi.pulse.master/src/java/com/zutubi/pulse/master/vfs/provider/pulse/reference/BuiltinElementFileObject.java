@@ -3,14 +3,13 @@ package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 import com.zutubi.pulse.core.marshal.doc.BuiltinElementDocs;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
  * A file object representing a {@link com.zutubi.pulse.core.marshal.doc.BuiltinElementDocs}
  * node in the tove file doc tree.
  */
-public class BuiltinElementFileObject extends AbstractPulseFileObject
+public class BuiltinElementFileObject extends AbstractReferenceFileObject
 {
     private BuiltinElementDocs elementDocs;
 
@@ -20,7 +19,12 @@ public class BuiltinElementFileObject extends AbstractPulseFileObject
         this.elementDocs = elementDocs;
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    protected String[] getDynamicChildren()
+    {
+        return new String[0];
+    }
+
+    public AbstractPulseFileObject createDynamicFile(FileName fileName)
     {
         return null;
     }
@@ -29,16 +33,6 @@ public class BuiltinElementFileObject extends AbstractPulseFileObject
     public String getIconCls()
     {
         return "reference-builtin-icon";
-    }
-
-    protected FileType doGetType() throws Exception
-    {
-        return FileType.FILE;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        return new String[0];
     }
 
     public BuiltinElementDocs getElementDocs()

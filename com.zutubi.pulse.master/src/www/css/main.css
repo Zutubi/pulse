@@ -1602,6 +1602,12 @@ ul.config-links li.invalid-property a:hover {
     width: 18px;
 }
 
+.x-tree-node-collapsed .reference-static-icon, .x-tree-node-expanded .reference-static-icon, .x-tree-node-leaf .reference-static-icon
+{
+	background-image: url(../images/page.gif);
+    width: 18px;
+}
+
 .x-tree-node-collapsed .reference-filetype-icon, .x-tree-node-expanded .reference-filetype-icon, .x-tree-node-leaf .reference-filetype-icon
 {
 	background-image: url(../images/page_code.gif);

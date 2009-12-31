@@ -53,19 +53,19 @@
 </p>
 <div class="example-snippet">&lt;macro name="build-command"&gt;
     &lt;command name="build"&gt;
-        &lt;executable exe="build-it.sh" args="MODE=${mode}"/&gt;
+        &lt;executable exe="build-it.sh" args="MODE=$(mode)"/&gt;
         &lt;artifact name="binary" file="bin/foo"/&gt;
     &lt;/command&gt;
 &lt;/macro&gt;
 
 &lt;recipe name="debug"&gt;
     &lt;property name="mode" value="DEBUG"/&gt;
-    &lt;macro-ref macro="\${build-command}"/&gt;
+    &lt;macro-ref macro="$(build-command)"/&gt;
 &lt;/recipe&gt;
 
 &lt;recipe name="release"&gt;
     &lt;property name="mode" value="RELEASE"/&gt;
-    &lt;macro-ref macro="\${build-command}"/&gt;
+    &lt;macro-ref macro="$(build-command)"/&gt;
 &lt;/recipe&gt;
 </div>
                           

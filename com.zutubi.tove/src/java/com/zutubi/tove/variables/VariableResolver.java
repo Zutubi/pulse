@@ -6,17 +6,22 @@ import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
+
+import static com.zutubi.util.CollectionUtils.asSet;
 
 /**
  * Methods for analysing and replacing variables within strings.
  */
 public class VariableResolver
 {
+    /**
+     * Set of all characters that are reserved for special meanings in the
+     * extended reference syntax $(...).
+     */
+    public static Set<Character> EXTENDED_SPECIAL_CHARS = asSet(')', '?', '|', '!', '%', '#', '&', '/', ':', ';');
+    
     private static final Map<String, UnaryFunction<String, String>> FILTER_FUNCTIONS = new HashMap<String, UnaryFunction<String, String>>();
 
     static

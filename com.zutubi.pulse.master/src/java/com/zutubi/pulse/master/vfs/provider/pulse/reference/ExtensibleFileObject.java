@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.marshal.doc.ExtensibleDocs;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.Sort;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.Collections;
@@ -16,7 +15,7 @@ import java.util.List;
  * A file object representing an {@link com.zutubi.pulse.core.marshal.doc.ExtensibleDocs}
  * node in the tove file doc tree.
  */
-public class ExtensibleFileObject extends AbstractPulseFileObject
+public class ExtensibleFileObject extends AbstractReferenceFileObject
 {
     private ExtensibleDocs extensibleDocs;
 
@@ -26,7 +25,14 @@ public class ExtensibleFileObject extends AbstractPulseFileObject
         this.extensibleDocs = extensibleDocs;
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    protected String[] getDynamicChildren()
+    {
+        List<String> children = new LinkedList<String>(extensibleDocs.getExtensions().keySet());
+        Collections.sort(children, new Sort.StringComparator());
+        return children.toArray(new String[children.size()]);
+    }
+
+    public AbstractPulseFileObject createDynamicFile(FileName fileName)
     {
         ElementDocs child = extensibleDocs.getExtensions().get(fileName.getBaseName());
         if (child == null)
@@ -41,18 +47,6 @@ public class ExtensibleFileObject extends AbstractPulseFileObject
     public String getIconCls()
     {
         return "reference-extensible-icon";
-    }
-
-    protected FileType doGetType() throws Exception
-    {
-        return extensibleDocs.getExtensions().size() == 0 ? FileType.FILE : FileType.FOLDER;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        List<String> children = new LinkedList<String>(extensibleDocs.getExtensions().keySet());
-        Collections.sort(children, new Sort.StringComparator());
-        return children.toArray(new String[children.size()]);
     }
 
     public ExtensibleDocs getExtensibleDocs()

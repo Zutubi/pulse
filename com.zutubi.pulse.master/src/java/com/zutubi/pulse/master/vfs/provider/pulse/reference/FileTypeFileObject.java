@@ -11,7 +11,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
  * Represents a type of tove file (e.g. a pulse file) in the tove file doc
  * tree.
  */
-public class FileTypeFileObject extends AbstractPulseFileObject
+public class FileTypeFileObject extends AbstractReferenceFileObject
 {
     private String root;
     private String displayName;
@@ -24,7 +24,12 @@ public class FileTypeFileObject extends AbstractPulseFileObject
         this.displayName = displayName;
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    protected String[] getDynamicChildren()
+    {
+        return new String[]{root};
+    }
+
+    public AbstractPulseFileObject createDynamicFile(FileName fileName)
     {
         ElementDocs child = toveFileDocManager.lookupRoot(fileName.getBaseName());
         if (child == null)
@@ -50,11 +55,6 @@ public class FileTypeFileObject extends AbstractPulseFileObject
     protected FileType doGetType() throws Exception
     {
         return FileType.FOLDER;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        return new String[]{root};
     }
 
     public void setToveFileDocManager(ToveFileDocManager toveFileDocManager)

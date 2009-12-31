@@ -2,10 +2,7 @@ package com.zutubi.pulse.master.tove.webwork.help;
 
 import com.zutubi.pulse.core.marshal.doc.NodeDocs;
 import com.zutubi.pulse.master.vfs.VfsManagerFactoryBean;
-import com.zutubi.pulse.master.vfs.provider.pulse.reference.BuiltinElementFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.reference.ElementFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.reference.ExtensibleFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.reference.FileTypeFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.reference.*;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
@@ -21,10 +18,12 @@ public class ReferenceAction extends ActionSupport
     private static final String RESULT_ELEMENT = "element";
     private static final String RESULT_EXTENSIBLE = "extensible";
     private static final String RESULT_FILETYPE = "filetype";
+    private static final String RESULT_ROOT = "root";
     private static final String RESULT_STATIC = "static";
 
     private String path;
     private String parentPath;
+    private String staticPath;
     private String baseName;
     private NodeDocs docs;
 
@@ -50,6 +49,11 @@ public class ReferenceAction extends ActionSupport
         return baseName;
     }
 
+    public String getStaticPath()
+    {
+        return staticPath;
+    }
+
     public NodeDocs getDocs()
     {
         return docs;
@@ -73,6 +77,10 @@ public class ReferenceAction extends ActionSupport
         baseName = PathUtils.getBaseName(path);
         parentPath = PathUtils.getParentPath(path);
 
+        if (fileObject instanceof ReferenceRootFileObject)
+        {
+            return RESULT_ROOT;
+        }
         if (fileObject instanceof FileTypeFileObject)
         {
             return RESULT_FILETYPE;
@@ -94,6 +102,7 @@ public class ReferenceAction extends ActionSupport
         }
         else
         {
+            staticPath = ((StaticReferenceFileObject) fileObject).getStaticPath();
             return RESULT_STATIC;
         }
     }

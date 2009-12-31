@@ -506,7 +506,8 @@
             <result name="element" type="velocity">reference/element.vm</result>
             <result name="extensible" type="velocity">reference/extensible.vm</result>
             <result name="filetype" type="velocity">reference/filetypes/${baseName}.vm</result>
-            <result name="static" type="velocity">reference/static/${baseName}.vm</result>
+            <result name="root" type="velocity">reference/index.vm</result>
+            <result name="static" type="velocity">reference/static/${staticPath}.vm</result>
         </action>
 
         <action name="takeResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.TakeResponsibilityAction">

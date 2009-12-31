@@ -8,6 +8,7 @@ import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
+import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
@@ -53,15 +54,23 @@ public class ToveFileUtils
     }
 
     /**
-     * Converts a reference name into a reference (i.e. wraps it in the ${}
-     * syntax).
+     * Converts a reference name into a reference (i.e. wraps it in the $()
+     * syntax, or ${} if the name includes a reserved character).
      *
      * @param referenceName the name being referenced
      * @return string form of the reference
      */
     public static String toReference(String referenceName)
     {
-        return "${" + referenceName + "}";
+        for (int i = 0; i < referenceName.length(); i++)
+        {
+            if (VariableResolver.EXTENDED_SPECIAL_CHARS.contains(referenceName.charAt(i)))
+            {
+                return "${" + referenceName + "}";
+            }
+        }
+
+        return "$(" + referenceName + ")";
     }
 
     /**

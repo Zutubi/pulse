@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
 import com.zutubi.pulse.core.marshal.ToveFileUtils;
-import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Internal;
@@ -16,21 +15,23 @@ import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.validation.annotations.Required;
 import nu.xom.Element;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import static java.util.Arrays.asList;
 import java.util.*;
+
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
+import static com.zutubi.util.CollectionUtils.map;
+import static com.zutubi.util.reflection.MethodPredicates.*;
+import static java.util.Arrays.asList;
 
 /**
  * Analyses types and creates data structures representing tove file
@@ -51,6 +52,7 @@ public class ToveFileDocManager
     private static final String KEY_SUFFIX_CONTENT           = "content";
     private static final String KEY_PREFIX_EXAMPLE           = "example";
     private static final String KEY_SUFFIX_EXAMPLE_BLURB     = "blurb";
+    private static final String KEY_REFERENCE                = "reference";
 
     private static final String EXAMPLE_METHOD_PREFIX = "get";
 
@@ -204,7 +206,8 @@ public class ToveFileDocManager
             }
 
             Messages messages = Messages.getInstance(type.getClazz());
-            docs = new ElementDocs(typeDocs.getBrief(), typeDocs.getVerbose());
+            String verbose = messages.isKeyDefined(KEY_REFERENCE) ? messages.format(KEY_REFERENCE) : typeDocs.getVerbose();
+            docs = new ElementDocs(typeDocs.getBrief(), verbose);
             concreteCache.put(type, docs);
 
             for (TypeProperty property: type.getProperties())

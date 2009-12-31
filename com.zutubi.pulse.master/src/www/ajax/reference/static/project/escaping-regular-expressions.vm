@@ -1,0 +1,48 @@
+<h1>Escaping Regular Expressions In Pulse Files</h1>
+<p>
+    When you write a regular expression in a Pulse file, care must be taken to escape the special
+    characters $ and &#92;, as they have meanings both to Pulse and in regular expressions.
+</p>
+<p>
+    For more general information about regular expressions, see
+    <a href="#" onclick="selectNode('/reference/regular-expressions'); return false">Regular Expressions</a>.
+</p>
+
+<h2>Backslashes</h2>
+<p>
+    The backslash character (&#92;) is used as an escape character in both Pulse files and regular
+    expressions. Thus, you must pay close attention to how backslashes are used in your regular
+    expressions. Often, you will want to escape special characters (such as '.') in your
+    expressions. To do so, you must preceed them with a backslash in the expression. For example,
+    to match file names ending in ".cpp", you need the regular expression:
+
+    <div class="example-snippet">*\.cpp</div>
+
+    Now, to enter this expression in a Pulse file, you must add another backslash, as the Pulse file
+    itself treats backslashes specially. So you would need something like:
+
+    <div class="example-snippet">&lt;pattern category="info" expression="*&#92;&#92;.cpp"/&gt;</div>
+
+    If you need to actually match the backslash character itself within a regular expression, your
+    expression must contain two backslashes. For example:
+
+    <div class="example-snippet">sample&#92;&#92;file&#92;&#92;path</div>
+
+    To express this pattern in a Pulse file, you must escape each of the backslashes, giving:
+
+    <div class="example-snippet">&lt;pattern category="info" expression="sample&#92;&#92;&#92;&#92;file&#92;&#92;&#92;&#92;path"/&gt;</div>
+</p>
+
+<h2>Dollar Signs</h2>
+<p>
+    The dollar sign ($) character also has a special meaning in both Pulse files (a property
+    reference) and regular expressions (end of line). Thus to use the dollar sign to match the end
+    of line in an expression, you must escape it in your Pulse file:
+
+    <div class="example-snippet">&lt;pattern category="info" expression="line ends here&#92;$"/&gt;</div>
+
+    To match a literal dollar sign in your expression, it must be escaped with a backslash in the
+    pattern. To express this pattern in a Pulse file, the backslash itself needs escaping, hence:
+
+    <div class="example-snippet">&lt;pattern category="info" expression="&#92;&#92;$100"/&gt;</div>
+</p>

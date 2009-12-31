@@ -53,8 +53,8 @@
 <h4>import/commands.xml</h4>
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;root&gt;
-    &lt;make name="build" targets="all" args="-Dmode=${mode}"/&gt;
-    &lt;make name="test" targets="test" args="-Dmode=${mode}"/&gt;
+    &lt;make name="build" targets="all" args="-Dmode=$(mode)"/&gt;
+    &lt;make name="test" targets="test" args="-Dmode=$(mode)"/&gt;
 &lt;/root&gt;</div>
 
 <h4>pulse.xml</h4>

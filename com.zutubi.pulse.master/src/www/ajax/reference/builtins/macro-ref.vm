@@ -4,17 +4,17 @@
     at an arbitraty point in a pulse file.  The macro reference is effectively replaced with the
     body of the macro.  To illustrate:
 </p>
-<div class="code">&lt;macro name="mack"&gt;
+<div class="example-snippet">&lt;macro name="mack"&gt;
     &lt;property name="foo" value="bar"/&gt;
 &lt;/macro&gt;
 
-&lt;macro-ref macro="${mack}"/&gt;</div>
+&lt;macro-ref macro="$(mack)"/&gt;</div>
 
 <p>
     is equivalent to:
 </p>
 
-<div class="code">&lt;property name="foo" value="bar"/&gt;</div>
+<div class="example-snippet">&lt;property name="foo" value="bar"/&gt;</div>
 
 <p>
     The body of the macro, including references to named entities, is evaluated at the point (and
@@ -32,7 +32,7 @@
         </tr>
         <tr>
             <td class="nowrap">macro</td>
-            <td>The macro to be referenced (e.g. ${my.macro}).</td>
+            <td>The macro to be referenced (e.g. $(my.macro)).</td>
             <td>true</td>
             <td> </td>
         </tr>
