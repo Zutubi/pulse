@@ -224,9 +224,23 @@ public class ZutubiTestCase extends TestCase
      */
     public static void removeDirectory(File dir) throws IOException
     {
-        if (!FileSystemUtils.rmdir(dir))
+        // add some retries because windows 7 is still not brown enough.
+        int retryCount = 0;
+        while (retryCount < 3 && !FileSystemUtils.rmdir(dir))
         {
-            throw new IOException("Failed to remove " + dir);
+            retryCount++;
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                // noop.
+            }
+        }
+        if (dir.exists())
+        {
+            throw new IOException("Unable to remove '" + dir + "' because your OS is not brown enough");
         }
     }
 }

@@ -2,8 +2,7 @@ package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
@@ -28,7 +27,7 @@ public class LastAccessManager
     private static final long FLUSH_INTERVAL = 5 * Constants.MINUTE;
 
     private final Map<Long, Long> idToTime = new HashMap<Long, Long>();
-    private Scheduler scheduler;
+    private CallbackService callbackService;
     private SessionFactory sessionFactory;
     private UserManager userManager;
 
@@ -36,7 +35,7 @@ public class LastAccessManager
     {
         try
         {
-            scheduler.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(new NullaryProcedure()
             {
                 public void run()
                 {
@@ -44,7 +43,7 @@ public class LastAccessManager
                 }
             }, FLUSH_INTERVAL);
         }
-        catch (SchedulingException e)
+        catch (Exception e)
         {
             LOG.severe(e);
         }
@@ -142,9 +141,9 @@ public class LastAccessManager
         }
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setCallbackService(CallbackService callbackService)
     {
-        this.scheduler = scheduler;
+        this.callbackService = callbackService;
     }
 
     public void setSessionFactory(SessionFactory sessionFactory)

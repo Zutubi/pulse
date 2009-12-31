@@ -40,7 +40,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.rmdir(persistentDirectory));
+        removeDirectory(persistentDirectory);
 
         super.tearDown();
     }

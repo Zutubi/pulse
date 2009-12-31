@@ -50,10 +50,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.rmdir(tmpDir))
-        {
-            throw new IOException("Failed to remove " + tmpDir);
-        }
+        removeDirectory(tmpDir);
 
         super.tearDown();
     }

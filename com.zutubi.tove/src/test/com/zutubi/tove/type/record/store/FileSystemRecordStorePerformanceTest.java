@@ -38,9 +38,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
 
     protected void tearDown() throws Exception
     {
-        transactionManager = null;
-
-        assertTrue(FileSystemUtils.rmdir(persistentDirectory));
+        removeDirectory(persistentDirectory);
 
         super.tearDown();
     }

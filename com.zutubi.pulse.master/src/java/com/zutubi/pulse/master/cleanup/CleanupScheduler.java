@@ -11,8 +11,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.ObjectFactory;
@@ -38,7 +37,7 @@ public class CleanupScheduler implements Stoppable
 
     private EventManager eventManager;
     private EventListener eventListener;
-    private Scheduler scheduler;
+    private CallbackService callbackService;
     private ObjectFactory objectFactory;
     private CleanupManager cleanupManager;
     private ProjectManager projectManager;
@@ -53,7 +52,7 @@ public class CleanupScheduler implements Stoppable
     {
         try
         {
-            scheduler.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(new NullaryProcedure()
             {
                 public void run()
                 {
@@ -61,7 +60,7 @@ public class CleanupScheduler implements Stoppable
                 }
             }, Constants.DAY);
         }
-        catch (SchedulingException e)
+        catch (Exception e)
         {
             LOG.severe(e);
         }
@@ -104,9 +103,9 @@ public class CleanupScheduler implements Stoppable
         this.eventManager = eventManager;
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setCallbackService(CallbackService callbackService)
     {
-        this.scheduler = scheduler;
+        this.callbackService = callbackService;
     }
 
     public void setCleanupManager(CleanupManager cleanupManager)

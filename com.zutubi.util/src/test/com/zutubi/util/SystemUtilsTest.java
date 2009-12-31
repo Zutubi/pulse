@@ -3,12 +3,9 @@ package com.zutubi.util;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.net.URL;
-import java.net.URISyntaxException;
 
 /**
+ * NOTE: cygwin is requried on the path for windows machines.
  */
 public class SystemUtilsTest extends ZutubiTestCase
 {

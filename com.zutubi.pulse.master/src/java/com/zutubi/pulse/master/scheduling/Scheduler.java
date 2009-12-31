@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.util.NullaryProcedure;
 
 import java.util.List;
-import java.util.Date;
 
 /**
  * The scheduler defines the scheduling services available to the system.
@@ -127,44 +125,4 @@ public interface Scheduler extends Stoppable
      * @throws SchedulingException on error.
      */
     void resume(Trigger trigger) throws SchedulingException;
-
-    /**
-     * Register a procedure that will be triggered at a regular interval.
-     *
-     * @param callback  the callback procedure to be triggered.
-     * @param interval  the interval (in milliseconds) at which the callback will be triggered.
-     * @throws SchedulingException if there is a problem scheduling the
-     * regular callback.
-     */
-    void registerCallback(NullaryProcedure callback, long interval) throws SchedulingException;
-
-    /**
-     * Register a procedure that will be triggered at the specified time.
-     *
-     * @param callback  the callback procedure to be triggered.
-     * @param when      the time at which the procedure will be triggered.
-     * @throws SchedulingException if there is a problem scheduling the
-     * callback.
-     */
-    void registerCallback(NullaryProcedure callback, Date when) throws SchedulingException;
-
-    /**
-     * Unregister the procedure from being triggered.
-     *
-     * @param callback  the callback procedure that will no longer be triggered.
-     * @return true if the callback is found and unregistered, false otherwise.
-     *
-     * @throws SchedulingException on error.
-     */
-    boolean unregisterCallback(NullaryProcedure callback) throws SchedulingException;
-
-    /**
-     * A method used by the internal implementation to handle the callback mechanism.
-     * This is of no use to external clients.
-     *
-     * @param triggerName  the name of the trigger associated with a callback.
-     *
-     * @return the named callback, or null if it is not found.
-     */
-    NullaryProcedure getCallback(String triggerName);
 }

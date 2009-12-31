@@ -9,22 +9,40 @@ import java.io.IOException;
 
 public class ZipUtilsTest extends ZutubiTestCase
 {
+    private File tmpDir;
+
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        tmpDir = FileSystemUtils.createTempDir();
+    }
+
+    @Override
+    protected void tearDown() throws Exception
+    {
+        removeDirectory(tmpDir);
+
+        super.tearDown();
+    }
+
     public void testCompressUncompressEmpty() throws IOException
     {
-        File f = File.createTempFile(getName(), ".tmp");
+        File f = File.createTempFile(getName(), ".tmp", tmpDir);
         doCompressRoundTrip(f);
     }
 
     public void testCompressUncompressSmall() throws IOException
     {
-        File f = File.createTempFile(getName(), ".tmp");
+        File f = File.createTempFile(getName(), ".tmp", tmpDir);
         FileSystemUtils.createFile(f, "a little data");
         doCompressRoundTrip(f);
     }
 
     public void testCompressUncompressLarge() throws IOException
     {
-        File f = File.createTempFile(getName(), ".tmp");
+        File f = File.createTempFile(getName(), ".tmp", tmpDir);
         String random = RandomUtils.randomString(1024);
         byte[] randomBytes = random.getBytes();
         FileOutputStream os = new FileOutputStream(f);
@@ -71,7 +89,7 @@ public class ZipUtilsTest extends ZutubiTestCase
 
     public void testCompressUncompressOutFilesExist() throws IOException
     {
-        File in = File.createTempFile(getName(), ".tmp");
+        File in = File.createTempFile(getName(), ".tmp", tmpDir);
         File compressed = new File(in.getAbsolutePath() + ".compressed");
         File uncompressed = new File(in.getAbsolutePath() + ".uncompressed");
         FileSystemUtils.createFile(in, "a little data");

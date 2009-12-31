@@ -40,9 +40,7 @@ import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.scheduling.DefaultScheduler;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -92,7 +90,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private int pendingRecipes = 0;
-    private Scheduler scheduler;
+    private CallbackService callbackService;
 
     private BuildResult previousSuccessful;
     private PulseExecutionContext buildContext;
@@ -668,10 +666,10 @@ public class DefaultBuildController implements EventListener, BuildController
                     RecipeTimeoutCallback callback = timeoutCallbacks.get(e.getRecipeId());
                     if (callback != null)
                     {
-                        scheduler.unregisterCallback(callback);
+                        callbackService.unregisterCallback(callback);
                     }
                 }
-                catch (SchedulingException ex)
+                catch (Exception ex)
                 {
                     LOG.warning("Unable to unschedule timeout trigger: " + ex.getMessage(), ex);
                 }
@@ -791,14 +789,13 @@ public class DefaultBuildController implements EventListener, BuildController
     {
         Date timeoutAt = new Date(System.currentTimeMillis() + projectConfig.getOptions().getTimeout() * Constants.MINUTE);
 
-        DefaultScheduler scheduler = new DefaultScheduler();
         try
         {
             RecipeTimeoutCallback timeoutCallback = new RecipeTimeoutCallback(buildResult.getId(), recipeId);
             timeoutCallbacks.put(recipeId, timeoutCallback);
-            scheduler.registerCallback(timeoutCallback, timeoutAt);
+            callbackService.registerCallback(timeoutCallback, timeoutAt);
         }
-        catch (SchedulingException e)
+        catch (Exception e)
         {
             LOG.severe("Unable to schedule build timeout callback: " + e.getMessage(), e);
         }
@@ -1088,9 +1085,9 @@ public class DefaultBuildController implements EventListener, BuildController
         this.collector = collector;
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setCallbackService(CallbackService callbackService)
     {
-        this.scheduler = scheduler;
+        this.callbackService = callbackService;
     }
 
     public void setScmManager(ScmManager scmManager)

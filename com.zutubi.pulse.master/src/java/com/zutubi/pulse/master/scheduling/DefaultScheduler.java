@@ -4,14 +4,10 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.NullaryProcedure;
-import com.zutubi.util.Pair;
-import com.zutubi.util.Predicate;
+import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The implementation of the scheduler interface.  It provides persistence of
@@ -20,19 +16,17 @@ import static com.zutubi.util.CollectionUtils.asPair;
  */
 public class DefaultScheduler implements Scheduler
 {
-    private static final String CALLBACK_TRIGGER_GROUP = "callback-triggers";
-
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
 
     private Map<String, SchedulerStrategy> strategies = new TreeMap<String, SchedulerStrategy>();
 
-    private TriggerHandler triggerHandler;
-
     private TriggerDao triggerDao;
 
-    private Map<String, Pair<NullaryProcedure, Trigger>> registeredCallbacks = new HashMap<String, Pair<NullaryProcedure, Trigger>>();
-    private List<Pair<NullaryProcedure, Trigger>> callbacksToRegister = new LinkedList<Pair<NullaryProcedure, Trigger>>();
-    private long nextCallbackId = 1;
+    /**
+     * The list of triggers that are not persistent across restarts.  Any state changes
+     * made to these triggers is lost on restart.
+     */
+    private List<Trigger> transientTriggers = new LinkedList<Trigger>();
 
     private volatile boolean started = false;
 
@@ -47,7 +41,6 @@ public class DefaultScheduler implements Scheduler
         {
             strategies.put(key, strategy);
         }
-        strategy.setTriggerHandler(triggerHandler);
     }
 
     /**
@@ -82,21 +75,14 @@ public class DefaultScheduler implements Scheduler
     {
         try
         {
-            // ensure that the strategies are correctly configured.
-            for (SchedulerStrategy strategy : strategies.values())
-            {
-                strategy.setTriggerHandler(triggerHandler);
-            }
-
             // initialise the persisted triggers.
             for (Trigger trigger : triggerDao.findAll())
             {
                 if (isTriggerValid(trigger))
                 {
-                    SchedulerStrategy strategy = getStrategy(trigger);
                     try
                     {
-                        strategy.init(trigger);
+                        getStrategy(trigger).init(trigger);
                     }
                     catch (SchedulingException e)
                     {
@@ -107,18 +93,16 @@ public class DefaultScheduler implements Scheduler
                 }
             }
 
-            // initialise the already registered callbacks.
-            for (Pair<NullaryProcedure, Trigger> value : callbacksToRegister)
+            // initialise the already registered transient triggers.
+            for (Trigger trigger : transientTriggers)
             {
-                Trigger trigger = value.getSecond();
                 try
                 {
-                    registeredCallbacks.put(trigger.getName(), value);
-                    getStrategy(trigger).schedule(trigger);
+                    getStrategy(trigger).init(trigger);
                 }
                 catch (SchedulingException e)
                 {
-                    LOG.severe("Failed to initialise callback (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
+                    LOG.severe("Failed to initialise a trigger (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
                 }
             }
         }
@@ -141,6 +125,11 @@ public class DefaultScheduler implements Scheduler
 
     public Trigger getTrigger(String name, String group)
     {
+        Trigger trigger = CollectionUtils.find(transientTriggers, new TriggerByNameAndGroupPredicate(name, group));
+        if (trigger != null)
+        {
+            return trigger;
+        }
         return triggerDao.findByNameAndGroup(name, group);
     }
 
@@ -151,28 +140,42 @@ public class DefaultScheduler implements Scheduler
 
     public List<Trigger> getTriggers()
     {
-        return triggerDao.findAll();
+        return CollectionUtils.mergeToList(
+                triggerDao.findAll(),
+                transientTriggers);
     }
 
     public List<Trigger> getTriggers(long project)
     {
-        return triggerDao.findByProject(project);
+        return CollectionUtils.mergeToList(
+                triggerDao.findByProject(project),
+                CollectionUtils.filter(transientTriggers, new TriggerByProjectPredicate(project)));
+    }
+
+    public List<Trigger> getTriggers(String group)
+    {
+        return CollectionUtils.mergeToList(
+                triggerDao.findByGroup(group),
+                CollectionUtils.filter(transientTriggers, new TriggerByGroupPredicate(group)));
     }
 
     public Trigger getTrigger(long project, String triggerName)
     {
+        Trigger trigger = CollectionUtils.find(transientTriggers, new ConjunctivePredicate<Trigger>(
+                new TriggerByProjectPredicate(project), new TriggerByNamePredicate(triggerName)
+        ));
+        if (trigger != null)
+        {
+            return trigger;
+        }
         return triggerDao.findByProjectAndName(project, triggerName);
     }
 
     public void schedule(Trigger trigger) throws SchedulingException
     {
-        if (!trigger.isPersistent())
+        if (getTrigger(trigger.getName(), trigger.getGroup()) != null)
         {
-            Trigger existingTrigger = triggerDao.findByNameAndGroup(trigger.getName(), trigger.getGroup());
-            if (existingTrigger != null)
-            {
-                throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been scheduled.");
-            }
+            throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been scheduled.");
         }
 
         if (trigger.isScheduled())
@@ -180,46 +183,61 @@ public class DefaultScheduler implements Scheduler
             throw new SchedulingException("Trigger is already scheduled.");
         }
 
-        trigger.setState(TriggerState.SCHEDULED);
-        triggerDao.save(trigger);
-
-        try
+        SchedulerStrategy impl = getStrategy(trigger);
+        if (impl == null)
         {
-            if (started)
-            {
-                SchedulerStrategy impl = getStrategy(trigger);
-                if (impl == null)
-                {
-                    throw new SchedulingException("No strategy associated with trigger of type " + trigger.getType());
-                }
-                impl.schedule(trigger);
-            }
+            throw new SchedulingException("No strategy associated with trigger of type " + trigger.getType());
         }
-        catch (SchedulingException e)
+
+        trigger.setState(TriggerState.SCHEDULED);
+
+        if (started)
         {
-            triggerDao.delete(trigger);
-            throw e;
+            impl.schedule(trigger);
+        }
+
+        if (trigger.isTransient())
+        {
+            transientTriggers.add(trigger);
+        }
+        else
+        {
+            triggerDao.save(trigger);    
         }
     }
 
-    public void unschedule(final Trigger trigger) throws SchedulingException
+    public void unschedule(Trigger trigger) throws SchedulingException
     {
-        assertScheduled(trigger);
+        if (getTrigger(trigger.getName(), trigger.getGroup()) == null)
+        {
+            throw new SchedulingException("Trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " is unknown.");
+        }
 
-        trigger.setState(TriggerState.NONE);
-        triggerDao.save(trigger);
+        assertScheduled(trigger);
 
         SchedulerStrategy impl = getStrategy(trigger);
         impl.unschedule(trigger);
 
-        triggerDao.delete(trigger);
+        trigger.setState(TriggerState.NONE);
+
+        if (trigger.isTransient())
+        {
+            transientTriggers.remove(trigger);
+        }
+        else
+        {
+            triggerDao.delete(trigger);
+        }
     }
 
     public void update(Trigger trigger) throws SchedulingException
     {
         assertScheduled(trigger);
 
-        triggerDao.save(trigger);
+        if (!trigger.isTransient())
+        {
+            triggerDao.save(trigger);
+        }
 
         TriggerState state = trigger.getState();
 
@@ -239,7 +257,7 @@ public class DefaultScheduler implements Scheduler
 
     public void pause(String group) throws SchedulingException
     {
-        for (Trigger trigger : triggerDao.findByGroup(group))
+        for (Trigger trigger : getTriggers(group))
         {
             pause(trigger);
         }
@@ -254,7 +272,10 @@ public class DefaultScheduler implements Scheduler
         }
 
         trigger.setState(TriggerState.PAUSED);
-        triggerDao.save(trigger);
+        if (!trigger.isTransient())
+        {
+            triggerDao.save(trigger);
+        }
 
         SchedulerStrategy impl = getStrategy(trigger);
         impl.pause(trigger);
@@ -262,7 +283,7 @@ public class DefaultScheduler implements Scheduler
 
     public void resume(String group) throws SchedulingException
     {
-        for (Trigger trigger : triggerDao.findByGroup(group))
+        for (Trigger trigger : getTriggers(group))
         {
             resume(trigger);
         }
@@ -277,78 +298,13 @@ public class DefaultScheduler implements Scheduler
         }
 
         trigger.setState(TriggerState.SCHEDULED);
-        triggerDao.save(trigger);
+        if (!trigger.isTransient())
+        {
+            triggerDao.save(trigger);
+        }
 
         SchedulerStrategy impl = getStrategy(trigger);
         impl.resume(trigger);
-    }
-
-    public void registerCallback(NullaryProcedure callback, Date when) throws SchedulingException
-    {
-        SimpleTrigger trigger = new SimpleTrigger(String.valueOf(nextCallbackId++), CALLBACK_TRIGGER_GROUP, when);
-        trigger.setTaskClass(CallbackTask.class);
-
-        registerCallbackTrigger(callback, trigger);
-    }
-
-    public void registerCallback(NullaryProcedure callback, long interval) throws SchedulingException
-    {
-        SimpleTrigger trigger = new SimpleTrigger(String.valueOf(nextCallbackId++), CALLBACK_TRIGGER_GROUP, interval);
-        trigger.setTaskClass(CallbackTask.class);
-
-        registerCallbackTrigger(callback, trigger);
-    }
-
-    private synchronized void registerCallbackTrigger(NullaryProcedure callback, Trigger trigger) throws SchedulingException
-    {
-        SchedulerStrategy impl = getStrategy(trigger);
-        if (impl == null)
-        {
-            throw new SchedulingException("No strategy associated with trigger of type " + trigger.getType());
-        }
-
-        Pair<NullaryProcedure, Trigger> value = asPair(callback, trigger);
-        if (started)
-        {
-            registeredCallbacks.put(trigger.getName(), value);
-            impl.schedule(trigger);
-        }
-        else
-        {
-            // defer the scheduling of this trigger till we start the scheduler.
-            callbacksToRegister.add(value);
-        }
-    }
-
-    public synchronized NullaryProcedure getCallback(String name)
-    {
-        if (registeredCallbacks.containsKey(name))
-        {
-            return registeredCallbacks.get(name).getFirst();
-        }
-        return null;
-    }
-
-    public synchronized boolean unregisterCallback(NullaryProcedure callback) throws SchedulingException
-    {
-        HasCallbackPredicate hasCallbackPredicate = new HasCallbackPredicate(callback);
-        Pair<NullaryProcedure, Trigger> found = CollectionUtils.find(registeredCallbacks.values(), hasCallbackPredicate);
-        if (found == null)
-        {
-            found = CollectionUtils.find(callbacksToRegister, hasCallbackPredicate);
-        }
-        if (found == null)
-        {
-            return false;
-        }
-
-        Trigger trigger = found.getSecond();
-        getStrategy(trigger).unschedule(trigger);
-
-        registeredCallbacks.remove(trigger.getName());
-        callbacksToRegister.remove(found);
-
-        return true;
     }
 
     /**
@@ -364,7 +320,7 @@ public class DefaultScheduler implements Scheduler
 
     private void assertScheduled(Trigger trigger) throws SchedulingException
     {
-        if (!trigger.isScheduled())
+        if (getTrigger(trigger.getName(), trigger.getGroup()) == null)
         {
             throw new SchedulingException("The trigger must be scheduled.");
         }
@@ -378,11 +334,6 @@ public class DefaultScheduler implements Scheduler
     public void setTriggerDao(TriggerDao triggerDao)
     {
         this.triggerDao = triggerDao;
-    }
-
-    public void setTriggerHandler(TriggerHandler triggerHandler)
-    {
-        this.triggerHandler = triggerHandler;
     }
 
     public void setEventManager(EventManager eventManager)
@@ -414,47 +365,6 @@ public class DefaultScheduler implements Scheduler
         finally
         {
             started = false;
-        }
-    }
-
-    private static class HasCallbackPredicate implements Predicate<Pair<NullaryProcedure, Trigger>>
-    {
-        private NullaryProcedure callback;
-
-        private HasCallbackPredicate(NullaryProcedure callback)
-        {
-            this.callback = callback;
-        }
-
-        public boolean satisfied(Pair<NullaryProcedure, Trigger> pair)
-        {
-            return pair.getFirst() == callback;
-        }
-    }
-
-    public static class CallbackTask implements Task
-    {
-        private Scheduler scheduler;
-
-        public void execute(TaskExecutionContext context)
-        {
-            NullaryProcedure callback = scheduler.getCallback(context.getTrigger().getName());
-            if (callback != null)
-            {
-                try
-                {
-                    callback.run();
-                }
-                catch (Exception e)
-                {
-                    LOG.warning("Uncaught exception generated by callback: " + e.getMessage(), e);
-                }
-            }
-        }
-
-        public void setScheduler(Scheduler scheduler)
-        {
-            this.scheduler = scheduler;
         }
     }
 }

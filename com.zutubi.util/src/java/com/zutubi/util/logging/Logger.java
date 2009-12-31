@@ -236,7 +236,7 @@ public class Logger
 
     public void entering(String source, String method)
     {
-        delegate.entering(sourceClass, sourceMethod);
+        delegate.entering(source, method);
     }
 
     public void exiting()

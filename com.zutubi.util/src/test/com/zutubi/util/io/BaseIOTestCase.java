@@ -18,8 +18,7 @@ public abstract class BaseIOTestCase extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.rmdir(tmp));
-        tmp = null;
+        removeDirectory(tmp);
         super.tearDown();
     }
 

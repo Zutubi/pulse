@@ -14,16 +14,15 @@ public class DefaultRecordSerialiserTest extends ZutubiTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
         tmpDir = FileSystemUtils.createTempDir(getName(), "");
         serialiser = new DefaultRecordSerialiser(tmpDir);
     }
 
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.rmdir(tmpDir))
-        {
-            throw new RuntimeException("Failed to clean up " + tmpDir.getAbsolutePath());
-        }
+        removeDirectory(tmpDir);
+        super.tearDown();
     }
 
     public void testSimple() throws IOException

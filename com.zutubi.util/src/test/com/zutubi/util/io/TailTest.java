@@ -1,25 +1,10 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.FileSystemUtils;
-
 import java.io.File;
 import java.io.IOException;
 
 public class TailTest extends BaseIOTestCase
 {
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        tmp = FileSystemUtils.createTempDir();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        FileSystemUtils.rmdir(tmp);
-        super.tearDown();
-    }
-
     public void testDefaultTail() throws IOException
     {
         File f = generateTestFile(100);

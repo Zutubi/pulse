@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.scm.polling;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -13,20 +14,19 @@ import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
 import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.i18n.Messages;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -44,7 +44,7 @@ public class PollingServiceTest extends ZutubiTestCase
     private EventManager eventManager;
     private ThreadFactory threadFactory;
     private ShutdownManager shutdownManager;
-    private Scheduler scheduler;
+    private CallbackService callbackService;
     private ProjectManager projectManager;
     private WiringObjectFactory objectFactory;
     private RecordingEventListener eventListener;
@@ -92,7 +92,7 @@ public class PollingServiceTest extends ZutubiTestCase
         configurationProvider = mock(ConfigurationProvider.class);
         stub(configurationProvider.get(GlobalConfiguration.class)).toReturn(globalConfiguration);
 
-        scheduler = mock(Scheduler.class);
+        callbackService = mock(CallbackService.class);
         shutdownManager = mock(ShutdownManager.class);
         projectManager = mock(ProjectManager.class);
 
@@ -119,11 +119,11 @@ public class PollingServiceTest extends ZutubiTestCase
         super.tearDown();
     }
 
-    public void testInitialisationRunsExpectedRequests() throws SchedulingException
+    public void testInitialisationRunsExpectedRequests() throws Exception
     {
         serviceHandle.init();
 
-        verify(scheduler, times(1)).registerCallback((NullaryProcedure) anyObject(), anyLong());
+        verify(callbackService, times(1)).registerCallback((NullaryProcedure) anyObject(), anyLong());
         verify(shutdownManager, times(1)).addStoppable(service);
     }
 

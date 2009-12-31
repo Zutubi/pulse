@@ -66,6 +66,16 @@ public class CollectionUtils
         return result.toArray((T[])Array.newInstance(in.getClass().getComponentType(), result.size()));
     }
 
+    public static <T> List<T> mergeToList(Collection<T>... collections)
+    {
+        List<T> result = new LinkedList<T>();
+        for (Collection<T> collection : collections)
+        {
+            result.addAll(collection);
+        }
+        return result;
+    }
+
     public static <T, U> List<U> map(Iterable<T> l, Mapping<T, U> m)
     {
         List<U> result = new LinkedList<U>();

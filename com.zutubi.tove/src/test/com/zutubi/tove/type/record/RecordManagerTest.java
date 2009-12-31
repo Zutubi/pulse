@@ -46,10 +46,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.rmdir(tempDir))
-        {
-            throw new RuntimeException("Unable to remove '" + tempDir + "' because your OS is not brown enough");
-        }
+        removeDirectory(tempDir);
 
         super.tearDown();
     }

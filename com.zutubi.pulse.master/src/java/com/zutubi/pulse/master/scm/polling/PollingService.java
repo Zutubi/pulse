@@ -11,7 +11,7 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
-import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.scm.util.PredicateRequest;
@@ -44,7 +44,7 @@ public class PollingService implements Stoppable
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
 
     private ProjectManager projectManager;
-    private Scheduler scheduler;
+    private CallbackService callbackService;
     private EventManager eventManager;
     private ThreadFactory threadFactory;
     private ShutdownManager shutdownManager;
@@ -73,7 +73,7 @@ public class PollingService implements Stoppable
 
         try
         {
-            scheduler.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(new NullaryProcedure()
             {
                 public void run()
                 {
@@ -340,9 +340,9 @@ public class PollingService implements Stoppable
         }
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setCallbackService(CallbackService callbackService)
     {
-        this.scheduler = scheduler;
+        this.callbackService = callbackService;
     }
 
     public void setProjectManager(ProjectManager projectManager)

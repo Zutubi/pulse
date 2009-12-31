@@ -57,6 +57,12 @@ public abstract class Trigger extends Entity implements NamedEntity
     private TriggerConfiguration config;
 
     /**
+     * Indicates whether or not this trigger should be persisted.  Trigger are
+     * persisted unless otherwise specified.
+     */
+    private boolean isTransient;
+
+    /**
      * The no argument constructor should not be used directly. It is made available so
      * that triggers can be created via the use of newInstance(). A trigger should have
      * at least a name.
@@ -229,5 +235,35 @@ public abstract class Trigger extends Entity implements NamedEntity
     public void setConfig(TriggerConfiguration config)
     {
         this.config = config;
+    }
+
+    public boolean isTransient()
+    {
+        return this.isTransient;
+    }
+
+    public void setTransient(boolean b)
+    {
+        this.isTransient = b;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!(other instanceof Trigger))
+        {
+            return false;
+        }
+        Trigger otherTrigger = (Trigger) other;
+        return getName().equals(otherTrigger.getName()) && getGroup().equals(otherTrigger.getGroup());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (group != null ? group.hashCode() : 0);
+        return result;
     }
 }

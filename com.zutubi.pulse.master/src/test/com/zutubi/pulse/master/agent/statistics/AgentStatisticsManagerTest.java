@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
-import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TestClock;
 
@@ -60,7 +60,7 @@ public class AgentStatisticsManagerTest extends PulseTestCase
         agentStatisticsManager.setClock(clock);
         agentStatisticsManager.setAgentManager(agentManager);
         agentStatisticsManager.setAgentDailyStatisticsDao(agentDailyStatisticsDao);
-        agentStatisticsManager.setScheduler(mock(Scheduler.class));
+        agentStatisticsManager.setCallbackService(mock(CallbackService.class));
         agentStatisticsManager.init();
     }
 

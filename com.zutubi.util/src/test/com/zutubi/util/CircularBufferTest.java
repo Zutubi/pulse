@@ -1,6 +1,5 @@
 package com.zutubi.util;
 
-import com.zutubi.util.CircularBuffer;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
@@ -13,12 +12,6 @@ public class CircularBufferTest extends ZutubiTestCase
     {
         super.setUp();
         buffer = new CircularBuffer<String>(4);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        buffer = null;
     }
 
     public void testIterateEmpty()

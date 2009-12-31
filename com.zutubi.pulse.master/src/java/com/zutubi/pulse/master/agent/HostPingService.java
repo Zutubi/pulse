@@ -5,8 +5,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.events.HostPingEvent;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
@@ -47,7 +46,7 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
     private Set<Long> inProgress = new HashSet<Long>();
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
-    private Scheduler scheduler;
+    private CallbackService callbackService;
     private HostManager hostManager;
     private PingHostsCallback pingHostsCallback;
 
@@ -189,12 +188,12 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
         {
             if (pingHostsCallback != null)
             {
-                scheduler.unregisterCallback(pingHostsCallback);
+                callbackService.unregisterCallback(pingHostsCallback);
             }
             pingHostsCallback = new PingHostsCallback();
-            scheduler.registerCallback(pingHostsCallback, agentPingConfig.getPingInterval() * Constants.SECOND);
+            callbackService.registerCallback(pingHostsCallback, agentPingConfig.getPingInterval() * Constants.SECOND);
         }
-        catch (SchedulingException e)
+        catch (Exception e)
         {
             LOG.severe(e);
         }
@@ -246,9 +245,9 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
         eventManager.register(this);
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setCallbackService(CallbackService callbackService)
     {
-        this.scheduler = scheduler;
+        this.callbackService = callbackService;
     }
 
     public void setHostManager(HostManager hostManager)

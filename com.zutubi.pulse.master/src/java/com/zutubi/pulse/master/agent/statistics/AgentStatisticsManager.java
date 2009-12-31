@@ -8,8 +8,7 @@ import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
-import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -33,7 +32,7 @@ public class AgentStatisticsManager implements EventListener
     private AgentDailyStatisticsDao agentDailyStatisticsDao;
     private AgentManager agentManager;
     private Clock clock = new SystemClock();
-    private Scheduler scheduler;
+    private CallbackService callbackService;
 
     public synchronized void init()
     {
@@ -48,7 +47,7 @@ public class AgentStatisticsManager implements EventListener
     {
         try
         {
-            scheduler.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(new NullaryProcedure()
             {
                 public void run()
                 {
@@ -56,7 +55,7 @@ public class AgentStatisticsManager implements EventListener
                 }
             }, TRIGGER_INTERVAL);
         }
-        catch (SchedulingException e)
+        catch (Exception e)
         {
             LOG.severe(e);
         }
@@ -222,9 +221,9 @@ public class AgentStatisticsManager implements EventListener
         this.clock = clock;
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setCallbackService(CallbackService callbackService)
     {
-        this.scheduler = scheduler;
+        this.callbackService = callbackService;
     }
 
     private static class StampedStatus

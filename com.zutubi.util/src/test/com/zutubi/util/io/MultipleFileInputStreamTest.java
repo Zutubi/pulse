@@ -1,14 +1,12 @@
 package com.zutubi.util.io;
 
 import com.zutubi.util.Constants;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 
 public class MultipleFileInputStreamTest extends BaseIOTestCase
 {
-    private File tmp;
     private int lsl;
     private String ls;
     private MultipleFileInputStream input;
@@ -16,19 +14,13 @@ public class MultipleFileInputStreamTest extends BaseIOTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tmp = FileSystemUtils.createTempDir();
         ls = Constants.LINE_SEPARATOR;
         lsl = ls.length();
     }
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tmp);
-        tmp = null;
-
         IOUtils.close(input);
-        input = null;
-
         super.tearDown();
     }
 

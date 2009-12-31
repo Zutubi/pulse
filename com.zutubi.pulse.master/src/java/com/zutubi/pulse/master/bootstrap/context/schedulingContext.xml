@@ -12,6 +12,9 @@ This context exports:
                      It is recommended that all scheduling be done via the scheduler interface. However,
                      if this interface is inappropirate, the quartzScheduler is also available.
 
+    callbackService: a service that provides a convenient interface for registering a procedure to be
+                     called at some point in the future.
+
 This context requires:
 
     objectFactory: the systems object factory.
@@ -97,6 +100,12 @@ This context requires:
     <bean id="triggerHandlerTarget" class="com.zutubi.pulse.master.scheduling.DefaultTriggerHandler">
         <property name="objectFactory" ref="objectFactory"/>
         <property name="triggerDao" ref="triggerDao"/>
+    </bean>
+
+    <bean id="callbackService" class="com.zutubi.pulse.master.scheduling.CallbackService">
+        <property name="scheduler">
+            <ref local="scheduler"/>
+        </property>
     </bean>
 
 </beans>

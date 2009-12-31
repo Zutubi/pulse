@@ -29,15 +29,6 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         scheduler.setTriggerHandler(triggerHandler);
     }
 
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-        eventManager = null;
-        scheduler = null;
-
-        super.tearDown();
-    }
-
     public void testTriggerOnSpecificEvent() throws SchedulingException
     {
         EventTrigger trigger = new EventTrigger(TestEvent.class);

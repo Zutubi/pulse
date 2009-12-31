@@ -7,16 +7,12 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.events.HostPingEvent;
-import com.zutubi.pulse.master.scheduling.NoopTrigger;
-import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.pulse.servercore.services.HostStatus;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -24,6 +20,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class HostPingServiceTest extends PulseTestCase
 {
@@ -68,9 +67,7 @@ public class HostPingServiceTest extends PulseTestCase
             }
         });
 
-        Scheduler scheduler = mock(Scheduler.class);
-        stub(scheduler.getTrigger(anyString(), anyString())).toReturn(new NoopTrigger());
-        hostPingService.setScheduler(scheduler);
+        hostPingService.setCallbackService(mock(CallbackService.class));
 
         hostPingService.init();
         hostPingService.refreshSettings(new AgentPingConfiguration());
