@@ -21,10 +21,6 @@ public class IsReadyToPollPredicate implements Predicate<Project>
     private ConfigurationProvider configurationProvider;
     private Clock clock = new SystemClock();
 
-    public IsReadyToPollPredicate()
-    {
-    }
-    
     public boolean satisfied(Project project)
     {
         Pollable scm = (Pollable) project.getConfig().getScm();

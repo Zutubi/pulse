@@ -14,9 +14,6 @@ import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.scm.util.PredicateRequest;
-import com.zutubi.pulse.master.scm.util.PredicateRequestQueue;
-import com.zutubi.pulse.master.scm.util.PredicateRequestQueueListenerAdapter;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -56,11 +53,13 @@ public class PollingService implements Stoppable
     private ExecutorService executorService;
     private final Map<Long, Pair<Long, Revision>> waiting = Collections.synchronizedMap(new HashMap<Long, Pair<Long, Revision>>());
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
-    private final PredicateRequestQueue<Project> requestQueue;
+    private final PollingQueue requestQueue;
+    private final List<Long> clearCacheForProjects = new LinkedList<Long>();
+    private final Map<Long, String> projectUidCache = new HashMap<Long, String>();
 
     public PollingService()
     {
-        requestQueue = new PredicateRequestQueue<Project>();
+        requestQueue = new PollingQueue();
     }
 
     public void init()
@@ -99,12 +98,49 @@ public class PollingService implements Stoppable
 
     public void clearCache(long projectId)
     {
-        latestRevisions.remove(projectId);
-        waiting.remove(projectId);
+        synchronized (clearCacheForProjects)
+        {
+            clearCacheForProjects.add(projectId);
+        }
+    }
+
+    public void loadProjectScmUidIntoCache(Project project)
+    {
+        final long key = project.getId();
+
+        if (!projectUidCache.containsKey(key))
+        {
+            try
+            {
+                ProjectConfiguration config = project.getConfig();
+                ScmClient client = scmManager.createClient(config.getScm());
+                projectUidCache.put(key, client.getUid());
+            }
+            catch (ScmException e)
+            {
+                // noop.
+            }
+        }
+    }
+
+    private void clearCachesIfNecessary()
+    {
+        synchronized (clearCacheForProjects)
+        {
+            for (long projectId : clearCacheForProjects)
+            {
+                latestRevisions.remove(projectId);
+                waiting.remove(projectId);
+                projectUidCache.remove(projectId);
+            }
+            clearCacheForProjects.clear();
+        }
     }
 
     public void pollForChanges()
     {
+        clearCachesIfNecessary();
+
         List<DependencyTree> allDependencyTrees = generateDependencyTrees();
 
         // filter those dependency trees that are not ready for polling.
@@ -120,16 +156,22 @@ public class PollingService implements Stoppable
         requestQueue.setListener(requestListener);
 
         // go through the dependency trees generating the poll requests.
+        List<PollingRequest> requests = new LinkedList<PollingRequest>();
         for (DependencyTree tree : treesToPoll)
         {
             for (Project project : tree.getProjectsToPoll())
             {
-                PredicateRequest<Project> request = new PredicateRequest<Project>(project);
-                request.add(objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PredicateRequestQueue.class}, new Object[]{requestQueue}));
-                request.add(new InvertedPredicate<PredicateRequest<Project>>(objectFactory.buildBean(HasDependencyBeingPolledPredicate.class, new Class[]{PredicateRequestQueue.class}, new Object[]{requestQueue})));
-                requestQueue.enqueue(request);
+                // so that we do not make potentially slow calls during the predicate processing, we load
+                // the scm uids into a cache now.  This cache will be complete with the necessary uids before
+                // the enqueuing (and subsequent reading) occurs.
+                loadProjectScmUidIntoCache(project);
+                PollingRequest request = new PollingRequest(project);
+                request.add(objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PollingQueue.class, Map.class}, new Object[]{requestQueue, projectUidCache}));
+                request.add(objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, new Class[]{PollingQueue.class}, new Object[]{requestQueue}));
+                requests.add(request);
             }
         }
+        requestQueue.enqueue(requests.toArray(new PollingRequest[requests.size()]));
 
         requestListener.waitForProcessingToComplete();
 
@@ -141,6 +183,8 @@ public class PollingService implements Stoppable
             eventManager.publish(change);
             latestRevisions.put(change.getProjectConfiguration().getProjectId(), change.getNewRevision());
         }
+
+        clearCachesIfNecessary();
     }
 
     /**
@@ -451,7 +495,7 @@ public class PollingService implements Stoppable
      *
      * @see PollingService#pollForChanges()
      */
-    private class PollingRequestListener extends PredicateRequestQueueListenerAdapter<Project>
+    private class PollingRequestListener implements PollingActivationListener
     {
         private final List<Future> futures;
         private final List<ScmChangeEvent> scmChanges;
@@ -462,14 +506,13 @@ public class PollingService implements Stoppable
             scmChanges = Collections.synchronizedList(new LinkedList<ScmChangeEvent>());
         }
 
-        @Override
-        public boolean onActivation(final PredicateRequest<Project> request)
+        public void onActivation(final PollingRequest request)
         {
             Future<?> future = executorService.submit(new Runnable()
             {
                 public void run()
                 {
-                    poll(request.getData(), scmChanges);
+                    poll(request.getProject(), scmChanges);
                     requestQueue.complete(request);
                 }
             });
@@ -477,7 +520,6 @@ public class PollingService implements Stoppable
             {
                 futures.add(future);
             }
-            return true;
         }
 
         public List<ScmChangeEvent> getScmChanges()

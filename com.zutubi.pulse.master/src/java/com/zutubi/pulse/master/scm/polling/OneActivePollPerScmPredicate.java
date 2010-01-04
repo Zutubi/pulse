@@ -1,71 +1,43 @@
 package com.zutubi.pulse.master.scm.polling;
 
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.scm.util.PredicateRequest;
-import com.zutubi.pulse.master.scm.util.PredicateRequestQueue;
-import com.zutubi.pulse.master.scm.util.PredicateRequestQueueSnapshot;
-import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
-import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.logging.Logger;
+
+import java.util.Map;
 
 /**
  * This predicate ensures that only one poll request can be activated for a
- * specific scm at a particular point in time.
+ * specific scm (unique scm uid) at a particular point in time.
  */
-public class OneActivePollPerScmPredicate implements Predicate<PredicateRequest<Project>>
+public class OneActivePollPerScmPredicate implements Predicate<PollingRequest>
 {
-    private static final Logger LOG = Logger.getLogger(OneActivePollPerScmPredicate.class);
+    private PollingQueue requestQueue;
+    private Map<Long, String> projectUidCache;
 
-    private PredicateRequestQueue<Project> requestQueue;
-
-    private ScmManager scmManager;
-
-    public OneActivePollPerScmPredicate(PredicateRequestQueue<Project> requestQueue)
+    public OneActivePollPerScmPredicate(PollingQueue requestQueue, Map<Long, String> projectUidCache)
     {
         this.requestQueue = requestQueue;
+        this.projectUidCache = projectUidCache;
     }
 
-    public boolean satisfied(PredicateRequest<Project> request)
+    public boolean satisfied(PollingRequest request)
     {
-        try
-        {
-            String uid = getProjectsScmServerUid(request.getData());
+        String uid = getProjectsScmServerUid(request.getProject());
 
-            PredicateRequestQueueSnapshot<Project> snapshot = requestQueue.getSnapshot();
-            for (PredicateRequest<Project> activeRequest : snapshot.getActivatedRequests())
+        PollingQueueSnapshot snapshot = requestQueue.getSnapshot();
+        for (PollingRequest activeRequest : snapshot.getActivatedRequests())
+        {
+            String activeRequestUid = getProjectsScmServerUid(activeRequest.getProject());
+            if (uid.equals(activeRequestUid))
             {
-                String activeRequestUid = getProjectsScmServerUid(activeRequest.getData());
-                if (uid.equals(activeRequestUid))
-                {
-                    return false;
-                }
+                return false;
             }
-            return true;
         }
-        catch (ScmException e)
-        {
-            // if we are unable to accurately determine that an scm server
-            // is not already in use, then we disable this check.  To leave it
-            // enabled runs the risk of blocking an scm and halting the queue.
-            LOG.warning(e);
-            return true;
-        }
+        return true;
     }
 
-    private String getProjectsScmServerUid(Project project) throws ScmException
+    private String getProjectsScmServerUid(Project project)
     {
-        ProjectConfiguration config = project.getConfig();
-        ScmClient client = scmManager.createClient(config.getScm());
-        return client.getUid();
-    }
-
-    public void setScmManager(ScmManager scmManager)
-    {
-        this.scmManager = scmManager;
+        return projectUidCache.get(project.getId());
     }
 }
