@@ -5,11 +5,11 @@ import com.zutubi.util.Predicate;
 /**
  * A predicate that is satisfied by any trigger with a specified name.
  */
-public class TriggerByNamePredicate implements Predicate<Trigger>
+public class HasNamePredicate implements Predicate<Trigger>
 {
     private String name;
 
-    public TriggerByNamePredicate(String name)
+    public HasNamePredicate(String name)
     {
         this.name = name;
     }

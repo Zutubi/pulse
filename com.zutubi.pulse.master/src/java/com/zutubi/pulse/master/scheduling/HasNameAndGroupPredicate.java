@@ -6,18 +6,18 @@ import com.zutubi.util.ConjunctivePredicate;
 /**
  * A predicate that is satisfied by any trigger with a specified name and group.
  * 
- * @see TriggerByNamePredicate
- * @see TriggerByGroupPredicate
+ * @see HasNamePredicate
+ * @see HasGroupPredicate
  */
-public class TriggerByNameAndGroupPredicate implements Predicate<Trigger>
+public class HasNameAndGroupPredicate implements Predicate<Trigger>
 {
     private Predicate<Trigger> delegate;
 
-    public TriggerByNameAndGroupPredicate(String name, String group)
+    public HasNameAndGroupPredicate(String name, String group)
     {
         this.delegate = new ConjunctivePredicate<Trigger>(
-                new TriggerByNamePredicate(name),
-                new TriggerByGroupPredicate(group)
+                new HasNamePredicate(name),
+                new HasGroupPredicate(group)
         );
     }
 

@@ -314,8 +314,8 @@ public class CollectionUtilsTest extends ZutubiTestCase
         assertEquals(asList(asList(1, 2, 3), asList(4, 5, 6)), CollectionUtils.partition(3, asList(1, 2, 3, 4, 5, 6)));
     }
 
-    public void testMergeToList()
+    public void testConcatenateLists()
     {
-        assertEquals(asList("a", "b", "c"), CollectionUtils.mergeToList(asList("a"), asList("b", "c")));
+        assertEquals(asList("a", "b", "c"), CollectionUtils.concatenate(asList("a"), asList("b", "c")));
     }
 }

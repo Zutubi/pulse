@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import static com.zutubi.util.CollectionUtils.mergeToList;
+import static com.zutubi.util.CollectionUtils.concatenate;
 import static java.util.Arrays.asList;
 
 /**
@@ -53,7 +53,7 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
         }
         else
         {
-            List<String> allChildren = mergeToList(asList(staticChildren), asList(dynamicChildren));
+            List<String> allChildren = concatenate(asList(staticChildren), asList(dynamicChildren));
             Collections.sort(allChildren, new Sort.StringComparator());
             return allChildren.toArray(new String[allChildren.size()]);
         }

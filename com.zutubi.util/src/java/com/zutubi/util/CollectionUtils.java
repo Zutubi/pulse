@@ -66,10 +66,19 @@ public class CollectionUtils
         return result.toArray((T[])Array.newInstance(in.getClass().getComponentType(), result.size()));
     }
 
-    public static <T> List<T> mergeToList(Collection<T>... collections)
+    /**
+     * Create a single list that contains the contents of each of the specified
+     * lists.  If items are in the input lists multiple times, then they will appear
+     * in the concatenated list multiple times.
+     *
+     * @param lists     the lists being concatenated.
+     * @param <T>       the type of the objects contained by the lists
+     * @return a list that contains all of the data from the input lists.
+     */
+    public static <T> List<T> concatenate(List<T>... lists)
     {
         List<T> result = new LinkedList<T>();
-        for (Collection<T> collection : collections)
+        for (Collection<T> collection : lists)
         {
             result.addAll(collection);
         }

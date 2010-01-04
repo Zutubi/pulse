@@ -5,11 +5,11 @@ import com.zutubi.util.Predicate;
 /**
  * A predicate that is satisfied by any trigger with a specified project id
  */
-public class TriggerByProjectPredicate implements Predicate<Trigger>
+public class HasProjectPredicate implements Predicate<Trigger>
 {
     private long projectId;
 
-    public TriggerByProjectPredicate(long projectId)
+    public HasProjectPredicate(long projectId)
     {
         this.projectId = projectId;
     }

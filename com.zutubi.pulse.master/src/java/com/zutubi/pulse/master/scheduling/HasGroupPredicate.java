@@ -5,11 +5,11 @@ import com.zutubi.util.Predicate;
 /**
  * A predicate that is satisfied by any trigger with a specified group.
  */
-public class TriggerByGroupPredicate implements Predicate<Trigger>
+public class HasGroupPredicate implements Predicate<Trigger>
 {
     private String group;
 
-    public TriggerByGroupPredicate(String group)
+    public HasGroupPredicate(String group)
     {
         this.group = group;
     }

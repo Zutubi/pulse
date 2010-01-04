@@ -125,7 +125,7 @@ public class DefaultScheduler implements Scheduler
 
     public Trigger getTrigger(String name, String group)
     {
-        Trigger trigger = CollectionUtils.find(transientTriggers, new TriggerByNameAndGroupPredicate(name, group));
+        Trigger trigger = CollectionUtils.find(transientTriggers, new HasNameAndGroupPredicate(name, group));
         if (trigger != null)
         {
             return trigger;
@@ -140,29 +140,29 @@ public class DefaultScheduler implements Scheduler
 
     public List<Trigger> getTriggers()
     {
-        return CollectionUtils.mergeToList(
+        return CollectionUtils.concatenate(
                 triggerDao.findAll(),
                 transientTriggers);
     }
 
     public List<Trigger> getTriggers(long project)
     {
-        return CollectionUtils.mergeToList(
+        return CollectionUtils.concatenate(
                 triggerDao.findByProject(project),
-                CollectionUtils.filter(transientTriggers, new TriggerByProjectPredicate(project)));
+                CollectionUtils.filter(transientTriggers, new HasProjectPredicate(project)));
     }
 
     public List<Trigger> getTriggers(String group)
     {
-        return CollectionUtils.mergeToList(
+        return CollectionUtils.concatenate(
                 triggerDao.findByGroup(group),
-                CollectionUtils.filter(transientTriggers, new TriggerByGroupPredicate(group)));
+                CollectionUtils.filter(transientTriggers, new HasGroupPredicate(group)));
     }
 
     public Trigger getTrigger(long project, String triggerName)
     {
         Trigger trigger = CollectionUtils.find(transientTriggers, new ConjunctivePredicate<Trigger>(
-                new TriggerByProjectPredicate(project), new TriggerByNamePredicate(triggerName)
+                new HasProjectPredicate(project), new HasNamePredicate(triggerName)
         ));
         if (trigger != null)
         {

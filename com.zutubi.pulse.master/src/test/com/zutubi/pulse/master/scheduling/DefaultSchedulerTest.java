@@ -39,7 +39,7 @@ public class DefaultSchedulerTest extends ZutubiTestCase
             {
                 String name = (String)invocationOnMock.getArguments()[0];
                 String group = (String)invocationOnMock.getArguments()[1];
-                return CollectionUtils.find(persistedTriggers, new TriggerByNameAndGroupPredicate(name, group));
+                return CollectionUtils.find(persistedTriggers, new HasNameAndGroupPredicate(name, group));
             }
         });
         stub(triggerDao.findByGroup(anyString())).toAnswer(new Answer()
@@ -47,7 +47,7 @@ public class DefaultSchedulerTest extends ZutubiTestCase
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 String group = (String)invocationOnMock.getArguments()[0];
-                return CollectionUtils.filter(persistedTriggers, new TriggerByGroupPredicate(group));
+                return CollectionUtils.filter(persistedTriggers, new HasGroupPredicate(group));
             }
         });
         stub(triggerDao.findAll()).toReturn(persistedTriggers);
