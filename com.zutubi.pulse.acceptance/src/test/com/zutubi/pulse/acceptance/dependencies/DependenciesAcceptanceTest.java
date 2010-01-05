@@ -481,6 +481,29 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyInRepository(project, buildNumber);
     }
 
+    public void testDirectoryArtifactRoundTrip() throws Exception
+    {
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addDirArtifact("dirArtifact", "build/blah");
+        projectA.addFilesToCreate("build/blah/artifact-A.jar");
+        projectA.addFilesToCreate("build/blah/artifact-B.jar");
+        insertProject(projectA);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        assertIvyInRepository(projectA, buildNumber);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/artifact-A.jar");
+        projectB.addExpectedFiles("lib/artifact-B.jar");
+        insertProject(projectB);
+
+        buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
+
+        assertIvyInRepository(projectB, buildNumber);
+    }
+
     public void testArtifactPattern() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);
