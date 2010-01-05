@@ -8,6 +8,10 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
+ * The formatter that is used to control the formatting of what is
+ * written to the systems event log.
+ *
+ * @see Formatter
  */
 public class EventLogFormatter extends Formatter
 {
