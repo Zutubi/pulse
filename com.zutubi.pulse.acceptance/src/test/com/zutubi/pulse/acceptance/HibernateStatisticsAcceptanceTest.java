@@ -24,7 +24,7 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
 
     public void testCanViewStatistics() throws Exception
     {
-        HibernateStatisticsPage statsPage = browser.openAndWaitFor(HibernateStatisticsPage.class);
+        HibernateStatisticsPage statsPage = new HibernateStatisticsPage(selenium, urls);
         assertTrue(statsPage.isPresent());
         assertFalse(statsPage.isEnabled());
 

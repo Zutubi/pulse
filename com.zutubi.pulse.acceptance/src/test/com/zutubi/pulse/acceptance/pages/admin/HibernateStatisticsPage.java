@@ -1,14 +1,14 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.thoughtworks.selenium.Selenium;
 
 public class HibernateStatisticsPage extends SeleniumPage
 {
-    public HibernateStatisticsPage(SeleniumBrowser browser, Urls urls)
+    public HibernateStatisticsPage(Selenium selenium, Urls urls)
     {
-        super(browser, urls, "hibernate.statistics.heading", "hibernate statistics");
+        super(selenium, urls, "hibernate.statistics.heading", "hibernate statistics");
     }
 
     public String getUrl()
@@ -18,7 +18,7 @@ public class HibernateStatisticsPage extends SeleniumPage
 
     public boolean isEnabled()
     {
-        return browser.getBodyText().contains("Hibernate statistics are enabled.");
+        return selenium.getBodyText().contains("Hibernate statistics are enabled.");
     }
 
     public String getToggleId()
@@ -28,7 +28,7 @@ public class HibernateStatisticsPage extends SeleniumPage
 
     public void clickToggle()
     {
-        browser.click(getToggleId());
-        browser.waitForPageToLoad();
+        selenium.click(getToggleId());
+        selenium.waitForPageToLoad("30000");
     }
 }
