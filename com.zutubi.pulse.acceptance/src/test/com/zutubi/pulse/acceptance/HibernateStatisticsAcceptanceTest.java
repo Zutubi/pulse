@@ -18,13 +18,6 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
-    @Override
-    protected void tearDown() throws Exception
-    {
-        logout();
-        super.tearDown();
-    }
-
     public void testCanViewStatistics() throws Exception
     {
         final HibernateStatisticsPage statsPage = browser.openAndWaitFor(HibernateStatisticsPage.class);

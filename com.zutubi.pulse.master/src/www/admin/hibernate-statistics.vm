@@ -12,8 +12,6 @@
     <title>#wwtext("name=administration")</title>
 </head>
 <body>
-    #adminTabs("settings")
-
     #parse("/template/includes/actionerrors.vm")
 
     <h1 id="hibernate.statistics.heading">:: hibernate statistics ::</h1>
@@ -21,7 +19,7 @@
         Hibernate statistics are #if($on) enabled. #else disabled. #end
     </p>
     <p>
-<a id="link.toggle" href="$base/admin/actions?hibernateStatistics=toggle">#if($on) Switch off #else Switch on #end</a>
+        <a id="link.toggle" href="$base/admin/actions?hibernateStatistics=toggle&_dc=$random">#if($on) Switch off #else Switch on #end</a>
     </p>
 #if($on)
     <h2 class="section">Second-Level Cache</h2>
