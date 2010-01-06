@@ -26,8 +26,9 @@ public class HibernateStatisticsPage extends SeleniumPage
         return "link.toggle";
     }
 
-    public void clickToggle()
+    public void clickToggleAndWait()
     {
         browser.click(getToggleId());
+        browser.waitForPageToLoad();
     }
 }
