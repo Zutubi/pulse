@@ -350,19 +350,15 @@
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="hibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.DumpHibernateStatisticsAction">
+        <action name="hibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.HibernateStatisticsAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="velocity">hibernate-statistics.vm</result>
+            <result name="toggled" type="redirect">actions?hibernateStatistics=execute</result>
         </action>
 
         <action name="triggerBackup" class="com.zutubi.pulse.master.xwork.actions.admin.debug.TriggerBackupAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="redirect">/admin/settings/</result>
-        </action>
-
-        <action name="toggleHibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.ToggleHibernateStatisticsAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="redirect">hibernateStatistics.action</result>
         </action>
 
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.xwork.actions.admin.ToggleRecipeQueueAction">
