@@ -1,10 +1,9 @@
 #macro(statRow $stat $value)
     <tr>
         <th class="content">$stat</th>
-        <td class="content-right">$value</th>
+        <td class="content-right">$value</td>
     </tr>
 #end
-
 
 #authorisationTags($principle)
 <content tag="selectedTab">administration</content>
@@ -17,8 +16,14 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    <h1>:: hibernate statistics ::</h1>
-
+    <h1 id="hibernate.statistics.heading">:: hibernate statistics ::</h1>
+    <p>
+        Hibernate statistics are #if($on) enabled. #else disabled. #end
+    </p>
+    <p>
+<a id="link.toggle" href="$base/admin/actions?hibernateStatistics=toggle">#if($on) Switch off #else Switch on #end</a>
+    </p>
+#if($on)
     <h2 class="section">Second-Level Cache</h2>
     <p>Total size of second level cache: $secondLevelCacheSizeKB KB ($secondLevelCacheSizeMB MB)</p>
 
@@ -33,7 +38,6 @@
         #statRow("miss count" $cacheStats.missCount)
         #statRow("put count" $cacheStats.putCount)
         #statRow("size in memory" $cacheStats.sizeInMemory)
-##        #statRow("entries" $cacheStats.entries)
     </table>
     #end
 
@@ -69,18 +73,6 @@
         #statRow("delete count" $entityStats.deleteCount)
     </table>
     #end
-
-    <p>
-        Hibernate statistics are now #if($on) on. #else off. #end
-    </p>
-    <p>
-#if($on)
-    <a href="$base/admin/toggleHibernateStatistics.action?on=true">Switch off</a>
-#else
-    <a href="$base/admin/toggleHibernateStatistics.action?on=true">Switch on</a>
 #end
-    </p>
-    
-    #tabEnd()
 </body>
 </html>

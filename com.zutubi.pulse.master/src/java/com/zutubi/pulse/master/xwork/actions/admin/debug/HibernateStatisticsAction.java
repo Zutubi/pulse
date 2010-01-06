@@ -11,8 +11,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * The hibernate statistics action provides access to the various
+ * statistics gathered by the hibernate session factory.
+ *
+ * By default, statistics gathering is disabled.  It can be disabled
+ * via the {@link #toggle()} action.
+ *
+ * @see org.hibernate.SessionFactory#getStatistics() 
  */
-public class DumpHibernateStatisticsAction extends ActionSupport
+public class HibernateStatisticsAction extends ActionSupport
 {
     private SessionFactory sessionFactory;
     private boolean on;
@@ -25,6 +32,11 @@ public class DumpHibernateStatisticsAction extends ActionSupport
     public boolean isOn()
     {
         return on;
+    }
+
+    public void setOn(boolean on)
+    {
+        this.on = on;
     }
 
     public Statistics getStats()
@@ -64,6 +76,21 @@ public class DumpHibernateStatisticsAction extends ActionSupport
 
     public String execute() throws Exception
     {
+        loadStatistics();
+
+        return SUCCESS;
+    }
+
+    public String toggle() throws Exception
+    {
+        Statistics stats = sessionFactory.getStatistics();
+        stats.setStatisticsEnabled(!stats.isStatisticsEnabled());
+
+        return "toggled";
+    }
+
+    private void loadStatistics()
+    {
         stats = sessionFactory.getStatistics();
         on = stats.isStatisticsEnabled();
 
@@ -80,14 +107,12 @@ public class DumpHibernateStatisticsAction extends ActionSupport
             {
                 queryStats.put(query, stats.getQueryStatistics(query));
             }
-            
+
             for (String entity : stats.getEntityNames())
             {
                 entityStats.put(entity, stats.getEntityStatistics(entity));
             }
         }
-
-        return SUCCESS;
     }
 
     public void setSessionFactory(SessionFactory sessionFactory)
