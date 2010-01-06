@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
+import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.thoughtworks.selenium.Selenium;
 
 public class HibernateStatisticsPage extends SeleniumPage
 {
@@ -29,6 +29,5 @@ public class HibernateStatisticsPage extends SeleniumPage
     public void clickToggle()
     {
         selenium.click(getToggleId());
-        selenium.waitForPageToLoad("30000");
     }
 }

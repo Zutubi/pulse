@@ -11,7 +11,6 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActio
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionResolver;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
@@ -22,6 +21,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  */
@@ -177,7 +178,7 @@ public class PulseActionMapper implements ActionMapper
         {
             // Strip parameter which is automatically added by Ext in some
             // cases.
-            query = query.replaceAll("_dc=[0-9]+", "");
+            query = stripRandomParam(query);
         }
         
         if (TextUtils.stringSet(query))
@@ -200,6 +201,11 @@ public class PulseActionMapper implements ActionMapper
             }
         }
         return actionSubmit;
+    }
+
+    private String stripRandomParam(String query)
+    {
+        return query.replaceAll("&?_dc=[0-9]+", "");
     }
 
     private ActionMapping getDashboardMapping(String encodedPath, HttpServletRequest request)
@@ -319,7 +325,8 @@ public class PulseActionMapper implements ActionMapper
             // for example:  http://..../admin/actions?hibernateStatistics=execute
             if(TextUtils.stringSet(request.getQueryString()))
             {
-                String[] pieces = request.getQueryString().split("=", 2);
+                String query = stripRandomParam(request.getQueryString());
+                String[] pieces = query.split("=", 2);
                 return new ActionMapping(pieces[0], ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);
             }
 

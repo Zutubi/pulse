@@ -1,12 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.HibernateStatisticsPage;
+import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.util.Condition;
 
 /**
  * A sanity check to ensure that the hibernate statistics are displayable.
  */
 public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
 {
+    private static final int TIMEOUT = 60000;
+
     @Override
     protected void setUp() throws Exception
     {
@@ -15,28 +19,30 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
-    @Override
-    protected void tearDown() throws Exception
-    {
-        logout();
-        super.tearDown();
-    }
-
     public void testCanViewStatistics() throws Exception
     {
-        HibernateStatisticsPage statsPage = new HibernateStatisticsPage(selenium, urls);
+        final HibernateStatisticsPage statsPage = new HibernateStatisticsPage(selenium, urls);
+        statsPage.goTo();
         assertTrue(statsPage.isPresent());
         assertFalse(statsPage.isEnabled());
 
         statsPage.clickToggle();
-        statsPage.waitFor();
-
-        assertTrue(statsPage.isEnabled());
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return statsPage.isEnabled();
+            }
+        }, TIMEOUT, "statistics to be enabled");
 
         statsPage.clickToggle();
-        statsPage.waitFor();
-
-        assertFalse(statsPage.isEnabled());
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !statsPage.isEnabled();
+            }
+        }, TIMEOUT, "statistics to be disabled");
     }
 
 }

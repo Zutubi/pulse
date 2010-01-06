@@ -39,6 +39,11 @@ public class HibernateStatisticsAction extends ActionSupport
         this.on = on;
     }
 
+    public int getRandom()
+    {
+        return (int) (Math.random() * 4096);
+    }
+
     public Statistics getStats()
     {
         return stats;
