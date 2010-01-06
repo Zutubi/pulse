@@ -227,7 +227,12 @@ public class ZutubiTestCase extends TestCase
      */
     public static void removeDirectory(File dir) throws IOException
     {
-        // add some retries because windows 7 is still not brown enough.
+        if (dir == null) // this case returns false from the FileSystemUtils.rmdir, so needs to be handled separately.
+        {
+            return;
+        }
+        
+        // add some retries because windows 7 is still not brown enough, particularly when a virus scanner is active.
         int retryCount = 0;
         while (retryCount < 3 && !FileSystemUtils.rmdir(dir))
         {

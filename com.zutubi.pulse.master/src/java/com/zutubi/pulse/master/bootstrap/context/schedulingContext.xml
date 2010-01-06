@@ -20,7 +20,7 @@ This context requires:
     objectFactory: the systems object factory.
 
 -->
-<beans>
+<beans> <!-- do not autowire, quartz scheduler attempts lookup tables in the database that do not exist. -->
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="configLocation" value="classpath:com/zutubi/pulse/master/bootstrap/quartz/quartz.properties"/>
@@ -51,6 +51,7 @@ This context requires:
             </list>
         </property>
     </bean>
+
     <bean id="scheduler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
@@ -74,7 +75,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.EventSchedulerStrategy">
+    <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.EventSchedulerStrategy" autowire="byName">
         <property name="eventManager" ref="eventManager"/>
         <property name="objectFactory" ref="objectFactory"/>
     </bean>

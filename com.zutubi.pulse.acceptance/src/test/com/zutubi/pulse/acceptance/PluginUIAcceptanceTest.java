@@ -31,11 +31,8 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
-        if(tmpDir != null)
-        {
-            FileSystemUtils.rmdir(tmpDir);
-        }
-        
+        removeDirectory(tmpDir);
+
         super.tearDown();
     }
 
