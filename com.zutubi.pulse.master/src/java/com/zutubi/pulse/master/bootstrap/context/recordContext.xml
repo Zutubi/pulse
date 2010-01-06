@@ -7,12 +7,6 @@
         <property name="propertyPath" value="userPaths.recordRoot"/>
     </bean>
 
-    <bean id="recordSerialiser" class="com.zutubi.tove.type.record.DefaultRecordSerialiser">
-        <constructor-arg index="0">
-            <ref local="recordRoot"/>
-        </constructor-arg>
-    </bean>
-    
     <bean id="recordManager" class="com.zutubi.tove.type.record.RecordManager">
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>

@@ -56,7 +56,7 @@ public abstract class AbstractPredefinedRecordsUpgradeTask extends AbstractUpgra
             stream = new ZipInputStream(clazz.getResourceAsStream(clazz.getSimpleName() + "." + name + ".zip"));
             ZipUtils.extractZip(stream, tempDir);
             DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(tempDir);
-            return serialiser.deserialise("");
+            return serialiser.deserialise();
         }
         catch (IOException e)
         {

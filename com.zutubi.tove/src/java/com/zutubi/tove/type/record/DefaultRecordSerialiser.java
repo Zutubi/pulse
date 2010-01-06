@@ -12,7 +12,16 @@ import java.io.FileFilter;
  */
 public class DefaultRecordSerialiser implements RecordSerialiser
 {
+    private static final int UNLIMITED = -1;
+
     private File baseDirectory;
+
+    /**
+     * The number of nested directories this serialiser will create when
+     * serialising a record.  When the max depth is reached, any remaining
+     * nested records will be serialised into a single record. 
+     */
+    private int maxPathDepth = UNLIMITED;
 
     private XmlRecordSerialiser xrs = new XmlRecordSerialiser();
 
@@ -25,7 +34,12 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         }
     }
 
-    public void serialise(String path, Record record, boolean deep)
+    public void serialise(Record record, boolean deep)
+    {
+        serialise("", record, deep, 0);
+    }
+
+    public void serialise(String path, Record record, boolean deep, int depth)
     {
         File storageDir = getStorageDir(path);
         if (!storageDir.isDirectory() && !storageDir.mkdir())
@@ -37,23 +51,29 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         }
 
         File file = getRecordFile(storageDir);
-        xrs.serialise(file, record, false);
-
-        if (deep)
+        if (deep && maxPathDepth == depth)
         {
-            // Clear out any existing child record directories.
-            File[] childDirs = storageDir.listFiles(new SubrecordDirFileFilter());
-            for (File childDir : childDirs)
+            xrs.serialise(file, record, true);
+        }
+        else
+        {
+            xrs.serialise(file, record, false);
+            if (deep)
             {
-                FileSystemUtils.rmdir(childDir);
-            }
-
-            for (String key : record.keySet())
-            {
-                Object value = record.get(key);
-                if (value instanceof Record)
+                // Clear out any existing child record directories.
+                File[] childDirs = storageDir.listFiles(new SubrecordDirFileFilter());
+                for (File childDir : childDirs)
                 {
-                    serialise(PathUtils.getPath(path, key), (MutableRecord) value, deep);
+                    FileSystemUtils.rmdir(childDir);
+                }
+
+                for (String key : record.keySet())
+                {
+                    Object value = record.get(key);
+                    if (value instanceof Record)
+                    {
+                        serialise(PathUtils.getPath(path, key), (MutableRecord) value, deep, depth + 1);
+                    }
                 }
             }
         }
@@ -93,6 +113,11 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         return new File(dir, "record.xml");
     }
 
+    public MutableRecord deserialise()
+    {
+        return deserialise("");
+    }
+
     public MutableRecord deserialise(String path)
     {
         File dir = getStorageDir(path);
@@ -123,6 +148,11 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         {
             throw new RecordSerialiseException("Unable to parse record file: " + e.getMessage(), e);
         }
+    }
+
+    public void setMaxPathDepth(int depth)
+    {
+        this.maxPathDepth = depth;
     }
 
     private class SubrecordDirFileFilter implements FileFilter
