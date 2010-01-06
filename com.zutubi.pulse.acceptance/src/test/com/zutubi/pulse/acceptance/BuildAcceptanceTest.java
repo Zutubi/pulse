@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -15,8 +13,6 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
@@ -26,7 +22,6 @@ import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfig
 import com.zutubi.pulse.master.tove.config.project.types.FileArtifactConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
@@ -49,6 +44,12 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -562,6 +563,24 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         stageTestsPage.waitFor();
         stageTestsPage.clickAllCrumb();
         testsPage.waitFor();
+        
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, buildId);
+        checkApiTestSummary(build);
+        @SuppressWarnings({"unchecked"})
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        checkApiTestSummary(stages.get(0));
+    }
+
+    private void checkApiTestSummary(Hashtable<String, Object> build)
+    {
+        @SuppressWarnings({"unchecked"})
+        Hashtable<String, Object> tests = (Hashtable<String, Object>) build.get("tests");
+        assertNotNull(tests);
+        assertEquals(2, tests.get("total"));
+        assertEquals(1, tests.get("passed"));
+        assertEquals(0, tests.get("skipped"));
+        assertEquals(1, tests.get("failures"));
+        assertEquals(0, tests.get("errors"));
     }
 
     public void testOCUnitTestResults() throws Exception

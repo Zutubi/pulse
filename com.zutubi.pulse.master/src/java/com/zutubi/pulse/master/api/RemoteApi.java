@@ -26,8 +26,6 @@ import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -51,6 +49,9 @@ import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -2214,6 +2215,7 @@ public class RemoteApi
         buildDetails.put("id", (int) build.getNumber());
         buildDetails.put("project", build.getProject().getName());
         buildDetails.put("revision", getBuildRevision(build));
+        buildDetails.put("tests", convertTests(build.getTestSummary()));
         addResultFields(build, buildDetails);
 
         Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
@@ -2242,6 +2244,7 @@ public class RemoteApi
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
         stage.put("name", recipeResultNode.getStageName());
         stage.put("agent", recipeResultNode.getHostSafe());
+        stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
         addResultFields(recipeResultNode.getResult(), stage);
         return stage;
     }
@@ -2267,6 +2270,17 @@ public class RemoteApi
         {
             buildDetails.put("progress", -1);
         }
+    }
+
+    private Hashtable<String, Object> convertTests(TestResultSummary testSummary)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("total", testSummary.getTotal());
+        result.put("passed", testSummary.getPassed());
+        result.put("skipped", testSummary.getSkipped());
+        result.put("failures", testSummary.getFailures());
+        result.put("errors", testSummary.getErrors());
+        return result;
     }
 
     /**
