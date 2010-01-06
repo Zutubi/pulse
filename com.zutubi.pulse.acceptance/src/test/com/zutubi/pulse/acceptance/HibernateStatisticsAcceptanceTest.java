@@ -29,12 +29,12 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
         assertFalse(statsPage.isEnabled());
 
         statsPage.clickToggle();
-        statsPage.waitFor();
+        browser.waitForPageToLoad();
 
         assertTrue(statsPage.isEnabled());
 
         statsPage.clickToggle();
-        statsPage.waitFor();
+        browser.waitForPageToLoad();
 
         assertFalse(statsPage.isEnabled());
     }
