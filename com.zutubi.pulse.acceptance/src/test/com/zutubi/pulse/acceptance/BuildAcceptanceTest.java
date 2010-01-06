@@ -614,6 +614,24 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         stageTestsPage.waitFor();
         stageTestsPage.clickAllCrumb();
         testsPage.waitFor();
+        
+        checkApiTestSummary(expectedSummary, build);
+        @SuppressWarnings({"unchecked"})
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        checkApiTestSummary(expectedSummary, stages.get(0));
+    }
+
+    private void checkApiTestSummary(TestResultSummary expectedSummary, Hashtable<String, Object> result)
+    {
+        @SuppressWarnings({"unchecked"})
+        Hashtable<String, Object> tests = (Hashtable<String, Object>) result.get("tests");
+        assertNotNull(tests);
+        assertEquals(expectedSummary.getTotal(), tests.get("total"));
+        assertEquals(expectedSummary.getPassed(), tests.get("passed"));
+        assertEquals(expectedSummary.getSkipped(), tests.get("skipped"));
+        assertEquals(expectedSummary.getExpectedFailures(), tests.get("expectedFailures"));
+        assertEquals(expectedSummary.getFailures(), tests.get("failures"));
+        assertEquals(expectedSummary.getErrors(), tests.get("errors"));
     }
 
     public void testTestResultsNestedSuites() throws Exception

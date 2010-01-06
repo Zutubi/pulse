@@ -12,9 +12,9 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.build.queue.FatController;
-import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
 import com.zutubi.pulse.master.charting.model.DataPoint;
@@ -27,7 +27,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -51,6 +50,8 @@ import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -2393,6 +2394,7 @@ public class RemoteApi
         buildDetails.put("id", (int) build.getNumber());
         buildDetails.put("project", build.getProject().getName());
         buildDetails.put("revision", getBuildRevision(build));
+        buildDetails.put("tests", convertTests(build.getTestSummary()));
         buildDetails.put("version", getBuildVersion(build));
         addResultFields(build, buildDetails);
 
@@ -2456,6 +2458,7 @@ public class RemoteApi
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
         stage.put("name", recipeResultNode.getStageName());
         stage.put("agent", recipeResultNode.getHostSafe());
+        stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
         addResultFields(recipeResultNode.getResult(), stage);
         return stage;
     }
@@ -2481,6 +2484,18 @@ public class RemoteApi
         {
             buildDetails.put("progress", -1);
         }
+    }
+
+    private Hashtable<String, Object> convertTests(TestResultSummary testSummary)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("total", testSummary.getTotal());
+        result.put("passed", testSummary.getPassed());
+        result.put("skipped", testSummary.getSkipped());
+        result.put("expectedFailures", testSummary.getExpectedFailures());
+        result.put("failures", testSummary.getFailures());
+        result.put("errors", testSummary.getErrors());
+        return result;
     }
 
     /**
