@@ -821,6 +821,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b"), NAME_ROOT));
     }
 
+    public void testCanPullUpAncestorDoesNotDefineParentPath() throws TypeException
+    {
+        ConfigA configA = createAInstance("child");
+        configA.getBmap().get("colby").getCmap().put("colcy", new ConfigC("colcy"));
+        String path = insertTemplateAInstance(rootPath, configA, false);
+        assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "bmap", "colby", "cmap", "colcy"), NAME_ROOT));
+    }
+
     public void testCanPullUpSiblingDefinesPath() throws TypeException
     {
         String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);

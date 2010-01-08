@@ -3,10 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
@@ -15,6 +12,10 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -1592,6 +1593,12 @@ public class ConfigurationRefactoringManager
             }
 
             String ancestorPath = PathUtils.getPath(scope, ancestorKey, remainderPath);
+            String ancestorParentPath = PathUtils.getParentPath(ancestorPath);
+            if (!configurationTemplateManager.pathExists(ancestorParentPath))
+            {
+                throw new IllegalArgumentException("Ancestor parent path '" + ancestorParentPath + "' does not exist");
+            }
+            
             List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(ancestorPath, true, false, false);
             List<String> existingDescendantPaths = configurationTemplateManager.getDescendantPaths(path, false, false, false);
             descendantPaths.removeAll(existingDescendantPaths);
