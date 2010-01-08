@@ -261,8 +261,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream", false);
         upstreamProject.addRecipe("recipeA").addArtifacts("build/artifactA.jar");
         upstreamProject.addRecipe("recipeB").addArtifacts("build/artifactB.jar");
-        upstreamProject.addStage("A").setRecipe("recipeA");
-        upstreamProject.addStage("B").setRecipe("recipeB");
+        upstreamProject.addStage("Stage A").setRecipe("recipeA");
+        upstreamProject.addStage("Stage B").setRecipe("recipeB");
         upstreamProject.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
         insertProject(upstreamProject);
 
@@ -273,10 +273,10 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         dependencyConfig.setStageType(DependencyConfiguration.StageType.CORRESPONDING_STAGES);
         dependencyConfig.setCustomRevision(String.valueOf(buildNumber));
 
-        BuildStageConfiguration stageA = downstreamProject.addStage("A");
+        BuildStageConfiguration stageA = downstreamProject.addStage("Stage A");
         downstreamProject.addStageProperty(stageA, DepAntProject.PROPERTY_EXPECTED_LIST, "lib/artifactA.jar");
         downstreamProject.addStageProperty(stageA, DepAntProject.PROPERTY_NOT_EXPECTED_LIST, "lib/artifactB.jar");
-        BuildStageConfiguration stageC = downstreamProject.addStage("C");
+        BuildStageConfiguration stageC = downstreamProject.addStage("Stage C");
         downstreamProject.addStageProperty(stageC, DepAntProject.PROPERTY_NOT_EXPECTED_LIST, "list/artifactA.jar,lib/artifactB.jar");
         insertProject(downstreamProject);
 
