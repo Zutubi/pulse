@@ -10,7 +10,7 @@
 
 <table class="content">
     <tr><th>term</th><th>description</th></tr>
-    #term("agent" "An agent is a pulse server that is capable of executing recipes. Agents can be either local, in which case they are embedded in the pulse master server, or remote, i.e. installed on remote machines. This allows builds to be distributed across multiple servers.")
+    #term("agent" "An agent is a pulse service that is capable of executing recipes. Agents can be either local, in which case they are embedded in the pulse master server, or remote, i.e. installed on remote machines. This allows builds to be distributed across multiple machines.")
     #term("artifact" "A file or directory produced during a build that is captured and preserved as part of the build result.  This can include output from running commands, binaries, packages, reports, etc.")
     #term("base directory" "The base directory for a recipe is the top-level directory in which the recipe is executed.")
     #term("bootstrapping" "Bootstrapping refers to the process of obtaining an initial working copy when executing a recipe. How this is done depends on the checkout scheme for the project, but it generally involves synchronising the project source code from the appropriate SCM.")

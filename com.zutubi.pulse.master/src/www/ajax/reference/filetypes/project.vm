@@ -25,7 +25,8 @@
 <div class="example-snippet">${&lt;name&gt;}</div>
 <div class="example-snippet">$(&lt;name&gt;)</div>
 <p>
-    where &lt;name&gt; is the name of the entity being referred to.  Such entities may be simple
+    where &lt;name&gt; is the name of the entity being referred to.  The latter form is preferred,
+    as it supports more functionality (see below for details).  Referenced entities may be simple
     <a href="#" onclick="selectNode('$path/project/property'); return false">property</a> values:
 </p>
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;
