@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
 
@@ -38,13 +39,13 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         super.setUp();
         tmpDir = FileSystemUtils.createTempDir("FileSystemUtilsTest", getName());
 
-        if(FileSystemUtils.CP_AVAILABLE)
+        if (FileSystemUtils.CP_AVAILABLE)
         {
-            copiers = new Copier[]{ new DefaultCopier(), new JavaCopier(), new UnixCopier() };
+            copiers = new Copier[]{new DefaultCopier(), new JavaCopier(), new UnixCopier()};
         }
         else
         {
-            copiers = new Copier[]{ new DefaultCopier(), new JavaCopier() };
+            copiers = new Copier[]{new DefaultCopier(), new JavaCopier()};
         }
     }
 
@@ -86,7 +87,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testSetExecutableOn() throws IOException
     {
-        if(!SystemUtils.IS_WINDOWS)
+        if (!SystemUtils.IS_WINDOWS)
         {
             File temp = File.createTempFile(FileSystemUtils.class.getName(), ".tmp");
             try
@@ -105,7 +106,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testSetExecutableOff() throws IOException
     {
-        if(!SystemUtils.IS_WINDOWS)
+        if (!SystemUtils.IS_WINDOWS)
         {
             File temp = File.createTempFile(FileSystemUtils.class.getName(), ".tmp");
             try
@@ -121,7 +122,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
         }
     }
-    
+
     public void testGetFilenameExtensionEmpty()
     {
         assertEquals("", FileSystemUtils.getFilenameExtension(""));
@@ -262,7 +263,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 long startTime = System.currentTimeMillis();
                 for (int i = 0; i < 100; i++)
                 {
-                   FileSystemUtils.getPermissions(f);
+                    FileSystemUtils.getPermissions(f);
                 }
 
                 long runningTime = System.currentTimeMillis() - startTime;
@@ -271,7 +272,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 startTime = System.currentTimeMillis();
                 for (int i = 0; i < 100; i++)
                 {
-                   FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_EXECUTE);
+                    FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_EXECUTE);
                 }
 
                 runningTime = System.currentTimeMillis() - startTime;
@@ -280,8 +281,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 startTime = System.currentTimeMillis();
                 for (int i = 0; i < 100; i++)
                 {
-                   FileSystemUtils.getPermissions(f);
-                   FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_EXECUTE);
+                    FileSystemUtils.getPermissions(f);
+                    FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_EXECUTE);
                 }
 
                 runningTime = System.currentTimeMillis() - startTime;
@@ -327,7 +328,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
             finally
             {
-                if(test != null)
+                if (test != null)
                 {
                     test.delete();
                 }
@@ -346,7 +347,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
         finally
         {
-            if(test != null)
+            if (test != null)
             {
                 test.delete();
             }
@@ -364,7 +365,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
         finally
         {
-            if(test != null)
+            if (test != null)
             {
                 test.delete();
             }
@@ -382,7 +383,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
         finally
         {
-            if(test != null)
+            if (test != null)
             {
                 test.delete();
             }
@@ -391,8 +392,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testTranslateEOLCRLFAcrossBoundary() throws IOException
     {
-        byte [] in = new byte[1030];
-        byte [] out = new byte[1029];
+        byte[] in = new byte[1030];
+        byte[] out = new byte[1029];
 
         Arrays.fill(in, (byte) 'x');
         Arrays.fill(out, (byte) 'x');
@@ -409,14 +410,14 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
             byte[] got = IOUtils.fileToBytes(test);
             Assert.assertEquals(out.length, got.length);
-            for(int i = 0; i < out.length; i++)
+            for (int i = 0; i < out.length; i++)
             {
                 Assert.assertEquals(out[i], got[i]);
             }
         }
         finally
         {
-            if(test != null)
+            if (test != null)
             {
                 test.delete();
             }
@@ -425,7 +426,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     private void runCopyTest(CopyTest test) throws IOException
     {
-        for(Copier copier: copiers)
+        for (Copier copier : copiers)
         {
             FileSystemUtils.rmdir(tmpDir);
             Assert.assertTrue(tmpDir.mkdir());
@@ -630,7 +631,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         File to = new File(tmpDir, "to");
 
         FileSystemUtils.createFile(from, "test");
-        for(int i = 0; i < 2500; i++)
+        for (int i = 0; i < 2500; i++)
         {
             FileSystemUtils.copy(to, from);
         }
@@ -656,7 +657,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File destDir = new File(tmpDir, "dest");
             File dest = new File(destDir, link.getName());
             assertTrue(destDir.mkdir());
-            
+
             FileSystemUtils.copy(destDir, link);
             assertSymlinkContentCopied(dest, TEST_FILE_CONTENT);
         }
@@ -680,7 +681,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testIsSymlinkRegularFile() throws IOException
     {
-        if(FileSystemUtils.LN_AVAILABLE)
+        if (FileSystemUtils.LN_AVAILABLE)
         {
             File file = new File(tmpDir, "file");
             FileSystemUtils.createFile(file, "data");
@@ -690,7 +691,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testIsSymlinkRegularDir() throws IOException
     {
-        if(FileSystemUtils.LN_AVAILABLE)
+        if (FileSystemUtils.LN_AVAILABLE)
         {
             Assert.assertFalse(FileSystemUtils.isRelativeSymlink(tmpDir));
         }
@@ -698,7 +699,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testIsSymlinkSimpleLink() throws IOException
     {
-        if(FileSystemUtils.LN_AVAILABLE)
+        if (FileSystemUtils.LN_AVAILABLE)
         {
             File file = new File(tmpDir, "file");
             File link = new File(tmpDir, "link");
@@ -711,7 +712,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testIsSymlinkDirLink() throws IOException
     {
-        if(FileSystemUtils.LN_AVAILABLE)
+        if (FileSystemUtils.LN_AVAILABLE)
         {
             File dir = new File(tmpDir, "file");
             File link = new File(tmpDir, "link");
@@ -723,7 +724,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testIsSymlinkFileWithParentLink() throws IOException
     {
-        if(FileSystemUtils.LN_AVAILABLE)
+        if (FileSystemUtils.LN_AVAILABLE)
         {
             File dir = new File(tmpDir, "dir");
             File link = new File(tmpDir, "link");
@@ -739,7 +740,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testIsSymlinkLinkWithParentLink() throws IOException
     {
-        if(FileSystemUtils.LN_AVAILABLE)
+        if (FileSystemUtils.LN_AVAILABLE)
         {
             File dir = new File(tmpDir, "dir");
             File dirLink = new File(tmpDir, "dirlink");
@@ -841,7 +842,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File dir = new File(tmpDir, "dir");
         createDirectoryLayout(dir);
-        
+
         assertTrue(FileSystemUtils.rmdir(dir));
         assertFalse(dir.exists());
     }
@@ -1111,7 +1112,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(e.getMessage().contains("destination already exists"));
         }
     }
-    
+
     public void testRobustRenameDestExistsForced() throws IOException
     {
         File src = new File(tmpDir, "src");
@@ -1238,7 +1239,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         final String ALL_SAFE = "alphanumeric_is-123.ok";
         final String UNTRUSTED = "% !@#$%^&*()'\";:\\//<>|`~,";
-        
+
         assertEquals(ALL_SAFE, FileSystemUtils.encodeFilenameComponent(ALL_SAFE));
         assertEquals("%25%20%21%40%23%24%25%5e%26%2a%28%29%27%22%3b%3a%5c%2f%2f%3c%3e%7c%60%7e%2c", FileSystemUtils.encodeFilenameComponent(UNTRUSTED));
     }
@@ -1255,10 +1256,18 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
         });
 
-        assertEquals("file1.txt", files.get(0).getName());
-        assertEquals("file2.txt", files.get(1).getName());
-        assertEquals("file3.txt", files.get(2).getName());
-        assertEquals("root.txt", files.get(3).getName());
+        List<String> filenames = CollectionUtils.map(files, new Mapping<File, String>()
+        {
+            public String map(File file)
+            {
+                return file.getName();
+            }
+        });
+        assertEquals(4, filenames.size());
+        assertTrue(filenames.contains("file1.txt"));
+        assertTrue(filenames.contains("file2.txt"));
+        assertTrue(filenames.contains("file3.txt"));
+        assertTrue(filenames.contains("root.txt"));
 
         files = FileSystemUtils.filter(tmpDir, new Predicate<File>()
         {
@@ -1267,11 +1276,19 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 return file.isDirectory();
             }
         });
+        filenames = CollectionUtils.map(files, new Mapping<File, String>()
+        {
+            public String map(File file)
+            {
+                return file.getName();
+            }
+        });
 
-        assertEquals("a", files.get(0).getName());
-        assertEquals("b", files.get(1).getName());
-        assertEquals("c", files.get(2).getName());
-        assertEquals("d", files.get(3).getName());
+        assertEquals(4, filenames.size());
+        assertTrue(filenames.contains("a"));
+        assertTrue(filenames.contains("b"));
+        assertTrue(filenames.contains("c"));
+        assertTrue(filenames.contains("d"));
     }
 
     private void assertCreateFiles(String... paths) throws IOException
@@ -1330,7 +1347,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
         finally
         {
-            if(test != null)
+            if (test != null)
             {
                 test.delete();
             }
@@ -1353,7 +1370,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
      *
      * @param file1 the first file to compare
      * @param file2 the second file to compare
-     * @throws junit.framework.AssertionFailedError if the contents of the files differ
+     * @throws junit.framework.AssertionFailedError
+     *          if the contents of the files differ
      */
     protected void assertFilesEqual(File file1, File file2) throws IOException
     {
@@ -1468,6 +1486,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     interface Copier
     {
         String getName();
+
         void copy(File dest, File... src) throws IOException;
     }
 
