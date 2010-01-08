@@ -1,12 +1,13 @@
 package com.zutubi.pulse.master.scm.polling;
 
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
+import java.util.Arrays;
 
-public class PollingQueueTest extends ZutubiTestCase
+public class PollingQueueTest extends PulseTestCase
 {
     private PollingQueue queue;
 
@@ -103,12 +104,12 @@ public class PollingQueueTest extends ZutubiTestCase
         assertEquals(0, queue.complete(r1).size());
     }
 
-    public void testVetoActivate()
+    public void testActivateCalled()
     {
         final boolean[] called = new boolean[]{false};
         queue.setListener(new PollingActivationListener()
         {
-            public void onActivation(PollingRequest stringPredicateRequest)
+            public void onActivation(PollingRequest request)
             {
                 called[0] = true;
             }
@@ -132,12 +133,12 @@ public class PollingQueueTest extends ZutubiTestCase
 
     private void assertQueued(PollingRequest... requests)
     {
-        assertItemsEqual(queue.getSnapshot().getQueuedRequests(), requests);
+        assertItemsSame(Arrays.asList(requests), queue.getSnapshot().getQueuedRequests());
     }
 
     private void assertActivated(PollingRequest... requests)
     {
-        assertItemsEqual(queue.getSnapshot().getActivatedRequests(), requests);
+        assertItemsSame(Arrays.asList(requests), queue.getSnapshot().getActivatedRequests());
     }
 
     private class QueueThisRequest implements Predicate<PollingRequest>

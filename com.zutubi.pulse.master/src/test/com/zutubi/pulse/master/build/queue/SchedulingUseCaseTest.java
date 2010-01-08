@@ -14,6 +14,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Matchers.eq;
 
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Check that a set of use cases behave as expected.
@@ -383,13 +384,13 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
     private void assertActivated(BuildRequestEvent... requests)
     {
         List<BuildRequestEvent> activatedRequests = controller.getSnapshot().getActivatedBuildRequests();
-        assertItemsEqual(activatedRequests, requests);
+        assertItemsSame(Arrays.asList(requests), activatedRequests);
     }
 
     private void assertQueued(BuildRequestEvent... requests)
     {
         List<BuildRequestEvent> queuedRequests = controller.getSnapshot().getQueuedBuildRequests();
-        assertItemsEqual(queuedRequests, requests);
+        assertItemsSame(Arrays.asList(requests), queuedRequests);
     }
 
     private void assertActivatedEvents(BuildRequestEvent... requests)
@@ -402,6 +403,6 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
                 return buildActivatedEvent.getEvent();
             }
         });
-        assertItemsEqual(activatedEvents, requests);
+        assertItemsSame(Arrays.asList(requests), activatedEvents);
     }
 }

@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.model.Project;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Arrays;
 
 public class BuildQueueTest extends BaseQueueTestCase
 {
@@ -274,12 +275,12 @@ public class BuildQueueTest extends BaseQueueTestCase
 
     private void assertQueued(BuildRequestEvent... requests)
     {
-        assertItemsEqual(buildQueue.getSnapshot().getQueuedBuildRequests(), requests);
+        assertItemsSame(Arrays.asList(requests), buildQueue.getSnapshot().getQueuedBuildRequests());
     }
 
     private void assertActivated(BuildRequestEvent... requests)
     {
-        assertItemsEqual(buildQueue.getSnapshot().getActivatedBuildRequests(), requests);
+        assertItemsSame(Arrays.asList(requests), buildQueue.getSnapshot().getActivatedBuildRequests());
     }
 
     private static class ActivateIfIdlePredicate implements QueuedRequestPredicate

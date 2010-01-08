@@ -5,6 +5,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.build.control.BuildController;
@@ -22,9 +23,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
-import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.reflection.ReflectionUtils;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
@@ -38,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Base test case with loads of goodies needed to test the
  * individual components of the queuing system.
  */
-public abstract class BaseQueueTestCase extends ZutubiTestCase
+public abstract class BaseQueueTestCase extends PulseTestCase
 {
     protected AtomicInteger nextId = new AtomicInteger(1);
 
@@ -249,22 +248,6 @@ public abstract class BaseQueueTestCase extends ZutubiTestCase
         controllers.put(request, controller);
 
         return request;
-    }
-
-    protected <T> void assertItemsEqual(List<T> actual, T... expected)
-    {
-        assertEquals(expected.length, actual.size());
-
-        for (final T expectedItem : expected)
-        {
-            assertNotNull(CollectionUtils.find(actual, new Predicate<T>()
-            {
-                public boolean satisfied(T actualItem)
-                {
-                    return expectedItem == actualItem;
-                }
-            }));
-        }
     }
 
     protected QueuedRequest queue(BuildRequestEvent request)

@@ -1,8 +1,6 @@
 package com.zutubi.util.junit;
 
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
 import junit.framework.TestCase;
@@ -15,7 +13,6 @@ import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
-import java.util.List;
 
 /**
  * A useful base class for JUnit test cases that nulls out fields in teardown
@@ -251,21 +248,4 @@ public class ZutubiTestCase extends TestCase
             throw new IOException("Unable to remove '" + dir + "' because your OS is not brown enough");
         }
     }
-
-    protected <T> void assertItemsEqual(List<T> actual, T... expected)
-    {
-        assertEquals(expected.length, actual.size());
-
-        for (final T expectedItem : expected)
-        {
-            assertNotNull(CollectionUtils.find(actual, new Predicate<T>()
-            {
-                public boolean satisfied(T actualItem)
-                {
-                    return expectedItem == actualItem;
-                }
-            }));
-        }
-    }
-
 }

@@ -1,11 +1,14 @@
 package com.zutubi.pulse.core.test.api;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -60,6 +63,22 @@ public abstract class PulseTestCase extends ZutubiTestCase
         finally
         {
             IOUtils.close(is);
+        }
+    }
+
+    protected <T> void assertItemsSame(List<T> expected, List<T> actual)
+    {
+        assertEquals(expected.size(), actual.size());
+
+        for (final T expectedItem : expected)
+        {
+            assertNotNull(CollectionUtils.find(actual, new Predicate<T>()
+            {
+                public boolean satisfied(T actualItem)
+                {
+                    return expectedItem == actualItem;
+                }
+            }));
         }
     }
 }

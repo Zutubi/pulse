@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.model.SequenceManager;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Arrays;
 
 public class SchedulingControllerTest extends BaseQueueTestCase
 {
@@ -259,12 +260,12 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     private void assertActivated(BuildRequestEvent... requests)
     {
         List<BuildRequestEvent> activatedRequests = controller.getSnapshot().getActivatedBuildRequests();
-        assertItemsEqual(activatedRequests, requests);
+        assertItemsSame(Arrays.asList(requests), activatedRequests);
     }
 
     private void assertQueued(BuildRequestEvent... requests)
     {
         List<BuildRequestEvent> queuedRequests = controller.getSnapshot().getQueuedBuildRequests();
-        assertItemsEqual(queuedRequests, requests);
+        assertItemsSame(Arrays.asList(requests), queuedRequests);
     }
 }
