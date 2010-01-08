@@ -66,6 +66,21 @@ public abstract class PulseTestCase extends ZutubiTestCase
         }
     }
 
+    /**
+     * Asserts that all items in an expected list are found, in any order, in
+     * the actual list.  The lists must also be of the same size, implying that
+     * (when there are no duplicate elements) the lists are permutations of
+     * each other.  If there are duplicate elements in both lists the assertion
+     * may pass despite the lists not containing the same duplications.  Items
+     * are compared using == (i.e. by identity).
+     *
+     * @param expected the items that are expected
+     * @param actual   the actual list obtained by testing
+     * @param <T> the type of the list element
+     *
+     * @throws junit.framework.AssertionFailedError if the actual list does not
+     *         have the same items as the expected one
+     */
     protected <T> void assertItemsSame(List<T> expected, List<T> actual)
     {
         assertEquals(expected.size(), actual.size());
