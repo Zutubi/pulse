@@ -5,13 +5,13 @@ import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.settings.IvySettings;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.io.IOException;
-import java.io.File;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The ivy configuration defines how the underlying ivy instance will be
@@ -26,6 +26,7 @@ public class IvyConfiguration
     private static final String IVY_CACHE_DIR = "ivy.cache.dir";
     private static final String IVY_CACHE_RESOLUTION = "ivy.cache.resolution";
     private static final String IVY_CACHE_REPOSITORY = "ivy.cache.repository";
+    private static final String IVY_CACHE_ARTIFACT_PATTERN = "([organisation]/)[module]/([stage]/)([type]s/)[artifact]-[revision](.[ext])";
 
     /**
      * A set of key value pairs that are passed through to the underlying ivy
@@ -108,7 +109,7 @@ public class IvyConfiguration
     {
         IvySettings settings = new IvySettings();
         settings.load(getClass().getResource("ivysettings.xml"));
-
+        settings.setDefaultCacheArtifactPattern(IVY_CACHE_ARTIFACT_PATTERN);
         for (String variableName : getVariables().keySet())
         {
             settings.setVariable(variableName, getVariable(variableName));

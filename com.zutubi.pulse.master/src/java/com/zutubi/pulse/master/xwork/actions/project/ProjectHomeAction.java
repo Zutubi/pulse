@@ -195,11 +195,16 @@ public class ProjectHomeAction extends ProjectActionBase
         recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns(), accessManager);
 
         File contentRoot = systemPaths.getContentRoot();
-        List<String> availabledActions = actionManager.getActions(project.getConfig(), false, true);
+        List<String> availableActions = actionManager.getActions(project.getConfig(), false, true);
+        if (accessManager.hasPermission(AccessManager.ACTION_WRITE, project.getConfig()))
+        {
+            availableActions.add(AccessManager.ACTION_WRITE);
+        }
+        
         Messages messages = Messages.getInstance(ProjectConfiguration.class);
         for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN, ACTION_TRIGGER, ACTION_REBUILD))
         {
-            if (availabledActions.contains(candidateAction))
+            if (availableActions.contains(candidateAction))
             {
                 actions.add(ToveUtils.getActionLink(candidateAction, messages, contentRoot));
             }
