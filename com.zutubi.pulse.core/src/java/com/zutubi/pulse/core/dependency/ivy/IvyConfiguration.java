@@ -20,9 +20,9 @@ import java.text.ParseException;
  */
 public class IvyConfiguration
 {
-    private static final String DEFAULT_PATTERN_ARTIFACT = "([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[ext]";
-    private static final String DEFAULT_PATTERN_IVY = "([organisation]/)[module]/ivy-[revision].xml";
-    
+    private static final String DEFAULT_PATTERN_ARTIFACT = "([organisation]/)[module]/([stage]/)[artifact](-[revision])(.[ext])";
+    private static final String DEFAULT_PATTERN_IVY = "([organisation]/)[module]/ivy(-[revision]).xml";
+
     private static final String IVY_CACHE_DIR = "ivy.cache.dir";
     private static final String IVY_CACHE_RESOLUTION = "ivy.cache.resolution";
     private static final String IVY_CACHE_REPOSITORY = "ivy.cache.repository";
@@ -52,6 +52,13 @@ public class IvyConfiguration
     {
     }
 
+    public IvyConfiguration(File repositoryBase, String artifactPattern, String ivyPattern)
+    {
+        this(repositoryBase.toURI().toString());
+        this.artifactPattern = artifactPattern;
+        this.ivyPattern = ivyPattern;
+    }
+    
     public IvyConfiguration(String repositoryBase)
     {
         this.repositoryBase = repositoryBase;

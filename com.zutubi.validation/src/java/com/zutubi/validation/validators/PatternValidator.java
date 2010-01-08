@@ -55,6 +55,5 @@ public class PatternValidator extends StringFieldValidatorSupport
                 //
             }
         }
-
     }
 }

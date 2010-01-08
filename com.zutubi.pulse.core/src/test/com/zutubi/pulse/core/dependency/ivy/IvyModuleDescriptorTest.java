@@ -86,7 +86,7 @@ public class IvyModuleDescriptorTest extends ZutubiTestCase
         IvyModuleDescriptor descriptor = new IvyModuleDescriptor("org", "module", "revision", configuration);
         descriptor.addArtifact(new File("artifact.jar"), "build");
         List<String> paths = descriptor.getArtifactPaths();
-        assertEquals(Arrays.asList("org/module/build/jars/artifact-revision.jar"), paths);
+        assertEquals(Arrays.asList("org/module/build/artifact-revision.jar"), paths);
     }
 
     public void testEncodedArtifactPaths()
@@ -94,7 +94,7 @@ public class IvyModuleDescriptorTest extends ZutubiTestCase
         IvyModuleDescriptor descriptor = new IvyModuleDescriptor("or*", "modul*", "revision", configuration);
         descriptor.addArtifact(new File("artifac*.ja*"), "buil*");
         List<String> paths = descriptor.getArtifactPaths();
-        assertEquals(Arrays.asList("or$2a/modul$2a/buil$2a/ja$2as/artifac$2a-revision.ja$2a"), paths);
+        assertEquals(Arrays.asList("or$2a/modul$2a/buil$2a/artifac$2a-revision.ja$2a"), paths);
     }
 
     public void testGetArtifacts()

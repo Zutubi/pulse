@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.UNKNOWN;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -29,7 +30,7 @@ public class IvyClientTest extends ZutubiTestCase
         tmp = createTempDirectory();
         repositoryBase = new File(tmp, "repository");
         workBase = new File(tmp, "work");
-        standardRetrievalPattern = workBase.getCanonicalPath() + "/[artifact]-[revision].[ext]";
+        standardRetrievalPattern = workBase.getCanonicalPath() + "/[artifact](-[revision])(.[ext])";
         File cacheBase = new File(tmp, "cache");
 
         configuration = new IvyConfiguration(repositoryBase.toURI().toString());
@@ -61,7 +62,7 @@ public class IvyClientTest extends ZutubiTestCase
 
         client.publishArtifacts(descriptor);
 
-        assertExists(repositoryBase, "org/modu$21le/build/jars/artifact-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/build/artifact-revision.jar");
     }
 
     public void testPublishMultipleArtifacts() throws IOException
@@ -71,8 +72,8 @@ public class IvyClientTest extends ZutubiTestCase
 
         client.publishArtifacts(descriptor);
 
-        assertExists(repositoryBase, "org/modu$21le/build/jars/artifactA-revision.jar");
-        assertExists(repositoryBase, "org/modu$21le/build/jars/artifactB-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/build/artifactA-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/build/artifactB-revision.jar");
     }
 
     public void testPublishArtifactByConf() throws IOException
@@ -82,8 +83,8 @@ public class IvyClientTest extends ZutubiTestCase
 
         client.publishArtifacts(descriptor, "buildA");
 
-        assertExists(repositoryBase, "org/modu$21le/buildA/jars/artifactA-revision.jar");
-        assertNotExists(repositoryBase, "org/modu$21le/buildB/jars/artifactB-revision.jar");
+        assertExists(repositoryBase, "org/modu$21le/buildA/artifactA-revision.jar");
+        assertNotExists(repositoryBase, "org/modu$21le/buildB/artifactB-revision.jar");
     }
 
     public void testPublishDescriptor() throws IOException, ParseException
@@ -258,6 +259,23 @@ public class IvyClientTest extends ZutubiTestCase
         assertEquals(1, report.getRetrievedArtifacts().size());
 
         report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        assertEquals(1, report.getRetrievedArtifacts().size());
+    }
+
+    public void testPublishAndRetrieveArtifactWithoutExtension() throws IOException, ParseException
+    {
+        descriptor.addArtifact("artifact", UNKNOWN, UNKNOWN, createArtifact("artifact"), "build");
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
+
+        assertExists(repositoryBase, "org/modu$21le/build/artifact-revision");
+
+        IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
+
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+
+        assertExists(workBase, "artifact-revision");
         assertEquals(1, report.getRetrievedArtifacts().size());
     }
 

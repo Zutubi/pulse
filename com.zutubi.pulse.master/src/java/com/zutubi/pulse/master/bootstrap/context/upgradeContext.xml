@@ -114,6 +114,8 @@
                 <ref local="addConfigAuditLoggingEnabled"/>
                 <ref local="dependencyCorrespondingStages"/>
                 <ref local="deleteStatisticsCallbackTrigger"/>
+                <ref local="removeTypeFromArtifactPattern"/>
+                <ref local="upgradeDefaultArtifactPattern"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -553,4 +555,13 @@
     <bean id="deleteStatisticsCallbackTrigger" class="com.zutubi.pulse.master.upgrade.tasks.DeleteStatisticsCallbackTriggerUpgradeTask">
         <property name="buildNumber" value="201012001"/>
     </bean>
+
+    <bean id="removeTypeFromArtifactPattern" class="com.zutubi.pulse.master.upgrade.tasks.RemoveTypeFromArtifactPatternUpgradeTask">
+        <property name="buildNumber" value="201013001"/>
+    </bean>
+
+    <bean id="upgradeDefaultArtifactPattern" class="com.zutubi.pulse.master.upgrade.tasks.UpgradeDefaultArtifactPatternUpgradeTask">
+        <property name="buildNumber" value="201013002"/>
+    </bean>
+
 </beans>

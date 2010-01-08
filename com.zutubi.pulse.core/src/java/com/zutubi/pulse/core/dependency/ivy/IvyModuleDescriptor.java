@@ -46,6 +46,7 @@ public class IvyModuleDescriptor
     public static final String CORRESPONDING_STAGE = "#";
     public static final String SOURCEFILE = "sourcefile";
     public static final String STAGE = "stage";
+    public static final String UNKNOWN = "";
 
     /**
      * The stage extra attribute is used to track which stage a particular artifact was produced by.
@@ -202,7 +203,7 @@ public class IvyModuleDescriptor
      * and extension of the artifact are taken from the respective portions of the file.
      * @param stageName          the stage to which this artifact belongs.
      *
-     * @see #addArtifact(String, String, String, java.util.Map)
+     * @see #addArtifact(String, String, String, java.io.File, String)
      * @see #EXTRA_ATTRIBUTE_SOURCE_FILE
      * @see #EXTRA_ATTRIBUTE_STAGE 
      */
@@ -211,7 +212,7 @@ public class IvyModuleDescriptor
         String artifactName = artifactFile.getName().substring(0, artifactFile.getName().lastIndexOf('.'));
         String artifactExt = artifactFile.getName().substring(artifactFile.getName().lastIndexOf('.') + 1);
 
-        addArtifact(artifactName, artifactExt, artifactFile, stageName);
+        addArtifact(artifactName, artifactExt, artifactExt, artifactFile, stageName);
     }
 
     /**
@@ -221,30 +222,32 @@ public class IvyModuleDescriptor
      * {@link #EXTRA_ATTRIBUTE_SOURCE_FILE} and {@link #EXTRA_ATTRIBUTE_STAGE} values respectively.
      *
      * @param artifactName      the name of the artifact
-     * @param artifactExt       the extension of the artifact.  This doubles up with the type of the artifact.
+     * @param artifactType      the extension of the artifact.
+     * @param artifactExt       the extension of the artifact.
      * @param artifactFile      the actual artifact source file.
      * @param stageName         the name of the stage the artifact is associated with.
      */
-    public void addArtifact(String artifactName, String artifactExt, File artifactFile, String stageName)
+    public void addArtifact(String artifactName, String artifactType, String artifactExt, File artifactFile, String stageName)
     {
         Map<String, String> extraAttributes = new HashMap<String, String>();
         extraAttributes.put(EXTRA_ATTRIBUTE_SOURCE_FILE, getFilePathBestEffort(artifactFile));
         extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, stageName);
 
-        addArtifact(artifactName, artifactExt, stageName, extraAttributes);
+        addArtifact(artifactName, artifactType, artifactExt, stageName, extraAttributes);
     }
 
     /**
      * Add an artifact to this module descriptor.
      *
      * @param artifactName      the name of the artifact.
+     * @param artifactType      the type of the artifact
      * @param artifactExt       the extension of the artifact
      * @param stageName         the stage to which this artifact belongs.
      * @param extraAttributes   any extra attributes to be associated with this artifact.
      */
-    public void addArtifact(String artifactName, String artifactExt, String stageName, Map<String, String> extraAttributes)
+    public void addArtifact(String artifactName, String artifactType, String artifactExt, String stageName, Map<String, String> extraAttributes)
     {
-        MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactExt, artifactExt, null, extraAttributes);
+        MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactType, artifactExt, null, extraAttributes);
         ivyArtifact.addConfiguration(stageName);
 
         String conf = ensureConfigurationExists(stageName);

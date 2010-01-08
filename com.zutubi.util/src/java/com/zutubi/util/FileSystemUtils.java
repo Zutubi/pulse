@@ -1368,4 +1368,37 @@ public class FileSystemUtils
             }
         });
     }
+
+    /**
+     * A recursive search through the specified directory, returning all of the files
+     * that match the predicate.
+     *
+     * @param base          the base directory of the search
+     * @param predicate     the predicate that defined which files are matched.
+     * @return  a list of all the matched files.
+     */
+    public static List<File> filter(File base, Predicate<File> predicate)
+    {
+        List<File> satisfiedFiles = new LinkedList<File>();
+        for (File f : base.listFiles())
+        {
+            filter(f, predicate, satisfiedFiles);
+        }
+        return satisfiedFiles;
+    }
+
+    private static void filter(File base, Predicate<File> predicate, List<File> satisfiedFiles)
+    {
+        if (predicate.satisfied(base))
+        {
+            satisfiedFiles.add(base);
+        }
+        if (base.isDirectory())
+        {
+            for (File f : base.listFiles())
+            {
+                filter(f, predicate, satisfiedFiles);
+            }
+        }
+    }
 }

@@ -40,11 +40,11 @@ public abstract class FileSystemArtifactConfigurationSupport extends ArtifactCon
     /**
      * The default artifact pattern uses the files name for the
      * artifact name, and the files extension for the artifacts
-     * extension.
+     * extension.  The artifacts extension is optional.
      */
-    @ValidRegex(groupCount = 2)
+    @ValidRegex
     @Wizard.Ignore
-    private String artifactPattern = "(.+)\\.(.+)";
+    private String artifactPattern = "(.*?)(?:\\.([^.]*))?";
 
     protected FileSystemArtifactConfigurationSupport()
     {

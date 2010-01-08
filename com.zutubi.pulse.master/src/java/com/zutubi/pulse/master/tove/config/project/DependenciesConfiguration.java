@@ -22,7 +22,7 @@ public class DependenciesConfiguration extends AbstractConfiguration
 
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
-    private String retrievalPattern = "lib/[artifact].[ext]";
+    private String retrievalPattern = "lib/[artifact](.[ext])";
 
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")

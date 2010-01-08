@@ -1243,6 +1243,51 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals("%25%20%21%40%23%24%25%5e%26%2a%28%29%27%22%3b%3a%5c%2f%2f%3c%3e%7c%60%7e%2c", FileSystemUtils.encodeFilenameComponent(UNTRUSTED));
     }
 
+    public void testFilterFiles() throws IOException
+    {
+        assertCreateFiles("root.txt", "a/file1.txt", "b/file2.txt", "c/d/file3.txt");
+
+        List<File> files = FileSystemUtils.filter(tmpDir, new Predicate<File>()
+        {
+            public boolean satisfied(File file)
+            {
+                return file.isFile();
+            }
+        });
+
+        assertEquals("file1.txt", files.get(0).getName());
+        assertEquals("file2.txt", files.get(1).getName());
+        assertEquals("file3.txt", files.get(2).getName());
+        assertEquals("root.txt", files.get(3).getName());
+
+        files = FileSystemUtils.filter(tmpDir, new Predicate<File>()
+        {
+            public boolean satisfied(File file)
+            {
+                return file.isDirectory();
+            }
+        });
+
+        assertEquals("a", files.get(0).getName());
+        assertEquals("b", files.get(1).getName());
+        assertEquals("c", files.get(2).getName());
+        assertEquals("d", files.get(3).getName());
+    }
+
+    private void assertCreateFiles(String... paths) throws IOException
+    {
+        for (String path : paths)
+        {
+            File file = new File(tmpDir, path);
+            File parent = file.getParentFile();
+            if (!parent.exists())
+            {
+                assertTrue(parent.mkdirs());
+            }
+            assertTrue(file.createNewFile());
+        }
+    }
+
     private boolean notRoot()
     {
         return !"root".equals(System.getProperty("user.name"));

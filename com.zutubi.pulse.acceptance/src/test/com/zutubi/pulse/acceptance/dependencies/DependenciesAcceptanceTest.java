@@ -504,6 +504,52 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyInRepository(projectB, buildNumber);
     }
 
+    public void testArtifactWithUnknownExtension() throws Exception
+    {
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addArtifact("artifact", "build/artifactWithNoExtension").setArtifactPattern("(.+)");
+        projectA.addFilesToCreate("build/artifactWithNoExtension");
+        insertProject(projectA);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        assertIvyInRepository(projectA, buildNumber);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/artifactWithNoExtension");
+        insertProject(projectB);
+
+        buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
+
+        assertIvyInRepository(projectB, buildNumber);
+    }
+
+    public void testDirectoryOfMixedExtensionArtifacts() throws Exception
+    {
+        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        projectA.addDirArtifact("dirArtifact", "build/blah");
+        projectA.addFilesToCreate("build/blah/artifact-A.jar");
+        projectA.addFilesToCreate("build/blah/artifact-B");
+        projectA.addFilesToCreate("build/blah/artifact-C.txt");
+        insertProject(projectA);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
+
+        assertIvyInRepository(projectA, buildNumber);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/artifact-A.jar");
+        projectB.addExpectedFiles("lib/artifact-B");
+        projectB.addExpectedFiles("lib/artifact-C.txt");
+        insertProject(projectB);
+
+        buildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
+
+        assertIvyInRepository(projectB, buildNumber);
+    }
+
     public void testArtifactPattern() throws Exception
     {
         DepAntProject project = projects.createDepAntProject(randomName);

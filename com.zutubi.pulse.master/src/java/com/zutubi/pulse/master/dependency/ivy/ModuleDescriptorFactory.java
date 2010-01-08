@@ -232,26 +232,24 @@ public class ModuleDescriptorFactory
         Matcher m = artifactDetail.getPattern().matcher(artifactFilename);
         if (m.matches())
         {
-            if (m.groupCount() < 2)
+            String artifactName = IvyModuleDescriptor.UNKNOWN;
+            if (m.groupCount() > 0)
             {
-                result.warning(I18N.format("pattern.match.unexpectedGroupCount", artifactDetail.getArtifactPattern(), artifactFilename));
-                return false;
+                artifactName = m.group(1);
             }
-            String artifactName = m.group(1);
+            String artifactExt = IvyModuleDescriptor.UNKNOWN;
+            if (m.groupCount() > 1)
+            {
+                artifactExt = m.group(2);
+            }
+
             if (artifactName == null || artifactName.trim().length() == 0)
             {
                 result.warning(I18N.format("pattern.match.missingArtifactName", artifactDetail.getArtifactPattern(), artifactFilename));
                 return false;
             }
 
-            String artifactExt = m.group(2);
-            if (artifactExt == null || artifactExt.trim().length() == 0)
-            {
-                result.warning(I18N.format("pattern.match.missingArtifactExtension", artifactDetail.getArtifactPattern(), artifactFilename));
-                return false;
-            }
-
-            descriptor.addArtifact(artifactName, artifactExt, artifactDetail.getArtifactFile(), artifactDetail.getStageName());
+            descriptor.addArtifact(artifactName, artifactExt, artifactExt, artifactDetail.getArtifactFile(), artifactDetail.getStageName());
             return true;
         }
         else
