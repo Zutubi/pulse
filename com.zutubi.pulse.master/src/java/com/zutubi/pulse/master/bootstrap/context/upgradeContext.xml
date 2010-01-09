@@ -116,6 +116,7 @@
                 <ref local="deleteStatisticsCallbackTrigger"/>
                 <ref local="removeTypeFromArtifactPattern"/>
                 <ref local="upgradeDefaultArtifactPattern"/>
+                <ref local="addLdapPasswordAttribute"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -564,4 +565,7 @@
         <property name="buildNumber" value="201013002"/>
     </bean>
 
+    <bean id="addLdapPasswordAttribute" class="com.zutubi.pulse.master.upgrade.tasks.AddLdapPasswordAttributeUpgradeTask">
+        <property name="buildNumber" value="201013003"/>
+    </bean>
 </beans>

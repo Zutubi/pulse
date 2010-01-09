@@ -11,8 +11,8 @@ import java.util.List;
  */
 @SymbolicName("zutubi.ldapConfig")
 @Form(fieldOrder = {"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
-        "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDns", "groupSearchFilter",
-        "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
+        "userBaseDn", "userFilter", "autoAddUsers", "passwordAttribute", "emailAttribute", "groupBaseDns",
+        "groupSearchFilter", "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
 @ConfigurationCheck("LDAPConfigurationCheckHandler")
 @Classification(single = "security")
 public class LDAPConfiguration extends AbstractConfiguration
@@ -32,6 +32,7 @@ public class LDAPConfiguration extends AbstractConfiguration
     @Required
     private String userFilter;
     private boolean autoAddUsers;
+    private String passwordAttribute;
     private String emailAttribute;
 
     @StringList
@@ -126,6 +127,16 @@ public class LDAPConfiguration extends AbstractConfiguration
     public void setAutoAddUsers(boolean autoAddUsers)
     {
         this.autoAddUsers = autoAddUsers;
+    }
+
+    public String getPasswordAttribute()
+    {
+        return passwordAttribute;
+    }
+
+    public void setPasswordAttribute(String passwordAttribute)
+    {
+        this.passwordAttribute = passwordAttribute;
     }
 
     public String getEmailAttribute()

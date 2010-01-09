@@ -26,6 +26,7 @@ import org.acegisecurity.ldap.search.FilterBasedLdapUserSearch;
 import org.acegisecurity.providers.ldap.authenticator.BindAuthenticator;
 import org.acegisecurity.providers.ldap.populator.DefaultLdapAuthoritiesPopulator;
 import org.acegisecurity.userdetails.ldap.LdapUserDetails;
+import org.acegisecurity.userdetails.ldap.LdapUserDetailsMapper;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -84,7 +85,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             boolean escapeSpaces = ldapConfiguration.getEscapeSpaceCharacters();
 
             contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, followReferrals, escapeSpaces);
-            authenticator = createAuthenticator(ldapConfiguration.getUserBaseDn(), ldapConfiguration.getUserFilter(), contextFactory);
+            authenticator = createAuthenticator(ldapConfiguration.getUserBaseDn(), ldapConfiguration.getUserFilter(), ldapConfiguration.getPasswordAttribute(), contextFactory);
 
             try
             {
@@ -148,13 +149,20 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return result;
     }
 
-    private BindAuthenticator createAuthenticator(String userBase, String userFilter, DefaultInitialDirContextFactory contextFactory)
+    private BindAuthenticator createAuthenticator(String userBase, String userFilter, String passwordAttribute, DefaultInitialDirContextFactory contextFactory)
     {
         FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch(userBase, convertUserFilter(userFilter), contextFactory);
         search.setSearchSubtree(true);
 
         BindAuthenticator authenticator = new BindAuthenticator(contextFactory);
         authenticator.setUserSearch(search);
+        if (StringUtils.stringSet(passwordAttribute))
+        {
+            LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
+            mapper.setPasswordAttributeName(passwordAttribute);
+            authenticator.setUserDetailsMapper(mapper);
+        }
+
         return authenticator;
     }
 
@@ -371,7 +379,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         DefaultInitialDirContextFactory contextFactory = createContextFactory(configuration.getLdapUrl(), configuration.getBaseDn(), configuration.getManagerDn(), configuration.getManagerPassword(), configuration.getFollowReferrals(), configuration.getEscapeSpaceCharacters());
         contextFactory.newInitialDirContext();
 
-        BindAuthenticator authenticator = createAuthenticator(configuration.getUserBaseDn(), configuration.getUserFilter(), contextFactory);
+        BindAuthenticator authenticator = createAuthenticator(configuration.getUserBaseDn(), configuration.getUserFilter(), configuration.getPasswordAttribute(), contextFactory);
         LdapUserDetails details = ldapAuthenticate(authenticator, testLogin, testPassword);
 
         if (!configuration.getGroupBaseDns().isEmpty())
