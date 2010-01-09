@@ -8,26 +8,25 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
 import org.acegisecurity.AccessDeniedException;
-
-import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+
+import java.util.*;
+import static java.util.Arrays.asList;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -267,20 +266,34 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneWithInternalReference()
     {
-        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        cloneWithInternalReferenceHelper(configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a")));
+    }
+
+    public void testCloneWithInternalReferenceInTemplatedScope() throws TypeException
+    {
+        cloneWithInternalReferenceHelper(insertTemplateAInstance(rootPath, createAInstance("a"), false));
+    }
+
+    private void cloneWithInternalReferenceHelper(String path)
+    {
         ConfigA instance = configurationTemplateManager.getInstance(path, ConfigA.class);
         instance.setRefToRef(instance.getRef());
+        instance.getListOfRefs().add(instance.getRef());
         configurationTemplateManager.save(instance);
 
         String clonePath = configurationRefactoringManager.clone(path, "clone");
         instance = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertNotNull(instance.getRef());
         assertSame(instance.getRef(), instance.getRefToRef());
+        assertEquals(1, instance.getListOfRefs().size());
+        assertSame(instance.getRef(), instance.getListOfRefs().get(0));
 
         ConfigA cloneInstance = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
         assertNotSame(instance.getRef(), cloneInstance.getRef());
         assertNotSame(instance.getRefToRef(), cloneInstance.getRefToRef());
         assertSame(cloneInstance.getRef(), cloneInstance.getRefToRef());
+        assertEquals(1, cloneInstance.getListOfRefs().size());
+        assertSame(cloneInstance.getRef(), cloneInstance.getListOfRefs().get(0));
     }
 
     public void testMultipleCloneWithReferenceBetween()

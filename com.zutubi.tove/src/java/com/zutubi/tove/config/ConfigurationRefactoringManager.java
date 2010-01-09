@@ -3,7 +3,10 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
@@ -12,10 +15,6 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -648,8 +647,12 @@ public class ConfigurationRefactoringManager
             String symbolicName = record.getSymbolicName();
             if (symbolicName != null)
             {
-                CompositeType type = typeRegistry.getType(symbolicName);
+                // Lazily created only when we need to make an update.  This
+                // approach makes this method quite long, in the name of
+                // efficiency.
                 MutableRecord mutableRecord = null;
+
+                CompositeType type = typeRegistry.getType(symbolicName);
                 for (TypeProperty property : type.getProperties(ReferenceType.class))
                 {
                     Object data = record.get(property.getName());
@@ -658,7 +661,7 @@ public class ConfigurationRefactoringManager
                         try
                         {
                             // Does the referenced path fall into the clone set?
-                            final ReferenceType referenceType = (ReferenceType) property.getType();
+                            ReferenceType referenceType = (ReferenceType) property.getType();
                             String referencedPath = referenceType.getReferencedPath(templateOwnerPath, data);
                             if (inCloneSet(referencedPath, parentPath, oldKeyToNewKey.keySet()))
                             {
@@ -677,6 +680,55 @@ public class ConfigurationRefactoringManager
                         catch (TypeException e)
                         {
                             LOG.severe(e);
+                        }
+                    }
+                }
+
+                for (TypeProperty property: type.getProperties(ListType.class))
+                {
+                    Type targetType = property.getType().getTargetType();
+                    if (targetType instanceof ReferenceType)
+                    {
+                        String[] value = (String[]) record.get(property.getName());
+                        if (value != null)
+                        {
+                            ReferenceType referenceType = (ReferenceType) targetType;
+                            // Created when we find something to update - if no
+                            // updates are made this will be null after the loop.
+                            String[] newValue = null;
+                            for (int i = 0; i < value.length; i++)
+                            {
+                                try
+                                {
+                                    String referencedPath = referenceType.getReferencedPath(templateOwnerPath, value[i]);
+                                    if (inCloneSet(referencedPath, parentPath, oldKeyToNewKey.keySet()))
+                                    {
+                                        String newPath = convertPath(referencedPath, parentPath, oldKeyToNewKey);
+                                        long newHandle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, newPath);
+                                        if (newValue == null)
+                                        {
+                                            newValue = new String[value.length];
+                                            System.arraycopy(value, 0, newValue, 0, value.length);
+                                        }
+
+                                        newValue[i] = Long.toString(newHandle);
+                                    }
+                                }
+                                catch (TypeException e)
+                                {
+                                    LOG.severe(e);
+                                }
+                            }
+
+                            if (newValue != null)
+                            {
+                                if (mutableRecord == null)
+                                {
+                                    mutableRecord = record.copy(false, true);
+                                }
+
+                                mutableRecord.put(property.getName(), newValue);
+                            }
                         }
                     }
                 }
