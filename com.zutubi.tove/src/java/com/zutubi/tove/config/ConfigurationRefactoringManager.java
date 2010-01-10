@@ -3,10 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
@@ -15,6 +12,10 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -524,24 +525,16 @@ public class ConfigurationRefactoringManager
                 Record record = checkKeys(parentPath, originalKey, cloneKey, templatedCollection, seenNames);
                 configurationTemplateManager.validateNameIsUnique(parentPath, cloneKey, keyPropertyName, textProvider);
 
-                MutableRecord clone;
-                if (record instanceof TemplateRecord)
-                {
-                    clone = ((TemplateRecord) record).flatten();
-                }
-                else
-                {
-                    clone = record.copy(true, false);
-                }
-                
+                MutableRecord clone = copySimple(record);
                 clone.put(keyPropertyName, cloneKey);
-
-                if(templatedCollection)
+                if (templatedCollection)
                 {
                     checkParent(parentPath, originalKey, clone, originalKeyToCloneKey);
                 }
 
-                configurationTemplateManager.insertRecord(parentPath, clone);
+                String clonePath = getPath(parentPath, cloneKey);
+                recordManager.insert(clonePath, clone);
+                cloneChildren(clonePath, record, mapType.getTargetType());
             }
 
             // Now rewrite all internal references that fall inside the clone set
@@ -588,7 +581,14 @@ public class ConfigurationRefactoringManager
             }
 
             String path = getPath(parentPath, originalKey);
-            Record record = configurationTemplateManager.getRecord(path);
+            // If we are cloning an element of a templated collection, we can
+            // just copy the raw records as the cloned item will inherit
+            // everything the original item does.  If we are cloning anything
+            // else, the new clone will not inherit anything, so we take the
+            // whole template record (and later flatten it) so all the values
+            // in the clone are the same as the original (whether the original
+            // inherited them or not).
+            Record record = templatedCollection ? recordManager.select(path) : configurationTemplateManager.getRecord(path);
             if (record == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': path does not exist");
@@ -598,7 +598,7 @@ public class ConfigurationRefactoringManager
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': refers to a permanent record");
             }
-            
+
             if(templatedCollection && configurationTemplateManager.getTemplateParentHandle(path, record) == 0)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': cannot clone root of a template hierarchy");
@@ -606,7 +606,7 @@ public class ConfigurationRefactoringManager
 
             seenNames.add(cloneKey);
 
-            return record;
+            return record instanceof TemplateRecord ? ((TemplateRecord) record).flatten() : record;
         }
 
         private void checkParent(String scope, String originalKey, MutableRecord clone, Map<String, String> originalKeyToCloneKey)
@@ -619,6 +619,50 @@ public class ConfigurationRefactoringManager
                 // Parent is also in the clone set: update the parent reference
                 configurationTemplateManager.setParentTemplate(clone, configurationTemplateManager.getRecord(getPath(scope, parentCloneKey)).getHandle());
             }
+        }
+
+        private void cloneChildren(String path, Record record, ComplexType type)
+        {
+            // We walk over all child records recursively to ensure collection
+            // items are inserted in the same order that they are in the
+            // original records.  This ensures implicit collection ordering is
+            // the preserved in the clone (CIB-2254).
+            Collection<String> keys;
+            boolean collection = type instanceof CollectionType;
+            if (collection)
+            {
+                CollectionType collectionType = (CollectionType) type;
+                keys = collectionType.getOrder(record);
+            }
+            else
+            {
+                keys = record.nestedKeySet();
+            }
+
+            for (String key: keys)
+            {
+                Record child = (Record) record.get(key);
+                String insertPath = getPath(path, key);
+                MutableRecord copy = copySimple(child);
+                recordManager.insert(insertPath, copy);
+                cloneChildren(insertPath, child, (ComplexType) type.getActualPropertyType(key, child));
+            }
+        }
+
+        private MutableRecord copySimple(Record record)
+        {
+            MutableRecord copy = new MutableRecordImpl();
+            for (String meta: record.metaKeySet())
+            {
+                copy.putMeta(meta, record.getMeta(meta));
+            }
+
+            for (String simple: record.simpleKeySet())
+            {
+                copy.put(simple, record.get(simple));
+            }
+
+            return copy;
         }
 
         private void rewriteReferences(String parentPath, Map<String, String> oldKeyToNewKey)

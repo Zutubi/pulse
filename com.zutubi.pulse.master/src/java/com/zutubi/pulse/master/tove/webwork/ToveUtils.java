@@ -149,14 +149,17 @@ public class ToveUtils
 
         if (path.length() == 0)
         {
-            listing = sortAndFilter(path, configurationTemplateManager.getRootListing(), configurationSecurityManager);
+            listing = configurationTemplateManager.getRootListing();
+            Collections.sort(listing, STRING_COMPARATOR);
+            listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
         }
         else if (type instanceof MapType)
         {
             Record record = configurationTemplateManager.getRecord(path);
             if (record != null)
             {
-                listing = sortAndFilter(path, new LinkedList<String>(((CollectionType) type).getOrder(record)), configurationSecurityManager);
+                listing = new LinkedList<String>(((CollectionType) type).getOrder(record));
+                listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
             }
         }
         else if (type instanceof CompositeType)
@@ -233,12 +236,6 @@ public class ToveUtils
         }
 
         return result;
-    }
-
-    private static List<String> sortAndFilter(String path, List<String> listing, ConfigurationSecurityManager configurationSecurityManager)
-    {
-        Collections.sort(listing, STRING_COMPARATOR);
-        return configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
     }
 
     public static String getCollapsedCollection(String path, Type type, ConfigurationSecurityManager configurationSecurityManager)

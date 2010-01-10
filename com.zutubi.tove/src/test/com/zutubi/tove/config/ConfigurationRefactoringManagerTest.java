@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
@@ -8,25 +9,24 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
 import org.acegisecurity.AccessDeniedException;
+
+import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.*;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-
-import java.util.*;
-import static java.util.Arrays.asList;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -377,6 +377,43 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(111222333, clone.getY());
     }
 
+    public void testClonePreservesImplicitCollectionOrders() throws TypeException
+    {
+        final List<String> LIST_NAMES = asList("zingyl", "angryl", "snowyl", "jauntyl", "ickyl", "yuckyl");
+        final List<String> MAP_NAMES = asList("zingym", "angrym", "snowym", "jauntym", "ickym", "yuckym");
+
+        // We can't just add collection items to this list and unstantiate as
+        // then the collection records will have explicit orders set.
+        ConfigA instance = createAInstance("source");
+        String sourcePath = configurationTemplateManager.insert(SAMPLE_SCOPE, instance);
+
+        String listPath = getPath(sourcePath, "orderedBlist");
+        for (String name: LIST_NAMES)
+        {
+            configurationTemplateManager.insert(listPath, new ConfigB(name));
+        }
+
+        String mapPath = getPath(sourcePath, "orderedBmap");
+        for (String name: MAP_NAMES)
+        {
+            configurationTemplateManager.insert(mapPath, new ConfigB(name));
+        }
+
+        String clonePath = configurationRefactoringManager.clone(sourcePath, "clone");
+
+        instance = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
+        Mapping<ConfigB, String> configToNameFn = new Mapping<ConfigB, String>()
+        {
+            public String map(ConfigB configB)
+            {
+                return configB.getName();
+            }
+        };
+        
+        assertEquals(LIST_NAMES, map(instance.getOrderedBlist(), configToNameFn));
+        assertEquals(MAP_NAMES, map(instance.getOrderedBmap().values(), configToNameFn));
+    }
+
     private void templateHierarchyHelper(Map<String, String> originalKeyToCloneKey) throws TypeException
     {
         String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
@@ -537,7 +574,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("root/extracted", node.getTemplatePath());
 
         assertEquals(2, node.getChildren().size());
-        List<String> children = CollectionUtils.map(node.getChildren(), new Mapping<TemplateNode, String>()
+        List<String> children = map(node.getChildren(), new Mapping<TemplateNode, String>()
         {
             public String map(TemplateNode templateNode)
             {
@@ -1716,7 +1753,11 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         private int x;
         private ConfigB b;
         private List<ConfigB> blist = new LinkedList<ConfigB>();
+        @Ordered
+        private List<ConfigB> orderedBlist = new LinkedList<ConfigB>();
         private Map<String, ConfigB> bmap = new HashMap<String, ConfigB>();
+        @Ordered
+        private Map<String, ConfigB> orderedBmap = new LinkedHashMap<String, ConfigB>();
         private Referee ref;
         @Reference
         private Referee refToRef;
@@ -1762,6 +1803,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
             this.blist = blist;
         }
 
+        public List<ConfigB> getOrderedBlist()
+        {
+            return orderedBlist;
+        }
+
+        public void setOrderedBlist(List<ConfigB> orderedBlist)
+        {
+            this.orderedBlist = orderedBlist;
+        }
+
         public Map<String, ConfigB> getBmap()
         {
             return bmap;
@@ -1770,6 +1821,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setBmap(Map<String, ConfigB> bmap)
         {
             this.bmap = bmap;
+        }
+
+        public Map<String, ConfigB> getOrderedBmap()
+        {
+            return orderedBmap;
+        }
+
+        public void setOrderedBmap(Map<String, ConfigB> orderedBmap)
+        {
+            this.orderedBmap = orderedBmap;
         }
 
         public Referee getRef()
