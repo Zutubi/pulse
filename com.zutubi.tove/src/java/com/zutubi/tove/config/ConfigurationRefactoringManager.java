@@ -3,7 +3,10 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
@@ -12,10 +15,6 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -519,6 +518,7 @@ public class ConfigurationRefactoringManager
             // Copy each record, updating parent references if necessary as
             // we go (reparenting is not safe due to scrubbing).
             Set<String> seenNames = new HashSet<String>();
+            List<String> newConcretePaths = new LinkedList<String>();
             for (String originalKey: originalKeys)
             {
                 String cloneKey = originalKeyToCloneKey.get(originalKey);
@@ -535,11 +535,17 @@ public class ConfigurationRefactoringManager
                 String clonePath = getPath(parentPath, cloneKey);
                 recordManager.insert(clonePath, clone);
                 cloneChildren(clonePath, record, mapType.getTargetType());
+
+                if (configurationTemplateManager.isConcrete(parentPath, clone))
+                {
+                    newConcretePaths.add(clonePath);
+                }
             }
 
             // Now rewrite all internal references that fall inside the clone set
             rewriteReferences(parentPath, originalKeyToCloneKey);
             configurationTemplateManager.refreshCaches();
+            configurationTemplateManager.raiseInsertEvents(newConcretePaths);
             return null;
         }
 
