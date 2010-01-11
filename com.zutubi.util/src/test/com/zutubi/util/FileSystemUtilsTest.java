@@ -1,8 +1,8 @@
 package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.IsFilePredicate;
 import com.zutubi.util.io.IsDirectoryPredicate;
+import com.zutubi.util.io.IsFilePredicate;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -11,7 +11,6 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
 
@@ -1291,6 +1290,20 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals(2, filenames.size());
         assertTrue(filenames.contains("a"));
         assertTrue(filenames.contains("b"));
+    }
+
+    public void testFilterNonExistentDirectory() throws IOException
+    {
+        List<File> files = FileSystemUtils.filter(new File("nosuchfile"), new TruePredicate<File>());
+        assertEquals(0, files.size());
+    }
+
+    public void testFilterRegularFile() throws IOException
+    {
+        File f = new File(tmpDir, "f");
+        assertTrue(f.createNewFile());
+        List<File> files = FileSystemUtils.filter(f, new TruePredicate<File>());
+        assertEquals(0, files.size());
     }
 
     private void assertCreateFiles(String... paths) throws IOException

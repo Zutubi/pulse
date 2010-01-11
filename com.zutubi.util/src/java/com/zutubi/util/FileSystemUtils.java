@@ -1380,7 +1380,7 @@ public class FileSystemUtils
     public static List<File> filter(File base, Predicate<File> predicate)
     {
         List<File> satisfiedFiles = new LinkedList<File>();
-        for (File f : base.listFiles())
+        for (File f : safeListing(base))
         {
             filter(f, predicate, satisfiedFiles);
         }
@@ -1395,10 +1395,16 @@ public class FileSystemUtils
         }
         if (base.isDirectory())
         {
-            for (File f : base.listFiles())
+            for (File f : safeListing(base))
             {
                 filter(f, predicate, satisfiedFiles);
             }
         }
+    }
+
+    private static File[] safeListing(File dir)
+    {
+        File[] files = dir.listFiles();
+        return files == null ? new File[0] : files;
     }
 }
