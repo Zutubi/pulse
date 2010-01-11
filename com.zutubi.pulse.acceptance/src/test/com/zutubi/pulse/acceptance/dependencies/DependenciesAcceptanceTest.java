@@ -507,6 +507,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testArtifactWithNoExtension() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "Upstream");
+        projectA.addArtifact("fileArtifact", "build/artifactWithNoExtension");
         projectA.addFilesToCreate("build/artifactWithNoExtension");
         insertProject(projectA);
 

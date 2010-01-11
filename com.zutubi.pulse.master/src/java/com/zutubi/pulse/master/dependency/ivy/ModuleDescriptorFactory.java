@@ -241,10 +241,15 @@ public class ModuleDescriptorFactory
             {
                 artifactName = m.group(1);
             }
-            String artifactExt = IvyModuleDescriptor.UNKNOWN;
+            String artifactExt = null;
             if (m.groupCount() > 1)
             {
                 artifactExt = m.group(2);
+            }
+
+            if (artifactExt == null)
+            {
+                artifactExt = IvyModuleDescriptor.UNKNOWN;
             }
 
             if (artifactName == null || artifactName.trim().length() == 0)
