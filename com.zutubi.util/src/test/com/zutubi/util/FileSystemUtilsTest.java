@@ -1,6 +1,8 @@
 package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.IsFilePredicate;
+import com.zutubi.util.io.IsDirectoryPredicate;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -1248,47 +1250,47 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         assertCreateFiles("root.txt", "a/file1.txt", "b/file2.txt", "c/d/file3.txt");
 
-        List<File> files = FileSystemUtils.filter(tmpDir, new Predicate<File>()
-        {
-            public boolean satisfied(File file)
-            {
-                return file.isFile();
-            }
-        });
+        List<File> files = FileSystemUtils.filter(tmpDir, new IsFilePredicate());
 
-        List<String> filenames = CollectionUtils.map(files, new Mapping<File, String>()
-        {
-            public String map(File file)
-            {
-                return file.getName();
-            }
-        });
+        List<String> filenames = mapToFilenames(files);
+
         assertEquals(4, filenames.size());
         assertTrue(filenames.contains("file1.txt"));
         assertTrue(filenames.contains("file2.txt"));
         assertTrue(filenames.contains("file3.txt"));
         assertTrue(filenames.contains("root.txt"));
 
-        files = FileSystemUtils.filter(tmpDir, new Predicate<File>()
-        {
-            public boolean satisfied(File file)
-            {
-                return file.isDirectory();
-            }
-        });
-        filenames = CollectionUtils.map(files, new Mapping<File, String>()
-        {
-            public String map(File file)
-            {
-                return file.getName();
-            }
-        });
+        files = FileSystemUtils.filter(tmpDir, new IsDirectoryPredicate());
+        filenames = mapToFilenames(files);
 
         assertEquals(4, filenames.size());
         assertTrue(filenames.contains("a"));
         assertTrue(filenames.contains("b"));
         assertTrue(filenames.contains("c"));
         assertTrue(filenames.contains("d"));
+    }
+
+    private List<String> mapToFilenames(List<File> files)
+    {
+        return CollectionUtils.map(files, new Mapping<File, String>()
+        {
+            public String map(File file)
+            {
+                return file.getName();
+            }
+        });
+    }
+
+    public void testFilterEmptyDirectory() throws IOException
+    {
+        assertTrue(new File(tmpDir, "a").mkdirs());
+        assertTrue(new File(tmpDir, "b").mkdirs());
+
+        List<File> files = FileSystemUtils.filter(tmpDir, new TruePredicate<File>());
+        List<String> filenames = mapToFilenames(files);
+        assertEquals(2, filenames.size());
+        assertTrue(filenames.contains("a"));
+        assertTrue(filenames.contains("b"));
     }
 
     private void assertCreateFiles(String... paths) throws IOException

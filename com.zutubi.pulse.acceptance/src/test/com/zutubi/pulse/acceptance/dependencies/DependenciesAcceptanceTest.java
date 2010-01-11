@@ -504,10 +504,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyInRepository(projectB, buildNumber);
     }
 
-    public void testArtifactWithUnknownExtension() throws Exception
+    public void testArtifactWithNoExtension() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
-        projectA.addArtifact("artifact", "build/artifactWithNoExtension").setArtifactPattern("(.+)");
+        DepAntProject projectA = projects.createDepAntProject(randomName + "Upstream");
         projectA.addFilesToCreate("build/artifactWithNoExtension");
         insertProject(projectA);
 
@@ -515,7 +514,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projects.createDepAntProject(randomName + "Downstream");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifactWithNoExtension");
         insertProject(projectB);
@@ -527,7 +526,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDirectoryOfMixedExtensionArtifacts() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projects.createDepAntProject(randomName + "Upstream");
         projectA.addDirArtifact("dirArtifact", "build/blah");
         projectA.addFilesToCreate("build/blah/artifact-A.jar");
         projectA.addFilesToCreate("build/blah/artifact-B");
@@ -538,7 +537,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projects.createDepAntProject(randomName + "Downstream");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact-A.jar");
         projectB.addExpectedFiles("lib/artifact-B");
