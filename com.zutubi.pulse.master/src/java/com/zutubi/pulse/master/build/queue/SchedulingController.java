@@ -180,7 +180,14 @@ public class SchedulingController implements EventListener
 
     protected void handleBuildCompleted(BuildCompletedEvent event)
     {
-        BuildRequestHandler requestHandler = getRequestHandler(event);
+        if (!handlers.containsKey(event.getMetaBuildId()))
+        {
+            // we are processing an existing request, we definately do not
+            // expect to not know its handler.
+            throw new IllegalArgumentException();
+        }
+
+        BuildRequestHandler requestHandler = handlers.get(event.getMetaBuildId());
 
         lock.lock();
         try
@@ -296,21 +303,14 @@ public class SchedulingController implements EventListener
         return affectedProjects;
     }
 
-    private BuildRequestHandler getRequestHandler(BuildCompletedEvent evt)
-    {
-        if (!handlers.containsKey(evt.getMetaBuildId()))
-        {
-            // we are processing an existing request, we definately do not
-            // expect to not know its handler.
-            throw new IllegalArgumentException();
-        }
-
-        return handlers.get(evt.getMetaBuildId());
-    }
-
     private BuildRequestHandler getRequestHandler(long id)
     {
-        return handlers.get(buildQueue.getRequest(id).getMetaBuildId());
+        BuildRequestEvent request = buildQueue.getRequest(id);
+        if (request != null)
+        {
+            return handlers.get(request.getMetaBuildId());
+        }
+        return null;
     }
 
     private BuildRequestHandler getRequestHandler(BuildRequestEvent request)
@@ -380,19 +380,22 @@ public class SchedulingController implements EventListener
     public boolean cancelRequest(long id)
     {
         BuildRequestHandler requestHandler = getRequestHandler(id);
-
-        lock.lock();
-        try
+        if (requestHandler != null)
         {
-            List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-            List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
-            internalCompleteRequests(requestHandler, queuedRequests);
-            return queuedRequests.size() > 0;
+            lock.lock();
+            try
+            {
+                List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
+                List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
+                internalCompleteRequests(requestHandler, queuedRequests);
+                return queuedRequests.size() > 0;
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
-        finally
-        {
-            lock.unlock();
-        }
+        return false;
     }
 
     /**

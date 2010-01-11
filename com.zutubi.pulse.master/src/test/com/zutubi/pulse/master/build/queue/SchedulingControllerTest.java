@@ -249,10 +249,26 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         assertActivated(requestA);
         assertQueued(requestB);
 
-        controller.cancelRequest(requestB.getId());
+        assertTrue(controller.cancelRequest(requestB.getId()));
 
         assertActivated(requestA);
         assertQueued();
+    }
+
+    public void testCancelUnknownRequest()
+    {
+        BuildRequestEvent requestA = createRequest("a");
+        BuildRequestEvent requestB = createRequest("a");
+        controller.handleEvent(requestA);
+        controller.handleEvent(requestB);
+
+        assertActivated(requestA);
+        assertQueued(requestB);
+
+        assertFalse(controller.cancelRequest(-1));
+
+        assertActivated(requestA);
+        assertQueued(requestB);
     }
 
     // -- utility methods..
