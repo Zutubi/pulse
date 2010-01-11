@@ -12,6 +12,7 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
 {
     private static final String SUITE_TOP = "top";
     private static final String SUITE_NESTED = "nes/%ed";
+    private static final String SUITE_WRAPPING = "wrapping";
     private static final String CASE_PASSED = "passed";
     private static final String CASE_EXPECTED_FAILURE = "expected";
     private static final String CASE_FAILED = "fai/e%";
@@ -30,7 +31,8 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
 
     public void testExpectedFailureFileDoesNotExist() throws IOException
     {
-        assertEquals(buildSuite(null, makeSuite()), runProcessorAndGetTests(new File("nonexistant")));
+        Processor processor = new Processor(new Config(new File("nonexistant").getName()), makeSuite());
+        assertEquals(buildSuite(null, makeSuite()), runProcessorAndGetTests(processor));
     }
 
     public void testExpectedFailureFile() throws IOException
@@ -47,7 +49,8 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
                     makeTestPath("random suite", CASE_FAILED))
         );
 
-        TestSuiteResult testSuiteResult = runProcessorAndGetTests(failureFile);
+        Config config = new Config(failureFile.getName());
+        TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
 
         assertEquals(buildSuite(null, buildSuite(SUITE_TOP,
                          buildSuite(SUITE_NESTED,
@@ -77,7 +80,8 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
                     makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_SKIPPED))
         );
 
-        TestSuiteResult testSuiteResult = runProcessorAndGetTests(failureFile);
+        Config config = new Config(failureFile.getName());
+        TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
 
         assertEquals(buildSuite(null, buildSuite(SUITE_TOP,
                          buildSuite(SUITE_NESTED,
@@ -95,13 +99,45 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
                      )), testSuiteResult);
     }
 
-    private TestSuiteResult runProcessorAndGetTests(File failureFile)
+    public void testExpectedFailureFileWrappingSuite() throws IOException
+    {
+        File failureFile = new File(tempDir, "failures.txt");
+        FileSystemUtils.createFile(failureFile,
+                StringUtils.join("\n",
+                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
+                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
+                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
+                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
+                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED))
+        );
+
+        Config config = new Config(failureFile.getName());
+        config.setSuite(SUITE_WRAPPING);
+        TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
+
+        assertEquals(buildSuite(null, buildSuite(SUITE_WRAPPING,
+                          buildSuite(SUITE_TOP,
+                              buildSuite(SUITE_NESTED,
+                                 new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                                 new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                                 new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
+                                 new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
+                                 new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                              ),
+                              new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                              new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                              new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
+                              new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
+                              new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                      ))), testSuiteResult);
+    }
+
+    private TestSuiteResult runProcessorAndGetTests(Processor processor)
     {
         PulseExecutionContext executionContext = new PulseExecutionContext();
         executionContext.setWorkingDir(tempDir);
         TestPostProcessorContext context = new TestPostProcessorContext(executionContext);
-        Processor postProcessor = new Processor(new Config(failureFile.getName()), makeSuite());
-        postProcessor.process(dummyArtifact, context);
+        processor.process(dummyArtifact, context);
         return context.getTestSuiteResult();
     }
 

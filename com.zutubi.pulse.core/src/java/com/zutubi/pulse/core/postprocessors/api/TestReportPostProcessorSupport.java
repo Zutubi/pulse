@@ -55,7 +55,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             }
 
             extractTestResults(artifactFile, ppContext, accumulateSuite);
-            processExpectedFailures(accumulateSuite, ppContext);
+            processExpectedFailures(suiteResult, ppContext);
             ppContext.addTests(suiteResult, config.getResolveConflicts());
 
             ResultState state = ppContext.getResultState();
