@@ -36,11 +36,9 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         // generate license string.
         String licenseStr = toString(license);
-
-        byte[] data = licenseStr.getBytes();
-
         try
         {
+            byte[] data = licenseStr.getBytes("UTF-8");
             // generate digital signature.
             byte[] sig = signData(data);
 

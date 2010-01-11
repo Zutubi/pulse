@@ -6,6 +6,7 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -76,7 +77,14 @@ public class LicenseDecoder
         }
 
         // create the license instance.
-        return fromString(new String(licenseStr));
+        try
+        {
+            return fromString(new String(licenseStr, "UTF-8"));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new LicenseException(e);
+        }
     }
 
     private License fromString(String data) throws LicenseException

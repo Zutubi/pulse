@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.license;
 
+import com.zutubi.util.StringUtils;
 import org.apache.commons.cli.*;
+import org.apache.commons.codec.binary.Base64;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,7 +17,7 @@ public class LicenseCommandLineInterface
 {
     private Command command;
 
-    public int execute()
+    public int execute() throws Exception
     {
         return command.execute();
     }
@@ -52,7 +54,7 @@ public class LicenseCommandLineInterface
     private interface Command
     {
         void parse(String... argv) throws Exception;
-        int execute();
+        int execute() throws Exception;
     }
 
     private SimpleDateFormat getDateFormat()
@@ -75,6 +77,10 @@ public class LicenseCommandLineInterface
                     .hasArg()
                     .create('t'));
 
+            options.addOption(OptionBuilder.withLongOpt("b64holder")
+                    .hasArg()
+                    .create('b'));
+
             options.addOption(OptionBuilder.withLongOpt("holder")
                     .hasArg()
                     .create('h'));
@@ -92,6 +98,12 @@ public class LicenseCommandLineInterface
 
             String type = commandLine.getOptionValue('t');
             String holder = commandLine.getOptionValue('h');
+            String encodedHolder = commandLine.getOptionValue('b');
+            if (StringUtils.stringSet(encodedHolder))
+            {
+                holder = new String(Base64.decodeBase64(encodedHolder.getBytes("US-ASCII")), "UTF-8");
+            }
+
             String expiryString = commandLine.getOptionValue('e');
             Date expiry = null;
             if (!expiryString.equals("Never"))
@@ -123,8 +135,8 @@ public class LicenseCommandLineInterface
 
     private class Decode implements Command
     {
-
         private String key;
+        private boolean encode;
 
         @SuppressWarnings({"AccessStaticViaInstance" })
         public void parse(String... argv) throws Exception
@@ -134,17 +146,26 @@ public class LicenseCommandLineInterface
                     .hasArg()
                     .create('k'));
 
+            options.addOption(OptionBuilder.withLongOpt("b64encode")
+                    .create('b'));
+
             CommandLineParser parser = new PosixParser();
             CommandLine commandLine = parser.parse(options, argv, true);
             key = commandLine.getOptionValue('k');
+            encode = commandLine.hasOption('b');
         }
 
-        public int execute()
+        public int execute() throws Exception
         {
             LicenseDecoder decoder = new LicenseDecoder();
             License license = decoder.decode(key);
             System.out.println("type:" + license.getType().toString());
-            System.out.println("holder:" + license.getHolder());
+            String holder = license.getHolder();
+            if (encode)
+            {
+                holder = new String(Base64.encodeBase64(holder.getBytes("UTF-8")), "US-ASCII");
+            }
+            System.out.println("holder:" + holder);
             System.out.println("expiry:" + ((license.getExpiryDate() != null) ? getDateFormat().format(license.getExpiryDate()): "Never"));
             System.out.println("supports:" + license.getSupportedAgents() + ":" +
                     license.getSupportedProjects() + ":" +
