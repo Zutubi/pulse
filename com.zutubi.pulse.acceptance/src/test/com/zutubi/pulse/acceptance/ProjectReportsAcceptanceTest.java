@@ -1,28 +1,29 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.FieldScope;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 {
@@ -86,7 +87,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
     public void testCustomFieldPostProcessing() throws Exception
     {
         String projectPath = addProject(random, true);
-        String capturesPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, ARTIFACTS);
+        String capturesPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS);
 
         Hashtable<String, Object> capture = xmlRpcHelper.createEmptyConfig(FileArtifactConfiguration.class);
         capture.put(Constants.Project.Command.FileArtifact.NAME, "fields");
@@ -111,7 +112,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         final String FIELD_VALUE = "3";
 
         String projectPath = addProject(random, true);
-        String commandsPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS);
+        String commandsPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS);
 
         Hashtable<String, Object> field = xmlRpcHelper.createEmptyConfig(CustomFieldConfiguration.class);
         field.put(Constants.Project.CustomFieldsCommand.Field.NAME, FIELD_NAME);

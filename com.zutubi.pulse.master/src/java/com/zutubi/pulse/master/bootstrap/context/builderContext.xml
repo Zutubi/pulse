@@ -263,4 +263,6 @@
     <bean id="triggerConditionFactory" class="com.zutubi.pulse.master.trigger.DefaultTriggerConditionFactory"/>
 
     <bean id="lastAccessManager" class="com.zutubi.pulse.master.security.LastAccessManager" init-method="init" autowire="byName"/>
+
+    <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener" autowire="byName"/>
 </beans>

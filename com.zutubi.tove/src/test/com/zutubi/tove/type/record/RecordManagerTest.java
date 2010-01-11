@@ -528,7 +528,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
         eventListener.reset();
         recordManager.update("path", record);
-        assertEvents(new RecordUpdatedEvent(recordManager, "path", record));
+        assertEvents(new RecordUpdatedEvent(recordManager, "path", loaded, record));
 
         loaded = recordManager.select("path");
         assertEquals(0, loaded.size());
@@ -549,7 +549,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
         eventListener.reset();
         recordManager.update("path", record);
-        assertEvents(new RecordUpdatedEvent(recordManager, "path", record));
+        assertEvents(new RecordUpdatedEvent(recordManager, "path", loaded, record));
 
         loaded = recordManager.select("path");
         assertEquals(1, loaded.size());

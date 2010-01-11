@@ -182,7 +182,7 @@ public class RecordManager implements HandleAllocator
             }
         });
 
-        eventManager.publish(new RecordUpdatedEvent(this, path, values));
+        eventManager.publish(new RecordUpdatedEvent(this, path, originalRecord, values));
     }
 
     /**

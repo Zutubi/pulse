@@ -96,14 +96,14 @@ public class Constants
          */
         public static class MultiRecipeType
         {
-            public static final String DEFAULT_RECIPE  = "default";
-
+            public static final String DEFAULT_RECIPE = "defaultRecipe";
+            public static final String DEFAULT_RECIPE_NAME = "default";
             public static final String RECIPES = "recipes";
-            public static final String NAME = "name";
+
             public static class Recipe
             {
+                public static final String NAME = "name";
                 public static final String DEFAULT_COMMAND = "build";
-
                 public static final String COMMANDS = "commands";
             }
         }

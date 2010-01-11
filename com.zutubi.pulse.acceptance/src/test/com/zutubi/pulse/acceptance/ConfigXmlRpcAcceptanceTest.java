@@ -6,10 +6,11 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 
 /**
@@ -441,7 +442,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testCanCloneUncloneablePath() throws Exception
     {
-        assertEquals(false, call("canCloneConfig", PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
+        assertEquals(false, call("canCloneConfig", getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
     }
 
     public void testCanCloneCloneablePath() throws Exception
@@ -465,7 +466,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
         keyMap.put(name, cloneName);
         assertEquals(true, call("cloneConfig", MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap));
-        assertTrue(xmlRpcHelper.configPathExists(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
+        assertTrue(xmlRpcHelper.configPathExists(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
     }
 
     public void testDeleteConfigNonExistantPath() throws Exception
@@ -555,8 +556,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.insertSimpleProject(parentName, true);
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
 
-        String stagesPath = PathUtils.getPath(childPath, "stages");
-        String hidePath = PathUtils.getPath(stagesPath, "default");
+        String stagesPath = getPath(childPath, "stages");
+        String hidePath = getPath(stagesPath, "default");
         xmlRpcHelper.deleteConfig(hidePath);
         assertEquals(0, xmlRpcHelper.getConfigListing(stagesPath).size());
         xmlRpcHelper.restoreConfig(hidePath);
@@ -569,7 +570,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String random = randomName();
         String path = xmlRpcHelper.insertSimpleProject(random, true);
-        String propertiesPath = PathUtils.getPath(path, "properties");
+        String propertiesPath = getPath(path, "properties");
         xmlRpcHelper.insertProjectProperty(random, "p1", "v1");
         xmlRpcHelper.insertProjectProperty(random, "p2", "v2");
 
@@ -685,7 +686,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         user.put("login", random);
         user.put("name", random);
         String path = xmlRpcHelper.insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
-        assertTrue(xmlRpcHelper.isConfigPermanent(PathUtils.getPath(path, "preferences")));
+        assertTrue(xmlRpcHelper.isConfigPermanent(getPath(path, "preferences")));
     }
 
     public void testGetConfigDoesntReturnExternalState() throws Exception
@@ -731,7 +732,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> childHook = xmlRpcHelper.getConfig(childHookPath);
         @SuppressWarnings({"unchecked"})
         Vector<String> stages = (Vector<String>) childHook.get("stages");
-        assertEquals(PathUtils.getPath(childPath, Constants.Project.STAGES, "default"), stages.get(0));
+        assertEquals(getPath(childPath, Constants.Project.STAGES, "default"), stages.get(0));
     }
 
     public void testCanPullUp() throws Exception
@@ -799,6 +800,106 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(new Vector<String>(asList(pushedDownToPath)), xmlRpcHelper.pushDownConfig(propertyPath, new Vector<String>(asList(childProject))));
         assertFalse(xmlRpcHelper.configPathExists(propertyPath));
         assertTrue(xmlRpcHelper.configPathExists(pushedDownToPath));
+    }
+
+    public void testRenameRecipe() throws Exception
+    {
+        // Simple case: rename concrete recipe, check default and stages
+        // updated.
+        recipeRenameHelper(false);
+    }
+
+    public void testRenameRecipeInTemplate() throws Exception
+    {
+        // A template with no ancestors will raise no instance events on change
+        // - ensuring that we don't depend on these events.
+        recipeRenameHelper(true);
+    }
+
+    private void recipeRenameHelper(boolean template) throws Exception
+    {
+        final String ORIGINAL_NAME = "default";
+        final String NEW_NAME = "edited";
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName(), template);
+        String stagePath = getPath(projectPath, Constants.Project.STAGES, "default");
+        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        stage.put(Constants.Project.Stage.RECIPE, ORIGINAL_NAME);
+        xmlRpcHelper.saveConfig(stagePath, stage, false);
+
+
+        String typePath = renameRecipe(projectPath, ORIGINAL_NAME, NEW_NAME);
+
+
+        Hashtable<String, Object> type = xmlRpcHelper.getConfig(typePath);
+        assertEquals(NEW_NAME, type.get(Constants.Project.MultiRecipeType.DEFAULT_RECIPE));
+
+        stage = xmlRpcHelper.getConfig(stagePath);
+        assertEquals(NEW_NAME, stage.get(Constants.Project.Stage.RECIPE));
+    }
+
+    public void testRenameRecipeInTemplateUpdatesDescendant() throws Exception
+    {
+        // In the descendant we override the default recipe (so it should not
+        // be updated) and we add a second parentDefaultStage that uses the recipe (which
+        // should be updated).
+        final String ORIGINAL_NAME = "default";
+        final String NEW_NAME = "edited";
+        final String OTHER_NAME = "other";
+
+        final String STAGE_DEFAULT = "default";
+        final String STAGE_OTHER = "otherstage";
+
+        String random = randomName();
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+
+        String parentDefaultStagePath = getPath(parentPath, Constants.Project.STAGES, STAGE_DEFAULT);
+        Hashtable<String, Object> parentDefaultStage = xmlRpcHelper.getConfig(parentDefaultStagePath);
+        parentDefaultStage.put(Constants.Project.Stage.RECIPE, ORIGINAL_NAME);
+        xmlRpcHelper.saveConfig(parentDefaultStagePath, parentDefaultStage, false);
+
+        String childTypePath = getPath(childPath, Constants.Project.TYPE);
+        Hashtable<String, Object> childType = xmlRpcHelper.getConfig(childTypePath);
+        childType.put(Constants.Project.MultiRecipeType.DEFAULT_RECIPE, OTHER_NAME);
+        xmlRpcHelper.saveConfig(childTypePath, childType, false);
+        String childStagesPath = getPath(childPath, Constants.Project.STAGES);
+        Hashtable<String, String> keyMap = new Hashtable<String, String>();
+        keyMap.put(STAGE_DEFAULT, STAGE_OTHER);
+        xmlRpcHelper.cloneConfig(childStagesPath, keyMap);
+
+
+        String parentTypePath = renameRecipe(parentPath, ORIGINAL_NAME, NEW_NAME);
+
+
+        // Parent references (default recipe, stage) both updated.
+        Hashtable<String, Object> parentType = xmlRpcHelper.getConfig(parentTypePath);
+        assertEquals(NEW_NAME, parentType.get(Constants.Project.MultiRecipeType.DEFAULT_RECIPE));
+
+        parentDefaultStage = xmlRpcHelper.getConfig(parentDefaultStagePath);
+        assertEquals(NEW_NAME, parentDefaultStage.get(Constants.Project.Stage.RECIPE));
+
+        // Overridden child default recipe unchanged.
+        childType = xmlRpcHelper.getConfig(childTypePath);
+        assertEquals(OTHER_NAME, childType.get(Constants.Project.MultiRecipeType.DEFAULT_RECIPE));
+        
+        // Both child stages (one inherited, other local) updated.
+        Hashtable<String, Object> childStage = xmlRpcHelper.getConfig(getPath(childStagesPath, STAGE_DEFAULT));
+        assertEquals(NEW_NAME, childStage.get(Constants.Project.Stage.RECIPE));
+        childStage = xmlRpcHelper.getConfig(getPath(childStagesPath, STAGE_OTHER));
+        assertEquals(NEW_NAME, childStage.get(Constants.Project.Stage.RECIPE));
+    }
+
+    private String renameRecipe(String projectPath, String originalName, String newName) throws Exception
+    {
+        String typePath = getPath(projectPath, Constants.Project.TYPE);
+        String recipePath = getPath(typePath, Constants.Project.MultiRecipeType.RECIPES, originalName);
+        Hashtable<String, Object> recipe = xmlRpcHelper.getConfig(recipePath);
+        recipe.put(Constants.Project.MultiRecipeType.Recipe.NAME, newName);
+        xmlRpcHelper.saveConfig(recipePath, recipe, false);
+        return typePath;
     }
 
     private void assertSortedEquals(Collection<String> got, String... expected)

@@ -8,19 +8,32 @@ import com.zutubi.tove.type.record.RecordManager;
  */
 public class RecordUpdatedEvent extends RecordEvent
 {
+    private Record originalRecord;
     private Record newRecord;
 
     /**
      * Create a new record updated event.
      *
-     * @param source    the source that is raising the event
-     * @param path      path of the updated record
-     * @param newRecord the new record values
+     * @param source         the source that is raising the event
+     * @param path           path of the updated record
+     * @param originalRecord the original record values
+     * @param newRecord      the new record values
      */
-    public RecordUpdatedEvent(RecordManager source, String path, Record newRecord)
+    public RecordUpdatedEvent(RecordManager source, String path, Record originalRecord, Record newRecord)
     {
         super(source, path);
+        this.originalRecord = originalRecord;
         this.newRecord = newRecord;
+    }
+
+    /**
+     * Returns the original record values.
+     *
+     * @return the original record values
+     */
+    public Record getOriginalRecord()
+    {
+        return originalRecord;
     }
 
     /**

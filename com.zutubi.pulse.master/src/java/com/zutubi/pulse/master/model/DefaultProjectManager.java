@@ -48,7 +48,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
@@ -63,12 +62,12 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.zutubi.util.CollectionUtils.filter;
+
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
     private static final Messages I18N = Messages.getInstance(DefaultProjectManager.class);
-
-    public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
     private static final Map<Project.Transition, String> TRANSITION_TO_ACTION_MAP = new HashMap<Project.Transition, String>();
 
