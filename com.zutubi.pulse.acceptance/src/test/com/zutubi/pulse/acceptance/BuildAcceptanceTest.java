@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.dependencies.Repository;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;

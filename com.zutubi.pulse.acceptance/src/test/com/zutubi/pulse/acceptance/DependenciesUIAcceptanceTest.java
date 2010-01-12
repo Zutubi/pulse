@@ -1,7 +1,8 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;

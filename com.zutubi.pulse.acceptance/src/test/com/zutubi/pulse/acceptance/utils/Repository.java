@@ -1,4 +1,4 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
@@ -178,7 +178,7 @@ public class Repository
      *
      * @throws IOException on error.
      */
-    protected void createFile(String path) throws IOException
+    public void createFile(String path) throws IOException
     {
         File file = new File(getBase(), path);
         File parentFile = file.getParentFile();
@@ -197,7 +197,7 @@ public class Repository
      *
      * @return the repositories base directory.
      */
-    protected File getBase()
+    public File getBase()
     {
         return new File(configuration.getRepositoryBase());
     }

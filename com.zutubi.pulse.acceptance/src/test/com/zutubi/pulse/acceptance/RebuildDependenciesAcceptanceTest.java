@@ -1,9 +1,10 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.CollectionUtils;

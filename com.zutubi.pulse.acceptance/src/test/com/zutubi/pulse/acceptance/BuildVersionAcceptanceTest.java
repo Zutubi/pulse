@@ -1,12 +1,12 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;

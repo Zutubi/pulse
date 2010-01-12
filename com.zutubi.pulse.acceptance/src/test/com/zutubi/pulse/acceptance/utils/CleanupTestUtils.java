@@ -1,9 +1,9 @@
-package com.zutubi.pulse.acceptance.cleanup;
+package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
-import com.zutubi.pulse.acceptance.dependencies.Repository;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.LogFile;

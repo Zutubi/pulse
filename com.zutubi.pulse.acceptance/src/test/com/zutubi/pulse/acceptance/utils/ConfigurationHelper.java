@@ -1,4 +1,4 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;

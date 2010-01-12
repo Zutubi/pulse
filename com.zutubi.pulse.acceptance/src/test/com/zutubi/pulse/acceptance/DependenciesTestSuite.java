@@ -1,8 +1,9 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import com.zutubi.pulse.acceptance.utils.Repository;
 
 /**
  * This test suite includes all of the acceptance tests related to the

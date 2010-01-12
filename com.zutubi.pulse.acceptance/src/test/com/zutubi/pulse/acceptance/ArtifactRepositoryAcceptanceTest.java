@@ -1,7 +1,8 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;

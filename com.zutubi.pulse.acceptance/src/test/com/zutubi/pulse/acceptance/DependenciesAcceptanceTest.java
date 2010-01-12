@@ -1,6 +1,6 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;

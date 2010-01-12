@@ -1,7 +1,8 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;

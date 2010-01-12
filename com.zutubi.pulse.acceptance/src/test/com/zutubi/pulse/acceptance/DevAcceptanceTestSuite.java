@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.cleanup.CleanupAcceptanceTest;
-import com.zutubi.pulse.acceptance.cleanup.CleanupUIAcceptanceTest;
-import com.zutubi.pulse.acceptance.dependencies.DependenciesTestSuite;
+import com.zutubi.pulse.acceptance.CleanupAcceptanceTest;
+import com.zutubi.pulse.acceptance.CleanupUIAcceptanceTest;
+import com.zutubi.pulse.acceptance.DependenciesTestSuite;
 import junit.framework.TestSuite;
 
 public class DevAcceptanceTestSuite

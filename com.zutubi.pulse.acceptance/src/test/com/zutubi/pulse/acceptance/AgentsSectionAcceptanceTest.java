@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.dependencies.ConfigurationHelper;
-import com.zutubi.pulse.acceptance.dependencies.ProjectConfigurations;
-import com.zutubi.pulse.acceptance.dependencies.WaitAntProject;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
+import com.zutubi.pulse.acceptance.utils.WaitAntProject;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;

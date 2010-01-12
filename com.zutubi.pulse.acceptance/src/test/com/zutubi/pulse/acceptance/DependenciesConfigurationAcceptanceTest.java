@@ -1,7 +1,11 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.DepAntProject;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;

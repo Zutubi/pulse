@@ -1,4 +1,4 @@
-package com.zutubi.pulse.acceptance.dependencies;
+package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
@@ -76,7 +76,7 @@ public abstract class ProjectConfigurationHelper
         return config;
     }
 
-    protected ResourcePropertyConfiguration addStageProperty(BuildStageConfiguration stage, String key, String value)
+    public ResourcePropertyConfiguration addStageProperty(BuildStageConfiguration stage, String key, String value)
     {
         ResourcePropertyConfiguration property = new ResourcePropertyConfiguration();
         property.setName(key);

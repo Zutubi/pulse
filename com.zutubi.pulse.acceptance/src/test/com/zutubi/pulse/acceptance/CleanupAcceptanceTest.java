@@ -1,8 +1,9 @@
-package com.zutubi.pulse.acceptance.cleanup;
+package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;

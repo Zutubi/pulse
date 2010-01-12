@@ -1,4 +1,4 @@
-package com.zutubi.pulse.acceptance.cleanup;
+package com.zutubi.pulse.acceptance;
 
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
