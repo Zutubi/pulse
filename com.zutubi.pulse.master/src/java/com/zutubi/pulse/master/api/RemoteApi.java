@@ -2396,6 +2396,7 @@ public class RemoteApi
         buildDetails.put("revision", getBuildRevision(build));
         buildDetails.put("tests", convertTests(build.getTestSummary()));
         buildDetails.put("version", getBuildVersion(build));
+        buildDetails.put("reason", build.getReason().getSummary());
         addResultFields(build, buildDetails);
 
         Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();

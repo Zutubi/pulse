@@ -462,6 +462,44 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
     }
 
+    public void testDependentBuildReason() throws Exception
+    {
+        DepAntProject upstream = projects.createDepAntProject(randomName + "-upstream");
+        insertProject(upstream);
+
+        DepAntProject downstream = projects.createDepAntProject(randomName + "-downstream");
+        downstream.addDependency(upstream);
+        insertProject(downstream);
+
+        buildRunner.triggerSuccessfulBuild(upstream);
+        xmlRpcHelper.waitForBuildToComplete(downstream.getConfig().getName(), 1);
+
+        // verify that the build reasons are as expected.
+        Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
+        assertEquals("trigger via remote api by admin", buildA.get("reason"));
+        Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
+        assertEquals("dependency triggered by (trigger via remote api by admin)", buildB.get("reason"));
+    }
+
+    public void testRebuildBuildReason() throws Exception
+    {
+        DepAntProject upstream = projects.createDepAntProject(randomName + "-upstream");
+        insertProject(upstream);
+
+        DepAntProject downstream = projects.createDepAntProject(randomName + "-downstream");
+        downstream.addDependency(upstream);
+        insertProject(downstream);
+
+        buildRunner.triggerRebuild(downstream);
+        xmlRpcHelper.waitForBuildToComplete(downstream.getConfig().getName(), 1);
+
+        // verify that the build reasons are as expected.
+        Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
+        assertEquals("rebuild triggered by (trigger via remote api by admin)", buildA.get("reason"));
+        Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
+        assertEquals("trigger via remote api by admin", buildB.get("reason"));
+    }
+
     public void testDependentBuild_PropagateStatus() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");

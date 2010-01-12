@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.model;
 
 /**
- * The build reason for any downstream build that is triggered in response to
+ * The build reason for any upstream build that is triggered in response to
  * a project dependency relationship.
  */
-public class DependencyBuildReason extends AbstractBuildReason
+public class RebuildBuildReason extends AbstractBuildReason
 {
     /**
      * The build reason of the original build request, referenced by
@@ -12,18 +12,18 @@ public class DependencyBuildReason extends AbstractBuildReason
      */
     private String sourceBuildReason;
 
-    public DependencyBuildReason()
+    public RebuildBuildReason()
     {
     }
 
-    public DependencyBuildReason(String sourceBuildReason)
+    public RebuildBuildReason(String sourceBuildReason)
     {
         this.sourceBuildReason = sourceBuildReason;
     }
 
     public String getSummary()
     {
-        return "dependency triggered by ("+sourceBuildReason+")";
+        return "rebuild triggered by ("+sourceBuildReason+")";
     }
 
     // for hibernate only.

@@ -8,6 +8,8 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.TriggerOptions;
+import com.zutubi.pulse.master.model.RebuildBuildReason;
+import com.zutubi.pulse.master.model.DependencyBuildReason;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
@@ -94,8 +96,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 Project owner = getNodeProject(node);
                 if (!ownerRequests.containsKey(owner))
                 {
-                    BuildRequestEvent newRequest = (request.getOwner().equals(owner)) ? request : cloneRequest(request, owner);
-                    buildRequestRegistry.register(newRequest);
+                    BuildRequestEvent newRequest = cloneAndRegisterIfNotOriginal(request, owner, false);
 
                     DependentBuildTriggerConfiguration trigger = getTrigger(owner);
                     if (trigger != null && !node.isRoot())
@@ -156,8 +157,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
 
                 if (!ownerRequests.containsKey(owner))
                 {
-                    BuildRequestEvent newRequest = (request.getOwner().equals(owner)) ? request : cloneRequest(request, owner);
-                    buildRequestRegistry.register(newRequest);
+                    BuildRequestEvent newRequest = cloneAndRegisterIfNotOriginal(request, owner, true);
 
                     // create queued request.
                     QueuedRequest request = newQueuedRequest(newRequest);
@@ -178,14 +178,31 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
         return requestsToQueue;
     }
 
-    private BuildRequestEvent cloneRequest(BuildRequestEvent sourceRequest, Project owner)
+    /**
+     * Create a new build request event if the specified events owner is not the same as the
+     * specified owner.
+     *
+     * @param originalRequest   the request to be conditionally 'cloned'.
+     * @param owner             the owner of the new request
+     * @param upstream          indicates whether or not the new build request is upstream of the original or not.
+     * @return  a new request, or the old one if the owner is the same as the requests owner.
+     */
+    private BuildRequestEvent cloneAndRegisterIfNotOriginal(BuildRequestEvent originalRequest, Project owner, boolean upstream)
     {
-        TriggerOptions options = new TriggerOptions(sourceRequest.getOptions());
-        BuildRevision sourceRevision = sourceRequest.getRevision();
+        if (originalRequest.getOwner().equals(owner))
+        {
+            return originalRequest;
+        }
+
+        TriggerOptions options = new TriggerOptions(originalRequest.getOptions());
+        options.setReason((upstream) ? new RebuildBuildReason(options.getReason().getSummary()) : new DependencyBuildReason(options.getReason().getSummary()));
+        BuildRevision sourceRevision = originalRequest.getRevision();
         BuildRevision revision = sourceRevision.isUser() ? new BuildRevision(sourceRevision.getRevision(), sourceRevision.isUser()) : new BuildRevision();
-        BuildRequestEvent request = new SingleBuildRequestEvent(this, owner, revision, options);
-        request.setMetaBuildId(sourceRequest.getMetaBuildId());
-        return request;
+        BuildRequestEvent newRequest = new SingleBuildRequestEvent(this, owner, revision, options);
+        newRequest.setMetaBuildId(originalRequest.getMetaBuildId());
+
+        buildRequestRegistry.register(newRequest);
+        return newRequest;
     }
 
     private QueuedRequest newQueuedRequest(BuildRequestEvent request)

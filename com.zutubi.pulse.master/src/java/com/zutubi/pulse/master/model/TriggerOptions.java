@@ -20,7 +20,7 @@ public class TriggerOptions
     /**
      * The reason the build was triggered.
      */
-    private final BuildReason reason;
+    private BuildReason reason;
 
     /**
      * A freeform source for the trigger, used to identify related
@@ -128,6 +128,11 @@ public class TriggerOptions
     public BuildReason getReason()
     {
         return reason;
+    }
+
+    public void setReason(BuildReason reason)
+    {
+        this.reason = reason;
     }
 
     public String getSource()
