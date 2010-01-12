@@ -8,7 +8,7 @@ import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 
 /**
- * not yet implemented
+ * Tests connections to git repositories.
  */
 @Wire
 @SymbolicName("zutubi.gitConfigurationCheckHandler")

@@ -22,6 +22,10 @@ import java.util.List;
  * Implemented at this low level as changes can happen in templates, so higher-
  * level methods that deal with instances may not even be raised.
  *
+ * Normally such manual fixing is not required as these things would be
+ * modelled as references which Just Work.  In this case, though, the recipes
+ * may or may not be in a Pulse file, so we can't use references.
+ *
  * See CIB-2255.
  */
 public class RecipeRenameListener implements EventListener

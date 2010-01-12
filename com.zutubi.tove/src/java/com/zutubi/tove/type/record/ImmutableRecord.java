@@ -10,9 +10,9 @@ import java.util.Set;
  */
 public class ImmutableRecord implements Record
 {
-    private MutableRecord delegate;
+    private Record delegate;
 
-    public ImmutableRecord(MutableRecord delegate)
+    public ImmutableRecord(Record delegate)
     {
         this.delegate = delegate;
     }

@@ -8,6 +8,7 @@ import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 
 /**
+ * Tests the connection to a Perforce server.
  */
 @Wire
 @SymbolicName("zutubi.perforceConfigurationCheckHandler")
