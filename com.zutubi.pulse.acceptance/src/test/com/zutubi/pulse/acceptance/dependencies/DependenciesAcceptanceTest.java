@@ -5,14 +5,15 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.RandomUtils;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.util.*;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.File;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -266,12 +267,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         upstreamProject.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
         insertProject(upstreamProject);
 
-        int buildNumber = buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
 
         DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream", false);
         DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
         dependencyConfig.setStageType(DependencyConfiguration.StageType.CORRESPONDING_STAGES);
-        dependencyConfig.setCustomRevision(String.valueOf(buildNumber));
 
         BuildStageConfiguration stageA = downstreamProject.addStage("Stage A");
         downstreamProject.addStageProperty(stageA, DepAntProject.PROPERTY_EXPECTED_LIST, "lib/artifactA.jar");
@@ -281,6 +281,48 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(downstreamProject);
 
         buildRunner.triggerSuccessfulBuild(downstreamProject.getConfig());
+    }
+
+    public void testRetrieve_CorrespondingStagesIvyCaching() throws Exception
+    {
+        final String RECIPE = "recipe";
+        final String ARTIFACT = "art.txt";
+        final String STAGE_A = "Stage A";
+        final String STAGE_B = "Stage B";
+
+        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream", false);
+        upstreamProject.addRecipe(RECIPE).addArtifacts(ARTIFACT);
+        upstreamProject.addStage(STAGE_A).setRecipe(RECIPE);
+        upstreamProject.addStage(STAGE_B).setRecipe(RECIPE);
+        upstreamProject.addFilesToCreate(ARTIFACT);
+        insertProject(upstreamProject);
+
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+
+        AgentConfiguration masterAgent = configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME);
+        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream", false);
+        DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
+        dependencyConfig.setStageType(DependencyConfiguration.StageType.CORRESPONDING_STAGES);
+        downstreamProject.addRecipe(RECIPE).addArtifacts("lib/" + ARTIFACT);
+        BuildStageConfiguration downstreamStageA = downstreamProject.addStage(STAGE_A);
+        downstreamStageA.setRecipe(RECIPE);
+        downstreamStageA.setAgent(masterAgent);
+        BuildStageConfiguration downstreamStageB = downstreamProject.addStage(STAGE_B);
+        downstreamStageB.setAgent(masterAgent);
+        downstreamStageB.setRecipe(RECIPE);
+        insertProject(downstreamProject);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(downstreamProject.getConfig());
+
+        checkCorrespondingStageFile(downstreamProject, STAGE_A, buildNumber);
+        checkCorrespondingStageFile(downstreamProject, STAGE_B, buildNumber);
+    }
+
+    private void checkCorrespondingStageFile(DepAntProject project, String stage, int buildNumber) throws IOException
+    {
+        String path = repository.getArtifactPath(project.getConfig().getOrganisation(), project.getConfig().getName(), stage, Integer.toString(buildNumber), "art", "txt");
+        File aFile = new File(repository.getBase(), path);
+        assertThat(IOUtils.fileToString(aFile), containsString("PULSE_STAGE = " + stage));
     }
 
     public void testRetrieve_SpecificRevision() throws Exception

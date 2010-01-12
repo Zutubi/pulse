@@ -138,7 +138,7 @@ public class Repository
         String revisionString = (revision != null) ? revision.toString() : null;
         String orgString = (org != null) ? org : "";
         Map<String, String> extraAttributes = new HashMap<String, String>();
-        extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, IvyEncoder.encode(stageName));
+        extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, stageName);
         ModuleRevisionId mrid = IvyEncoder.encode(IvyModuleRevisionId.newInstance(orgString, name, revisionString, extraAttributes));
 
         return configuration.getArtifactPath(mrid, artifactName, artifactExtension);
