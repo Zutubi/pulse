@@ -127,16 +127,53 @@
                     them directly to Pulse.
                 </td>
             </tr>
-        <tr>
-            #actionHeader("multiple.agents.per.host" "multiple agents per host" "accept" false)
-            <td>
-                Pulse now directly supports running multiple agents on the same host, including the
-                ability to run multiple master agents.  This allows you to make full use of high
-                end hardware with just a single Pulse service installed on a machine.  To make use
-                of this ability, configure multiple agents with identical host and port details.
-                Pulse will recognise agents that share a host and act accordingly.
-            </td>
-        </tr>
+            <tr>
+                #actionHeader("multiple.agents.per.host" "multiple agents per host" "accept" false)
+                <td>
+                    Pulse now directly supports running multiple agents on the same host, including the
+                    ability to run multiple master agents.  This allows you to make full use of high
+                    end hardware with just a single Pulse service installed on a machine.  To make use
+                    of this ability, configure multiple agents with identical host and port details.
+                    Pulse will recognise agents that share a host and act accordingly.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("further.net.support" "further .net tool support" "accept" false)
+                <td>
+                    Support has been added for the popular .Net build tool NAnt and the NUnit testing
+                    library. NAnt support includes a new command and a post-processor to extract error
+                    and warning messages from both NAnt itself and commonly-used tools (e.g. the
+                    Visual Studio compilers). NUnit support includes a post-processor that can read
+                    NUnit XML reports to integrate test results into your Pulse builds.
+                </td>
+            <tr>
+                #actionHeader("agent.utilisation.stats" "agent utilisation statistics" "accept" false)
+                <td>
+                    A new "statistics" tab has been added for agents. This tab lists various figures
+                    such as the number of recipes the agent executes each day and how long the average
+                    recipe keeps the agent busy. Statistics are also shown for agent utilisation,
+                    including a pie chart that makes them easy to visualise. This allows you to see if
+                    you are getting the most out of your agent machines.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("build.comments" "build result comments" "accept" false)
+                <td>
+                    Users can now leave comments on build results. This allows teams to communicate;
+                    for example by leaving a note indicating why the build failed. Comments are displayed
+                    prominently on the build summary tab, where users viewing the build will be most
+                    likely to see them.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("finer.cleanup.rules" "fine-grained cleanup rules" "accept" false)
+                <td>
+                    Cleanup rules allow you to reduce disk space usage by having Pulse automatically
+                    delete old and unwanted build data. In 2.1, there are more options controlling exactly
+                    what is cleaned up. This allows you greater control: for example you can remove old
+                    build artifacts but maintain the key build result information.
+                </td>
+            </tr>
             <tr>
                 #actionHeader("built.in.docs" "built-in documentation" "accept" false)
                 <td>
