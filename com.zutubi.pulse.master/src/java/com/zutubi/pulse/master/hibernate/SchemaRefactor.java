@@ -223,16 +223,20 @@ public class SchemaRefactor
         });
     }
 
-    public void renameColumn(final String tableName, final String fromColumnName, final String toColumnName) throws SQLException
+    public boolean renameColumn(final String tableName, final String fromColumnName, final String toColumnName) throws SQLException
     {
-        executeWithConnection(new Callback()
+        return (Boolean)executeWithConnection(new Callback()
         {
             public Object execute(Connection con) throws SQLException
             {
-                Table table = getTable(tableName);
-                Column column = getColumn(table, fromColumnName);
-                renameColumn(con, table, column, toColumnName);
-                return null;
+                if (JDBCUtils.columnExists(con,  tableName, fromColumnName))
+                {
+                    Table table = getTable(tableName);
+                    Column column = getColumn(table, fromColumnName);
+                    renameColumn(con, table, column, toColumnName);
+                    return true;
+                }
+                return false;
             }
         });
     }

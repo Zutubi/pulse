@@ -12,23 +12,11 @@ import org.hsqldb.jdbcDriver;
 import java.sql.DriverManager;
 import java.util.List;
 
-/**
- * <class-comment/>
- */
 public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
 {
     protected BasicDataSource dataSource;
     protected DatabaseConfig databaseConfig;
     protected DatabaseConsole databaseConsole;
-
-    public BaseUpgradeTaskTestCase()
-    {
-    }
-
-    public BaseUpgradeTaskTestCase(String name)
-    {
-        super(name);
-    }
 
     protected void setUp() throws Exception
     {

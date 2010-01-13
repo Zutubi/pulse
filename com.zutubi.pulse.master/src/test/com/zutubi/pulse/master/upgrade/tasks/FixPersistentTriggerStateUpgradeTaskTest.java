@@ -22,13 +22,6 @@ public class FixPersistentTriggerStateUpgradeTaskTest extends BaseUpgradeTaskTes
         task.setDataSource(dataSource);
     }
 
-    protected void tearDown() throws Exception
-    {
-        task = null;
-
-        super.tearDown();
-    }
-
     public void testUpgrade() throws SQLException, IOException
     {
         insertTriggerState(1, "NONE");
@@ -70,8 +63,7 @@ public class FixPersistentTriggerStateUpgradeTaskTest extends BaseUpgradeTaskTes
         JDBCUtils.execute(dataSource, "INSERT INTO local_trigger (id, state, trigger_type, trigger_name, trigger_group) values ("+id+", '"+state+"', 'x', 'x', 'x')");
     }
 
-    private void runUpgrade()
-            throws SQLException, IOException
+    private void runUpgrade() throws SQLException, IOException
     {
         Connection con = null;
         try

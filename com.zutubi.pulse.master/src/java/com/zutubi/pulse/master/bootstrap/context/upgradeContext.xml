@@ -79,6 +79,7 @@
                 <ref local="addSettingsFileToMaven2UpgradeTask"/>
                 <ref local="dependencyTransitiveMode"/>
                 <ref local="updateBuildResultAndAddSequenceTableUpgradeTask"/>
+                <ref local="renameTriggerIntervalColumn"/>
                 <ref local="simpleTriggerSchema"/>
                 <ref local="triggerConditions"/>
                 <ref local="buildResultDependencyFields"/>
@@ -94,7 +95,7 @@
                 <ref local="ensureAgentPingConfigPermanent"/>
                 <ref local="expectedFailureTestCases"/>
                 <ref local="addExpectedFailureReportSeries"/>
-                <ref local="renameTriggerIntervalColumn"/>
+                <ref local="optionalRenameTriggerIntervalColumn"/>
                 <ref local="ensureDependenciesAndOptionsConfigPermanent"/>
                 <ref local="addPerforceView"/>
                 <ref local="fixExpectedFailureSeries"/>
@@ -381,12 +382,23 @@
         </property>
     </bean>
 
-    <bean id="simpleTriggerSchema" class="com.zutubi.pulse.master.upgrade.tasks.RemoveTriggerDataMapRefactorUpgradeTask">
+    <bean id="renameTriggerIntervalColumn" class="com.zutubi.pulse.master.upgrade.tasks.RenameTriggerIntervalColumnUpgradeTask">
         <property name="buildNumber" value="201004003"/>
+        <property name="mappings">
+            <list>
+                <!-- for this refactor we need to know what affected portion of the schema looked like before the refactor -->
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.8-partial-mappings.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="simpleTriggerSchema" class="com.zutubi.pulse.master.upgrade.tasks.RemoveTriggerDataMapRefactorUpgradeTask">
+        <property name="buildNumber" value="201004004"/>
     </bean>
 
     <bean id="triggerConditions" class="com.zutubi.pulse.master.upgrade.tasks.TriggerConditionsUpgradeTask">
-        <property name="buildNumber" value="201004004"/>
+        <property name="buildNumber" value="201004005"/>
     </bean>
 
     <bean id="buildResultDependencyFields" class="com.zutubi.pulse.master.upgrade.tasks.BuildResultDependencyFieldsUpgradeTask">
@@ -455,8 +467,8 @@
         <property name="buildNumber" value="201008007"/>
     </bean>
 
-    <bean id="renameTriggerIntervalColumn"
-          class="com.zutubi.pulse.master.upgrade.tasks.RenameTriggerIntervalColumnUpgradeTask">
+    <bean id="optionalRenameTriggerIntervalColumn"
+          class="com.zutubi.pulse.master.upgrade.tasks.OptionalRenameTriggerIntervalColumnUpgradeTask">
         <property name="buildNumber" value="201008008"/>
         <property name="mappings">
             <list>

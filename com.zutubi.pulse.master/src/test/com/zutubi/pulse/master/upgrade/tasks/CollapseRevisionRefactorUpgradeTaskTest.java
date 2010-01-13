@@ -23,13 +23,6 @@ public class CollapseRevisionRefactorUpgradeTaskTest extends BaseUpgradeTaskTest
         task.setMappings(getMappings());
     }
 
-    protected void tearDown() throws Exception
-    {
-        task = null;
-        
-        super.tearDown();
-    }
-
     public void testEmptyDatabaseUpgrade() throws Exception
     {
         assertTableExists("REVISION");

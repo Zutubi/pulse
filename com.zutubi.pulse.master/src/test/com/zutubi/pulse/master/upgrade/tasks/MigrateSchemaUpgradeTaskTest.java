@@ -10,22 +10,6 @@ import java.io.File;
 
 public class MigrateSchemaUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
-    public MigrateSchemaUpgradeTaskTest(String testName)
-    {
-        super(testName);
-    }
-
-    public void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-        super.tearDown();
-    }
-
     protected List<String> getMappings()
     {
         // we are handling our own map processing.. 

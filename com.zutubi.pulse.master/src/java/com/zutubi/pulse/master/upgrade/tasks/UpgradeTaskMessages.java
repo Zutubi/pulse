@@ -21,11 +21,16 @@ public class UpgradeTaskMessages
 
     public String getName()
     {
-        return I18N.format(KEY_NAME);
+        return format(KEY_NAME);
     }
 
     public String getDescription()
     {
-        return I18N.format(KEY_DESCRIPTION);
+        return format(KEY_DESCRIPTION);
+    }
+
+    public String format(String name)
+    {
+        return I18N.format(name);
     }
 }
