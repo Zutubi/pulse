@@ -22,7 +22,7 @@ public class DependencyBuildReason extends AbstractBuildReason
 
     public String getSummary()
     {
-        return "build of dependent of "+ source;
+        return "dependent of " + source;
     }
 
     // for hibernate only.

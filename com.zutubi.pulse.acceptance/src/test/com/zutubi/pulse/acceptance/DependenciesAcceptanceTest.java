@@ -2,18 +2,21 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.File;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -478,7 +481,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
         assertEquals("trigger via remote api by admin", buildA.get("reason"));
         Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
-        assertEquals("build of dependent of " + upstream.getConfig().getName(), buildB.get("reason"));
+        assertEquals("dependent of " + upstream.getConfig().getName(), buildB.get("reason"));
     }
 
     public void testRebuildBuildReason() throws Exception
