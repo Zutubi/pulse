@@ -7,10 +7,9 @@ package com.zutubi.pulse.master.model;
 public class RebuildBuildReason extends AbstractBuildReason
 {
     /**
-     * The build reason of the original build request, referenced by
-     * this build reasons summary.
+     * The name of the downstream project that is the source of this build request.
      */
-    private String sourceBuildReason;
+    private String source;
 
     public RebuildBuildReason()
     {
@@ -18,23 +17,23 @@ public class RebuildBuildReason extends AbstractBuildReason
 
     public RebuildBuildReason(String sourceBuildReason)
     {
-        this.sourceBuildReason = sourceBuildReason;
+        this.source = sourceBuildReason;
     }
 
     public String getSummary()
     {
-        return "rebuild triggered by ("+sourceBuildReason+")";
+        return "build with dependencies of "+ source;
     }
 
     // for hibernate only.
-    private String getSourceBuildReason()
+    private String getSource()
     {
-        return sourceBuildReason;
+        return source;
     }
 
     // for hibernate only.
-    private void setSourceBuildReason(String sourceBuildReason)
+    private void setSource(String source)
     {
-        this.sourceBuildReason = sourceBuildReason;
+        this.source = source;
     }
 }

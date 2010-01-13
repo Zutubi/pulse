@@ -92,11 +92,11 @@
         </subclass>
 
         <subclass name="com.zutubi.pulse.master.model.DependencyBuildReason" discriminator-value="DEPENDENCY" lazy="false">
-            <property name="sourceBuildReason" type="string" column="DETAILS" length="255"/>
+            <property name="source" type="string" column="DETAILS" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.master.model.RebuildBuildReason" discriminator-value="REBUILD" lazy="false">
-            <property name="sourceBuildReason" type="string" column="DETAILS" length="255"/>
+            <property name="source" type="string" column="DETAILS" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.master.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>

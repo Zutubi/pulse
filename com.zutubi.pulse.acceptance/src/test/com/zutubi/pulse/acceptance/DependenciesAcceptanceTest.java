@@ -478,7 +478,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
         assertEquals("trigger via remote api by admin", buildA.get("reason"));
         Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
-        assertEquals("dependency triggered by (trigger via remote api by admin)", buildB.get("reason"));
+        assertEquals("build of dependent of " + downstream.getConfig().getName(), buildB.get("reason"));
     }
 
     public void testRebuildBuildReason() throws Exception
@@ -495,7 +495,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // verify that the build reasons are as expected.
         Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
-        assertEquals("rebuild triggered by (trigger via remote api by admin)", buildA.get("reason"));
+        assertEquals("build with dependencies of " + upstream.getConfig().getName(), buildA.get("reason"));
         Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
         assertEquals("trigger via remote api by admin", buildB.get("reason"));
     }
