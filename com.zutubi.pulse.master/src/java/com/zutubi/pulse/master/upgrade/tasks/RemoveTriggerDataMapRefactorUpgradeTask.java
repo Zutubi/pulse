@@ -43,7 +43,7 @@ public class RemoveTriggerDataMapRefactorUpgradeTask extends AbstractSchemaRefac
         try
         {
             selectStatement = con.prepareStatement("select ID, DATA from LOCAL_TRIGGER where TRIGGER_TYPE = 'SIMPLE'");
-            updateStatement = con.prepareStatement("update LOCAL_TRIGGER set INTERVAL = ?, REPEAT_COUNT = ?, START_TIME = ? where ID = ?");
+            updateStatement = con.prepareStatement("update LOCAL_TRIGGER set TRIGGER_INTERVAL = ?, REPEAT_COUNT = ?, START_TIME = ? where ID = ?");
 
             rs = selectStatement.executeQuery();
             while (rs.next())

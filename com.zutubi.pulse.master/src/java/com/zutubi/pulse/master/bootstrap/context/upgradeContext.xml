@@ -382,16 +382,15 @@
         </property>
     </bean>
 
+    <!-- this needed to be moved forward from its original location because the trigger table was accessed directly by simpleTriggerSchema upgrade task. -->
     <bean id="renameTriggerIntervalColumn" class="com.zutubi.pulse.master.upgrade.tasks.RenameTriggerIntervalColumnUpgradeTask">
         <property name="buildNumber" value="201004003"/>
         <property name="mappings">
             <list>
-                <!-- for this refactor we need to know what affected portion of the schema looked like before the refactor -->
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.8-partial-mappings.hbm.xml</value>
             </list>
         </property>
     </bean>
-
 
     <bean id="simpleTriggerSchema" class="com.zutubi.pulse.master.upgrade.tasks.RemoveTriggerDataMapRefactorUpgradeTask">
         <property name="buildNumber" value="201004004"/>
@@ -472,7 +471,6 @@
         <property name="buildNumber" value="201008008"/>
         <property name="mappings">
             <list>
-                <!-- for this refactor we need to know what affected portion of the schema looked like before the refactor -->
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.8-partial-mappings.hbm.xml</value>
             </list>
         </property>
