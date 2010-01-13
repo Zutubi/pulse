@@ -15,9 +15,9 @@ public class RebuildBuildReason extends AbstractBuildReason
     {
     }
 
-    public RebuildBuildReason(String sourceBuildReason)
+    public RebuildBuildReason(String source)
     {
-        this.source = sourceBuildReason;
+        this.source = source;
     }
 
     public String getSummary()

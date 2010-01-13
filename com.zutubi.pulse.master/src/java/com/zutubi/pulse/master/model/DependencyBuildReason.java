@@ -15,9 +15,9 @@ public class DependencyBuildReason extends AbstractBuildReason
     {
     }
 
-    public DependencyBuildReason(String sourceBuildReason)
+    public DependencyBuildReason(String source)
     {
-        this.source = sourceBuildReason;
+        this.source = source;
     }
 
     public String getSummary()
