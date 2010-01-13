@@ -30,9 +30,7 @@ public class OptionalRenameTriggerIntervalColumnUpgradeTaskTest extends BaseUpgr
             task.execute(con);
             assertFalse(task.hasFailed());
             task.execute(con);
-            assertTrue(task.hasFailed());
-            assertTrue(task.getErrors().get(0).startsWith("Rename skipped"));
-            assertFalse(task.haltOnFailure());
+            assertFalse(task.hasFailed());
         }
         finally
         {

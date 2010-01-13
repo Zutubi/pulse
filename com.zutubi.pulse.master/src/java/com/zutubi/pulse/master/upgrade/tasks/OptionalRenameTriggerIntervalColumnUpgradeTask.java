@@ -19,10 +19,6 @@ public class OptionalRenameTriggerIntervalColumnUpgradeTask extends AbstractSche
         {
             refactor.renameColumn("LOCAL_TRIGGER", "INTERVAL", "TRIGGER_INTERVAL");
         }
-        else
-        {
-            addError(I18N.format("skipped"));
-        }
     }
 
     @Override
