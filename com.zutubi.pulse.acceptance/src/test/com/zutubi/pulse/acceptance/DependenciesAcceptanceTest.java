@@ -69,7 +69,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private void updateProject(ProjectConfigurationHelper project) throws Exception
     {
-        configurationHelper.updateProject(project.getConfig());
+        configurationHelper.update(project.getConfig());
     }
 
     public void testPublish_NoArtifacts() throws Exception

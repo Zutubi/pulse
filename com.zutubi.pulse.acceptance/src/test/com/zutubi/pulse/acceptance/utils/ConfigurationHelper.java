@@ -5,11 +5,15 @@ import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
@@ -33,7 +37,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * The configuration helper is a support class that bridges the gap between local
  * configuration instances and the remote pulse server.
- *
+ * <p/>
  * In particular, it allows you to create local configuration instances and insert
  * them into a remote pulse server by handling the communications overhead.
  */
@@ -60,7 +64,7 @@ public class ConfigurationHelper
         {
             public Object answer(InvocationOnMock invocation) throws Throwable
             {
-                long handle = (Long)invocation.getArguments()[1];
+                long handle = (Long) invocation.getArguments()[1];
                 return xmlRpcHelper.getConfigPath(String.valueOf(handle));
             }
         });
@@ -108,25 +112,25 @@ public class ConfigurationHelper
 
     /**
      * Get a proxy instance to the pulse master agent.
-     * @return  a proxy instance to the pulse master agent.
-     * 
+     *
+     * @return a proxy instance to the pulse master agent.
      * @throws Exception thrown on error.
      */
     public AgentConfiguration getMasterAgentReference() throws Exception
     {
-        return getAgentReference("master");
+        return getAgentReference(MASTER_AGENT_NAME);
     }
 
     /**
      * Get a prxy instance to the named agent.
-     * @param agentName     the name of the agent this proxy will reference.
-     * @return an agent reference.
      *
+     * @param agentName the name of the agent this proxy will reference.
+     * @return an agent reference.
      * @throws Exception thrown on error.
      */
     public AgentConfiguration getAgentReference(String agentName) throws Exception
     {
-        return getConfigurationReference("agents/" + agentName, AgentConfiguration.class);
+        return getConfigurationReference(AGENTS_SCOPE + "/" + agentName, AgentConfiguration.class);
     }
 
     /**
@@ -135,11 +139,10 @@ public class ConfigurationHelper
      * contains enough details for the configuration system to resolve the reference to the actual instance.
      * This method handles creating such a proxy instance.
      *
-     * @param path  the path to the configuration being referenced.
-     * @param type  the type of the configuration being referenced.
-     * @param <V>   the class type of the configuration being referenced.
-     * @return  a proxy instance with enough details configured of Pulse to resolve the reference.
-     *
+     * @param path the path to the configuration being referenced.
+     * @param type the type of the configuration being referenced.
+     * @param <V>  the class type of the configuration being referenced.
+     * @return a proxy instance with enough details configured of Pulse to resolve the reference.
      * @throws Exception thrown on error.
      */
     public <V extends Configuration> V getConfigurationReference(String path, Class<V> type) throws Exception
@@ -150,7 +153,7 @@ public class ConfigurationHelper
 
         if (config instanceof NamedConfiguration)
         {
-            ((NamedConfiguration)config).setName(PathUtils.getBaseName(path));
+            ((NamedConfiguration) config).setName(PathUtils.getBaseName(path));
         }
 
         return config;
@@ -159,24 +162,35 @@ public class ConfigurationHelper
     /**
      * Convenience method for inserting a new ProjectConfiguration instance.
      *
-     * @param project   the project to be inserted.
+     * @param project the project to be inserted.
      * @return the path at which the project was inserted.
-     *
      * @throws Exception thrown on error.
      */
     public String insertProject(ProjectConfiguration project) throws Exception
     {
-        String globalTemplateProjectPath = MasterConfigurationRegistry.PROJECTS_SCOPE + "/" + ProjectManager.GLOBAL_PROJECT_NAME;
+        String globalTemplateProjectPath = PROJECTS_SCOPE + "/" + GLOBAL_PROJECT_NAME;
         return insertTemplatedConfig(globalTemplateProjectPath, project);
+    }
+
+    /**
+     * Convenience method for inserting a new AgentConfiguration instance.
+     *
+     * @param agent the agent to be inserted.
+     * @return  the path at which the agent was inserted.
+     * @throws Exception thrown on error
+     */
+    public String insertAgent(AgentConfiguration agent) throws Exception
+    {
+        String globalTemplateAgentPath = AGENTS_SCOPE + "/" + GLOBAL_AGENT_NAME;
+        return insertTemplatedConfig(globalTemplateAgentPath, agent);
     }
 
     /**
      * Insert a concreate configuration instance into a templated scope.
      *
-     * @param parentTemplatePath    the path of the templated parent for the configuration instance
-     * @param config    the configuration instance.
+     * @param parentTemplatePath the path of the templated parent for the configuration instance
+     * @param config             the configuration instance.
      * @return the path at which the configuration instance was inserted.
-     * 
      * @throws Exception thrown on error.
      */
     public String insertTemplatedConfig(String parentTemplatePath, Configuration config) throws Exception
@@ -191,24 +205,38 @@ public class ConfigurationHelper
     }
 
     /**
-     * Convenience method for updating an existing project configuration.
+     * Insert a concrete configuration instance into a particular path.
      *
-     * @param project   the updated project configuration
+     * @param path      the path at which the configuration will be inserted.
+     * @param config    the configuration to be inserted.
+     * @return  the path at which teh configuration instance was inserted.
+     * @throws Exception throws on error.
+     */
+    public String insertConfig(String path, Configuration config) throws Exception
+    {
+        Hashtable<String, Object> data = toXmlRpc(config);
+        String insertedPath = xmlRpcHelper.insertConfig(path, data);
+        updatePathsAndHandles(config, insertedPath, data);
+        return insertedPath;
+    }
+
+    /**
+     * Convenience method for updating an existing configuration.
+     *
+     * @param configuration the configuration to be updated.
      * @return the path at which the configuration was updated.
-     *
      * @throws Exception thrown on error
      */
-    public String updateProject(ProjectConfiguration project) throws Exception
+    public String update(Configuration configuration) throws Exception
     {
-        Hashtable<String, Object> data = toXmlRpc(project);
-        return xmlRpcHelper.saveConfig(project.getConfigurationPath(), data, true);
+        Hashtable<String, Object> data = toXmlRpc(configuration);
+        return xmlRpcHelper.saveConfig(configuration.getConfigurationPath(), data, true);
     }
 
     /**
      * Convert the configuration instance into a form that is compatible with xml rpc.
      *
-     * @param config    the configuration instance being converted.
-     *
+     * @param config the configuration instance being converted.
      * @return a hashtable representation of the configuration instance
      * @throws Exception on error
      */
@@ -260,9 +288,9 @@ public class ConfigurationHelper
                     for (Object o : collection.keySet())
                     {
                         String key = (String) o;
-                        Configuration value = (Configuration)collection.get(key);
+                        Configuration value = (Configuration) collection.get(key);
                         String configPath = basePath + "/" + propertyName + "/" + key;
-                        updatePathsAndHandles(value, configPath, (Hashtable<String, Object>)collectionData.get(key));
+                        updatePathsAndHandles(value, configPath, (Hashtable<String, Object>) collectionData.get(key));
                     }
                 }
             }

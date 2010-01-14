@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -676,12 +677,12 @@ public class XmlRpcHelper
         agent.put("host", host);
         agent.put("port", port);
 
-        return insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
+        return insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
     }
 
     public String ensureAgent(String name) throws Exception
     {
-        String path = "agents/" + name;
+        String path = MasterConfigurationRegistry.AGENTS_SCOPE + "/" + name;
         if(!configPathExists(path))
         {
             insertSimpleAgent(name);
@@ -692,7 +693,7 @@ public class XmlRpcHelper
 
     public boolean ensureUser(String login) throws Exception
     {
-        if(!configPathExists("users/" + login))
+        if(!configPathExists(USERS_SCOPE + "/" + login))
         {
             insertTrivialUser(login);
             return true;
@@ -706,7 +707,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
         user.put("login", login);
         user.put("name", login);
-        String path = insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
+        String path = insertConfig(USERS_SCOPE, user);
         Hashtable <String, Object> password = createEmptyConfig(SetPasswordConfiguration.class);
         password.put("password", "");
         password.put("confirmPassword", "");

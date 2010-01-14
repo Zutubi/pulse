@@ -52,11 +52,6 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected SeleniumBrowser browser;
 
-    public SeleniumTestBase()
-    {
-        super();
-    }
-    
     protected void setUp() throws Exception
     {
         super.setUp();

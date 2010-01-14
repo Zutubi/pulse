@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 
@@ -77,7 +78,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         final String AGENT = "offline-agent";
 
-        xmlRpcHelper.insertSimpleAgent(AGENT, HOST_LOCALHOST, 8899);
+        configurationHelper.insertAgent(new AgentConfiguration(AGENT, HOST_LOCALHOST, 8899));
 
         loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
@@ -87,7 +88,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testDisableEnable() throws Exception
     {
-        xmlRpcHelper.insertSimpleAgent(LOCAL_AGENT, HOST_LOCALHOST);
+        configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
 
         loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
@@ -104,7 +105,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testDisableOnIdle() throws Exception
     {
-        xmlRpcHelper.insertSimpleAgent(LOCAL_AGENT, HOST_LOCALHOST);
+        configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
 
         WaitAntProject project = projects.createWaitAntProject(tempDir, randomName());
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
@@ -142,8 +143,8 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         String agent1 = LOCAL_AGENT + "-1";
         String agent2 = LOCAL_AGENT + "-2";
 
-        xmlRpcHelper.insertSimpleAgent(agent1, HOST_LOCALHOST);
-        xmlRpcHelper.insertSimpleAgent(agent2, HOST_LOCALHOST);
+        configurationHelper.insertAgent( new AgentConfiguration(agent1, HOST_LOCALHOST, 8890));
+        configurationHelper.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
 
         String random = randomName();
         WaitAntProject project1 = projects.createWaitAntProject(tempDir, random + "-1");
@@ -186,9 +187,9 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         String agent2 = random + "-2";
         String agent3 = random + "-3";
 
-        xmlRpcHelper.insertSimpleAgent(agent1, HOST_1);
-        xmlRpcHelper.insertSimpleAgent(agent2, HOST_2);
-        xmlRpcHelper.insertSimpleAgent(agent3, HOST_1);
+        configurationHelper.insertAgent( new AgentConfiguration(agent1, HOST_1, 8890));
+        configurationHelper.insertAgent( new AgentConfiguration(agent2, HOST_2, 8890));
+        configurationHelper.insertAgent( new AgentConfiguration(agent3, HOST_1, 8890));
 
         loginAsAdmin();
 
