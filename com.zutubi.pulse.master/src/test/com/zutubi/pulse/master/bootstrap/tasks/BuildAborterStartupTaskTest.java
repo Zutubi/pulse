@@ -47,7 +47,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
 
     public void testNoBuilds()
     {
-        projectManager.save(new Project());
+        projectManager.save(createProject());
         aborter.execute();
     }
 

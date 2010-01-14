@@ -64,8 +64,6 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureResult
     List<Project> getProjects(Collection<Long> ids, boolean allowInvalid);
 
-    boolean isProjectValid(Project project);
-
     /**
      * A check to see whether or not the specified project configuration is
      * valid.
