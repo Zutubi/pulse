@@ -6,13 +6,15 @@ import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 import java.util.List;
 
 /**
+ * Aborts incomplete builds found on startup.
  */
 public class BuildAborterStartupTask implements StartupTask
 {
+    private static final String ABORT_MESSAGE = "Server shut down while build in progress";
+
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
-    private static final String ABORT_MESSAGE = "Server shut down while build in progress";
 
     public void execute()
     {
@@ -27,7 +29,7 @@ public class BuildAborterStartupTask implements StartupTask
                 }
 
                 List<User> users = userManager.getAllUsers();
-                for(User user: users)
+                for (User user: users)
                 {
                     buildManager.abortUnfinishedBuilds(user, ABORT_MESSAGE);
                 }

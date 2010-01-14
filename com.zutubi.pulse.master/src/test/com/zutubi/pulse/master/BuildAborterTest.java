@@ -6,13 +6,15 @@ import com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 public class BuildAborterTest extends PulseTestCase
 {
@@ -44,13 +46,13 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testNoBuilds()
     {
-        projectManager.save(new Project());
+        projectManager.save(newProject());
         aborter.execute();
     }
 
     public void testCompletedBuild()
     {
-        Project project = new Project();
+        Project project = newProject();
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 1, false);
         result.commence(10);
         result.complete();
@@ -65,7 +67,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testIncompleteBuild()
     {
-        Project project = new Project();
+        Project project = newProject();
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 1, false);
         result.commence(10);
 
@@ -81,7 +83,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testCompletePersonalBuild()
     {
-        Project project = new Project();
+        Project project = newProject();
         User user = newUser();
         BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.commence(10);
@@ -99,7 +101,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testIncompletePersonalBuild()
     {
-        Project project = new Project();
+        Project project = newProject();
         User user = newUser();
         BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.commence(10);
@@ -130,6 +132,13 @@ public class BuildAborterTest extends PulseTestCase
         user.setId(1);
         user.setConfig(config);
         return user;
+    }
+
+    private Project newProject()
+    {
+        Project project = new Project();
+        project.setConfig(new ProjectConfiguration());
+        return project;
     }
 
     public static class MockProjectDao extends MockEntityDao<Project> implements ProjectDao

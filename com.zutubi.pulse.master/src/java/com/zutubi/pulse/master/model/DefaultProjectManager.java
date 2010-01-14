@@ -686,17 +686,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public Project getProject(String name, boolean allowInvalid)
     {
         ProjectConfiguration config = nameToConfig.get(name);
-        if(config == null || !allowInvalid && !configurationTemplateManager.isDeeplyValid(config.getConfigurationPath()))
+        if (config == null)
         {
             return null;
         }
-        return projectDao.findById(config.getProjectId());
+        return getProject(config.getProjectId(), allowInvalid);
     }
 
     public Project getProject(long id, boolean allowInvalid)
     {
         Project project = projectDao.findById(id);
-        if (allowInvalid || isProjectValid(project))
+        if (isCompleteAndValid(project, allowInvalid))
         {
             return project;
         }
@@ -715,18 +715,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 result.add(project);
             }
         }
-        return (allowInvalid) ? result : filterValidProjects(result);
+        return filterCompleteAndValidProjects(result, allowInvalid);
     }
 
     public List<Project> getProjects(boolean allowInvalid)
     {
         List<Project> result = projectDao.findAll();
-        if (!allowInvalid)
-        {
-            result = filterValidProjects(result);
-        }
-
-        return result;
+        return filterCompleteAndValidProjects(result, allowInvalid);
     }
 
     public List<Project> getDescendentProjects(String project, boolean strict, boolean allowInvalid)
@@ -743,23 +738,34 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return getProjects(ids, allowInvalid);
     }
 
-    public boolean isProjectValid(ProjectConfiguration config)
-    {
-        return config != null && configurationTemplateManager.isDeeplyValid(config.getConfigurationPath());
-    }
-
     public boolean isProjectValid(Project project)
     {
-        return project != null && isProjectValid(project.getConfig());
+        return isCompleteAndValid(project, false);
     }
 
-    private List<Project> filterValidProjects(List<Project> projects)
+    private boolean isCompleteAndValid(Project project, boolean allowInvalid)
+    {
+        if (project == null)
+        {
+            return false;
+        }
+
+        if (project.getConfig() == null)
+        {
+            LOG.severe("Project '" + project.getId() + "' has no configuration.");
+            return false;
+        }
+
+        return allowInvalid || configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath());
+    }
+
+    private List<Project> filterCompleteAndValidProjects(List<Project> projects, final boolean allowInvalid)
     {
         return CollectionUtils.filter(projects, new Predicate<Project>()
         {
             public boolean satisfied(Project project)
             {
-                return isProjectValid(project);
+                return isCompleteAndValid(project, allowInvalid);
             }
         });
     }
