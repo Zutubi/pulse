@@ -4,6 +4,7 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
+import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 
 /**
  * A filter to ensure a trigger only fires for the SCM of the matching
@@ -17,7 +18,11 @@ public class ScmChangeEventFilter implements EventTriggerFilter
     {
         ScmChangeEvent changeEvent = (ScmChangeEvent) event;
         ProjectConfiguration project = projectManager.getProjectConfig(trigger.getProject(), false);
-        return project != null && project.getName().equals(changeEvent.getProjectConfiguration().getName());
+        boolean accept = project != null && project.getName().equals(changeEvent.getProjectConfiguration().getName());
+
+        context.put(BuildProjectTask.PARAM_JUMP_QUEUE_ALLOWED, false);
+
+        return accept;
     }
 
     public void setProjectManager(ProjectManager projectManager)

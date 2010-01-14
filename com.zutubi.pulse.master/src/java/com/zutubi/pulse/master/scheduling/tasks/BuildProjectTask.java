@@ -50,6 +50,11 @@ public class BuildProjectTask implements Task
      */
     public static final String PARAM_VERSION_PROPAGATED = "version.propagated";
 
+    /**
+     * Indicates whether or not the generated build request can jump its queue.
+     */
+    public static final String PARAM_JUMP_QUEUE_ALLOWED = "jumpQueue";
+
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
     private ProjectManager projectManager;
@@ -82,6 +87,9 @@ public class BuildProjectTask implements Task
 
         String version = (String) context.get(PARAM_VERSION);
 
+        Boolean jumpQueueValue = (Boolean) context.get(PARAM_JUMP_QUEUE_ALLOWED);
+        boolean jumpQueue = jumpQueueValue == null || jumpQueueValue;
+
         Collection<ResourcePropertyConfiguration> properties;
         if (triggerConfig == null)
         {
@@ -100,6 +108,7 @@ public class BuildProjectTask implements Task
         options.setStatus(status);
         options.setResolveVersion(!versionPropagated);
         options.setVersion(version);
+        options.setJumpQueueAllowed(jumpQueue);
         projectManager.triggerBuild(project.getConfig(), options, revision);
     }
 
