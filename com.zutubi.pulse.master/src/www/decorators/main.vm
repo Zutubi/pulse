@@ -218,7 +218,7 @@
         <table>
             <tr>
               <td class="logo">
-                  :: <a href="$base/default.action">pulse 2.1 [beta]</a> ::
+                  :: <a href="$base/default.action">pulse 2.1</a> ::
 #if($personalBuild)
                   <a href="$urls.dashboardMyBuilds()">my builds</a>
     #if($buildNumber && $buildNumber != "0")
@@ -289,7 +289,7 @@
         
       <div id="south">
          <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
-         <b>::</b> copyright &copy; 2005-2009 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
+         <b>::</b> copyright &copy; 2005-2010 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
          <a href="http://jira.zutubi.com/">report bug/request feature</a>
      #if($license)
           #if($license.evaluation)
