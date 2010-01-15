@@ -272,6 +272,8 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     {
         TypeWizardState commandState = getCompletedStateForType(commandType);
         MutableRecord commandDataRecord = commandState.getDataRecord();
+        String recipeName = DEFAULT_RECIPE;
+
         if (templateParentProject.getType() == null)
         {
             SimpleInstantiator instantiator = new SimpleInstantiator(templateParentPath, configurationReferenceManager, configurationTemplateManager);
@@ -287,18 +289,23 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
                 LOG.severe(e);
             }
         }
+        else
+        {
+            MultiRecipeTypeConfiguration parentType = (MultiRecipeTypeConfiguration) templateParentProject.getType();
+            recipeName = parentType.getRecipes().keySet().iterator().next();
+        }
 
         MutableRecord typeRecord = createMultiRecipeType();
-        typeRecord.put(PROPERTY_DEFAULT_RECIPE, DEFAULT_RECIPE);
+        typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
 
         MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
-        recipeRecord.put(PROPERTY_NAME, DEFAULT_RECIPE);
+        recipeRecord.put(PROPERTY_NAME, recipeName);
         MutableRecord commandsRecord = (MutableRecord) recipeRecord.get(PROPERTY_COMMANDS);
         Record commandRenderRecord = commandState.getRenderRecord();
         commandsRecord.put((String) commandRenderRecord.get(PROPERTY_NAME), commandDataRecord);
 
         MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
-        recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
+        recipesRecord.put(recipeName, recipeRecord);
         return typeRecord;
     }
 

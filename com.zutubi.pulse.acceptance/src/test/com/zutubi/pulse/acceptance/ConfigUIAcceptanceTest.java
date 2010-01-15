@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -17,8 +16,11 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.IOUtils;
 
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
+import java.util.LinkedList;
+
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -520,6 +522,36 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         SubversionForm subversionForm = browser.createForm(SubversionForm.class);
         subversionForm.waitFor();
         assertFormElements(subversionForm, Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
+    }
+
+    public void testWizardOverridingConfiguredWithNonDefaultName() throws Exception
+    {
+        final String NEW_RECIPE_NAME = "edited";
+        final String NEW_COMMAND_NAME = "edited";
+
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        String recipePath = PathUtils.getPath(parentPath, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES, Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME);
+        Hashtable<String, Object> recipe = xmlRpcHelper.getConfig(recipePath);
+        recipe.put("name", NEW_RECIPE_NAME);
+        @SuppressWarnings({"unchecked"})
+        Hashtable<String, Object> command = (Hashtable<String, Object>) ((Hashtable<String, Object>) recipe.get(Constants.Project.MultiRecipeType.Recipe.COMMANDS)).get(Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND);
+        command.put("name", NEW_COMMAND_NAME);
+        xmlRpcHelper.saveConfig(recipePath, recipe, true);
+
+        loginAsAdmin();
+        addInheritingProject(parentName, childName);
+
+        String childRecipesPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES);
+        assertEquals(asList(NEW_RECIPE_NAME), new LinkedList<String>(xmlRpcHelper.getConfigListing(childRecipesPath)));
+
+        String childCommandsPath = PathUtils.getPath(childRecipesPath, NEW_RECIPE_NAME, Constants.Project.MultiRecipeType.Recipe.COMMANDS);
+        assertEquals(asList(NEW_COMMAND_NAME), new LinkedList<String>(xmlRpcHelper.getConfigListing(childCommandsPath)));
+        
+        browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(childCommandsPath, NEW_COMMAND_NAME));
+        AntCommandForm form = browser.createForm(AntCommandForm.class);
+        assertTrue(form.isFormPresent());
     }
 
     private void addInheritingProject(String parentName, String childName)
