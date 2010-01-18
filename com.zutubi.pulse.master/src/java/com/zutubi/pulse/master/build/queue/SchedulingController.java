@@ -62,6 +62,7 @@ public class SchedulingController implements EventListener
                 List<QueuedRequest> accepted = filterCanBuildRequestsInPlace(candidates);
                 List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
 
+                // can only proceed if the original request was accepted.
                 boolean canProceed = CollectionUtils.contains(accepted, new HasIdPredicate<QueuedRequest>(request.getId()));
                 if (!canProceed)
                 {

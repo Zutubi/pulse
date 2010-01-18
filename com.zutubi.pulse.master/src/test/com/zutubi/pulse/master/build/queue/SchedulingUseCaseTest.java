@@ -220,6 +220,10 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         assertActivated(triggerA);
         setProjectState(State.BUILDING, client);
+        // lock the revision when it starts building to prevent further assimilation.
+        triggerA.getRevision().lock();
+        triggerA.getRevision().fix();
+        triggerA.getRevision().unlock();
 
         // The triggerd requests queue up.
         BuildRequestEvent triggerB = createRequest(client, "cronTrigger", true, new Revision("1"));
@@ -227,7 +231,7 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         assertQueued(triggerB);
         BuildRequestEvent triggerC = createRequest(client, "cronTrigger", true, new Revision("2"));
         controller.handleEvent(triggerC);
-        assertQueued(triggerB, triggerC);
+        assertQueued(triggerB);
 
         controller.handleEvent(createSuccessful(triggerA.getMetaBuildId(), client));
 
@@ -285,6 +289,8 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
      *
      * We need to ensure that so long as the requests are correctly configured, they are assimilated
      * with minimal fuss.
+     *
+     * Note that each individual scm build request will generate a series of related build requests.
      */
     public void testOverlappingScmCommitsAreAssimilated()
     {
@@ -298,17 +304,14 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         controller.handleEvent(libBScmChange);
         controller.handleEvent(clientScmChange);
 
-        assertEquals(8, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(3, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
 
         verify(buildRequestRegistry, times(1)).requestActivated(utilScmChange, utilScmChange.getId());
-        verify(buildRequestRegistry, times(1)).requestQueued(libAScmChange);
-        verify(buildRequestRegistry, times(1)).requestQueued(libBScmChange);
-        verify(buildRequestRegistry, times(1)).requestQueued(clientScmChange);
 
         controller.handleEvent(createSuccessful(utilScmChange.getMetaBuildId(), utility));
 
-        assertEquals(4, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
 
         verify(buildRequestRegistry, times(1)).requestAssimilated(eq(libAScmChange), anyLong());
@@ -316,7 +319,7 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         controller.handleEvent(createSuccessful(utilScmChange.getMetaBuildId(), libraryA));
 
-        assertEquals(4, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
 
         controller.handleEvent(createSuccessful(utilScmChange.getMetaBuildId(), libraryB));
@@ -331,10 +334,10 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
     }
 
     /**
-     * Two scm changes to the same component, ensure that none of the second changes
-     * requests are assimilated into the first changes build.
+     * Two scm changes to the same component, ensure that the second request assimilates
+     * into the first if the first hasn't started (revision fixed).
      */
-    public void testMultipleOverlappingCommitsRemainDistinct()
+    public void testMultipleOverlappingCommitsMergeIfTheyCanAssimilate()
     {
         BuildRequestEvent changeA = createRequest(utility, "scm change", true, false);
         BuildRequestEvent changeB = createRequest(utility, "scm change", true, false);
@@ -342,11 +345,57 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         controller.handleEvent(changeA);
         controller.handleEvent(changeB);
 
+        assertEquals(3, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
+
+        verify(buildRequestRegistry, times(1)).requestActivated(changeA, changeA.getId());
+
+        controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), utility));
+
+        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
+
+        controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), libraryA));
+
+        assertEquals(1, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
+
+        controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), libraryB));
+
+        assertEquals(0, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
+
+        controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), client));
+
+        assertEquals(0, controller.getSnapshot().getQueuedBuildRequests().size());
+        assertEquals(0, controller.getSnapshot().getActivatedBuildRequests().size());
+
+        verify(buildRequestRegistry, times(4)).requestAssimilated((BuildRequestEvent) anyObject(), anyLong());
+    }
+
+    /**
+     * Two scm changes to the same component, ensure that the second request does not assimilate
+     * into the first because the first one has started and its revision is fixed.  Assimilation only
+     * occurs if all of a builds associated requests can be assimilated.
+     */
+    public void testMultipleOverlappingCommitsRemainSeparateIfTheyCanNotAssimilateCompletely()
+    {
+        BuildRequestEvent changeA = createRequest(utility, "scm change", true, false);
+        BuildRequestEvent changeB = createRequest(utility, "scm change", true, false);
+
+        controller.handleEvent(changeA);
+
+        // lock the build revision, preventing further assimilation
+        changeA.getRevision().lock();
+        changeA.getRevision().fix();
+        changeA.getRevision().unlock();
+        
+        controller.handleEvent(changeB);
+
         assertEquals(7, controller.getSnapshot().getQueuedBuildRequests().size());
         assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
 
         verify(buildRequestRegistry, times(1)).requestActivated(changeA, changeA.getId());
-        verify(buildRequestRegistry, times(1)).requestQueued(changeB);
 
         controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), utility));
 

@@ -3,24 +3,36 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.PublishFlag;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.build.control.BuildControllerFactory;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.ConjunctivePredicate;
-import com.zutubi.util.InvertedPredicate;
+import com.zutubi.util.Predicate;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The build queue tracks queued and active build requests.
  * <p/>
  * A request remains queued until all of its predicates are satisfied, at which point
  * it is activated.
+ * <p/>
+ * Request assimilation is the process by which two requests are considered to produce
+ * the exact same result and are therefore merged into one request to avoid an unnecessary
+ * build.  The assimilation of requests happens at the earliest possible opportunity to
+ * avoid reduntant builds showing up in the queue snapshot.
+ * <p/>
+ * Two requests can be assimilated under the following conditions:
+ * <lu>
+ * <li>The request source fields must be the same</li>
+ * <li>The trigger options replaceable field must be true</li>
+ * <li>The build revision can not be fixed</li>
+ * <li>The requests belong to the same project</li>
+ * <li>The requests are adjacent in the queue</li>
+ * <li>For extended builds with multiple related requests, all of the requests must be
+ * assimilated or non of them will be assimilated.</li>
+ * </lu>
  */
 public class BuildQueue
 {
@@ -61,13 +73,15 @@ public class BuildQueue
      */
     public synchronized void enqueue(List<QueuedRequest> requests)
     {
+        if (assimilateRequests(requests))
+        {
+            return;
+        }
+
         for (QueuedRequest request : requests)
         {
-            if (onNewlyQueued(request))
-            {
-                queuedRequests.add(0, request);
-                buildRequestRegistry.requestQueued(request.getRequest());
-            }
+            queuedRequests.add(0, request);
+            buildRequestRegistry.requestQueued(request.getRequest());
         }
 
         activateWhatWeCan();
@@ -77,7 +91,6 @@ public class BuildQueue
      * Enqueue the requests.
      *
      * @param requests the requests to enqueue.
-     *
      * @see #enqueue(java.util.List)
      */
     public synchronized void enqueue(QueuedRequest... requests)
@@ -90,9 +103,8 @@ public class BuildQueue
      * or if the request has been activated, no change is made and false is returned.
      *
      * @param requestId the id of the request to be cancelled.
-     *
      * @return true if a queued request matching the request id was located and cancelled,
-     * false otherwise.
+     *         false otherwise.
      */
     public synchronized boolean cancel(long requestId)
     {
@@ -114,9 +126,8 @@ public class BuildQueue
      * or if the request has is still queued, no change is made and false is returned.
      *
      * @param requestId the id of the request to be completed
-     *
      * @return true if an activated request matching the request is was located and completed,
-     * false otherwise.
+     *         false otherwise.
      */
     public synchronized boolean complete(long requestId)
     {
@@ -135,7 +146,7 @@ public class BuildQueue
     /**
      * Stop the queue from activating any further requests.  This is
      * permanent.
-     *
+     * <p/>
      * To temporarily stop the activation of requests, see {@link #pauseActivation()}
      */
     public synchronized void stop()
@@ -168,7 +179,7 @@ public class BuildQueue
      * }
      * </code>
      *
-     * @throws IllegalStateException if the current thread does not hold a lock on the build queue.
+     * @throws IllegalStateException    if the current thread does not hold a lock on the build queue.
      * @throws IllegalArgumentException if the build queue is already paused.
      */
     public void pauseActivation()
@@ -189,9 +200,8 @@ public class BuildQueue
     /**
      * Unpause the activation of this build queue.
      *
-     * @throws IllegalStateException if the current thread does not hold a lock on the build queue.
+     * @throws IllegalStateException    if the current thread does not hold a lock on the build queue.
      * @throws IllegalArgumentException if the build queue is not already paused.
-     *
      * @see #pauseActivation()
      */
     public void resumeActivation()
@@ -240,8 +250,6 @@ public class BuildQueue
         // Now we go through and finish activating the newly activated requests.
         for (ActivatedRequest activatedRequest : toActivateRequests)
         {
-            onNewlyActivated(activatedRequest);
-
             // it may be worth taking this startup processing outside the synchronisation block since it may take some time.
             BuildController controller = buildControllerFactory.create(activatedRequest.getRequest());
             long buildNumber = controller.start();
@@ -254,71 +262,121 @@ public class BuildQueue
     }
 
     /**
-     * The assimilation processing is delayed to as late as possible to avoid assimilating into
-     * a build request that is later cancelled.  As such, we only assimilate into activated requests.
-     * <p/>
-     * When we receive a new queued request, check if we can assimilate into any of the currently
-     * activated requests.
+     * Assimilate the requests into the existing queued entried if possible.
      *
-     * @param queuedRequest the request to be compared to the existing activated requests for
-     *                      assimilation.
-     * @return true if we can continue to queue this request, false otherwise.
+     * @param requests  the requests to be assimilated.
+     * @return true if the requests were assimilated, false otherwise.
      */
-    private boolean onNewlyQueued(final QueuedRequest queuedRequest)
+    private boolean assimilateRequests(List<QueuedRequest> requests)
     {
-        // find the first activated request that we can assimilate into.
-        BuildRequestEvent event = queuedRequest.getRequest();
-        List<ActivatedRequest> assimilationCandidates = CollectionUtils.filter(activatedRequests,
-                new HasOwnerAndSource<ActivatedRequest>(event.getOwner(), event.getOptions().getSource())
-        );
-        if (assimilationCandidates.size() > 0)
+        Map<QueuedRequest, RequestHolder> assimilationTargets = new HashMap<QueuedRequest, RequestHolder>();
+        for (QueuedRequest source : requests)
         {
-            ActivatedRequest activatedRequest = null;
-            for (ActivatedRequest request : assimilationCandidates)
+            if (!isReplaceable(source))
             {
-                // is revision fixed?
-                BuildRevision buildRevision = queuedRequest.getRequest().getRevision();
-                if (request.getController().updateRevisionIfNotFixed(buildRevision.getRevision()))
-                {
-                    activatedRequest = request;
-                    break;
-                }
+                return false;
             }
 
-            // if we located an active request we can assimilate with, do so.
-            if (activatedRequest != null)
+            RequestHolder target = getAssimilationCandidate(source);
+            if (isReplaceable(target))
             {
-                buildRequestRegistry.requestAssimilated(queuedRequest.getRequest(), activatedRequest.getRequest().getId());
+                assimilationTargets.put(source, target);
+            }
+            else
+            {
                 return false;
             }
         }
+
+        Collection<RequestHolder> targets = assimilationTargets.values();
+        try
+        {
+            lock(targets);
+
+            // any fixed?
+            RequestHolder fixed = CollectionUtils.find(assimilationTargets.values(), new Predicate<RequestHolder>()
+            {
+                public boolean satisfied(RequestHolder requestHolder)
+                {
+                    return requestHolder.getRequest().getRevision().isFixed();
+                }
+            });
+
+            // if any revisions are fixed, then we can not assimilate it, so bail on the assimilation
+            // of the rest.
+            if (fixed != null)
+            {
+                return false;
+            }
+
+            // handle the assimilation of all of the requests.
+            for (QueuedRequest source : assimilationTargets.keySet())
+            {
+                RequestHolder target = assimilationTargets.get(source);
+
+                BuildRequestEvent targetRequest = target.getRequest();
+                BuildRequestEvent sourceRequest = source.getRequest();
+
+                // if it is activated, update the revision in the controller.
+                // else update the revision in the request.
+                if (target instanceof ActivatedRequest)
+                {
+                    BuildController controller = ((ActivatedRequest) target).getController();
+                    boolean updated = controller.updateRevisionIfNotFixed(sourceRequest.getRevision().getRevision());
+
+                    // if updated is false, we have a problem.  We have done everything we can to
+                    // ensure that the update will be possible, but now one update has failed.  This
+                    // implies that we need to roll all of the updates back.  What makes this very
+                    // difficult is the fact that updateRevisionIfNotFixed generates events.
+                    // SideNote: update should not return false since we are already checking for isFixed.
+                    // Maybe this area needs to be reviewed and cleaned up.
+                }
+                else
+                {
+                    targetRequest.getRevision().update(sourceRequest.getRevision().getRevision());
+                }
+
+                buildRequestRegistry.requestAssimilated(sourceRequest, targetRequest.getId());
+            }
+        }
+        finally
+        {
+            unlock(targets);
+        }
+        
         return true;
     }
 
-    private void onNewlyActivated(final ActivatedRequest activated)
+    private void unlock(Collection<RequestHolder> holders)
     {
-        // on newly assimilated, it is like two queued items merging, so we keep it simple and do not need to
-        // include any crazy business with the controller.
-
-        if (activated.getRequest().getOptions().isReplaceable())
+        for (RequestHolder target : holders)
         {
-            // can only assimilate builds that are themselves ready to build - not waiting on a dependency.
-            List<QueuedRequest> assimilationCandidates = CollectionUtils.filter(queuedRequests, new ConjunctivePredicate<QueuedRequest>(
-                        new HasOwnerAndSource<QueuedRequest>(activated),
-                        new InvertedPredicate<QueuedRequest>(new HasPendingDependencyPredicate())));
-
-            if (assimilationCandidates.size() > 0)
-            {
-                BuildRequestEvent latestQueuedRequest = assimilationCandidates.get(0).getRequest();
-                activated.getRequest().setRevision(latestQueuedRequest.getRevision());
-
-                for (QueuedRequest assimilationTarget : assimilationCandidates)
-                {
-                    buildRequestRegistry.requestAssimilated(assimilationTarget.getRequest(), activated.getRequest().getId());
-                    queuedRequests.remove(assimilationTarget);
-                }
-            }
+            target.getRequest().getRevision().unlock();
         }
+    }
+
+    private void lock(Collection<RequestHolder> holders)
+    {
+        for (RequestHolder target : holders)
+        {
+            target.getRequest().getRevision().lock();
+        }
+    }
+
+    private RequestHolder getAssimilationCandidate(RequestHolder source)
+    {
+        // the back of the queue is the start of the list.
+        QueuedRequest candidate = CollectionUtils.find(queuedRequests, new HasOwnerAndSource<QueuedRequest>(source));
+        if (candidate != null)
+        {
+            return candidate;
+        }
+        return CollectionUtils.find(activatedRequests, new HasOwnerAndSource<ActivatedRequest>(source));
+    }
+
+    private boolean isReplaceable(RequestHolder target)
+    {
+        return target != null && target.getRequest().getOptions().isReplaceable();
     }
 
     /**
@@ -392,7 +450,6 @@ public class BuildQueue
      * Get the identified request.
      *
      * @param requestId the identifier of the request to be retrieved.
-     *
      * @return the build request event matching the id.
      */
     public synchronized BuildRequestEvent getRequest(long requestId)
@@ -413,7 +470,6 @@ public class BuildQueue
      * Returns true if the specified owner has an active or queued request.
      *
      * @param owner the owner of the request
-     *
      * @return true if the specified owner has a request in the queue, false otherwise
      */
     public synchronized boolean hasRequest(Object owner)
@@ -425,7 +481,6 @@ public class BuildQueue
      * Returns a list of build requests for the specified owner.
      *
      * @param owner the owner of the request
-     *
      * @return a list of build request event instances associated with the specified owner.
      */
     public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)

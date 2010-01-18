@@ -5,10 +5,13 @@ import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class BuildQueueTest extends BaseQueueTestCase
 {
@@ -170,7 +173,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         assertEquals(r1.getRequest(), activatedEvent.getEvent());
     }
 
-    public void testAssimilationOfNewQueueRequestIntoActivatedRequest()
+    public void testAssimilationIntoActivatedRequest()
     {
         Project projectA = createProject("a");
 
@@ -190,25 +193,88 @@ public class BuildQueueTest extends BaseQueueTestCase
         verify(controller, times(1)).updateRevisionIfNotFixed(new Revision("2"));
     }
 
-    public void testAssimilationOfQueuedRequestsDuringActivation()
+    public void testAssimilationIntoQueuedRequest()
     {
-        Project projectA = createProject("a");
-
-        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, new Revision("2"));
-
-        BuildController controller = controllers.get(requestA);
-        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
-
-        buildQueue.enqueue(active(requestA), queue(requestB));
-
-        assertActivated(requestA);
-        assertQueued();
-
-        verify(buildRequestRegistry, times(1)).requestAssimilated(requestB, requestA.getId());
+        queuedAssimilationTest(createProject("utility"));
     }
 
-    public void testAssimilationRequiresSameSource()
+    public void testAssimilationOfTwoRelatedRequests()
+    {
+        queuedAssimilationTest(createProject("utility"), createProject("client"));
+    }
+
+    public void testAssimilationOfMultipleRelatedRequests()
+    {
+        queuedAssimilationTest(createProject("utility"), createProject("lib"), createProject("client"));
+    }
+
+    private void queuedAssimilationTest(Project... projects)
+    {
+        List<BuildRequestEvent> requests = new LinkedList<BuildRequestEvent>();
+        for (Project p : projects)
+        {
+            requests.add(createRequest(p, "sourceA", true, new Revision("1")));
+        }
+
+        buildQueue.enqueue(CollectionUtils.map(requests, new Mapping<BuildRequestEvent, QueuedRequest>()
+        {
+            public QueuedRequest map(BuildRequestEvent request)
+            {
+                return queue(request);
+            }
+        }));
+
+        assertActivated();
+        assertQueued(requests.toArray(new BuildRequestEvent[requests.size()]));
+
+        List<BuildRequestEvent> requestsToBeAssimilated = new LinkedList<BuildRequestEvent>();
+        for (Project p : projects)
+        {
+            requestsToBeAssimilated.add(createRequest(p, "sourceA", true, new Revision("2")));
+        }
+
+        buildQueue.enqueue(CollectionUtils.map(requestsToBeAssimilated, new Mapping<BuildRequestEvent, QueuedRequest>()
+        {
+            public QueuedRequest map(BuildRequestEvent request)
+            {
+                return queue(request);
+            }
+        }));
+
+        assertActivated();
+        assertQueued(requests.toArray(new BuildRequestEvent[requests.size()]));
+
+        for (int i = 0; i < projects.length; i++)
+        {
+            verify(buildRequestRegistry, times(1)).requestAssimilated(requestsToBeAssimilated.get(i), requests.get(i).getId());
+        }
+    }
+
+    public void testNoAssimilationIfSomeRequestsCanNotAssimilate()
+    {
+        Project utilityProject = createProject("utility");
+        Project clientProject = createProject("client");
+
+        BuildRequestEvent utilityRequestA = createRequest(utilityProject, "sourceA", true, new Revision("1"));
+        BuildRequestEvent clientRequestA = createRequest(clientProject, "sourceA", true, new Revision("1"));
+
+        buildQueue.enqueue(queue(utilityRequestA), queue(clientRequestA));
+
+        assertActivated();
+        assertQueued(utilityRequestA, clientRequestA);
+
+        BuildRequestEvent utilityRequestB = createRequest(utilityProject, "sourceA", true, new Revision("1"));
+        BuildRequestEvent clientRequestB = createRequest(clientProject, "sourceB", true, new Revision("1"));
+
+        buildQueue.enqueue(queue(utilityRequestB), queue(clientRequestB));
+
+        assertActivated();
+        assertQueued(utilityRequestA, clientRequestA, utilityRequestB, clientRequestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated((BuildRequestEvent) anyObject(), anyLong());
+    }
+
+    public void testNoAssimilationIfSourcesAreDifferent()
     {
         Project projectA = createProject("a");
 
@@ -226,7 +292,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         verify(buildRequestRegistry, never()).requestAssimilated((BuildRequestEvent) anyObject(), anyLong());
     }
 
-    public void testRequestsFromDifferentOwnersNotAssimilated()
+    public void testNoAssimilationIfOwnersAreDifferent()
     {
         BuildRequestEvent requestA = createRequest(createProject("A"), "sourceA", true, new Revision("1"));
         BuildRequestEvent requestB = createRequest(createProject("B"), "sourceA", true, new Revision("2"));
@@ -235,6 +301,57 @@ public class BuildQueueTest extends BaseQueueTestCase
         doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
 
         buildQueue.enqueue(active(requestA), queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued(requestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated(requestB, requestA.getId());
+    }
+
+    public void testNoAssimilationIfReplaceableOnTargetRequestIsFalse()
+    {
+        Project project = createProject("A");
+        BuildRequestEvent requestA = createRequest(project, "sourceA", false, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(project, "sourceA", true, new Revision("2"));
+
+        buildQueue.enqueue(active(requestA));
+        buildQueue.enqueue(queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued(requestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated(requestB, requestA.getId());
+    }
+
+    public void testNoAssimilationIfReplaceableOnSourceRequestIsFalse()
+    {
+        Project project = createProject("A");
+        BuildRequestEvent requestA = createRequest(project, "sourceA", true, new Revision("1"));
+        BuildRequestEvent requestB = createRequest(project, "sourceA", false, new Revision("2"));
+
+        buildQueue.enqueue(active(requestA));
+        buildQueue.enqueue(queue(requestB));
+
+        assertActivated(requestA);
+        assertQueued(requestB);
+
+        verify(buildRequestRegistry, never()).requestAssimilated(requestB, requestA.getId());
+    }
+
+    public void testNoAssimilationIfRevisionIsFixed()
+    {
+        Project project = createProject("A");
+        BuildRequestEvent requestA = createRequest(project, "sourceA", true, new Revision("1"));
+
+        // lock the request A revision.
+        requestA.getRevision().lock();
+        requestA.getRevision().fix();
+        requestA.getRevision().unlock();
+
+        BuildRequestEvent requestB = createRequest(project, "sourceA", true, new Revision("2"));
+
+        buildQueue.enqueue(active(requestA));
+        buildQueue.enqueue(queue(requestB));
 
         assertActivated(requestA);
         assertQueued(requestB);
