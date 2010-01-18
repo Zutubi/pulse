@@ -14,8 +14,8 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to the Pulse 2.1 Beta!  Beta builds give you a chance to try new Pulse features
-        before the stable release.  It's a great chance to give feedback on these features!
+        Welcome to the Pulse 2.1!  This page provides information on common next steps and important
+        new features in the 2.1 release.
     </p>
     <p>
         You can return to this page at any time by clicking on the "pulse 2.1" link in the top left
