@@ -16,7 +16,6 @@ import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
@@ -607,6 +606,23 @@ public class PollingServiceTest extends ZutubiTestCase
                 status(project, "polling.quiet.end"),
                 status(project, "polling.end", "0 ms")
         );
+    }
+
+    // CIB-2291
+    public void testPollingScmsWithNullUID() throws ScmException, ExecutionException, InterruptedException
+    {
+        latestProjectRevision = new Revision(1);
+        Project projectA = createProject("projectA");
+        Project projectB = createProject("projectB");
+
+        stub(scmClientsByProject.get(projectA).getUid()).toReturn(null);
+        stub(scmClientsByProject.get(projectB).getUid()).toReturn(null);
+
+        serviceHandle.init();
+        serviceHandle.pollAndWait();
+
+        assertScmChanges();
+        assertPolledForChanges(projectA, projectB);
     }
 
     private void assertStatusEvents(ProjectStatusEvent... expectedEvents)

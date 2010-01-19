@@ -23,6 +23,11 @@ public class OneActivePollPerScmPredicate implements Predicate<PollingRequest>
     public boolean satisfied(PollingRequest request)
     {
         String uid = getProjectsScmServerUid(request.getProject());
+        if (uid == null)
+        {
+            // essentially disable this predicate if we dont know the scm server uid.
+            return true;
+        }
 
         PollingQueueSnapshot snapshot = requestQueue.getSnapshot();
         for (PollingRequest activeRequest : snapshot.getActivatedRequests())

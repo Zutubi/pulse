@@ -114,7 +114,11 @@ public class PollingService implements Stoppable
             {
                 ProjectConfiguration config = project.getConfig();
                 ScmClient client = scmManager.createClient(config.getScm());
-                projectUidCache.put(key, client.getUid());
+                String projectUid = client.getUid();
+                if (projectUid != null)
+                {
+                    projectUidCache.put(key, projectUid);
+                }
             }
             catch (ScmException e)
             {
