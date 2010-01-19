@@ -12,11 +12,18 @@ import java.util.List;
 /**
  * Subversion SCM configuration.
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration
 {
+    public enum ExternalsMonitoring
+    {
+        DO_NOT_MONITOR,
+        MONITOR_ALL,
+        MONITOR_SELECTED
+    }
+
     @Required
     @Constraint("SubversionUrlValidator")
     private String url;
@@ -27,10 +34,13 @@ public class SubversionConfiguration extends PollableScmConfiguration
     private String keyfilePassphrase;
 
     @Wizard.Ignore
+    @ControllingSelect(dependentFields = {"externalMonitorPaths"}, enableSet = {"MONITOR_SELECTED"})
+    private ExternalsMonitoring externalsMonitoring = ExternalsMonitoring.DO_NOT_MONITOR;
+    @Wizard.Ignore
     @StringList
     private List<String> externalMonitorPaths = new LinkedList<String>();
     @Wizard.Ignore
-    private boolean verifyExternals;
+    private boolean verifyExternals = true;
     @Wizard.Ignore
     private boolean enableHttpSpooling;
 
@@ -98,6 +108,16 @@ public class SubversionConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return SubversionClient.TYPE;
+    }
+
+    public ExternalsMonitoring getExternalsMonitoring()
+    {
+        return externalsMonitoring;
+    }
+
+    public void setExternalsMonitoring(ExternalsMonitoring externalsMonitoring)
+    {
+        this.externalsMonitoring = externalsMonitoring;
     }
 
     public List<String> getExternalMonitorPaths()

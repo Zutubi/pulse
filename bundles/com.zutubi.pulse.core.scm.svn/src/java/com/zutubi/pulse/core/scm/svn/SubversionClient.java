@@ -14,9 +14,10 @@ import org.tmatesoft.svn.core.internal.io.dav.http.DefaultHTTPConnectionFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
+import org.tmatesoft.svn.core.internal.wc.SVNExternal;
 import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
-import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.io.*;
+import org.tmatesoft.svn.core.io.diff.SVNDiffWindow;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.*;
@@ -32,10 +33,18 @@ public class SubversionClient implements ScmClient
     private static final Logger LOG = Logger.getLogger(ScmClient.class);
 
     /**
+     * If true, we will monitor all externals by recursively scanning for
+     * svn:externals properties.  We also recurse to find externals defined
+     * within externals.
+     */
+    private boolean monitorAllExternals = false;
+    /**
      * A list of paths within the main repository for which we will check the
      * svn:externals property.  If any externals are set to paths within the
      * *same* repository, they will be taken into account in checkout, update
      * and change checking operations.
+     * <p/>
+     * Ignored when {@link #monitorAllExternals} is true.
      */
     private List<String> externalsPaths = new LinkedList<String>();
     private boolean verifyExternals = true;
@@ -106,8 +115,9 @@ public class SubversionClient implements ScmClient
     /**
      * Initialises a connection to the subversion repository.
      *
-     * @param url the URL to connect to the server on
-     * @param enableHttpSpooling
+     * @param url                the URL to connect to the server on
+     * @param enableHttpSpooling set to true if we should enable spooling (to
+     *                           a temp file) for HTTP downloads in SvnKit
      * @throws ScmException if an error occurs connecting to the server
      */
     private void initialiseRepository(String url, boolean enableHttpSpooling) throws ScmException
@@ -220,6 +230,11 @@ public class SubversionClient implements ScmClient
     public void setExcludedPaths(List<String> excludedPaths)
     {
         this.excludedPaths = excludedPaths;
+    }
+
+    public void setMonitorAllExternals(boolean monitorAllExternals)
+    {
+        this.monitorAllExternals = monitorAllExternals;
     }
 
     public void addExternalPath(String path)
@@ -465,86 +480,51 @@ public class SubversionClient implements ScmClient
 
     List<ExternalDefinition> getExternals(Revision revision) throws ScmException
     {
-        List<ExternalDefinition> result = new LinkedList<ExternalDefinition>();
-        if (externalsPaths.size() > 0)
+        final List<ExternalDefinition> result = new LinkedList<ExternalDefinition>();
+        try
         {
-            try
+            long rev = revision == null ? repository.getLatestRevision() : convertRevision(revision).getNumber();
+            if (monitorAllExternals)
             {
-                SVNWCClient wcClient = new SVNWCClient(repository.getAuthenticationManager(), null);
-                for (String externalsPath : externalsPaths)
+                addExternalsFromUrl(rev, "", repository.getLocation(), result);
+            }
+            else if (externalsPaths.size() > 0)
+            {
+                for (String externalsPath: externalsPaths)
                 {
+                    if (externalsPath.equals("."))
+                    {
+                        externalsPath = "";
+                    }
+                    
                     SVNURL url = repository.getLocation().appendPath(externalsPath, false);
-                    SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.UNDEFINED, convertRevision(revision));
-                    if (data == null)
-                    {
-                        LOG.warning("Configured externals path '" + externalsPath + "' for URL '" + repository.getLocation().toString() + "' does not exist or does not have svn:externals property set: ignoring.");
-                    }
-                    else
-                    {
-                        addExternalsFromProperty(StringUtils.join("/", true, true, externalsPath, data.getValue().getString()), result);
-                    }
+                    addExternalsFromUrl(rev, externalsPath, url, result);
                 }
             }
-            catch (IOException e)
-            {
-                throw new ScmException("I/O error checking externals: " + e.getMessage(), e);
-            }
-            catch (SVNException e)
-            {
-                throw convertException(e);
-            }
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
         }
 
         return result;
     }
 
-    private void addExternalsFromProperty(String value, List<ExternalDefinition> externals) throws IOException, SVNException
+    private void addExternalsFromUrl(final long revision, final String ownerPath, final SVNURL ownerURL, final List<ExternalDefinition> result) throws SVNException
     {
-        BufferedReader reader = new BufferedReader(new StringReader(value));
-        String line;
-        while ((line = reader.readLine()) != null)
+        SVNRepository repository = SVNRepositoryFactory.create(ownerURL);
+        repository.setAuthenticationManager(authenticationManager);
+
+        ISVNReporterBaton reporter = new ISVNReporterBaton()
         {
-            line = line.trim();
-            if (line.length() == 0 || line.startsWith("#"))
+            public void report(ISVNReporter reporter) throws SVNException
             {
-                continue;
+                reporter.setPath("", null, revision, SVNDepth.INFINITY, true);
+                reporter.finishReport();
             }
+        };
 
-            String[] parts = line.split("\\s+");
-            if (parts.length == 2)
-            {
-                // Restriciting to 2 parts means we ignore fixed revision
-                // externals (as intended).
-                ExternalDefinition external = new ExternalDefinition(parts[0], parts[1]);
-
-                if (verifyExternals)
-                {
-                    SVNRepository repo = SVNRepositoryFactory.create(external.url);
-                    repo.setAuthenticationManager(authenticationManager);
-
-                    try
-                    {
-                        String uid = repo.getRepositoryUUID(true);
-                        if (uid.equals(getUid()))
-                        {
-                            externals.add(external);
-                        }
-                        else
-                        {
-                            LOG.warning("Ignoring external at URL '" + external.url.toDecodedString() + "': UID does not match");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        LOG.warning("Ignoring external at URL '" + external.url.toDecodedString() + "'", e);
-                    }
-                }
-                else
-                {
-                    externals.add(external);
-                }
-            }
-        }
+        repository.status(revision, null, monitorAllExternals ? SVNDepth.INFINITY : SVNDepth.EMPTY, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
@@ -1027,10 +1007,208 @@ public class SubversionClient implements ScmClient
         String path;
         SVNURL url;
 
-        public ExternalDefinition(String path, String url) throws SVNException
+        public ExternalDefinition(String path, SVNURL url)
         {
             this.path = path;
-            this.url = SVNURL.parseURIDecoded(url);
+            this.url = url;
+        }
+
+        public ExternalDefinition(String path, String url) throws SVNException
+        {
+            this(path, SVNURL.parseURIDecoded(url));
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            ExternalDefinition that = (ExternalDefinition) o;
+
+            if (!path.equals(that.path))
+            {
+                return false;
+            }
+            if (!url.equals(that.url))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = path.hashCode();
+            result = 31 * result + url.hashCode();
+            return result;
+        }
+
+        @Override
+        public String toString()
+        {
+            return path + " -> "+ url;
+        }
+    }
+
+    /**
+     * Editor implementation to gather svn:externals values from directory as
+     * part of externals collection.
+     */
+    private class GetExternalsEditor implements ISVNEditor
+    {
+        private Stack<String> dirStack;
+        private final long revision;
+        private final String ownerPath;
+        private final SVNURL ownerURL;
+        private final List<ExternalDefinition> result;
+
+        public GetExternalsEditor(long revision, String ownerPath, SVNURL ownerURL, List<ExternalDefinition> result)
+        {
+            this.revision = revision;
+            this.ownerPath = ownerPath;
+            this.ownerURL = ownerURL;
+            this.result = result;
+            dirStack = new Stack<String>();
+        }
+
+        public void targetRevision(long revision) throws SVNException
+        {
+        }
+
+        public void openRoot(long revision) throws SVNException
+        {
+            dirStack.push("");
+        }
+
+        public void deleteEntry(String path, long revision) throws SVNException
+        {
+        }
+
+        public void absentDir(String path) throws SVNException
+        {
+        }
+
+        public void absentFile(String path) throws SVNException
+        {
+        }
+
+        public void addDir(String path, String copyFromPath, long copyFromRevision) throws SVNException
+        {
+            dirStack.push(path);
+        }
+
+        public void openDir(String path, long revision) throws SVNException
+        {
+            dirStack.push(path);
+        }
+
+        public void changeDirProperty(String name, SVNPropertyValue value) throws SVNException
+        {
+            if (SVNProperty.EXTERNALS.equals(name))
+            {
+                String dirPath = StringUtils.join("/", true, true, ownerPath, dirStack.peek());
+                addExternalsFromProperty(revision, dirPath, ownerURL.appendPath(dirStack.peek(), false), value.getString(), result);
+            }
+        }
+
+        private void addExternalsFromProperty(long revision, String ownerPath, SVNURL ownerURL, String value, List<ExternalDefinition> externals) throws SVNException
+        {
+            SVNExternal[] svnExternals = SVNExternal.parseExternals(ownerURL.toString(), value);
+            for (SVNExternal external: svnExternals)
+            {
+                // We don't monitor or report changes when the revision is fixed.
+                if (!external.isRevisionExplicit())
+                {
+                    ExternalDefinition definition = new ExternalDefinition(StringUtils.join("/", true, true, ownerPath, external.getPath()), external.resolveURL(repository.getRepositoryRoot(true), ownerURL));
+                    if (verifyExternals)
+                    {
+                        SVNRepository repo = SVNRepositoryFactory.create(definition.url);
+                        repo.setAuthenticationManager(authenticationManager);
+
+                        try
+                        {
+                            String uid = repo.getRepositoryUUID(true);
+                            if (uid.equals(getUid()))
+                            {
+                                addExternal(revision, definition, externals);
+                            }
+                            else
+                            {
+                                LOG.warning("Ignoring external at URL '" + definition.url.toDecodedString() + "': UID does not match");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            LOG.warning("Ignoring external at URL '" + definition.url.toDecodedString() + "'", e);
+                        }
+                    }
+                    else
+                    {
+                        addExternal(revision, definition, externals);
+                    }
+                }
+            }
+        }
+
+        private void addExternal(long revision, ExternalDefinition definition, List<ExternalDefinition> externals) throws SVNException
+        {
+            externals.add(definition);
+            if (monitorAllExternals)
+            {
+                addExternalsFromUrl(revision, definition.path, definition.url, externals);
+            }
+        }
+        
+        public void closeDir() throws SVNException
+        {
+            dirStack.pop();
+        }
+
+        public void addFile(String path, String copyFromPath, long copyFromRevision) throws SVNException
+        {
+        }
+
+        public void openFile(String path, long revision) throws SVNException
+        {
+        }
+
+        public void changeFileProperty(String path, String name, SVNPropertyValue value) throws SVNException
+        {
+        }
+
+        public void closeFile(String path, String textChecksum) throws SVNException
+        {
+        }
+
+        public SVNCommitInfo closeEdit() throws SVNException
+        {
+            return null;
+        }
+
+        public void abortEdit() throws SVNException
+        {
+        }
+
+        public void applyTextDelta(String path, String baseChecksum) throws SVNException
+        {
+        }
+
+        public OutputStream textDeltaChunk(String path, SVNDiffWindow diffWindow) throws SVNException
+        {
+            return null;
+        }
+
+        public void textDeltaEnd(String path) throws SVNException
+        {
         }
     }
 }

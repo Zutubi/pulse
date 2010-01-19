@@ -7,8 +7,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 
 /**
- *
- *
+ * Factory that creates {@link SubversionClient} instances from configuration.
  */
 public class SubversionClientFactory implements ScmClientFactory<SubversionConfiguration>
 {
@@ -39,9 +38,23 @@ public class SubversionClientFactory implements ScmClientFactory<SubversionConfi
         }
 
         client.setExcludedPaths(config.getFilterPaths());
-        for(String path: config.getExternalMonitorPaths())
+        switch (config.getExternalsMonitoring())
         {
-            client.addExternalPath(path);
+            case DO_NOT_MONITOR:
+                client.setMonitorAllExternals(false);
+                break;
+
+            case MONITOR_ALL:
+                client.setMonitorAllExternals(true);
+                break;
+
+            case MONITOR_SELECTED:
+                client.setMonitorAllExternals(false);
+                for(String path: config.getExternalMonitorPaths())
+                {
+                    client.addExternalPath(path);
+                }
+                break;
         }
 
         client.setVerifyExternals(config.getVerifyExternals());
