@@ -28,7 +28,7 @@ import java.util.*;
  * <li>The trigger options replaceable field must be true</li>
  * <li>The build revision can not be fixed</li>
  * <li>The requests belong to the same project</li>
- * <li>The requests are adjacent in the queue</li>
+ * <li>The requests are adjacent requests of the same owner and source in the queue</li>
  * <li>For extended builds with multiple related requests, all of the requests must be
  * assimilated or non of them will be assimilated.</li>
  * </lu>
