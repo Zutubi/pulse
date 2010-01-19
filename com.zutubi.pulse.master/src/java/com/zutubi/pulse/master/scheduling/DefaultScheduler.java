@@ -208,13 +208,7 @@ public class DefaultScheduler implements Scheduler
 
     public void unschedule(Trigger trigger) throws SchedulingException
     {
-        if (getTrigger(trigger.getName(), trigger.getGroup()) == null)
-        {
-            throw new SchedulingException("Trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " is unknown.");
-        }
-
         assertScheduled(trigger);
-
         SchedulerStrategy impl = getStrategy(trigger);
         impl.unschedule(trigger);
 
@@ -320,9 +314,21 @@ public class DefaultScheduler implements Scheduler
 
     private void assertScheduled(Trigger trigger) throws SchedulingException
     {
-        if (getTrigger(trigger.getName(), trigger.getGroup()) == null)
+        if (!isScheduled(trigger))
         {
             throw new SchedulingException("The trigger must be scheduled.");
+        }
+    }
+
+    private boolean isScheduled(Trigger trigger) throws SchedulingException
+    {
+        if (trigger.isTransient())
+        {
+            return getTrigger(trigger.getName(), trigger.getGroup()) != null;
+        }
+        else
+        {
+            return trigger.isScheduled();
         }
     }
 
