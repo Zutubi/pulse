@@ -650,6 +650,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
 
             DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshotDirectory);
+            serialiser.setMaxPathDepth(2);
             serialiser.serialise(newSnapshot, true);
 
             FileWriter writer = null;
