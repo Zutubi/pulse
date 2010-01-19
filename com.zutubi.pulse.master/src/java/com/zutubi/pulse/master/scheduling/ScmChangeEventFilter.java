@@ -21,6 +21,7 @@ public class ScmChangeEventFilter implements EventTriggerFilter
         boolean accept = project != null && project.getName().equals(changeEvent.getProjectConfiguration().getName());
 
         context.put(BuildProjectTask.PARAM_JUMP_QUEUE_ALLOWED, false);
+        context.put(BuildProjectTask.PARAM_SOURCE, "scm change");
 
         return accept;
     }

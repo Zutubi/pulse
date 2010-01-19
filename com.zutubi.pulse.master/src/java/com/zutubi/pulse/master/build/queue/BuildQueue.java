@@ -8,7 +8,6 @@ import com.zutubi.pulse.master.build.control.BuildControllerFactory;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.*;
 
@@ -293,18 +292,8 @@ public class BuildQueue
         {
             lock(targets);
 
-            // any fixed?
-            RequestHolder fixed = CollectionUtils.find(assimilationTargets.values(), new Predicate<RequestHolder>()
-            {
-                public boolean satisfied(RequestHolder requestHolder)
-                {
-                    return requestHolder.getRequest().getRevision().isFixed();
-                }
-            });
-
-            // if any revisions are fixed, then we can not assimilate it, so bail on the assimilation
-            // of the rest.
-            if (fixed != null)
+            // if any revisions are fixed, then we can not assimilate it, so bail on the assimilation of the rest.
+            if (CollectionUtils.contains(assimilationTargets.values(), new HasFixedRevisionPredicate<RequestHolder>()))
             {
                 return false;
             }
@@ -322,14 +311,7 @@ public class BuildQueue
                 if (target instanceof ActivatedRequest)
                 {
                     BuildController controller = ((ActivatedRequest) target).getController();
-                    boolean updated = controller.updateRevisionIfNotFixed(sourceRequest.getRevision().getRevision());
-
-                    // if updated is false, we have a problem.  We have done everything we can to
-                    // ensure that the update will be possible, but now one update has failed.  This
-                    // implies that we need to roll all of the updates back.  What makes this very
-                    // difficult is the fact that updateRevisionIfNotFixed generates events.
-                    // SideNote: update should not return false since we are already checking for isFixed.
-                    // Maybe this area needs to be reviewed and cleaned up.
+                    controller.updateRevisionIfNotFixed(sourceRequest.getRevision().getRevision());
                 }
                 else
                 {
@@ -366,12 +348,12 @@ public class BuildQueue
     private RequestHolder getAssimilationCandidate(RequestHolder source)
     {
         // the back of the queue is the start of the list.
-        QueuedRequest candidate = CollectionUtils.find(queuedRequests, new HasOwnerAndSource<QueuedRequest>(source));
+        QueuedRequest candidate = CollectionUtils.find(queuedRequests, new HasOwnerAndSourcePredicate<QueuedRequest>(source));
         if (candidate != null)
         {
             return candidate;
         }
-        return CollectionUtils.find(activatedRequests, new HasOwnerAndSource<ActivatedRequest>(source));
+        return CollectionUtils.find(activatedRequests, new HasOwnerAndSourcePredicate<ActivatedRequest>(source));
     }
 
     private boolean isReplaceable(RequestHolder target)

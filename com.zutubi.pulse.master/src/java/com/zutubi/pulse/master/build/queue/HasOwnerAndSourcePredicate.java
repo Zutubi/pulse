@@ -10,17 +10,17 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
  *
  * @param <T> the specific subclass of RequestHolder that is being searched.
  */
-public class HasOwnerAndSource<T extends RequestHolder> implements Predicate<T>
+public class HasOwnerAndSourcePredicate<T extends RequestHolder> implements Predicate<T>
 {
     private Object owner;
     private String source;
 
-    public HasOwnerAndSource(RequestHolder request)
+    public HasOwnerAndSourcePredicate(RequestHolder request)
     {
         this(request.getOwner(), request.getRequest().getRequestSource());
     }
 
-    public HasOwnerAndSource(Object owner, String source)
+    public HasOwnerAndSourcePredicate(Object owner, String source)
     {
         this.owner = owner;
         this.source = source;

@@ -55,6 +55,11 @@ public class BuildProjectTask implements Task
      */
     public static final String PARAM_JUMP_QUEUE_ALLOWED = "jumpQueue";
 
+    /**
+     * The source of the build trigger.  Defaults to the trigger name if non is specified.
+     */
+    public static final String PARAM_SOURCE = "source";
+
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
     private ProjectManager projectManager;
@@ -101,7 +106,7 @@ public class BuildProjectTask implements Task
         }
 
         // generate build request.
-        TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), getSource(trigger));
+        TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), getSource(context));
         options.setReplaceable(replaceable);
         options.setForce(false);
         options.setProperties(properties);
@@ -126,9 +131,14 @@ public class BuildProjectTask implements Task
         return true;
     }
 
-    private static String getSource(Trigger trigger)
+    private static String getSource(TaskExecutionContext context)
     {
-        return "trigger '" + trigger.getName() + "'";
+        String source = (String) context.get(PARAM_SOURCE);
+        if (source != null)
+        {
+            return source;
+        }
+        return "trigger '" + context.getTrigger().getName() + "'";
     }
 
     public void setProjectManager(ProjectManager projectManager)
