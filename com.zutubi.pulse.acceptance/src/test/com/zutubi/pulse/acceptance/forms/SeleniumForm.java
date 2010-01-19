@@ -246,6 +246,13 @@ public abstract class SeleniumForm
     {
         int type = getFieldType(name);
         setFormElement(name, value, type);
+
+        // Hack: make sure buttons are updated.  Typing something empty in
+        // selenium doesn't work :|.
+        if (type == TEXTFIELD && value != null && value.length() == 0)
+        {
+            forceButtonUpdate(name);
+        }
     }
 
     private void setFormElement(String name, String value, int type)
@@ -330,8 +337,13 @@ public abstract class SeleniumForm
         // selenium doesn't work :|.
         if (names.length > 0)
         {
-            browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(names[0]) + "'); field.form.updateButtons()");
+            forceButtonUpdate(names[0]);
         }
+    }
+
+    private void forceButtonUpdate(String fieldName)
+    {
+        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(fieldName) + "'); field.form.updateButtons()");
     }
 
     public String[] getFormValues()

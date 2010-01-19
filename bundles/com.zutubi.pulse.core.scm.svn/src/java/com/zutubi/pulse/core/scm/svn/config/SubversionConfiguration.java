@@ -17,10 +17,26 @@ import java.util.List;
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration
 {
+    /**
+     * Describes if and how svn:externals will be monitored.
+     */
     public enum ExternalsMonitoring
     {
+        /**
+         * Externals are not monitored for changes.
+         */
         DO_NOT_MONITOR,
+        /**
+         * Externals will be scanned for in the whole directory tree, and any
+         * externals found will have their trees scanned recursively.  All
+         * externals found will be monitored for changes.
+         */
         MONITOR_ALL,
+        /**
+         * Externals set on specific paths will be monitored for changes.  Only
+         * first-level externals can be monitored in this way (i.e. not
+         * externals referenced within externals).
+         */
         MONITOR_SELECTED
     }
 

@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 
 /**
  * The Subversion SCM form.
@@ -21,11 +20,11 @@ public class SubversionForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return new String[]{ "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" };
+        return new String[]{ "url", "username", "password", "keyfile", "keyfilePassphrase", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX, COMBOBOX, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD};
+        return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, COMBOBOX, ITEM_PICKER, CHECKBOX, CHECKBOX, COMBOBOX, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD};
     }
 }

@@ -514,17 +514,18 @@ public class SubversionClient implements ScmClient
     {
         SVNRepository repository = SVNRepositoryFactory.create(ownerURL);
         repository.setAuthenticationManager(authenticationManager);
+        final SVNDepth depth = monitorAllExternals ? SVNDepth.INFINITY : SVNDepth.EMPTY;
 
         ISVNReporterBaton reporter = new ISVNReporterBaton()
         {
             public void report(ISVNReporter reporter) throws SVNException
             {
-                reporter.setPath("", null, revision, SVNDepth.INFINITY, true);
+                reporter.setPath("", null, revision, depth, true);
                 reporter.finishReport();
             }
         };
 
-        repository.status(revision, null, monitorAllExternals ? SVNDepth.INFINITY : SVNDepth.EMPTY, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
+        repository.status(revision, null, depth, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
