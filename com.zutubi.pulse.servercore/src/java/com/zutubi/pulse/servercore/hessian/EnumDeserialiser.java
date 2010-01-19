@@ -51,7 +51,7 @@ public class EnumDeserialiser extends AbstractDeserializer
         Class enumClazz;
         try
         {
-            enumClazz = Class.forName(clazz);
+            enumClazz = Thread.currentThread().getContextClassLoader().loadClass(clazz);
         }
         catch (ClassNotFoundException e)
         {
