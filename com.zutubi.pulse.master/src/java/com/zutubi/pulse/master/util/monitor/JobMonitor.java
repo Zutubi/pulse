@@ -89,15 +89,15 @@ public class JobMonitor<T extends Task> implements Monitor<T>
             TaskFeedback<T> feedback = getProgress(task);
             if (feedback.isAborted())
             {
-                listener.taskAborted(task, null);
+                listener.taskAborted(task, feedback);
             }
             else if (feedback.isFailed())
             {
-                listener.taskFailed(task, null);
+                listener.taskFailed(task, feedback);
             }
             else
             {
-                listener.taskCompleted(task, null);
+                listener.taskCompleted(task, feedback);
             }
         }
     }
