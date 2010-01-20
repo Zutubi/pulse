@@ -486,7 +486,7 @@ public class SubversionClient implements ScmClient
             long rev = revision == null ? repository.getLatestRevision() : convertRevision(revision).getNumber();
             if (monitorAllExternals)
             {
-                addExternalsFromUrl(rev, "", repository.getLocation(), result);
+                addExternalsFromUrl(rev, "", repository.getLocation(), SVNDepth.INFINITY, result);
             }
             else if (externalsPaths.size() > 0)
             {
@@ -498,7 +498,7 @@ public class SubversionClient implements ScmClient
                     }
                     
                     SVNURL url = repository.getLocation().appendPath(externalsPath, false);
-                    addExternalsFromUrl(rev, externalsPath, url, result);
+                    addExternalsFromUrl(rev, externalsPath, url, SVNDepth.EMPTY, result);
                 }
             }
         }
@@ -510,11 +510,10 @@ public class SubversionClient implements ScmClient
         return result;
     }
 
-    private void addExternalsFromUrl(final long revision, final String ownerPath, final SVNURL ownerURL, final List<ExternalDefinition> result) throws SVNException
+    private void addExternalsFromUrl(final long revision, final String ownerPath, final SVNURL ownerURL, final SVNDepth depth, final List<ExternalDefinition> result) throws SVNException
     {
         SVNRepository repository = SVNRepositoryFactory.create(ownerURL);
         repository.setAuthenticationManager(authenticationManager);
-        final SVNDepth depth = monitorAllExternals ? SVNDepth.INFINITY : SVNDepth.EMPTY;
 
         ISVNReporterBaton reporter = new ISVNReporterBaton()
         {
@@ -1165,7 +1164,7 @@ public class SubversionClient implements ScmClient
             externals.add(definition);
             if (monitorAllExternals)
             {
-                addExternalsFromUrl(revision, definition.path, definition.url, externals);
+                addExternalsFromUrl(revision, definition.path, definition.url, SVNDepth.INFINITY, externals);
             }
         }
         
