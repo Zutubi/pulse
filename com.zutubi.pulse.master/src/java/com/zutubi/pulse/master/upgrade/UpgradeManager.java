@@ -5,7 +5,17 @@ import com.zutubi.pulse.master.util.monitor.Monitor;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * The upgrade manager is responsible for handling the upgrade process during the
+ * Pulse server startup.
+ *
+ * The workflow for the upgrade manager is as follows.
+ * <ul>
+ * <li>An upgrade is required if and only if {@link #isUpgradeRequired()} returns true.</li>
+ * <li>If an upgrade is required, the first step is to {@link #prepareUpgrade()} the upgrade.</li>
+ * <li>Once the upgrade has been prepared, it can be previewed via ({@link #previewUpgrade()} and monitored
+ * via ({@link #getMonitor()}.</li>
+ * <li>When the upgrade has been prepared, and only then, you can run the upgrade via {@link #executeUpgrade()}</li>
+ * </ul>
  */
 public interface UpgradeManager
 {
@@ -34,7 +44,6 @@ public interface UpgradeManager
 
     /**
      * Execute the required upgrade tasks.
-     *
      */
     void executeUpgrade();
 

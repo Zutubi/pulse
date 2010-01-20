@@ -6,7 +6,6 @@ import java.util.List;
  * An upgrade component represents part of the system that can be upgraded.
  *
  * Each upgradeable component is asked whether or not an upgrade is required.  
- *
  */
 public interface UpgradeableComponent
 {

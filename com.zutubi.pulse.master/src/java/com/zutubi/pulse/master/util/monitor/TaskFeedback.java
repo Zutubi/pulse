@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.util.TimeStamps;
+import com.zutubi.util.Clock;
+import com.zutubi.util.SystemClock;
 
 public class TaskFeedback
 {
-    private static final int UNDEFINED = -1;
+    static final int UNDEFINED = -1;
 
     private long startTime = UNDEFINED;
 
@@ -19,6 +21,8 @@ public class TaskFeedback
     private TaskStatus status = TaskStatus.PENDING;
     
     private String statusMessage;
+
+    private Clock clock = new SystemClock();
 
     public TaskFeedback(Monitor monitor, Task task)
     {
@@ -81,12 +85,12 @@ public class TaskFeedback
 
     private void start()
     {
-        startTime = System.currentTimeMillis();
+        startTime = clock.getCurrentTimeMillis();
     }
 
     private void finish()
     {
-        finishTime = System.currentTimeMillis();
+        finishTime = clock.getCurrentTimeMillis();
         if (startTime == UNDEFINED)
         {
             startTime = finishTime;
@@ -151,14 +155,14 @@ public class TaskFeedback
 
     public long getElapsedTime()
     {
-        if (!isStarted())
+        if (startTime == UNDEFINED)
         {
             return UNDEFINED;
         }
 
-        if (!isFinished())
+        if (finishTime == UNDEFINED)
         {
-            long currentTime = System.currentTimeMillis();
+            long currentTime = clock.getCurrentTimeMillis();
             return currentTime - startTime;
         }
 
@@ -216,4 +220,8 @@ public class TaskFeedback
         this.statusMessage = statusMessage;
     }
 
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
+    }
 }

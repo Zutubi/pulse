@@ -139,6 +139,4 @@ public class JobRunner
         }
         return monitor;
     }
-
-
 }

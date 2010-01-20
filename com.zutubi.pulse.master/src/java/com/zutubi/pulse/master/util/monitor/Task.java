@@ -32,12 +32,14 @@ public interface Task
     List<String> getErrors();
 
     /**
-     * If this tasks fails (generates an exception during execution) then the processing
-     * will be aborted if halt on failure is true.
+     * If this task is part of a group of tasks being executed, and it fails, the
+     * halt on failure property will indicate whether or not the execution of the
+     * remaining tasks should continue.
      *
-     * For example: If this upgrade task requires a database connection and non is available
-     * for whatever reason, then halt on failure should be true. Once the connection is available
-     * then we can continue.
+     * For example: If this upgrade task that changes the structure of some data
+     * (such as adding a column to the database) and it fails, then haltOnFailure
+     * should return true since subsequent upgrade task may rely on the existance
+     * of that column. 
      *
      * @return boolean indicating whether or not to halt processing on task failure.
      */

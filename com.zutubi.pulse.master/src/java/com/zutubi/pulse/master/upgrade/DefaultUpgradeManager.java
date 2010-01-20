@@ -6,7 +6,7 @@ import com.zutubi.util.logging.Logger;
 import java.util.*;
 
 /**
- * <class-comment/>
+ * The default implementation of the upgrade manager interface for the Pulse server.
  */
 public class DefaultUpgradeManager implements UpgradeManager
 {
@@ -103,11 +103,15 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     public List<UpgradeTaskGroup> previewUpgrade()
     {
+        assertUpgradePrepared();
+
         return Collections.unmodifiableList(groups);
     }
 
     public void executeUpgrade()
     {
+        assertUpgradePrepared();
+
         Monitor monitor = runner.getMonitor();
 
         // CIB-1029: Refresh during upgrade causes tasks to be re-run
@@ -125,6 +129,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
 
         UpgradeTaskGroupJobAdapter job = new UpgradeTaskGroupJobAdapter(groups);
+        runner.getMonitor().add(new UpgradeTaskLogger(runner.getMonitor()));
         runner.getMonitor().add(job);
         runner.run(job);
 
@@ -132,7 +137,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         {
             boolean abort = false;
 
-            for (UpgradeTask task : group.getTasks())
+            for (Task task : group.getTasks())
             {
                 TaskFeedback progress = monitor.getProgress(task);
                 if (progress.isFailed() && task.haltOnFailure())
@@ -151,6 +156,14 @@ public class DefaultUpgradeManager implements UpgradeManager
             {
                 source.upgradeCompleted();
             }
+        }
+    }
+
+    private void assertUpgradePrepared()
+    {
+        if (groups == null)
+        {
+            throw new IllegalStateException("You can not execute the upgrade before it has been prepared.");
         }
     }
 

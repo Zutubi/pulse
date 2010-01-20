@@ -4,6 +4,10 @@ import com.zutubi.util.TimeStamps;
 
 import java.util.*;
 
+/**
+ * The monitor provides a way to track the progress of the execution of a set
+ * of tasks.
+ */
 public class Monitor
 {
     private static final long UNDEFINED = -1;
@@ -74,7 +78,7 @@ public class Monitor
         }
     }
 
-    public void finish(Task task)
+    void finish(Task task)
     {
         currentTask = null;
         completedTasks++;
