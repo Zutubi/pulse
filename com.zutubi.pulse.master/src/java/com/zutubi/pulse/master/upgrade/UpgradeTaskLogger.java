@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.upgrade;
 
 import com.zutubi.pulse.master.util.monitor.JobListener;
-import com.zutubi.pulse.master.util.monitor.Task;
-import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.util.logging.Logger;
 
@@ -10,37 +8,27 @@ import com.zutubi.util.logging.Logger;
  * The logger is responsible for logging the execution of
  * upgrade tasks to the logging system.
  */
-public class UpgradeTaskLogger implements JobListener
+public class UpgradeTaskLogger implements JobListener<UpgradeTask>
 {
     private static final Logger LOG = Logger.getLogger(UpgradeTaskLogger.class);
 
-    private Monitor monitor;
-
-    public UpgradeTaskLogger(Monitor monitor)
-    {
-        this.monitor = monitor;
-    }
-
-    public void taskStarted(Task task)
+    public void taskStarted(UpgradeTask task, TaskFeedback<UpgradeTask> feedback)
     {
         // noop.
     }
 
-    public void taskFailed(Task task)
+    public void taskFailed(UpgradeTask task, TaskFeedback<UpgradeTask> feedback)
     {
-        TaskFeedback feedback = monitor.getProgress(task);
         LOG.info("Task " + task.getName() + " failed in " + feedback.getElapsedTimePretty() + ". " + feedback.getStatusMessage());
     }
 
-    public void taskCompleted(Task task)
+    public void taskCompleted(UpgradeTask task, TaskFeedback<UpgradeTask> feedback)
     {
-        TaskFeedback feedback = monitor.getProgress(task);
         LOG.info("Task " + task.getName() + " completed in " + feedback.getElapsedTimePretty() + ".");
     }
 
-    public void taskAborted(Task task)
+    public void taskAborted(UpgradeTask task, TaskFeedback feedback)
     {
         LOG.info("Task " + task.getName() + " aborted.");
     }
-
 }

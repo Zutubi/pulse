@@ -5,7 +5,7 @@ import com.zutubi.util.TestClock;
 
 public class TaskFeedbackTest extends PulseTestCase
 {
-    private Monitor monitor;
+    private JobMonitor monitor;
     private TestClock clock;
 
     @Override
@@ -13,14 +13,14 @@ public class TaskFeedbackTest extends PulseTestCase
     {
         super.setUp();
 
-        monitor = new Monitor();
+        monitor = new JobMonitor();
         clock = new TestClock();
     }
 
     public void testElapsedTime()
     {
         Task noopTask = new NoopTask();
-        TaskFeedback feedback = new TaskFeedback(monitor, noopTask);
+        TaskFeedback feedback = new TaskFeedback<Task>(monitor, noopTask);
         feedback.setClock(clock);
 
         assertEquals(TaskFeedback.UNDEFINED, feedback.getElapsedTime());

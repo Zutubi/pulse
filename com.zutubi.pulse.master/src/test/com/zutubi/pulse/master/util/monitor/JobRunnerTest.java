@@ -6,13 +6,13 @@ import com.zutubi.util.Constants;
 
 public class JobRunnerTest extends PulseTestCase
 {
-    private JobRunner runner = null;
+    private JobRunner<Task> runner = null;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        runner = new JobRunner();
+        runner = new JobRunner<Task>();
     }
 
     protected void tearDown() throws Exception
@@ -50,7 +50,7 @@ public class JobRunnerTest extends PulseTestCase
         Task successful = new SuccessfulTask();
         runner.run(failed, successful);
 
-        Monitor monitor = runner.getMonitor();
+        Monitor<Task> monitor = runner.getMonitor();
         assertTrue(monitor.isStarted());
         assertTrue(monitor.isFinished());
         assertTrue(monitor.isFailed());
@@ -65,7 +65,7 @@ public class JobRunnerTest extends PulseTestCase
         Task successful = new SuccessfulTask();
         runner.run(failed, successful);
 
-        Monitor monitor = runner.getMonitor();
+        Monitor<Task> monitor = runner.getMonitor();
         assertTrue(monitor.isStarted());
         assertTrue(monitor.isFinished());
         assertFalse(monitor.isFailed());
@@ -94,6 +94,14 @@ public class JobRunnerTest extends PulseTestCase
         assertEquals(2, monitor.getCompletedTasks());
     }
 
+    public void testLastTaskFailed()
+    {
+        runner.run(new SuccessfulTask(), new SuccessfulTask(), new HaltOnFailureTask());
+
+        Monitor monitor = runner.getMonitor();
+        assertTrue(monitor.isFailed());
+    }
+
     // this test works through the virtue of the correct behaviour of the monitoring.  If something
     // breaks, then this test will hang until it times out.
     // Im sure there is a cleaner way to do this using locks, but at least this is very clear on what is happening
@@ -118,7 +126,7 @@ public class JobRunnerTest extends PulseTestCase
 
                 // give the runner a chance to start.
 
-                Monitor monitor = runner.getMonitor();
+                Monitor<Task> monitor = runner.getMonitor();
                 TaskFeedback progress = monitor.getProgress(task);
                 while (progress == null)
                 {
@@ -238,6 +246,5 @@ public class JobRunnerTest extends PulseTestCase
         {
             complete = true;
         }
-
     }
 }

@@ -120,7 +120,7 @@ public class DefaultRestoreManager implements RestoreManager
             return;
         }
 
-        jobManager.start(ARCHIVE_JOB_KEY);
+        jobManager.run(ARCHIVE_JOB_KEY);
 
         if(monitor.isSuccessful())
         {

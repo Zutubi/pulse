@@ -6,33 +6,33 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JobRunner
+public class JobRunner<T extends Task>
 {
     private static final Logger LOG = Logger.getLogger(JobRunner.class);
 
-    private Monitor monitor = null;
+    private JobMonitor<T> monitor = null;
 
-    public void run(List<Task> tasks)
+    public void run(List<T> tasks)
     {
-        run(new ListJobWrapper(tasks));
+        run(new ListJobWrapper<T>(tasks));
     }
 
-    public void run(Task task)
+    public void run(T task)
     {
-        run(new ArrayJobWrapper(task));
+        run(new ArrayJobWrapper<T>(task));
     }
 
-    public void run(Task... tasks)
+    public void run(T... tasks)
     {
-        run(new ArrayJobWrapper(tasks));
+        run(new ArrayJobWrapper<T>(tasks));
     }
 
-    public void run(Job job)
+    public void run(Job<T> job)
     {
-        Monitor monitor = getMonitor();
+        JobMonitor<T> monitor = (JobMonitor<T>) getMonitor();
 
         // register the tasks with the monitor.
-        Iterator<Task> i = job.getTasks();
+        Iterator<T> i = job.getTasks();
         while (i.hasNext())
         {
             monitor.add(i.next());
@@ -43,11 +43,11 @@ public class JobRunner
         boolean abort = false;
         try
         {
-            List<Task> tasks = new LinkedList<Task>(monitor.getTasks());
+            List<T> tasks = new LinkedList<T>(monitor.getTasks());
 
-            for (Task currentTask : tasks)
+            for (T currentTask : tasks)
             {
-                TaskFeedback taskTracker = monitor.getProgress(currentTask);
+                TaskFeedback<T> taskTracker = monitor.getProgress(currentTask);
 
                 if (currentTask instanceof FeedbackAware)
                 {
@@ -125,7 +125,7 @@ public class JobRunner
         }
     }
 
-    public Monitor getMonitor()
+    public Monitor<T> getMonitor()
     {
         if (monitor == null)
         {
@@ -133,7 +133,7 @@ public class JobRunner
             {
                 if (monitor == null)
                 {
-                    monitor = new Monitor();
+                    monitor = new JobMonitor<T>();
                 }
             }
         }

@@ -4,8 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * A holder for a group of upgrade tasks some a single source upgradeable component
  */
 public class UpgradeTaskGroup
 {

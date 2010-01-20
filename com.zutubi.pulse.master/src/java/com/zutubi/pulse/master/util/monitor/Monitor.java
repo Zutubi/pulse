@@ -1,222 +1,89 @@
 package com.zutubi.pulse.master.util.monitor;
 
-import com.zutubi.util.TimeStamps;
-
 import java.util.*;
 
 /**
  * The monitor provides a way to track the progress of the execution of a set
  * of tasks.
  */
-public class Monitor
+public interface Monitor<T extends Task>
 {
-    private static final long UNDEFINED = -1;
-    private long startTime = UNDEFINED;
-    private long finishTime = UNDEFINED;
+    /**
+     * Add a job listener to the monitor.  The listener will then receive
+     * the appropriate callbacks for the tasks being monitored.
+     *
+     * @param listener  the listener being registered.
+     */
+    void add(JobListener<T> listener);
 
-    private final Map<Object, TaskFeedback> feedbacks = new HashMap<Object, TaskFeedback>();
+    /**
+     * Get the task feedback for the specific task.
+     *
+     * @param task  the task for which the feedback is requested.
+     *
+     * @return the feedback for the specified task.
+     */
+    TaskFeedback<T> getProgress(T task);
 
-    private List<Task> tasks = new LinkedList<Task>();
+    /**
+     * @return true if the monitored job has finished and was not successful.
+     */
+    boolean isFailed();
 
-    private Task currentTask = null;
+    /**
+     * @return true if the monitored job has started running.
+     */
+    boolean isStarted();
 
-    private int completedTasks = 0;
+    /**
+     * @return true if the monitored job has finished running and is considered to have
+     * done so successfully.  That is, no tasks that are not allowed to fail failed.
+     */
+    boolean isSuccessful();
 
-    private boolean successful = true;
+    /**
+     * @return true if the monitored job has finished, that is all of the tasks have been
+     * completed.
+     */
+    boolean isFinished();
 
-    private final List<JobListener> listeners = new LinkedList<JobListener>();
+    /**
+     * @return the number of tasks that have been completed at the time of asking.
+     */
+    int getCompletedTasks();
 
-    public void add(JobListener listener)
-    {
-        if (!listeners.contains(listener))
-        {
-            synchronized(listeners)
-            {
-                if (!listeners.contains(listener))
-                {
-                    listeners.add(listener);
-                }
-            }
-        }
-    }
+    /**
+     * @return the percentage completed.  This is a number between 0 and 100.
+     */
+    int getPercentageComplete();
 
-    public TaskFeedback add(Task task)
-    {
-        TaskFeedback feedback = feedbacks.get(task);
-        if (feedback == null)
-        {
-            synchronized(feedbacks)
-            {
-                feedback = feedbacks.get(task);
-                if (feedback == null)
-                {
-                    feedback = new TaskFeedback(this, task);
-                    feedbacks.put(task, feedback);
-                    tasks.add(task);
-                }
-            }
-        }
-        return feedback;
-    }
+    /**
+     * @return the task that is currently being run, or null if no task is being run.
+     */
+    T getCurrentTask();
 
-    public TaskFeedback getProgress(Task task)
-    {
-        return feedbacks.get(task);
-    }
+    /**
+     * @return the feedback for the task that is currently being run.
+     */
+    TaskFeedback<T> getCurrentTaskProgress();
 
-    void start(Task task)
-    {
-        if (currentTask != null)
-        {
-            throw new IllegalStateException();
-        }
-        currentTask = task;
+    /**
+     * @return a list of all the tasks associated with the job being monitored.
+     */
+    List<T> getTasks();
 
-        for (JobListener listener : listeners)
-        {
-            listener.taskStarted(task);
-        }
-    }
+    /**
+     * Return the elapsed time between the monitored job starting and it finishing.  If the
+     * job has not finished, then the elapsed time is between the start and time of this request.
+     *
+     * @return the elapsed time in milliseconds.
+     */
+    long getElapsedTime();
 
-    void finish(Task task)
-    {
-        currentTask = null;
-        completedTasks++;
-
-        for (JobListener listener : listeners)
-        {
-            TaskFeedback feedback = getProgress(task);
-            if (feedback.isAborted())
-            {
-                listener.taskAborted(task);
-            }
-            else if (feedback.isFailed())
-            {
-                listener.taskFailed(task);
-            }
-            else
-            {
-                listener.taskCompleted(task);
-            }
-        }
-    }
-
-    public void markFailed()
-    {
-        successful = false;
-        if (finishTime == UNDEFINED)
-        {
-            finishTime = System.currentTimeMillis();
-        }
-    }
-
-    public boolean isFailed()
-    {
-        return isFinished() && !successful;
-    }
-
-    // backwards compatibility with UI layer.
-    public boolean isError()
-    {
-        return isFailed();
-    }
-
-    public void markStarted()
-    {
-        if (startTime == UNDEFINED)
-        {
-            startTime = System.currentTimeMillis();
-        }
-    }
-
-    public boolean isStarted()
-    {
-        return startTime != UNDEFINED;
-    }
-
-    public void markCompleted()
-    {
-        if (finishTime == UNDEFINED)
-        {
-            finishTime = System.currentTimeMillis();
-        }
-    }
-
-    public boolean isSuccessful()
-    {
-        return isFinished() && !isFailed();
-    }
-
-    public boolean isFinished()
-    {
-        return finishTime != UNDEFINED;
-    }
-
-    public int getCompletedTasks()
-    {
-        return completedTasks;
-    }
-    
-    public int getPercentageComplete()
-    {
-        int numberOfTasks = feedbacks.size();
-
-        if (numberOfTasks == 0)
-        {
-            return 0;
-        }
-
-        int completedPercentage = (100 * completedTasks / numberOfTasks);
-
-        // add the small amount contributed by the current running task.
-        if (currentTask != null)
-        {
-            int singleTaskPercentage = (100 / numberOfTasks);
-            TaskFeedback currentProgress = getCurrentTaskProgress();
-            int currentTaskCompletion = (int)(singleTaskPercentage * (((double)currentProgress.getPercentageComplete()) / 100));
-
-            if (currentTaskCompletion > 0)
-            {
-                completedPercentage = completedPercentage + currentTaskCompletion;
-            }
-        }
-
-        return completedPercentage;
-    }
-
-    public Task getCurrentTask()
-    {
-        return currentTask;
-    }
-
-    public TaskFeedback getCurrentTaskProgress()
-    {
-        return getProgress(currentTask);
-    }
-
-    public List<Task> getTasks()
-    {
-        return Collections.unmodifiableList(tasks);
-    }
-
-    public long getElapsedTime()
-    {
-        if (!isStarted())
-        {
-            return UNDEFINED;
-        }
-
-        if (!isFinished())
-        {
-            long currentTime = System.currentTimeMillis();
-            return currentTime - startTime;
-        }
-
-        return finishTime - startTime;
-    }
-
-    public String getElapsedTimePretty()
-    {
-        return TimeStamps.getPrettyElapsed(getElapsedTime());
-    }
+    /**
+     * @return a human readable version of the elapsed time.
+     *
+     * @see #getElapsedTime() 
+     */
+    String getElapsedTimePretty();
 }

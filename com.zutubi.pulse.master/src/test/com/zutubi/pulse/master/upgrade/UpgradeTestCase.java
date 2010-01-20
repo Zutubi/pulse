@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.upgrade;
 
 import com.zutubi.pulse.master.util.monitor.JobListener;
 import com.zutubi.pulse.master.util.monitor.Task;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
@@ -74,25 +75,25 @@ public abstract class UpgradeTestCase extends ZutubiTestCase
             return wasAborted;
         }
 
-        public void taskCompleted(UpgradeTaskAdapter task)
+        public void taskCompleted(UpgradeTaskAdapter task, TaskFeedback<UpgradeTaskAdapter> feedback)
         {
             completedTasks.add(task);
             assertTrue(tasks.contains(task));
         }
 
-        public void taskFailed(UpgradeTaskAdapter task)
+        public void taskFailed(UpgradeTaskAdapter task, TaskFeedback<UpgradeTaskAdapter> feedback)
         {
             failedTasks.add(task);
             assertTrue(tasks.contains(task));
         }
 
-        public void taskAborted(UpgradeTaskAdapter task)
+        public void taskAborted(UpgradeTaskAdapter task, TaskFeedback feedback)
         {
             abortedTasks.add(task);
             assertTrue(tasks.contains(task));
         }
 
-        public void taskStarted(UpgradeTaskAdapter task)
+        public void taskStarted(UpgradeTaskAdapter task, TaskFeedback<UpgradeTaskAdapter> feedback)
         {
             assertTrue(tasks.contains(task));
         }

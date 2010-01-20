@@ -18,13 +18,6 @@ public class JobManagerTest extends PulseTestCase
         jobManager = new JobManager();
     }
 
-    protected void tearDown() throws Exception
-    {
-        jobManager = null;
-
-        super.tearDown();
-    }
-
     public void testRegister()
     {
         jobManager.register("test", new NoopJob());
@@ -37,7 +30,7 @@ public class JobManagerTest extends PulseTestCase
     {
         jobManager.register("test", new NoopJob());
 
-        jobManager.start("test");
+        jobManager.run("test");
 
         Monitor monitor = jobManager.getMonitor("test");
         assertTrue(monitor.isFinished());
@@ -60,7 +53,7 @@ public class JobManagerTest extends PulseTestCase
         assertNotNull(jobManager.getJob("test"));
         assertNotNull(jobManager.getMonitor("test"));
 
-        jobManager.start("test");
+        jobManager.run("test");
 
         assertTrue(jobManager.getMonitor("test").isFinished());
 
@@ -78,7 +71,7 @@ public class JobManagerTest extends PulseTestCase
         {
             public void run()
             {
-                jobManager.start("test");
+                jobManager.run("test");
             }
         });
 

@@ -7,5 +7,10 @@ import java.util.Iterator;
  */
 public interface Job<T extends Task>
 {
+    /**
+     * Retrieve an iterator over the tasks contained by this job.
+     *
+     * @return an interator
+     */
     Iterator<T> getTasks();
 }

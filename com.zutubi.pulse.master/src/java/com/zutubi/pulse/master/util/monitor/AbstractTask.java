@@ -6,10 +6,12 @@ import java.util.List;
 public abstract class AbstractTask implements Task
 {
     private String name;
+    private List<String> errors;
 
     protected AbstractTask(String name)
     {
         this.name = name;
+        this.errors = new LinkedList<String>();
     }
 
     public String getName()
@@ -24,7 +26,7 @@ public abstract class AbstractTask implements Task
 
     public List<String> getErrors()
     {
-        return new LinkedList<String>();
+        return errors;
     }
 
     public boolean haltOnFailure()
@@ -34,11 +36,16 @@ public abstract class AbstractTask implements Task
 
     public boolean hasFailed()
     {
-        return false;
+        return errors.size() > 0;
+    }
+
+    public void addError(String msg)
+    {
+        errors.add(msg);
     }
 
     public void execute() throws TaskException
     {
-
+        
     }
 }

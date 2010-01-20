@@ -4,7 +4,7 @@ import com.zutubi.util.TimeStamps;
 import com.zutubi.util.Clock;
 import com.zutubi.util.SystemClock;
 
-public class TaskFeedback
+public class TaskFeedback<T extends Task>
 {
     static final int UNDEFINED = -1;
 
@@ -14,9 +14,9 @@ public class TaskFeedback
 
     private int percentageComplete = UNDEFINED;
 
-    private Monitor monitor;
+    private JobMonitor monitor;
 
-    private Task task;
+    private T task;
 
     private TaskStatus status = TaskStatus.PENDING;
     
@@ -24,7 +24,7 @@ public class TaskFeedback
 
     private Clock clock = new SystemClock();
 
-    public TaskFeedback(Monitor monitor, Task task)
+    public TaskFeedback(JobMonitor monitor, T task)
     {
         this.monitor = monitor;
         this.task = task;

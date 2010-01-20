@@ -71,7 +71,7 @@ public class MigrationManager
 
     public void runMigration()
     {
-        jobManager.start(MIGRATE_JOB_KEY);
+        jobManager.run(MIGRATE_JOB_KEY);
     }
 
     public boolean isRequested()
