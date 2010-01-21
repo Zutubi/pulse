@@ -182,8 +182,8 @@ public class LicenseEncoder implements LicenseKeyFactory
         }
         else if (license.getType() == LicenseType.SMALL_TEAM)
         {
-            license.setSupported(1, 2, 2);
-            license.setSupportedContactPoints(3);
+            license.setSupported(1, 10, 5);
+            license.setSupportedContactPoints(10);
         }
         else if (license.getType() == LicenseType.STANDARD)
         {
