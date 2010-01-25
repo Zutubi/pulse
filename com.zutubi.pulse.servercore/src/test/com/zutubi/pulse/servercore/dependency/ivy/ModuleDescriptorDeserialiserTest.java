@@ -24,7 +24,6 @@ public class ModuleDescriptorDeserialiserTest extends AbstractHessianTestCase
 
         IvyManager ivyManager = new IvyManager();
         ivyManager.init();
-        deserialiser.setIvyManager(ivyManager);
     }
 
     public void testDeserialisation() throws IOException, ParseException
