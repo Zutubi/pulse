@@ -3,9 +3,9 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
@@ -21,11 +21,11 @@ import java.text.ParseException;
  */
 public class ModuleDescriptorDeserialiser extends AbstractDeserializer
 {
+    private static final Logger LOG = Logger.getLogger(ModuleDescriptorDeserialiser.class);
+
     private static final String FIELD_VALUE = "value";
 
     private File tmpDir;
-
-    private IvyManager ivyManager;
 
     public Object readMap(AbstractHessianInput input) throws IOException
     {
@@ -82,6 +82,8 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
         }
         catch (ParseException e)
         {
+            LOG.error("Failed to parse descriptor. ", e);
+            LOG.error("Descriptor: \n" + descriptor);
             throw new IOException(e.getMessage());
         }
         finally
@@ -118,10 +120,5 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
     public void setTmpDir(File tmpDir)
     {
         this.tmpDir = tmpDir;
-    }
-
-    public void setIvyManager(IvyManager ivyManager)
-    {
-        this.ivyManager = ivyManager;
     }
 }
