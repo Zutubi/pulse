@@ -234,7 +234,6 @@
 
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
         <property name="customSerialiserFactory" ref="customSerialiserFactory"/>
-        <property name="ivyManager" ref="dependencyManager"/>
     </bean>
 
     <bean id="toveFileDocManager" class="com.zutubi.pulse.core.marshal.doc.ToveFileDocManager"/>

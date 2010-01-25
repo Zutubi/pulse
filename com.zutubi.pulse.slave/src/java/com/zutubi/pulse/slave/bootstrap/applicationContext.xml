@@ -100,7 +100,6 @@
 
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
         <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
-        <property name="ivyManager" ref="dependencyManager"/>
     </bean>
 
     <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">

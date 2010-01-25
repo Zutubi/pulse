@@ -11,12 +11,10 @@ import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 public class HessianModuleDescriptorSupportInitialiser
 {
     private CustomSerialiserFactory customSerialiserFactory = null;
-    private IvyManager ivyManager = null;
 
     public void init()
     {
         ModuleDescriptorDeserialiser deserialiser = new ModuleDescriptorDeserialiser();
-        deserialiser.setIvyManager(ivyManager);
         ModuleDescriptorSerialiser serialiser = new ModuleDescriptorSerialiser();
 
         customSerialiserFactory.register(ModuleDescriptor.class, serialiser, deserialiser);
@@ -25,10 +23,5 @@ public class HessianModuleDescriptorSupportInitialiser
     public void setCustomSerialiserFactory(CustomSerialiserFactory customSerialiserFactory)
     {
         this.customSerialiserFactory = customSerialiserFactory;
-    }
-
-    public void setIvyManager(IvyManager ivyManager)
-    {
-        this.ivyManager = ivyManager;
     }
 }
