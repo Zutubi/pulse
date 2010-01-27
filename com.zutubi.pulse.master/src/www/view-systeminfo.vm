@@ -38,7 +38,7 @@
 #foreach ($key in $properties)
                     #dynamicRow($key $propertiesMap.get($key))
 #end
-
+                    #dynamicRow("locale.field" $info.locale)
 #set ($percentageUsed = $action.getPercentage($info.getUsedMemory(), $info.getTotalMemory()))
 #set ($percentageFree = $action.getPercentage($info.getFreeMemory(), $info.getTotalMemory()))
                 <tr>

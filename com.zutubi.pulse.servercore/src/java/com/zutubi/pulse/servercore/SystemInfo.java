@@ -9,10 +9,7 @@ import com.zutubi.util.Constants;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  */
@@ -25,6 +22,7 @@ public class SystemInfo
     private long totalMemory;
     private long usedMemory;
     private long freeMemory;
+    private String locale;
 
     public static SystemInfo getSystemInfo(ConfigurationManager configurationManager, StartupManager startupManager)
     {
@@ -32,6 +30,7 @@ public class SystemInfo
         DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
 
         SystemInfo info = new SystemInfo();
+        info.locale = Locale.getDefault().toString();
         info.coreProperties = configurationManager.getCoreProperties();
 
         Properties properties = System.getProperties();
@@ -97,6 +96,11 @@ public class SystemInfo
     public Version getVersion()
     {
         return version;
+    }
+
+    public String getLocale()
+    {
+        return locale;
     }
 
     public Map<String, String> getEnvironment()
