@@ -190,12 +190,6 @@ public class DefaultScheduler implements Scheduler
         }
 
         trigger.setState(TriggerState.SCHEDULED);
-
-        if (started)
-        {
-            impl.schedule(trigger);
-        }
-
         if (trigger.isTransient())
         {
             transientTriggers.add(trigger);
@@ -203,6 +197,11 @@ public class DefaultScheduler implements Scheduler
         else
         {
             triggerDao.save(trigger);    
+        }
+
+        if (started)
+        {
+            impl.schedule(trigger);
         }
     }
 
