@@ -169,6 +169,8 @@ public class XMLStreamUtilsTest extends PulseTestCase
         assertEquals("blah", XMLStreamUtils.getElementText(reader));
         reader.nextTag();
         assertEquals("<element> blah </element>", XMLStreamUtils.getElementText(reader));
+        reader.nextTag();
+        assertEquals("<element name=\"value\"></element>", XMLStreamUtils.getElementText(reader));
     }
 
     public void testNextSiblingTag() throws XMLStreamException

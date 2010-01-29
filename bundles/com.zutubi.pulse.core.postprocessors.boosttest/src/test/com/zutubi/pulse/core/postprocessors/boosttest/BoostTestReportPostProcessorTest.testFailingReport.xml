@@ -1,0 +1,2085 @@
+<TestLog>
+    <TestSuite name="test_hpaa test suite">
+        <TestCase name="test_async_fifo">
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="82">
+                check basicFifo.peek(el) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="83">
+                check el == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="84">
+                check basicFifo.get(el) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="85">
+                check el == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="86">
+                check basicFifo.put(1) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="87">
+                check basicFifo.put(2) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="88">
+                check basicFifo.put(3) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="89">
+                check basicFifo.put(4) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="90">
+                check basicFifo.put(5) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="91">
+                check basicFifo.put(6) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="92">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="93">
+                check el == 1 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="94">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="95">
+                check el == 2 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="96">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="97">
+                check el == 3 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="98">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="99">
+                check el == 4 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="100">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="101">
+                check el == 5 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="102">
+                check basicFifo.get(el) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="103">
+                check el == 5 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="104">
+                check basicFifo.put(1) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="105">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="106">
+                check el == 1 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="107">
+                check basicFifo.put(1) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="108">
+                check basicFifo.put(2) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="109">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="110">
+                check el == 1 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="111">
+                check basicFifo.put(3) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="112">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="113">
+                check el == 2 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="114">
+                check basicFifo.get(el) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="115">
+                check el == 3 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="135">
+                check ACE_Thread::spawn(&amp;writer_thread, &amp;args, 0|0, &amp;writerId, &amp;writerHandle) != -1
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="139">
+                check ACE_Thread::spawn(&amp;reader_thread, &amp;args, 0|0, &amp;readerId, &amp;readerHandle) != -1
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/async_fifo_tests.cpp" line="146">
+                check writes.size() == reads.size() passed
+            </Info>
+            <TestingTime>16000</TestingTime>
+        </TestCase>
+        <TestCase name="test_packet_file">
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="158">
+                check preader.packet_start_offset() == sizeof(hpaa::packet_file::FileHeader) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="160">
+                check preader.local_address() == localAddress passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="161">
+                check preader.server_name() == serverName passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="162">
+                check preader.start_time() == startTime passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="163">
+                check preader.version() == hpaa::packet_file::PACKET_FILE_LATEST_SUPPORTED_VERSION passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="167">
+                check preader.read(readPacket) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="168">
+                check readPacket.type() == hpaa::packet_file::ePacketType_UDP passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="169">
+                check readPacket.relative_time().as_nsec() == TestPackets[i].relativeTime passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="171">
+                check udp.size() == TestPackets[i].size passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="172">
+                check memcmp(udp.data(), TestPackets[i].data, udp.size()) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="174">
+                check udp.remote_address() == remoteAddress passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="167">
+                check preader.read(readPacket) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="168">
+                check readPacket.type() == hpaa::packet_file::ePacketType_UDP passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="169">
+                check readPacket.relative_time().as_nsec() == TestPackets[i].relativeTime passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="171">
+                check udp.size() == TestPackets[i].size passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="172">
+                check memcmp(udp.data(), TestPackets[i].data, udp.size()) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="174">
+                check udp.remote_address() == remoteAddress passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="167">
+                check preader.read(readPacket) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="168">
+                check readPacket.type() == hpaa::packet_file::ePacketType_UDP passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="169">
+                check readPacket.relative_time().as_nsec() == TestPackets[i].relativeTime passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="171">
+                check udp.size() == TestPackets[i].size passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="172">
+                check memcmp(udp.data(), TestPackets[i].data, udp.size()) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="174">
+                check udp.remote_address() == remoteAddress passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="167">
+                check preader.read(readPacket) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="168">
+                check readPacket.type() == hpaa::packet_file::ePacketType_UDP passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="169">
+                check readPacket.relative_time().as_nsec() == TestPackets[i].relativeTime passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="171">
+                check udp.size() == TestPackets[i].size passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="172">
+                check memcmp(udp.data(), TestPackets[i].data, udp.size()) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="174">
+                check udp.remote_address() == remoteAddress passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="176">
+                check preader.read(readPacket) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="198">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_fileIo passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="209">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_fileIo passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="127">
+                check h != ((HANDLE)(LONG_PTR)-1) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="128">
+                check ACE_OS::write(h, &amp;packetFile, sizeof(packetFile)) == sizeof(packetFile) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="224">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_invalidFormat passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="127">
+                check h != ((HANDLE)(LONG_PTR)-1) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="128">
+                check ACE_OS::write(h, &amp;packetFile, sizeof(packetFile)) == sizeof(packetFile) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="238">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_invalidVersion passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="127">
+                check h != ((HANDLE)(LONG_PTR)-1) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="128">
+                check ACE_OS::write(h, &amp;packetFile, sizeof(packetFile)) == sizeof(packetFile) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="252">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_invalidFormat passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="127">
+                check h != ((HANDLE)(LONG_PTR)-1) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="128">
+                check ACE_OS::write(h, &amp;packetFile, sizeof(packetFile)) == sizeof(packetFile) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="270">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_invalidFormat passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/packet_file_tests.cpp" line="290">
+                check e.error()-&gt;code() == hpaa::error::hpaa_packetRecord_fileIo passed
+            </Info>
+            <TestingTime>31000</TestingTime>
+        </TestCase>
+        <TestCase name="test_sequence_number_history">
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="306">
+                Rollover test
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="308">Duplicate test
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="310">Out-of-order test
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="312">Missing test
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="314">Invalid test
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="316">Invalid test 2
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="318">Invalid test 3
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="293">check history.insert(pSeries-&gt;received) == pSeries-&gt;normalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="294">check history.last_normalized_seqnum() == pSeries-&gt;lastNormalized passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="295">check history.last_seqnum() == pSeries-&gt;last passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="299">check history.contains(pContains-&gt;start, pContains-&gt;count) == pContains-&gt;result
+                passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="321">General Test
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="324">check history.contains(65534) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="326">check history.contains(65534) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="327">check history.contains(65535) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="329">check history.contains(65534) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="330">check history.contains(65535) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="331">check history.contains(0) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="333">check !history.contains(65533) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="334">check history.contains(65534) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="335">check history.contains(65535) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="336">check history.contains(0) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="337">check history.contains(1) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="338">check !history.contains(2) passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="343">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="344">check history.contains(i-1) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="345">check history.contains(i-63) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="346">check history.contains(i-64) == true passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="347">check history.contains(i-65) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                  line="350">check history.contains(i) == false passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="355">ROC test
+            </Message>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/sequence_number_history.cpp"
+                     line="367">Last normalized sequence number=:4295032799
+            </Message>
+            <TestingTime>1107000</TestingTime>
+        </TestCase>
+        <TestCase name="test_srtp_crypto">
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp"
+                     line="520">Verifying HMAC-SHA1 test vectors (RFC2202)...
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="58">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="76">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="100">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="125">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="148">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="167">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="186">
+                check memcmp(digest, cmp, sizeof(digest)) == 0 passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp"
+                     line="523">Verifying key derivation test vectors (RFC3711, Appendix B.3)...
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="220">
+                check memcmp(cipherKey, cipherKeyBin, sizeof(cipherKey)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="228">
+                check memcmp(cipherSalt, cipherSaltBin, sizeof(cipherSalt)) == 0 passed
+            </Info>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="241">
+                check memcmp(authKey, authKeyBin, sizeof(authKey)) == 0 passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp"
+                     line="526">Verifying AES F8 test vectors (RFC3711, Appendix B.1)...
+            </Message>
+            <Info file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp" line="282">
+                check hexCiphertext == &quot;019ce7a26e7854014a6366aa95d4eefd&quot; &quot;1ad4172a14f9faf455b7f1d4b62bd08f&quot;
+                &quot;562c0eef7c4802&quot; passed
+            </Info>
+            <Message file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp"
+                     line="529">Verifying end-to-end F8 encryption/decryption...
+            </Message>
+            <Exception>memory access violation occurred at address 0x000077e6, while attempting to read inaccessible
+                data
+                <LastCheckpoint
+                        file="D:/pulse/data/work/media-main-systest/int/src/hpaa/unit_tests/srtp_crypto_tests.cpp"
+                        line="282"></LastCheckpoint>
+            </Exception>
+            <Message file="D:/pulse/data/work/system-main-systest/pub/dists/boost/boost/test/impl/unit_test_log.ipp"
+                     line="164">Test is aborted
+            </Message>
+            <TestingTime>47000</TestingTime>
+        </TestCase>
+    </TestSuite>
+</TestLog>

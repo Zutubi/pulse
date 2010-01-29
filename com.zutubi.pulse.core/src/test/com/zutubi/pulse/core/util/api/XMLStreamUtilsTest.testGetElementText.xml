@@ -2,4 +2,5 @@
     <empty/>
     <simple>blah</simple>
     <nested><element> blah </element></nested>
+    <nested_attributes><element name="value"/></nested_attributes>
 </root>

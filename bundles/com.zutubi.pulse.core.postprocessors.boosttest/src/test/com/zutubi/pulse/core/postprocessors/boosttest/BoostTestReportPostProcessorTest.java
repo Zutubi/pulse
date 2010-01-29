@@ -164,4 +164,11 @@ public class BoostTestReportPostProcessorTest extends XMLTestPostProcessorTestCa
     {
         assertEquals(buildSuite(null), runProcessorAndGetTests(new BoostTestReportPostProcessor(new BoostTestReportPostProcessorConfiguration())));
     }
+
+    public void testFailingReport() throws Exception
+    {
+        TestSuiteResult result = runProcessorAndGetTests(new BoostTestReportPostProcessor(new BoostTestReportPostProcessorConfiguration()), "testFailingReport", EXTENSION_XML);
+        TestCaseResult testcase = result.getSuites().get(0).getCases().get(3);
+        assertTrue(testcase.getMessage().contains("<LastCheckpoint file="));
+    }
 }

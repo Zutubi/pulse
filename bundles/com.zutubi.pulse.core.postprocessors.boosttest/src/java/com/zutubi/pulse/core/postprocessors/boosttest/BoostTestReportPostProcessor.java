@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.postprocessors.boosttest;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
+import com.zutubi.pulse.core.util.api.XMLStreamUtils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -189,7 +190,7 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
             }
         }
 
-        message += ": " + reader.getElementText().trim();
+        message += ": " + XMLStreamUtils.getElementText(reader).trim();
         if (builder.indexOf(message) == -1)
         {
             if (builder.length() > 0)

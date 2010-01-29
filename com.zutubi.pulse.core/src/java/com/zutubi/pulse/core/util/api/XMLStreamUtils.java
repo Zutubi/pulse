@@ -280,7 +280,13 @@ public class XMLStreamUtils
             if (eventType == START_ELEMENT)
             {
                 tags.push(reader.getLocalName());
-                buffer.append("<").append(reader.getLocalName()).append(">");
+                buffer.append("<");
+                buffer.append(reader.getLocalName());
+                for (int i = 0; i < reader.getAttributeCount(); i++)
+                {
+                    buffer.append(" ").append(reader.getAttributeName(i)).append("=\"").append(reader.getAttributeValue(i)).append("\"");
+                }
+                buffer.append(">");
             }
             else if (eventType == END_ELEMENT)
             {
