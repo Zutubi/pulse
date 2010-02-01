@@ -2,16 +2,13 @@ package com.zutubi.pulse.core.scm.p4.config;
 
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
-import com.zutubi.tove.annotations.ConfigurationCheck;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wizard;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.validation.annotations.Required;
 
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" , "timeOffset"})
+@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" , "timeOffset"})
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -26,6 +23,10 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private boolean useTicketAuth = false;
     @Wizard.Ignore
     private int timeOffset= 0;
+
+    @ControllingCheckbox(dependentFields = {"charset"})
+    private boolean unicodeServer = false;
+    private String charset = "none";
 
     public PerforceConfiguration()
     {
@@ -102,5 +103,25 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setTimeOffset(int timeOffset)
     {
         this.timeOffset = timeOffset;
+    }
+
+    public boolean isUnicodeServer()
+    {
+        return unicodeServer;
+    }
+
+    public void setUnicodeServer(boolean unicodeServer)
+    {
+        this.unicodeServer = unicodeServer;
+    }
+
+    public String getCharset()
+    {
+        return charset;
+    }
+
+    public void setCharset(String charset)
+    {
+        this.charset = charset;
     }
 }

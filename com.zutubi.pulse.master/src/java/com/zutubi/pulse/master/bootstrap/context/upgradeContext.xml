@@ -71,6 +71,7 @@
                 <ref local="deleteUnknownHiddenReferences"/>
                 <ref local="addPerforceTimeOffset"/>
                 <ref local="addSubversionEnableHttpSpooling"/>
+                <ref local="addPerforceUnicodeConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -280,5 +281,9 @@
 
     <bean id="addSubversionEnableHttpSpooling" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionEnableHttpSpoolingUpgradeTask">
         <property name="buildNumber" value="200047001"/>
+    </bean>
+
+    <bean id="addPerforceUnicodeConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceUnicodeConfigurationUpgradeTask">
+        <property name="buildNumber" value="200049001"/>
     </bean>
 </beans>

@@ -185,7 +185,7 @@ public class TestUtils
             Socket sock = new Socket();
             try
             {
-                sock.connect(new InetSocketAddress(port));
+                sock.connect(new InetSocketAddress("localhost", port));
                 break;
             }
             catch (IOException e)

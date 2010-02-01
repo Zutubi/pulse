@@ -15,6 +15,7 @@ public class PerforceConstants
     public static final String PROPERTY_USER = "p4.user";
     public static final String PROPERTY_PASSWORD = "p4.password";
 
+    public static final String ENV_CHARSET = "P4CHARSET";
     public static final String ENV_PORT = "P4PORT";
     public static final String ENV_USER = "P4USER";
     public static final String ENV_PASSWORD = "P4PASSWD";

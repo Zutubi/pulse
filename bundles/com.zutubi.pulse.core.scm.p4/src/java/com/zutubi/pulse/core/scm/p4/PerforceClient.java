@@ -355,6 +355,10 @@ public class PerforceClient extends CachingScmClient
         this.core = new PerforceCore();
         this.core.setEnv(ENV_PORT, configuration.getPort());
         this.core.setEnv(ENV_USER, configuration.getUser());
+        if (configuration.isUnicodeServer())
+        {
+            this.core.setEnv(ENV_CHARSET, configuration.getCharset());
+        }
 
         String password = determinePassword(core, configuration);
         if (TextUtils.stringSet(password))
