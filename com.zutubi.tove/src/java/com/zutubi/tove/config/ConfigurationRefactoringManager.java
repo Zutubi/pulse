@@ -534,7 +534,10 @@ public class ConfigurationRefactoringManager
 
                 String clonePath = getPath(parentPath, cloneKey);
                 recordManager.insert(clonePath, clone);
-                cloneChildren(clonePath, record, mapType.getTargetType());
+                // CIB-2307 - we need the specific instances target type, not the generic type
+                // represented by the mapType.getTargetType()
+                ComplexType targetType = configurationTemplateManager.getType(parentPath + "/" + originalKey);
+                cloneChildren(clonePath, record, targetType);
 
                 if (configurationTemplateManager.isConcrete(parentPath, clone))
                 {
