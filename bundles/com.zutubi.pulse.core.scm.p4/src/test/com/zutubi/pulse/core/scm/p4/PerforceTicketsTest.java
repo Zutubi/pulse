@@ -9,7 +9,6 @@ import java.io.File;
 public class PerforceTicketsTest extends PerforceTestBase
 {
     private static final String FILE_ANT_BUILD = "build.xml";
-    private static final String FILE_CHECKPOINT = "checkpoint.1";
 
     private static final String USER = "ticketmaster";
     private static final String PASSWORD = "TicketMaster";
@@ -17,14 +16,11 @@ public class PerforceTicketsTest extends PerforceTestBase
 
     private PerforceConfiguration configuration;
 
-    protected String getCheckpointFilename()
-    {
-        return FILE_CHECKPOINT;
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        deployPerforceServer("repo", P4D_PORT, 1, false);
 
         configuration = new PerforceConfiguration(getP4Port(), USER, PASSWORD, WORKSPACE);
         configuration.setUseTicketAuth(true);
@@ -72,7 +68,7 @@ public class PerforceTicketsTest extends PerforceTestBase
 
     public void testCheckout() throws ScmException
     {
-        File workDir = new File(getTempDir(), "work");
+        File workDir = new File(tmpDir, "work");
         assertTrue(workDir.mkdir());
         PerforceClient client = new PerforceClient(configuration, new PerforceWorkspaceManager());
         client.checkout(createExecutionContext(workDir, false), client.getLatestRevision(null), new ScmFeedbackAdapter());

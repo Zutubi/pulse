@@ -22,8 +22,6 @@ public class PerforceClientTest extends PerforceTestBase
 {
     private static final String DIR_EXPECTED = "expected";
 
-    private static final String FILE_CHECKPOINT = "checkpoint.2";
-
     private static final String DEPOT_WORKSPACE = "depot-client";
     private static final String TEST_WORKSPACE = "test-client";
 
@@ -34,21 +32,18 @@ public class PerforceClientTest extends PerforceTestBase
     private PerforceClient client;
     private File workDir;
 
-    protected String getCheckpointFilename()
-    {
-        return FILE_CHECKPOINT;
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
-        core = new PerforceCore();
-
-        workDir = new File(getTempDir(), "work");
+        
+        workDir = new File(tmpDir, "work");
         if(!workDir.mkdirs())
         {
             throw new RuntimeException("Unable to make work directory '" + workDir.getAbsolutePath() + "'");
         }
+
+        deployPerforceServer("repo", P4D_PORT, 2, false);
+        core = new PerforceCore();
     }
 
     public void testGetLocation() throws ScmException
@@ -527,7 +522,7 @@ public class PerforceClientTest extends PerforceTestBase
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         PerforceCore core = getClient();
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", getTempDir().getAbsolutePath());
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", tmpDir.getAbsolutePath());
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
@@ -584,7 +579,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     private void checkDirectory(String name) throws IOException
     {
-        File expectedDir = new File(getTempDir(), DIR_EXPECTED);
+        File expectedDir = new File(tmpDir, DIR_EXPECTED);
         removeDirectory(expectedDir);
         assertTrue(expectedDir.mkdirs());
         unzipInput(name, expectedDir);

@@ -26,6 +26,7 @@ public class PerforceConfiguration extends PollableScmConfiguration
 
     @ControllingCheckbox(dependentFields = {"charset"})
     private boolean unicodeServer = false;
+    @Required
     private String charset = "none";
 
     public PerforceConfiguration()
