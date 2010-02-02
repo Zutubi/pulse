@@ -3,13 +3,12 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptorParser;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.settings.IvySettings;
-import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
-import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 import org.apache.ivy.plugins.repository.Resource;
 
 import java.io.File;
@@ -74,11 +73,9 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
             // is at least somewhat indicative of what the resource represents.  I don't think it
             // is getting used anywhere - at least not this particular instances name.
             Resource res = new MemoryResource("ivy.xml", descriptor);
-            ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser(res);
-            
             IvySettings ivySettings = new IvyConfiguration().loadSettings();
 
-            return parser.parseDescriptor(ivySettings, tmp.toURI().toURL(), res, ivySettings.doValidate());
+            return IvyModuleDescriptorParser.parseDescriptor(ivySettings, tmp.toURI().toURL(), res, ivySettings.doValidate());
         }
         catch (ParseException e)
         {

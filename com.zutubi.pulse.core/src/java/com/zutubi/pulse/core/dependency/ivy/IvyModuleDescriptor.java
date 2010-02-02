@@ -7,8 +7,6 @@ import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.*;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.settings.IvySettings;
-import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
-import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,11 +111,10 @@ public class IvyModuleDescriptor
      */
     public static IvyModuleDescriptor newInstance(URL url, IvyConfiguration configuration) throws Exception
     {
-        ModuleDescriptorParser parser =  XmlModuleDescriptorParser.getInstance();
-
         IvySettings ivySettings = configuration.loadSettings();
 
-        return new IvyModuleDescriptor((DefaultModuleDescriptor) parser.parseDescriptor(ivySettings, url, ivySettings.doValidate()), configuration);
+        DefaultModuleDescriptor descriptor = (DefaultModuleDescriptor) IvyModuleDescriptorParser.parseDescriptor(ivySettings, url, ivySettings.doValidate());
+        return new IvyModuleDescriptor(descriptor, configuration);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptorParser;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -12,8 +13,6 @@ import java.net.URL;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.plugins.repository.url.URLResource;
-import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
-import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 
 public class AbstractHessianTestCase extends PulseTestCase
 {
@@ -52,9 +51,7 @@ public class AbstractHessianTestCase extends PulseTestCase
         URL url = AbstractHessianTestCase.class.getResource(resourceName);
 
         URLResource res = new URLResource(url);
-        ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser(res);
-
-        return parser.parseDescriptor(ivy.getSettings(), url, res, false);
+        return IvyModuleDescriptorParser.parseDescriptor(ivy.getSettings(), url, res, false);
     }
 
     protected String readDescriptor(String resourceName) throws IOException

@@ -24,4 +24,9 @@ public class HessianModuleDescriptorSupportInitialiser
     {
         this.customSerialiserFactory = customSerialiserFactory;
     }
+
+    public void setIvyManager(IvyManager ivyManager)
+    {
+        // for backward patching compatibility.
+    }
 }
