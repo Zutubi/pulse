@@ -1,17 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.utils.*;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -38,9 +36,9 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         browser.start();
 
         buildRunner = new BuildRunner(xmlRpcHelper);
-        configurationHelper = new ConfigurationHelper();
-        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
-        configurationHelper.init();
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
 
         projects = new ProjectConfigurations(configurationHelper);
     }

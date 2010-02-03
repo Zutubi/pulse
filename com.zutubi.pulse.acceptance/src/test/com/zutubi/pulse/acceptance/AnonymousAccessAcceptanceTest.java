@@ -5,6 +5,9 @@ import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
+import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -17,20 +20,16 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 {
     private static final String ANONYMOUS_GROUP_PATH = "groups/anonymous users";
 
-    private static final String KEY_ANONYMOUS_ACCESS = "anonymousAccessEnabled";
-    private static final String KEY_ANONYMOUS_SIGNUP = "anonymousSignupEnabled";
-
-    private static final String ID_LOGIN         = "login";
-    private static final String ID_DASHBOARD_TAB = "tab.dashboard";
-    private static final String ID_PREFERENCES   = "prefs";
-    private static final String ID_LOGOUT        = "logout";
-
     private static final String SIGNUP_INPUT_ACTION = "signup!input.action";
+    private ConfigurationHelper configurationHelper;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
     }
 
     protected void tearDown() throws Exception
@@ -41,7 +40,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     public void testNoAnonymousAccess() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_ACCESS, false);
+        setAnonymousAccess(false);
+        setAnonymousSignup(false);
         browser.open(BrowsePage.class);
 
         // We should be denied access and redirected to the login page.
@@ -52,8 +52,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     public void testAnonymousSignup() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_ACCESS, false);
-        ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
+        setAnonymousAccess(false);
+        setAnonymousSignup(true);
 
         LoginPage loginPage = browser.open(LoginPage.class);
         loginPage.waitForSignup();
@@ -66,17 +66,20 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         welcomePage.waitFor();
         assertTitle(welcomePage);
         assertTextPresent("name_" + random);
-        assertElementPresent(ID_DASHBOARD_TAB);
-        assertElementPresent(ID_PREFERENCES);
-        assertElementPresent(ID_LOGOUT);
-        assertElementNotPresent(ID_LOGIN);
+        assertTrue(welcomePage.isElementIdPresent(IDs.ID_DASHBOARD_TAB));
+        assertTrue(welcomePage.isElementIdPresent(IDs.ID_PREFERENCES));
+        assertTrue(welcomePage.isElementIdPresent(IDs.ID_LOGOUT));
+        assertFalse(welcomePage.isElementIdPresent(IDs.ID_LOGIN));
     }
 
     public void testAnonymousSignupDisabled() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_SIGNUP, false);
+        setAnonymousAccess(false);
+        setAnonymousSignup(false);
         LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
         assertFalse(loginPage.isSignupPresent());
+
+        // go directly to the action and verify that it is disabled.
         browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
@@ -86,7 +89,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     public void testAnonymousSingupPasswordMismatch() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
+        setAnonymousAccess(false);
+        setAnonymousSignup(true);
         browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         form.waitFor();
@@ -97,7 +101,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     public void testAnonymousSingupExistingUser() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
+        setAnonymousAccess(false);
+        setAnonymousSignup(true);
         browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         form.waitFor();
@@ -108,21 +113,23 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     public void testAnonymousAccess() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_ACCESS, true);
+        setAnonymousAccess(true);
+        setAnonymousSignup(false);
 
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertTitle(browsePage);
-        assertElementPresent(ID_LOGIN);
+        assertTrue(browsePage.isElementIdPresent(IDs.ID_LOGIN));
 
         // No dashboard tab, user info or logout link for anonymous users
-        assertElementNotPresent(ID_DASHBOARD_TAB);
-        assertElementNotPresent(ID_PREFERENCES);
-        assertElementNotPresent(ID_LOGOUT);
+        assertFalse(browsePage.isElementIdPresent(IDs.ID_DASHBOARD_TAB));
+        assertFalse(browsePage.isElementIdPresent(IDs.ID_PREFERENCES));
+        assertFalse(browsePage.isElementIdPresent(IDs.ID_LOGOUT));
     }
 
     public void testAssignServerPermissionToAnonymousUsers() throws Exception
     {
-        ensureSetting(KEY_ANONYMOUS_ACCESS, true);
+        setAnonymousAccess(true);
+        setAnonymousSignup(false);
         Hashtable<String, Object> group = xmlRpcHelper.getConfig(ANONYMOUS_GROUP_PATH);
         group.put("serverPermissions", new Vector(0));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
@@ -140,13 +147,24 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         browser.waitForElement(ProjectHierarchyPage.LINK_ADD);
     }
 
-    private void ensureSetting(String key, boolean enabled) throws Exception
+    private void setAnonymousAccess(boolean enabled) throws Exception
     {
-        Hashtable<String, Object> general = xmlRpcHelper.getConfig(GlobalConfiguration.SCOPE_NAME);
-        if((Boolean)general.get(key) != enabled)
+        GlobalConfiguration globalConfig = configurationHelper.getConfiguration(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
+        if (globalConfig.isAnonymousAccessEnabled() != enabled)
         {
-            general.put(key, enabled);
-            xmlRpcHelper.saveConfig(GlobalConfiguration.SCOPE_NAME, general, false);
+            globalConfig.setAnonymousAccessEnabled(enabled);
+            configurationHelper.update(globalConfig, false);
+            browser.newSession();
+        }
+    }
+
+    private void setAnonymousSignup(boolean enabled) throws Exception
+    {
+        GlobalConfiguration globalConfig = configurationHelper.getConfiguration(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
+        if (globalConfig.isAnonymousSignupEnabled() != enabled)
+        {
+            globalConfig.setAnonymousSignupEnabled(enabled);
+            configurationHelper.update(globalConfig, false);
             browser.newSession();
         }
     }

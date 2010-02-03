@@ -4,7 +4,6 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.SystemUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
@@ -34,8 +33,6 @@ public class AcceptanceTestUtils
      */
     public static final String PROPERTY_AGENT_PORT = "agent.port";
     
-    private static final String PROPERTY_SELENIUM_BROWSER = "SELENIUM_BROWSER";
-
     public static int getPulsePort()
     {
         return Integer.getInteger(PROPERTY_PULSE_PORT, 8080);
@@ -49,23 +46,6 @@ public class AcceptanceTestUtils
     public static int getAgentPort()
     {
         return Integer.getInteger(PROPERTY_AGENT_PORT, 8890);
-    }
-
-    public static String getSeleniumBrowserProperty()
-    {
-        String browser = System.getenv(PROPERTY_SELENIUM_BROWSER);
-        if (browser == null)
-        {
-            if (SystemUtils.IS_WINDOWS)
-            {
-                browser = "*iexploreproxy";
-            }
-            else
-            {
-                browser = "*firefox";
-            }
-        }
-        return browser;
     }
 
     public static File getWorkingDirectory()

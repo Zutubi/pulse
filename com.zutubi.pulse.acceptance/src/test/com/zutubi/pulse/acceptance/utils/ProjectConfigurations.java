@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -77,6 +78,21 @@ public class ProjectConfigurations
         return project;
     }
 
+
+    public IvyAntProject createIvyAntProject(String projectName) throws Exception
+    {
+        IvyAntProject project = new IvyAntProject(new ProjectConfiguration(projectName));
+        configureBaseProject(project, true);
+        return project;
+    }
+
+    public DepMavenProject createDepMavenProject(String projectName) throws Exception
+    {
+        DepMavenProject project = new DepMavenProject(new ProjectConfiguration(projectName));
+        configureBaseProject(project, true);
+        return project;
+    }
+
     /**
      * Create a project configuration that allows for the execution of the build to be synchronised
      * with the acceptance tests.  When executing, the build will wait until explicitly 'released'
@@ -99,9 +115,11 @@ public class ProjectConfigurations
     {
         AgentConfiguration master = configurationHelper.getMasterAgentReference();
 
-        // setup the Ant post processor so that the commands have something to reference.
-        AntPostProcessorConfiguration postProcessorReference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/ant output processor", AntPostProcessorConfiguration.class);
-        helper.getConfig().getPostProcessors().put(postProcessorReference.getName(), postProcessorReference);
+        // setup the post processor references so that the commands have something to reference.
+        AntPostProcessorConfiguration antPostProcessorReference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/ant output processor", AntPostProcessorConfiguration.class);
+        Maven2PostProcessorConfiguration maven2PostProcessorReference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/maven 2 output processor", Maven2PostProcessorConfiguration.class);
+        helper.getConfig().getPostProcessors().put(antPostProcessorReference.getName(), antPostProcessorReference);
+        helper.getConfig().getPostProcessors().put(maven2PostProcessorReference.getName(), maven2PostProcessorReference);
 
         // setup the defaults:
         if (addDefaultStage)

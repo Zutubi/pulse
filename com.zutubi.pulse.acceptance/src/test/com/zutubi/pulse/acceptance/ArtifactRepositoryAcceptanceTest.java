@@ -1,18 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.acceptance.utils.Repository;
-import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
-import com.zutubi.pulse.master.model.ProjectManager;
-
-import java.util.Hashtable;
+import com.zutubi.pulse.core.engine.api.ResultState;
 
 public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private String random = null;
     private Repository repository = null;
+    private ConfigurationHelper configurationHelper;
+    private ProjectConfigurations projects;
 
     protected void setUp() throws Exception
     {
@@ -20,7 +18,11 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         random = randomName();
 
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
+        projects = new ProjectConfigurations(configurationHelper);
 
         repository = new Repository();
         repository.clean();
@@ -28,7 +30,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     protected void tearDown() throws Exception
     {
-        logout();
+        xmlRpcHelper.logout();
         
         super.tearDown();
     }
@@ -78,21 +80,25 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private int createAndRunMavenProject(String projectName, String pom, String goals) throws Exception
     {
-        Hashtable<String, Object> mavenConfig = xmlRpcHelper.createDefaultConfig(Maven2CommandConfiguration.class);
-        mavenConfig.put("pomFile", pom);
-        mavenConfig.put("settingsFile", "settings.xml");
-        mavenConfig.put("goals", goals);
+        DepMavenProject project = projects.createDepMavenProject(projectName);
+        Maven2CommandConfiguration command = (Maven2CommandConfiguration) project.getRecipe("default").getConfig().getCommands().get("build");
+        command.setPomFile(pom);
+        command.setSettingsFile("settings.xml");
+        command.setGoals(goals);
 
-        xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.DEP_MAVEN_REPOSITORY), mavenConfig);
+        configurationHelper.insertProject(project.getConfig());
+
         return xmlRpcHelper.runBuild(projectName);
     }
 
     private int createAndRunIvyAntProject(String target) throws Exception
     {
-        Hashtable<String,Object> antConfig = xmlRpcHelper.getAntConfig();
-        antConfig.put("targets", target);
+        IvyAntProject project = projects.createIvyAntProject(random);
+        AntCommandConfiguration command = (AntCommandConfiguration) project.getRecipe("default").getConfig().getCommands().get("build");
+        command.setTargets(target);
         
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.IVY_ANT_REPOSITORY), antConfig);
+        configurationHelper.insertProject(project.getConfig());
+
         return xmlRpcHelper.runBuild(random);
     }
 }

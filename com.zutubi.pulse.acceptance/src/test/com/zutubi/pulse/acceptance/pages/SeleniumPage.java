@@ -86,5 +86,10 @@ public abstract class SeleniumPage
         return title;
     }
 
+    public boolean isElementIdPresent(String id)
+    {
+        return browser.isElementIdPresent(id);
+    }
+
     public abstract String getUrl();
 }

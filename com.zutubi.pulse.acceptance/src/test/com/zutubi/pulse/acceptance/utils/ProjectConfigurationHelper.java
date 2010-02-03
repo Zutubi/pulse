@@ -27,7 +27,8 @@ import java.util.Map;
  */
 public abstract class ProjectConfigurationHelper
 {
-    private static final String ANT_PROCESSOR_NAME = "ant output processor";
+    protected static final String ANT_PROCESSOR_NAME = "ant output processor";
+    protected static final String MAVEN2_PROCESSOR_NAME = "maven 2 output processor";
 
     private ProjectConfiguration config;
 

@@ -47,9 +47,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         randomName = randomName();
 
         buildRunner = new BuildRunner(xmlRpcHelper);
-        configurationHelper = new ConfigurationHelper();
-        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
-        configurationHelper.init();
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
 
         projects = new ProjectConfigurations(configurationHelper);
     }

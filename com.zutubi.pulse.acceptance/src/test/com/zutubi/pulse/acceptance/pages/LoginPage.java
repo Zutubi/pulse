@@ -9,15 +9,14 @@ import static com.zutubi.util.CollectionUtils.asPair;
 
 import java.io.File;
 
-/**
- */
 public class LoginPage extends SeleniumPage
 {
     private static final String SIGNUP_ID = "signup";
+    private static final String TITLE = "login";
 
     public LoginPage(SeleniumBrowser browser, Urls urls)
     {
-        super(browser, urls, "login-logo", "login");
+        super(browser, urls, "login-logo", TITLE);
     }
 
     public String getUrl()
@@ -25,14 +24,15 @@ public class LoginPage extends SeleniumPage
         return urls.login();
     }
 
-    public void login(String username, String password)
+    public WelcomePage login(String username, String password)
     {
         LoginForm form = browser.createForm(LoginForm.class);
-        form.submitNamedFormElements("login", asPair("j_username", username), asPair("j_password", password));
+        form.submitNamedFormElements(TITLE, asPair("j_username", username), asPair("j_password", password));
         try
         {
             WelcomePage welcomePage = browser.createPage(WelcomePage.class);
             welcomePage.waitFor();
+            return welcomePage;
         }
         catch (Exception e)
         {

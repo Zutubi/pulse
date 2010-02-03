@@ -4,6 +4,9 @@ import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
+import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
+import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.maven.MavenPostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -19,11 +22,13 @@ import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.MutableRecord;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -48,6 +53,7 @@ public class ConfigurationHelper
     private XmlRpcHelper xmlRpcHelper;
     private ConfigurationReferenceManager referenceManager;
 
+    private Instantiator instantiator;
     private HandleAllocator handleAllocator;
     private AtomicLong nextHandle = new AtomicLong(0);
 
@@ -91,6 +97,9 @@ public class ConfigurationHelper
 
         ConfigurationPersistenceManager persistenceManager = mock(ConfigurationPersistenceManager.class);
         ConfigurationSecurityManager securityManager = mock(ConfigurationSecurityManager.class);
+        ConfigurationTemplateManager templateManager = mock(ConfigurationTemplateManager.class);
+
+        instantiator = new SimpleInstantiator(templateOwnerPath, referenceManager, templateManager);
 
         typeRegistry = new TypeRegistry();
         typeRegistry.setConfigurationReferenceManager(referenceManager);
@@ -108,6 +117,16 @@ public class ConfigurationHelper
         configurationRegistry.registerConfigurationType(AntPostProcessorConfiguration.class);
         configurationRegistry.registerConfigurationType(SubversionConfiguration.class);
         configurationRegistry.registerConfigurationType(DependentBuildTriggerConfiguration.class);
+        configurationRegistry.registerConfigurationType(Maven2CommandConfiguration.class);
+        configurationRegistry.registerConfigurationType(Maven2PostProcessorConfiguration.class);
+    }
+
+    public <T extends Configuration> void register(Class<T> type) throws TypeException
+    {
+        if (typeRegistry.getType(type) == null)
+        {
+            configurationRegistry.registerConfigurationType(type);
+        }
     }
 
     /**
@@ -148,6 +167,28 @@ public class ConfigurationHelper
     public <V extends Configuration> V getConfigurationReference(String path, Class<V> type) throws Exception
     {
         V config = type.newInstance();
+        config.setConfigurationPath(path);
+        config.setHandle(Long.valueOf(xmlRpcHelper.getConfigHandle(path)));
+
+        if (config instanceof NamedConfiguration)
+        {
+            ((NamedConfiguration) config).setName(PathUtils.getBaseName(path));
+        }
+
+        return config;
+    }
+
+    public <V extends Configuration> V getConfiguration(String path, Class<V> clazz) throws Exception
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+        Hashtable<String, Object> data = xmlRpcHelper.getConfig(path);
+
+        MutableRecord record = type.fromXmlRpc(templateOwnerPath, data);
+        //noinspection unchecked
+
+        V config = (V) type.instantiate(record, instantiator);
+        type.initialise(config, record, instantiator);
+        
         config.setConfigurationPath(path);
         config.setHandle(Long.valueOf(xmlRpcHelper.getConfigHandle(path)));
 
@@ -221,16 +262,33 @@ public class ConfigurationHelper
     }
 
     /**
-     * Convenience method for updating an existing configuration.
+     * Convenience method for updating an existing configuration, including
+     * nested configurations.
      *
      * @param configuration the configuration to be updated.
      * @return the path at which the configuration was updated.
      * @throws Exception thrown on error
+     *
+     * @see #update(Configuration, boolean) 
      */
     public String update(Configuration configuration) throws Exception
     {
+        return update(configuration, true);
+    }
+
+    /**
+     * Convenience method for updating an existing configuration.
+     *
+     * @param configuration the configuration to be updated.
+     * @param deep          indicates whether or not the configurations nested within
+     *                      specified ocnfiguration should also be updated.
+     * @return the path at which the configuration was updated.
+     * @throws Exception thrown on error
+     */
+    public String update(Configuration configuration, boolean deep) throws Exception
+    {
         Hashtable<String, Object> data = toXmlRpc(configuration);
-        return xmlRpcHelper.saveConfig(configuration.getConfigurationPath(), data, true);
+        return xmlRpcHelper.saveConfig(configuration.getConfigurationPath(), data, deep);
     }
 
     /**

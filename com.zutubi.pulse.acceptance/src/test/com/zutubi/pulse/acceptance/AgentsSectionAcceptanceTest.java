@@ -1,8 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
-import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
-import com.zutubi.pulse.acceptance.utils.WaitAntProject;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
@@ -41,9 +39,8 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         removeNonMasterAgents();
 
-        configurationHelper = new ConfigurationHelper();
-        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
-        configurationHelper.init();
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
 
         projects = new ProjectConfigurations(configurationHelper);
 

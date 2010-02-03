@@ -1,31 +1,25 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.acceptance.SeleniumTestBase;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
-import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
-import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
-import com.zutubi.pulse.acceptance.utils.DepAntProject;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 /**
  * A set of acceptance tests focused on the dependency systems UI.
@@ -42,9 +36,8 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.loginAsAdmin();
 
-        configurationHelper = new ConfigurationHelper();
-        configurationHelper.setXmlRpcHelper(xmlRpcHelper);
-        configurationHelper.init();
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
 
         projects = new ProjectConfigurations(configurationHelper);
     }
