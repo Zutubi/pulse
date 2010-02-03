@@ -5,6 +5,7 @@ import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
@@ -119,19 +120,19 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
      */
     public void testCanCloneCollectionItems() throws Exception
     {
-        CompositeType type = typeRegistry.register(ConfigW.class);
-        typeRegistry.register(ConfigX1.class);
+        CompositeType type = typeRegistry.register(ConfigRecipe.class);
+        typeRegistry.register(ConfigAntCommand.class);
 
-        ConfigW w = new ConfigW("w");
-        w.getExtensionField().put("x1", new ConfigX1("x1", new ConfigY("y", new ConfigZ())));
+        ConfigRecipe recipe = new ConfigRecipe("recipe");
+        recipe.getCommands().put("ant", new ConfigAntCommand("ant", new ConfigEnvironment("key", "value")));
 
         MapType map = new MapType(type, typeRegistry);
-        configurationPersistenceManager.register("scope", map);
+        configurationPersistenceManager.register("recipes", map);
 
-        configurationTemplateManager.insert("scope", w);
+        configurationTemplateManager.insert("recipes", recipe);
 
-        assertTrue(configurationRefactoringManager.canClone("scope/w/extensionField/x1"));
-        configurationRefactoringManager.clone("scope/w/extensionField/x1", "x1 Clone");
+        assertTrue(configurationRefactoringManager.canClone("recipes/recipe/commands/ant"));
+        configurationRefactoringManager.clone("recipes/recipe/commands/ant", "ant Clone");
     }
 
     public void testCanCloneItemBelowTopLevel()
@@ -1999,92 +2000,105 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
     }
 
-    @SymbolicName("w")
-    public static class ConfigW extends AbstractNamedConfiguration
+    @SymbolicName("recipe")
+    public static class ConfigRecipe extends AbstractNamedConfiguration
     {
-        private Map<String, ConfigX> extensionField = new HashMap<String, ConfigX>();
+        private Map<String, ConfigCommand> extensionField = new HashMap<String, ConfigCommand>();
 
-        public ConfigW()
+        public ConfigRecipe()
         {
         }
 
-        public ConfigW(String name)
+        public ConfigRecipe(String name)
         {
             super(name);
         }
 
-        public Map<String, ConfigX> getExtensionField()
+        public Map<String, ConfigCommand> getCommands()
         {
             return extensionField;
         }
 
-        public void setExtensionField(Map<String, ConfigX> extensionField)
+        public void setExtensionField(Map<String, ConfigCommand> extensionField)
         {
             this.extensionField = extensionField;
         }
     }
 
-    @SymbolicName("x")
-    public static interface ConfigX extends NamedConfiguration
+    @SymbolicName("command")
+    public static interface ConfigCommand extends NamedConfiguration
     {
 
     }
 
-    @SymbolicName("x1")
-    public static class ConfigX1 extends AbstractNamedConfiguration implements ConfigX
+    @SymbolicName("command.ant")
+    public static class ConfigAntCommand extends AbstractNamedConfiguration implements ConfigCommand
     {
-        private ConfigY yField;
+        private List<ConfigEnvironment> environments = new LinkedList<ConfigEnvironment>();
 
-        public ConfigX1()
+        public ConfigAntCommand()
         {
         }
 
-        public ConfigX1(String name, ConfigY field)
+        public ConfigAntCommand(String name, ConfigEnvironment environment)
         {
             super(name);
-            this.yField = field;
+            this.environments.add(environment);
         }
 
-        public ConfigY getYField()
+        public List<ConfigEnvironment> getEnvironments()
         {
-            return yField;
+            return environments;
         }
 
-        public void setYField(ConfigY field)
+        public void setEnvironments(List<ConfigEnvironment> field)
         {
-            this.yField = field;
+            this.environments = field;
         }
     }
 
-    @SymbolicName("y")
-    public static class ConfigY extends AbstractNamedConfiguration
+    @SymbolicName("environment")
+    public static class ConfigEnvironment extends AbstractConfiguration
     {
-        private ConfigZ field;
+        private String key;
+        private String value;
 
-        public ConfigY()
+        public ConfigEnvironment()
         {
         }
 
-        public ConfigY(String name, ConfigZ value)
+        public ConfigEnvironment(String key, String value)
         {
-            super(name);
-            this.field = value;
+            this.key = key;
+            this.value = value;
         }
 
-        public ConfigZ getField()
+        public String getKey()
         {
-            return field;
+            return key;
         }
 
-        public void setField(ConfigZ field)
+        public void setKey(String key)
         {
-            this.field = field;
+            this.key = key;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+
+        public void setValue(String value)
+        {
+            this.value = value;
         }
     }
 
+/*
     @SymbolicName("z")
     public static class ConfigZ extends AbstractNamedConfiguration
     {
 
     }
+*/
 }
