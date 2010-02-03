@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.io.IOException;
 
 /**
- * The IvyModuleDescriptorParser is a wrapper around ivies parsers
+ * The IvyModuleDescriptorParser is a wrapper around Ivy's parsers
  * that provides synchronisation.  The ivy parser uses un synchronised
  * access to a static instance of a SimpleDateFormat.
  */
