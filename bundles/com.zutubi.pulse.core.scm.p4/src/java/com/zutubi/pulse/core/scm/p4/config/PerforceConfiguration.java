@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern", "timeOffset" })
+@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern", "timeOffset" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -30,6 +30,11 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(agent.handle)";
     @Wizard.Ignore
     private int timeOffset= 0;
+
+    @ControllingCheckbox(checkedFields = {"charset"})
+    private boolean unicodeServer = false;
+    @Required
+    private String charset = "none";
 
     public PerforceConfiguration()
     {
@@ -136,5 +141,25 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setTimeOffset(int timeOffset)
     {
         this.timeOffset = timeOffset;
+    }
+
+    public boolean isUnicodeServer()
+    {
+        return unicodeServer;
+    }
+
+    public void setUnicodeServer(boolean unicodeServer)
+    {
+        this.unicodeServer = unicodeServer;
+    }
+
+    public String getCharset()
+    {
+        return charset;
+    }
+
+    public void setCharset(String charset)
+    {
+        this.charset = charset;
     }
 }

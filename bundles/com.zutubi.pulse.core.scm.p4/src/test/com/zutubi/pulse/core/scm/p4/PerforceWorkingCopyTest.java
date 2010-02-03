@@ -29,8 +29,6 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
 {
     private static final long REVISION_LATEST = 2;
 
-    private static final String FILE_CHECKPOINT = "checkpoint.1";
-
     private static final String P4_COMMAND = "p4";
     private static final String CLIENT_NAME = "test-client-1";
     private static final String OTHER_CLIENT_NAME = "test-client-2";
@@ -44,14 +42,11 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     private PerforceWorkingCopy wc;
     private TestPersonalBuildUI ui;
 
-    protected String getCheckpointFilename()
-    {
-        return FILE_CHECKPOINT;
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        deployPerforceServer("repo", P4D_PORT, 1, false);
 
         createClients();
 
@@ -68,7 +63,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
 
     private void createClients() throws ScmException
     {
-        clientRoot = new File(getTempDir(), CLIENT_NAME);
+        clientRoot = new File(tmpDir, CLIENT_NAME);
         assertTrue(clientRoot.mkdir());
 
         core = new PerforceCore();
@@ -81,7 +76,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         core.createOrUpdateWorkspace("client-1", CLIENT_NAME, "description", clientRoot.getAbsolutePath(), null);
         core.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
 
-        otherClientRoot = new File(getTempDir(), OTHER_CLIENT_NAME);
+        otherClientRoot = new File(tmpDir, OTHER_CLIENT_NAME);
         assertTrue(otherClientRoot.mkdir());
 
         otherCore = new PerforceCore();

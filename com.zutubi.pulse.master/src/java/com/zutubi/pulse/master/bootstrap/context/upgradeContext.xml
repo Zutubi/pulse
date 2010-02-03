@@ -118,6 +118,7 @@
                 <ref local="upgradeDefaultArtifactPattern"/>
                 <ref local="addLdapPasswordAttribute"/>
                 <ref local="subversionExternalsMonitoring"/>
+                <ref local="addPerforceUnicodeConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -571,5 +572,9 @@
 
     <bean id="subversionExternalsMonitoring" class="com.zutubi.pulse.master.upgrade.tasks.SubversionExternalsMonitoringUpgradeTask">
         <property name="buildNumber" value="201014001"/>
+    </bean>
+
+    <bean id="addPerforceUnicodeConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceUnicodeConfigurationUpgradeTask">
+        <property name="buildNumber" value="201014002"/>
     </bean>
 </beans>
