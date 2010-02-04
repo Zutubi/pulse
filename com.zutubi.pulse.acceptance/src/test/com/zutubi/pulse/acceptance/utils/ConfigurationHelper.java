@@ -6,17 +6,18 @@ import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
-import com.zutubi.pulse.core.commands.maven.MavenPostProcessorConfiguration;
+import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
@@ -27,8 +28,8 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.HandleAllocator;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -116,6 +117,7 @@ public class ConfigurationHelper
         configurationRegistry.registerConfigurationType(ExecutableCommandConfiguration.class);
         configurationRegistry.registerConfigurationType(AntPostProcessorConfiguration.class);
         configurationRegistry.registerConfigurationType(SubversionConfiguration.class);
+        configurationRegistry.registerConfigurationType(GitConfiguration.class);
         configurationRegistry.registerConfigurationType(DependentBuildTriggerConfiguration.class);
         configurationRegistry.registerConfigurationType(Maven2CommandConfiguration.class);
         configurationRegistry.registerConfigurationType(Maven2PostProcessorConfiguration.class);
@@ -201,6 +203,19 @@ public class ConfigurationHelper
     }
 
     /**
+     * Returns true if a project by the specified name exists.
+     *
+     * @param projectName   the name of the project we are checking
+     * @return true iff the project exists, false otherwise.
+     *
+     * @throws Exception thrown on error.
+     */
+    public boolean isProjectExists(String projectName) throws Exception
+    {
+        return xmlRpcHelper.configPathExists(PROJECTS_SCOPE + "/" + projectName);
+    }
+
+    /**
      * Convenience method for inserting a new ProjectConfiguration instance.
      *
      * @param project the project to be inserted.
@@ -211,6 +226,29 @@ public class ConfigurationHelper
     {
         String globalTemplateProjectPath = PROJECTS_SCOPE + "/" + GLOBAL_PROJECT_NAME;
         return insertTemplatedConfig(globalTemplateProjectPath, project);
+    }
+
+
+    public boolean isUserExists(String userName) throws Exception
+    {
+        return xmlRpcHelper.configPathExists(USERS_SCOPE + "/" + userName);
+    }
+
+    public void insertUser(UserConfiguration user) throws Exception
+    {
+        String path = USERS_SCOPE + "/" + user.getName();
+        insertConfig(USERS_SCOPE, user);
+
+        // set the password.
+        Hashtable <String, Object> password = xmlRpcHelper.createEmptyConfig(SetPasswordConfiguration.class);
+        password.put("password", user.getPassword());
+        password.put("confirmPassword", user.getPassword());
+        xmlRpcHelper.doConfigActionWithArgument(path, "setPassword", password);
+    }
+
+    public boolean isAgentExists(String agentName) throws Exception
+    {
+        return xmlRpcHelper.configPathExists(AGENTS_SCOPE + "/" + agentName);
     }
 
     /**
@@ -368,4 +406,5 @@ public class ConfigurationHelper
     {
         this.xmlRpcHelper = xmlRpcHelper;
     }
+
 }

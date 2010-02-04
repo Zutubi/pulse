@@ -63,7 +63,7 @@ public class BuildRunner
         return buildNumber;
     }
 
-    public int triggerSuccessfulBuild(WaitAntProject project, Pair<String, Object>... options) throws Exception
+    public int triggerSuccessfulBuild(WaitProject project, Pair<String, Object>... options) throws Exception
     {
         int buildNumber = triggerBuild(project, options);
         xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
@@ -214,6 +214,16 @@ public class BuildRunner
         System.arraycopy(options, 0, args, 0, options.length);
         args[args.length - 1] = asPair("rebuild", (Object)"true");
         return triggerBuild(project, args);
+    }
+
+    public void waitForBuildInProgress(ProjectConfigurationHelper project, int buildNumber) throws Exception
+    {
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
+    }
+
+    public void waitForBuildToComplete(ProjectConfigurationHelper project, int buildNumber) throws Exception
+    {
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
     }
 
     /**

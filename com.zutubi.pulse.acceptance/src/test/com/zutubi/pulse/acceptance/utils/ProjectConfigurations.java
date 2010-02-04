@@ -1,7 +1,10 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
-import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
+import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
+import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -10,6 +13,7 @@ import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTrigge
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * The project configurations instance provides the acceptance tests with a set of
@@ -36,10 +40,11 @@ public class ProjectConfigurations
      *
      * @throws Exception thrown on error.
      */
-    public FailAntProject createFailAntProject(String projectName) throws Exception
+    public AntProjectHelper createFailAntProject(String projectName) throws Exception
     {
-        FailAntProject project = new FailAntProject(new ProjectConfiguration(projectName));
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
         configureBaseProject(project, true);
+        configureSvnScm(project, Constants.FAIL_ANT_REPOSITORY);
         return project;
     }
 
@@ -75,21 +80,24 @@ public class ProjectConfigurations
     {
         DepAntProject project = new DepAntProject(new ProjectConfiguration(projectName));
         configureBaseProject(project, addDefaultStage);
+        configureSvnScm(project, Constants.DEP_ANT_REPOSITORY);
         return project;
     }
 
 
-    public IvyAntProject createIvyAntProject(String projectName) throws Exception
+    public AntProjectHelper createIvyAntProject(String projectName) throws Exception
     {
-        IvyAntProject project = new IvyAntProject(new ProjectConfiguration(projectName));
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
         configureBaseProject(project, true);
+        configureSvnScm(project, Constants.IVY_ANT_REPOSITORY);
         return project;
     }
 
-    public DepMavenProject createDepMavenProject(String projectName) throws Exception
+    public MavenProjectHelper createDepMavenProject(String projectName) throws Exception
     {
-        DepMavenProject project = new DepMavenProject(new ProjectConfiguration(projectName));
+        MavenProjectHelper project = new MavenProjectHelper(new ProjectConfiguration(projectName));
         configureBaseProject(project, true);
+        configureSvnScm(project, Constants.DEP_MAVEN_REPOSITORY);
         return project;
     }
 
@@ -104,10 +112,53 @@ public class ProjectConfigurations
      * 
      * @throws Exception thrown on error.
      */
-    public WaitAntProject createWaitAntProject(File dir, String projectName) throws Exception
+    public WaitProject createWaitAntProject(File dir, String projectName) throws Exception
     {
-        WaitAntProject project = new WaitAntProject(new ProjectConfiguration(projectName), dir);
+        WaitProject project = new WaitProject(new ProjectConfiguration(projectName), dir);
         configureBaseProject(project, true);
+        configureSvnScm(project, Constants.WAIT_ANT_REPOSITORY);
+        return project;
+    }
+
+    /**
+     * Create a project configuration that is configured with the test ant project, a project that
+     * generates test results.
+     *
+     * @param projectName   the name of the project
+     * @return the project configuration helper instance to allow further configuration
+     * of this project.
+     *
+     * @throws Exception thrown on error.
+     */
+    public AntProjectHelper createTestAntProject(String projectName) throws Exception
+    {
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
+        configureBaseProject(project, true);
+        configureSvnScm(project, Constants.TEST_ANT_REPOSITORY);
+        return project;
+    }
+
+    public AntProjectHelper createTrivialAntProject(String projectName) throws Exception
+    {
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
+        configureBaseProject(project, true);
+        configureSvnScm(project, Constants.TRIVIAL_ANT_REPOSITORY);
+        return project;
+    }
+
+    /**
+     * Create a project configuration that is configured to use an ant project in a git repository.
+     *
+     * @param projectName   the name of the project
+     * @return the project configuration helper instance to allow further configuration
+     * of this project.
+     * @throws Exception thrown on error.
+     */
+    public AntProjectHelper createGitAntProject(String projectName) throws Exception
+    {
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
+        configureBaseProject(project, true);
+        configureGitScm(project, Constants.getGitUrl());
         return project;
     }
 
@@ -116,10 +167,15 @@ public class ProjectConfigurations
         AgentConfiguration master = configurationHelper.getMasterAgentReference();
 
         // setup the post processor references so that the commands have something to reference.
-        AntPostProcessorConfiguration antPostProcessorReference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/ant output processor", AntPostProcessorConfiguration.class);
-        Maven2PostProcessorConfiguration maven2PostProcessorReference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/maven 2 output processor", Maven2PostProcessorConfiguration.class);
-        helper.getConfig().getPostProcessors().put(antPostProcessorReference.getName(), antPostProcessorReference);
-        helper.getConfig().getPostProcessors().put(maven2PostProcessorReference.getName(), maven2PostProcessorReference);
+        List<String> names = helper.getPostProcessorNames();
+        List<Class> types = helper.getPostProcessorTypes();
+        for (int i = 0; i < names.size(); i++)
+        {
+            String name = names.get(i);
+            Class<PostProcessorConfiguration> type = types.get(i);
+            PostProcessorConfiguration reference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/" + name, type);
+            helper.getConfig().getPostProcessors().put(reference.getName(), reference);
+        }
 
         // setup the defaults:
         if (addDefaultStage)
@@ -137,7 +193,25 @@ public class ProjectConfigurations
         DependentBuildTriggerConfiguration trigger = new DependentBuildTriggerConfiguration();
         trigger.setName(ProjectConfigurationWizard.DEPENDENCY_TRIGGER);
         helper.addTrigger(trigger);
+    }
 
-        helper.getConfig().setScm(helper.createDefaultScm());
+    private void configureGitScm(ProjectConfigurationHelper helper, String repository)
+    {
+        GitConfiguration git = new GitConfiguration();
+        git.setCheckoutScheme(CheckoutScheme.CLEAN_CHECKOUT);
+        git.setMonitor(false);
+        git.setRepository(repository);
+
+        helper.getConfig().setScm(git);
+    }
+
+    private void configureSvnScm(ProjectConfigurationHelper helper, String url)
+    {
+        SubversionConfiguration svn = new SubversionConfiguration();
+        svn.setCheckoutScheme(CheckoutScheme.CLEAN_CHECKOUT);
+        svn.setMonitor(false);
+        svn.setUrl(url);
+
+        helper.getConfig().setScm(svn);
     }
 }

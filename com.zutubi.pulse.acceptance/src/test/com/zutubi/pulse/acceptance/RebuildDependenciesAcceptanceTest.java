@@ -63,10 +63,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildSingleDependency() throws Exception
     {
-        WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
+        WaitProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
         insertProject(projectA);
 
-        WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         insertProject(projectB);
 
@@ -92,21 +92,21 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildMultipleDependencies() throws Exception
     {
-        final WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
+        final WaitProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
         insertProject(projectA);
 
-        final WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        final WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         insertProject(projectB);
 
-        WaitAntProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
+        WaitProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
         projectC.addDependency(projectA);
         projectC.addDependency(projectB);
         insertProject(projectC);
 
         buildRunner.triggerRebuild(projectC.getConfig());
 
-        WaitAntProject firstDependency;
-        WaitAntProject secondDependency;
+        WaitProject firstDependency;
+        WaitProject secondDependency;
         AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
@@ -155,14 +155,14 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildTransitiveDependency() throws Exception
     {
-        final WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
+        final WaitProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
         insertProject(projectA);
 
-        final WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        final WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         insertProject(projectB);
 
-        final WaitAntProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
+        final WaitProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
         projectC.addDependency(projectB);
         insertProject(projectC);
 
@@ -196,17 +196,17 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildUsesTransitiveProperty() throws Exception
     {
-        final WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
+        final WaitProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
         insertProject(projectA);
         // even though project a is not rebuilt as part of the rebuild, project b does depend on it
         // so we require it to have been built at least once for project b to be successful.
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        final WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        final WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         insertProject(projectB);
 
-        final WaitAntProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
+        final WaitProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
         projectC.addDependency(projectB).setTransitive(false);
         insertProject(projectC);
 
@@ -233,20 +233,20 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildUsesStatusProperty() throws Exception
     {
-        final WaitAntProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
+        final WaitProject projectA = projects.createWaitAntProject(tmpDir, projectName + "A");
         projectA.getConfig().getDependencies().setStatus(IvyStatus.STATUS_RELEASE);
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        final WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        final WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA).setRevision(REVISION_LATEST_RELEASE);
         insertProject(projectB);
 
-        final WaitAntProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
+        final WaitProject projectC = projects.createWaitAntProject(tmpDir, projectName + "C");
         projectC.addDependency(projectB).setRevision(REVISION_LATEST_MILESTONE);
         insertProject(projectC);
 
-        final WaitAntProject projectD = projects.createWaitAntProject(tmpDir, projectName + "D");
+        final WaitProject projectD = projects.createWaitAntProject(tmpDir, projectName + "D");
         projectD.addDependency(projectC).setRevision(REVISION_LATEST_INTEGRATION);
         insertProject(projectD);
 
@@ -284,7 +284,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         ProjectConfigurationHelper projectA = projects.createFailAntProject(projectName + "A");
         insertProject(projectA);
 
-        WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         insertProject(projectB);
 
@@ -316,7 +316,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectA.getDefaultStage().setAgent(null);  // allow project A to run on any agent.
         insertProject(projectA);
 
-        WaitAntProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
+        WaitProject projectB = projects.createWaitAntProject(tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         projectB.clearTriggers();                   // do not want dependency trigger firing.
         insertProject(projectB);

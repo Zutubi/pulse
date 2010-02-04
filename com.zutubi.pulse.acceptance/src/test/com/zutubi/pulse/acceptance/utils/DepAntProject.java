@@ -13,7 +13,7 @@ import com.zutubi.util.StringUtils;
 /**
  * A project configuration setup for working with dep ant projects.
  */
-public class DepAntProject extends ProjectConfigurationHelper
+public class DepAntProject extends AntProjectHelper
 {
     // specific to the dep ant project.
     public static final String PROPERTY_CREATE_LIST = "create.list";
@@ -45,16 +45,6 @@ public class DepAntProject extends ProjectConfigurationHelper
         command.setArgs("-Dcreate.list=\"${" + PROPERTY_CREATE_LIST + "}\" -Dpresent.list=\"${" + PROPERTY_EXPECTED_LIST + "}\" -Dnot.present.list=\"${" + PROPERTY_NOT_EXPECTED_LIST + "}\"");
         return command;
     }
-
-    public ScmConfiguration createDefaultScm()
-    {
-        SubversionConfiguration svn = new SubversionConfiguration();
-        svn.setCheckoutScheme(CheckoutScheme.CLEAN_CHECKOUT);
-        svn.setMonitor(false);
-        svn.setUrl(Constants.DEP_ANT_REPOSITORY);
-        return svn;
-    }
-
 
     /**
      * Add a list of file paths that should be created by the execution of this build.
@@ -93,5 +83,4 @@ public class DepAntProject extends ProjectConfigurationHelper
             addStageProperty(stage, propertyName, StringUtils.join(",", paths));
         }
     }
-
 }

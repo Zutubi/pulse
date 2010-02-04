@@ -3,9 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
 import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.model.ProjectManager;
-
-import java.util.Hashtable;
 
 /**
  * A high level acceptance test that checks the ability to browse and select
@@ -13,11 +12,21 @@ import java.util.Hashtable;
  */
 public class BrowseScmAcceptanceTest extends SeleniumTestBase
 {
+    private static final String MAIN_TITLE_PREFIX = ":: pulse ::";
+    
+    private ConfigurationHelper configurationHelper;
+    private ProjectConfigurations projects;
+
     protected void setUp() throws Exception
     {
         super.setUp();
 
         loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(xmlRpcHelper);
+        projects = new ProjectConfigurations(configurationHelper);
     }
 
     protected void tearDown() throws Exception
@@ -26,8 +35,9 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         // logout fails with an error.  Avoid this by resetting the focused window.
         resetToPulseWindow();
 
+        xmlRpcHelper.logout();
         logout();
-        
+
         super.tearDown();
     }
 
@@ -36,7 +46,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         String[] titles = browser.getAllWindowTitles();
         for (String title : titles)
         {
-            if (title.startsWith(":: pulse ::"))
+            if (title.startsWith(MAIN_TITLE_PREFIX))
             {
                 browser.selectWindow(title);
                 return;
@@ -169,24 +179,26 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig() throws Exception
     {
-        Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.logout();
+        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig());
         return navigateToCommandConfig();
     }
 
     private AntCommandForm insertTestGitProjectAndNavigateToCommandConfig() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.logout();
+        configurationHelper.insertProject(projects.createGitAntProject(random).getConfig());
+        Thread.sleep(1000); // the browse links seem to be a little slow rendering for git, so add this pause.
         return navigateToCommandConfig();
     }
 
     private AntCommandForm navigateToCommandConfig()
     {
-        browser.open(urls.adminProject(random) + "/" + Constants.Project.TYPE + "/recipes/default/commands/build");
+        browser.open(urls.adminProject(random) + "/" +
+                Constants.Project.TYPE + "/" +
+                Constants.Project.MultiRecipeType.RECIPES + "/" +
+                Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME + "/" +
+                Constants.Project.MultiRecipeType.Recipe.COMMANDS + "/"+
+                Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND
+        );
         AntCommandForm antForm = browser.createForm(AntCommandForm.class);
         antForm.waitFor();
         return antForm;

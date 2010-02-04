@@ -1,17 +1,16 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
@@ -27,9 +26,6 @@ import java.util.Map;
  */
 public abstract class ProjectConfigurationHelper
 {
-    protected static final String ANT_PROCESSOR_NAME = "ant output processor";
-    protected static final String MAVEN2_PROCESSOR_NAME = "maven 2 output processor";
-
     private ProjectConfiguration config;
 
     public ProjectConfigurationHelper(ProjectConfiguration config)
@@ -51,20 +47,17 @@ public abstract class ProjectConfigurationHelper
      */
     public List<FileArtifactConfiguration> addArtifacts(String... paths)
     {
-        RecipeConfigurationHelper helper = getRecipe("default");
-        return helper.addArtifacts(paths);
+        return getRecipe(DEFAULT_RECIPE).addArtifacts(paths);
     }
 
     public FileArtifactConfiguration addArtifact(String name, String path)
     {
-        RecipeConfigurationHelper helper = getRecipe("default");
-        return helper.addArtifact(name, path);
+        return getRecipe(DEFAULT_RECIPE).addArtifact(name, path);
     }
 
     public DirectoryArtifactConfiguration addDirArtifact(String name, String path)
     {
-        RecipeConfigurationHelper helper = getRecipe("default");
-        return helper.addDirArtifact(name, path);
+        return getRecipe(DEFAULT_RECIPE).addDirArtifact(name, path);
     }
 
     /**
@@ -103,7 +96,17 @@ public abstract class ProjectConfigurationHelper
 
     public BuildStageConfiguration getDefaultStage()
     {
-        return getStage(ProjectConfigurationWizard.DEFAULT_STAGE);
+        return getStage(DEFAULT_STAGE);
+    }
+
+    public RecipeConfiguration getDefaultRecipe()
+    {
+        return getRecipe(DEFAULT_RECIPE).getConfig();
+    }
+
+    public CommandConfiguration getDefaultCommand()
+    {
+        return getDefaultRecipe().getCommands().get(DEFAULT_COMMAND);
     }
 
     public BuildStageConfiguration getStage(String stageName)
@@ -139,22 +142,12 @@ public abstract class ProjectConfigurationHelper
         RecipeConfiguration recipe = new RecipeConfiguration(recipeName);
         type.addRecipe(recipe);
 
-        recipe.addCommand(createDefaultCommand());
+        CommandConfiguration command = createDefaultCommand();
+        command.setName(DEFAULT_COMMAND);
+        recipe.addCommand(command);
 
         return new RecipeConfigurationHelper(recipe);
     }
-
-    public CommandConfiguration createDefaultCommand()
-    {
-        // might be better to put this in a 'addCommand' type method?
-        AntCommandConfiguration command = new AntCommandConfiguration();
-        command.setBuildFile("build.xml");
-        command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
-        command.addPostProcessor(config.getPostProcessors().get(ANT_PROCESSOR_NAME));
-        return command;
-    }
-
-    public abstract ScmConfiguration createDefaultScm();
 
     public RecipeConfigurationHelper getRecipe(String recipeName)
     {
@@ -194,4 +187,8 @@ public abstract class ProjectConfigurationHelper
     {
         getConfig().setOrganisation(org);
     }
+
+    public abstract CommandConfiguration createDefaultCommand();
+    public abstract List<String> getPostProcessorNames();
+    public abstract List<Class> getPostProcessorTypes();
 }

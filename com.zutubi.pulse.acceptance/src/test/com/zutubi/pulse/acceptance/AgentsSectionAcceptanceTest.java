@@ -104,7 +104,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
 
-        WaitAntProject project = projects.createWaitAntProject(tempDir, randomName());
+        WaitProject project = projects.createWaitAntProject(tempDir, randomName());
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
         configurationHelper.insertProject(project.getConfig());
 
@@ -144,8 +144,8 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         configurationHelper.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
 
         String random = randomName();
-        WaitAntProject project1 = projects.createWaitAntProject(tempDir, random + "-1");
-        WaitAntProject project2 = projects.createWaitAntProject(tempDir, random + "-2");
+        WaitProject project1 = projects.createWaitAntProject(tempDir, random + "-1");
+        WaitProject project2 = projects.createWaitAntProject(tempDir, random + "-2");
         project1.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent1));
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
         configurationHelper.insertProject(project1.getConfig());
@@ -204,7 +204,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
         assertFalse(statusPage.isExecutingBuildPresent());
 
-        WaitAntProject project = projects.createWaitAntProject(tempDir, random);
+        WaitProject project = projects.createWaitAntProject(tempDir, random);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
         configurationHelper.insertProject(project.getConfig());
         xmlRpcHelper.waitForProjectToInitialise(project.getName());

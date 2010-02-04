@@ -80,8 +80,8 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private int createAndRunMavenProject(String projectName, String pom, String goals) throws Exception
     {
-        DepMavenProject project = projects.createDepMavenProject(projectName);
-        Maven2CommandConfiguration command = (Maven2CommandConfiguration) project.getRecipe("default").getConfig().getCommands().get("build");
+        MavenProjectHelper project = projects.createDepMavenProject(projectName);
+        Maven2CommandConfiguration command = (Maven2CommandConfiguration) project.getDefaultCommand();
         command.setPomFile(pom);
         command.setSettingsFile("settings.xml");
         command.setGoals(goals);
@@ -93,8 +93,8 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private int createAndRunIvyAntProject(String target) throws Exception
     {
-        IvyAntProject project = projects.createIvyAntProject(random);
-        AntCommandConfiguration command = (AntCommandConfiguration) project.getRecipe("default").getConfig().getCommands().get("build");
+        AntProjectHelper project = projects.createIvyAntProject(random);
+        AntCommandConfiguration command = (AntCommandConfiguration) project.getDefaultCommand();
         command.setTargets(target);
         
         configurationHelper.insertProject(project.getConfig());
