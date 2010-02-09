@@ -161,7 +161,7 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         if (license.getType() == LicenseType.ENTERPRISE)
         {
-            license.setSupported(16, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupported(15, License.UNRESTRICTED, License.UNRESTRICTED);
             license.setSupportedContactPoints(License.UNRESTRICTED);
         }
         else if (license.getType() == LicenseType.EVALUATION)
@@ -177,7 +177,7 @@ public class LicenseEncoder implements LicenseKeyFactory
         }
         else if (license.getType() == LicenseType.PROFESSIONAL)
         {
-            license.setSupported(6, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupported(5, License.UNRESTRICTED, License.UNRESTRICTED);
             license.setSupportedContactPoints(License.UNRESTRICTED);
         }
         else if (license.getType() == LicenseType.SMALL_TEAM)
@@ -187,7 +187,7 @@ public class LicenseEncoder implements LicenseKeyFactory
         }
         else if (license.getType() == LicenseType.STANDARD)
         {
-            license.setSupported(2, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupported(1, License.UNRESTRICTED, License.UNRESTRICTED);
             license.setSupportedContactPoints(License.UNRESTRICTED);
         }
     }
