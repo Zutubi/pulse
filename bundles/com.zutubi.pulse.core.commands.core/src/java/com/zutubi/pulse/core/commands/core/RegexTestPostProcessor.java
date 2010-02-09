@@ -89,9 +89,15 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
                 {
                     String testName = m.group(config.getNameGroup());
                     String message = null;
-                    if (config.getDetailsGroup() >= 0)
+                    if (config.hasDetailsGroup())
                     {
                         message = m.group(config.getDetailsGroup());
+                    }
+
+                    String suiteName = null;
+                    if (config.hasSuiteGroup())
+                    {
+                        suiteName = m.group(config.getSuiteGroup());
                     }
 
                     TestStatus status = statusMap.get(statusString);
@@ -101,7 +107,20 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
                         status = TestStatus.FAILURE;
                     }
 
-                    tests.addCase(new TestCaseResult(testName, TestResult.DURATION_UNKNOWN, status, message));
+                    TestCaseResult testCaseResult = new TestCaseResult(testName, TestResult.DURATION_UNKNOWN, status, message);
+
+                    // Determine which suite we should add the test case to.
+                    TestSuiteResult suite = tests;
+                    if (suiteName != null)
+                    {
+                        suite = tests.findSuite(suiteName);
+                        if (suite == null)
+                        {
+                            suite = new TestSuiteResult(suiteName);
+                            tests.addSuite(suite);
+                        }
+                    }
+                    suite.addCase(testCaseResult);
                 }
                 else
                 {

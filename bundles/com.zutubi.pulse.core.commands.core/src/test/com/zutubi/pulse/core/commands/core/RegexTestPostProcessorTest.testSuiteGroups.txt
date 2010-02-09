@@ -1,0 +1,5 @@
+TEST INFO: Test suite: TestPSQLA - Test case: testQuery01 - Test detail: psql: Setup (3.88 sec) - Test Status: PASS
+TEST INFO: Test suite: TestPSQLA - Test case: testQuery02 - Test detail: psql: Setup (3.88 sec) - Test Status: PASS
+TEST INFO: Test suite: TestPSQLB - Test case: testQuery03 - Test detail: psql: Setup (3.88 sec) - Test Status: PASS
+TEST INFO: Test suite: TestPSQLC - Test case: testQuery04 - Test detail: psql: Setup (3.88 sec) - Test Status: PASS
+TEST INFO: Test suite: TestPSQLC - Test case: testQuery05 - Test detail: psql: Setup (3.88 sec) - Test Status: PASS

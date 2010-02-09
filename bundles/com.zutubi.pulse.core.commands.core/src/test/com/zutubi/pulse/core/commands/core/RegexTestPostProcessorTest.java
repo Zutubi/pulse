@@ -1,12 +1,10 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
-import com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.api.*;
 
 import java.io.IOException;
+import java.util.List;
 
 public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
 {
@@ -61,6 +59,40 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         TestCaseResult skippedCase = tests.findCase(" <SKIPPY>");
         assertNotNull(skippedCase);
         assertEquals(TestStatus.SKIPPED, skippedCase.getStatus());
+    }
+
+    public void testSuiteGroups() throws IOException
+    {
+        // TEST INFO: Test suite: TestPSQLA - Test case: testQuery01 - Test detail: psql: Setup (3.88 sec) - Test Status: PASS
+        RegexTestPostProcessorConfiguration pp = new RegexTestPostProcessorConfiguration();
+        pp.setRegex("TEST INFO: Test suite: (.*) - Test case: (.*) - Test detail: (.*) - Test Status: (.*)");
+        pp.setSuiteGroup(1);
+        pp.setNameGroup(2);
+        pp.setDetailsGroup(3);
+        pp.setStatusGroup(4);
+        pp.setPassStatus("PASS");
+        pp.setSuite("baseSuite");
+
+        RegexTestPostProcessor postProcessor = new RegexTestPostProcessor(pp);
+
+        TestSuiteResult tests = runProcessorAndGetTests(postProcessor, EXTENSION);
+        TestSuiteResult baseSuite = tests.getSuites().get(0);
+        assertEquals("baseSuite", baseSuite.getName());
+
+        List<TestSuiteResult> suites = baseSuite.getSuites();
+        assertEquals(3, suites.size());
+
+        TestSuiteResult suiteA = suites.get(0);
+        assertEquals("TestPSQLA", suiteA.getName());
+        assertEquals(2, suiteA.getCases().size());
+
+        TestSuiteResult suiteB = suites.get(1);
+        assertEquals("TestPSQLB", suiteB.getName());
+        assertEquals(1, suiteB.getCases().size());
+
+        TestSuiteResult suiteC = suites.get(2);
+        assertEquals("TestPSQLC", suiteC.getName());
+        assertEquals(2, suiteC.getCases().size());
     }
 
     private RegexTestPostProcessor createProcessor()

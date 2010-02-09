@@ -16,16 +16,19 @@ import java.util.Map;
  * Configuration for instances of {@link RegexTestPostProcessor}.
  */
 @SymbolicName("zutubi.regexTestPostProcessorConfig")
-@Form(fieldOrder = {"name", "regex", "nameGroup", "statusGroup", "detailsGroup", "passStatus", "failureStatus", "errorStatus", "skippedStatus", "autoFail", "trim", "suite", "failOnFailure", "resolveConflicts"})
+@Form(fieldOrder = {"name", "regex", "nameGroup", "suiteGroup", "statusGroup", "detailsGroup", "passStatus", "failureStatus", "errorStatus", "skippedStatus", "autoFail", "trim", "suite", "failOnFailure", "resolveConflicts"})
 public class RegexTestPostProcessorConfiguration extends TestReportPostProcessorConfigurationSupport
 {
+    private static final int UNDEFINED_GROUP = -1;
+
     @Required @ValidRegex @Content
     private String regex;
     @Required
     private int statusGroup;
     @Required
     private int nameGroup;
-    private int detailsGroup = -1;
+    private int detailsGroup = UNDEFINED_GROUP;
+    private int suiteGroup = UNDEFINED_GROUP;
 
     private boolean autoFail = false;
     private boolean trim = true;
@@ -104,6 +107,26 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
     public void setDetailsGroup(int detailsGroup)
     {
         this.detailsGroup = detailsGroup;
+    }
+
+    public boolean hasDetailsGroup()
+    {
+        return getDetailsGroup() != UNDEFINED_GROUP;
+    }
+
+    public int getSuiteGroup()
+    {
+        return suiteGroup;
+    }
+
+    public void setSuiteGroup(int suiteGroup)
+    {
+        this.suiteGroup = suiteGroup;
+    }
+
+    public boolean hasSuiteGroup()
+    {
+        return getSuiteGroup() != UNDEFINED_GROUP;
     }
 
     @Required

@@ -119,6 +119,7 @@
                 <ref local="addLdapPasswordAttribute"/>
                 <ref local="subversionExternalsMonitoring"/>
                 <ref local="addPerforceUnicodeConfiguration"/>
+                <ref local="addRegexTestPostProcessorSuiteGroupConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -576,5 +577,9 @@
 
     <bean id="addPerforceUnicodeConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceUnicodeConfigurationUpgradeTask">
         <property name="buildNumber" value="201014002"/>
+    </bean>
+
+    <bean id="addRegexTestPostProcessorSuiteGroupConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddRegexTestPostProcessorConfigurationSuiteGroupUpgradeTask">
+        <property name="buildNumber" value="201016001"/>
     </bean>
 </beans>
