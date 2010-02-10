@@ -304,7 +304,8 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         {
             for (EnvironmentConfiguration setting : configuredEnv)
             {
-                appendProperty(setting.getName(), setting.getValue(), buffer, separator);
+                String value = setting.getValue() != null ? setting.getValue() : "";
+                appendProperty(setting.getName(), value, buffer, separator);
             }
         }
         else
@@ -446,7 +447,8 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         // Finally things defined on the command
         for (EnvironmentConfiguration setting : getConfig().getEnvironments())
         {
-            childEnvironment.put(setting.getName(), setting.getValue());
+            String value = setting.getValue() != null ? setting.getValue() : "";
+            childEnvironment.put(setting.getName(), value);
         }
     }
 

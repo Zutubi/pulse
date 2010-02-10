@@ -16,7 +16,6 @@ public class EnvironmentConfiguration extends AbstractConfiguration
 {
     @Required
     private String name;
-    @Required
     private String value;
 
     public EnvironmentConfiguration()
