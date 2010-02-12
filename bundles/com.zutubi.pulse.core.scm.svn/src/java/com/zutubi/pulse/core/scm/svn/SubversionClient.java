@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
@@ -452,7 +454,10 @@ public class SubversionClient implements ScmClient
     private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, ScmException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-        PathFilter filter = new ExcludePathFilter(excludedPaths);
+        Predicate<String> filter = new ConjunctivePredicate<String>(
+                new ExcludePathPredicate(excludedPaths),
+                new PrefixPathFilter(repository.getLocation().getPath())
+        );
 
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)
@@ -465,7 +470,7 @@ public class SubversionClient implements ScmClient
             for (Object value : files.values())
             {
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                if (filter.accept(entryPath.getPath()))
+                if (filter.satisfied(entryPath.getPath()))
                 {
                     if (handler.handleChange(new FileChange(entryPath.getPath(), revision, decodeAction(entryPath.getType()))))
                     {

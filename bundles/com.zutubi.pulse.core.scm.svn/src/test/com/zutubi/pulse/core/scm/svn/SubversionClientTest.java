@@ -11,13 +11,12 @@ import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class SubversionClientTest extends PulseTestCase
 {
@@ -35,6 +34,7 @@ public class SubversionClientTest extends PulseTestCase
     private File expectedDir;
     private Process serverProcess;
     private PulseExecutionContext context;
+    private SVNClientManager clientManager;
 
 //    $ svn log -v svn://localhost/test
 //    ------------------------------------------------------------------------
@@ -111,11 +111,13 @@ public class SubversionClientTest extends PulseTestCase
         context.setWorkingDir(gotDir);
 
         unzipInput("data", repoDir);
-        serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr .", null, repoDir);
+        serverProcess = Runtime.getRuntime().exec("svnserve --foreground --listen-port=3690 --listen-host=127.0.0.1  -dr .", null, repoDir);
 
         TestUtils.waitForServer(3690);
 
-        client = new SubversionClient(TRUNK_PATH, false, USER, PASSWORD);
+        clientManager = SVNClientManager.newInstance(null, SVNWCUtil.createDefaultAuthenticationManager(USER, PASSWORD));
+
+        createSubversionClient(TRUNK_PATH);
     }
 
     protected void tearDown() throws Exception
@@ -123,14 +125,15 @@ public class SubversionClientTest extends PulseTestCase
         IOUtils.close(client);
         serverProcess.destroy();
         serverProcess.waitFor();
+        clientManager.dispose();
+        
         removeDirectory(tmpDir);
         super.tearDown();
     }
 
     public void testGetLatestRevision() throws ScmException
     {
-        IOUtils.close(client);
-        client = new SubversionClient("svn://localhost/", false, USER, PASSWORD);
+        client = createSubversionClient("svn://localhost/");
         assertEquals("8", client.getLatestRevision(null).getRevisionString());
     }
 
@@ -141,7 +144,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetLatestRevisionNewBranch() throws ScmException, SVNException
     {
-        SVNCopyClient client = SVNClientManager.newInstance(null, SVNWCUtil.createDefaultAuthenticationManager(USER, PASSWORD)).getCopyClient();
+        SVNCopyClient client = clientManager.getCopyClient();
         SVNCopySource[] copySource = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(TRUNK_PATH))};
         SVNCommitInfo info = client.doCopy(copySource, SVNURL.parseURIDecoded(BRANCH_PATH), false, true, true, "Create a branch", null);
 
@@ -153,7 +156,7 @@ public class SubversionClientTest extends PulseTestCase
     {
         try
         {
-            client = new SubversionClient("svn://localhost/no/such/repo", false, USER, PASSWORD);
+            client = createSubversionClient("svn://localhost/no/such/repo");
             client.getLatestRevision(null);
             fail();
         }
@@ -362,6 +365,59 @@ public class SubversionClientTest extends PulseTestCase
         {
             IOUtils.close(server);
         }
+    }
+
+    // CIB-2322: Svn: Unexpected scm trigger when using filters.
+    public void testChangesOutsideBasePathIgnored() throws ScmException, IOException, SVNException
+    {
+        File workDir = context.getWorkingDir();
+        client.checkout(context, createRevision(8), null);
+
+        // make change to multiple directories.
+        long revision = doAddAndCommit(workDir, "afolder/newfile.txt", "bfolder/newfile.txt");
+
+        // drop into a subdirectory to isolate the two changes.
+        client = createSubversionClient(TRUNK_PATH + "/afolder");
+        List<Changelist> changelists = client.getChanges(null, createRevision(8), createRevision(revision));
+
+        Changelist changelist = changelists.get(0);
+        assertEquals(1, changelist.getChanges().size());
+        assertEquals("/test/trunk/afolder/newfile.txt", changelist.getChanges().get(0).getPath());
+
+        // exclude the new changes
+        client.setExcludedPaths(Arrays.asList("**/afolder/**"));
+        changelists = client.getChanges(null, createRevision(8), createRevision(revision));
+
+        assertEquals(0, changelists.size());
+    }
+
+    private long doAddAndCommit(File baseDir, String... paths) throws IOException, SVNException
+    {
+        SVNWCClient wcClient = clientManager.getWCClient();
+
+        List<File> filesToAdd = new LinkedList<File>();
+        for (String path : paths)
+        {
+            File newFile = new File(baseDir, path);
+            FileSystemUtils.createFile(newFile, newFile.getAbsolutePath());
+            filesToAdd.add(newFile);
+            wcClient.doAdd(newFile, true, false, false, SVNDepth.INFINITY, false, false);
+        }
+
+        SVNCommitInfo info = clientManager.getCommitClient().doCommit(filesToAdd.toArray(new File[filesToAdd.size()]), true, "add file", null, null, false, false, SVNDepth.EMPTY);
+
+        return info.getNewRevision();
+    }
+
+    private SubversionClient createSubversionClient(String path) throws ScmException
+    {
+        if (client != null)
+        {
+            IOUtils.close(client);
+        }
+
+        client = new SubversionClient(path, false, USER, PASSWORD);
+        return client;
     }
 
     private void assertRevision(File dir, int revision) throws IOException

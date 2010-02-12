@@ -1,12 +1,9 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.scm.api.Changelist;
-import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.util.Predicate;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Helpers shared amongst SCM implementations.
@@ -18,22 +15,20 @@ public class ScmUtils
      * accepted by the filter.
      *
      * @param changelists the changelists whose changes are analysed
-     * @param filter the filter that determines which paths are accepted and which are filtered.
+     * @param predicate the filter that determines which paths are accepted and which are filtered.
      *
      * @return the filtered list of changelists.
      */
-    public static List<Changelist> filter(List<Changelist> changelists, PathFilter filter)
+    public static List<Changelist> filter(List<Changelist> changelists, Predicate<String> predicate)
     {
         List<Changelist> filteredChangelists = new LinkedList<Changelist>();
 
-        Iterator<Changelist> changelist = changelists.iterator();
-        while (changelist.hasNext())
+        for (Changelist ch : changelists)
         {
             List<FileChange> changes = new LinkedList<FileChange>();
-            Changelist ch = changelist.next();
             for (FileChange c : ch.getChanges())
             {
-                if (filter == null || filter.accept(c.getPath()))
+                if (predicate == null || predicate.satisfied(c.getPath()))
                 {
                     changes.add(c);
                 }

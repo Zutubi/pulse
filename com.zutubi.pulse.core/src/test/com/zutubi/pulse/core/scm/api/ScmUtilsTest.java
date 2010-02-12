@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.Predicate;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -23,11 +24,11 @@ public class ScmUtilsTest extends PulseTestCase
         assertEquals(0, changelists.size());
     }
 
-    private PathFilter newPathFilter(final String endsWith)
+    private Predicate<String> newPathFilter(final String endsWith)
     {
-        return new PathFilter()
+        return new Predicate<String>()
         {
-            public boolean accept(String path)
+            public boolean satisfied(String path)
             {
                 return path.endsWith(endsWith);
             }

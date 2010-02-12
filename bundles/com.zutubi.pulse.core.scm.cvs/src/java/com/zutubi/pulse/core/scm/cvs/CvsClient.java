@@ -482,7 +482,7 @@ public class CvsClient implements ScmClient
         List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
-        changes = ScmUtils.filter(changes, new ExcludePathFilter(excludedPaths));
+        changes = ScmUtils.filter(changes, new ExcludePathPredicate(excludedPaths));
         if (changes.size() == 0)
         {
             return changes;

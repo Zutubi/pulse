@@ -8,7 +8,7 @@ import java.util.Arrays;
  * Note: we don't exhaustively test wildcards: we assume Ant works.  We do,
  * however, do a few trivial tests, then test for our special cases.
  */
-public class ExcludePathFilterTest extends PulseTestCase
+public class ExcludePathPredicateTest extends PulseTestCase
 {
     public void testIdentical()
     {
@@ -82,7 +82,7 @@ public class ExcludePathFilterTest extends PulseTestCase
 
     private void assertAccepts(String exclude, String path, boolean accept)
     {
-        ExcludePathFilter filter = new ExcludePathFilter(Arrays.asList(exclude));
-        assertEquals(accept, filter.accept(path));
+        ExcludePathPredicate predicate = new ExcludePathPredicate(Arrays.asList(exclude));
+        assertEquals(accept, predicate.satisfied(path));
     }
 }

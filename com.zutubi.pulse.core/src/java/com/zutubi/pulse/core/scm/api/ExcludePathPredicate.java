@@ -2,18 +2,28 @@ package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 
 import java.io.File;
 import java.util.List;
 
 /**
+ * A predicate that is satisfied if and only if the tested string
+ * is not matched by one of the excluded paths.
+ *
+ * The excluded path format uses ant selector formatting.
+ * <ul>
+ * <li>** - matches multiple path components, ie: this/path/is/matched.</li>
+ * <li>*  - matches a single path component.</li>
+ * <li>the rest is matched literally.</li>
+ * </ul>
  */
-public class ExcludePathFilter implements PathFilter
+public class ExcludePathPredicate implements Predicate<String>
 {
     private List<String> excludedPaths = null;
 
-    public ExcludePathFilter(List<String> excludedPaths)
+    public ExcludePathPredicate(List<String> excludedPaths)
     {
         this.excludedPaths = CollectionUtils.map(excludedPaths, new Mapping<String, String>()
         {
@@ -24,7 +34,7 @@ public class ExcludePathFilter implements PathFilter
         });
     }
 
-    public boolean accept(String path)
+    public boolean satisfied(String path)
     {
         path = normalisePath(path);
 
