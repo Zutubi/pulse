@@ -1,10 +1,14 @@
 package com.zutubi.pulse.core.commands.core;
 
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
-import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
 {
@@ -93,6 +97,20 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         TestSuiteResult suiteC = suites.get(2);
         assertEquals("TestPSQLC", suiteC.getName());
         assertEquals(2, suiteC.getCases().size());
+    }
+
+    public void testNoCaseName() throws IOException
+    {
+        RegexTestPostProcessorConfiguration config = new RegexTestPostProcessorConfiguration();
+        config.setRegex("(?:(a.*)|nota.*): (.*)");
+        config.setNameGroup(1);
+        config.setStatusGroup(2);
+        
+        RegexTestPostProcessor pp = new RegexTestPostProcessor(config);
+        TestSuiteResult tests = runProcessorAndGetTests(pp, EXTENSION);
+        assertEquals(1, tests.getTotal());
+        assertNull(tests.findCase("notaname"));
+        assertNotNull(tests.findCase("aname"));
     }
 
     private RegexTestPostProcessor createProcessor()

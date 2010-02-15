@@ -1,13 +1,15 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +22,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 {
     private static final Logger LOG = Logger.getLogger(RegexTestPostProcessor.class);
 
-    private BufferedReader reader;
+    private LineNumberReader reader;
 
     private String currentLine;
 
@@ -37,22 +39,12 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     public void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
-        // clean up any whitespace from the regex which may have been added via the setText()
-        RegexTestPostProcessorConfiguration config = getConfig();
-        String regex = config.getRegex();
-        if (config.isTrim())
-        {
-            regex = regex.trim();
-        }
-
         try
         {
-            reader = new BufferedReader(new FileReader(file));
-
-            // read until you locate the start of a test suite.
+            reader = new LineNumberReader(new FileReader(file));
             try
             {
-                processFile(tests, regex);
+                processFile(tests, ppContext);
             }
             catch (IllegalStateException e)
             {
@@ -71,69 +63,77 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
         }
     }
 
-    private void processFile(TestSuiteResult tests, String regex) throws IOException
+    private void processFile(TestSuiteResult tests, PostProcessorContext ppContext) throws IOException
     {
         RegexTestPostProcessorConfiguration  config = getConfig();
         Map<String, TestStatus> statusMap = config.getStatusMap();
 
+        // clean up any whitespace from the regex which may have been added via the setText()
+        String regex = config.getRegex();
+        if (config.isTrim())
+        {
+            regex = regex.trim();
+        }
+
         Pattern pattern = Pattern.compile(regex);
 
-        currentLine = nextLine();
+        currentLine = reader.readLine();
         while (currentLine != null)
         {
             Matcher m = pattern.matcher(currentLine);
             if (m.matches())
             {
                 String statusString = m.group(config.getStatusGroup());
-                if(config.isAutoFail() || statusMap.containsKey(statusString))
+                if (config.isAutoFail() || statusMap.containsKey(statusString))
                 {
                     String testName = m.group(config.getNameGroup());
-                    String message = null;
-                    if (config.hasDetailsGroup())
+                    if (StringUtils.stringSet(testName))
                     {
-                        message = m.group(config.getDetailsGroup());
-                    }
-
-                    String suiteName = null;
-                    if (config.hasSuiteGroup())
-                    {
-                        suiteName = m.group(config.getSuiteGroup());
-                    }
-
-                    TestStatus status = statusMap.get(statusString);
-                    if(status == null)
-                    {
-                        // Must be auto-fail case
-                        status = TestStatus.FAILURE;
-                    }
-
-                    TestCaseResult testCaseResult = new TestCaseResult(testName, TestResult.DURATION_UNKNOWN, status, message);
-
-                    // Determine which suite we should add the test case to.
-                    TestSuiteResult suite = tests;
-                    if (suiteName != null)
-                    {
-                        suite = tests.findSuite(suiteName);
-                        if (suite == null)
+                        String message = null;
+                        if (config.hasDetailsGroup())
                         {
-                            suite = new TestSuiteResult(suiteName);
-                            tests.addSuite(suite);
+                            message = m.group(config.getDetailsGroup());
                         }
+
+                        String suiteName = null;
+                        if (config.hasSuiteGroup())
+                        {
+                            suiteName = m.group(config.getSuiteGroup());
+                        }
+
+                        TestStatus status = statusMap.get(statusString);
+                        if (status == null)
+                        {
+                            // Must be auto-fail case
+                            status = TestStatus.FAILURE;
+                        }
+
+                        TestCaseResult testCaseResult = new TestCaseResult(testName, TestResult.DURATION_UNKNOWN, status, message);
+
+                        // Determine which suite we should add the test case to.
+                        TestSuiteResult suite = tests;
+                        if (StringUtils.stringSet(suiteName))
+                        {
+                            suite = tests.findSuite(suiteName);
+                            if (suite == null)
+                            {
+                                suite = new TestSuiteResult(suiteName);
+                                tests.addSuite(suite);
+                            }
+                        }
+                        suite.addCase(testCaseResult);
                     }
-                    suite.addCase(testCaseResult);
+                    else
+                    {
+                        ppContext.addFeature(new Feature(Feature.Level.WARNING, currentLine + ": Line matches expression '" + regex + "' but has no test case name (name group: " + config.getNameGroup() + ")", reader.getLineNumber()));
+                    }
                 }
                 else
                 {
-                    LOG.warning("Test with unrecognised status '" + statusString + "'");
+                    ppContext.addFeature(new Feature(Feature.Level.WARNING, currentLine + ": Test with unrecognised status '" + statusString + "'", reader.getLineNumber()));
                 }
             }
-            currentLine = nextLine();
+            currentLine = reader.readLine();
         }
-    }
-
-    private String nextLine() throws IOException
-    {
-        currentLine = reader.readLine();
-        return currentLine;
     }
 }
