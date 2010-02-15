@@ -6,12 +6,13 @@ import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryFunction;
 
 import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * A task to upgrade the template-based builtin project types (Ant, Make, etc)
@@ -38,7 +39,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
     private static final String PROPERTY_INDEX = "index";
     private static final String PROPERTY_FOLLOW_SYMLINKS = "followSymlinks";
     private static final String PROPERTY_INCLUSIONS = "inclusions";
-    private static final String PROEPRTY_EXCLUSIONS = "exclusions";
+    private static final String PROPERTY_EXCLUSIONS = "exclusions";
     private static final String PROPERTY_BASE = "base";
     private static final String PROPERTY_INCLUDES = "includes";
     private static final String PROPERTY_EXCLUDES = "excludes";
@@ -212,9 +213,9 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
     {
         Record oldArtifacts = (Record) oldTypeRecord.get(PROPERTY_ARTIFACTS);
         MutableRecord newArtifacts = new MutableRecordImpl();
-        for (Object o: oldArtifacts.values())
+        for (String key: oldArtifacts.nestedKeySet())
         {
-            Record oldArtifact = (Record) o;
+            Record oldArtifact = (Record) oldArtifacts.get(key);
 
             MutableRecord newArtifact = new MutableRecordImpl();
             String name = (String) copyValueIfPresent(oldArtifact, PROPERTY_NAME, newArtifact);
@@ -235,8 +236,14 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
                     newArtifact.put(PROPERTY_FOLLOW_SYMLINKS, "false");
                 }
                 copyValueIfPresent(oldArtifact, PROPERTY_BASE, newArtifact);
-                newArtifact.put(PROPERTY_INCLUSIONS, splitString((String) oldArtifact.get(PROPERTY_INCLUDES)));
-                newArtifact.put(PROEPRTY_EXCLUSIONS, splitString((String) oldArtifact.get(PROPERTY_EXCLUDES)));
+                if (oldArtifact.containsKey(PROPERTY_INCLUDES))
+                {
+                    newArtifact.put(PROPERTY_INCLUSIONS, splitString((String) oldArtifact.get(PROPERTY_INCLUDES)));
+                }
+                if (oldArtifact.containsKey(PROPERTY_EXCLUDES))
+                {
+                    newArtifact.put(PROPERTY_EXCLUSIONS, splitString((String) oldArtifact.get(PROPERTY_EXCLUDES)));
+                }
                 mapPostProcessors(oldArtifact, newArtifact, postProcessorMappings, projectHierarchy);
             }
             else
@@ -245,7 +252,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
                 copyValueIfPresent(oldArtifact, PROPERTY_FILE, newArtifact);
             }
 
-            newArtifacts.put(name, newArtifact);
+            newArtifacts.put(key, newArtifact);
         }
         
         newCommandRecord.put(PROPERTY_ARTIFACTS, newArtifacts);
