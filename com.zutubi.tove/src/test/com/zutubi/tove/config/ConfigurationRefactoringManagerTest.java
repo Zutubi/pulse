@@ -2093,12 +2093,4 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
             this.value = value;
         }
     }
-
-/*
-    @SymbolicName("z")
-    public static class ConfigZ extends AbstractNamedConfiguration
-    {
-
-    }
-*/
 }
