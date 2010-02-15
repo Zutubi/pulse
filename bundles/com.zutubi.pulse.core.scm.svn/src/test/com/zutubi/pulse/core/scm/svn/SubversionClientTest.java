@@ -111,7 +111,7 @@ public class SubversionClientTest extends PulseTestCase
         context.setWorkingDir(gotDir);
 
         unzipInput("data", repoDir);
-        serverProcess = Runtime.getRuntime().exec("svnserve --foreground --listen-port=3690 --listen-host=127.0.0.1  -dr .", null, repoDir);
+        serverProcess = Runtime.getRuntime().exec(new String[]{"svnserve", "--foreground", "--listen-port=3690", "--listen-host=127.0.0.1", "-dr", "."}, null, repoDir);
 
         TestUtils.waitForServer(3690);
 
@@ -370,23 +370,16 @@ public class SubversionClientTest extends PulseTestCase
     // CIB-2322: Svn: Unexpected scm trigger when using filters.
     public void testChangesOutsideBasePathIgnored() throws ScmException, IOException, SVNException
     {
-        File workDir = context.getWorkingDir();
-        client.checkout(context, createRevision(8), null);
-
-        // make change to multiple directories.
-        long revision = doAddAndCommit(workDir, "afolder/newfile.txt", "bfolder/newfile.txt");
-
         // drop into a subdirectory to isolate the two changes.
         client = createSubversionClient(TRUNK_PATH + "/afolder");
-        List<Changelist> changelists = client.getChanges(null, createRevision(8), createRevision(revision));
+        List<Changelist> changelists = client.getChanges(null, createRevision(0), createRevision(1));
 
         Changelist changelist = changelists.get(0);
-        assertEquals(1, changelist.getChanges().size());
-        assertEquals("/test/trunk/afolder/newfile.txt", changelist.getChanges().get(0).getPath());
+        assertEquals(8, changelist.getChanges().size());
 
         // exclude the new changes
         client.setExcludedPaths(Arrays.asList("**/afolder/**"));
-        changelists = client.getChanges(null, createRevision(8), createRevision(revision));
+        changelists = client.getChanges(null, createRevision(0), createRevision(1));
 
         assertEquals(0, changelists.size());
     }

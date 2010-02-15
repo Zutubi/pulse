@@ -454,32 +454,54 @@ public class SubversionClient implements ScmClient
     private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, ScmException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-        Predicate<String> filter = new ConjunctivePredicate<String>(
-                new ExcludePathPredicate(excludedPaths),
+        Predicate<String> changelistFilter = new ExcludePathPredicate(excludedPaths);
+
+        Predicate<String> hasChangedFilter = new ConjunctivePredicate<String>(
+                changelistFilter,
                 new PrefixPathFilter(repository.getLocation().getPath())
         );
 
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
-        for (SVNLogEntry entry : logs)
+
+        // First, check for changes within the base svn url.
+        boolean changed = false;
+        outer: for (SVNLogEntry entry : logs)
         {
-            Revision revision = new Revision(entry.getRevision());
-            handler.startChangelist(revision, entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
-
             Map files = entry.getChangedPaths();
-
             for (Object value : files.values())
             {
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                if (filter.satisfied(entryPath.getPath()))
+                if (hasChangedFilter.satisfied(entryPath.getPath()))
                 {
-                    if (handler.handleChange(new FileChange(entryPath.getPath(), revision, decodeAction(entryPath.getType()))))
-                    {
-                        return true;
-                    }
+                    changed = true;
+                    break outer;
                 }
             }
         }
 
+        if (changed)
+        {
+            // If we have changes, remove only those paths that are explicitly filtered.
+            for (SVNLogEntry entry : logs)
+            {
+                Revision revision = new Revision(entry.getRevision());
+                handler.startChangelist(revision, entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
+
+                Map files = entry.getChangedPaths();
+
+                for (Object value : files.values())
+                {
+                    SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
+                    if (changelistFilter.satisfied(entryPath.getPath()))
+                    {
+                        if (handler.handleChange(new FileChange(entryPath.getPath(), revision, decodeAction(entryPath.getType()))))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 

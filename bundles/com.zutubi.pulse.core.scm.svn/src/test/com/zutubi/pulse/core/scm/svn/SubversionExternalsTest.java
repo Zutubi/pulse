@@ -26,6 +26,7 @@ public class SubversionExternalsTest extends PulseTestCase
     private File tempDir;
     private File checkoutDir;
     private Process svnProcess;
+    private SVNClientManager clientManager;
 
     //    jsankey@tiberius-v ~/ext/all
     //    $ svn -v log
@@ -129,10 +130,24 @@ public class SubversionExternalsTest extends PulseTestCase
         svnProcess.waitFor();
 
         // Start svn server
-        svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", "."}, null, repoDir);
+        svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "--listen-port=3690", "--listen-host=127.0.0.1", "-dr", "."}, null, repoDir);
         TestUtils.waitForServer(3690);
 
         client = new SubversionClient(getRepoUrl(), false);
+
+        clientManager = SVNClientManager.newInstance();
+    }
+
+    protected void tearDown() throws Exception
+    {
+        IOUtils.close(client);
+        ProcessControl.destroyProcess(svnProcess);
+        svnProcess.waitFor();
+        clientManager.dispose();
+        Thread.sleep(1000);
+
+        removeDirectory(tempDir);
+        super.tearDown();
     }
 
     private String getRepoTag()
@@ -148,17 +163,6 @@ public class SubversionExternalsTest extends PulseTestCase
     private boolean isNested()
     {
         return getName().contains("Nested");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        IOUtils.close(client);
-        ProcessControl.destroyProcess(svnProcess);
-        svnProcess.waitFor();
-        Thread.sleep(1000);
-        
-        removeDirectory(tempDir);
-        super.tearDown();
     }
 
     public void testGetExternals() throws Exception
@@ -246,7 +250,6 @@ public class SubversionExternalsTest extends PulseTestCase
 
         File f1 = new File(checkoutDir, "pull1/file1");
         FileSystemUtils.createFile(f1, "edit in external");
-        SVNClientManager clientManager = SVNClientManager.newInstance();
         clientManager.getCommitClient().doCommit(new File[] { f1 }, true, "edit ext", null, null, false, false, SVNDepth.EMPTY);
         
         assertEquals("9", client.getLatestRevision(null).getRevisionString());
@@ -438,29 +441,6 @@ public class SubversionExternalsTest extends PulseTestCase
     {
         File f = new File(checkoutDir, path);
         assertEquals(content, IOUtils.fileToString(f));
-    }
-
-    public static void main(String[] argv) throws ScmException
-    {
-        SubversionClient server = null;
-        try
-        {
-            server = new SubversionClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk", false);
-            server.addExternalPath(".");
-            List<Changelist> changelists = server.getChanges(null, createRevision(6600), createRevision(6603));
-            for(Changelist list: changelists)
-            {
-                System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());
-                for(FileChange change: list.getChanges())
-                {
-                    System.out.println("    " + change.toString());
-                }
-            }
-        }
-        finally
-        {
-            IOUtils.close(server);
-        }
     }
 
     private static Revision createRevision(long rev)
