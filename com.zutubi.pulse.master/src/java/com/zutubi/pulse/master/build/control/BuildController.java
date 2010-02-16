@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.build.control;
 
-import com.zutubi.pulse.core.scm.api.Revision;
-
 /**
  * The build controller interface is designed to provide an abstraction between
  * the build management and the build processing system.
@@ -11,17 +9,6 @@ import com.zutubi.pulse.core.scm.api.Revision;
  */
 public interface BuildController
 {
-    /**
-     * Update the build revision associated with the build if
-     * that revision has not yet been fixed.  Return true if the
-     * revision was updated, false otherwise.
-     *
-     * @param revision the revision to update to.
-     *
-     * @return true if the handled build revision was updated, false otherwise.
-     */
-    boolean updateRevisionIfNotFixed(Revision revision);
-
     /**
      * Get the build result id associated with this build.
      * @return build result id.

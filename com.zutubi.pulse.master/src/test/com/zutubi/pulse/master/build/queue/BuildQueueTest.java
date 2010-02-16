@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
@@ -9,9 +8,9 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 public class BuildQueueTest extends BaseQueueTestCase
 {
@@ -177,11 +176,8 @@ public class BuildQueueTest extends BaseQueueTestCase
     {
         Project projectA = createProject("a");
 
-        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, new Revision("2"));
-
-        BuildController controller = controllers.get(requestA);
-        doReturn(true).when(controller).updateRevisionIfNotFixed(new Revision("2"));
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, null);
+        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, null);
 
         buildQueue.enqueue(active(requestA));
         buildQueue.enqueue(queue(requestB));
@@ -190,7 +186,6 @@ public class BuildQueueTest extends BaseQueueTestCase
         assertQueued();
 
         verify(buildRequestRegistry, times(1)).requestAssimilated(requestB, requestA.getId());
-        verify(controller, times(1)).updateRevisionIfNotFixed(new Revision("2"));
     }
 
     public void testAssimilationIntoQueuedRequest()
@@ -213,7 +208,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         List<BuildRequestEvent> requests = new LinkedList<BuildRequestEvent>();
         for (Project p : projects)
         {
-            requests.add(createRequest(p, "sourceA", true, new Revision("1")));
+            requests.add(createRequest(p, "sourceA", true, null));
         }
 
         buildQueue.enqueue(CollectionUtils.map(requests, new Mapping<BuildRequestEvent, QueuedRequest>()
@@ -230,7 +225,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         List<BuildRequestEvent> requestsToBeAssimilated = new LinkedList<BuildRequestEvent>();
         for (Project p : projects)
         {
-            requestsToBeAssimilated.add(createRequest(p, "sourceA", true, new Revision("2")));
+            requestsToBeAssimilated.add(createRequest(p, "sourceA", true, null));
         }
 
         buildQueue.enqueue(CollectionUtils.map(requestsToBeAssimilated, new Mapping<BuildRequestEvent, QueuedRequest>()
@@ -255,16 +250,16 @@ public class BuildQueueTest extends BaseQueueTestCase
         Project utilityProject = createProject("utility");
         Project clientProject = createProject("client");
 
-        BuildRequestEvent utilityRequestA = createRequest(utilityProject, "sourceA", true, new Revision("1"));
-        BuildRequestEvent clientRequestA = createRequest(clientProject, "sourceA", true, new Revision("1"));
+        BuildRequestEvent utilityRequestA = createRequest(utilityProject, "sourceA", true, null);
+        BuildRequestEvent clientRequestA = createRequest(clientProject, "sourceA", true, null);
 
         buildQueue.enqueue(queue(utilityRequestA), queue(clientRequestA));
 
         assertActivated();
         assertQueued(utilityRequestA, clientRequestA);
 
-        BuildRequestEvent utilityRequestB = createRequest(utilityProject, "sourceA", true, new Revision("1"));
-        BuildRequestEvent clientRequestB = createRequest(clientProject, "sourceB", true, new Revision("1"));
+        BuildRequestEvent utilityRequestB = createRequest(utilityProject, "sourceA", true, null);
+        BuildRequestEvent clientRequestB = createRequest(clientProject, "sourceB", true, null);
 
         buildQueue.enqueue(queue(utilityRequestB), queue(clientRequestB));
 
@@ -278,11 +273,8 @@ public class BuildQueueTest extends BaseQueueTestCase
     {
         Project projectA = createProject("a");
 
-        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(projectA, "sourceB", true, new Revision("2"));
-
-        BuildController controller = controllers.get(requestA);
-        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, null);
+        BuildRequestEvent requestB = createRequest(projectA, "sourceB", true, null);
 
         buildQueue.enqueue(active(requestA), queue(requestB));
 
@@ -294,11 +286,8 @@ public class BuildQueueTest extends BaseQueueTestCase
 
     public void testNoAssimilationIfOwnersAreDifferent()
     {
-        BuildRequestEvent requestA = createRequest(createProject("A"), "sourceA", true, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(createProject("B"), "sourceA", true, new Revision("2"));
-
-        BuildController controller = controllers.get(requestA);
-        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+        BuildRequestEvent requestA = createRequest(createProject("A"), "sourceA", true, null);
+        BuildRequestEvent requestB = createRequest(createProject("B"), "sourceA", true, null);
 
         buildQueue.enqueue(active(requestA), queue(requestB));
 
@@ -311,8 +300,8 @@ public class BuildQueueTest extends BaseQueueTestCase
     public void testNoAssimilationIfReplaceableOnTargetRequestIsFalse()
     {
         Project project = createProject("A");
-        BuildRequestEvent requestA = createRequest(project, "sourceA", false, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(project, "sourceA", true, new Revision("2"));
+        BuildRequestEvent requestA = createRequest(project, "sourceA", false, null);
+        BuildRequestEvent requestB = createRequest(project, "sourceA", true, null);
 
         buildQueue.enqueue(active(requestA));
         buildQueue.enqueue(queue(requestB));
@@ -326,8 +315,8 @@ public class BuildQueueTest extends BaseQueueTestCase
     public void testNoAssimilationIfReplaceableOnSourceRequestIsFalse()
     {
         Project project = createProject("A");
-        BuildRequestEvent requestA = createRequest(project, "sourceA", true, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(project, "sourceA", false, new Revision("2"));
+        BuildRequestEvent requestA = createRequest(project, "sourceA", true, null);
+        BuildRequestEvent requestB = createRequest(project, "sourceA", false, null);
 
         buildQueue.enqueue(active(requestA));
         buildQueue.enqueue(queue(requestB));
@@ -343,12 +332,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         Project project = createProject("A");
         BuildRequestEvent requestA = createRequest(project, "sourceA", true, new Revision("1"));
 
-        // lock the request A revision.
-        requestA.getRevision().lock();
-        requestA.getRevision().fix();
-        requestA.getRevision().unlock();
-
-        BuildRequestEvent requestB = createRequest(project, "sourceA", true, new Revision("2"));
+        BuildRequestEvent requestB = createRequest(project, "sourceA", true, null);
 
         buildQueue.enqueue(active(requestA));
         buildQueue.enqueue(queue(requestB));
@@ -364,12 +348,9 @@ public class BuildQueueTest extends BaseQueueTestCase
         Project projectA = createProject("a");
         Project projectB = createProject("b");
 
-        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, new Revision("1"));
-        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, new Revision("2"));
-        BuildRequestEvent requestX = createRequest(projectB, "sourceA", true, new Revision("3"));
-
-        BuildController controller = controllers.get(requestA);
-        doReturn(true).when(controller).updateRevisionIfNotFixed((Revision) anyObject());
+        BuildRequestEvent requestA = createRequest(projectA, "sourceA", true, null);
+        BuildRequestEvent requestB = createRequest(projectA, "sourceA", true, null);
+        BuildRequestEvent requestX = createRequest(projectB, "sourceA", true, null);
 
         buildQueue.enqueue(active(requestX), active(requestA), queue(requestB, new DependencyCompleteQueuePredicate(buildQueue, projectB)));
 

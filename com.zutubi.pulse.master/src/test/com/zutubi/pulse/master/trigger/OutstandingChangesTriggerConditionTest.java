@@ -112,18 +112,14 @@ public class OutstandingChangesTriggerConditionTest extends PulseTestCase
     
     private BuildRequestEvent makeRequest(Revision revision, boolean fixed)
     {
-        BuildRevision buildRevision = new BuildRevision(revision, false);
+        BuildRevision buildRevision;
         if (fixed)
         {
-            buildRevision.lock();
-            try
-            {
-                buildRevision.fix();
-            }
-            finally
-            {
-                buildRevision.unlock();
-            }
+            buildRevision = new BuildRevision(revision, false);
+        }
+        else
+        {
+            buildRevision = new BuildRevision();
         }
         return new SingleBuildRequestEvent(this, project, buildRevision, new TriggerOptions(null, null));
     }

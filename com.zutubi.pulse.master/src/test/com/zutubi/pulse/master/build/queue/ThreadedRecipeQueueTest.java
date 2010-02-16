@@ -394,47 +394,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         assertEquals(0, queue.length());
     }
 
-    public void testRevisionUpdateWhileQueued() throws Exception
-    {
-        ProjectConfiguration projectConfig = createProjectConfig();
-        queue.enqueue(createAssignmentRequest(0, 1000, projectConfig));
-        RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
-        queue.enqueue(queuedRequest);
-
-        Agent agent = createAvailableAgent(0);
-        awaitBuild();
-        awaitDispatched();
-
-        BuildRevision queuedRevision = queuedRequest.getRevision();
-        updateRevision(queuedRevision, 98);
-
-        queue.handleEvent(new BuildRevisionUpdatedEvent(this, queuedRequest.getBuild(), queuedRevision));
-        sendAvailable(agent);
-        awaitBuild();
-        awaitDispatched();
-        assertEquals(1001, assignedEvent.getRequest().getId());
-    }
-
-    public void testRevisionUpdateMakesUnfulfillable() throws Exception
-    {
-        ProjectConfiguration projectConfig = createProjectConfig(12);
-        queue.enqueue(createAssignmentRequest(0, 1000, projectConfig));
-        RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
-        queue.enqueue(queuedRequest);
-
-        queue.setUnsatisfiableTimeout(0);
-        createAvailableAgent(0);
-        awaitBuild();
-
-        // Negative revision will be rejected by mock
-        BuildRevision queuedRevision = queuedRequest.getRevision();
-        updateRevision(queuedRevision, -1);
-
-        queue.handleEvent(new BuildRevisionUpdatedEvent(this, queuedRequest.getBuild(), queuedRevision));
-        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1001, "No online agent is capable of executing the build stage");
-    }
-
     public void testRevisionUpdateOtherBuild() throws Exception
     {
         ProjectConfiguration projectConfig = createProjectConfig(12);
@@ -450,8 +409,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         // Negative revision will be rejected by mock
         BuildResult anotherBuild = new BuildResult();
         anotherBuild.setId(queuedRequest.getBuild().getId() + 1);
-        BuildRevision anotherRevision = new BuildRevision();
-        updateRevision(anotherRevision, -1);
+        BuildRevision anotherRevision = new BuildRevision(createRevision(-1), false);
         queue.handleEvent(new BuildRevisionUpdatedEvent(this, anotherBuild, anotherRevision));
 
         // Despite updating another build to a rejected revision, this build
@@ -464,15 +422,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
     private void updateRevision(BuildRevision queuedRevision, int revision)
     {
-        queuedRevision.lock();
-        try
-        {
-            queuedRevision.update(createRevision(revision));
-        }
-        finally
-        {
-            queuedRevision.unlock();
-        }
+        queuedRevision.setRevision(createRevision(revision));
     }
 
     private ProjectConfiguration createProjectConfig()
@@ -538,28 +488,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         takeOffline(slave1000);
         assertFalse(errorSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
         assertNoError(1001);
-    }
-
-    public void testRevisionUpdateMakesTimeout() throws Exception
-    {
-        ProjectConfiguration projectConfig = createProjectConfig(12);
-        queue.enqueue(createAssignmentRequest(0, 1000, projectConfig));
-        RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
-        queue.enqueue(queuedRequest);
-
-        queue.setSleepInterval(100);
-        createAvailableAgent(0);
-        awaitBuild();
-
-        queue.setUnsatisfiableTimeout(1);
-
-        // Negative revision will be rejected by mock
-        BuildRevision queuedRevision = queuedRequest.getRevision();
-        updateRevision(queuedRevision, -1);
-
-        queue.handleEvent(new BuildRevisionUpdatedEvent(this, queuedRequest.getBuild(), queuedRevision));
-        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
     }
 
     //-----------------------------------------------------------------------
@@ -664,16 +592,8 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         RecipeRequest request = new RecipeRequest(context);
         request.setBootstrapper(new ChainBootstrapper());
-        BuildRevision revision = new BuildRevision();
-        revision.lock();
-        try
-        {
-            revision.update(new Revision("1"));
-        }
-        finally
-        {
-            revision.unlock();
-        }
+        BuildRevision revision = new BuildRevision(new Revision("1"), false);
+
         return new RecipeAssignmentRequest(project, requirements, null, revision, request, result);
     }
 

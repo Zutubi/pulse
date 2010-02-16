@@ -5,11 +5,9 @@ import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.build.control.BuildController;
-import com.zutubi.pulse.master.build.control.BuildControllerFactory;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
@@ -21,6 +19,8 @@ import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EX
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import com.zutubi.pulse.master.build.control.BuildControllerFactory;
+import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.WiringObjectFactory;
@@ -175,7 +175,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
 
     protected BuildRequestEvent createRequest(Project project, String source, boolean replaceable, boolean jumpQueueAllowed)
     {
-        BuildRequestEvent request = createRequest(project, source, replaceable, new Revision(1234));
+        BuildRequestEvent request = createRequest(project, source, replaceable, (replaceable) ? null : new Revision(1234));
         request.getOptions().setJumpQueueAllowed(jumpQueueAllowed);
         return request;
     }
@@ -185,7 +185,16 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         BuildReason reason = new ManualTriggerBuildReason("tester");
         TriggerOptions options = new TriggerOptions(reason, source);
         options.setReplaceable(replaceable);
-        BuildRevision buildRevision = new BuildRevision(revision, true);
+        
+        BuildRevision buildRevision;
+        if (revision != null)
+        {
+            buildRevision = new BuildRevision(revision, true);
+        }
+        else
+        {
+            buildRevision = new BuildRevision();
+        }
 
         BuildRequestEvent request = new SingleBuildRequestEvent(this, project, buildRevision, options);
 

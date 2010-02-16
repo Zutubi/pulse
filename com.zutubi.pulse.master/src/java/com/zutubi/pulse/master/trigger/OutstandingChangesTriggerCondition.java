@@ -43,7 +43,7 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
             BuildRevision latestQueued = getLatestQueuedRevision(project);
             if (latestQueued != null)
             {
-                if (isRevisionFixed(latestQueued))
+                if (latestQueued.isFixed())
                 {
                     previousRevision = latestQueued.getRevision();
                 }
@@ -57,22 +57,6 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
         }
 
         return previousRevision == null || hasChangedSince(project.getConfig(), previousRevision);
-    }
-
-    private boolean isRevisionFixed(BuildRevision latestQueued)
-    {
-        // There is a race where the revision may be fixed just after we check,
-        // but there is no sense worrying about it -- this condition is just
-        // making its best assessment at the current time.
-        latestQueued.lock();
-        try
-        {
-            return latestQueued.isFixed();
-        }
-        finally
-        {
-            latestQueued.unlock();
-        }
     }
 
     /**

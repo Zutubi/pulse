@@ -287,62 +287,24 @@ public class BuildQueue
             }
         }
 
-        Collection<RequestHolder> targets = assimilationTargets.values();
-        try
+        // if any revisions are fixed, then we can not assimilate it, so bail on the assimilation of the rest.
+        if (CollectionUtils.contains(assimilationTargets.values(), new HasFixedRevisionPredicate<RequestHolder>()))
         {
-            lock(targets);
-
-            // if any revisions are fixed, then we can not assimilate it, so bail on the assimilation of the rest.
-            if (CollectionUtils.contains(assimilationTargets.values(), new HasFixedRevisionPredicate<RequestHolder>()))
-            {
-                return false;
-            }
-
-            // handle the assimilation of all of the requests.
-            for (QueuedRequest source : assimilationTargets.keySet())
-            {
-                RequestHolder target = assimilationTargets.get(source);
-
-                BuildRequestEvent targetRequest = target.getRequest();
-                BuildRequestEvent sourceRequest = source.getRequest();
-
-                // if it is activated, update the revision in the controller.
-                // else update the revision in the request.
-                if (target instanceof ActivatedRequest)
-                {
-                    BuildController controller = ((ActivatedRequest) target).getController();
-                    controller.updateRevisionIfNotFixed(sourceRequest.getRevision().getRevision());
-                }
-                else
-                {
-                    targetRequest.getRevision().update(sourceRequest.getRevision().getRevision());
-                }
-
-                buildRequestRegistry.requestAssimilated(sourceRequest, targetRequest.getId());
-            }
+            return false;
         }
-        finally
+
+        // handle the assimilation of all of the requests.
+        for (QueuedRequest source : assimilationTargets.keySet())
         {
-            unlock(targets);
+            RequestHolder target = assimilationTargets.get(source);
+
+            BuildRequestEvent targetRequest = target.getRequest();
+            BuildRequestEvent sourceRequest = source.getRequest();
+
+            buildRequestRegistry.requestAssimilated(sourceRequest, targetRequest.getId());
         }
-        
+
         return true;
-    }
-
-    private void unlock(Collection<RequestHolder> holders)
-    {
-        for (RequestHolder target : holders)
-        {
-            target.getRequest().getRevision().unlock();
-        }
-    }
-
-    private void lock(Collection<RequestHolder> holders)
-    {
-        for (RequestHolder target : holders)
-        {
-            target.getRequest().getRevision().lock();
-        }
     }
 
     private RequestHolder getAssimilationCandidate(RequestHolder source)

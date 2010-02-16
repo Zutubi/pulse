@@ -113,6 +113,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
      * ${data.dir}/work.  If it is found, and we have no current work
      * directory, then we assume we have upgraded and move it across.
      *
+     * @param context           the execution context in which this check takes place
      * @param persistentWorkDir the new persistent working directory location
      */
     private void checkForOldWorkDir(ExecutionContext context, File persistentWorkDir)
@@ -163,12 +164,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
         }
 
-        // else we can update.
         if (localDir.list().length == 0)
         {
             return new CheckoutBootstrapper(projectName, revision);
         }
-        else
+        else // else we can update.
         {
             return new UpdateBootstrapper(projectName, revision);
         }

@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
@@ -327,56 +326,46 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             while (!stopRequested)
             {
-                    List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
-                    long currentTime = System.currentTimeMillis();
+                List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
+                long currentTime = System.currentTimeMillis();
 
-                    for (RecipeAssignmentRequest request : requestQueue)
+                for (RecipeAssignmentRequest request : requestQueue)
+                {
+                    if(request.hasTimedOut(currentTime))
                     {
-                        if(request.hasTimedOut(currentTime))
+                        doneRequests.add(request);
+                        eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Recipe request timed out waiting for a capable agent to become available"));
+                    }
+                    else
+                    {
+                        Iterable<Agent> agentList = agentSorter.sort(agentManager.getAvailableAgents(), request);
+                        for (Agent agent : agentList)
                         {
-                            doneRequests.add(request);
-                            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Recipe request timed out waiting for a capable agent to become available"));
-                        }
-                        else
-                        {
-                            BuildRevision buildRevision = request.getRevision();
-                            buildRevision.lock();
-                            try
-                            {
-                                Iterable<Agent> agentList = agentSorter.sort(agentManager.getAvailableAgents(), request);
-                                for (Agent agent : agentList)
-                                {
-                                    AgentService service = agent.getService();
+                            AgentService service = agent.getService();
 
-                                    // can the request be sent to this service?
-                                    if (request.getHostRequirements().fulfilledBy(request, service))
-                                    {
-                                        buildRevision.fix();
-                                        eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
-                                        doneRequests.add(request);
-                                        break;
-                                    }
-                                }
-                            }
-                            finally
+                            // can the request be sent to this service?
+                            if (request.getHostRequirements().fulfilledBy(request, service))
                             {
-                                buildRevision.unlock();
+                                eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
+                                doneRequests.add(request);
+                                break;
                             }
                         }
                     }
+                }
 
-                    requestQueue.removeAll(doneRequests);
+                requestQueue.removeAll(doneRequests);
 
-                    try
-                    {
-                        // Wake up when there is something to do, and also
-                        // periodically to check for timed-out requests.
-                        lockCondition.await(sleepInterval, TimeUnit.MILLISECONDS);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
-                    }
+                try
+                {
+                    // Wake up when there is something to do, and also
+                    // periodically to check for timed-out requests.
+                    lockCondition.await(sleepInterval, TimeUnit.MILLISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
+                }
             }
             executor.shutdown();
         }

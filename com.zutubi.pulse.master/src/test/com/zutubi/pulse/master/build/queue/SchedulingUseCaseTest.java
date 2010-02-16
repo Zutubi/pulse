@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
@@ -7,14 +8,13 @@ import static com.zutubi.pulse.master.model.Project.State;
 import static com.zutubi.pulse.master.model.Project.Transition;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
-import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Mockito.*;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Check that a set of use cases behave as expected.
@@ -215,21 +215,20 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         // We have a cron trigger that kicks off regular builds.  These builds are slower than the
         // schedule, so the excess cron triggers should be assimilated.
 
-        BuildRequestEvent triggerA = createRequest(client, "cronTrigger", true, new Revision("1"));
+        BuildRequestEvent triggerA = createRequest(client, "cronTrigger", true, null);
         controller.handleEvent(triggerA);
 
         assertActivated(triggerA);
         setProjectState(State.BUILDING, client);
-        // lock the revision when it starts building to prevent further assimilation.
-        triggerA.getRevision().lock();
-        triggerA.getRevision().fix();
-        triggerA.getRevision().unlock();
+
+        // fix the revision when it starts building to prevent further assimilation.
+        triggerA.getRevision().setRevision(new Revision("1"));
 
         // The triggerd requests queue up.
-        BuildRequestEvent triggerB = createRequest(client, "cronTrigger", true, new Revision("1"));
+        BuildRequestEvent triggerB = createRequest(client, "cronTrigger", true, null);
         controller.handleEvent(triggerB);
         assertQueued(triggerB);
-        BuildRequestEvent triggerC = createRequest(client, "cronTrigger", true, new Revision("2"));
+        BuildRequestEvent triggerC = createRequest(client, "cronTrigger", true, null);
         controller.handleEvent(triggerC);
         assertQueued(triggerB);
 
@@ -385,11 +384,9 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         controller.handleEvent(changeA);
 
-        // lock the build revision, preventing further assimilation
-        changeA.getRevision().lock();
-        changeA.getRevision().fix();
-        changeA.getRevision().unlock();
-        
+        // fix the revision when it starts building to prevent further assimilation.
+        changeA.getRevision().setRevision(new Revision("1"));
+
         controller.handleEvent(changeB);
 
         assertEquals(7, controller.getSnapshot().getQueuedBuildRequests().size());

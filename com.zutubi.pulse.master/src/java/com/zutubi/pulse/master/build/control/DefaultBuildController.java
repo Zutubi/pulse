@@ -395,7 +395,6 @@ public class DefaultBuildController implements EventListener, BuildController
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
         buildLogger.preBuildCompleted();
 
-        initialiseRevision();
         tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
@@ -419,81 +418,6 @@ public class DefaultBuildController implements EventListener, BuildController
                 return initialBootstrapper;
             }
         }, tree.getRoot().getChildren());
-    }
-
-    private void initialiseRevision()
-    {
-        BuildRevision buildRevision = request.getRevision();
-        buildRevision.lock();
-        try
-        {
-            if (!buildRevision.isInitialised())
-            {
-                buildLogger.status("Initialising build revision...");
-                updateRevision(buildRevision, null);
-                buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
-            }
-        }
-        finally
-        {
-            buildRevision.unlock();
-        }
-    }
-
-    /**
-     * Updates an active build's revision to the new revision.  This is
-     * allowed up until the point where the revision is fixed (which is at the
-     * same time as the build commences).
-     * <p/>
-     * The build revision for this build <strong>must</strong> be locked before
-     * making this call.
-     *
-     * @param revision the new revision, which may be null to indicate that
-     *                 the latest revision should be used
-     * @return true iff the revision was updated
-     * @throws BuildException if the revision cannot be set due to an error
-     */
-    public boolean updateRevisionIfNotFixed(Revision revision)
-    {
-        boolean updated = false;
-
-        BuildRevision buildRevision = request.getRevision();
-        buildRevision.lock();
-        try
-        {
-            if (!buildRevision.isFixed())
-            {
-                updateRevision(buildRevision, revision);
-                updated = true;
-            }
-        }
-        finally
-        {
-            buildRevision.unlock();
-        }
-
-        if (updated)
-        {
-            buildLogger.status("Revision updated to '" + buildRevision.getRevision() + "' due to a newer build request");
-            eventManager.publish(new BuildRevisionUpdatedEvent(this, buildResult, buildRevision));
-        }
-
-        return updated;
-    }
-
-    private void updateRevision(BuildRevision buildRevision, Revision revision)
-    {
-        if (revision == null)
-        {
-            revision = getLatestRevision();
-        }
-
-        if (revision.equals(buildRevision.getRevision()))
-        {
-            return;
-        }
-
-        buildRevision.update(revision);
     }
 
     private Revision getLatestRevision()
@@ -714,6 +638,13 @@ public class DefaultBuildController implements EventListener, BuildController
     private void handleFirstAssignment()
     {
         BuildRevision buildRevision = request.getRevision();
+
+        if (!buildRevision.isFixed())
+        {
+            buildLogger.status("Initialising build revision...");
+            buildRevision.setRevision(getLatestRevision());
+            buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
+        }
 
         MasterBuildProperties.addRevisionProperties(buildContext, buildRevision);
         getChanges(buildRevision);
