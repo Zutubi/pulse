@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
@@ -27,6 +27,8 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -50,6 +52,7 @@ import static com.zutubi.pulse.acceptance.Constants.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.FileArtifact.FILE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
@@ -434,6 +437,65 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.waitForPageToLoad(30 * SECOND);
 
         assertTrue(browser.getBodyText().contains("BUILD SUCCESSFUL"));
+    }
+
+    public void testSetArtifactContentType() throws Exception
+    {
+        final String ARTIFACT_NAME = "ant build file";
+        final String ARTIFACT_FILENAME = "build.xml";
+        final String CONTENT_TYPE = "application/test";
+
+        String projectPath = addProject(random, true);
+
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        artifactConfig.put(NAME, ARTIFACT_NAME);
+        artifactConfig.put(FILE, ARTIFACT_FILENAME);
+        artifactConfig.put(TYPE, CONTENT_TYPE);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+
+        int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(random, buildNumber);
+        Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> artifact)
+            {
+                return ARTIFACT_NAME.equals(artifact.get("name"));
+            }
+        });
+
+        assertNotNull(artifact);
+
+        String base = browser.getBaseUrl();
+        if (base.endsWith("/"))
+        {
+            base = base.substring(0, base.length() - 1);
+        }
+        
+        String url = base + artifact.get("permalink") + ARTIFACT_FILENAME;
+        GetMethod get = null;
+        try
+        {
+            get = AcceptanceTestUtils.httpGet(url);
+            Header[] headers = get.getResponseHeaders();
+            Header contentTypeHeader = CollectionUtils.find(headers, new Predicate<Header>()
+            {
+                public boolean satisfied(Header header)
+                {
+                    return header.getName().equals("Content-Type");
+                }
+            });
+
+            assertNotNull(contentTypeHeader);
+            assertEquals(CONTENT_TYPE, contentTypeHeader.getValue().trim());
+        }
+        finally
+        {
+            if (get != null)
+            {
+                get.releaseConnection();
+            }
+        }
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception

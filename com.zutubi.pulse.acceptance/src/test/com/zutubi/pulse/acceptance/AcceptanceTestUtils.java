@@ -7,9 +7,17 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
+import com.zutubi.util.io.IOUtils;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class AcceptanceTestUtils
 {
@@ -176,5 +184,99 @@ public class AcceptanceTestUtils
             throw new IllegalStateException("Unexpected invalid " + packageProperty + ": " + pkg + " does not exist.");
         }
         return pkg;
+    }
+
+    /**
+     * Reads the text content available at the given Pulse URI and returns it
+     * as a string.  Supplies administrator credentials to log in to Pulse.
+     *
+     * @param contentUri uri to download the content from
+     * @return the content available at the given URI, as a string
+     * @throws IOException on error
+     */
+    public static String readUriContent(String contentUri) throws IOException
+    {
+        return readUriContent(contentUri, getAdminHttpCredentials());
+    }
+
+    /**
+     * Reads the text content available at the given Pulse URI and returns it
+     * as a string.  Supplies the given credentials to log in to Pulse.
+     *
+     * @param contentUri  uri to download the content from
+     * @param credentials credentials of a Pulse user to log in as
+     * @return the content available at the given URI, as a string
+     * @throws IOException on error
+     */
+    public static String readUriContent(String contentUri, Credentials credentials) throws IOException
+    {
+        InputStream input = null;
+        GetMethod get = null;
+        try
+        {
+            get = httpGet(contentUri, credentials);
+            input = get.getResponseBodyAsStream();
+            return IOUtils.inputStreamToString(input);
+        }
+        finally
+        {
+            IOUtils.close(input);
+            if (get != null)
+            {
+                get.releaseConnection();
+            }
+        }
+    }
+
+    /**
+     * Executes an HTTP get of the given Pulse URI and returns the {@link org.apache.commons.httpclient.methods.GetMethod}
+     * instance for further processing.  The caller is responsible for
+     * releasing the connection (by calling {@link org.apache.commons.httpclient.methods.GetMethod#releaseConnection()})
+     * when it is no longer required.  Supplies administrator credentials to
+     * log in to Pulse.
+     *
+     * @param uri uri to GET
+     * @return the {@link org.apache.commons.httpclient.methods.GetMethod}
+     *         instance used to access the URI
+     * @throws IOException on error
+     */
+    public static GetMethod httpGet(String uri) throws IOException
+    {
+        return httpGet(uri, getAdminHttpCredentials());
+    }
+
+    /**
+     * Executes an HTTP get of the given Pulse URI and returns the {@link org.apache.commons.httpclient.methods.GetMethod}
+     * instance for further processing.  The caller is responsible for
+     * releasing the connection (by calling {@link org.apache.commons.httpclient.methods.GetMethod#releaseConnection()})
+     * when it is no longer required.  Supplies the given credentials to log in
+     * to Pulse.
+     *
+     * @param uri         uri to GET
+     * @param credentials credentials of a Pulse user to log in as
+     * @return the {@link org.apache.commons.httpclient.methods.GetMethod}
+     *         instance used to access the URI
+     * @throws IOException on error
+     */
+    public static GetMethod httpGet(String uri, Credentials credentials) throws IOException
+    {
+        HttpClient client = new HttpClient();
+
+        client.getState().setCredentials(AuthScope.ANY, credentials);
+        client.getParams().setAuthenticationPreemptive(true); // our Basic authentication does not challenge.
+
+        GetMethod get = new GetMethod(uri);
+        int status = client.executeMethod(get);
+        if (status != HttpStatus.SC_OK)
+        {
+            throw new RuntimeException("Get request returned status '" + status + "'");
+        }
+
+        return get;
+    }
+
+    private static UsernamePasswordCredentials getAdminHttpCredentials()
+    {
+        return new UsernamePasswordCredentials("admin", "admin");
     }
 }

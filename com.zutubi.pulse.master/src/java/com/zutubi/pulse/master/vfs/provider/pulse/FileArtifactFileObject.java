@@ -5,7 +5,9 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.commons.vfs.FileContentInfoFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -84,6 +86,25 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     protected long doGetContentSize() throws Exception
     {
         return base.length();
+    }
+
+    @Override
+    protected FileContentInfoFactory getFileContentInfoFactory()
+    {
+        try
+        {
+            final StoredFileArtifact fileArtifact = getFileArtifact();
+            if (fileArtifact != null && StringUtils.stringSet(fileArtifact.getType()))
+            {
+                return new FixedTypeFileContentInfoFactory(fileArtifact.getType());
+            }
+        }
+        catch (FileSystemException e)
+        {
+            LOG.warning(e);
+        }
+
+        return super.getFileContentInfoFactory();
     }
 
     protected InputStream doGetInputStream() throws Exception

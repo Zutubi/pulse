@@ -7,17 +7,9 @@ import com.sun.syndication.io.XmlReader;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.xwork.actions.rss.BuildResultsRssAction;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.io.IOUtils;
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -109,37 +101,7 @@ public class RssAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private SyndFeed readFeed(String path) throws FeedException, IOException
     {
-        String content = readUriContent(baseUrl + path);
-
+        String content = AcceptanceTestUtils.readUriContent(baseUrl + path);
         return new SyndFeedInput().build(new XmlReader(new ByteArrayInputStream(content.getBytes())));
-    }
-
-    private String readUriContent(String contentUri) throws IOException
-    {
-        UsernamePasswordCredentials adminCredentials = new UsernamePasswordCredentials("admin", "admin");
-        return readUriContent(contentUri, adminCredentials);
-    }
-
-    private String readUriContent(String contentUri, Credentials credentials) throws IOException
-    {
-        HttpClient client = new HttpClient();
-
-        client.getState().setCredentials(AuthScope.ANY, credentials);
-        client.getParams().setAuthenticationPreemptive(true); // our Basic authentication does not challenge.
-
-        GetMethod get = new GetMethod(contentUri);
-
-        InputStream input = null;
-        try
-        {
-            assertEquals(HttpStatus.SC_OK, client.executeMethod(get));
-            input = get.getResponseBodyAsStream();
-            return IOUtils.inputStreamToString(input);
-        }
-        finally
-        {
-            IOUtils.close(input);
-            get.releaseConnection();
-        }
     }
 }
