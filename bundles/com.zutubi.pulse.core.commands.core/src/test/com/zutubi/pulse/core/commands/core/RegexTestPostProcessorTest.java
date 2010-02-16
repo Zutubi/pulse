@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
-import com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.postprocessors.api.*;
 
 import java.io.IOException;
 import java.util.List;
 
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
 {
@@ -107,10 +107,18 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         config.setStatusGroup(2);
         
         RegexTestPostProcessor pp = new RegexTestPostProcessor(config);
-        TestSuiteResult tests = runProcessorAndGetTests(pp, EXTENSION);
+        TestPostProcessorContext context = runProcessor(pp, EXTENSION);
+        TestSuiteResult tests = context.getTestSuiteResult();
         assertEquals(1, tests.getTotal());
         assertNull(tests.findCase("notaname"));
         assertNotNull(tests.findCase("aname"));
+
+        List<Feature> features = context.getFeatures();
+        assertEquals(1, features.size());
+        
+        Feature feature = features.get(0);
+        assertEquals(Feature.Level.WARNING, feature.getLevel());
+        assertThat(feature.getSummary(), containsString("no test case name"));
     }
 
     private RegexTestPostProcessor createProcessor()

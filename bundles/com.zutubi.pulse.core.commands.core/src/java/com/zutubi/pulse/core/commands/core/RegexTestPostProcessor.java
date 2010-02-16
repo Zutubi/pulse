@@ -24,8 +24,6 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     private LineNumberReader reader;
 
-    private String currentLine;
-
     public RegexTestPostProcessor(RegexTestPostProcessorConfiguration config)
     {
         super(config);
@@ -77,7 +75,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
         Pattern pattern = Pattern.compile(regex);
 
-        currentLine = reader.readLine();
+        String currentLine = reader.readLine();
         while (currentLine != null)
         {
             Matcher m = pattern.matcher(currentLine);
