@@ -39,7 +39,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     @Numeric
     private int priority = 0;
     @Wizard.Ignore
-    private String dataDirectory = "${data.dir}/agents/${agent}";
+    private String dataDirectory = "$(data.dir)/agents/$(agent.handle)";
     private Map<String, ResourceConfiguration> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
 
