@@ -456,30 +456,9 @@ public class SubversionClient implements ScmClient
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
         Predicate<String> changelistFilter = new ExcludePathPredicate(excludedPaths);
 
-        Predicate<String> hasChangedFilter = new ConjunctivePredicate<String>(
-                changelistFilter,
-                new PrefixPathFilter(repository.getLocation().getPath())
-        );
-
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
 
-        // First, check for changes within the base svn url.
-        boolean changed = false;
-        outer: for (SVNLogEntry entry : logs)
-        {
-            Map files = entry.getChangedPaths();
-            for (Object value : files.values())
-            {
-                SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                if (hasChangedFilter.satisfied(entryPath.getPath()))
-                {
-                    changed = true;
-                    break outer;
-                }
-            }
-        }
-
-        if (changed)
+        if (containsUnfilteredChanges(logs, changelistFilter, repository))
         {
             // If we have changes, remove only those paths that are explicitly filtered.
             for (SVNLogEntry entry : logs)
@@ -499,6 +478,42 @@ public class SubversionClient implements ScmClient
                             return true;
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method returns true if there are changes within the logs that are
+     * <ul>
+     * <li>within the specified repository path</li>
+     * <li>not filtered out by the change filter</li>
+     * </ul>
+     *
+     * @param logs          the changes being checked
+     * @param changeFilter  the predicate that is only satisfied by unfiltered paths
+     * @param repository    the repository defines the repository path used in the
+     * filtering.
+     * 
+     * @return true if there are changes within the logs that are not filtered.
+     */
+    private boolean containsUnfilteredChanges(List<SVNLogEntry> logs, Predicate<String> changeFilter, SVNRepository repository)
+    {
+        Predicate<String> hasChangedFilter = new ConjunctivePredicate<String>(
+                changeFilter,
+                new PrefixPathFilter(repository.getLocation().getPath())
+        );
+
+        for (SVNLogEntry entry : logs)
+        {
+            Map files = entry.getChangedPaths();
+            for (Object value : files.values())
+            {
+                SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
+                if (hasChangedFilter.satisfied(entryPath.getPath()))
+                {
+                    return true;
                 }
             }
         }
