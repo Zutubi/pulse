@@ -1,15 +1,18 @@
 package com.zutubi.pulse.core.cli;
 
-import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.command.BootContext;
-import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
 import com.zutubi.i18n.Messages;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.command.BootContext;
+import com.zutubi.pulse.command.Command;
+import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
 import com.zutubi.util.FileSystemUtils;
 
-import java.util.*;
-import static java.util.Arrays.asList;
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * Commmand line interface for the 2.0->2.1 pulse file converter.
@@ -32,7 +35,7 @@ public class ConvertTo21Command implements Command
             fatal("Input file '" + inputFile.getPath() + "' does not exist");
         }
 
-        String converted = PulseFileToToveFile.convert(IOUtils.fileToString(inputFile));
+        String converted = PulseFileToToveFile.convert(new FileInputStream(inputFile));
         File outputFile = new File(argv[1]);
         FileSystemUtils.createFile(outputFile, converted);
 

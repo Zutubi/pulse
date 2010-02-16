@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.ParsingException;
 
@@ -34,6 +33,12 @@ public class PulseFileToToveFileTest extends PulseTestCase
     public void testRecipeVersion() throws IOException, ParsingException
     {
         expectedOutputHelper();
+    }
+
+    public void testUTF8BOM() throws IOException, ParsingException
+    {
+        // This is just to check the parser itself does not throw an exception.
+        PulseFileToToveFile.convert(getInput(EXTENSION_XML));
     }
 
     private void expectedOutputHelper() throws IOException, ParsingException

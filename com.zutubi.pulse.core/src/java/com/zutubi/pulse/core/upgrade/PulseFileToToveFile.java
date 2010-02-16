@@ -2,10 +2,12 @@ package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Set;
 
@@ -39,6 +41,25 @@ public class PulseFileToToveFile
     {
         Builder builder = new Builder();
         Document document = builder.build(new StringReader(pulseFile));
+        return convert(document);
+    }
+
+    public static String convert(InputStream pulseFile) throws IOException, ParsingException
+    {
+        try
+        {
+            Builder builder = new Builder();
+            Document document = builder.build(pulseFile);
+            return convert(document);
+        }
+        finally
+        {
+            IOUtils.close(pulseFile);
+        }
+    }
+
+    private static String convert(Document document) throws IOException
+    {
         boolean[] warningIssued = new boolean[]{false};
         processElement(null, document.getRootElement(), warningIssued);
 
