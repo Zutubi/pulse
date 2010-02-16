@@ -11,7 +11,6 @@ import com.zutubi.pulse.master.events.AgentAvailableEvent;
 import com.zutubi.pulse.master.events.AgentConnectivityEvent;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
-import com.zutubi.pulse.master.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
@@ -431,10 +430,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleConnectivityEvent((AgentConnectivityEvent) evt);
         }
-        else if (evt instanceof BuildRevisionUpdatedEvent)
-        {
-            handleBuildRevisionUpdated((BuildRevisionUpdatedEvent) evt);
-        }
         else if (evt instanceof AgentResourcesDiscoveredEvent)
         {
             resetTimeoutsForAgent(((AgentResourcesDiscoveredEvent) evt).getAgent());
@@ -476,46 +471,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void handleBuildRevisionUpdated(BuildRevisionUpdatedEvent event)
-    {
-        List<RecipeAssignmentRequest> rejects = null;
-        lock.lock();
-        try
-        {
-            List<RecipeAssignmentRequest> unfulfillable = checkQueueForChanges(event, requestQueue);
-            if(unsatisfiableTimeout == 0)
-            {
-                requestQueue.removeAll(unfulfillable);
-                rejects = unfulfillable;
-            }
-            else if(unsatisfiableTimeout > 0)
-            {
-                updateTimeouts(unfulfillable, System.currentTimeMillis() + unsatisfiableTimeout);
-            }
-        }
-        finally
-        {
-            lock.unlock();
-        }
-
-        // Publish events outside the lock
-        if(rejects != null)
-        {
-            publishUnfulfillable(rejects);
-        }
-    }
-
-    private void updateTimeouts(List<RecipeAssignmentRequest> requests, long timeout)
-    {
-        for(RecipeAssignmentRequest request: requests)
-        {
-            if(!request.hasTimeout())
-            {
-                request.setTimeout(timeout);
-            }
-        }
-    }
-
     private void publishUnfulfillable(List<RecipeAssignmentRequest> unfulfillable)
     {
         for (RecipeAssignmentRequest request : unfulfillable)
@@ -524,38 +479,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private List<RecipeAssignmentRequest> checkQueueForChanges(BuildRevisionUpdatedEvent event, RequestQueue requests)
-    {
-        List<RecipeAssignmentRequest> unfulfillable = new LinkedList<RecipeAssignmentRequest>();
-        for (RecipeAssignmentRequest request : requests)
-        {
-            if (request.getBuild().getId() == event.getBuildResult().getId())
-            {
-                try
-                {
-                    if (!requestMayBeFulfilled(request))
-                    {
-                        unfulfillable.add(request);
-                    }
-                }
-                catch (Exception e)
-                {
-                    // We already have a revision, so this is not fatal.
-                    LOG.warning("Unable to check build revision: " + e.getMessage(), e);
-                }
-            }
-        }
-
-        return unfulfillable;
-    }
-
     public Class[] getHandledEvents()
     {
         return new Class[]{
                 AgentAvailableEvent.class,
                 AgentConnectivityEvent.class,
                 AgentResourcesDiscoveredEvent.class,
-                BuildRevisionUpdatedEvent.class,
                 ConfigurationEventSystemStartedEvent.class,
                 SystemStartedEvent.class
         };

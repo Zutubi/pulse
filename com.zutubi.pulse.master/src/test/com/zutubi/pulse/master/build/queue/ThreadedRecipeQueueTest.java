@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.events.AgentAvailableEvent;
 import com.zutubi.pulse.master.events.AgentOfflineEvent;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentPingEvent;
-import com.zutubi.pulse.master.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
@@ -394,37 +393,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         assertEquals(0, queue.length());
     }
 
-    public void testRevisionUpdateOtherBuild() throws Exception
-    {
-        ProjectConfiguration projectConfig = createProjectConfig(12);
-        queue.enqueue(createAssignmentRequest(0, 1000, projectConfig));
-        RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
-        queue.enqueue(queuedRequest);
-
-        queue.setUnsatisfiableTimeout(0);
-        Agent agent = createAvailableAgent(0);
-        awaitBuild();
-        awaitDispatched();
-
-        // Negative revision will be rejected by mock
-        BuildResult anotherBuild = new BuildResult();
-        anotherBuild.setId(queuedRequest.getBuild().getId() + 1);
-        BuildRevision anotherRevision = new BuildRevision(createRevision(-1), false);
-        queue.handleEvent(new BuildRevisionUpdatedEvent(this, anotherBuild, anotherRevision));
-
-        // Despite updating another build to a rejected revision, this build
-        // still goes through.
-        sendAvailable(agent);
-        awaitBuild();
-        awaitDispatched();
-        assertEquals(1001, assignedEvent.getRequest().getId());
-    }
-
-    private void updateRevision(BuildRevision queuedRevision, int revision)
-    {
-        queuedRevision.setRevision(createRevision(revision));
-    }
-
     private ProjectConfiguration createProjectConfig()
     {
         return createProjectConfig(0);
@@ -540,11 +508,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     {
         agentManager.available(agent);
         queue.handleEvent(new AgentAvailableEvent(this, agent));
-    }
-
-    public void sendRecipeError(long id)
-    {
-        queue.handleEvent(new RecipeErrorEvent(this, id, "test"));
     }
 
     private AgentConfiguration createAgentConfig(long handle)
@@ -771,19 +734,9 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void garbageCollect()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
         public long getType()
         {
             return type;
-        }
-
-        public void setAcceptBuild(boolean acceptBuild)
-        {
-            this.acceptBuild = acceptBuild;
         }
 
         public void setThrowError(boolean throwError)
@@ -811,10 +764,5 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         {
             return "type matching";
         }
-    }
-
-    private Revision createRevision(long rev)
-    {
-        return new Revision(Long.toString(rev));
     }
 }
