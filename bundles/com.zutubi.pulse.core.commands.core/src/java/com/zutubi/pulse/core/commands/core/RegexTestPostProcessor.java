@@ -63,7 +63,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     private void processFile(TestSuiteResult tests, PostProcessorContext ppContext) throws IOException
     {
-        RegexTestPostProcessorConfiguration  config = getConfig();
+        RegexTestPostProcessorConfiguration config = getConfig();
         Map<String, TestStatus> statusMap = config.getStatusMap();
 
         // clean up any whitespace from the regex which may have been added via the setText()
@@ -106,7 +106,9 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
                             status = TestStatus.FAILURE;
                         }
 
-                        TestCaseResult testCaseResult = new TestCaseResult(testName, TestResult.DURATION_UNKNOWN, status, message);
+                        long duration = readDuration(ppContext, config, regex, currentLine, m);
+
+                        TestCaseResult testCaseResult = new TestCaseResult(testName, duration, status, message);
 
                         // Determine which suite we should add the test case to.
                         TestSuiteResult suite = tests;
@@ -133,5 +135,26 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
             }
             currentLine = reader.readLine();
         }
+    }
+
+    private long readDuration(PostProcessorContext ppContext, RegexTestPostProcessorConfiguration config, String regex, String currentLine, Matcher m)
+    {
+        long duration = TestResult.DURATION_UNKNOWN;
+        if (config.hasDurationGroup())
+        {
+            String durationString = m.group(config.getDurationGroup());
+            if (durationString != null)
+            {
+                try
+                {
+                    duration = Long.valueOf(durationString);
+                }
+                catch (NumberFormatException e)
+                {
+                    ppContext.addFeature(new Feature(Feature.Level.WARNING, currentLine + ": Line matches expression '" + regex + "' but was expecting millisecond duration. Instead found: '" + durationString +"'", reader.getLineNumber()));
+                }
+            }
+        }
+        return duration;
     }
 }

@@ -99,6 +99,25 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         assertEquals(2, suiteC.getCases().size());
     }
 
+    public void testDurationGroups() throws IOException
+    {
+        // TEST INFO: Test suite: TestPSQLA - Test case: testQuery01 - Test duration: 388 - Test Status: PASS
+        RegexTestPostProcessorConfiguration pp = new RegexTestPostProcessorConfiguration();
+        pp.setRegex("TEST INFO: Test case: (.*) - Test duration: (.*) - Test Status: (.*)");
+        pp.setNameGroup(1);
+        pp.setDurationGroup(2);
+        pp.setStatusGroup(3);
+        pp.setPassStatus("PASS");
+
+        RegexTestPostProcessor postProcessor = new RegexTestPostProcessor(pp);
+
+        TestSuiteResult tests = runProcessorAndGetTests(postProcessor, EXTENSION);
+        tests.getDuration();
+
+        List<TestCaseResult> cases = tests.getCases();
+        assertEquals(3, cases.size());
+    }
+
     public void testNoCaseName() throws IOException
     {
         RegexTestPostProcessorConfiguration config = new RegexTestPostProcessorConfiguration();

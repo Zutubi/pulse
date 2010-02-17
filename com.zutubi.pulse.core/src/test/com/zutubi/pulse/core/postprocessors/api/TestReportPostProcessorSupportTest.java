@@ -132,6 +132,30 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
                       ))), testSuiteResult);
     }
 
+    public void testDurationAccumulation()
+    {
+        TestSuiteResult rawResult = buildSuite("top",
+                buildSuite("child", 1,
+                        buildSuite("grandchild",
+                                new TestCaseResult(CASE_SKIPPED, 3, TestStatus.SKIPPED)
+                        )
+                ),
+                new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS)
+        );
+
+        TestSuiteResult processedResult = runProcessorAndGetTests(new Processor(new Config(null), rawResult));
+
+        assertEquals(buildSuite(null,
+                buildSuite("top", 2,
+                        buildSuite("child", 1,
+                                buildSuite("grandchild",
+                                        new TestCaseResult(CASE_SKIPPED, 3, TestStatus.SKIPPED)
+                                )
+                        ),
+                        new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS)
+                )), processedResult);
+    }
+
     private TestSuiteResult runProcessorAndGetTests(Processor processor)
     {
         PulseExecutionContext executionContext = new PulseExecutionContext();

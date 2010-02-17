@@ -1,0 +1,3 @@
+TEST INFO: Test case: testQuery01 - Test duration: 0 - Test Status: PASS
+TEST INFO: Test case: testQuery02 - Test duration: 1111111 - Test Status: PASS
+TEST INFO: Test case: testQuery03 - Test duration: 2222222 - Test Status: PASS

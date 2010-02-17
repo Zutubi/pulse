@@ -121,6 +121,7 @@
                 <ref local="addPerforceUnicodeConfiguration"/>
                 <ref local="addRegexTestPostProcessorSuiteGroupConfiguration"/>
                 <ref local="renameInitialResultStateToPending"/>
+                <ref local="addRegexTestPostProcessorDurationGroupConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -587,4 +588,9 @@
     <bean id="renameInitialResultStateToPending" class="com.zutubi.pulse.master.upgrade.tasks.RenameInitialResultStateToPendingUpgradeTask">
         <property name="buildNumber" value="201016002"/>
     </bean>
+
+    <bean id="addRegexTestPostProcessorDurationGroupConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddRegexTestPostProcessorConfigurationDurationGroupUpgradeTask">
+        <property name="buildNumber" value="201017001"/>
+    </bean>
+
 </beans>

@@ -16,7 +16,7 @@ import java.util.Map;
  * Configuration for instances of {@link RegexTestPostProcessor}.
  */
 @SymbolicName("zutubi.regexTestPostProcessorConfig")
-@Form(fieldOrder = {"name", "regex", "nameGroup", "suiteGroup", "statusGroup", "detailsGroup", "passStatus", "failureStatus", "errorStatus", "skippedStatus", "autoFail", "trim", "suite", "failOnFailure", "resolveConflicts"})
+@Form(fieldOrder = {"name", "regex", "nameGroup", "suiteGroup", "statusGroup", "detailsGroup", "durationGroup", "passStatus", "failureStatus", "errorStatus", "skippedStatus", "autoFail", "trim", "suite", "failOnFailure", "resolveConflicts"})
 public class RegexTestPostProcessorConfiguration extends TestReportPostProcessorConfigurationSupport
 {
     private static final int UNDEFINED_GROUP = -1;
@@ -29,6 +29,7 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
     private int nameGroup;
     private int detailsGroup = UNDEFINED_GROUP;
     private int suiteGroup = UNDEFINED_GROUP;
+    private int durationGroup = UNDEFINED_GROUP;
 
     private boolean autoFail = false;
     private boolean trim = true;
@@ -127,6 +128,21 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
     public boolean hasSuiteGroup()
     {
         return getSuiteGroup() != UNDEFINED_GROUP;
+    }
+
+    public int getDurationGroup()
+    {
+        return durationGroup;
+    }
+
+    public void setDurationGroup(int durationGroup)
+    {
+        this.durationGroup = durationGroup;
+    }
+
+    public boolean hasDurationGroup()
+    {
+        return getDurationGroup() != UNDEFINED_GROUP;
     }
 
     @Required

@@ -98,7 +98,6 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
             }
         }
 
-        suiteResult.setDuration(getTotalDuration(suiteResult));
         parentSuite.addSuite(suiteResult);
 
         expectEndTag(ELEMENT_TEST_SUITE, reader);
@@ -199,21 +198,5 @@ public class BoostTestReportPostProcessor extends StAXTestReportPostProcessorSup
             }
             builder.append(message);
         }
-    }
-
-    private long getTotalDuration(TestSuiteResult suiteResult)
-    {
-        long totalDuration = 0;
-        for (TestSuiteResult childSuite: suiteResult.getSuites())
-        {
-            totalDuration += childSuite.getDuration();
-        }
-
-        for (TestCaseResult childCase: suiteResult.getCases())
-        {
-            totalDuration += childCase.getDuration();
-        }
-
-        return totalDuration;
     }
 }

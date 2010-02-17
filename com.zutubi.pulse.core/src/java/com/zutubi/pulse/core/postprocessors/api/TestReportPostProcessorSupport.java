@@ -56,6 +56,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
 
             extractTestResults(artifactFile, ppContext, accumulateSuite);
             processExpectedFailures(suiteResult, ppContext);
+            accumulateResultDurations(suiteResult);
             ppContext.addTests(suiteResult, config.getResolveConflicts());
 
             ResultState state = ppContext.getResultState();
@@ -65,6 +66,49 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
                 {
                     ppContext.failCommand("One or more test cases failed.");
                 }
+            }
+        }
+    }
+
+    /**
+     * Accumulate the durations in the nested cases and suites. Any durations
+     * that are already defined are left as is, those that are unknown are
+     * accumulated.
+     *
+     * All updates to durations occur inplace. 
+     *
+     * @param suite     the suite whose nested suite and case durations are being accumulated.
+     */
+    private void accumulateResultDurations(TestSuiteResult suite)
+    {
+        if (suite.getDuration() == TestResult.DURATION_UNKNOWN)
+        {
+            // if a duration is already specified for this suite, then we do not update it.
+            boolean durationKnown = false;
+
+            long duration = 0;
+            for (TestCaseResult r : suite.getCases())
+            {
+                if (r.getDuration() != TestResult.DURATION_UNKNOWN)
+                {
+                    durationKnown = true;
+                    duration += r.getDuration();
+                }
+            }
+            for (TestSuiteResult r : suite.getSuites())
+            {
+                accumulateResultDurations(r);
+
+                if (r.getDuration() != TestResult.DURATION_UNKNOWN)
+                {
+                    durationKnown = true;
+                    duration += r.getDuration();
+                }
+            }
+
+            if (durationKnown)
+            {
+                suite.setDuration(duration);
             }
         }
     }
