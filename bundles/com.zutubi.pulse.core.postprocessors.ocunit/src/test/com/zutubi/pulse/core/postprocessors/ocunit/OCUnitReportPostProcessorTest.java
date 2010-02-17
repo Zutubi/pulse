@@ -93,12 +93,12 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
 
     public void testIncompleteSuite()
     {
-        assertSingleSuite(process(), -1);
+        assertSingleSuite(process(), 7);
     }
 
     public void testMissingSummary()
     {
-        assertSingleSuite(process(), -1);
+        assertSingleSuite(process(), 7);
     }
 
     public void testMismatchedSuiteName()

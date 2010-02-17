@@ -13,15 +13,15 @@ public class UnitTestPlusPlusReportPostProcessorTest extends XMLTestPostProcesso
     public void testBasic() throws Exception
     {
         TestSuiteResult expected = buildSuite(null,
-                buildSuite("DefaultSuite",
+                buildSuite("DefaultSuite", 0,
                         new TestCaseResult("SuiteLess", 0, PASS)
                 ),
-                buildSuite("SuiteOne",
+                buildSuite("SuiteOne", 108,
                         new TestCaseResult("TestOne", 0, PASS),
                         new TestCaseResult("TestTwo", 1, FAILURE, "utpp.cpp(14) : false"),
                         new TestCaseResult("TestThrow", 107, FAILURE, "utpp.cpp(17) : Unhandled exception: Crash!")
                 ),
-                buildSuite("SuiteTwo",
+                buildSuite("SuiteTwo", 0,
                         new TestCaseResult("TestOne", 0, PASS)
                 )
         );
@@ -32,15 +32,15 @@ public class UnitTestPlusPlusReportPostProcessorTest extends XMLTestPostProcesso
     public void testRandomJunkIgnored() throws IOException
     {
         TestSuiteResult expected = buildSuite(null,
-                buildSuite("DefaultSuite",
+                buildSuite("DefaultSuite", 0,
                         new TestCaseResult("SuiteLess", 0, PASS)
                 ),
-                buildSuite("SuiteOne",
+                buildSuite("SuiteOne", 108,
                         new TestCaseResult("TestOne", 0, PASS),
                         new TestCaseResult("TestTwo", 1, FAILURE, "utpp.cpp(14) : false"),
                         new TestCaseResult("TestThrow", 107, FAILURE, "utpp.cpp(17) : Unhandled exception: Crash!")
                 ),
-                buildSuite("SuiteTwo",
+                buildSuite("SuiteTwo", 0,
                         new TestCaseResult("TestOne", 0, PASS)
                 )
         );
