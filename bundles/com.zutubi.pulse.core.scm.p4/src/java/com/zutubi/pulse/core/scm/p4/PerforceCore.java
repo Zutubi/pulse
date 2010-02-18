@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
@@ -19,6 +18,8 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+
 /**
  * Core methods used for interaction with the p4 command.
  */
@@ -26,7 +27,10 @@ public class PerforceCore
 {
     private static final Logger LOG = Logger.getLogger(PerforceCore.class);
 
-    private static final long P4_TIMEOUT = Long.getLong("pulse.p4.inactivity.timeout", 300);
+    public static final int DEFAULT_INACTIVITY_TIMEOUT = 300;
+
+    private static final long SYSTEM_INACTIVITY_TIMEOUT = Long.getLong("pulse.p4.inactivity.timeout", DEFAULT_INACTIVITY_TIMEOUT);
+    private static final int USE_SYSTEM_INACTIVITY_TIMEOUT = 0;
 
     private static final String DUMMY_CLIENT = "pulse";
     private static final String ROOT_PREFIX = "Root:";
@@ -35,6 +39,7 @@ public class PerforceCore
 
     private Map<String, String> p4Env = new HashMap<String, String>();
     private ProcessBuilder p4Builder;
+    private long inactivityTimeout;
 
     public class P4Result
     {
@@ -51,6 +56,12 @@ public class PerforceCore
 
     public PerforceCore()
     {
+        this(USE_SYSTEM_INACTIVITY_TIMEOUT);
+    }
+
+    public PerforceCore(int inactivityTimeout)
+    {
+        this.inactivityTimeout = inactivityTimeout == USE_SYSTEM_INACTIVITY_TIMEOUT ? SYSTEM_INACTIVITY_TIMEOUT : inactivityTimeout;
         p4Builder = new ProcessBuilder();
     }
 
@@ -173,7 +184,7 @@ public class PerforceCore
                 else
                 {
                     long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
-                    if(secondsSinceActivity >= P4_TIMEOUT)
+                    if (secondsSinceActivity >= inactivityTimeout)
                     {
                         throw new ScmException("Timing out p4 process after " + secondsSinceActivity + " seconds of inactivity");
                     }
@@ -316,7 +327,7 @@ public class PerforceCore
             {
                 if (line.startsWith(ROOT_PREFIX))
                 {
-                    result[0] = new File(line.substring(ROOT_PREFIX.length()).trim());
+                    result[USE_SYSTEM_INACTIVITY_TIMEOUT] = new File(line.substring(ROOT_PREFIX.length()).trim());
                 }
             }
 
@@ -325,7 +336,7 @@ public class PerforceCore
             }
         }, null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_OUTPUT);
 
-        return result[0];
+        return result[USE_SYSTEM_INACTIVITY_TIMEOUT];
     }
 
     public Map<String, String> getServerInfo(String client) throws ScmException
@@ -345,9 +356,9 @@ public class PerforceCore
         for (String line : splitLines(result))
         {
             int index = line.indexOf(':');
-            if (index > 0 && index < line.length() - 1)
+            if (index > USE_SYSTEM_INACTIVITY_TIMEOUT && index < line.length() - 1)
             {
-                info.put(line.substring(0, index).trim(), line.substring(index + 1).trim());
+                info.put(line.substring(USE_SYSTEM_INACTIVITY_TIMEOUT, index).trim(), line.substring(index + 1).trim());
             }
         }
 

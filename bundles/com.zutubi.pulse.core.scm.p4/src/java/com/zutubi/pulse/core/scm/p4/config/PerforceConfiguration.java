@@ -2,14 +2,16 @@ package com.zutubi.pulse.core.scm.p4.config;
 
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
+import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.p4.PerforceWorkspaceManager;
 import com.zutubi.tove.annotations.*;
+import com.zutubi.validation.annotations.Min;
 import com.zutubi.validation.annotations.Required;
 
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "syncWorkspacePattern", "timeOffset" })
+@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "inactivityTimeout", "syncWorkspacePattern", "timeOffset" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -26,6 +28,8 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @TextArea(rows = 10, cols = 80) @Required
     private String view = "//depot/... //pulse/...";
     private boolean useTicketAuth = false;
+    @Wizard.Ignore @Min(0)
+    private int inactivityTimeout = PerforceCore.DEFAULT_INACTIVITY_TIMEOUT;
     @Wizard.Ignore
     private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(agent.handle)";
     @Wizard.Ignore
@@ -121,6 +125,16 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setUseTicketAuth(boolean useTicketAuth)
     {
         this.useTicketAuth = useTicketAuth;
+    }
+
+    public int getInactivityTimeout()
+    {
+        return inactivityTimeout;
+    }
+
+    public void setInactivityTimeout(int inactivityTimeout)
+    {
+        this.inactivityTimeout = inactivityTimeout;
     }
 
     public String getSyncWorkspacePattern()

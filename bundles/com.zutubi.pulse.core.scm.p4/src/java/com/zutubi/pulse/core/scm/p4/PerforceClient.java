@@ -354,7 +354,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         this.configuration = configuration;
         this.workspaceManager = workspaceManager;
 
-        this.core = new PerforceCore();
+        this.core = new PerforceCore(configuration.getInactivityTimeout());
         this.core.setEnv(ENV_PORT, configuration.getPort());
         this.core.setEnv(ENV_USER, configuration.getUser());
         if (configuration.isUnicodeServer())
