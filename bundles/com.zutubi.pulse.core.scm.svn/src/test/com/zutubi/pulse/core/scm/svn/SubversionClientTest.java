@@ -372,10 +372,13 @@ public class SubversionClientTest extends PulseTestCase
     // CIB-2322: Svn: Unexpected scm trigger when using filters.
     public void testChangesOutsideBasePathIgnored() throws ScmException, IOException, SVNException
     {
-        // drop into a subdirectory to isolate the two changes.
-        client = createSubversionClient(TRUNK_PATH + "/afolder");
+        // Drop into a subdirectory to isolate the two changes.
+        // We use a file:// url so that the url path does not match the
+        // repository path (to catch incorrect use of the url path to filter).
+        client = createSubversionClient("file://" + tmpDir.getAbsolutePath() + "/repo/test/trunk/afolder");
         List<Changelist> changelists = client.getChanges(null, createRevision(0), createRevision(1));
 
+        assertEquals(1, changelists.size());
         Changelist changelist = changelists.get(0);
         assertEquals(8, changelist.getChanges().size());
 
