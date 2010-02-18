@@ -2,16 +2,15 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
@@ -221,10 +220,55 @@ public class AcceptanceTestUtils
         finally
         {
             IOUtils.close(input);
-            if (get != null)
+            releaseConnection(get);
+        }
+    }
+
+    /**
+     * Reads and returns an HTTP header from the given Pulse URI, returning it
+     * for further inspection.  Supplies administrator credentials to log in to
+     * Pulse.
+     *
+     * @param uri        uri to read the header from
+     * @param headerName name of the header to retrieve
+     * @return the found header, or null if there was no such header
+     * @throws IOException on error
+     */
+    public static Header readHttpHeader(String uri, String headerName) throws IOException
+    {
+        return readHttpHeader(uri, headerName, getAdminHttpCredentials());
+    }
+
+    /**
+     * Reads and returns an HTTP header from the given Pulse URI, returning it
+     * for further inspection.  Supplies the given credentials to log in to
+     * Pulse.
+     *
+     * @param uri         uri to read the header from
+     * @param headerName  name of the header to retrieve
+     * @param credentials credentials of a Pulse user to log in as
+     * @return the found header, or null if there was no such header
+     * @throws IOException on error
+     */
+    public static Header readHttpHeader(String uri, final String headerName, Credentials credentials) throws IOException
+    {
+        GetMethod get = null;
+        try
+        {
+            get = AcceptanceTestUtils.httpGet(uri, credentials);
+            Header[] headers = get.getResponseHeaders();
+
+            return CollectionUtils.find(headers, new Predicate<Header>()
             {
-                get.releaseConnection();
-            }
+                public boolean satisfied(Header header)
+                {
+                    return header.getName().equals(headerName);
+                }
+            });
+        }
+        finally
+        {
+            releaseConnection(get);
         }
     }
 
@@ -244,6 +288,7 @@ public class AcceptanceTestUtils
     {
         return httpGet(uri, getAdminHttpCredentials());
     }
+
 
     /**
      * Executes an HTTP get of the given Pulse URI and returns the {@link org.apache.commons.httpclient.methods.GetMethod}
@@ -278,5 +323,13 @@ public class AcceptanceTestUtils
     private static UsernamePasswordCredentials getAdminHttpCredentials()
     {
         return new UsernamePasswordCredentials("admin", "admin");
+    }
+
+    private static void releaseConnection(GetMethod get)
+    {
+        if (get != null)
+        {
+            get.releaseConnection();
+        }
     }
 }

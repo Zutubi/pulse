@@ -28,7 +28,6 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -473,29 +472,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         }
         
         String url = base + artifact.get("permalink") + ARTIFACT_FILENAME;
-        GetMethod get = null;
-        try
-        {
-            get = AcceptanceTestUtils.httpGet(url);
-            Header[] headers = get.getResponseHeaders();
-            Header contentTypeHeader = CollectionUtils.find(headers, new Predicate<Header>()
-            {
-                public boolean satisfied(Header header)
-                {
-                    return header.getName().equals("Content-Type");
-                }
-            });
-
-            assertNotNull(contentTypeHeader);
-            assertEquals(CONTENT_TYPE, contentTypeHeader.getValue().trim());
-        }
-        finally
-        {
-            if (get != null)
-            {
-                get.releaseConnection();
-            }
-        }
+        Header contentTypeHeader = AcceptanceTestUtils.readHttpHeader(url, "Content-Type");
+        assertNotNull(contentTypeHeader);
+        assertEquals(CONTENT_TYPE, contentTypeHeader.getValue().trim());
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception
