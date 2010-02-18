@@ -40,32 +40,32 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
         File failureFile = new File(tempDir, "failures.txt");
         FileSystemUtils.createFile(failureFile,
                 StringUtils.join("\n",
-                    makeTestPath(SUITE_TOP, CASE_PASSED),
-                    makeTestPath(SUITE_TOP, CASE_EXPECTED_FAILURE),
-                    makeTestPath(SUITE_TOP, CASE_FAILED),
-                    makeTestPath(SUITE_TOP, CASE_ERRORED),
-                    makeTestPath(SUITE_TOP, "random case"),
-                    makeTestPath(SUITE_TOP, CASE_SKIPPED),
-                    makeTestPath("random suite", CASE_FAILED))
+                        makeTestPath(SUITE_TOP, CASE_PASSED),
+                        makeTestPath(SUITE_TOP, CASE_EXPECTED_FAILURE),
+                        makeTestPath(SUITE_TOP, CASE_FAILED),
+                        makeTestPath(SUITE_TOP, CASE_ERRORED),
+                        makeTestPath(SUITE_TOP, "random case"),
+                        makeTestPath(SUITE_TOP, CASE_SKIPPED),
+                        makeTestPath("random suite", CASE_FAILED))
         );
 
         Config config = new Config(failureFile.getName());
         TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
 
         assertEquals(buildSuite(null, buildSuite(SUITE_TOP,
-                         buildSuite(SUITE_NESTED,
-                            new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                            new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                            new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
-                            new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
-                            new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                         ),
-                         new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                         new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                         new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
-                         new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
-                         new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                     )), testSuiteResult);
+                buildSuite(SUITE_NESTED,
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                        new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
+                        new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
+                        new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                ),
+                new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
+                new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
+                new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+        )), testSuiteResult);
     }
 
     public void testExpectedFailureFileNestedSuite() throws IOException
@@ -73,30 +73,30 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
         File failureFile = new File(tempDir, "failures.txt");
         FileSystemUtils.createFile(failureFile,
                 StringUtils.join("\n",
-                    makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_PASSED),
-                    makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_EXPECTED_FAILURE),
-                    makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_FAILED),
-                    makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_ERRORED),
-                    makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_SKIPPED))
+                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_PASSED),
+                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_EXPECTED_FAILURE),
+                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_FAILED),
+                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_ERRORED),
+                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_SKIPPED))
         );
 
         Config config = new Config(failureFile.getName());
         TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
 
         assertEquals(buildSuite(null, buildSuite(SUITE_TOP,
-                         buildSuite(SUITE_NESTED,
-                            new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                            new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                            new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
-                            new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
-                            new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                         ),
-                         new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                         new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                         new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
-                         new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
-                         new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                     )), testSuiteResult);
+                buildSuite(SUITE_NESTED,
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                        new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                ),
+                new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
+                new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
+                new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+        )), testSuiteResult);
     }
 
     public void testExpectedFailureFileWrappingSuite() throws IOException
@@ -104,11 +104,11 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
         File failureFile = new File(tempDir, "failures.txt");
         FileSystemUtils.createFile(failureFile,
                 StringUtils.join("\n",
-                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
-                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
-                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
-                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
-                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED))
+                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
+                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
+                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
+                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
+                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED))
         );
 
         Config config = new Config(failureFile.getName());
@@ -116,43 +116,105 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
         TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
 
         assertEquals(buildSuite(null, buildSuite(SUITE_WRAPPING,
-                          buildSuite(SUITE_TOP,
-                              buildSuite(SUITE_NESTED,
-                                 new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                                 new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                                 new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
-                                 new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
-                                 new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                              ),
-                              new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                              new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                              new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
-                              new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
-                              new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                      ))), testSuiteResult);
+                buildSuite(SUITE_TOP,
+                        buildSuite(SUITE_NESTED,
+                                new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                                new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                                new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
+                                new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
+                                new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                        ),
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                        new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_FAILED, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_ERRORED, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                ))), testSuiteResult);
     }
 
-    public void testDurationAccumulation()
+    public void testAccumulationWhenChildrenHaveNoDurations()
+    {
+        TestSuiteResult rawResult = buildSuite("top",
+                buildSuite("child",
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS)
+                )
+        );
+
+        TestSuiteResult processedResult = runProcessorAndGetTests(new Processor(new Config(null), rawResult));
+
+        assertEquals(buildSuite(null,
+                buildSuite("top",
+                        buildSuite("child",
+                                new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                                new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                                new TestCaseResult(CASE_PASSED, TestStatus.PASS)
+                        )
+                )), processedResult);
+    }
+
+    public void testAccumulationOfChildrenIntoSuite()
+    {
+        TestSuiteResult rawResult = buildSuite("top",
+                buildSuite("child",
+                        new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS),
+                        new TestCaseResult(CASE_PASSED, 2, TestStatus.PASS),
+                        new TestCaseResult(CASE_PASSED, 3, TestStatus.PASS)
+                )
+        );
+
+        TestSuiteResult processedResult = runProcessorAndGetTests(new Processor(new Config(null), rawResult));
+
+        assertEquals(buildSuite(null,
+                buildSuite("top", 6,
+                        buildSuite("child", 6,
+                                new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS),
+                                new TestCaseResult(CASE_PASSED, 2, TestStatus.PASS),
+                                new TestCaseResult(CASE_PASSED, 3, TestStatus.PASS)
+                        )
+                )), processedResult);
+    }
+
+    public void testAccumulationHaltsAtKnownDuration()
     {
         TestSuiteResult rawResult = buildSuite("top",
                 buildSuite("child", 1,
                         buildSuite("grandchild",
                                 new TestCaseResult(CASE_SKIPPED, 3, TestStatus.SKIPPED)
                         )
-                ),
-                new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS)
+                )
+        );
+
+        TestSuiteResult processedResult = runProcessorAndGetTests(new Processor(new Config(null), rawResult));
+
+        assertEquals(buildSuite(null,
+                buildSuite("top", 1,
+                        buildSuite("child", 1,
+                                buildSuite("grandchild",
+                                        new TestCaseResult(CASE_SKIPPED, 3, TestStatus.SKIPPED)
+                                )
+                        )
+                )), processedResult);
+    }
+
+    public void testAccumulationDoesNotAddUnknownDurations()
+    {
+        TestSuiteResult rawResult = buildSuite("top",
+                buildSuite("childA", 1),
+                buildSuite("childB"),
+                new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS),
+                new TestCaseResult(CASE_PASSED, TestStatus.PASS)
         );
 
         TestSuiteResult processedResult = runProcessorAndGetTests(new Processor(new Config(null), rawResult));
 
         assertEquals(buildSuite(null,
                 buildSuite("top", 2,
-                        buildSuite("child", 1,
-                                buildSuite("grandchild",
-                                        new TestCaseResult(CASE_SKIPPED, 3, TestStatus.SKIPPED)
-                                )
-                        ),
-                        new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS)
+                        buildSuite("childA", 1),
+                        buildSuite("childB"),
+                        new TestCaseResult(CASE_PASSED, 1, TestStatus.PASS),
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS)
                 )), processedResult);
     }
 
@@ -169,7 +231,7 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     {
         StringBuilder builder = new StringBuilder();
         InvertedPredicate<Character> predicate = new InvertedPredicate<Character>(new InCollectionPredicate<Character>('/', '%'));
-        for (String piece: pieces)
+        for (String piece : pieces)
         {
             if (builder.length() > 0)
             {
@@ -185,19 +247,19 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     private TestSuiteResult makeSuite()
     {
         return buildSuite(SUITE_TOP,
-                   buildSuite(SUITE_NESTED,
-                      new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                      new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                      new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
-                      new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
-                      new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-                   ),
-                   new TestCaseResult(CASE_PASSED, TestStatus.PASS),
-                   new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
-                   new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
-                   new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
-                   new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
-               );
+                buildSuite(SUITE_NESTED,
+                        new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                        new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                        new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
+                        new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
+                        new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+                ),
+                new TestCaseResult(CASE_PASSED, TestStatus.PASS),
+                new TestCaseResult(CASE_EXPECTED_FAILURE, TestStatus.EXPECTED_FAILURE),
+                new TestCaseResult(CASE_FAILED, TestStatus.FAILURE),
+                new TestCaseResult(CASE_ERRORED, TestStatus.ERROR),
+                new TestCaseResult(CASE_SKIPPED, TestStatus.SKIPPED)
+        );
     }
 
     public static class Config extends TestReportPostProcessorConfigurationSupport
