@@ -28,6 +28,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
@@ -646,11 +647,12 @@ public class DefaultBuildController implements EventListener, BuildController
             buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
         }
 
-        MasterBuildProperties.addRevisionProperties(buildContext, buildRevision);
         getChanges(buildRevision);
-
-        buildResult.commence(buildRevision.getTimestamp());
+        buildResult.commence();
         buildLogger.commenced(buildResult);
+
+        addRevisionProperties(buildContext, buildResult);
+
         if (previousSuccessful != null)
         {
             buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());

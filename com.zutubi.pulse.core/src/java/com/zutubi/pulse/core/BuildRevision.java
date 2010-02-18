@@ -23,11 +23,6 @@ public class BuildRevision
      * triggering the build.
      */
     private boolean user = false;
-    /**
-     * The time at which the first recipe is dispatched: which is when the
-     * build is said to have commenced.
-     */
-    private long timestamp = -1;
 
     /**
      * Construct a new revision that will be determined lazily.
@@ -86,15 +81,6 @@ public class BuildRevision
     }
 
     /**
-     * @return the time at which this revision was fixed, or -1 if it has not
-     *         yet been fixed
-     */
-    public long getTimestamp()
-    {
-        return timestamp;
-    }
-
-    /**
      * Fix the revision.  The revision <strong>must not</strong> be fixed.
      *
      * @param revision  the revision to build
@@ -116,7 +102,6 @@ public class BuildRevision
      */
     private void fix()
     {
-        timestamp = System.currentTimeMillis();
         this.fixed = true;
     }
 }

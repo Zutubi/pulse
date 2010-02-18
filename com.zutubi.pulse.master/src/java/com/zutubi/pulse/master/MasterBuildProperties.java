@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
@@ -101,11 +100,11 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN, projectConfig.getOptions().getPersistentWorkDir());
     }
 
-    public static void addRevisionProperties(ExecutionContext context, BuildRevision buildRevision)
+    public static void addRevisionProperties(ExecutionContext context, BuildResult buildResult)
     {
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(buildRevision.getTimestamp())));
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, buildResult.getRevision().getRevisionString());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(buildResult.getStartTime())));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildResult.getStartTime()));
     }
 
     public static void addCompletedBuildProperties(ExecutionContext context, BuildResult result, MasterConfigurationManager configurationManager)

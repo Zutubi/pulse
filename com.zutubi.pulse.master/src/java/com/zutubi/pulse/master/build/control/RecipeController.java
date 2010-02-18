@@ -190,10 +190,9 @@ public class RecipeController
 
         // Update the request and its context before it is sent to the agent.
         RecipeRequest recipeRequest = assignmentRequest.getRequest();
-        BuildRevision buildRevision = assignmentRequest.getRevision();
 
         final ExecutionContext agentContext = recipeRequest.getContext();
-        addRevisionProperties(agentContext, buildRevision);
+        addRevisionProperties(agentContext, buildResult);
         agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_AGENT, agent.getConfig().getName());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
