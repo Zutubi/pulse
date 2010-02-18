@@ -327,7 +327,7 @@ public class PerforceCore
             {
                 if (line.startsWith(ROOT_PREFIX))
                 {
-                    result[USE_SYSTEM_INACTIVITY_TIMEOUT] = new File(line.substring(ROOT_PREFIX.length()).trim());
+                    result[0] = new File(line.substring(ROOT_PREFIX.length()).trim());
                 }
             }
 
@@ -336,7 +336,7 @@ public class PerforceCore
             }
         }, null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_OUTPUT);
 
-        return result[USE_SYSTEM_INACTIVITY_TIMEOUT];
+        return result[0];
     }
 
     public Map<String, String> getServerInfo(String client) throws ScmException
@@ -356,9 +356,9 @@ public class PerforceCore
         for (String line : splitLines(result))
         {
             int index = line.indexOf(':');
-            if (index > USE_SYSTEM_INACTIVITY_TIMEOUT && index < line.length() - 1)
+            if (index > 0 && index < line.length() - 1)
             {
-                info.put(line.substring(USE_SYSTEM_INACTIVITY_TIMEOUT, index).trim(), line.substring(index + 1).trim());
+                info.put(line.substring(0, index).trim(), line.substring(index + 1).trim());
             }
         }
 
