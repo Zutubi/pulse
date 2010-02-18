@@ -11,12 +11,14 @@ import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class SubversionClientTest extends PulseTestCase
 {
@@ -382,24 +384,6 @@ public class SubversionClientTest extends PulseTestCase
         changelists = client.getChanges(null, createRevision(0), createRevision(1));
 
         assertEquals(0, changelists.size());
-    }
-
-    private long doAddAndCommit(File baseDir, String... paths) throws IOException, SVNException
-    {
-        SVNWCClient wcClient = clientManager.getWCClient();
-
-        List<File> filesToAdd = new LinkedList<File>();
-        for (String path : paths)
-        {
-            File newFile = new File(baseDir, path);
-            FileSystemUtils.createFile(newFile, newFile.getAbsolutePath());
-            filesToAdd.add(newFile);
-            wcClient.doAdd(newFile, true, false, false, SVNDepth.INFINITY, false, false);
-        }
-
-        SVNCommitInfo info = clientManager.getCommitClient().doCommit(filesToAdd.toArray(new File[filesToAdd.size()]), true, "add file", null, null, false, false, SVNDepth.EMPTY);
-
-        return info.getNewRevision();
     }
 
     private SubversionClient createSubversionClient(String path) throws ScmException

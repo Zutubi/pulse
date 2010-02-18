@@ -3,10 +3,10 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.ConjunctivePredicate;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
@@ -498,11 +498,11 @@ public class SubversionClient implements ScmClient
      * 
      * @return true if there are changes within the logs that are not filtered.
      */
-    private boolean containsUnfilteredChanges(List<SVNLogEntry> logs, Predicate<String> changeFilter, SVNRepository repository)
+    private boolean containsUnfilteredChanges(List<SVNLogEntry> logs, Predicate<String> changeFilter, SVNRepository repository) throws SVNException
     {
         Predicate<String> hasChangedFilter = new ConjunctivePredicate<String>(
                 changeFilter,
-                new PrefixPathFilter(repository.getLocation().getPath())
+                new PrefixPathFilter(repository.getRepositoryPath(""))
         );
 
         for (SVNLogEntry entry : logs)
