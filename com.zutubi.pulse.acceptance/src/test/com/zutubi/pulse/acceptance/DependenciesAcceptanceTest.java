@@ -1,22 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
+import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.RandomUtils;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +21,11 @@ import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATE
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.wc.*;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -715,6 +715,88 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         buildRunner.triggerSuccessfulBuild(projectB);
+    }
+
+    public void testPropagateRevisionToDownstream() throws Exception
+    {
+        String revision = setupPropagateWorkspace();
+
+        String projectAName = randomName + "A";
+        ProjectConfigurationHelper projectA = projects.createAntProject(projectAName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectAName);
+        insertProject(projectA);
+
+        String projectBName = randomName + "B";
+        ProjectConfigurationHelper projectB = projects.createAntProject(projectBName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectBName);
+        projectB.addDependency(projectA);
+        DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
+        trigger.setPropagateRevision(true);
+        insertProject(projectB);
+
+        // test triggering the upstream project.
+        buildRunner.triggerSuccessfulBuild(projectA);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+
+        // verify build revision.
+        assertEquals(revision, xmlRpcHelper.getBuild(projectAName, 1).get("revision"));
+        assertEquals(revision, xmlRpcHelper.getBuild(projectBName, 1).get("revision"));
+
+        // test triggering the downstream project.
+        buildRunner.triggerRebuild(projectB);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 2);
+
+        assertEquals(revision, xmlRpcHelper.getBuild(projectAName, 2).get("revision"));
+        assertEquals(revision, xmlRpcHelper.getBuild(projectBName, 2).get("revision"));
+
+        // test that triggering b directly picks up its own revision.
+        buildRunner.triggerSuccessfulBuild(projectB);
+        assertFalse(revision.equals(xmlRpcHelper.getBuild(projectBName, 3).get("revision")));
+    }
+
+    // setup the repository for the propagate revision tests.
+    public String setupPropagateWorkspace() throws IOException, SVNException
+    {
+        SVNRepositoryFactoryImpl.setup();
+
+        String svnUrl = TRIVIAL_ANT_REPOSITORY;
+        DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
+        BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager("pulse", "pulse");
+
+        SVNClientManager clientManager = SVNClientManager.newInstance(options, authenticationManager);
+        File wcDir = createTempDirectory();
+
+        SvnWorkspace workspace = new SvnWorkspace(clientManager, wcDir);
+
+        try
+        {
+            workspace.doCheckout(svnUrl);
+
+            File fileA = new File(wcDir, randomName + "A/build.xml");
+            assertTrue(fileA.getParentFile().mkdirs());
+            FileSystemUtils.copy(fileA, new File(wcDir, "build.xml"));
+
+            File fileB = new File(wcDir, randomName + "B/build.xml");
+            assertTrue(fileB.getParentFile().mkdirs());
+            FileSystemUtils.copy(fileB, new File(wcDir, "build.xml"));
+
+            workspace.doAdd(fileA.getParentFile(), fileA, fileB.getParentFile(), fileB);
+            workspace.doCommit("initial checkin", fileA.getParentFile(), fileA, fileB.getParentFile(), fileB);
+
+            File txtFileA = new File(wcDir, randomName + "A/file.txt");
+            assertTrue(txtFileA.createNewFile());
+            workspace.doAdd(txtFileA);
+            String revision = workspace.doCommit("update a", txtFileA);
+
+            File txtFileB = new File(wcDir, randomName + "B/file.txt");
+            assertTrue(txtFileB.createNewFile());
+            workspace.doAdd(txtFileB);
+            workspace.doCommit("update b", txtFileB);
+
+            return revision;
+        }
+        finally
+        {
+            workspace.dispose();
+        }
     }
 
     private void assertCommandFailed(String projectName, int buildNumber, String commandName) throws Exception

@@ -4,6 +4,8 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -137,6 +139,114 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
 
         List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(client));
         assertEquals(4, toQueue.size());
+    }
+
+    public void testPropagateRevisionResultsInSameRevisionInstance()
+    {
+        Project util = createProject("util");
+        Project client = createProject("client", dependency(util));
+
+        List<QueuedRequest> toQueue = handler.prepare(createRequest(util));
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        BuildRequestEvent clientRequest = toQueue.get(1).getRequest();
+        assertTrue(utilRequest.getRevision() != clientRequest.getRevision());
+
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+
+        toQueue = handler.prepare(createRequest(util));
+        utilRequest = toQueue.get(0).getRequest();
+        clientRequest = toQueue.get(1).getRequest();
+        assertTrue(utilRequest.getRevision() == clientRequest.getRevision());
+    }
+
+    public void testPropagateRevisionToMultipleDownstreamBuilds()
+    {
+        Project util = createProject("util");
+        Project clientA = createProject("clientA", dependency(util));
+        Project clientB = createProject("clientB", dependency(util));
+
+        TriggerUtils.getTrigger(clientA.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(clientB.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+
+        List<QueuedRequest> toQueue = handler.prepare(createRequest(util));
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        BuildRequestEvent clientARequest = toQueue.get(1).getRequest();
+        BuildRequestEvent clientBRequest = toQueue.get(2).getRequest();
+        assertTrue(utilRequest.getRevision() == clientARequest.getRevision());
+        assertTrue(utilRequest.getRevision() == clientBRequest.getRevision());
+    }
+
+    public void testPropagateRevisionsAreDistinctOnExtendedTree()
+    {
+        Project util = createProject("util");
+        Project lib = createProject("lib", dependency(util));
+        Project component = createProject("component", dependency(lib));
+        Project client = createProject("client", dependency(component));
+
+        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+
+        List<QueuedRequest> toQueue = handler.prepare(createRequest(util));
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        BuildRequestEvent libRequest = toQueue.get(1).getRequest();
+        BuildRequestEvent componentRequest = toQueue.get(2).getRequest();
+        BuildRequestEvent clientRequest = toQueue.get(3).getRequest();
+
+        assertTrue(utilRequest.getRevision() == libRequest.getRevision());
+        assertTrue(libRequest.getRevision() != componentRequest.getRevision());
+        assertTrue(componentRequest.getRevision() == clientRequest.getRevision());
+    }
+
+    public void testPropagateRevisionViaRebuild()
+    {
+        Project util = createProject("util");
+        Project lib = createProject("lib", dependency(util));
+
+        List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(lib));
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        BuildRequestEvent libRequest = toQueue.get(1).getRequest();
+        assertTrue(utilRequest.getRevision() != libRequest.getRevision());
+
+        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+
+        toQueue = handler.prepare(createRebuildRequest(lib));
+        utilRequest = toQueue.get(0).getRequest();
+        libRequest = toQueue.get(1).getRequest();
+        assertTrue(utilRequest.getRevision() == libRequest.getRevision());
+    }
+
+    public void testPropagateRevisionViaRebuildEnsuresMultipleUpstreamRevisionsAreSame()
+    {
+        Project libA = createProject("libA");
+        Project libB = createProject("libB");
+        Project client = createProject("client", dependency(libA), dependency(libB));
+
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+
+        List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(client));
+        BuildRequestEvent libARequest = toQueue.get(0).getRequest();
+        BuildRequestEvent libBRequest = toQueue.get(1).getRequest();
+        BuildRequestEvent clientRequest = toQueue.get(2).getRequest();
+
+        assertTrue(libARequest.getRevision() == libBRequest.getRevision());
+        assertTrue(clientRequest.getRevision() == libBRequest.getRevision());
+    }
+
+    public void testPropagateRevisionWhereMultiplePathsExist()
+    {
+        Project libA = createProject("libA");
+        Project libB = createProject("libB", dependency(libA));
+        Project client = createProject("client", dependency(libA), dependency(libB));
+
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+
+        List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(client));
+        BuildRequestEvent libARequest = toQueue.get(0).getRequest();
+        BuildRequestEvent libBRequest = toQueue.get(1).getRequest();
+        BuildRequestEvent clientRequest = toQueue.get(2).getRequest();
+
+        assertTrue(libARequest.getRevision() == libBRequest.getRevision());
+        assertTrue(clientRequest.getRevision() == libBRequest.getRevision());
     }
 
     private void assertRequestMatchesProjects(List<QueuedRequest> requests, List<Project> projects)

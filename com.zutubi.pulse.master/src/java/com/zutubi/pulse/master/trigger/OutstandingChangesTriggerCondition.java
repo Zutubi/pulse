@@ -43,7 +43,7 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
             BuildRevision latestQueued = getLatestQueuedRevision(project);
             if (latestQueued != null)
             {
-                if (latestQueued.isFixed())
+                if (latestQueued.isInitialised())
                 {
                     previousRevision = latestQueued.getRevision();
                 }

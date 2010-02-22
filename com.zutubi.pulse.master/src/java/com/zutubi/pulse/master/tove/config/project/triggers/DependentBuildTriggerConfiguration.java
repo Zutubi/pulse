@@ -24,6 +24,12 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
      */
     private boolean propagateVersion;
 
+    /**
+     * If true, build requests raised by this trigger will inherit the revision
+     * of the completed build.
+     */
+    private boolean propagateRevision;
+
     public Trigger newTrigger()
     {
         return new NoopTrigger(getName(), Trigger.DEFAULT_GROUP);
@@ -47,5 +53,15 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
     public void setPropagateVersion(boolean propagateVersion)
     {
         this.propagateVersion = propagateVersion;
+    }
+
+    public boolean isPropagateRevision()
+    {
+        return propagateRevision;
+    }
+
+    public void setPropagateRevision(boolean propagateRevision)
+    {
+        this.propagateRevision = propagateRevision;
     }
 }

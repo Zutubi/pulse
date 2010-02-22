@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.utils.Repository;
+import com.zutubi.pulse.acceptance.utils.SvnWorkspace;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
@@ -28,16 +29,10 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.apache.commons.httpclient.Header;
-import org.tmatesoft.svn.core.SVNCommitInfo;
-import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
@@ -189,12 +184,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         SVNRepositoryFactoryImpl.setup();
         File wcDir = createTempDirectory();
+        BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager(CHANGE_AUTHOR, CHANGE_AUTHOR);
+        SVNClientManager clientManager = SVNClientManager.newInstance(SVNWCUtil.createDefaultOptions(true), authenticationManager);
+        SvnWorkspace workspace = new SvnWorkspace(clientManager, wcDir);
+        
         try
         {
-            DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
-            BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager(CHANGE_AUTHOR, CHANGE_AUTHOR);
-            SVNUpdateClient updateClient = new SVNUpdateClient(authenticationManager, options);
-            updateClient.doCheckout(SVNURL.parseURIDecoded(TRIVIAL_ANT_REPOSITORY), wcDir, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
+            workspace.doCheckout(TRIVIAL_ANT_REPOSITORY);
 
             File buildFile = new File(wcDir, CHANGE_FILENAME);
             assertTrue(buildFile.exists());
@@ -205,13 +201,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
                     "    </target>\n" +
                     "</project>");
 
-            SVNClientManager clientManager = SVNClientManager.newInstance(options, authenticationManager);
-            SVNCommitInfo commitInfo = clientManager.getCommitClient().doCommit(new File[]{buildFile}, true, CHANGE_COMMENT, null, null, false, false, SVNDepth.EMPTY);
-            return Long.toString(commitInfo.getNewRevision());
+            return workspace.doCommit(CHANGE_COMMENT, buildFile);
         }
         finally
         {
-            FileSystemUtils.rmdir(wcDir);
+            workspace.dispose();
         }
     }
 

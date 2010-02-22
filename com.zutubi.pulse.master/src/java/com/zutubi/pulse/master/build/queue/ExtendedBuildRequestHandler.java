@@ -6,14 +6,12 @@ import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
 import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.TriggerOptions;
-import com.zutubi.pulse.master.model.RebuildBuildReason;
 import com.zutubi.pulse.master.model.DependencyBuildReason;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.RebuildBuildReason;
+import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.InstanceOfPredicate;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.util.TreeNode;
 import com.zutubi.util.UnaryProcedure;
 
@@ -21,8 +19,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 
 /**
  * The extended build request handler is responsible for handling all
@@ -64,14 +60,16 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
             TreeNode<BuildGraphData> upstream = builder.buildUpstreamGraph(project.getConfig(),
                     filters.status(request.getStatus()),
                     filters.transitive(),
-                    filters.duplicate());
+                    filters.duplicate()
+            );
             upstreamRequests = prepareUpstreamRequests(request, upstream);
             upstreamRoot = upstreamRequests.removeLast();
         }
 
         TreeNode<BuildGraphData> downstream = builder.buildDownstreamGraph(project.getConfig(), 
                 filters.trigger(),
-                filters.duplicate());
+                filters.duplicate()
+        );
         LinkedList<QueuedRequest> downstreamRequests = prepareDownstreamRequests(request, downstream);
         QueuedRequest downstreamRoot = downstreamRequests.removeFirst();
 
@@ -98,7 +96,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 {
                     BuildRequestEvent newRequest = cloneAndRegisterIfNotOriginal(request, owner, false);
 
-                    DependentBuildTriggerConfiguration trigger = getTrigger(owner);
+                    DependentBuildTriggerConfiguration trigger = TriggerUtils.getTrigger(owner.getConfig(), DependentBuildTriggerConfiguration.class);
                     if (trigger != null && !node.isRoot())
                     {
                         Project upstreamOwner = getNodeProject(node.getParent());
@@ -112,6 +110,10 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                         if (trigger.isPropagateVersion())
                         {
                             options.setVersion(upstreamRequest.getRequest().getVersion());
+                        }
+                        if (trigger.isPropagateRevision())
+                        {
+                            newRequest.setRevision(upstreamRequest.getRequest().getRevision());
                         }
                     }
 
@@ -136,12 +138,6 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
     private Project getNodeProject(TreeNode<BuildGraphData> node)
     {
         return projectManager.getProject(node.getData().getProjectConfig().getProjectId(), true);
-    }
-
-    private DependentBuildTriggerConfiguration getTrigger(Project project)
-    {
-        Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getConfig().getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
-        return (DependentBuildTriggerConfiguration) CollectionUtils.find(triggers.values(), new InstanceOfPredicate<TriggerConfiguration>(DependentBuildTriggerConfiguration.class));
     }
 
     private LinkedList<QueuedRequest> prepareUpstreamRequests(final BuildRequestEvent request, final TreeNode<BuildGraphData> upstream)
@@ -175,6 +171,26 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 }
             }
         });
+
+        upstream.breadthFirstWalk(new UnaryProcedure<TreeNode<BuildGraphData>>()
+        {
+            public void run(TreeNode<BuildGraphData> node)
+            {
+                Project owner = getNodeProject(node);
+                QueuedRequest request = ownerRequests.get(owner);
+                DependentBuildTriggerConfiguration trigger = TriggerUtils.getTrigger(owner.getConfig(), DependentBuildTriggerConfiguration.class);
+                if (trigger.isPropagateRevision())
+                {
+                    for (TreeNode<BuildGraphData> child : node.getChildren())
+                    {
+                        Project childOwner = getNodeProject(child);
+                        QueuedRequest childRequest = ownerRequests.get(childOwner);
+                        childRequest.getRequest().setRevision(request.getRequest().getRevision());
+                    }
+                }
+            }
+        });
+
         return requestsToQueue;
     }
 

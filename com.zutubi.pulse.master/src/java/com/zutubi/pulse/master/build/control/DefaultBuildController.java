@@ -443,7 +443,6 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private Bootstrapper createPersonalBuildBootstrapper(final Bootstrapper initialBootstrapper)
     {
-        // TODO: preferrable to move this out (maybe to the request)
         PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
         return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), pbr.getPatchFormat());
     }
@@ -640,7 +639,7 @@ public class DefaultBuildController implements EventListener, BuildController
     {
         BuildRevision buildRevision = request.getRevision();
 
-        if (!buildRevision.isFixed())
+        if (!buildRevision.isInitialised())
         {
             buildLogger.status("Initialising build revision...");
             buildRevision.setRevision(getLatestRevision());

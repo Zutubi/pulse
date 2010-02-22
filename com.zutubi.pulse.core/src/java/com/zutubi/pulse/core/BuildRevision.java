@@ -3,19 +3,21 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.scm.api.Revision;
 
 /**
- * Represents the revision to be built.  This revision may be fixed when the
- * build is triggered or determined lazily.  Once fixed, the build revision can
- * not be changed.
+ * Represents the revision to be built.  The revision of the build can be initialised
+ * at any time before the build starts, but once initialised, it can not be changed.
+ *
+ * The build revision can be marked as fixed before it is initialised.  Once fixed, the
+ * build revision should not take part in any scheduling assimilation processing.
  */
 public class BuildRevision
 {
     /**
      * The revision to build, which may be null if it has not yet been
-     * determined.
+     * initialised.
      */
     private Revision revision;
     /**
-     * True if the revision has been determined.
+     * True if the build revision has been fixed.
      */
     private boolean fixed = false;
     /**
@@ -48,12 +50,11 @@ public class BuildRevision
 
         this.revision = revision;
         this.user = user;
-        fix();
     }
 
     /**
      * @return the underlying revision to use for the build, may be null if
-     *         this revision has not been fixed.
+     *         this revision has not been initialised.
      */
     public synchronized Revision getRevision()
     {
@@ -64,44 +65,49 @@ public class BuildRevision
      * Check if this revision has been fixed.  The revision is fixed at the
      * latest when the build commences.
      *
-     * @return true if this revision has been fixed ({@link #setRevision} can no
-     *         longer be called
+     * @return true if this revision has been fixed.
      */
     public synchronized boolean isFixed()
     {
-        return fixed;
+        return isInitialised() || fixed;
     }
 
-    /**
-     * @return true if this revision was determined from user input
-     */
-    public boolean isUser()
+    private synchronized void setFixed(boolean fixed)
+    {
+        this.fixed = fixed;
+    }
+
+    public synchronized void fix()
+    {
+        setFixed(true);
+    }
+
+    public synchronized boolean isInitialised()
+    {
+        return getRevision() != null;
+    }
+
+    public synchronized boolean isUser()
     {
         return user;
     }
 
-    /**
-     * Fix the revision.  The revision <strong>must not</strong> be fixed.
-     *
-     * @param revision  the revision to build
-     */
-    public void setRevision(Revision revision)
+    public synchronized void setUser(boolean user)
     {
-        if (isFixed())
-        {
-            throw new IllegalStateException("Attempt to update a fixed revision");
-        }
-
-        this.revision = revision;
-        fix();
+        this.user = user;
     }
 
     /**
-     * Fixes this revision, timestamping the moment when this occurs.  No
-     * more updates are permitted after fixing.
+     * Initialise the revision.
+     *
+     * @param revision  the revision to build
      */
-    private void fix()
+    public synchronized void setRevision(Revision revision)
     {
-        this.fixed = true;
+        if (isInitialised())
+        {
+            throw new IllegalStateException("Attempt to update the revision");
+        }
+        this.revision = revision;
     }
 }

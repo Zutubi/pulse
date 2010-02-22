@@ -98,20 +98,8 @@ public abstract class BuildRequestEvent extends Event implements Comparable
         return revision;
     }
 
-    /**
-     * Update the revision due to a new request arriving with the same source.
-     * Note this request must be replaceable to allow this.
-     *
-     * @param revision the new revision to use for the build
-     * @throws IllegalStateException if this request is not replaceable
-     */
     public void setRevision(BuildRevision revision)
     {
-        if (!options.isReplaceable())
-        {
-            throw new IllegalStateException("Attempt to update revision for a non-replaceable build request.");
-        }
-
         this.revision = revision;
     }
 

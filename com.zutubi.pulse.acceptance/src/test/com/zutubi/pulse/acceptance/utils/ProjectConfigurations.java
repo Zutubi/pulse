@@ -42,10 +42,7 @@ public class ProjectConfigurations
      */
     public AntProjectHelper createFailAntProject(String projectName) throws Exception
     {
-        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
-        configureBaseProject(project, true);
-        configureSvnScm(project, Constants.FAIL_ANT_REPOSITORY);
-        return project;
+        return createAntProject(projectName, Constants.FAIL_ANT_REPOSITORY);
     }
 
     /**
@@ -87,10 +84,7 @@ public class ProjectConfigurations
 
     public AntProjectHelper createIvyAntProject(String projectName) throws Exception
     {
-        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
-        configureBaseProject(project, true);
-        configureSvnScm(project, Constants.IVY_ANT_REPOSITORY);
-        return project;
+        return createAntProject(projectName, Constants.IVY_ANT_REPOSITORY);
     }
 
     public MavenProjectHelper createDepMavenProject(String projectName) throws Exception
@@ -132,17 +126,19 @@ public class ProjectConfigurations
      */
     public AntProjectHelper createTestAntProject(String projectName) throws Exception
     {
-        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
-        configureBaseProject(project, true);
-        configureSvnScm(project, Constants.TEST_ANT_REPOSITORY);
-        return project;
+        return createAntProject(projectName, Constants.TEST_ANT_REPOSITORY);
     }
 
     public AntProjectHelper createTrivialAntProject(String projectName) throws Exception
     {
+        return createAntProject(projectName, Constants.TRIVIAL_ANT_REPOSITORY);
+    }
+
+    public AntProjectHelper createAntProject(String projectName, String svnUrl) throws Exception
+    {
         AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
         configureBaseProject(project, true);
-        configureSvnScm(project, Constants.TRIVIAL_ANT_REPOSITORY);
+        configureSvnScm(project, svnUrl);
         return project;
     }
 
