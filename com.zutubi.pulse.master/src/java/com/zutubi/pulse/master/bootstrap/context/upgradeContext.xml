@@ -123,6 +123,7 @@
                 <ref local="renameInitialResultStateToPending"/>
                 <ref local="addRegexTestPostProcessorDurationGroupConfiguration"/>
                 <ref local="addPerforceInactivityTimeout"/>
+                <ref local="addPropagateRevisionToDependentBuildTrigger"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -596,5 +597,9 @@
 
     <bean id="addPerforceInactivityTimeout" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceInactivityTimeoutUpgradeTask">
         <property name="buildNumber" value="201018001"/>
+    </bean>
+
+    <bean id="addPropagateRevisionToDependentBuildTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddPropagateRevisionToDependentTriggerUpgradeTask">
+        <property name="buildNumber" value="201019001"/>
     </bean>
 </beans>
