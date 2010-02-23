@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <recipe name="foo" version="test version"></recipe>
+    <recipe name="foo">
+        <custom-fields name="record-version">
+            <field name="version" scope="build" value="test version"/>
+        </custom-fields>
+    </recipe>
 </project>

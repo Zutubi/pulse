@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
 
@@ -18,9 +17,12 @@ import java.util.Set;
 public class PulseFileToToveFile
 {
     private static final String ELEMENT_COMMAND = "command";
+    private static final String ELEMENT_CUSTOM_FIELDS = "custom-fields";
+    private static final String ELEMENT_FIELD = "field";
     private static final String ELEMENT_RESOURCE = "resource";
     private static final String ELEMENT_VERSION = "version";
     private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_SCOPE = "scope";
     private static final String ATTRIBUTE_VALUE = "value";
     private static final String ATTRIBUTE_VERSION = "version";
 
@@ -114,12 +116,19 @@ public class PulseFileToToveFile
         }
         else if (localName.equals(ELEMENT_VERSION))
         {
-            String value = element.getAttributeValue(ATTRIBUTE_VALUE);
-            if (StringUtils.stringSet(value))
-            {
-                parentElement.addAttribute(new Attribute(ATTRIBUTE_VERSION, value));
-            }
-            parentElement.removeChild(element);
+            System.out.println("WARNING: Replacing <version> element from recipe '" + parentElement.getAttributeValue("name") + "' with a custom field.");
+            System.out.println("WARNING: Consider using the new version field in project dependencies configuration instead.");
+
+            element.setLocalName(ELEMENT_CUSTOM_FIELDS);
+            element.addAttribute(new Attribute(ATTRIBUTE_NAME, "record-version"));
+            Attribute valueAttribute = element.getAttribute(ATTRIBUTE_VALUE);
+            element.removeAttribute(valueAttribute);
+
+            Element fieldElement = new Element(ELEMENT_FIELD);
+            fieldElement.addAttribute(new Attribute(ATTRIBUTE_NAME, "version"));
+            fieldElement.addAttribute(new Attribute(ATTRIBUTE_SCOPE, "build"));
+            fieldElement.addAttribute(new Attribute(ATTRIBUTE_VALUE, valueAttribute.getValue()));
+            element.appendChild(fieldElement);
         }
         else
         {
