@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.RandomUtils;
 import org.apache.commons.httpclient.HttpClient;
@@ -9,7 +8,6 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Vector;
 
 /**
@@ -103,12 +101,6 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
         {
             assertTrue("Message '" + e.getMessage() + "' does not contain '" + error + "'", e.getMessage().contains(error));
         }
-    }
-
-    protected ResultState getBuildStatus(String projectName, int buildNumber) throws Exception
-    {
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
-        return ResultState.fromPrettyString((String) build.get("status"));
     }
 
     protected String downloadAsAdmin(String url) throws IOException

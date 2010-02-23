@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
@@ -232,8 +233,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         waitForHook(PROJECT_NAME);
         int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
-        Hashtable<String,Object> build = xmlRpcHelper.getBuild(PROJECT_NAME, buildNumber);
-        assertEquals("error", build.get("status"));
+        assertEquals(ResultState.ERROR, xmlRpcHelper.getBuildStatus(PROJECT_NAME, buildNumber));
     }
 
     public void testRestrictToStates() throws Exception

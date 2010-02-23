@@ -7,6 +7,7 @@ import com.zutubi.util.InstanceOfPredicate;
 
 import java.util.Map;
 import java.util.List;
+import java.util.LinkedList;
 
 public class TriggerUtils
 {
@@ -16,7 +17,7 @@ public class TriggerUtils
      *
      * @param projectConfig the project configuration from which the trigger is being retrieved.
      * @param type          the type of the trigger being retrieved.
-     * @param <T>
+     * @param <T>           an extension of TriggerConfiguration.
      * @return a trigger instance of the specified type, or null if non exists.
      */
     public static <T extends TriggerConfiguration> T getTrigger(ProjectConfiguration projectConfig, Class<T> type)
@@ -34,8 +35,9 @@ public class TriggerUtils
      *
      * @param projectConfig the project configuration from which the triggers are being retrieved.
      * @param type          the type of the triggers being retrieved.
-     * @param <T>
-     * @return a list of triggers of the specified type.
+     * @param <T>           an extension of TriggerConfiguration.
+     * @return a list of triggers of the specified type, or an empty list of no triggers of the
+     * specified type exist.
      */
     public static <T extends TriggerConfiguration> List<T> getTriggers(ProjectConfiguration projectConfig, Class<T> type)
     {
@@ -44,6 +46,6 @@ public class TriggerUtils
         {
             return (List<T>) CollectionUtils.filter(triggers.values(), new InstanceOfPredicate<TriggerConfiguration>(type));
         }
-        return null;
+        return new LinkedList<T>();
     }
 }

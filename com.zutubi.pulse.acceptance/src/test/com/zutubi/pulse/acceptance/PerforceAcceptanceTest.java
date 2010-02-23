@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 
@@ -49,8 +50,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String project = randomName();
         xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, xmlRpcHelper.getAntConfig());
         int buildId = xmlRpcHelper.runBuild(project);
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
-        assertEquals("success", build.get("status"));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(project, buildId));
     }
 
     public void testClientsCleanedUp() throws Exception

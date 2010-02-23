@@ -14,10 +14,7 @@ public class AddPropagateRevisionToDependentTriggerUpgradeTask extends AbstractR
 
     protected RecordLocator getRecordLocator()
     {
-        return RecordLocators.newTypeFilter(
-                RecordLocators.newPathPattern(PathUtils.getPath("projects/*/triggers/*")),
-                TYPE
-        );
+        return RecordLocators.newTypeFilter(RecordLocators.newPathPattern("projects/*/triggers/*"),TYPE);
     }
 
     protected List<RecordUpgrader> getRecordUpgraders()

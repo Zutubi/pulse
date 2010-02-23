@@ -5,15 +5,18 @@ import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 
 import java.io.File;
+import java.io.Closeable;
 
 import com.zutubi.util.FileSystemUtils;
 
 /**
  * Utility class that provides assistance when working with an svn workspace.
  */
-public class SvnWorkspace
+public class SubversionWorkspace implements Closeable
 {
     private SVNClientManager clientManager;
     private File workingDir;
@@ -21,12 +24,16 @@ public class SvnWorkspace
     /**
      * Create a new instance.
      *
-     * @param clientManager     the configured client manager that provides access to the svn operations.
-     * @param workingDir        the working directory in which the svn operations will take place.
+     * @param workingDir    the working directory in which the svn operations will take place.
+     * @param user          the username used to authenticate the svn operations.
+     * @param pass          the password used to authenticate the svn operations.
      */
-    public SvnWorkspace(SVNClientManager clientManager, File workingDir)
+    public SubversionWorkspace(File workingDir, String user, String pass)
     {
-        this.clientManager = clientManager;
+        SVNRepositoryFactoryImpl.setup();
+
+        BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager(user, pass);
+        this.clientManager = SVNClientManager.newInstance(SVNWCUtil.createDefaultOptions(true), authenticationManager);
         this.workingDir = workingDir;
     }
 
@@ -76,7 +83,7 @@ public class SvnWorkspace
      * Cleanup resources held by this instance.  This includes cleaning up the working
      * directory.
      */
-    public void dispose()
+    public void close()
     {
         clientManager.dispose();
         FileSystemUtils.rmdir(workingDir);

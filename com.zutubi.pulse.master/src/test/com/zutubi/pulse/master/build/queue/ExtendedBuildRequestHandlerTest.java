@@ -18,9 +18,9 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
 {
     private ExtendedBuildRequestHandler handler;
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings({"UnusedDeclaration", "FieldCanBeLocal"})
     private Sequence sequence;
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings({"UnusedDeclaration", "FieldCanBeLocal"})
     private BuildQueue buildQueue;
 
     @Override
@@ -149,14 +149,14 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         List<QueuedRequest> toQueue = handler.prepare(createRequest(util));
         BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
         BuildRequestEvent clientRequest = toQueue.get(1).getRequest();
-        assertTrue(utilRequest.getRevision() != clientRequest.getRevision());
+        assertNotSame(utilRequest.getRevision(), clientRequest.getRevision());
 
         TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
 
         toQueue = handler.prepare(createRequest(util));
         utilRequest = toQueue.get(0).getRequest();
         clientRequest = toQueue.get(1).getRequest();
-        assertTrue(utilRequest.getRevision() == clientRequest.getRevision());
+        assertSame(utilRequest.getRevision(), clientRequest.getRevision());
     }
 
     public void testPropagateRevisionToMultipleDownstreamBuilds()
@@ -172,8 +172,8 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
         BuildRequestEvent clientARequest = toQueue.get(1).getRequest();
         BuildRequestEvent clientBRequest = toQueue.get(2).getRequest();
-        assertTrue(utilRequest.getRevision() == clientARequest.getRevision());
-        assertTrue(utilRequest.getRevision() == clientBRequest.getRevision());
+        assertSame(utilRequest.getRevision(), clientARequest.getRevision());
+        assertSame(utilRequest.getRevision(), clientBRequest.getRevision());
     }
 
     public void testPropagateRevisionsAreDistinctOnExtendedTree()
@@ -192,9 +192,9 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         BuildRequestEvent componentRequest = toQueue.get(2).getRequest();
         BuildRequestEvent clientRequest = toQueue.get(3).getRequest();
 
-        assertTrue(utilRequest.getRevision() == libRequest.getRevision());
-        assertTrue(libRequest.getRevision() != componentRequest.getRevision());
-        assertTrue(componentRequest.getRevision() == clientRequest.getRevision());
+        assertSame(utilRequest.getRevision(), libRequest.getRevision());
+        assertNotSame(libRequest.getRevision(), componentRequest.getRevision());
+        assertSame(componentRequest.getRevision(), clientRequest.getRevision());
     }
 
     public void testPropagateRevisionViaRebuild()
@@ -205,14 +205,14 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(lib));
         BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
         BuildRequestEvent libRequest = toQueue.get(1).getRequest();
-        assertTrue(utilRequest.getRevision() != libRequest.getRevision());
+        assertNotSame(utilRequest.getRevision(), libRequest.getRevision());
 
         TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
 
         toQueue = handler.prepare(createRebuildRequest(lib));
         utilRequest = toQueue.get(0).getRequest();
         libRequest = toQueue.get(1).getRequest();
-        assertTrue(utilRequest.getRevision() == libRequest.getRevision());
+        assertSame(utilRequest.getRevision(), libRequest.getRevision());
     }
 
     public void testPropagateRevisionViaRebuildEnsuresMultipleUpstreamRevisionsAreSame()
@@ -228,8 +228,8 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         BuildRequestEvent libBRequest = toQueue.get(1).getRequest();
         BuildRequestEvent clientRequest = toQueue.get(2).getRequest();
 
-        assertTrue(libARequest.getRevision() == libBRequest.getRevision());
-        assertTrue(clientRequest.getRevision() == libBRequest.getRevision());
+        assertSame(libARequest.getRevision(), libBRequest.getRevision());
+        assertSame(clientRequest.getRevision(), libBRequest.getRevision());
     }
 
     public void testPropagateRevisionWhereMultiplePathsExist()
@@ -245,8 +245,8 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         BuildRequestEvent libBRequest = toQueue.get(1).getRequest();
         BuildRequestEvent clientRequest = toQueue.get(2).getRequest();
 
-        assertTrue(libARequest.getRevision() == libBRequest.getRevision());
-        assertTrue(clientRequest.getRevision() == libBRequest.getRevision());
+        assertSame(libARequest.getRevision(), libBRequest.getRevision());
+        assertSame(clientRequest.getRevision(), libBRequest.getRevision());
     }
 
     private void assertRequestMatchesProjects(List<QueuedRequest> requests, List<Project> projects)

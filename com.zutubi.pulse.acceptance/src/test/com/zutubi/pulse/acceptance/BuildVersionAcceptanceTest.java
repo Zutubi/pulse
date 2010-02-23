@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
@@ -53,7 +51,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         // trigger a successful build.
         int buildNumber = xmlRpcHelper.runBuild(projectName);
-        assertEquals(ResultState.SUCCESS, getBuildStatus(projectName, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, Integer.toString(buildNumber));
     }
@@ -63,7 +61,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String buildVersion = "FIXED";
 
         int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertEquals(ResultState.SUCCESS, getBuildStatus(projectName, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, buildVersion);
     }
@@ -73,7 +71,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String buildVersion = "${project}-${build.number}";
 
         int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertEquals(ResultState.SUCCESS, getBuildStatus(projectName, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, projectName + "-" + buildNumber);
     }
@@ -134,8 +132,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         repository.getIvyModuleDescriptor(projectName, expectedVersion);
 
         // b) the xml rpc interface - build details
-        Hashtable<String, Object> buildDetails = xmlRpcHelper.getBuild(projectName, buildNumber);
-        assertEquals(expectedVersion, buildDetails.get("version"));
+        assertEquals(expectedVersion, xmlRpcHelper.getBuildVersion(projectName, buildNumber));
 
         // c) the environment text contents
         String text = getEnvironmentText(projectName, buildNumber);

@@ -7,7 +7,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.utils.Repository;
-import com.zutubi.pulse.acceptance.utils.SvnWorkspace;
+import com.zutubi.pulse.acceptance.utils.SubversionWorkspace;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
@@ -28,12 +28,9 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -182,11 +179,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private String editAndCommitBuildFile() throws IOException, SVNException
     {
-        SVNRepositoryFactoryImpl.setup();
         File wcDir = createTempDirectory();
-        BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager(CHANGE_AUTHOR, CHANGE_AUTHOR);
-        SVNClientManager clientManager = SVNClientManager.newInstance(SVNWCUtil.createDefaultOptions(true), authenticationManager);
-        SvnWorkspace workspace = new SvnWorkspace(clientManager, wcDir);
+        SubversionWorkspace workspace = new SubversionWorkspace(wcDir, CHANGE_AUTHOR, CHANGE_AUTHOR);
         
         try
         {
@@ -205,7 +199,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         }
         finally
         {
-            workspace.dispose();
+            IOUtils.close(workspace);
         }
     }
 

@@ -251,12 +251,7 @@ public class BuildRunner
      */
     public ResultState getBuildStatus(ProjectConfiguration project, int buildNumber) throws Exception
     {
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), buildNumber);
-        if (build != null)
-        {
-            return ResultState.fromPrettyString((String) build.get("status"));
-        }
-        return null;
+        return xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
     }
 
 }

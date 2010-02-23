@@ -806,6 +806,46 @@ public class XmlRpcHelper
         }
     }
 
+    public String getBuildRevision(String projectName, int number) throws Exception
+    {
+        Hashtable<String, Object> build = getBuild(projectName, number);
+        if (build != null)
+        {
+            return (String)build.get("revision");
+        }
+        return null;
+    }
+
+    public String getBuildVersion(String projectName, int number) throws Exception
+    {
+        Hashtable<String, Object> build = getBuild(projectName, number);
+        if (build != null)
+        {
+            return (String)build.get("version");
+        }
+        return null;
+    }
+
+    public String getBuildReason(String projectName, int number) throws Exception
+    {
+        Hashtable<String, Object> build = getBuild(projectName, number);
+        if (build != null)
+        {
+            return (String)build.get("reason");
+        }
+        return null;
+    }
+
+    public ResultState getBuildStatus(String projectName, int buildNumber) throws Exception
+    {
+        Hashtable<String, Object> build = getBuild(projectName, buildNumber);
+        if (build != null)
+        {
+            return ResultState.fromPrettyString((String) build.get("status"));
+        }
+        return null;
+    }
+
     public boolean deleteBuild(String projectName, int number) throws Exception
     {
         return (Boolean)call("deleteBuild", projectName, number);

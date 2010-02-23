@@ -30,7 +30,6 @@ public class DefaultRestoreManager implements RestoreManager
 
     private File tmpDirectory;
 
-    //TODO: bypass the UserPaths instance, set the directory directly to ease testing and minimise the dependencies.
     private Data paths = null;
 
     private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();

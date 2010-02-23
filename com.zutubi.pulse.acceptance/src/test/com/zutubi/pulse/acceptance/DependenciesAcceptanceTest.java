@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
-import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -17,15 +16,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
-import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.wc.*;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -443,7 +440,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(projectB);
 
         int buildNumber = buildRunner.triggerAndWaitForBuild(projectB.getConfig());
-        assertEquals(ResultState.FAILURE, getBuildStatus(projectB.getConfig().getName(), buildNumber));
+        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(projectB.getConfig().getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(projectB, buildNumber);
@@ -478,10 +475,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(downstream.getConfig().getName(), 1);
 
         // verify that the build reasons are as expected.
-        Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
-        assertEquals("trigger via remote api by admin", buildA.get("reason"));
-        Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
-        assertEquals("dependent of " + upstream.getConfig().getName(), buildB.get("reason"));
+        assertEquals("trigger via remote api by admin", xmlRpcHelper.getBuildReason(upstream.getConfig().getName(), 1));
+        assertEquals("dependent of " + upstream.getConfig().getName(), xmlRpcHelper.getBuildReason(downstream.getConfig().getName(), 1));
     }
 
     public void testRebuildBuildReason() throws Exception
@@ -497,10 +492,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(downstream.getConfig().getName(), 1);
 
         // verify that the build reasons are as expected.
-        Hashtable buildA = xmlRpcHelper.getBuild(upstream.getConfig().getName(), 1);
-        assertEquals("build with dependencies of " + downstream.getConfig().getName(), buildA.get("reason"));
-        Hashtable buildB = xmlRpcHelper.getBuild(downstream.getConfig().getName(), 1);
-        assertEquals("trigger via remote api by admin", buildB.get("reason"));
+        assertEquals("build with dependencies of " + downstream.getConfig().getName(), xmlRpcHelper.getBuildReason(upstream.getConfig().getName(), 1));
+        assertEquals("trigger via remote api by admin", xmlRpcHelper.getBuildReason(downstream.getConfig().getName(), 1));
     }
 
     public void testDependentBuild_PropagateStatus() throws Exception
@@ -515,7 +508,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.addDependency(projectA.getConfig());
         projectB.getConfig().getDependencies().setStatus(STATUS_INTEGRATION);
 
-        DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
+        DependentBuildTriggerConfiguration trigger = projectB.getTrigger(DEPENDENCY_TRIGGER);
         trigger.setPropagateStatus(true);
 
         insertProject(projectB);
@@ -539,7 +532,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
 
-        DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
+        DependentBuildTriggerConfiguration trigger = projectB.getTrigger(DEPENDENCY_TRIGGER);
         trigger.setPropagateVersion(true);
         insertProject(projectB);
 
@@ -721,14 +714,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String revision = setupPropagateWorkspace();
 
-        String projectAName = randomName + "A";
+        String projectAName = randomName + "-upstream";
         ProjectConfigurationHelper projectA = projects.createAntProject(projectAName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectAName);
         insertProject(projectA);
 
-        String projectBName = randomName + "B";
+        String projectBName = randomName + "-downstream";
         ProjectConfigurationHelper projectB = projects.createAntProject(projectBName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectBName);
         projectB.addDependency(projectA);
-        DependentBuildTriggerConfiguration trigger = projectB.getTrigger("dependency trigger");
+        DependentBuildTriggerConfiguration trigger = projectB.getTrigger(DEPENDENCY_TRIGGER);
         trigger.setPropagateRevision(true);
         insertProject(projectB);
 
@@ -737,65 +730,56 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         // verify build revision.
-        assertEquals(revision, xmlRpcHelper.getBuild(projectAName, 1).get("revision"));
-        assertEquals(revision, xmlRpcHelper.getBuild(projectBName, 1).get("revision"));
+        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectAName, 1));
+        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectBName, 1));
 
         // test triggering the downstream project.
         buildRunner.triggerRebuild(projectB);
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 2);
 
-        assertEquals(revision, xmlRpcHelper.getBuild(projectAName, 2).get("revision"));
-        assertEquals(revision, xmlRpcHelper.getBuild(projectBName, 2).get("revision"));
+        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectAName, 2));
+        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectBName, 2));
 
         // test that triggering b directly picks up its own revision.
         buildRunner.triggerSuccessfulBuild(projectB);
-        assertFalse(revision.equals(xmlRpcHelper.getBuild(projectBName, 3).get("revision")));
+        assertFalse(revision.equals(xmlRpcHelper.getBuildRevision(projectBName, 3)));
     }
 
     // setup the repository for the propagate revision tests.
     public String setupPropagateWorkspace() throws IOException, SVNException
     {
-        SVNRepositoryFactoryImpl.setup();
-
-        String svnUrl = TRIVIAL_ANT_REPOSITORY;
-        DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
-        BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager("pulse", "pulse");
-
-        SVNClientManager clientManager = SVNClientManager.newInstance(options, authenticationManager);
         File wcDir = createTempDirectory();
-
-        SvnWorkspace workspace = new SvnWorkspace(clientManager, wcDir);
-
+        SubversionWorkspace workspace = new SubversionWorkspace(wcDir, "pulse", "pulse");
         try
         {
-            workspace.doCheckout(svnUrl);
+            workspace.doCheckout(TRIVIAL_ANT_REPOSITORY);
 
-            File fileA = new File(wcDir, randomName + "A/build.xml");
-            assertTrue(fileA.getParentFile().mkdirs());
-            FileSystemUtils.copy(fileA, new File(wcDir, "build.xml"));
+            File upstreamBuildFile = new File(wcDir, randomName + "-upstream/build.xml");
+            assertTrue(upstreamBuildFile.getParentFile().mkdirs());
+            FileSystemUtils.copy(upstreamBuildFile, new File(wcDir, "build.xml"));
 
-            File fileB = new File(wcDir, randomName + "B/build.xml");
-            assertTrue(fileB.getParentFile().mkdirs());
-            FileSystemUtils.copy(fileB, new File(wcDir, "build.xml"));
+            File downstreamBuildFile = new File(wcDir, randomName + "-downstream/build.xml");
+            assertTrue(downstreamBuildFile.getParentFile().mkdirs());
+            FileSystemUtils.copy(downstreamBuildFile, new File(wcDir, "build.xml"));
 
-            workspace.doAdd(fileA.getParentFile(), fileA, fileB.getParentFile(), fileB);
-            workspace.doCommit("initial checkin", fileA.getParentFile(), fileA, fileB.getParentFile(), fileB);
+            workspace.doAdd(upstreamBuildFile.getParentFile(), upstreamBuildFile, downstreamBuildFile.getParentFile(), downstreamBuildFile);
+            workspace.doCommit("initial checkin", upstreamBuildFile.getParentFile(), upstreamBuildFile, downstreamBuildFile.getParentFile(), downstreamBuildFile);
 
-            File txtFileA = new File(wcDir, randomName + "A/file.txt");
-            assertTrue(txtFileA.createNewFile());
-            workspace.doAdd(txtFileA);
-            String revision = workspace.doCommit("update a", txtFileA);
+            File upstreamFile = new File(wcDir, randomName + "-upstream/file.txt");
+            assertTrue(upstreamFile.createNewFile());
+            workspace.doAdd(upstreamFile);
+            String revision = workspace.doCommit("update upstream", upstreamFile);
 
-            File txtFileB = new File(wcDir, randomName + "B/file.txt");
-            assertTrue(txtFileB.createNewFile());
-            workspace.doAdd(txtFileB);
-            workspace.doCommit("update b", txtFileB);
+            File downstreamFile = new File(wcDir, randomName + "-downstream/file.txt");
+            assertTrue(downstreamFile.createNewFile());
+            workspace.doAdd(downstreamFile);
+            workspace.doCommit("update downstream", downstreamFile);
 
             return revision;
         }
         finally
         {
-            workspace.dispose();
+            IOUtils.close(workspace);
         }
     }
 

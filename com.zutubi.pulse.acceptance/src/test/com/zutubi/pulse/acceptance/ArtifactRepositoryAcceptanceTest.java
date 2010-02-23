@@ -44,7 +44,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = createAndRunIvyAntProject("publish");
 
         // ensure that the build passed.
-        assertEquals(ResultState.SUCCESS, getBuildStatus(random, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(random, buildNumber));
 
         assertTrue(repository.isInRepository("zutubi/com.zutubi.sample/jars"));
     }
@@ -59,7 +59,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = createAndRunIvyAntProject("retrieve");
 
         // ensure that the build passed.
-        assertEquals(ResultState.SUCCESS, getBuildStatus(random, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(random, buildNumber));
     }
 
     public void testExternalMavenCanUseRepository() throws Exception
@@ -67,7 +67,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectA = random + "A";
         int buildNumber = createAndRunMavenProject(projectA, "pom-artifact1.xml", "clean deploy");
 
-        assertEquals(ResultState.SUCCESS, getBuildStatus(projectA, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA, buildNumber));
 
         assertTrue(repository.isInRepository("zutubi/artifact1/maven-metadata.xml"));
         assertTrue(repository.isInRepository("zutubi/artifact1/1.0/artifact1-1.0.jar"));
@@ -75,7 +75,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         String projectB = random + "B";
         buildNumber = createAndRunMavenProject(projectB, "pom-artifact2.xml", "clean dependency:copy-dependencies");
-        assertEquals(ResultState.SUCCESS, getBuildStatus(projectB, buildNumber));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB, buildNumber));
     }
 
     private int createAndRunMavenProject(String projectName, String pom, String goals) throws Exception

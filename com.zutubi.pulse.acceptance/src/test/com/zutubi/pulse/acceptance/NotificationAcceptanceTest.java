@@ -23,6 +23,8 @@ import com.zutubi.util.RandomUtils;
 import java.util.*;
 
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import com.zutubi.pulse.core.engine.api.ResultState;
+
 import static java.util.Arrays.asList;
 
 /**
@@ -114,8 +116,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String projectName = random + "project" + PROJECT_SUCCESS;
         int buildNumber = xmlRpcHelper.runBuild(projectName);
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
-        assertEquals("success", build.get("status"));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
         assertIndividualEmailsTo(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS);
     }
 
@@ -123,8 +124,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String projectName = random + "project" + PROJECT_FAIL;
         int buildNumber = xmlRpcHelper.runBuild(projectName);
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
-        assertEquals("failure", build.get("status"));
+        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
         assertIndividualEmailsTo(BUILDS_ALL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
     }
 
