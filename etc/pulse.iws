@@ -2,8 +2,8 @@
 <project version="4" relativePaths="false">
   <component name="RunManager" selected="Application.Pulse Master">
     <configuration default="false" name="Pulse Master" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Xmx1024m -Dbootstrap=com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml -XX:+HeapDumpOnOutOfMemoryError" />
+      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand"/>
+      <option name="VM_PARAMETERS" value="-Xmx1024m -Dbootstrap=com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -41,25 +41,18 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="false" name="SetupAcceptanceTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="com.zutubi.pulse.acceptance.*" />
-      <module name="com.zutubi.pulse.acceptance" />
+    <configuration default="false" name="SetPassword" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.master.cli.SetPasswordCommand" />
+      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml" />
+      <option name="PROGRAM_PARAMETERS" value="<username> <password>" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="com.zutubi.pulse.acceptance" />
-      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.acceptance.SetupAcceptanceTest" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <RunnerSettings RunnerId="Profile ">
-        <option name="myExternalizedOptions" value="&#13;&#10;additional-options=&#13;&#10;snapshots-dir=&#13;&#10;" />
-      </RunnerSettings>
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="com.zutubi.pulse.master" />
+      <envs />
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method>
