@@ -24,7 +24,6 @@ public class PulseFileToToveFile
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_SCOPE = "scope";
     private static final String ATTRIBUTE_VALUE = "value";
-    private static final String ATTRIBUTE_VERSION = "version";
 
     private static final Set<String> COMMAND_ELEMENTS = CollectionUtils.asSet(
             "ant",
