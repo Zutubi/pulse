@@ -611,12 +611,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void initialiseProjects()
     {
-        // Restore project states that are out of sync due to unclean shutdown.
-        for (Project project: filter(projectDao.findAll(), ProjectPredicates.exists()))
-        {
-            makeStateTransition(project.getId(), Project.Transition.STARTUP);
-        }
-
         cacheLock.writeLock().lock();
         try
         {
@@ -628,6 +622,12 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         finally
         {
             cacheLock.writeLock().unlock();
+        }
+
+        // Restore project states that are out of sync due to unclean shutdown.
+        for (Project project: filter(projectDao.findAll(), ProjectPredicates.exists()))
+        {
+            makeStateTransition(project.getId(), Project.Transition.STARTUP);
         }
     }
 
