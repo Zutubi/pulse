@@ -783,6 +783,19 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
+    public void testBuildRevisionInBuildVersion() throws Exception
+    {
+        DepAntProject project = projects.createDepAntProject(randomName);
+        project.getConfig().getDependencies().setVersion("version-$(build.revision)");
+        insertProject(project);
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
+
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), buildNumber);
+        String revision = (String) build.get("revision");
+        assertEquals("version-" + revision, build.get("version"));
+    }
+
     private void assertCommandFailed(String projectName, int buildNumber, String commandName) throws Exception
     {
         Vector<Hashtable<String, String>> features = xmlRpcHelper.call("getErrorMessagesInBuild", projectName, buildNumber);

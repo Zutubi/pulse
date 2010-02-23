@@ -173,15 +173,6 @@ public class DefaultBuildController implements EventListener, BuildController
             buildContext.add(requestProperty);
         }
 
-        String version = request.getVersion();
-        if (request.getOptions().isResolveVersion())
-        {
-            version = buildContext.resolveVariables(version);
-        }
-        
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, version);
-        buildResult.setVersion(version);
-
         activateBuildAuthenticationToken();
 
         configure(root, buildResult.getRoot());
@@ -651,6 +642,15 @@ public class DefaultBuildController implements EventListener, BuildController
         buildLogger.commenced(buildResult);
 
         addRevisionProperties(buildContext, buildResult);
+
+        String version = request.getVersion();
+        if (request.getOptions().isResolveVersion())
+        {
+            version = buildContext.resolveVariables(version);
+        }
+
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, version);
+        buildResult.setVersion(version);
 
         if (previousSuccessful != null)
         {
