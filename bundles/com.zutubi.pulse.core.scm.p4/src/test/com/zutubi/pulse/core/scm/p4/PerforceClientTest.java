@@ -113,24 +113,24 @@ public class PerforceClientTest extends PerforceTestBase
         setupClient(DEPOT_WORKSPACE);
         List<String> statuses = checkoutChanges(workDir, null, 4);
 
-        assertEquals(10, statuses.size());
-        for (int i = 0; i < 10; i++)
+        assertEquals(11, statuses.size());
+        for (int i = 1; i < 11; i++)
         {
             String status = statuses.get(i);
 
             // Foolish of me to create file10 which ruins lexical ordering :|
             int number;
-            if (i == 0)
+            if (i == 1)
             {
                 number = 1;
             }
-            else if (i == 1)
+            else if (i == 2)
             {
                 number = 10;
             }
             else
             {
-                number = i;
+                number = i - 1;
             }
 
             String re = String.format("//depot/file%d#[1-9][0-9]* - added as.*", number);
@@ -455,8 +455,8 @@ public class PerforceClientTest extends PerforceTestBase
 
         List<String> statuses = updateChanges(workDir, createRevision(8));
         checkDirectory("checkoutHead");
-        assertEquals(1, statuses.size());
-        assertTrue(statuses.get(0).startsWith("//depot/file2#2 - updating"));
+        assertEquals(2, statuses.size());
+        assertTrue(statuses.get(1).startsWith("//depot/file2#2 - updating"));
     }
 
     public void testUpdateSameRevision() throws ScmException, IOException
@@ -467,7 +467,7 @@ public class PerforceClientTest extends PerforceTestBase
 
         List<String> statuses = updateChanges(workDir, null);
         checkDirectory("checkoutHead");
-        assertEquals(0, statuses.size());
+        assertEquals(1, statuses.size());
     }
 
     public void testMultiUpdates() throws ScmException, IOException
@@ -579,6 +579,18 @@ public class PerforceClientTest extends PerforceTestBase
     {
         setupClient(TEST_WORKSPACE);
         assertEquals("jsankey@bob", client.getEmailAddress(null, "jsankey"));
+    }
+
+    public void testBootstrapFeedback() throws ScmException
+    {
+        setupClient(TEST_WORKSPACE);
+        ExecutionContext context = createExecutionContext(workDir, true);
+
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        client.checkout(context, new Revision("1"), handler);
+        
+        String expectedWorkspace = PerforceWorkspaceManager.getSyncWorkspaceName(client.getConfiguration(), context);
+        assertEquals(">> p4 -c " + expectedWorkspace + " sync -f @1", handler.getStatusMessages().get(0));
     }
 
     private PerforceCore getCore()

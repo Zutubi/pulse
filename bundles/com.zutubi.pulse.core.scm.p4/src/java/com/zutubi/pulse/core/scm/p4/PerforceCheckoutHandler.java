@@ -15,6 +15,14 @@ public class PerforceCheckoutHandler extends PerforceErrorDetectingHandler
         this.handler = handler;
     }
 
+    public void handleCommandLine(String line)
+    {
+        if (handler != null)
+        {
+            handler.status(">> " + line);
+        }
+    }
+
     public void handleStdout(String line)
     {
         if (handler != null)

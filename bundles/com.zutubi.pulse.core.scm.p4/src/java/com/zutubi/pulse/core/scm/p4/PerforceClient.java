@@ -866,4 +866,9 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
     {
         // Do nothing.
     }
+
+    PerforceConfiguration getConfiguration()
+    {
+        return configuration;
+    }
 }

@@ -19,6 +19,11 @@ public class PerforceSyncHandler implements PerforceHandler
         this.ui = ui;
     }
 
+    public void handleCommandLine(String line)
+    {
+        // no-op
+    }
+
     public void handleStdout(String line)
     {
         if(ui != null)

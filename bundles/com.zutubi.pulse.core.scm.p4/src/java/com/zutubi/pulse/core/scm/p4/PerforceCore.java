@@ -118,15 +118,16 @@ public class PerforceCore
 
     public void runP4WithHandler(final PerforceHandler handler, String input, String... commands) throws ScmException
     {
+        String commandLine = StringUtils.join(" ", commands);
         if (LOG.isLoggable(Level.FINE))
         {
-            LOG.fine(StringUtils.join(" ", commands));
+            LOG.fine(commandLine);
         }
 
-        Process child;
-
+        handler.handleCommandLine(commandLine);
         p4Builder.command(commands);
 
+        Process child;
         try
         {
             child = p4Builder.start();

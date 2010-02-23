@@ -23,6 +23,10 @@ public abstract class PerforceErrorDetectingHandler implements PerforceHandler
         stderr = new StringBuffer();
     }
 
+    public void handleCommandLine(String line)
+    {
+    }
+
     public void handleStderr(String line)
     {
         stderr.append(line);
