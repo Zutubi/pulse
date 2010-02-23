@@ -179,7 +179,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 Project owner = getNodeProject(node);
                 QueuedRequest request = ownerRequests.get(owner);
                 DependentBuildTriggerConfiguration trigger = TriggerUtils.getTrigger(owner.getConfig(), DependentBuildTriggerConfiguration.class);
-                if (trigger.isPropagateRevision())
+                if (trigger != null && trigger.isPropagateRevision())
                 {
                     for (TreeNode<BuildGraphData> child : node.getChildren())
                     {
