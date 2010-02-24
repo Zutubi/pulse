@@ -156,7 +156,7 @@ public class PulseFileToToveFile
         }
     }
 
-    private static boolean isChildSignificant(Node child, Element childCommand)
+    private static boolean isChildSignificant(Node child, Element ignoreElement)
     {
         if (child instanceof Text)
         {
@@ -165,7 +165,7 @@ public class PulseFileToToveFile
         }
         else
         {
-            return child != childCommand;
+            return child != ignoreElement;
         }
     }
 
