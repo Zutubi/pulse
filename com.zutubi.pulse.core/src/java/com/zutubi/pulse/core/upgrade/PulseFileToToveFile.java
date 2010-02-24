@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
 
@@ -8,6 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,7 +69,6 @@ public class PulseFileToToveFile
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Serializer serializer = new Serializer(baos);
-        serializer.setIndent(4);
         serializer.write(document);
 
         return new String(baos.toByteArray());
@@ -86,20 +88,34 @@ public class PulseFileToToveFile
                     childCommand.addAttribute(new Attribute(ATTRIBUTE_NAME, name));
                 }
 
-                Elements childElements = element.getChildElements();
-                boolean beforeChildCommand = true;
-                int childCommandChildCount = childCommand.getChildCount();
-                for (int i = 0; i < childElements.size(); i++)
+                List<Node> childElementsCopy = new LinkedList<Node>();
+                boolean hasSignificantChild = false;
+                for (int i = 0; i < element.getChildCount(); i++)
                 {
-                    Element child = childElements.get(i);
-                    if (child == childCommand)
+                    Node child = element.getChild(i);
+                    hasSignificantChild |= isChildSignificant(child, childCommand);
+                    childElementsCopy.add(child);
+                }
+
+                // If the wrapping <command> contains only whitespace (aside
+                // from the child command), there is no need to move its
+                // contents into the child command.
+                if (hasSignificantChild)
+                {
+                    int childCommandChildCount = childCommand.getChildCount();
+                    int insertIndex = 0;
+                    for (Node child: childElementsCopy)
                     {
-                        beforeChildCommand = false;
-                    }
-                    else
-                    {
-                        element.removeChild(child);
-                        childCommand.insertChild(child, i + (beforeChildCommand ? 0 : childCommandChildCount - 1));
+                        if (child == childCommand)
+                        {
+                            insertIndex += childCommandChildCount;
+                        }
+                        else
+                        {
+                            element.removeChild(child);
+                            childCommand.insertChild(child, insertIndex);
+                            insertIndex++;
+                        }
                     }
                 }
 
@@ -137,6 +153,19 @@ public class PulseFileToToveFile
         else
         {
             processChildren(element, warningIssued);
+        }
+    }
+
+    private static boolean isChildSignificant(Node child, Element childCommand)
+    {
+        if (child instanceof Text)
+        {
+            Text text = (Text) child;
+            return StringUtils.trimmedStringSet(text.getValue());
+        }
+        else
+        {
+            return child != childCommand;
         }
     }
 

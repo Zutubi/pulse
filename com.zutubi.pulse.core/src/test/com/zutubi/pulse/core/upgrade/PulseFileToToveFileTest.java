@@ -40,6 +40,11 @@ public class PulseFileToToveFileTest extends PulseTestCase
         expectedOutputHelper();
     }
 
+    public void testWhitespacePreserved() throws IOException, ParsingException
+    {
+        expectedOutputHelper(false);
+    }
+
     public void testUTF8BOM() throws IOException, ParsingException
     {
         // This is just to check the parser itself does not throw an exception.
@@ -48,16 +53,34 @@ public class PulseFileToToveFileTest extends PulseTestCase
 
     private void expectedOutputHelper() throws IOException, ParsingException
     {
+        expectedOutputHelper(true);
+    }
+
+    private void expectedOutputHelper(boolean stripWhitespace) throws IOException, ParsingException
+    {
         String in = IOUtils.inputStreamToString(getInput(getName() + ".in", EXTENSION_XML));
         String out = PulseFileToToveFile.convert(in);
-        out = stripWhitespace(out);
         String expected = IOUtils.inputStreamToString(getInput(getName() + ".out", EXTENSION_XML));
-        expected = stripWhitespace(expected);
+        if (stripWhitespace)
+        {
+            out = stripWhitespace(out);
+            expected = stripWhitespace(expected);
+        }
+        else
+        {
+            out = normaliseLineEndings(out);
+            expected = normaliseLineEndings(expected);
+        }
         assertEquals(expected, out);
     }
 
     private String stripWhitespace(String out)
     {
         return out.replaceAll("\\s+", "");
+    }
+
+    private String normaliseLineEndings(String s)
+    {
+        return s.replaceAll("\\r\\n", "\n");
     }
 }
