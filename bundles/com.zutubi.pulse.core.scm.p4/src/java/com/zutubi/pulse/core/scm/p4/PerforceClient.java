@@ -236,7 +236,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         }, command);
 
         final boolean[] stdoutSeen = new boolean[]{false};
-        core.runP4WithHandler(new PerforceErrorDetectingHandler(false)
+        core.runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(false)
         {
             public void handleStdout(String line)
             {
@@ -305,7 +305,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                 revision = getLatestRevision(workspace);
             }
 
-            PerforceCheckoutHandler perforceHandler = new PerforceCheckoutHandler(force, handler);
+            PerforceCheckoutFeedbackHandler perforceHandler = new PerforceCheckoutFeedbackHandler(force, handler);
 
             if (force)
             {
@@ -626,7 +626,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
-            core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
+            core.runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(true)
             {
                 public void handleStdout(String line)
                 {
@@ -838,7 +838,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
     private void mapFiles(List<FileStatus> statuses, List<String> fstatCommand) throws ScmException
     {
         final Map<String, String> mappedPaths = new HashMap<String, String>();
-        core.runP4WithHandler(new AbstractPerforceFStatHandler()
+        core.runP4WithHandler(new AbstractPerforceFStatFeedbackHandler()
         {
             @Override
             protected void handleCurrentItem()

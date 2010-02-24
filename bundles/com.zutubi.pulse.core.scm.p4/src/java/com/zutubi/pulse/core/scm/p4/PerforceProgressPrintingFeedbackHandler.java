@@ -5,11 +5,11 @@ import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 
 /**
  */
-public class PerforceProgressPrintingHandler extends PerforceErrorDetectingHandler
+public class PerforceProgressPrintingFeedbackHandler extends PerforceErrorDetectingFeedbackHandler
 {
     private PersonalBuildUI ui;
 
-    public PerforceProgressPrintingHandler(PersonalBuildUI ui, boolean throwOnStderr)
+    public PerforceProgressPrintingFeedbackHandler(PersonalBuildUI ui, boolean throwOnStderr)
     {
         super(throwOnStderr);
         this.ui = ui;

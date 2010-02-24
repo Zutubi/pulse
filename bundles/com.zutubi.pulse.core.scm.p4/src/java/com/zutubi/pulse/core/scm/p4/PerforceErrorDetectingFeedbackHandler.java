@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 /**
  * Perforce output handler that detects and reports errors.
  */
-public abstract class PerforceErrorDetectingHandler implements PerforceHandler
+public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceFeedbackHandler
 {
     /**
      * Perforce may report this error during a sync but it does not affect the
@@ -17,7 +17,7 @@ public abstract class PerforceErrorDetectingHandler implements PerforceHandler
     private boolean haveSignificantError = false;
     private StringBuffer stderr;
 
-    public PerforceErrorDetectingHandler(boolean throwOnStderr)
+    public PerforceErrorDetectingFeedbackHandler(boolean throwOnStderr)
     {
         this.throwOnStderr = throwOnStderr;
         stderr = new StringBuffer();

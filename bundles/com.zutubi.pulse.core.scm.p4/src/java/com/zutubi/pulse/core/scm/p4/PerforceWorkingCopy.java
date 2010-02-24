@@ -190,7 +190,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         }
 
         PersonalBuildUI ui = context.getUI();
-        PerforceSyncHandler syncHandler = new PerforceSyncHandler(ui);
+        PerforceSyncFeedbackHandler syncHandler = new PerforceSyncFeedbackHandler(ui);
         core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
 
         if(syncHandler.isResolveRequired())
@@ -214,7 +214,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             ui.enterContext();
             try
             {
-                core.runP4WithHandler(new PerforceProgressPrintingHandler(ui, false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+                core.runP4WithHandler(new PerforceProgressPrintingFeedbackHandler(ui, false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
             }
             finally
             {
@@ -230,7 +230,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     {
         PerforceCore core = createCore(context);
         WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
-        StatusBuildingFStatHandler handler = new StatusBuildingFStatHandler(context.getUI(), status);
+        StatusBuildingFStatFeedbackHandler handler = new StatusBuildingFStatFeedbackHandler(context.getUI(), status);
 
         ConfigSupport configSupport = new ConfigSupport(context.getConfig());
         boolean pre2004_2 = configSupport.getBooleanProperty(PROPERTY_PRE_2004_2, false);
@@ -283,7 +283,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
     public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
     {
-        FileTypeFStatHandler handler = new FileTypeFStatHandler();
+        FileTypeFStatFeedbackHandler handler = new FileTypeFStatFeedbackHandler();
         PerforceCore core = createCore(context);
         File f = new File(context.getBase(), path);
         core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, f.getAbsolutePath());
@@ -300,7 +300,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         writer.println(UnifiedPatch.HEADER_OLD_FILE + " " + path);
         writer.println(UnifiedPatch.HEADER_NEW_FILE + " " + path);
         
-        core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
+        core.runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(true)
         {
             public void handleStdout(String line)
             {

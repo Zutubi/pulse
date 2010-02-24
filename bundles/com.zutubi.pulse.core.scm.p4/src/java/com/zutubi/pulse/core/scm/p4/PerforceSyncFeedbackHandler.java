@@ -8,13 +8,13 @@ import com.zutubi.pulse.core.scm.api.ScmException;
  * A handler for the p4 sync operation that just passes the output through to
  * the UI.
  */
-public class PerforceSyncHandler implements PerforceHandler
+public class PerforceSyncFeedbackHandler implements PerforceFeedbackHandler
 {
     private PersonalBuildUI ui;
     private boolean resolveRequired = false;
     private boolean errorEncountered = false;
 
-    public PerforceSyncHandler(PersonalBuildUI ui)
+    public PerforceSyncFeedbackHandler(PersonalBuildUI ui)
     {
         this.ui = ui;
     }

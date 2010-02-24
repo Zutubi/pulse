@@ -140,11 +140,11 @@ import java.util.Map;
  * ... haveRev 1
  * </pre>
  */
-public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectingHandler
+public abstract class AbstractPerforceFStatFeedbackHandler extends PerforceErrorDetectingFeedbackHandler
 {
     protected Map<String, String> currentItem = new HashMap<String, String>();
 
-    public AbstractPerforceFStatHandler()
+    public AbstractPerforceFStatFeedbackHandler()
     {
         super(true);
     }

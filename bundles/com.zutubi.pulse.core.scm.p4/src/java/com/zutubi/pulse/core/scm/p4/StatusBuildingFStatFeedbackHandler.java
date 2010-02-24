@@ -2,19 +2,20 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
+
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * A handler for p4 fstat output that builds up a working copy status.
  */
-public class StatusBuildingFStatHandler extends AbstractPerforceFStatHandler
+public class StatusBuildingFStatFeedbackHandler extends AbstractPerforceFStatFeedbackHandler
 {
     private PersonalBuildUI ui;
     private WorkingCopyStatus status;
 
-    public StatusBuildingFStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
+    public StatusBuildingFStatFeedbackHandler(PersonalBuildUI ui, WorkingCopyStatus status)
     {
         super();
         this.ui = ui;

@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.scm.p4;
 /**
  * A handler for p4 fstat output which determines the type of a file.
  */
-public class FileTypeFStatHandler extends AbstractPerforceFStatHandler
+public class FileTypeFStatFeedbackHandler extends AbstractPerforceFStatFeedbackHandler
 {
     private boolean text = false;
 

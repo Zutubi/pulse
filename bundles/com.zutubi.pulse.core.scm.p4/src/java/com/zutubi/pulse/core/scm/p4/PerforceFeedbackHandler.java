@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
  * Callback interface used for progress reporting when running a p4 process
  * using {@link PerforceCore}.}
  */
-public interface PerforceHandler
+public interface PerforceFeedbackHandler
 {
     /**
      * Called just before starting the p4 child process with the command line

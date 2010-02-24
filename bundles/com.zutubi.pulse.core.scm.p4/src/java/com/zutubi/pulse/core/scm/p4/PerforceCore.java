@@ -93,7 +93,7 @@ public class PerforceCore
     {
         final P4Result result = new P4Result();
 
-        runP4WithHandler(new PerforceErrorDetectingHandler(throwOnStderr)
+        runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(throwOnStderr)
         {
             public void handleStdout(String line)
             {
@@ -116,7 +116,7 @@ public class PerforceCore
         return result;
     }
 
-    public void runP4WithHandler(final PerforceHandler handler, String input, String... commands) throws ScmException
+    public void runP4WithHandler(final PerforceFeedbackHandler handler, String input, String... commands) throws ScmException
     {
         String commandLine = StringUtils.join(" ", commands);
         if (LOG.isLoggable(Level.FINE))
@@ -322,7 +322,7 @@ public class PerforceCore
     {
         final File[] result = new File[1];
 
-        runP4WithHandler(new PerforceErrorDetectingHandler(true)
+        runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(true)
         {
             public void handleStdout(String line)
             {

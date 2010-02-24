@@ -5,11 +5,11 @@ import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 
 /**
  */
-public class PerforceCheckoutHandler extends PerforceErrorDetectingHandler
+public class PerforceCheckoutFeedbackHandler extends PerforceErrorDetectingFeedbackHandler
 {
     private ScmFeedbackHandler handler;
 
-    public PerforceCheckoutHandler(boolean throwOnStderr, ScmFeedbackHandler handler)
+    public PerforceCheckoutFeedbackHandler(boolean throwOnStderr, ScmFeedbackHandler handler)
     {
         super(throwOnStderr);
         this.handler = handler;
