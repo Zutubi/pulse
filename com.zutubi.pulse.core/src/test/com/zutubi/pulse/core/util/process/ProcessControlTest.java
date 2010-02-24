@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -15,6 +16,8 @@ public class ProcessControlTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        System.setProperty(ProcessControl.NATIVE_PROCESS_KILL, "true");
+        ProcessControl.init();
         tempDir = FileSystemUtils.createTempDir(getName(), "");
     }
 
@@ -27,8 +30,7 @@ public class ProcessControlTest extends PulseTestCase
 
     public void testDestroyTree() throws Exception
     {
-        System.setProperty(ProcessControl.NATIVE_PROCESS_KILL, "true");
-        if(ProcessControl.init())
+        if (ProcessControl.isNativeDestroyAvailable())
         {
             File buildFile = copyInputToDirectory("xml", tempDir);
             ProcessBuilder processBuilder = new ProcessBuilder("ant.bat", "-f", buildFile.getAbsolutePath(), "doit");
@@ -58,6 +60,18 @@ public class ProcessControlTest extends PulseTestCase
 
             p.waitFor();
             killer.join();
+        }
+    }
+    
+    public void testGetPid() throws IOException, InterruptedException
+    {
+        if (ProcessControl.isPidAvailable())
+        {
+            ProcessBuilder builder = new ProcessBuilder("sh");
+            Process p = builder.start();
+            assertTrue(ProcessControl.getPid(p) != 0);
+            ProcessControl.destroyProcess(p);
+            p.waitFor();
         }
     }
 }

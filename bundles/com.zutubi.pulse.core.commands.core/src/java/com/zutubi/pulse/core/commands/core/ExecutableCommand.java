@@ -14,6 +14,7 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -29,16 +30,16 @@ import java.util.TreeMap;
  */
 public class ExecutableCommand extends OutputProducingCommandSupport
 {
+    private static final Logger LOG = Logger.getLogger(ExecutableCommand.class);
+
     /**
      * The name of the execution environment artifact.
      */
     static final String ENV_ARTIFACT_NAME = "environment";
     static final String ENV_FILENAME = "env.txt";
 
-    public static final String OUTPUT_ARTIFACT_NAME = "command output";
-    static final String OUTPUT_FILENAME = "output.txt";
-
-    private Process child;
+    private volatile Process child;
+    private volatile int pid;
     private CancellableReader reader;
     private CancellableReader writer;
     private volatile boolean terminated = false;
@@ -100,6 +101,8 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             throw new BuildException("Unable to create process: " + message, e);
         }
 
+        pid = ProcessControl.getPid(child);
+        
         try
         {
             InputStream input = child.getInputStream();
@@ -118,7 +121,10 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             }
 
             final int result = child.waitFor();
-
+            
+            // Record an error if we were explicitly terminated.
+            terminatedCheck(commandContext);
+            
             // Wait at least once: we want to allow the reader some time to
             // complete after we are terminated so that we can identify the
             // resource leak (see below).
@@ -244,9 +250,15 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
     private boolean terminatedCheck(CommandContext commandContext)
     {
-        if(terminated)
+        if (terminated)
         {
-            commandContext.error("Command terminated");
+            String message = "Command terminated";
+            if (pid != 0)
+            {
+                message += " (pid: " + pid + ")";
+            }
+            
+            commandContext.error(message);
             return true;
         }
 
@@ -430,7 +442,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     private void updateChildEnvironment(ExecutionContext context, ProcessBuilder builder)
     {
         Map<String, String> childEnvironment = builder.environment();
-        // Implicit PULSE_* varialbes come first: anything explicit
+        // Implicit PULSE_* variables come first: anything explicit
         // should override them.
         PulseScope scope = ((PulseExecutionContext) context).getScope();
         for(Variable variable : scope.getVariables(String.class))
@@ -528,6 +540,13 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         terminated = true;
         if (child != null)
         {
+            String message = "Terminating child process for command '" + getConfig().getName() + "'";
+            if (pid != 0)
+            {
+                message += " (pid: " + pid + ")";
+            }
+            
+            LOG.warning(message);
             ProcessControl.destroyProcess(child);
             child = null;
         }
