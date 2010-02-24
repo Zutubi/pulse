@@ -87,19 +87,24 @@ public class PulseFileToToveFile
                 }
 
                 Elements childElements = element.getChildElements();
+                boolean beforeChildCommand = true;
+                int childCommandChildCount = childCommand.getChildCount();
                 for (int i = 0; i < childElements.size(); i++)
                 {
                     Element child = childElements.get(i);
-                    if (child != childCommand)
+                    if (child == childCommand)
+                    {
+                        beforeChildCommand = false;
+                    }
+                    else
                     {
                         element.removeChild(child);
-                        childCommand.appendChild(child);
+                        childCommand.insertChild(child, i + (beforeChildCommand ? 0 : childCommandChildCount - 1));
                     }
                 }
 
                 element.removeChild(childCommand);
-                parentElement.removeChild(element);
-                parentElement.appendChild(childCommand);
+                parentElement.replaceChild(element, childCommand);
                 processChildren(childCommand, warningIssued);
             }
         }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <recipe name="foo">
+        <junit.pp name="j1"/>
+        <command name="relax">
+            <junit.pp name="j2"/>
+            <executable>
+                <process processor="$(j2)"/>
+            </executable>
+            <junit.pp name="j3"/>
+        </command>
+        <junit.pp name="j4"/>
+        <command name="dont">
+            <junit.pp name="j5"/>
+            <ant>
+                <junit.pp name="j6"/>
+                <junit.pp name="j7"/>
+                <process processor="$(j5)"/>
+                <junit.pp name="j8"/>
+            </ant>
+            <junit.pp name="j9"/>
+        </command>
+        <command>
+            <ant name="do"/>
+        </command>
+        <command>
+            <junit.pp name="ja"/>
+            <ant name="it"/>
+            <junit.pp name="jb"/>
+        </command>
+        <junit.pp name="jc"/>                
+    </recipe>
+</project>

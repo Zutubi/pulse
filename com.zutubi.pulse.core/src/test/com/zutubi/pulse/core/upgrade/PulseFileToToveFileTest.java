@@ -35,6 +35,11 @@ public class PulseFileToToveFileTest extends PulseTestCase
         expectedOutputHelper();
     }
 
+    public void testOrderingPreserved() throws IOException, ParsingException
+    {
+        expectedOutputHelper();
+    }
+
     public void testUTF8BOM() throws IOException, ParsingException
     {
         // This is just to check the parser itself does not throw an exception.
