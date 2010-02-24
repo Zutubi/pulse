@@ -76,6 +76,17 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertBuildVersion(projectName, buildNumber, projectName + "-" + buildNumber);
     }
 
+    public void testBuildRevisionInBuildVersion() throws Exception
+    {
+        String buildVersion = "version-$(build.revision)";
+
+        int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+
+        String revision = xmlRpcHelper.getBuildRevision(projectName, buildNumber);
+        assertBuildVersion(projectName, buildNumber, "version-" + revision);
+    }
+
     public void testSpecifyVersionViaManualPrompt() throws Exception
     {
         loginAsAdmin();
@@ -114,6 +125,11 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectName, 1);
 
         assertBuildVersion(projectName, 1, "OH_HAI");
+    }
+
+    public void testSpecifyVersionViaConfiguration()
+    {
+
     }
 
     /**

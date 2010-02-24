@@ -193,6 +193,7 @@ public class RecipeController
 
         final ExecutionContext agentContext = recipeRequest.getContext();
         addRevisionProperties(agentContext, buildResult);
+        agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
         agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_AGENT, agent.getConfig().getName());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
@@ -200,6 +201,10 @@ public class RecipeController
         agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
 
         addScmProperties(agentContext);
+
+        // update the context to be used for the post build actions with version details.
+        addRevisionProperties(recipeContext, buildResult);
+        recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
 
         // Now it may be dispatched.
         recipeDispatchService.dispatch(event);

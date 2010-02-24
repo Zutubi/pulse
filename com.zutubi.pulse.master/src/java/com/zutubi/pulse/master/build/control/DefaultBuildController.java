@@ -648,9 +648,9 @@ public class DefaultBuildController implements EventListener, BuildController
         {
             version = buildContext.resolveVariables(version);
         }
-
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, version);
         buildResult.setVersion(version);
+
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
 
         if (previousSuccessful != null)
         {
