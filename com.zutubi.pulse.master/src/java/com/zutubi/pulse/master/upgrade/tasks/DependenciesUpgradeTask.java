@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.UserTransaction;
@@ -13,7 +12,6 @@ import java.util.Map;
  */
 public class DependenciesUpgradeTask extends AbstractUpgradeTask
 {
-    private static final String PATH_GLOBAL_DEPENDENCIES = "projects/" + GLOBAL_PROJECT_NAME + "/dependencies";
     private static final String PATH_PATTERN_ALL_PROJECTS = "projects/*";
 
     private static final String PROPERTY_NAME = "name";
@@ -81,11 +79,12 @@ public class DependenciesUpgradeTask extends AbstractUpgradeTask
             }
 
             // for global project, add specific values.
-            Record globalDependencies = recordManager.select(PATH_GLOBAL_DEPENDENCIES);
+            String globalDependenciesPath = "projects/" + getGlobalProjectName() + "/dependencies";
+            Record globalDependencies = recordManager.select(globalDependenciesPath);
             MutableRecord globalDependenciesEntry = globalDependencies.copy(true, true);
             globalDependenciesEntry.put(PROPERTY_PUBLICATION_PATTERN, "build/[artifact].[ext]");
             globalDependenciesEntry.put(PROPERTY_RETRIEVAL_PATTERN, "lib/[artifact].[ext]");
-            recordManager.update(PATH_GLOBAL_DEPENDENCIES, globalDependenciesEntry);
+            recordManager.update(globalDependenciesPath, globalDependenciesEntry);
 
             txn.commit();
             
@@ -100,6 +99,12 @@ public class DependenciesUpgradeTask extends AbstractUpgradeTask
             txn.rollback();
             throw new RuntimeException(t);
         }
+    }
+
+    private String getGlobalProjectName()
+    {
+        TemplatedScopeDetails details = new TemplatedScopeDetails("projects", recordManager);
+        return details.getHierarchy().getRoot().getId();
     }
 
     public void setRecordManager(RecordManager recordManager)
