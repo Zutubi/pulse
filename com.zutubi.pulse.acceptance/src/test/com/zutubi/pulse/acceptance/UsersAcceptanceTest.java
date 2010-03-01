@@ -148,12 +148,12 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         changePasswordForm.saveFormElements("", NEW_PASSWORD, NEW_PASSWORD);
         logout();
         
+        LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
         LoginForm loginForm = browser.createForm(LoginForm.class);
-        loginForm.waitFor();
         loginForm.submitNamedFormElements("login", asPair(LoginPage.FIELD_USERNAME, random), asPair(LoginPage.FIELD_PASSWORD, ""));
         loginForm.waitFor();
         
-        login(random, NEW_PASSWORD);
+        loginPage.login(random, NEW_PASSWORD);
     }
 
     private String createUserWithContact(String name)
