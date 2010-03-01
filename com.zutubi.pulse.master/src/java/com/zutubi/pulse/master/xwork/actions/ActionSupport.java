@@ -26,6 +26,7 @@ import com.zutubi.util.TimeStamps;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
+import org.acegisecurity.AccessDeniedException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -246,17 +247,24 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
                 Revision revision = changelist.getRevision();
                 if (revision != null)
                 {
-                    for(long id: changelistDao.getAllAffectedProjectIds(changelist))
+                    for (long id: changelistDao.getAllAffectedProjectIds(changelist))
                     {
-                        ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
-                        if(p != null && p.getChangeViewer() != null)
+                        try
                         {
-                            String url = p.getChangeViewer().getRevisionURL(revision);
-                            if(url != null)
+                            ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
+                            if (p != null && p.getChangeViewer() != null)
                             {
-                                changeUrl = url;
-                                return;
+                                String url = p.getChangeViewer().getRevisionURL(revision);
+                                if(url != null)
+                                {
+                                    changeUrl = url;
+                                    return;
+                                }
                             }
+                        }
+                        catch (AccessDeniedException e)
+                        {
+                            // User cannot view this project
                         }
                     }
                 }

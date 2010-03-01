@@ -34,7 +34,7 @@
         </tr>
     </table>
 
-    <table class="content">
+    <table id="changelist.builds" class="content">
        #headingRow("changelist.builds" 4)
        <tr>
            #contentHeading("project" 1)
@@ -42,7 +42,7 @@
            #contentHeading("status" 2)
         </tr>
 #foreach($result in $buildResults)
-        <tr>
+        <tr id="changelist.build.${velocityCount}">
             <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
 
             #set($result = $latestBuilds.get($index))

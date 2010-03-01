@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.utils.SubversionWorkspace;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
@@ -60,6 +61,8 @@ import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PR
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.Constants.SECOND;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -146,6 +149,56 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
     }
 
+    public void testChangeAffectsMultipleProjects() throws Exception
+    {
+        String visibleProject = random + "-visible";
+        String invisibleProject = random + "-invisible";
+        String regularUser = random + "-user";
+        
+        addProject(visibleProject, true);
+        String invisibleProjectPath = addProject(invisibleProject, true);
+        xmlRpcHelper.insertTrivialUser(regularUser);
+        
+        // Remove permissions that allow normal users to view the invisible
+        // project (so only admin can see it).
+        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(invisibleProjectPath, Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
+        
+        xmlRpcHelper.runBuild(visibleProject);
+        xmlRpcHelper.runBuild(invisibleProject);
+
+        // Commit a change to the repository.  Note monitoring the SCM is
+        // disabled for these projects, so no chance of a build being started
+        // by this change.
+        String revisionString = editAndCommitBuildFile();
+        
+        long visibleBuildNumber = xmlRpcHelper.runBuild(visibleProject);
+        long invisibleBuildNumber = xmlRpcHelper.runBuild(invisibleProject);
+
+        // Check the changes tab.
+        loginAsAdmin();
+        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, visibleProject, visibleBuildNumber);
+        List<Long> changeIds = changesPage.getChangeIds();
+        assertEquals(1, changeIds.size());
+        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, visibleProject, visibleBuildNumber, changeIds.get(0), revisionString);
+        List<Pair<String, Long>> builds = changelistPage.getBuilds();
+        assertEquals(2, builds.size());
+        assertThat(builds, hasItem(new Pair<String, Long>(visibleProject, visibleBuildNumber)));
+        assertThat(builds, hasItem(new Pair<String, Long>(invisibleProject, invisibleBuildNumber)));
+        
+        logout();
+        login(regularUser, "");
+        
+        // Regular user should only see the visible project.
+        changelistPage.openAndWaitFor();
+        builds = changelistPage.getBuilds();
+        assertEquals(1, builds.size());
+        assertThat(builds, hasItem(new Pair<String, Long>(visibleProject, visibleBuildNumber)));
+        
+        // Check other pages that we can view where the changelist appears.
+        browser.openAndWaitFor(ProjectHomePage.class, visibleProject);
+        browser.openAndWaitFor(DashboardPage.class);
+    }
+    
     public void testChangeViewerLinks() throws Exception
     {
         final String FISHEYE_BASE = "http://fisheye";

@@ -19,6 +19,7 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
 
@@ -162,7 +163,14 @@ public class ViewChangelistAction extends ActionSupport
         buildResults = new LinkedList<BuildResult>();
         for (Long id : buildIds)
         {
-            buildResults.add(buildManager.getBuildResult(id));
+            try
+            {
+                buildResults.add(buildManager.getBuildResult(id));
+            }
+            catch (AccessDeniedException e)
+            {
+                // User can't view this one, just continue.
+            }
         }
 
         Collections.sort(buildResults, new Comparator<BuildResult>()
@@ -209,10 +217,17 @@ public class ViewChangelistAction extends ActionSupport
 
         for (long id : changelistDao.getAllAffectedProjectIds(changelist))
         {
-            p = projectManager.getProject(id, false);
-            if (hasChangeViewer(p))
+            try
             {
-                return p.getConfig();
+                p = projectManager.getProject(id, false);
+                if (hasChangeViewer(p))
+                {
+                    return p.getConfig();
+                }
+            }
+            catch (AccessDeniedException e)
+            {
+                // User can't view this project, just continue.
             }
         }
 
