@@ -149,41 +149,41 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
     }
 
-    public void testChangeAffectsMultipleProjects() throws Exception
+    public void testChangeAffectsViewableAndUnviewableProjects() throws Exception
     {
-        String visibleProject = random + "-visible";
-        String invisibleProject = random + "-invisible";
+        String viewableProject = random + "-viewable";
+        String unviewableProject = random + "-unviewable";
         String regularUser = random + "-user";
         
-        addProject(visibleProject, true);
-        String invisibleProjectPath = addProject(invisibleProject, true);
+        addProject(viewableProject, true);
+        String unviewableProjectPath = addProject(unviewableProject, true);
         xmlRpcHelper.insertTrivialUser(regularUser);
         
         // Remove permissions that allow normal users to view the invisible
         // project (so only admin can see it).
-        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(invisibleProjectPath, Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
+        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(unviewableProjectPath, Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
         
-        xmlRpcHelper.runBuild(visibleProject);
-        xmlRpcHelper.runBuild(invisibleProject);
+        xmlRpcHelper.runBuild(viewableProject);
+        xmlRpcHelper.runBuild(unviewableProject);
 
         // Commit a change to the repository.  Note monitoring the SCM is
         // disabled for these projects, so no chance of a build being started
         // by this change.
         String revisionString = editAndCommitBuildFile();
         
-        long visibleBuildNumber = xmlRpcHelper.runBuild(visibleProject);
-        long invisibleBuildNumber = xmlRpcHelper.runBuild(invisibleProject);
+        long viewableBuildNumber = xmlRpcHelper.runBuild(viewableProject);
+        long unviewableBuildNumber = xmlRpcHelper.runBuild(unviewableProject);
 
         // Check the changes tab.
         loginAsAdmin();
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, visibleProject, visibleBuildNumber);
+        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, viewableProject, viewableBuildNumber);
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
-        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, visibleProject, visibleBuildNumber, changeIds.get(0), revisionString);
+        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, viewableProject, viewableBuildNumber, changeIds.get(0), revisionString);
         List<Pair<String, Long>> builds = changelistPage.getBuilds();
         assertEquals(2, builds.size());
-        assertThat(builds, hasItem(new Pair<String, Long>(visibleProject, visibleBuildNumber)));
-        assertThat(builds, hasItem(new Pair<String, Long>(invisibleProject, invisibleBuildNumber)));
+        assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
+        assertThat(builds, hasItem(new Pair<String, Long>(unviewableProject, unviewableBuildNumber)));
         
         logout();
         login(regularUser, "");
@@ -192,10 +192,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         changelistPage.openAndWaitFor();
         builds = changelistPage.getBuilds();
         assertEquals(1, builds.size());
-        assertThat(builds, hasItem(new Pair<String, Long>(visibleProject, visibleBuildNumber)));
+        assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
         
         // Check other pages that we can view where the changelist appears.
-        browser.openAndWaitFor(ProjectHomePage.class, visibleProject);
+        browser.openAndWaitFor(ProjectHomePage.class, viewableProject);
         browser.openAndWaitFor(DashboardPage.class);
     }
     
