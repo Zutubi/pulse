@@ -58,9 +58,12 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         LoginPage loginPage = browser.open(LoginPage.class);
         loginPage.waitForSignup();
 
+        String login = "login_" + random;
+        String password = "password";
+
         SignupForm form = loginPage.clickSignup();
         form.waitFor();
-        form.saveFormElements("login_" + random, "name_" + random, "password", "password");
+        form.saveFormElements(login, "name_" + random, password, password);
 
         WelcomePage welcomePage = browser.createPage(WelcomePage.class);
         welcomePage.waitFor();
@@ -70,6 +73,15 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         assertTrue(welcomePage.isElementIdPresent(IDs.ID_PREFERENCES));
         assertTrue(welcomePage.isElementIdPresent(IDs.ID_LOGOUT));
         assertFalse(welcomePage.isElementIdPresent(IDs.ID_LOGIN));
+
+        // logout and log back in again.
+        logout();
+
+        loginPage = browser.open(LoginPage.class);
+        loginPage.login(login, password);
+
+        welcomePage.waitFor();
+        assertTitle(welcomePage);
     }
 
     public void testAnonymousSignupDisabled() throws Exception

@@ -33,13 +33,25 @@ public class SignupUserAction extends TransientAction<SignupUserConfiguration>
         }
 
         UserConfiguration user = new UserConfiguration(instance.getLogin(), instance.getName());
-        user.setPassword(instance.getPassword());
         user = userManager.insert(user);
+
+        setPassword(user, instance.getPassword());
 
         User state = userManager.getUser(instance.getLogin());
         state.setConfig(user);
         AcegiUtils.loginAs(userManager.getPrinciple(state));
         return SUCCESS;
+    }
+
+    private void setPassword(final UserConfiguration user, final String password)
+    {
+        AcegiUtils.runAsSystem(new Runnable()
+        {
+            public void run()
+            {
+                userManager.setPassword(user, password);
+            }
+        });
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
