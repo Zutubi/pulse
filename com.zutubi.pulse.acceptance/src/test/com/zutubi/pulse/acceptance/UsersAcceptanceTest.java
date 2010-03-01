@@ -1,10 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.admin.AddUserForm;
+import com.zutubi.pulse.acceptance.forms.dashboard.ChangePasswordForm;
+import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.UsersPage;
+import com.zutubi.pulse.acceptance.pages.dashboard.PreferencesPage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationCreator;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfigurationStateDisplay;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
@@ -116,6 +121,39 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
         emailContactPage = browser.openAndWaitFor(CompositePage.class, originalContactPath);
         assertNotPrimaryContact(emailContactPage);
+    }
+    
+    public void testChangePassword() throws Exception
+    {
+        final String NEW_PASSWORD = "boo";
+
+        xmlRpcHelper.insertTrivialUser(random);
+        
+        login(random, "");
+        
+        PreferencesPage preferencesPage = browser.openAndWaitFor(PreferencesPage.class, random);
+        preferencesPage.clickAction(UserPreferencesConfigurationActions.ACTION_CHANGE_PASSWORD);
+        
+        ChangePasswordForm changePasswordForm = browser.createForm(ChangePasswordForm.class);
+        changePasswordForm.waitFor();
+
+        changePasswordForm.saveFormElements("nope", NEW_PASSWORD, NEW_PASSWORD);
+        changePasswordForm.waitFor();
+        assertTextPresent("password is incorrect");
+        
+        changePasswordForm.saveFormElements("", NEW_PASSWORD, "wrong");
+        changePasswordForm.waitFor();
+        assertTextPresent("new passwords do not match");
+        
+        changePasswordForm.saveFormElements("", NEW_PASSWORD, NEW_PASSWORD);
+        logout();
+        
+        LoginForm loginForm = browser.createForm(LoginForm.class);
+        loginForm.waitFor();
+        loginForm.submitNamedFormElements("login", asPair(LoginPage.FIELD_USERNAME, random), asPair(LoginPage.FIELD_PASSWORD, ""));
+        loginForm.waitFor();
+        
+        login(random, NEW_PASSWORD);
     }
 
     private String createUserWithContact(String name)

@@ -58,6 +58,16 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     
     AcegiUser getPrinciple(User user);
 
+    /**
+     * Checks if the given password matches the current password of the given
+     * user.
+     *  
+     * @param user     user to check the password against
+     * @param password the password to check
+     * @return true if the given password matches the given user's password
+     */
+    boolean checkPassword(UserConfiguration user, String password);
+    
     void setPassword(UserConfiguration user, String rawPassword);
 
     long getNextBuildNumber(User user);

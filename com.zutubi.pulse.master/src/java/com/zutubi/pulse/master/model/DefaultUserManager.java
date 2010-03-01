@@ -329,6 +329,12 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return getPrinciple(user);
     }
 
+    public boolean checkPassword(UserConfiguration user, String password)
+    {
+        String encodedPassword = passwordEncoder.encodePassword(password, null);
+        return StringUtils.equals(user.getPassword(), encodedPassword);
+    }
+
     public void setPassword(UserConfiguration user, String rawPassword)
     {
         String encodedPassword = passwordEncoder.encodePassword(rawPassword, null);

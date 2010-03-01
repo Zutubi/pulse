@@ -5,12 +5,16 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 import java.io.File;
 
+import static com.zutubi.util.CollectionUtils.asPair;
+
 public class LoginPage extends SeleniumPage
 {
+    public static final String FIELD_USERNAME = "j_username";
+    public static final String FIELD_PASSWORD = "j_password";
+
     private static final String SIGNUP_ID = "signup";
     private static final String TITLE = "login";
 
@@ -27,7 +31,7 @@ public class LoginPage extends SeleniumPage
     public WelcomePage login(String username, String password)
     {
         LoginForm form = browser.createForm(LoginForm.class);
-        form.submitNamedFormElements(TITLE, asPair("j_username", username), asPair("j_password", password));
+        form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password));
         try
         {
             WelcomePage welcomePage = browser.createPage(WelcomePage.class);
