@@ -135,7 +135,7 @@ public class GitClientTest extends GitClientTestBase
         assertEquals(REVISION_SIMPLE_INTERMEDIATE, rev.getRevisionString());
 
         assertGitDir(workingDir);
-        assertEquals(2, workingDir.list().length);
+        assertEquals(1, workingDir.list().length);
     }
 
     public void testGetLatestRevision() throws ScmException
@@ -301,7 +301,7 @@ public class GitClientTest extends GitClientTestBase
     {
         client.setBranch(BRANCH_SIMPLE);
         client.checkout(context, new Revision(REVISION_SIMPLE_INTERMEDIATE), handler);
-        assertEquals(2, workingDir.list().length);
+        assertEquals(1, workingDir.list().length);
 
         Revision rev = client.update(context, null, handler);
         assertEquals(REVISION_SIMPLE_LATEST, rev.getRevisionString());
@@ -344,11 +344,27 @@ public class GitClientTest extends GitClientTestBase
         client.checkout(context, null, handler);
         handler.reset();
 
-        File completeFile = new File(workingDir, GitClient.CHECKOUT_COMPLETE_FILENAME);
-        assertTrue(completeFile.delete());
+        File markerFile = client.getMarkerFile(workingDir);
+        assertTrue(markerFile.delete());
 
         client.update(context, null, handler);
         assertThat(handler.getStatusMessages(), hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT)));
+        assertLatestCheckedOut();
+    }
+
+    public void testCheckoutOldMarkerRecognised() throws ScmException, IOException
+    {
+        client.checkout(context, null, handler);
+        handler.reset();
+
+        File markerFile = client.getMarkerFile(workingDir);
+        assertTrue(markerFile.delete());
+
+        File oldMarkerFile = new File(workingDir, GitClient.CHECKOUT_COMPLETE_FILENAME);
+        assertTrue(oldMarkerFile.createNewFile());
+
+        client.update(context, null, handler);
+        assertThat(handler.getStatusMessages(), not(hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT))));
         assertLatestCheckedOut();
     }
 

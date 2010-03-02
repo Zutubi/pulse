@@ -225,9 +225,31 @@ public class GitClient implements ScmClient
         return new Revision(logs.get(0).getId());
     }
 
+    File getMarkerFile(File workingDir)
+    {
+        File gitDir = new File(workingDir, GIT_REPOSITORY_DIRECTORY);
+        return new File(gitDir, CHECKOUT_COMPLETE_FILENAME);
+    }
+
+    private boolean markerExists(File workingDir)
+    {
+        File marker = getMarkerFile(workingDir);
+        if (marker.exists())
+        {
+            return true;
+        }
+        else
+        {
+            // For compatibility, support the old marker file location
+            // (directly in the working directory).
+            File oldMarker = new File(workingDir, CHECKOUT_COMPLETE_FILENAME);
+            return oldMarker.exists();
+        }
+    }
+
     private void createMarker(File workingDir) throws ScmException
     {
-        File marker = new File(workingDir, CHECKOUT_COMPLETE_FILENAME);
+        File marker = getMarkerFile(workingDir);
         try
         {
             if (!marker.createNewFile())
@@ -244,8 +266,7 @@ public class GitClient implements ScmClient
     public Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         File workingDir = context.getWorkingDir();
-        File checkoutMarker = new File(workingDir, CHECKOUT_COMPLETE_FILENAME);
-        if (!isGitRepository(workingDir) || !checkoutMarker.isFile())
+        if (!isGitRepository(workingDir) || !markerExists(workingDir))
         {
             handler.status(I18N.format(KEY_INCOMPLETE_CHECKOUT));
             return checkout(context, revision, handler);
