@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import org.apache.velocity.context.Context;
@@ -34,9 +35,17 @@ public class CustomVelocityManager extends VelocityManager
     public CustomVelocityManager()
     {
         SpringComponentContext.autowire(this);
+
+        // Since this managers lifecycle is controlled via velocity, we need to ensure
+        // that if a new instance is created after the startup that we are aware of it.
+        StartupManager startupManager = SpringComponentContext.getBean("startupManager");
+        if (startupManager != null)
+        {
+            systemStarted = startupManager.isSystemStarted();
+        }
     }
 
-    public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
+    public synchronized Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
     {
         Context context = super.createContext(stack, req, res);
         context.put("urls", new Urls((String) context.get("base")));
@@ -47,7 +56,7 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
-        if(systemStarted)
+        if (systemStarted)
         {
             GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.class);
             if (config != null)
@@ -95,7 +104,6 @@ public class CustomVelocityManager extends VelocityManager
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-        systemStarted = true;
     }
 
     public void setEventManager(EventManager eventManager)
@@ -105,6 +113,10 @@ public class CustomVelocityManager extends VelocityManager
             public void systemStarted()
             {
                 SpringComponentContext.autowire(CustomVelocityManager.this);
+                synchronized (CustomVelocityManager.this)
+                {
+                    systemStarted = true;
+                }
             }
         });
     }

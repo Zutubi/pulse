@@ -51,7 +51,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private static final int DEFAULT_AGENT_PORT = 8090;
 
     private ReentrantLock lock = new ReentrantLock();
-    private Map<Long, Agent> agents;
+    private Map<Long, Agent> agents = Collections.emptyMap();
 
     private ObjectFactory objectFactory;
     private AgentStatusManager agentStatusManager;
