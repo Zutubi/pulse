@@ -154,6 +154,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         loginForm.submitNamedFormElements("login", asPair(LoginPage.FIELD_USERNAME, random), asPair(LoginPage.FIELD_PASSWORD, ""));
         loginForm.waitFor();
         
+        loginPage.openAndWaitFor();
         loginPage.login(random, NEW_PASSWORD);
     }
 
