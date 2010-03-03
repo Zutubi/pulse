@@ -3,24 +3,25 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class GitClientTest extends GitClientTestBase
 {
@@ -358,10 +359,8 @@ public class GitClientTest extends GitClientTestBase
         handler.reset();
 
         File markerFile = client.getMarkerFile(workingDir);
-        assertTrue(markerFile.delete());
-
         File oldMarkerFile = new File(workingDir, GitClient.CHECKOUT_COMPLETE_FILENAME);
-        assertTrue(oldMarkerFile.createNewFile());
+        assertTrue(markerFile.renameTo(oldMarkerFile));
 
         client.update(context, null, handler);
         assertThat(handler.getStatusMessages(), not(hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT))));
