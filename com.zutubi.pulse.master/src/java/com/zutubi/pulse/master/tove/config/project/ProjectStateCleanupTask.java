@@ -23,35 +23,33 @@ class ProjectStateCleanupTask extends DatabaseStateCleanupTaskSupport
 
     public void cleanupState()
     {
-        long projectId = instance.getProjectId();
+        final long projectId = instance.getProjectId();
 
-        projectManager.lockProjectStates(projectId);
-        try
+        projectManager.runUnderProjectLocks(new Runnable()
         {
-            Project project = projectManager.getProject(projectId, true);
-            if (project != null)
+            public void run()
             {
-                if (project.isTransitionValid(Project.Transition.DELETE))
+                Project project = projectManager.getProject(projectId, true);
+                if (project != null)
                 {
-                    projectManager.delete(project);
-                }
-                else
-                {
-                    Project.State state = project.getState();
-                    if (state.isBuilding())
+                    if (project.isTransitionValid(Project.Transition.DELETE))
                     {
-                        throw new ToveRuntimeException("Unable to delete project as a build is running.  The project may be deleted when it becomes idle (consider pausing the project).");
+                        projectManager.delete(project);
                     }
                     else
                     {
-                        throw new ToveRuntimeException("Unable to delete project while in state '" + state + "'");
+                        Project.State state = project.getState();
+                        if (state.isBuilding())
+                        {
+                            throw new ToveRuntimeException("Unable to delete project as a build is running.  The project may be deleted when it becomes idle (consider pausing the project).");
+                        }
+                        else
+                        {
+                            throw new ToveRuntimeException("Unable to delete project while in state '" + state + "'");
+                        }
                     }
                 }
             }
-        }
-        finally
-        {
-            projectManager.unlockProjectStates(projectId);
-        }
+        }, projectId);
     }
 }

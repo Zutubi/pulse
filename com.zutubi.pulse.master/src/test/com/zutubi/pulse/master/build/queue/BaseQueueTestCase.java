@@ -8,6 +8,8 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.build.control.BuildController;
+import com.zutubi.pulse.master.build.control.BuildControllerFactory;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
@@ -15,22 +17,22 @@ import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.master.build.control.BuildControllerFactory;
-import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.reflection.ReflectionUtils;
-import static org.mockito.Mockito.*;
+import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -110,6 +112,21 @@ public abstract class BaseQueueTestCase extends PulseTestCase
             }
         });
 
+        Answer answer = new Answer()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Runnable runnable = (Runnable) invocationOnMock.getArguments()[0];
+                runnable.run();
+                return null;
+            }
+        };
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject());
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong());
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong());
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong());
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong(), anyLong());
+    
         stub(projectManager.getNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
 
         buildControllerFactory = mock(BuildControllerFactory.class);

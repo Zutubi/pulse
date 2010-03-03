@@ -2105,29 +2105,27 @@ public class RemoteApi
      * @access requires write permission for the given project
      * @see #getNextBuildNumber(String, String)
      */
-    public boolean setNextBuildNumber(String token, String projectName, String number)
+    public boolean setNextBuildNumber(String token, String projectName, final String number)
     {
         tokenManager.loginUser(token);
         try
         {
-            long n = Long.parseLong(number);
-            Project project = internalGetProject(projectName, true);
-            projectManager.lockProjectStates(project.getId());
-            try
+            final long n = Long.parseLong(number);
+            final Project project = internalGetProject(projectName, true);
+            projectManager.runUnderProjectLocks(new Runnable()
             {
-                long next = project.getNextBuildNumber();
-                if (next > n)
+                public void run()
                 {
-                    throw new IllegalArgumentException("The existing next build number '" + next + "' is larger than the given number '" + number + "' (build numbers must always increase)");
-                }
+                    long next = project.getNextBuildNumber();
+                    if (next > n)
+                    {
+                        throw new IllegalArgumentException("The existing next build number '" + next + "' is larger than the given number '" + number + "' (build numbers must always increase)");
+                    }
 
-                project.setNextBuildNumber(n);
-                projectManager.save(project);
-            }
-            finally
-            {
-                projectManager.unlockProjectStates(project.getId());
-            }
+                    project.setNextBuildNumber(n);
+                    projectManager.save(project);
+                }
+            }, project.getId());
         }
         finally
         {

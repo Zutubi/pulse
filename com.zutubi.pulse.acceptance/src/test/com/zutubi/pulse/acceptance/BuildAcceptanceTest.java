@@ -889,6 +889,25 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
         assertTextPresent("Build terminated due to the stage failure limit (1) being reached");
     }
+    
+    public void testDeadlockUpdatingConfigAfterTrigger() throws Exception
+    {
+        addProject(random, true);
+        String propertyPath = xmlRpcHelper.insertProjectProperty(random, "prop", "val", false, true, false);
+        Hashtable<String, Object> property = xmlRpcHelper.getConfig(propertyPath);
+        
+        // Run through a few times to make the deadlock more likely to happen.
+        // This is a balance between the speed of the test and likelihood of
+        // triggering the problem.
+        for (int i = 0; i < 3; i++)
+        {
+            Vector<String> ids = xmlRpcHelper.triggerBuild(random, new Hashtable<String, Object>());
+            property.put("value", Integer.toString(i));
+            xmlRpcHelper.saveConfig(propertyPath, property, false);
+            Hashtable<String, Object> buildRequest = xmlRpcHelper.waitForBuildRequestToBeActivated(ids.get(0), BUILD_TIMEOUT);
+            xmlRpcHelper.waitForBuildToComplete(random, Integer.parseInt((String) buildRequest.get("buildId")));
+        }
+    }
 
     private String createProjectWithTwoAntStages(String buildFile) throws Exception
     {

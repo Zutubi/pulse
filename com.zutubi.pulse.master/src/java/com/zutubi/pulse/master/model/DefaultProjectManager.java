@@ -578,13 +578,36 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return lock;
     }
 
-    public boolean isProjectStateLocked(long projectId)
+    public void runUnderProjectLocks(Runnable fn, long... projectIds)
     {
-        return getProjectStateLock(projectId).isHeldByCurrentThread();
+        lockProjectStates(projectIds);
+        try
+        {
+            fn.run();
+        }
+        finally
+        {
+            unlockProjectStates(projectIds);
+        }
     }
 
-    public void lockProjectStates(long... projectIds)
+    /**
+     * Acquires a lock on the states for the given projects.  The lock must be
+     * held when performing compound logic involving the project state.  The
+     * lock is exclusive and reentrant.  When locking multiple states, pass
+     * them all to this method at once to ensure a consistent locking order.
+     *
+     * @param projectIds identifiers of the projects to lock the state for
+     *
+     * @see #unlockProjectStates(long...)
+     */
+    private void lockProjectStates(long... projectIds)
     {
+        // Take the cache lock first to prevent deadlocks.  The cache lock is
+        // often taken indirectly while project configurations are wired into
+        // states, and we don't want it acquired while some project locks are
+        // already held.
+        cacheLock.writeLock().lock();
         projectIds = sortForLock(projectIds);
         for (long id: projectIds)
         {
@@ -592,13 +615,23 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public void unlockProjectStates(long... projectIds)
+    /**
+     * Releases a lock on the states for the given projects.  The caller must
+     * currently hold the locks.  When unlocking multiple states, pass them all
+     * to this method at once to ensure a consistent unlocking order.
+     *
+     * @param projectIds identifiers of the projects to unlock the state for
+     *
+     * @see #lockProjectStates(long...)
+     */
+    private void unlockProjectStates(long... projectIds)
     {
         projectIds = sortForLock(projectIds);
         for (int i = projectIds.length - 1; i >= 0; i--)
         {
             getProjectStateLock(projectIds[i]).unlock();
         }
+        cacheLock.writeLock().unlock();
     }
 
     private long[] sortForLock(long... projectIds)

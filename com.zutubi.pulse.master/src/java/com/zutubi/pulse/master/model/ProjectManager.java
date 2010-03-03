@@ -79,39 +79,16 @@ public interface ProjectManager extends EntityManager<Project>
     void abortUnfinishedBuilds(Project project, String message);
 
     /**
-     * Acquires a lock on the states for the given projects.  The lock must be
-     * held when performing compound logic involving the project state.  The
-     * lock is exclusive and reentrant.  When locking multiple states, pass
-     * them all to this method at once to ensure a consistent locking order.
-     *
-     * @param projectIds identifiers of the projects to lock the state for
-     *
-     * @see #unlockProjectStates(long...)
-     * @see #isProjectStateLocked(long)
+     * Runs the given callback function while holding state locks for all of
+     * the given projects.  Whenever basing decisions on project states, these
+     * locks must be held.  The acquisition and release of these locks is
+     * controlled by the project manager so that it can prevent possible
+     * deadlocks.
+     * 
+     * @param fn         callback to run while holding the locks
+     * @param projectIds ids of the projects to lock
      */
-    void lockProjectStates(long... projectIds);
-
-    /**
-     * Releases a lock on the states for the given projects.  The caller must
-     * currently hold the locks.  When unlocking multiple states, pass them all
-     * to this method at once to ensure a consistent unlocking order.
-     *
-     * @param projectIds identifiers of the projects to unlock the state for
-     *
-     * @see #lockProjectStates(long...)
-     * @see #isProjectStateLocked(long)
-     */
-    void unlockProjectStates(long... projectIds);
-
-    /**
-     * Indicates if the calling thread holds the state lock for the given
-     * project.
-     *
-     * @param projectId identifier of the project to test the state lock of
-     * @return true iff the given project's state lock is held by the calling
-     *         thread
-     */
-    boolean isProjectStateLocked(long projectId);
+    void runUnderProjectLocks(Runnable fn, long... projectIds);
 
     /**
      * Performs a state transition on a project if possible.  This is the only
@@ -121,8 +98,8 @@ public interface ProjectManager extends EntityManager<Project>
      * so.  In cases where the caller needs to inspect the state first or
      * perform other operations atomically with the transition, however, the
      * caller should increase the scope of the locking as required using
-     * {@link #lockProjectStates(long...)}.  State locks are reentrant to allow
-     * this pattern.
+     * {@link #runUnderProjectLocks(Runnable, long...)}.  State locks are
+     * reentrant to allow this pattern.
      * <p/>
      * If the project transitions into a state which requires further action,
      * the project manager will initiate that action after updating the state.
