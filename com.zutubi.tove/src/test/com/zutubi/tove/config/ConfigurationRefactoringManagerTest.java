@@ -3,9 +3,9 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
-import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
@@ -1429,6 +1429,34 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
     }
 
+    public void testPushDownPathHiddenInOtherChild() throws TypeException
+    {
+        // parent
+        //   bmap
+        //     colby <-- push down(child)
+        // child
+        //   bmap
+        //   colby
+        // child-hidden
+        //   bmap
+        //   [colby] (hidden)
+        final String NAME_CHILD = "child";
+        final String NAME_CHILD_HIDDEN = "child-hidden";
+
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String childHiddenPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD_HIDDEN), false);
+        configurationTemplateManager.delete(getPath(childHiddenPath, "bmap", "colby"));
+        String pushPath = getPath(parentPath, "bmap", "colby");
+        configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+
+        String toPath = getPath(childPath, "bmap", "colby");
+        String toHiddenPath = getPath(childHiddenPath, "bmap", "colby");
+        assertFalse(configurationTemplateManager.pathExists(pushPath));
+        assertTrue(configurationTemplateManager.pathExists(toPath));
+        assertFalse(configurationTemplateManager.pathExists(toHiddenPath));
+    }
+    
     public void testPushDownComposite() throws TypeException
     {
         // parent

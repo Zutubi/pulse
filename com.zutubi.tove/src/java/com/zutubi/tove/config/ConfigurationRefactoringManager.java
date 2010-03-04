@@ -3,10 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
@@ -15,6 +12,10 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -2020,7 +2021,7 @@ public class ConfigurationRefactoringManager
                     }
                     else
                     {
-                        cleanupHiddenKey(childKey, childPath);
+                        cleanupHiddenKey(childPath);
                     }
                 }
 
@@ -2087,16 +2088,18 @@ public class ConfigurationRefactoringManager
             }
         }
 
-        private void cleanupHiddenKey(String childKey, String childPath)
+        private void cleanupHiddenKey(String childPath)
         {
             // Hidden in this child, remove the hidden key from the
             // collection.
             String childCollectionPath = PathUtils.getParentPath(childPath);
             MutableRecord collectionClone = recordManager.select(childCollectionPath).copy(false, true);
-            if (!TemplateRecord.restoreItem(collectionClone, childKey))
+            if (!TemplateRecord.restoreItem(collectionClone, PathUtils.getBaseName(childPath)))
             {
                 throw new IllegalStateException("Did not find expected hidden key for path '" + childPath + "'");
             }
+            
+            recordManager.update(childCollectionPath, collectionClone);
         }
 
         private class PushDownValuesFunction implements GraphFunction<Record>
