@@ -90,7 +90,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     // Protects the five caches defined below.
     private ReadWriteLock cacheLock = new ReentrantReadWriteLock();
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
-    private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
+    /**
+     * We use a concurrent map for the configs despite the cache lock, as we
+     * need a safe way to do a non-locking get in {@link #setConfiguration}.
+     * Compound operations on this map should still acquire the appropriate
+     * cache lock (read or write).
+     */
+    private Map<Long, ProjectConfiguration> idToConfig = new ConcurrentHashMap<Long, ProjectConfiguration>();
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
     /**
@@ -603,11 +609,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
      */
     private void lockProjectStates(long... projectIds)
     {
-        // Take the cache lock first to prevent deadlocks.  The cache lock is
-        // often taken indirectly while project configurations are wired into
-        // states, and we don't want it acquired while some project locks are
-        // already held.
-        cacheLock.writeLock().lock();
         projectIds = sortForLock(projectIds);
         for (long id: projectIds)
         {
@@ -631,7 +632,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             getProjectStateLock(projectIds[i]).unlock();
         }
-        cacheLock.writeLock().unlock();
     }
 
     private long[] sortForLock(long... projectIds)
@@ -1335,16 +1335,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void setConfiguration(Project state)
     {
-        cacheLock.readLock().lock();
-        try
-        {
-            ProjectConfiguration projectConfiguration = idToConfig.get(state.getId());
-            state.setConfig(projectConfiguration);
-        }
-        finally
-        {
-            cacheLock.readLock().unlock();
-        }
+        // We don't lock the cache here as this is a very low-level callback.
+        // We rely on the concurrent map implementation to give us something
+        // consistent back.
+        ProjectConfiguration projectConfiguration = idToConfig.get(state.getId());
+        state.setConfig(projectConfiguration);
     }
 
     private void handleBuildCompleted(BuildCompletedEvent event)
