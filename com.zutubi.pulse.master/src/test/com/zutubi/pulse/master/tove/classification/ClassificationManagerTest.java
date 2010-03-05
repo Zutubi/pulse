@@ -4,11 +4,12 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.classification.types.ClassifierType;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.config.TemplateNodeImpl;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.ListType;
 import com.zutubi.util.bean.DefaultObjectFactory;
+
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -37,8 +38,8 @@ public class ClassificationManagerTest extends PulseTestCase
         ConfigurationTemplateManager configurationTemplateManager = mock(ConfigurationTemplateManager.class);
         doReturn(null).when(configurationTemplateManager).getTemplateNode(SINGLE_PATH);
         doReturn(null).when(configurationTemplateManager).getTemplateNode(COLLECTION_PATH);
-        doReturn(new TemplateNode(TEMPLATE_PATH, "id", false)).when(configurationTemplateManager).getTemplateNode(TEMPLATE_PATH);
-        doReturn(new TemplateNode(CONCRETE_PATH, "id", true)).when(configurationTemplateManager).getTemplateNode(CONCRETE_PATH);
+        doReturn(new TemplateNodeImpl(TEMPLATE_PATH, "id", false)).when(configurationTemplateManager).getTemplateNode(TEMPLATE_PATH);
+        doReturn(new TemplateNodeImpl(CONCRETE_PATH, "id", true)).when(configurationTemplateManager).getTemplateNode(CONCRETE_PATH);
 
         CompositeType defaultsType = new CompositeType(DefaultsType.class, "configType");
         doReturn(defaultsType).when(configurationTemplateManager).getType(SINGLE_PATH);

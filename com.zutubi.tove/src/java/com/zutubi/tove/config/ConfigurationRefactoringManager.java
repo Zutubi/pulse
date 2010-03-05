@@ -3,10 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.GraphFunction;
-import com.zutubi.util.Pair;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
@@ -45,9 +42,9 @@ public class ConfigurationRefactoringManager
      */
     public boolean canClone(final String path)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<Boolean>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public Boolean execute() throws Exception
+            public Boolean process()
             {
                 String parentPath = PathUtils.getParentPath(path);
                 if (parentPath != null && configurationTemplateManager.pathExists(path))
@@ -135,9 +132,9 @@ public class ConfigurationRefactoringManager
     public String clone(final String path, final String cloneKey)
     {
         // Validate new name, get a clone of the instance, set new key, insert?
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<String>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<String>()
         {
-            public String execute() throws Exception
+            public String process()
             {
                 String parentPath = PathUtils.getParentPath(path);
                 if (parentPath == null)
@@ -164,9 +161,9 @@ public class ConfigurationRefactoringManager
      */
     public boolean canExtractParentTemplate(final String path)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<Boolean>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public Boolean execute() throws Exception
+            public Boolean process()
             {
                 return configurationTemplateManager.pathExists(path) && configurationTemplateManager.isTemplatedCollection(PathUtils.getParentPath(path)) && configurationTemplateManager.getTemplateParentRecord(path) != null;
             }
@@ -209,9 +206,9 @@ public class ConfigurationRefactoringManager
      */
     public boolean canSmartClone(final String path)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<Boolean>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public Boolean execute() throws Exception
+            public Boolean process()
             {
                 return canExtractParentTemplate(path) && canClone(path);
             }
@@ -253,9 +250,9 @@ public class ConfigurationRefactoringManager
      */
     public List<String> getPullUpAncestors(final String path)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<List<String>>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<List<String>>()
         {
-            public List<String> execute() throws Exception
+            public List<String> process()
             {
                 String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
                 if (templateOwnerPath == null)
@@ -355,9 +352,9 @@ public class ConfigurationRefactoringManager
      */
     public List<String> getPushDownChildren(final String path)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<List<String>>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<List<String>>()
         {
-            public List<String> execute() throws Exception
+            public List<String> process()
             {
                 String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
                 if (templateOwnerPath == null)
@@ -477,7 +474,7 @@ public class ConfigurationRefactoringManager
     /**
      * Action used to implement {@link ConfigurationRefactoringManager#clone(String, java.util.Map)}.
      */
-    private class CloneAction implements ConfigurationTemplateManager.Action<Object>
+    private class CloneAction implements NullaryFunction<Object>
     {
         private final String parentPath;
         private final Map<String, String> originalKeyToCloneKey;
@@ -488,7 +485,7 @@ public class ConfigurationRefactoringManager
             this.originalKeyToCloneKey = originalKeyToCloneKey;
         }
 
-        public Object execute() throws Exception
+        public Object process()
         {
             // Be careful that no two new keys conflict!
             // Be careful that references (including parent pointers) within the
@@ -524,7 +521,14 @@ public class ConfigurationRefactoringManager
             {
                 String cloneKey = originalKeyToCloneKey.get(originalKey);
                 Record record = checkKeys(parentPath, originalKey, cloneKey, templatedCollection, seenNames);
-                configurationTemplateManager.validateNameIsUnique(parentPath, cloneKey, keyPropertyName, textProvider);
+                try
+                {
+                    configurationTemplateManager.validateNameIsUnique(parentPath, cloneKey, keyPropertyName, textProvider);
+                }
+                catch (ValidationException e)
+                {
+                    throw new IllegalArgumentException(e.getMessage(), e);
+                }
 
                 MutableRecord clone = copySimple(record);
                 clone.put(keyPropertyName, cloneKey);
@@ -819,7 +823,7 @@ public class ConfigurationRefactoringManager
         }
     }
 
-    private class SmartCloneAction implements ConfigurationTemplateManager.Action<String>
+    private class SmartCloneAction implements NullaryFunction<String>
     {
         private final String parentPath;
         private final String rootKey;
@@ -834,7 +838,7 @@ public class ConfigurationRefactoringManager
             this.originalKeyToCloneKey = originalKeyToCloneKey;
         }
 
-        public String execute() throws Exception
+        public String process()
         {
             if(!originalKeyToCloneKey.containsKey(rootKey))
             {
@@ -848,7 +852,7 @@ public class ConfigurationRefactoringManager
 
     }
 
-    private class ExtractParentTemplateAction implements ConfigurationTemplateManager.Action<String>
+    private class ExtractParentTemplateAction implements NullaryFunction<String>
     {
         private final String parentPath;
         private final String parentTemplateName;
@@ -861,7 +865,7 @@ public class ConfigurationRefactoringManager
             this.keys = keys;
         }
 
-        public String execute() throws ValidationException
+        public String process()
         {
             // First: what happens to references?  And state?  They want to stay
             // pointing at the same handles, so best to keep the current records
@@ -878,9 +882,16 @@ public class ConfigurationRefactoringManager
             
             MapType mapType = configurationTemplateManager.getType(parentPath, MapType.class);
             MessagesTextProvider textProvider = new MessagesTextProvider(mapType.getTargetType().getClazz());
-            configurationTemplateManager.validateNameIsUnique(parentPath, parentTemplateName, mapType.getKeyProperty(), textProvider);
+            try
+            {
+                configurationTemplateManager.validateNameIsUnique(parentPath, parentTemplateName, mapType.getKeyProperty(), textProvider);
+            }
+            catch (ValidationException e)
+            {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
 
-            if(keys.size() == 0)
+            if (keys.size() == 0)
             {
                 throw new IllegalArgumentException("No child keys specified");
             }
@@ -1741,14 +1752,14 @@ public class ConfigurationRefactoringManager
      *
      * @see com.zutubi.tove.config.ConfigurationRefactoringManager#canPullUp(String, String)
      */
-    private class CanPullUpAction extends PullUpActionSupport implements ConfigurationTemplateManager.Action<Boolean>
+    private class CanPullUpAction extends PullUpActionSupport implements NullaryFunction<Boolean>
     {
         public CanPullUpAction(String path, String ancestorKey)
         {
             super(path, ancestorKey);
         }
 
-        public Boolean execute() throws Exception
+        public Boolean process()
         {
             try
             {
@@ -1767,14 +1778,14 @@ public class ConfigurationRefactoringManager
      *
      * @see com.zutubi.tove.config.ConfigurationRefactoringManager#pullUp(String, String)
      */
-    private class PullUpAction extends PullUpActionSupport implements ConfigurationTemplateManager.Action<String>
+    private class PullUpAction extends PullUpActionSupport implements NullaryFunction<String>
     {
         public PullUpAction(String path, String ancestorKey)
         {
             super(path, ancestorKey);
         }
 
-        public String execute() throws Exception
+        public String process()
         {
             String insertPath;
 
@@ -1945,7 +1956,7 @@ public class ConfigurationRefactoringManager
      *
      * @see com.zutubi.tove.config.ConfigurationRefactoringManager#canPushDown(String, String)
      */
-    private class CanPushDownAction extends PushDownActionSupport implements ConfigurationTemplateManager.Action<Boolean>
+    private class CanPushDownAction extends PushDownActionSupport implements NullaryFunction<Boolean>
     {
         private String childKey;
 
@@ -1955,7 +1966,7 @@ public class ConfigurationRefactoringManager
             this.childKey = childKey;
         }
 
-        public Boolean execute() throws Exception
+        public Boolean process()
         {
             try
             {
@@ -1974,7 +1985,7 @@ public class ConfigurationRefactoringManager
      *
      * @see ConfigurationRefactoringManager#pushDown(String, Set<String>)
      */
-    private class PushDownAction extends PushDownActionSupport implements ConfigurationTemplateManager.Action<Set<String>>
+    private class PushDownAction extends PushDownActionSupport implements NullaryFunction<Set<String>>
     {
         private Set<String> childKeys;
 
@@ -1984,7 +1995,7 @@ public class ConfigurationRefactoringManager
             this.childKeys = childKeys;
         }
 
-        public Set<String> execute() throws Exception
+        public Set<String> process()
         {
             validateChildKeys();
 

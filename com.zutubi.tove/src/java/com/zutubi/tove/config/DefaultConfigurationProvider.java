@@ -171,13 +171,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public <T> T executeInsideTransaction(final NullaryFunction<T> f)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<T>()
-        {
-            public T execute() throws Exception
-            {
-                return f.process();
-            }
-        });
+        return configurationTemplateManager.executeInsideTransaction(f);
     }
 
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class clazz)

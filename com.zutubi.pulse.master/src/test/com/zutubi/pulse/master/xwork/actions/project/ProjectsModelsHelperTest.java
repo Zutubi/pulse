@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
-import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.config.TemplateNodeImpl;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -65,8 +65,8 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         //   - p1 (odd, lonely)
         //   - p2
         //   - p3 (odd)
-        TemplateNode globalNode = createNode(TEMPLATE_GLOBAL, false);
-        TemplateNode templateNode = createNode(TEMPLATE_CHILD, false);
+        TemplateNodeImpl globalNode = createNode(TEMPLATE_GLOBAL, false);
+        TemplateNodeImpl templateNode = createNode(TEMPLATE_CHILD, false);
         globalNode.addChild(templateNode);
 
         templateNode.addChild(createNode(cp1.getName(), true));
@@ -118,9 +118,9 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         helper.setActionManager(actionManager);
     }
 
-    private TemplateNode createNode(String name, boolean concrete)
+    private TemplateNodeImpl createNode(String name, boolean concrete)
     {
-        return new TemplateNode(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
+        return new TemplateNodeImpl(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
     }
 
     private Map<String, ProjectGroup> groupProjects(List<Project> allProjects)

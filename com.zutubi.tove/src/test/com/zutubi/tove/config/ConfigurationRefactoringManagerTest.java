@@ -530,7 +530,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testExtractParentTemplateParentNameNotUnique() throws TypeException
     {
         insertTemplateA(rootPath, "a", true);
-        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "com.zutubi.validation.ValidationException: name is already in use, please select another name");
+        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "name is already in use, please select another name");
     }
 
     private void extractParentTemplateErrorHelper(String parentPath, List<String> childKeys, String parentTemplateName, String expectedError)

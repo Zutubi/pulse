@@ -1,5 +1,7 @@
 package com.zutubi.tove.transaction;
 
+import com.zutubi.util.UnaryFunction;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,9 +36,9 @@ public class TransactionalWrapperTest extends AbstractTransactionTestCase
     {
         try
         {
-            wrapper.execute(new TransactionalWrapper.Action<Set<String>>()
+            wrapper.execute(new UnaryFunction<Set<String>, Object>()
             {
-                public Object execute(Set<String> strings)
+                public Object process(Set<String> strings)
                 {
                     strings.add("fail");
                     throw new RuntimeException("boom.");
@@ -60,9 +62,9 @@ public class TransactionalWrapperTest extends AbstractTransactionTestCase
 
         try
         {
-            wrapper.execute(new TransactionalWrapper.Action<Set<String>>()
+            wrapper.execute(new UnaryFunction<Set<String>, Object>()
             {
-                public Object execute(Set<String> strings)
+                public Object process(Set<String> strings)
                 {
                     strings.add("fail");
                     throw new RuntimeException("boom.");
@@ -133,9 +135,9 @@ public class TransactionalWrapperTest extends AbstractTransactionTestCase
 
         public void addToSet(final String str)
         {
-            this.execute(new TransactionalWrapper.Action<Set<String>>()
+            this.execute(new UnaryFunction<Set<String>, Object>()
             {
-                public Object execute(Set<String> strings)
+                public Object process(Set<String> strings)
                 {
                     strings.add(str);
                     return null;

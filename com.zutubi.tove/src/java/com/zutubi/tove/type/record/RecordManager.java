@@ -7,6 +7,7 @@ import com.zutubi.tove.type.record.events.RecordDeletedEvent;
 import com.zutubi.tove.type.record.events.RecordInsertedEvent;
 import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.tove.type.record.store.RecordStore;
+import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -173,9 +174,9 @@ public class RecordManager implements HandleAllocator
             }
         }
 
-        stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        stateWrapper.execute(new UnaryFunction<RecordManagerState, Object>()
         {
-            public Object execute(RecordManagerState state)
+            public Object process(RecordManagerState state)
             {
                 recordStore.update(path, values);
                 return null;
@@ -204,9 +205,9 @@ public class RecordManager implements HandleAllocator
         // we copy first because we do not want to modify the argument.
         final Record copy = record.copy(true, true);
 
-        stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        stateWrapper.execute(new UnaryFunction<RecordManagerState, Object>()
         {
-            public Object execute(RecordManagerState state)
+            public Object process(RecordManagerState state)
             {
                 allocateHandles((MutableRecord) copy);
                 state.addToHandleMap(path, copy);
@@ -229,9 +230,9 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        Record record = (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        Record record = stateWrapper.execute(new UnaryFunction<RecordManagerState, Record>()
         {
-            public Object execute(RecordManagerState state)
+            public Record process(RecordManagerState state)
             {
                 Record deletedRecord = recordStore.delete(path);
                 if (deletedRecord != null)
@@ -266,9 +267,9 @@ public class RecordManager implements HandleAllocator
         final Record record = delete(sourcePath);
         if (record != null)
         {
-            stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+            stateWrapper.execute(new UnaryFunction<RecordManagerState, Object>()
             {
-                public Object execute(RecordManagerState state)
+                public Object process(RecordManagerState state)
                 {
                     state.addToHandleMap(destinationPath, record);
                     recordStore.insert(destinationPath, record);

@@ -3,6 +3,7 @@ package com.zutubi.tove.type.record.store;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionalWrapper;
 import com.zutubi.tove.type.record.*;
+import com.zutubi.util.UnaryFunction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +40,9 @@ public class InMemoryRecordStore implements RecordStore
     {
         // all methods that modify the internal structure of this memory store
         // are wrapped.
-        wrapper.execute(new TransactionalWrapper.Action<MutableRecordHolder>()
+        wrapper.execute(new UnaryFunction<MutableRecordHolder, Object>()
         {
-            public Object execute(MutableRecordHolder base)
+            public Object process(MutableRecordHolder base)
             {
                 insert(base, path, record);
                 return null;
@@ -53,9 +54,9 @@ public class InMemoryRecordStore implements RecordStore
     {
         // all methods that modify the internal structure of this memory store
         // are wrapped.
-        wrapper.execute(new TransactionalWrapper.Action<MutableRecordHolder>()
+        wrapper.execute(new UnaryFunction<MutableRecordHolder, Object>()
         {
-            public Object execute(MutableRecordHolder base)
+            public Object process(MutableRecordHolder base)
             {
                 update(base, path, record);
                 return null;
@@ -67,9 +68,9 @@ public class InMemoryRecordStore implements RecordStore
     {
         // all methods that modify the internal structure of this memory store
         // are wrapped.
-        return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecordHolder>()
+        return wrapper.execute(new UnaryFunction<MutableRecordHolder, Record>()
         {
-            public Object execute(MutableRecordHolder base)
+            public Record process(MutableRecordHolder base)
             {
                 return delete(base, path);
             }
@@ -85,9 +86,9 @@ public class InMemoryRecordStore implements RecordStore
     {
         // all methods that modify the internal structure of this memory store
         // are wrapped.
-        wrapper.execute(new TransactionalWrapper.Action<MutableRecordHolder>()
+        wrapper.execute(new UnaryFunction<MutableRecordHolder, Object>()
         {
-            public Object execute(MutableRecordHolder holder)
+            public Object process(MutableRecordHolder holder)
             {
                 // update the base to contain the contents of r.
                 MutableRecord base = new MutableRecordImpl();

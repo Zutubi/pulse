@@ -1,140 +1,38 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A node in a heirarchy of templated configuration.  Stores just enough
+ * A node in a hierarchy of templated configuration.  Stores just enough
  * information to display the hierarchy to the user and retrieve further info
  * from the CTM if necessary.
+ * <p/>
+ * This interface presents an immutable view of the underlying implementation -
+ * nodes should not be modified outside of the hierarchy refreshing.
  */
-public class TemplateNode
+public interface TemplateNode
 {
-    private TemplateNode parent;
-    private List<TemplateNode> children = new LinkedList<TemplateNode>();
-    private String path;
-    private String id;
-    private boolean concrete;
+    TemplateNode getParent();
 
-    public TemplateNode(String path, String id, boolean concrete)
-    {
-        this.concrete = concrete;
-        this.path = path;
-        this.id = id;
-    }
+    List<TemplateNode> getChildren();
 
-    public TemplateNode getParent()
-    {
-        return parent;
-    }
+    TemplateNode getChild(String id);
 
-    private void setParent(TemplateNode parent)
-    {
-        this.parent = parent;
-    }
+    String getPath();
 
-    public List<TemplateNode> getChildren()
-    {
-        return children;
-    }
+    String getId();
 
-    public TemplateNode getChild(final String id)
-    {
-        return CollectionUtils.find(children, new Predicate<TemplateNode>()
-        {
-            public boolean satisfied(TemplateNode templateNode)
-            {
-                return templateNode.getId().equals(id);
-            }
-        });
-    }
+    boolean isConcrete();
 
-    public void addChild(TemplateNode child)
-    {
-        child.setParent(this);
-        children.add(child);
-    }
+    TemplateNode findNodeById(String id);
 
-    public String getPath()
-    {
-        return path;
-    }
+    String getTemplatePath();
 
-    public String getId()
-    {
-        return id;
-    }
+    int getDepth();
 
-    public boolean isConcrete()
-    {
-        return concrete;
-    }
+    void forEachAncestor(NodeHandler callback, boolean strict);
 
-    public TemplateNode findNodeById(String id)
-    {
-        if(this.id.equals(id))
-        {
-            return this;
-        }
-
-        for(TemplateNode child: children)
-        {
-            TemplateNode node = child.findNodeById(id);
-            if(node != null)
-            {
-                return node;
-            }
-        }
-
-        return null;
-    }
-
-    public String getTemplatePath()
-    {
-        if(parent == null)
-        {
-            return id;
-        }
-        else
-        {
-            return PathUtils.getPath(parent.getTemplatePath(), id);
-        }
-    }
-
-    public int getDepth()
-    {
-        if(parent == null)
-        {
-            return 0;
-        }
-        else
-        {
-            return parent.getDepth() + 1;
-        }
-    }
-
-    public void forEachAncestor(NodeHandler callback, boolean strict)
-    {
-        if((strict || callback.handle(this)) && parent != null)
-        {
-            parent.forEachAncestor(callback, false);
-        }
-    }
-
-    public void forEachDescendant(NodeHandler callback, boolean strict)
-    {
-        if(strict || callback.handle(this))
-        {
-            for(TemplateNode node: children)
-            {
-                node.forEachDescendant(callback, false);
-            }
-        }
-    }
+    void forEachDescendant(NodeHandler callback, boolean strict);
 
     public interface NodeHandler
     {

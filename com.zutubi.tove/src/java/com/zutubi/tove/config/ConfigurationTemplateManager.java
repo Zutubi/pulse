@@ -7,7 +7,10 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.transaction.*;
+import com.zutubi.tove.transaction.Transaction;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.tove.transaction.TransactionResource;
+import com.zutubi.tove.transaction.TransactionalWrapper;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.type.record.events.RecordDeletedEvent;
@@ -45,8 +48,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     private EventManager eventManager;
     private TransactionManager transactionManager;
 
-    private UserTransaction userTransaction;
-
     private WireService wireService;
 
     private ValidationManager validationManager;
@@ -59,8 +60,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         stateWrapper = new StateTransactionalWrapper();
         stateWrapper.setTransactionManager(transactionManager);
-
-        userTransaction = new UserTransaction(transactionManager);
     }
 
     public void initSecondPhase()
@@ -271,51 +270,39 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return record;
     }
 
-    <T> T executeInsideTransaction(Action<T> a)
+    <T> T executeInsideTransaction(final NullaryFunction<T> a)
     {
-        userTransaction.begin();
-        try
+        return stateWrapper.execute(new UnaryFunction<State, T>()
         {
-            // Add a resource that publishes events on commit.
-            Transaction txn = transactionManager.getTransaction();
-            txn.enlistResource(new TransactionResource()
+            public T process(final State state)
             {
-                public boolean prepare()
+                Transaction txn = transactionManager.getTransaction();
+                txn.enlistResource(new TransactionResource()
                 {
-                    return true;
-                }
-
-                public void commit()
-                {
-                    ConfigurationTemplateManager.State state = getState();
-                    for(ConfigurationEvent e: state.pendingEvents)
+                    public boolean prepare()
                     {
-                        eventManager.publish(e);
+                        return true;
                     }
 
-                    state.pendingEvents.clear();
-                }
+                    public void commit()
+                    {
+                        for(ConfigurationEvent e: state.pendingEvents)
+                        {
+                            eventManager.publish(e);
+                        }
 
-                public void rollback()
-                {
-                    // Just don't raise the events.
-                }
-            });
+                        state.pendingEvents.clear();
+                    }
 
-            T result = a.execute();
-            userTransaction.commit();
-            return result;
-        }
-        catch (RuntimeException e)
-        {
-            userTransaction.rollback();
-            throw e;
-        }
-        catch (Throwable t)
-        {
-            userTransaction.rollback();
-            throw new ToveRuntimeException(t);
-        }
+                    public void rollback()
+                    {
+                        // Just don't raise the events.
+                    }
+                });
+
+                return a.process();
+            }
+        });
     }
 
     private void publishEvent(ConfigurationEvent event)
@@ -338,9 +325,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         try
         {
             final MutableRecord record = type.unstantiate(instance, getTemplateOwnerPath(path));
-            return executeInsideTransaction(new Action<String>()
+            return executeInsideTransaction(new NullaryFunction<String>()
             {
-                public String execute() throws Exception
+                public String process()
                 {
                     return insertRecord(path, record);
                 }
@@ -357,9 +344,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_CREATE);
 
-        return executeInsideTransaction(new Action<String>()
+        return executeInsideTransaction(new NullaryFunction<String>()
         {
-            public String execute() throws Exception
+            public String process()
             {
                 MutableRecord record = r;
 
@@ -653,18 +640,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     void refreshCaches()
     {
-        stateWrapper.execute(new TransactionalWrapper.Action<State>()
+        ConfigurationTemplateManager.State state = getState();
+        refreshTemplateHierarchies(state);
+        if (state.instancesEnabled)
         {
-            public Object execute(State state)
-            {
-                refreshTemplateHierarchies(state);
-                if (state.instancesEnabled)
-                {
-                    refreshInstances(state);
-                }
-                return null;
-            }
-        });
+            refreshInstances(state);
+        }
         refreshCount++;
     }
 
@@ -775,9 +756,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public boolean existsInTemplateParent(final String path)
     {
-        return executeInsideTransaction(new Action<Boolean>()
+        return executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public Boolean execute() throws Exception
+            public Boolean process()
             {
                 String parentPath = PathUtils.getParentPath(path);
                 if(parentPath == null || !pathExists(parentPath))
@@ -813,9 +794,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public boolean isOverridden(final String path)
     {
-        return executeInsideTransaction(new Action<Boolean>()
+        return executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public Boolean execute() throws Exception
+            public Boolean process()
             {
                 String parentPath = PathUtils.getParentPath(path);
                 if(parentPath == null || !pathExists(parentPath))
@@ -947,7 +928,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     records.add(entry.getValue());
                 }
 
-                TemplateNode root = null;
+                TemplateNodeImpl root = null;
                 List<Record> rootRecords = recordsByParent.get(0L);
                 if (rootRecords != null)
                 {
@@ -965,11 +946,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private TemplateNode createTemplateNode(Record record, String scopeName, String idProperty, Map<Long, List<Record>> recordsByParent)
+    private TemplateNodeImpl createTemplateNode(Record record, String scopeName, String idProperty, Map<Long, List<Record>> recordsByParent)
     {
         String id = (String) record.get(idProperty);
         String path = PathUtils.getPath(scopeName, id);
-        TemplateNode node = new TemplateNode(path, id, isConcreteOwner(record));
+        TemplateNodeImpl node = new TemplateNodeImpl(path, id, isConcreteOwner(record));
 
         List<Record> children = recordsByParent.get(record.getHandle());
         if (children != null)
@@ -1295,9 +1276,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             final MutableRecord record = type.unstantiate(instance, getTemplateOwnerPath(path));
 
-            return executeInsideTransaction(new Action<String>()
+            return executeInsideTransaction(new NullaryFunction<String>()
             {
-                public String execute() throws Exception
+                public String process()
                 {
                     return saveRecord(path, record, true);
                 }
@@ -1355,9 +1336,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             throw new IllegalArgumentException("Record has no type (note that collections should not be saved directly)");
         }
 
-        return executeInsideTransaction(new Action<String>()
+        return executeInsideTransaction(new NullaryFunction<String>()
         {
-            public String execute() throws Exception
+            public String process()
             {
                 final Record existingRecord = getRecord(path);
                 if (existingRecord == null)
@@ -1833,9 +1814,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public boolean canDelete(final String path)
     {
-        return executeInsideTransaction(new Action<Boolean>()
+        return executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public Boolean execute() throws Exception
+            public Boolean process()
             {
                 Record record = recordManager.select(path);
                 if(record == null)
@@ -1877,9 +1858,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     public RecordCleanupTask getCleanupTasks(final String path)
     {
-        return executeInsideTransaction(new Action<RecordCleanupTask>()
+        return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>()
         {
-            public RecordCleanupTask execute() throws Exception
+            public RecordCleanupTask process()
             {
                 Record record = recordManager.select(path);
                 if(record == null)
@@ -1999,9 +1980,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
-        executeInsideTransaction(new Action<Object>()
+        executeInsideTransaction(new NullaryFunction<Object>()
         {
-            public Object execute() throws Exception
+            public Object process()
             {
                 Record record = recordManager.select(path);
                 if(record == null)
@@ -2069,9 +2050,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public int deleteAll(final String pathPattern)
     {
-        return executeInsideTransaction(new Action<Integer>()
+        return executeInsideTransaction(new NullaryFunction<Integer>()
         {
-            public Integer execute() throws Exception
+            public Integer process()
             {
                 List<String> paths = recordManager.getAllPaths(pathPattern);
                 int deleted = 0;
@@ -2118,9 +2099,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         final String parentPath = PathUtils.getParentPath(path);
 
-        executeInsideTransaction(new Action<Object>()
+        executeInsideTransaction(new NullaryFunction<Object>()
         {
-            public Object execute() throws Exception
+            public Object process()
             {
                 TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
                 if(parentRecord == null)
@@ -2167,9 +2148,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_WRITE);
 
-        executeInsideTransaction(new Action<Object>()
+        executeInsideTransaction(new NullaryFunction<Object>()
         {
-            public Object execute() throws Exception
+            public Object process()
             {
                 Type type = getType(path);
                 if(!(type instanceof CollectionType))
@@ -2822,11 +2803,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return localNode != null;
     }
 
-    interface Action<T>
-    {
-        T execute() throws Exception;
-    }
-
     /**
      * The state class encapsulates the state of the configuration template manager that is subject to
      * transactional control / isolation etc.
@@ -2865,6 +2841,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             // Instances are immutable (we copy on write) so we can reuse the
             // same instances, wrapped with a new cache.
             copy.instances = v.instances.copyStructure();
+            // Template hierarchies are also immutable, so just copy the map,
+            // reusing the same hierarchies.
+            copy.templateHierarchies = new HashMap<String, TemplateHierarchy>(v.templateHierarchies);
             return copy;
         }
     }

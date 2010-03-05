@@ -3,8 +3,10 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.type.record.PathUtils;
 
 /**
- * A heirarchy of template configuration meta-data, used to display the
+ * A hierarchy of template configuration meta-data, used to display the
  * template tree and retrieve further information if required.
+ * <p/>
+ * This class is designed to be immutable (as indeed are the nodes).
  */
 public class TemplateHierarchy
 {

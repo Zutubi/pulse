@@ -1,5 +1,7 @@
 package com.zutubi.tove.transaction;
 
+import com.zutubi.util.UnaryFunction;
+
 public abstract class TransactionalWrapper<T> implements TransactionResource
 {
     private T global;
@@ -22,7 +24,7 @@ public abstract class TransactionalWrapper<T> implements TransactionResource
         return global;
     }
 
-    public Object execute(Action<T> action)
+    public <U> U execute(UnaryFunction<T, U> action)
     {
         // ensure that we are part of the transaction.
         boolean activeTransaction = transactionManager.getTransaction() != null;
@@ -45,7 +47,7 @@ public abstract class TransactionalWrapper<T> implements TransactionResource
         {
             try
             {
-                Object result = action.execute(writeableState);
+                U result = action.process(writeableState);
 
                 // execute a manual transaction.
                 transactionManager.commit();
@@ -67,7 +69,7 @@ public abstract class TransactionalWrapper<T> implements TransactionResource
         {
             try
             {
-                return action.execute(writeableState);
+                return action.process(writeableState);
             }
             catch (RuntimeException e)
             {
@@ -110,11 +112,6 @@ public abstract class TransactionalWrapper<T> implements TransactionResource
     public void setTransactionManager(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
-    }
-
-    public static interface Action<T>
-    {
-        Object execute(T t);
     }
 
     public abstract T copy(T v);
