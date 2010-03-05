@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.tove.type.record.PathUtils;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -220,14 +221,9 @@ public class PluginManager
             plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
         }
 
-        //NOTE: the extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgraded. 
-
+        //The extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgraded.
         // resolve them all.
         equinox.resolveBundles();
-
-        //FIXME: Since we are resolving all of the bundles at once, we need to post process
-        //FIXME: them and disable those that could not be resolved.
-        //FIXME: This will also provide us with the opporunity to provide properly detailed error messages.
 
         List<LocalPlugin> resolvedPlugins = new LinkedList<LocalPlugin>();
         for (LocalPlugin plugin : installedPlugins)
@@ -405,15 +401,15 @@ public class PluginManager
         }
     }
 
-    private void delete(File pluginSource) throws IOException
+    private void delete(File file) throws IOException
     {
-        if (pluginSource.isDirectory())
+        if (file.isDirectory())
         {
-            FileSystemUtils.rmdir(pluginSource);
+            FileSystemUtils.rmdir(file);
         }
-        else if (pluginSource.isFile())
+        else if (file.isFile())
         {
-            FileSystemUtils.delete(pluginSource);
+            FileSystemUtils.delete(file);
         }
     }
 
@@ -456,10 +452,25 @@ public class PluginManager
             {
                 if (!registry.isRegistered(plugin))
                 {
-                    // download and register - may want to make the default 'discovery' behaviour configurable?
-                    File installedSource = downloadPlugin(file.toURI(), paths.getPluginStorageDir());
+                    // SPECIAL CASE: check if a file of the same name already exists in the destination directory.
+                    // If so, we over write it.  This is rather aggressive, but can a file in the storage directory
+                    // that is the same name as a pre-packaged file be considered valid if it is not registered?
+                    File downloadDest = new File(paths.getPluginStorageDir(), file.getName());
+                    if (downloadDest.exists())
+                    {
+                        try
+                        {
+                            delete(downloadDest);
+                        }
+                        catch (IOException e)
+                        {
+                            LOG.warning(e);
+                        }
+                    }
 
-                    registerPlugin(createPluginHandle(installedSource, Plugin.Type.USER));
+                    File downloadedSource = downloadPlugin(file.toURI(), file.getName(), paths.getPluginStorageDir());
+
+                    registerPlugin(createPluginHandle(downloadedSource, Plugin.Type.USER));
                 }
                 else
                 {
@@ -479,8 +490,6 @@ public class PluginManager
                     }
 
                     LocalPlugin registeredPlugin = createPluginHandle(entry.getSource(), entry.getType());
-
-                    //TODO: provide the user with the opportunity to not upgrade to the new version. They may have an old version for a specific reason.
 
                     if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) > 0)
                     {
@@ -569,7 +578,6 @@ public class PluginManager
             }
 
             installedPlugin = createPluginHandle(file, Plugin.Type.USER);
-            // register the plugin with the registry
             registerPlugin(installedPlugin);
         }
         catch (Exception e)
@@ -588,10 +596,6 @@ public class PluginManager
         installedPlugin.setState(Plugin.State.INSTALLED);
         plugins.add(installedPlugin);
 
-        // FIXME: if registration fails, then we will want to delete the installed source. Chances are that the
-        // user will try again, so make sure we leave nothing behing at this stage.
-
-        // and optionally enable it.
         if (autostart)
         {
             enablePlugin(installedPlugin);
@@ -898,11 +902,6 @@ public class PluginManager
         }
     }
 
-    private void checkInstallAndResolve(LocalPlugin plugin) throws BundleException
-    {
-        equinox.checkInstallAndResolve(plugin.manifest, plugin.source);
-    }
-
     private PluginRegistryEntry registerPlugin(LocalPlugin plugin) throws PluginException
     {
         try
@@ -1007,57 +1006,61 @@ public class PluginManager
             throw new PluginException("Can not download plugin.  Plugin with name " + downloadedFile.getName() + " already exists.");
         }
 
-        File tmpFile = null;
-        InputStream is = null;
-        OutputStream os = null;
-
         try
         {
-            is = source.toURL().openStream();
-
-            tmpFile = new File(downloadedFile.getAbsolutePath() + ".tmp");
-
-            if (!tmpFile.getParentFile().exists() && !tmpFile.getParentFile().mkdirs())
+            // treat local URIs differently because they may be either files or expanded directories.
+            if ("file".equals(source.getScheme()))
             {
-                throw new IOException("Failed to download plugin. Unable to create new directory: " + tmpFile.getParentFile().getAbsolutePath());
+                downloadLocalTo(source, downloadedFile);
             }
-
-            os = new FileOutputStream(tmpFile);
-
-            IOUtils.joinStreams(is, os);
+            else
+            {
+                downloadRemoteTo(source, downloadedFile);
+            }
         }
         catch (IOException e)
         {
             throw new PluginException(e);
         }
-        finally
-        {
-            IOUtils.close(is);
-            IOUtils.close(os);
-        }
-
-        try
-        {
-            FileSystemUtils.rename(tmpFile, downloadedFile, true);
-        }
-        catch (IOException e)
-        {
-            tmpFile.delete();
-            throw new PluginException("Renaming plugin temp file: " + e.getMessage(), e);
-        }
 
         return downloadedFile;
     }
 
-    private String deriveName(URI url)
+    private void downloadLocalTo(URI source, File dest) throws IOException
     {
-        String name = url.getPath();
-        int index = name.lastIndexOf('/');
-        if (index >= 0)
+        FileSystemUtils.copy(dest, new File(source));
+    }
+
+    private void downloadRemoteTo(URI source, File dest) throws IOException
+    {
+        // ensure that we download all or nothing by downloading to a temporary location first.
+        File tmpFile = new File(dest.getAbsolutePath() + ".tmp");
+
+        try
         {
-            name = name.substring(index + 1);
+            if (!tmpFile.getParentFile().exists() && !tmpFile.getParentFile().mkdirs())
+            {
+                throw new IOException("Failed to download plugin. Unable to create new directory: " + tmpFile.getParentFile().getAbsolutePath());
+            }
+
+            IOUtils.joinStreams(source.toURL().openStream(), new FileOutputStream(tmpFile), true);
+
+            // 'commit' the downloaded file by renaming it
+            FileSystemUtils.rename(tmpFile, dest, true);
         }
-        return name;
+        finally
+        {
+            if (!tmpFile.delete())
+            {
+                LOG.warning("Failed to delete: " + tmpFile.getAbsolutePath());
+            }
+        }
+    }
+
+    private String deriveName(URI uri)
+    {
+        String path = PathUtils.normalisePath(uri.getPath());
+        return PathUtils.getBaseName(path);
     }
 
     public Plugin getPlugin(String id)

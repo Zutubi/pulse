@@ -3,7 +3,7 @@ package com.zutubi.i18n.context;
 import java.io.InputStream;
 
 /**
- * <class-comment/>
+ * Implementation of the context interface that is based on a class file.
  */
 public class ClassContext implements Context
 {
@@ -23,7 +23,7 @@ public class ClassContext implements Context
     {
         if (context == null)
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No context specified.");
         }
         if (context instanceof Class)
         {

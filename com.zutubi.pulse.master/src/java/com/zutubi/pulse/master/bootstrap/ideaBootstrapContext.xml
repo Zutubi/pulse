@@ -44,6 +44,11 @@
         </property>
     </bean>
 
+    <!--
+    NOTE: We compile the bundles directly into the storage directory, so all prepackaged
+    bundles are handled as USER plugins.  We can change this so that the prepackaged bundles
+    are 'deployed', but then plugins will not be kept up to date.
+    -->
     <bean id="pluginPaths" class="com.zutubi.pulse.core.plugins.ConfigurablePluginPaths">
         <property name="internalPluginStorageString" value="plugins/internal"/>
         <property name="osgiConfigurationString" value="com.zutubi.pulse.master/etc/osgi"/>

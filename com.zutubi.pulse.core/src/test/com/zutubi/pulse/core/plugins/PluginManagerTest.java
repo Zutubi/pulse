@@ -1,7 +1,9 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.FileSystemUtils.delete;
 import com.zutubi.util.ZipUtils;
+import static com.zutubi.util.io.IOUtils.copyFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -116,11 +118,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertNoInstalledJars();
     }
 
-    private void assertNoInstalledJars()
-    {
-        assertEquals(0, paths.getPluginStorageDir().list().length);
-    }
-
     public void testInstallWithMissingDependency() throws Exception
     {
         startupPluginCore();
@@ -129,8 +126,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         Plugin installedConsumer = manager.install(consumer1.toURI());
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessage());
-        //TODO: Improve the error message.
-//        assertTrue(installedConsumer.getStatusMessage().contains("Reason: Missing Constraint: Require-Bundle: com.zutubi.bundles.producer; bundle-version=\"[1.0.0,2.0.0)\""));
 
         assertEquals(0, manager.equinox.getBundleCount(CONSUMER_ID));
     }
@@ -143,8 +138,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         Plugin installedConsumer = manager.install(consumer1.toURI());
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessage());
-        //TODO: Improve the error message.
-//        assertTrue(installedConsumer.getStatusMessage().contains("Reason: Missing Constraint: Require-Bundle: com.zutubi.bundles.producer; bundle-version=\"[1.0.0,2.0.0)\""));
         assertTrue(new File(paths.getPluginStorageDir(), consumer1.getName()).isFile());
 
         // install the missing consumer dependency
@@ -482,6 +475,8 @@ public class PluginManagerTest extends BasePluginSystemTestCase
      *
      * A side complication is that it is difficult to distinguish between a plugin that is manually installed and a
      * plugin that is uninstalled - but we fail to delete the jar file.
+     *
+     * @throws Exception on error
      */
     public void testUninstallAndReinstallPlugin() throws Exception
     {
@@ -534,7 +529,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         shutdownPluginCore();
 
-        FileSystemUtils.delete(new File(paths.getPluginStorageDir(), producer1.getName()));
+        delete(new File(paths.getPluginStorageDir(), producer1.getName()));
 
         startupPluginCore();
 
@@ -769,27 +764,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         }
     }
 
-    public void testConcurrentUpgrades()
-    {
-        // upgrade 2 different plugins,
-    }
-
-    public void testUpgradingToPluginWhereFileWasDeletedBeforeRestart()
-    {
-        // upgrade a plugin, -> copied into the working directory.
-        // working directory is cleared out (is scratch space after all)
-        // restart
-        // plugin upgrade fails, but old plugin should be activated - appropriate message should be available somewhere.
-    }
-
-    public void testUpgradingDisabledPluginTriggersUpgrade()
-    {
-        // install producer 1.0.0,
-        // disable producer
-        // upgrade to producer 3.0.0
-        // ensure that upgrade is required.
-    }
-
     public void testDependencyCheckMessagesOnInstall() throws PluginException
     {
         startupPluginCore();
@@ -797,8 +771,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         Plugin consumer = manager.install(consumer1.toURI());
         assertEquals("Failed to resolve bundle dependencies.", consumer.getErrorMessage());
         assertEquals(Plugin.State.DISABLED, consumer.getState());
-
-        //TODO: should be identifying the missing dependency
     }
 
     public void testDependencyCheckMessagesOnStartup() throws PluginException, IOException
@@ -810,8 +782,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         Plugin consumer = manager.getPlugin("com.zutubi.bundles.consumer");
         assertEquals("Failed to resolve bundle.", consumer.getErrorMessage());
         assertEquals(Plugin.State.DISABLED, consumer.getState());
-
-        //TODO: should be identifying the missing dependency
     }
 
     public void testInstallingZeroLengthJarFile() throws Exception
@@ -855,17 +825,26 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
     public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup() throws Exception
     {
-        manuallyDeploy(failonstartup);
+        File pluginFile = new File(tmpDir, "com.zutubi.bundles.onstartup_1.0.0.jar");
+        copyFile(getInputFile("com.zutubi.bundles.onstartup_1.0.0_fails", EXTENSION_JAR), pluginFile);
+
+        manuallyDeploy(pluginFile);
 
         startupPluginCore();
 
-        Plugin plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
+        Plugin plugin = manager.getPlugin("com.zutubi.bundles.onstartup");
         assertEquals(Plugin.State.DISABLED, plugin.getState());
 
-        restartPluginCore();
+        shutdownPluginCore();
 
-        plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
-        assertEquals(Plugin.State.DISABLED, plugin.getState());
+        delete(pluginFile);
+        copyFile(getInputFile("com.zutubi.bundles.onstartup_1.0.0_succeeds", EXTENSION_JAR), pluginFile);
+        manuallyDeploy(pluginFile);
+        
+        startupPluginCore();
+
+        plugin = manager.getPlugin("com.zutubi.bundles.onstartup");
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
     }
 
     public void testPluginThatFailsOnShutdown() throws Exception
@@ -892,11 +871,41 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(Plugin.State.DISABLED, plugin.getState());
     }
 
+    public void testPrepackageExpandedDirectoryPlugin() throws IOException, PluginException
+    {
+        // deploy an expanded version of the plugin.
+        File base = new File(paths.getPrepackagedPluginStorageDir(), producer1.getName());
+        assertTrue(base.mkdirs());
+        ZipUtils.extractZip(new ZipInputStream(new FileInputStream(producer1)), base);
+        
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+    }
+
+    // CIB-2377
+    public void testPrepackagedFileCollisionOnStartup() throws IOException, PluginException
+    {
+        FileSystemUtils.copy(paths.getPrepackagedPluginStorageDir(), producer1);
+        manuallyDeploy(producer1);
+        
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+    }
+
     private void assertPlugin(Plugin plugin, String expectedId, String expectedVersion, Plugin.State expectedState)
     {
         assertNotNull(plugin);
         assertEquals(expectedId, plugin.getId());
         assertEquals(expectedVersion, plugin.getVersion().toString());
         assertEquals(expectedState, plugin.getState());
+    }
+
+    private void assertNoInstalledJars()
+    {
+        assertEquals(0, paths.getPluginStorageDir().list().length);
     }
 }

@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 
 public abstract class BasePluginSystemTestCase extends PulseTestCase
 {
-    private File tmpDir;
+    protected File tmpDir;
     
     protected ConfigurablePluginPaths paths;
     protected PluginManager manager;
