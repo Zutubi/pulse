@@ -10,5 +10,7 @@ public interface PackageFactory
 {
     public PulsePackage createPackage(File pkg);
 
+    public Pulse createPulse(String pulseHome);
+
     void close();
 }

@@ -13,6 +13,7 @@ public interface Pulse
     int stop();
     int stop(long timeout);
     int stop(long timeout, boolean service);
+    int waitForProcessToExit(long timeout);
 
     void setPort(long i);
 

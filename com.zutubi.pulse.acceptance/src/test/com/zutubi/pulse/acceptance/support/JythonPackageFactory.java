@@ -6,11 +6,7 @@ import com.zutubi.util.io.IOUtils;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 
 /**
  *
@@ -57,6 +53,18 @@ public class JythonPackageFactory implements PackageFactory
         }
     }
 
+    public Pulse createPulse(String pulseHome)
+    {
+        try
+        {
+            return (Pulse) invocableEngine.invokeFunction("createPulse", pulseHome);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    
     public void close()
     {
 

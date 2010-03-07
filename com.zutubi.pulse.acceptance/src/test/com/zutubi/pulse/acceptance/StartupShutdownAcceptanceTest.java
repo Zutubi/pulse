@@ -16,6 +16,7 @@ import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import org.apache.commons.cli.ParseException;
 
+import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 
@@ -255,6 +256,34 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertSecondTimeStartup(commandline, file, expected);
     }
 
+    public void testAdminTokenNotOverridenBeforeBindingPort() throws ParseException, IOException, InterruptedException, ScriptException
+    {
+        RuntimeContext commandline = new RuntimeContext();
+
+        RuntimeContext expected = new RuntimeContext("8080", "/");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
+
+        assertStartServer(commandline);
+        assertServerAvailable(expected);
+
+        String originalAdminToken = pulse.getAdminToken();
+
+        applyContextToPulse(commandline);
+        PackageFactory factory = new JythonPackageFactory();
+        Pulse secondPulse = factory.createPulse(pulse.getPulseHome()); 
+        assertEquals(0, secondPulse.start(false));
+        assertEquals(0, secondPulse.waitForProcessToExit(60));
+
+        assertTrue(pulse.ping());
+        assertEquals(originalAdminToken, pulse.getAdminToken());
+        
+        // With our original admin.token is still intact, we should be able to
+        // shut down.
+        assertShutdownServer(commandline);
+        assertServerNotAvailable(expected);
+    }
+    
     // test the shutdown command to ensure that
 
     /**
@@ -383,6 +412,14 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     private void assertStartServer(RuntimeContext commandline) throws ParseException
     {
+        applyContextToPulse(commandline);
+        assertFalse(pulse.ping());
+        assertEquals(0, pulse.start());
+        assertTrue(pulse.ping());
+    }
+
+    private void applyContextToPulse(RuntimeContext commandline)
+    {
         if (TextUtils.stringSet(commandline.getPort()))
         {
             pulse.setPort(Long.valueOf(commandline.getPort()));
@@ -399,9 +436,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         {
             pulse.setConfigFile(commandline.getExternalConfig());
         }
-        assertFalse(pulse.ping());
-        assertEquals(0, pulse.start());
-        assertTrue(pulse.ping());
     }
 
     private void assertShutdownServer(RuntimeContext commandline) throws ParseException, InterruptedException, IOException

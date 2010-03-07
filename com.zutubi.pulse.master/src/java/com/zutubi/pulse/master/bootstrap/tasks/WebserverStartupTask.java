@@ -19,6 +19,7 @@ public class WebserverStartupTask implements StartupTask
 
         JettyManager jettyManager = SpringComponentContext.getBean("jettyManager");
         shutdownManager.addStoppable(jettyManager);
+        jettyManager.start();
     }
 
     public boolean haltOnFailure()

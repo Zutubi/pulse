@@ -299,20 +299,22 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         if ret != 0:
             raise Exception('Shutdown scripted exited with code ' + str(ret))
         if not service:
-            endTime = time.time() + timeout
-            while time.time() < endTime:
-                ret = self.pop.poll()
-                if ret is None:
-                    time.sleep(1)
-                else:
-                    self.stdout.close()
-                    self.stderr.close()
-                    self.pop = None
-                    return 0
-            raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
-
+            self.waitForProcessToExit(timeout)
         return 0
 
+    def waitForProcessToExit(self, timeout=60):
+        endTime = time.time() + timeout
+        while time.time() < endTime:
+            ret = self.pop.poll()
+            if ret is None:
+                time.sleep(1)
+            else:
+                self.stdout.close()
+                self.stderr.close()
+                self.pop = None
+                return 0
+        raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
+    
     def getActiveVersionDirectory(self):
 
         activeFilename = os.path.join(self.baseDir, 'active-version.txt')
@@ -439,3 +441,6 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
 def createPackage(packageFile):
     return PulsePackage(packageFile)
 
+
+def createPulse(pulseHome):
+    return Pulse(pulseHome)
