@@ -10,14 +10,10 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 
-/**
- *
- *
- */
 @Test
-public class JythonPackageFactoryTest extends PulseTestCase
+public class JythonPulseTestFactoryTest extends PulseTestCase
 {
-    private PackageFactory factory;
+    private PulseTestFactory factory;
 
     private File tmp;
     private File pkgFile;
@@ -29,7 +25,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir();
 
-        factory = new JythonPackageFactory();
+        factory = new JythonPulseTestFactory();
 
         pkgFile = AcceptanceTestUtils.getPulsePackage();
     }
@@ -37,11 +33,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
     @AfterMethod
     protected void tearDown() throws Exception
     {
-        factory.close();
-        factory = null;
-
         removeDirectory(tmp);
-
         super.tearDown();
     }
 

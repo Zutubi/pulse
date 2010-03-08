@@ -12,11 +12,11 @@ import java.io.*;
  *
  *
  */
-public class JythonPackageFactory implements PackageFactory
+public class JythonPulseTestFactory implements PulseTestFactory
 {
     private Invocable invocableEngine;
 
-    public JythonPackageFactory() throws ScriptException, FileNotFoundException
+    public JythonPulseTestFactory() throws ScriptException, FileNotFoundException
     {
         ScriptEngine jythonEngine = new JythonScriptEngine();
 
@@ -26,10 +26,10 @@ public class JythonPackageFactory implements PackageFactory
         InputStream script = null;
         try
         {
-            script = getClass().getResourceAsStream("jythonPackageFactory.jy");
+            script = getClass().getResourceAsStream("jythonPulseTestFactory.jy");
             if (script == null)
             {
-                throw new IllegalStateException("Unable to locate the jythonPackageFactory.jy resource.");
+                throw new IllegalStateException("Unable to locate the jythonPulseTestFactory.jy resource.");
             }
 
             Reader scriptReader = new InputStreamReader(script);
@@ -63,10 +63,5 @@ public class JythonPackageFactory implements PackageFactory
         {
             throw new RuntimeException(e);
         }
-    }
-    
-    public void close()
-    {
-
     }
 }

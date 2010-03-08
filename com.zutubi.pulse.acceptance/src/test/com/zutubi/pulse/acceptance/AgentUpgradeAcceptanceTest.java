@@ -1,13 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
-import com.zutubi.pulse.acceptance.support.PackageFactory;
+import com.zutubi.pulse.acceptance.support.JythonPulseTestFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
+import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.Constants;
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.createTempDir;
 import com.zutubi.util.NullUnaryProcedure;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
@@ -17,17 +16,19 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 
+import static com.zutubi.util.FileSystemUtils.createTempDir;
+
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
     private File tmp = null;
-    private PackageFactory packageFactory = null;
+    private PulseTestFactory pulseTestFactory = null;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tmp = createTempDir();
-        packageFactory = new JythonPackageFactory();
+        pulseTestFactory = new JythonPulseTestFactory();
     }
 
     protected void tearDown() throws Exception
@@ -134,7 +135,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         // master-port
         // tmp/master-data
         File pulsePackage = AcceptanceTestUtils.getPulsePackage();
-        PulsePackage masterPackage = packageFactory.createPackage(pulsePackage);
+        PulsePackage masterPackage = pulseTestFactory.createPackage(pulsePackage);
         master = masterPackage.extractTo(new File(tmp, "master").getCanonicalPath());
         master.setUserHome(new File(tmp, "user-home").getCanonicalPath());
         master.setDataDir(new File(tmp, "master-data").getCanonicalPath());
@@ -177,7 +178,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         // unpack and start old agent.
         // agent-port
         // tmp/agent-data
-        PulsePackage agentPackage = packageFactory.createPackage(oldAgentPackage);
+        PulsePackage agentPackage = pulseTestFactory.createPackage(oldAgentPackage);
         agent = agentPackage.extractTo(new File(tmp, "agent").getCanonicalPath());
         agent.setUserHome(new File(tmp, "user-home").getCanonicalPath());
         agent.setDataDir(new File(tmp, "agent-data").getCanonicalPath());

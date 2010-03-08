@@ -4,10 +4,10 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetupDatabaseTypeForm;
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
-import com.zutubi.pulse.acceptance.support.PackageFactory;
+import com.zutubi.pulse.acceptance.support.JythonPulseTestFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
+import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.FileSystemUtils;
@@ -43,7 +43,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
         
-        PackageFactory factory = new JythonPackageFactory();
+        PulseTestFactory factory = new JythonPulseTestFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
 
         pulse = pkg.extractTo(tmpDir.getCanonicalPath());
@@ -270,7 +270,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         String originalAdminToken = pulse.getAdminToken();
 
         applyContextToPulse(commandline);
-        PackageFactory factory = new JythonPackageFactory();
+        PulseTestFactory factory = new JythonPulseTestFactory();
         Pulse secondPulse = factory.createPulse(pulse.getPulseHome()); 
         assertEquals(0, secondPulse.start(false));
         assertEquals(0, secondPulse.waitForProcessToExit(60));

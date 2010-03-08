@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.JythonPulseTestFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.util.TextUtils;
@@ -21,7 +21,7 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 
     public void setUp() throws Exception
     {
-        JythonPackageFactory factory = new JythonPackageFactory();
+        JythonPulseTestFactory factory = new JythonPulseTestFactory();
 
         int port = Integer.getInteger("pulse.port");
 

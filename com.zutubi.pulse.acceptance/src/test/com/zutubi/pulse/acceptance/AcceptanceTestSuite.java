@@ -1,10 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import com.zutubi.pulse.acceptance.support.JythonPackageFactoryTest;
 import com.zutubi.pulse.acceptance.plugins.PluginUpgradeManagerAcceptanceTest;
 import com.zutubi.pulse.acceptance.plugins.PostProcessorPluginAcceptanceTest;
+import com.zutubi.pulse.acceptance.support.JythonPulseTestFactoryTest;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Collection of all acceptance tests, mainly required to ensure the setup
@@ -17,7 +17,7 @@ public class AcceptanceTestSuite
         //---( other acceptance tests )---
 
         TestSuite main = new TestSuite();
-        main.addTestSuite(JythonPackageFactoryTest.class); // check the support code works before running the acceptance test suite.
+        main.addTestSuite(JythonPulseTestFactoryTest.class); // check the support code works before running the acceptance test suite.
         main.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
         main.addTestSuite(PostProcessorPluginAcceptanceTest.class);
         main.addTest(new AcceptanceTestSuiteSetupTeardown(DevAcceptanceTestSuite.suite()));
