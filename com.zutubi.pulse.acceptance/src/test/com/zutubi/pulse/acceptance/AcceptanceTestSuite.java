@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.plugins.PluginUpgradeManagerAcceptanceTest;
 import com.zutubi.pulse.acceptance.plugins.PostProcessorPluginAcceptanceTest;
-import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactoryTest;
+import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactoryTest;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -17,7 +17,7 @@ public class AcceptanceTestSuite
         //---( other acceptance tests )---
 
         TestSuite main = new TestSuite();
-        main.addTestSuite(JythonPackageFactoryTest.class); // check the support code works before running the acceptance test suite.
+        main.addTestSuite(JythonPulseTestFactoryTest.class); // check the support code works before running the acceptance test suite.
         main.addTestSuite(StartupShutdownAcceptanceTest.class);
         main.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
         main.addTestSuite(PostProcessorPluginAcceptanceTest.class);

@@ -1,8 +1,9 @@
 package com.zutubi.pulse.acceptance.support.jython;
 
 import com.sun.script.jython.JythonScriptEngine;
-import com.zutubi.pulse.acceptance.support.PackageFactory;
+import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
+import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.util.io.IOUtils;
 
 import javax.script.Invocable;
@@ -11,16 +12,14 @@ import javax.script.ScriptException;
 import java.io.*;
 
 /**
- * A jython implementation of the PackageFactory interface that returns handles that
- * are implemented using the jython scripting system.
+ *
+ *
  */
-public class JythonPackageFactory implements PackageFactory
+public class JythonPulseTestFactory implements PulseTestFactory
 {
     private Invocable invocableEngine;
 
-    private boolean verbose;
-
-    public JythonPackageFactory() throws ScriptException, FileNotFoundException
+    public JythonPulseTestFactory() throws ScriptException, FileNotFoundException
     {
         ScriptEngine jythonEngine = new JythonScriptEngine();
 
@@ -30,10 +29,10 @@ public class JythonPackageFactory implements PackageFactory
         InputStream script = null;
         try
         {
-            script = getClass().getResourceAsStream("jythonPackageFactory.jy");
+            script = getClass().getResourceAsStream("jythonPulseTestFactory.jy");
             if (script == null)
             {
-                throw new IllegalStateException("Unable to locate the jythonPackageFactory.jy resource.");
+                throw new IllegalStateException("Unable to locate the jythonPulseTestFactory.jy resource.");
             }
 
             Reader scriptReader = new InputStreamReader(script);
@@ -49,7 +48,7 @@ public class JythonPackageFactory implements PackageFactory
     {
         try
         {
-            return (PulsePackage) invocableEngine.invokeFunction("createPackage", pkg.getCanonicalPath(), verbose);
+            return (PulsePackage) invocableEngine.invokeFunction("createPackage", pkg.getCanonicalPath());
         }
         catch (Exception e)
         {
@@ -57,13 +56,15 @@ public class JythonPackageFactory implements PackageFactory
         }
     }
 
-    public void setVerbose(boolean verbose)
+    public Pulse createPulse(String pulseHome)
     {
-        this.verbose = verbose;
-    }
-
-    public void close()
-    {
-
+        try
+        {
+            return (Pulse) invocableEngine.invokeFunction("createPulse", pulseHome);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

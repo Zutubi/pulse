@@ -15,12 +15,7 @@ This context exports:
 
     <bean id="jettyServerManager" class="com.zutubi.pulse.servercore.jetty.JettyServerManager"/>
 
-    <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager">
-        <property name="jettyServerManager">
-            <ref local="jettyServerManager"/>
-        </property>
-        <property name="configurationManager" ref="configurationManager"/>
-    </bean>
+    <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager"/>
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.bootstrap.StartupTokenManager">
         <property name="adminTokenManager">
@@ -29,7 +24,7 @@ This context exports:
     </bean>
 
     <!-- Token manager required for scripted access to the remote api. -->
-    <bean id="adminTokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" autowire="byName" init-method="init">
+    <bean id="adminTokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" autowire="byName">
         <property name="configRoot">
             <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName" value="configurationManager"/>

@@ -19,6 +19,7 @@ public interface Pulse
     int stop();
     int stop(long timeout);
     int stop(long timeout, boolean service);
+    int waitForProcessToExit(long timeout);
 
     /**
      * Set the port on which the Pulse instance will start.

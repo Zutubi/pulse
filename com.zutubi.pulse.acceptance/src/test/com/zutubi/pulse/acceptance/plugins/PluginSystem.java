@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.plugins;
 
-import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.PulseTestFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.plugins.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
@@ -23,7 +23,7 @@ public class PluginSystem
 
     public PluginSystem(File pkgFile, File tmpDir) throws Exception
     {
-        PackageFactory factory = new JythonPackageFactory();
+        PulseTestFactory factory = new JythonPulseTestFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
 
         Pulse pulse = pkg.extractTo(tmpDir.getCanonicalPath());

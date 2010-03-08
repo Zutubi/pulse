@@ -1,57 +1,55 @@
 package com.zutubi.pulse.acceptance.support.jython;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPackage;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePackage;
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
+import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-public class JythonPackageFactoryTest extends PulseTestCase
+@Test
+public class JythonPulseTestFactoryTest extends PulseTestCase
 {
-    private JythonPackageFactory factory;
+    private PulseTestFactory factory;
 
     private File tmp;
-    private String tmpUserHome;
-    private File serverPkg;
-    private File agentPkg;
+    private File pkgFile;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tmp = FileSystemUtils.createTempDir();
-        tmpUserHome = new File(tmp, "user.home").getCanonicalPath();
-        
-        factory = new JythonPackageFactory();
 
-        serverPkg = getPulsePackage();
-        agentPkg = getAgentPackage();
+        factory = new JythonPulseTestFactory();
+
+        pkgFile = AcceptanceTestUtils.getPulsePackage();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
-        factory.close();
-
         removeDirectory(tmp);
-
         super.tearDown();
     }
 
     public void testExtractPackage() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(serverPkg);
+        PulsePackage pkg = factory.createPackage(pkgFile);
 
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
-        pulse.setUserHome(tmpUserHome);
         assertNotNull(pulse);
 
         // ensure that pulse is extracted as expected.
 
-        String pkgFileName = serverPkg.getName();
+        String pkgFileName = pkgFile.getName();
         String pkgName;
         if (pkgFileName.endsWith(".tar.gz"))
         {
@@ -59,7 +57,6 @@ public class JythonPackageFactoryTest extends PulseTestCase
         }
         else
         {
-            // we assume a single file extension archive.
             pkgName = pkgFileName.substring(0, pkgFileName.lastIndexOf('.'));
         }
 
@@ -82,57 +79,32 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertNull(pulse.getAdminToken());
     }
 
-    public void testStartAndStopPulseServer() throws IOException
+    public void disabledTestStartAndStopPulse() throws IOException
     {
-        assertStartAndStop(serverPkg, 1111);
-    }
-
-    public void testStartAndStopPulseAgent() throws IOException
-    {
-        assertStartAndStop(agentPkg, 1112);
-    }
-
-    private void assertStartAndStop(File pkg, int port) throws IOException
-    {
-        PulsePackage pulsePackage = factory.createPackage(pkg);
-        Pulse pulse = pulsePackage.extractTo(tmp.getCanonicalPath());
-        pulse.setUserHome(tmpUserHome);
-        pulse.setPort(port);
-        assertFalse(pulse.ping());
-
-        // once pulse has started, we do not wait it waiting around, so regardless
-        // of what happens, we make sure we call stop.  Lets just hope it works.
-        try
-        {
-            pulse.start(true);
-            assertTrue(pulse.ping());
-        }
-        finally
-        {
-            pulse.stop();
-        }
-        assertFalse(pulse.ping());
-    }
-
-    public void testSettingAlternateUserHome() throws Exception
-    {
-        PulsePackage pkg = factory.createPackage(serverPkg);
+        PulsePackage pkg = factory.createPackage(pkgFile);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
-        File alternateUserHome = new File(tmp, "alternate.user.home");
+        assertFalse(pulse.ping());
+
+        pulse.start(true);
+        assertTrue(pulse.ping());
+
+        pulse.stop();
+        assertFalse(pulse.ping());
+    }
+
+    public void disabledTestSettingAlternateUserHome() throws Exception
+    {
+        PulsePackage pkg = factory.createPackage(pkgFile);
+        Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
+
+        File alternateUserHome = new File(tmp, "user_home");
         pulse.setUserHome(alternateUserHome.getCanonicalPath());
-        pulse.setPort(1113);
-        
-        try
-        {
-            pulse.start();
-        }
-        finally
-        {
-            pulse.stop();
-        }
+        pulse.start();
 
         // by default, the .pulse2 directory will be created in the user home on Pulse startup.
         assertTrue(new File(alternateUserHome, ".pulse2").exists());
+
+        pulse.stop();
     }
 }

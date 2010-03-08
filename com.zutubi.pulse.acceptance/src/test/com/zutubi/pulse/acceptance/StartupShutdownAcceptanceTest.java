@@ -2,10 +2,10 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetupDatabaseTypeForm;
-import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.PulseTestFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
@@ -43,7 +43,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
 
-        PackageFactory factory = new JythonPackageFactory();
+        PulseTestFactory factory = new JythonPulseTestFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
 
         pulse = pkg.extractTo(tmpDir.getCanonicalPath());
@@ -270,6 +270,34 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertSecondTimeStartup(commandline, file, expected);
     }
 
+    public void testAdminTokenNotOverridenBeforeBindingPort() throws Exception
+    {
+        RuntimeContext commandline = new RuntimeContext();
+
+        RuntimeContext expected = new RuntimeContext("8080", "/");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
+
+        assertStartServer(commandline);
+        assertServerAvailable();
+
+        String originalAdminToken = pulse.getAdminToken();
+
+        applyContextToPulse(commandline);
+        PulseTestFactory factory = new JythonPulseTestFactory();
+        Pulse secondPulse = factory.createPulse(pulse.getPulseHome()); 
+        assertEquals(0, secondPulse.start(false));
+        assertEquals(0, secondPulse.waitForProcessToExit(60));
+
+        assertTrue(pulse.ping());
+        assertEquals(originalAdminToken, pulse.getAdminToken());
+        
+        // With our original admin.token is still intact, we should be able to
+        // shut down.
+        assertShutdownServer();
+        assertServerNotAvailable();
+    }
+    
     // test the shutdown command to ensure that
 
     /**
@@ -391,6 +419,14 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     private void assertStartServer(RuntimeContext commandline) throws Exception
     {
+        applyContextToPulse(commandline);
+        assertFalse(pulse.ping());
+        assertEquals(0, pulse.start());
+        assertTrue(pulse.ping());
+    }
+
+    private void applyContextToPulse(RuntimeContext commandline)
+    {
         if (StringUtils.stringSet(commandline.getPort()))
         {
             pulse.setPort(Long.valueOf(commandline.getPort()));
@@ -407,9 +443,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         {
             pulse.setConfigFile(commandline.getExternalConfig());
         }
-        assertFalse(pulse.ping());
-        assertEquals(0, pulse.start());
-        assertTrue(pulse.ping());
     }
 
     private void assertShutdownServer() throws ParseException, InterruptedException, IOException

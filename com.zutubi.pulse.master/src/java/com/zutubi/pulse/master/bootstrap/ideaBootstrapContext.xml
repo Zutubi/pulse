@@ -12,6 +12,7 @@
                 <value>com.zutubi.pulse.master.bootstrap.tasks.FreemarkerLoggingStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.CoreSystemStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.WebserverStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.AdminTokenStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.NextBuildNumberAdjusterStartupTask</value>

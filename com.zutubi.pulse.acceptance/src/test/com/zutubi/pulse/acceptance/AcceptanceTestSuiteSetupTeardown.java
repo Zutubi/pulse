@@ -1,15 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPort;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.SupportUtils;
-import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import junit.extensions.TestSetup;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPort;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 
 public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 {
@@ -23,7 +24,7 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 
     public void setUp() throws Exception
     {
-        JythonPackageFactory factory = new JythonPackageFactory();
+        JythonPulseTestFactory factory = new JythonPulseTestFactory();
 
         int pulsePort = getPulsePort();
         int agentPort = getAgentPort();

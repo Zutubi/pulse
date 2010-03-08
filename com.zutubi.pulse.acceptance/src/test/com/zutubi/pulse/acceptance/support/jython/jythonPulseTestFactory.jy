@@ -32,10 +32,6 @@ class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
 
     def __init__(self, packageFile):
         self.packageFile = packageFile
-        self._verbose = False
-
-    def setVerbose(self, verbose):
-        self._verbose = verbose
 
     def extractTo(self, destDir):
 
@@ -44,13 +40,9 @@ class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
 
         if self.packageFile.endswith('.zip'):
             command = ['unzip', '-qd', destDir, self.packageFile]
-            if self._verbose:
-                print str(command)
             ret = subprocess.call(command)
         else:
             command = ['tar', '-zxC', destDir, '-f', self.packageFile]
-            if self._verbose:
-                print str(command)
             ret = subprocess.call(command)
 
         if ret != 0:
@@ -61,9 +53,7 @@ class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
             else:
                 raise Exception('Extract process '+str(command)+' exited with code %d' % ret)
 
-        pulse = Pulse(os.path.join(destDir, self.getBasename()))
-        pulse.setVerbose(self._verbose)
-        return pulse
+        return Pulse(os.path.join(destDir, self.getBasename()))
 
 
     def getFilename(self):
@@ -90,15 +80,6 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         self._userHome = None
         self._defaultPort = 8080
         self._verbose = False
-        self._agent = False
-
-        # If the base directory contains the 'agent' string, then we know we are
-        # dealing with an agent, for which the default port is different.
-        
-        if self.baseDir.find('agent') >= 0:
-            self._defaultPort = 8090
-            self._agent = True
-
 
     def setConfigFile(self, configFile):
         self._configFile = configFile
@@ -135,6 +116,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         return self.baseDir
 
     def getPluginRoot(self):
+        """ todo: somehow use the java paths interface here - more generally useful. """
         versionDir = self.getActiveVersionDirectory()
         return os.path.join(versionDir, 'system', 'plugins')
 
@@ -250,7 +232,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             if not self.waitFor():
                 raise Exception('Timed out waiting for server to start')
 
-#TODO: Return the return value of the executed command, and let the calling system handle the result.
+# would prefer to return the return value of the executed command, and let the calling system handle the result.
 
         return 0
 
@@ -258,9 +240,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
     def waitFor(self, timeout=300):
         """Waits for this server to start listening.  If a connection
         can be made to the port before the specified timeout (in seconds) elapses,
-        and a successful ping is sent, this function returns True.  Otherwise,
-        False is returned."""
-
+        this function returns True.  Otherwise, False is returned."""
         endTime = time.time() + timeout
         while time.time() < endTime:
             try:
@@ -271,11 +251,9 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                     print 'Waiting for process at port: ' + str(port)
                 s.connect(('127.0.0.1', int(port)))
                 s.close()
-
-                # Attempt a ping. When the ping is true, we know the system is up.
-                if self.ping():
-                    return True
-
+                # Sleep a little longer just to be sure
+                time.sleep(3)
+                return True
             except Exception, e:
                 if self._verbose:
                     print e
@@ -319,20 +297,22 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         if ret != 0:
             raise Exception('Shutdown scripted exited with code ' + str(ret))
         if not service:
-            endTime = time.time() + timeout
-            while time.time() < endTime:
-                ret = self.pop.poll()
-                if ret is None:
-                    time.sleep(1)
-                else:
-                    self.stdout.close()
-                    self.stderr.close()
-                    self.pop = None
-                    return 0
-            raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
-
+            self.waitForProcessToExit(timeout)
         return 0
 
+    def waitForProcessToExit(self, timeout=60):
+        endTime = time.time() + timeout
+        while time.time() < endTime:
+            ret = self.pop.poll()
+            if ret is None:
+                time.sleep(1)
+            else:
+                self.stdout.close()
+                self.stderr.close()
+                self.pop = None
+                return 0
+        raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
+    
     def getActiveVersionDirectory(self):
 
         activeFilename = os.path.join(self.baseDir, 'active-version.txt')
@@ -363,7 +343,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         url = url + '/xmlrpc'
 
         if self._verbose:
-            print 'Connecting to : ' + url
+            print 'Connecting to pulse xmlrpc at: ' + url
 
         return xmlrpclib.ServerProxy(url)
 
@@ -396,7 +376,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
 
         if port is None:
             if self._userHome is not None:
-                port = self.readFromConfig('webapp.port', os.path.join(self._userHome, self.getPulseDir(), 'config.properties'))
+                port = self.readFromConfig('webapp.port', os.path.join(self._userHome, '.pulse2', 'config.properties'))
                 if port is not None:
                     port = port.strip()
 
@@ -416,18 +396,11 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
 
         if context is None:
             if self._userHome is not None:
-                context = self.readFromConfig('webapp.contextPath', os.path.join(self._userHome, self.getPulseDir(), 'config.properties'))
+                context = self.readFromConfig('webapp.contextPath', os.path.join(self._userHome, '.pulse2', 'config.properties'))
                 if context is not None:
                     context = context.strip()
 
         return context
-
-    def getPulseDir(self):
-
-        if self._agent:
-            return '.pulse2-agent'
-        return '.pulse2'
-
 
     def readFromConfig(self, property, file):
 
@@ -453,27 +426,19 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         """ should be using the command line interface for this ping to ensure that the bundled
             ping actually works, well at least when that ping is implemented. """
             
-        if self._verbose:
-            if self._agent:
-                print 'Pinging agent'
-            else:
-                print 'Pinging server'
-
-
         proxy = self.getServerProxy()
-
         try:
             proxy.RemoteApi.ping()
             return True
         except Exception, e:
-            # If we see a NoSuchMethodException, then the xmlrpc interface must be up, so all is good.
-            if str(e).find('NoSuchMethodException') > 0:
-                return True
+            if self._verbose:
+                print e
             return False
 
 
-def createPackage(packageFile, verbose=False):
-    pkg = PulsePackage(packageFile)
-    pkg.setVerbose(verbose)
-    return pkg
+def createPackage(packageFile):
+    return PulsePackage(packageFile)
 
+
+def createPulse(pulseHome):
+    return Pulse(pulseHome)
