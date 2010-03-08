@@ -1,12 +1,13 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.UNKNOWN;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.UNKNOWN;
 
 public class IvyClientTest extends ZutubiTestCase
 {
@@ -96,14 +97,12 @@ public class IvyClientTest extends ZutubiTestCase
 
     public void testRetrieveArtifact() throws IOException, ParseException
     {
-        descriptor.addArtifact(createArtifact("artifact.jar"), "build");
-        client.publishArtifacts(descriptor);
-        client.publishDescriptor(descriptor);
+        publishArtifactsAndDescriptor("artifact.jar");
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
 
         assertExists(workBase, "artifact-revision.jar");
         assertEquals(1, report.getRetrievedArtifacts().size());
@@ -111,26 +110,54 @@ public class IvyClientTest extends ZutubiTestCase
 
     public void testRetrieveMultipleArtifacts() throws IOException, ParseException
     {
-        descriptor.addArtifact(createArtifact("artifactA.jar"), "build");
-        descriptor.addArtifact(createArtifact("artifactB.jar"), "build");
-        client.publishArtifacts(descriptor);
-        client.publishDescriptor(descriptor);
+        publishArtifactsAndDescriptor("artifactA.jar", "artifactB.jar");
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
 
         assertExists(workBase, "artifactA-revision.jar");
         assertExists(workBase, "artifactB-revision.jar");
         assertEquals(2, report.getRetrievedArtifacts().size());
     }
 
+    public void testRetrieveSyncDestination() throws IOException, ParseException
+    {
+        assertTrue(workBase.mkdirs());
+        File innocentBystanderFile = new File(workBase, "foo");
+        assertTrue(innocentBystanderFile.createNewFile());
+        
+        publishArtifactsAndDescriptor("artifact.jar");
+
+        IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
+
+        client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
+
+        assertExists(workBase, "artifact-revision.jar");
+        assertFalse(innocentBystanderFile.exists());        
+    }
+    
+    public void testRetrieveDoNotSyncDestination() throws IOException, ParseException
+    {
+        assertTrue(workBase.mkdirs());
+        File innocentBystanderFile = new File(workBase, "foo");
+        assertTrue(innocentBystanderFile.createNewFile());
+        publishArtifactsAndDescriptor("artifact.jar");
+
+        IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
+        
+        client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, false);
+
+        assertExists(workBase, "artifact-revision.jar");
+        assertTrue(innocentBystanderFile.exists());        
+    }
+    
     public void testTransitiveDependency() throws IOException, ParseException
     {
-        descriptor.addArtifact(createArtifact("artifact.jar"), "build");
-        client.publishArtifacts(descriptor);
-        client.publishDescriptor(descriptor);
+        publishArtifactsAndDescriptor("artifact.jar");
 
         IvyModuleDescriptor descriptorB = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         descriptorB.addDependency(descriptor.getModuleRevisionId(), TEST_CONF, true);
@@ -139,7 +166,7 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
         descriptorC.addDependency(descriptor.getModuleRevisionId(), TEST_CONF, true);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(descriptorC.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(descriptorC.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
 
         assertExists(workBase, "artifact-revision.jar");
         assertEquals(1, report.getRetrievedArtifacts().size());
@@ -153,7 +180,7 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertTrue(report.hasFailures());
     }
 
@@ -164,7 +191,7 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertTrue(report.hasFailures());
     }
 
@@ -176,7 +203,7 @@ public class IvyClientTest extends ZutubiTestCase
         retrievalDescriptor.addOptionalDependency(descriptor.getModuleRevisionId().getName());
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF, "nosuchconf");
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertFalse(report.hasFailures());
     }
 
@@ -187,7 +214,7 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF, "nosuchconf");
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertTrue(report.hasFailures());
     }
     
@@ -202,7 +229,7 @@ public class IvyClientTest extends ZutubiTestCase
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF, "nosuchconf");
         retrievalDescriptor.addDependency(secondUpstreamDescriptor.getModuleRevisionId(), TEST_CONF, "nosuchconf");
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertEquals(1, report.getFailures().size());
     }
 
@@ -223,7 +250,7 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor descriptorD = new IvyModuleDescriptor("org", "moduleD", "revision", configuration);
         descriptorD.addDependency(descriptorC.getModuleRevisionId(), TEST_CONF, true);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(descriptorD.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(descriptorD.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertTrue(report.hasFailures());
     }
 
@@ -240,25 +267,23 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor descriptorC = new IvyModuleDescriptor("org", "moduleC", "revision", configuration);
         descriptorC.addDependency(descriptorB.getModuleRevisionId(), TEST_CONF, false);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(descriptorC.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(descriptorC.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertFalse(report.hasFailures());
     }
 
     public void testRetrieveWhereNoDownloadIsRequired() throws IOException, ParseException
     {
-        descriptor.addArtifact(createArtifact("artifactB.jar"), "build");
-        client.publishArtifacts(descriptor);
-        client.publishDescriptor(descriptor);
+        publishArtifactsAndDescriptor("artifactB.jar");
 
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
 
         assertExists(workBase, "artifactB-revision.jar");
         assertEquals(1, report.getRetrievedArtifacts().size());
 
-        report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
         assertEquals(1, report.getRetrievedArtifacts().size());
     }
 
@@ -273,10 +298,21 @@ public class IvyClientTest extends ZutubiTestCase
         IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
         retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF);
 
-        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern);
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
 
         assertExists(workBase, "artifact-revision");
         assertEquals(1, report.getRetrievedArtifacts().size());
+    }
+
+    private void publishArtifactsAndDescriptor(String... artifacts) throws IOException
+    {
+        for (String artifact: artifacts)
+        {
+            descriptor.addArtifact(createArtifact(artifact), "build");
+        }
+        
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
     }
 
     private File createArtifact(String path) throws IOException

@@ -235,11 +235,13 @@ public class IvyClient
      * @param stageName     the name of the stage doing the retrieval
      * @param targetPattern the pattern defining where the artifacts will be written.  This pattern,
      *                      supports the usual ivy tokens.
+     * @param sync          if true, the destination is synchronised - i.e. any files not retrieved
+     *                      will be remove from the destination directory 
      * @return a retrieval report containing details of the artifacts that were retrieved.
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    public IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern) throws IOException, ParseException
+    public IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern, boolean sync) throws IOException, ParseException
     {
         // annoying but necessary.  See CustomURLHandler for details.
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
@@ -261,7 +263,7 @@ public class IvyClient
 
             RetrieveOptions options = new RetrieveOptions();
             options.setConfs(new String[]{conf});
-            options.setSync(true); // important if the build directory is being re-used.
+            options.setSync(sync);
 
             ivy.retrieve(mrid, targetPattern, options);
 

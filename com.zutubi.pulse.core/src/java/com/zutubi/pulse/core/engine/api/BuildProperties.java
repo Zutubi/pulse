@@ -154,6 +154,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_PROJECT_HANDLE          = "project.handle";
     /**
+     * The pattern that defines where retrieved dependencies are to be delivered.
+     */
+    public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";
+    /**
      * The SCM configuration for the project being built.
      */
     public static final String PROPERTY_SCM_CONFIGURATION       = "scm.config";
@@ -162,6 +166,11 @@ public class BuildProperties
      * running build.
      */
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
+    /**
+     * Controls whether dependency retrieval synchronises its destination
+     * directory (i.e. removes any files it does not put there).
+     */
+    public static final String PROPERTY_SYNC_DESTINATION       = "sync.destination";
     /**
      * A short, human-readable summary of the test results for the build
      * (only available post-build).
@@ -251,10 +260,6 @@ public class BuildProperties
      * The handle of the stage being built.
      */
     public static final String PROPERTY_STAGE_HANDLE            = "stage.handle";
-    /**
-     * The pattern that defines where retrieved dependencies are to be delivered.
-     */
-    public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";
     /**
      * Internal property used to collect test results for a recipe.
      */

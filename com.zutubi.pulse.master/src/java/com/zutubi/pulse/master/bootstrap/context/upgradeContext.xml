@@ -125,6 +125,7 @@
                 <ref local="addPerforceInactivityTimeout"/>
                 <ref local="addPropagateRevisionToDependentBuildTrigger"/>
                 <ref local="updatePerforceSyncWorkspacePattern"/>
+                <ref local="addDependencySyncField"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -606,5 +607,9 @@
 
     <bean id="updatePerforceSyncWorkspacePattern" class="com.zutubi.pulse.master.upgrade.tasks.UpdatePerforceSyncWorkspacePatternUpgradeTask">
         <property name="buildNumber" value="201021001"/>
+    </bean>
+
+    <bean id="addDependencySyncField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencySyncFieldUpgradeTask">
+        <property name="buildNumber" value="201021002"/>
     </bean>
 </beans>

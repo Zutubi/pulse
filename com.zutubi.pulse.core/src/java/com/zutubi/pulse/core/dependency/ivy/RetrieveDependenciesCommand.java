@@ -62,9 +62,10 @@ public class RetrieveDependenciesCommand implements Command
                         DefaultModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, DefaultModuleDescriptor.class);
                         String stageName = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_STAGE));
                         String retrievalPattern = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
+                        boolean syncDestination = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, true);
 
                         String targetPattern = PathUtils.getPath(context.getWorkingDir().getAbsolutePath(), retrievalPattern);
-                        IvyRetrievalReport retrievalReport = ivy.retrieveArtifacts(descriptor, stageName, targetPattern);
+                        IvyRetrievalReport retrievalReport = ivy.retrieveArtifacts(descriptor, stageName, targetPattern, syncDestination);
 
                         captureRetrievalReport(retrievalReport, commandContext);
 
