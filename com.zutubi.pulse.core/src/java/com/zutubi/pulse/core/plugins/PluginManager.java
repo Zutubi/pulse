@@ -999,6 +999,11 @@ public class PluginManager
             filename = deriveName(source);
         }
 
+        if (!dest.exists() && !dest.mkdirs())
+        {
+            throw new PluginException("Can not download plugin.  Failed to create destination: " + dest.getAbsolutePath());
+        }
+
         File downloadedFile = new File(dest, filename);
 
         if (downloadedFile.exists())
