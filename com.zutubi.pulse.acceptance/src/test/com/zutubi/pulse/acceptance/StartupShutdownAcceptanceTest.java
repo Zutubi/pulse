@@ -273,7 +273,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         PulseTestFactory factory = new JythonPulseTestFactory();
         Pulse secondPulse = factory.createPulse(pulse.getPulseHome()); 
         assertEquals(0, secondPulse.start(false));
-        assertEquals(0, secondPulse.waitForProcessToExit(60));
+        assertEquals(0, secondPulse.waitForProcessToExit(300));
 
         assertTrue(pulse.ping());
         assertEquals(originalAdminToken, pulse.getAdminToken());
