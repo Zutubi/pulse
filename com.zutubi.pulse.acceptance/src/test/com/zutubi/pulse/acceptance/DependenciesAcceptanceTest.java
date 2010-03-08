@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.*;
+import static com.zutubi.util.Constants.MEGABYTE;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
@@ -19,7 +20,9 @@ import java.util.Vector;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNException;
@@ -31,6 +34,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private BuildRunner buildRunner;
     private ProjectConfigurations projects;
     private ConfigurationHelper configurationHelper;
+
+    private File tmp;
 
     protected void setUp() throws Exception
     {
@@ -49,12 +54,16 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         configurationHelper = factory.create(xmlRpcHelper);
 
         projects = new ProjectConfigurations(configurationHelper);
+
+        tmp = FileSystemUtils.createTempDir();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
         logout();
+
+        removeDirectory(tmp);
 
         super.tearDown();
     }
@@ -743,6 +752,29 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // test that triggering b directly picks up its own revision.
         buildRunner.triggerSuccessfulBuild(projectB);
         assertFalse(revision.equals(xmlRpcHelper.getBuildRevision(projectBName, 3)));
+    }
+
+    public void testPublishAndRetrievalOfLargeFiles() throws Exception
+    {
+        File largeArtifact = new File(tmp, "BIGFILE");
+        FileOutputStream out = new FileOutputStream(largeArtifact, true);
+        byte[] oneMegabyte = new byte[(int) MEGABYTE];
+        for (int i = 0; i < 500; i++)
+        {
+            IOUtils.joinStreams(new ByteArrayInputStream(oneMegabyte), out);
+        }
+
+        DepAntProject projectA = projects.createDepAntProject(randomName + "-upstream");
+        projectA.getRecipe(DEFAULT_RECIPE).addArtifact("BIG ARTIFACT", largeArtifact.getCanonicalPath().replace('\\', '/'));
+        insertProject(projectA);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "-downstream");
+        projectB.addDependency(projectA.getConfig());
+        projectB.addExpectedFiles("lib/BIGFILE");
+        insertProject(projectB);
+
+        buildRunner.triggerSuccessfulBuild(projectA);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
     }
 
     // setup the repository for the propagate revision tests.

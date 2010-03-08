@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.dependency.ivy;
 import org.apache.ivy.util.CopyProgressListener;
 import org.apache.ivy.util.url.AbstractURLHandler;
 import org.apache.ivy.util.url.BasicURLHandler;
-import org.apache.ivy.util.url.HttpClientHandler;
 import org.apache.ivy.util.url.URLHandler;
 
 import java.io.File;
@@ -30,7 +29,7 @@ import java.net.URL;
 public class CustomURLHandler extends AbstractURLHandler
 {
     private URLHandler basicUrlHandler = new BasicURLHandler();
-    private URLHandler httpClientHandler = new HttpClientHandler();
+    private URLHandler httpClientHandler = new CustomHttpClientHandler();
 
     public CustomURLHandler()
     {
