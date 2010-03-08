@@ -90,8 +90,9 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
     static String getSyncWorkspaceDescription(ExecutionContext context)
     {
         String projectName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT);
+        String stageName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_STAGE);
         String agentName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
-        return "Sync workspace for project '" + projectName + "' on agent '" + agentName + "'.";
+        return "Sync workspace for project '" + projectName + "', stage '" + stageName + "' on agent '" + agentName + "'.";
     }
 
     /**

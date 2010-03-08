@@ -124,6 +124,7 @@
                 <ref local="addRegexTestPostProcessorDurationGroupConfiguration"/>
                 <ref local="addPerforceInactivityTimeout"/>
                 <ref local="addPropagateRevisionToDependentBuildTrigger"/>
+                <ref local="updatePerforceSyncWorkspacePattern"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -601,5 +602,9 @@
 
     <bean id="addPropagateRevisionToDependentBuildTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddPropagateRevisionToDependentTriggerUpgradeTask">
         <property name="buildNumber" value="201019001"/>
+    </bean>
+
+    <bean id="updatePerforceSyncWorkspacePattern" class="com.zutubi.pulse.master.upgrade.tasks.UpdatePerforceSyncWorkspacePatternUpgradeTask">
+        <property name="buildNumber" value="201021001"/>
     </bean>
 </beans>

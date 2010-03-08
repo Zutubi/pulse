@@ -31,7 +31,7 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @Wizard.Ignore @Min(0)
     private int inactivityTimeout = PerforceCore.DEFAULT_INACTIVITY_TIMEOUT;
     @Wizard.Ignore
-    private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(agent.handle)";
+    private String syncWorkspacePattern = PerforceWorkspaceManager.getWorkspacePrefix() + "$(project.handle)-$(stage.handle)-$(agent.handle)";
     @Wizard.Ignore
     private int timeOffset= 0;
 

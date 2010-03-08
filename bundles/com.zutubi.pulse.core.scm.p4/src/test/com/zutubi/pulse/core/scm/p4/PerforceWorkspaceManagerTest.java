@@ -9,9 +9,6 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -20,6 +17,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.*;
+
 public class PerforceWorkspaceManagerTest extends PulseTestCase
 {
     private static final File TEST_DIR = new File("some/dir");
@@ -27,6 +28,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
     private static final String TEST_AGENT = "master";
     private static final String TEST_PROJECT = "my project";
+    private static final String TEST_STAGE = "my stage";
 
     private static final String TEST_PORT = ":1234";
     private static final String TEST_USER = "user";
@@ -58,27 +60,37 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
     public void testGetSyncWorkspaceNameConsistent()
     {
-        assertEquals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 1)), PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 1)));
+        assertEquals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 1, 1)), PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 1, 1)));
     }
 
     public void testGetSyncWorkspaceNameDependsOnProject()
     {
-        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 0)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(2, 0))));
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(1, 0, 0)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(2, 0, 0))));
+    }
+
+    public void testGetSyncWorkspaceNameDependsOnStage()
+    {
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 1, 0)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 2, 0))));
     }
 
     public void testGetSyncWorkspaceNameDependsOnAgent()
     {
-        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 1)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 2))));
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 0, 1)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, createExecutionContext(0, 0, 2))));
     }
 
     public void testGetSyncWorkspaceDescriptionIncludesAgent()
     {
-        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 1)).contains(TEST_AGENT));
+        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 0, 1)).contains(TEST_AGENT));
     }
 
     public void testGetSyncWorkspaceDescriptionIncludesProject()
     {
-        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 1)).contains(TEST_PROJECT));
+        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 0, 1)).contains(TEST_PROJECT));
+    }
+
+    public void testGetSyncWorkspaceDescriptionIncludesStage()
+    {
+        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 0, 1)).contains(TEST_STAGE));
     }
 
     public void testGetTemporaryWorkspaceDescription()
@@ -93,7 +105,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     
     public void testGetSyncWorkspaceBasicProperties() throws ScmException
     {
-        ExecutionContext context = createExecutionContext(1, 1);
+        ExecutionContext context = createExecutionContext(1, 0, 1);
         String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(TEST_PERFORCE_CONFIGURATION, context);
 
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
@@ -104,7 +116,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
     public void testGetSyncWorkspaceCreatesExpectedClient() throws ScmException
     {
-        ExecutionContext context = createExecutionContext(1, 1);
+        ExecutionContext context = createExecutionContext(1, 0, 1);
         PerforceConfiguration config = new PerforceConfiguration(TEST_PORT, TEST_USER, TEST_PASSWORD, TEST_TEMPLATE_WORKSPACE);
         final PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, config, context);
         verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_WORKSPACE, workspace.getName(), PerforceWorkspaceManager.getSyncWorkspaceDescription(context), TEST_ROOT, null);
@@ -236,13 +248,15 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         verifyNoMoreInteractions(core);
     }
 
-    private ExecutionContext createExecutionContext(long projectHandle, long agentHandle)
+    private ExecutionContext createExecutionContext(long projectHandle, long stageHandle, long agentHandle)
     {
         PulseExecutionContext context = new PulseExecutionContext();
         context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, TEST_AGENT);
         context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, agentHandle);
         context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT, TEST_PROJECT);
         context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE, projectHandle);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_STAGE, TEST_STAGE);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_STAGE_HANDLE, stageHandle);
         context.setWorkingDir(TEST_DIR);
         return context;
     }
