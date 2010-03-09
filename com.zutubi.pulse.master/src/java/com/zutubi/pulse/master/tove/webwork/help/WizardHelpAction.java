@@ -39,17 +39,16 @@ public class WizardHelpAction extends ActionSupport
         }
 
         TypeWizardState state = wizardInstance.getCurrentState();
-        if(state == null)
+        if (state == null)
         {
             return "none";
         }
-
-        if(state instanceof AbstractTypeWizardState)
+        else if (state instanceof AbstractTypeWizardState)
         {
             // We are configuring a type: chain to the wizard type help action.
             return "type";
         }
-        else if(state instanceof TwoStepStateBuilder.SelectWizardState)
+        else if (state instanceof TwoStepStateBuilder.SelectWizardState)
         {
             // A type selection state: chain to the wizard select help action.
             return "select";

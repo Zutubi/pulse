@@ -664,7 +664,6 @@
         <action name="manualTrigger" class="com.zutubi.pulse.master.tove.webwork.help.ManualTriggerHelpAction">
             <result name="success" type="velocity">type.vm</result>
         </action>
-
     </package>
 
     <package name="actionAjax" namespace="/aaction" extends="configAjax">
