@@ -38,6 +38,7 @@ public class WizardDescriptor extends AbstractParameterised implements Descripto
 
         // create the form wizard for the wizard.
         WizardState currentState = wizardInstance.getCurrentState();
+        wizard.setTemplate(wizardInstance.isTemplate());
 
         FormDescriptor formDescriptor = currentState.createFormDescriptor(formDescriptorFactory, path, "wizardForm");
         formDescriptor.setAction("wizard");

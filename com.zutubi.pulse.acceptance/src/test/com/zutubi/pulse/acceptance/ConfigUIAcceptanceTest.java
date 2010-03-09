@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -14,13 +13,15 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeView
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.IOUtils;
 
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.LinkedList;
+
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -735,6 +736,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
         projectState.waitFor();
+        assertTextPresent("add new project");
+        assertTextNotPresent("add new project template");
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements(random, "", "");
 
@@ -762,6 +765,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // name.
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
         projectState.waitFor();
+        assertTextPresent("add new project template");
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
         assertTrue(projectState.isFormPresent());
