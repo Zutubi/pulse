@@ -1,8 +1,12 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
+import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.tove.annotations.*;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
 
@@ -12,11 +16,13 @@ import java.util.List;
 /**
  * Subversion SCM configuration.
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "useExport", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
-public class SubversionConfiguration extends PollableScmConfiguration
+public class SubversionConfiguration extends PollableScmConfiguration implements Validateable
 {
+    private static final Messages I18N = Messages.getInstance(SubversionConfiguration.class);
+    
     /**
      * Describes if and how svn:externals will be monitored.
      */
@@ -49,6 +55,7 @@ public class SubversionConfiguration extends PollableScmConfiguration
     @Password
     private String keyfilePassphrase;
 
+    private boolean useExport;
     @Wizard.Ignore
     @ControllingSelect(dependentFields = {"externalMonitorPaths"}, enableSet = {"MONITOR_SELECTED"})
     private ExternalsMonitoring externalsMonitoring = ExternalsMonitoring.DO_NOT_MONITOR;
@@ -121,6 +128,16 @@ public class SubversionConfiguration extends PollableScmConfiguration
         this.keyfilePassphrase = keyfilePassphrase;
     }
 
+    public boolean isUseExport()
+    {
+        return useExport;
+    }
+
+    public void setUseExport(boolean useExport)
+    {
+        this.useExport = useExport;
+    }
+
     public String getType()
     {
         return SubversionClient.TYPE;
@@ -164,5 +181,21 @@ public class SubversionConfiguration extends PollableScmConfiguration
     public void setEnableHttpSpooling(boolean enableHttpSpooling)
     {
         this.enableHttpSpooling = enableHttpSpooling;
+    }
+
+    public void validate(ValidationContext context)
+    {
+        if (useExport)
+        {
+            if (getCheckoutScheme() != CheckoutScheme.CLEAN_CHECKOUT)
+            {
+                context.addFieldError("checkoutScheme", I18N.format("useExport.bad.scheme"));
+            }
+            
+            if (externalsMonitoring != ExternalsMonitoring.DO_NOT_MONITOR)
+            {
+                context.addFieldError("externalsMonitoring", I18N.format("useExport.externals"));                
+            }
+        }
     }
 }

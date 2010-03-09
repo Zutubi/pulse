@@ -309,8 +309,17 @@ public class SubversionClientTest extends PulseTestCase
     {
         client.checkout(context, null, null);
         assertRevision(gotDir, 8);
+        assertTrue(new File(gotDir, ".svn").isDirectory());
     }
 
+    public void testExport() throws ScmException, IOException
+    {
+        client.setUseExport(true);
+        client.checkout(context, null, null);
+        assertRevision(gotDir, 8);
+        assertFalse(new File(gotDir, ".svn").isDirectory());
+    }
+    
     public void testUpdate() throws ScmException, IOException
     {
         client.checkout(context, createRevision(1), null);

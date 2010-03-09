@@ -34,6 +34,7 @@ public class SubversionClient implements ScmClient
 
     private static final Logger LOG = Logger.getLogger(ScmClient.class);
 
+    private boolean useExport = false;
     /**
      * If true, we will monitor all externals by recursively scanning for
      * svn:externals properties.  We also recurse to find externals defined
@@ -234,6 +235,11 @@ public class SubversionClient implements ScmClient
         this.excludedPaths = excludedPaths;
     }
 
+    public void setUseExport(boolean useExport)
+    {
+        this.useExport = useExport;
+    }
+
     public void setMonitorAllExternals(boolean monitorAllExternals)
     {
         this.monitorAllExternals = monitorAllExternals;
@@ -365,8 +371,15 @@ public class SubversionClient implements ScmClient
 
         try
         {
-            updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, SVNDepth.INFINITY, false);
-            updateExternals(context.getWorkingDir(), revision, updateClient, handler);
+            if (useExport)
+            {
+                updateClient.doExport(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, null, true, SVNDepth.INFINITY);
+            }
+            else
+            {
+                updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, SVNDepth.INFINITY, false);
+                updateExternals(context.getWorkingDir(), revision, updateClient, handler);
+            }
         }
         catch (SVNException e)
         {

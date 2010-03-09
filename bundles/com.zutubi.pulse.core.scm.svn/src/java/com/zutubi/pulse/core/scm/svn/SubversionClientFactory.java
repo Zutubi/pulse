@@ -38,6 +38,7 @@ public class SubversionClientFactory implements ScmClientFactory<SubversionConfi
         }
 
         client.setExcludedPaths(config.getFilterPaths());
+        client.setUseExport(config.isUseExport());
         switch (config.getExternalsMonitoring())
         {
             case DO_NOT_MONITOR:
