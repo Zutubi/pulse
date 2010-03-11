@@ -90,6 +90,7 @@
                             split: true,
                             collapsible: true,
                             collapseMode:'mini',
+                            hideCollapseTool:true,
                             width: 250,
                             items: [tree]
                         }]

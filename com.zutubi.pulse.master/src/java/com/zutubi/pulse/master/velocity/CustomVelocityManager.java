@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * An extension of the velocity manager used to provide customisations
+ * to setup of the velocity system.
  */
 public class CustomVelocityManager extends VelocityManager
 {
@@ -46,6 +48,15 @@ public class CustomVelocityManager extends VelocityManager
         }
     }
 
+    /**
+     * Override the {@link VelocityManager#createContext(OgnlValueStack, HttpServletRequest, HttpServletResponse)} method
+     * to add Pulse system specific details to the created context.
+     *
+     * @param stack the current ognl stack
+     * @param req   the current servlet request
+     * @param res   the current servlet response
+     * @return a new context
+     */
     public synchronized Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
     {
         Context context = super.createContext(stack, req, res);

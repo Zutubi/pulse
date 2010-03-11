@@ -165,21 +165,11 @@ td.x-form-annotation
     border: 1px solid #B5B8C8;
 }
 
-.x-form-focus
-{
-    border: 1px solid #7eadd9;
-}
-
 .x-form-item
 {
     font-family: verdana;
     font-size: 12px;
 }
-
-/*.x-form-check-wrap*/
-/*{*/
-    /*padding: 0;*/
-/*}*/
 
 .field-no-override, textarea.field-no-override
 {

@@ -594,7 +594,7 @@ ZUTUBI.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled,
 
 ZUTUBI.ProjectsTable.prototype = {
     renderToolbar: function() {
-        this.toolbar = new Ext.StatusBar({
+        this.toolbar = new Ext.ux.StatusBar({
             defaultText: 'Layout Controls:',
             renderTo: this.toolbarEl,
             style: { 'background': '#F2F2FF', 'border-width': '1px' },

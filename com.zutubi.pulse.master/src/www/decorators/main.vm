@@ -59,7 +59,7 @@
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
         <script type="text/javascript" src="$base/js/ext-base.js"></script>
-        <script type="text/javascript" src="$base/js/ext-all.js"></script>
+        <script type="text/javascript" src="$base/js/ext-all-debug.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
         <script type="text/javascript" src="$base/js/zutubi.js"></script>
         <script type="text/javascript">
@@ -129,6 +129,7 @@
                                     titlebar: false,
                                     collapsible: true,
                                     collapseMode:'mini',
+                                    hideCollapseTool:true,
                                     hidden: true
                                 }, {
                                     region: 'east',
@@ -138,6 +139,7 @@
                                     collapsible: true,
                                     collapsed: true,
                                     collapseMode:'mini',
+                                    hideCollapseTool:true,
                                     width: 450,
                                     hidden: true,
                                     autoScroll: true,

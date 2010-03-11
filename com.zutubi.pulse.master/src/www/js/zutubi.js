@@ -71,7 +71,7 @@ ZUTUBI.FloatManager = function() {
             {
                 initialise();
             }
-            
+
             showTime = new Date();
 
             var windowId = getWindowId(category);
@@ -104,7 +104,7 @@ ZUTUBI.FloatManager = function() {
                 {
                     Ext.getDoc().on('mousedown', onMouseDown);
                 }
-                
+
                 getElement(contentId).innerHTML = getElement(id).innerHTML;
 
                 press(id);
@@ -272,7 +272,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
 
     addHiddenField: function(value)
     {
-        this.hiddenFields[value] = this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: value});        
+        this.hiddenFields[value] = this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: value});
     },
 
     findRecord : function(prop, value)
@@ -314,7 +314,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
             this.hiddenFields[key].remove();
         }
         this.hiddenFields = {};
-        
+
         for(var i = 0; i < value.length; i++)
         {
             var record = this.findRecord(this.valueField, value[i]);
@@ -419,7 +419,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
     toConfigPathPrefix: function(treePath)
     {
         var configPath = treePath;
-        
+
         if (!this.rootVisible)
         {
             configPath = configPath.substring(this.root.attributes.baseName.length + 1);
@@ -427,7 +427,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 
         if(configPath.length > 0 && configPath.substring(0, 1) == '/')
         {
-            configPath = configPath.substring(1);    
+            configPath = configPath.substring(1);
         }
 
         if (this.pathPrefix)
@@ -702,7 +702,7 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
                 return this.getNodeConfigPath(node);
             }
         }
-        
+
         return null;
     }
 });
@@ -765,12 +765,12 @@ ZUTUBI.FormLayout = function(config)
 {
     if(!config.fieldTpl)
     {
-        config.fieldTpl = new Ext.Template('<tr id="x-form-row-{0}" class="x-form-row {5}">' +
-                                        '<td class="x-form-label"><label for="{0}" style="{2}">{1}</td>' +
-                                        '<td class="x-form-label-annotation" id="x-form-label-annotation-{0}"></td>' +
+        config.fieldTpl = new Ext.Template('<tr id="x-form-row-{id}" class="x-form-row {itemCls}">' +
+                                        '<td class="x-form-label"><label for="{id}" style="{labelStyle}">{label}{labelSeparator}</td>' +
+                                        '<td class="x-form-label-annotation" id="x-form-label-annotation-{id}"></td>' +
                                         '<td class="x-form-separator">{4}</td>' +
-                                        '<td><div id="x-form-el-{0}" class="x-form-element" style="{3}">' +
-                                        '</div><div class="{6}"></div></td>' +
+                                        '<td><div id="x-form-el-{id}" class="x-form-element" style="{elementStyle}">' +
+                                        '</div><div class="{clearCls}"></div></td>' +
                                     '</tr>');
         config.fieldTpl.disableFormats = true;
         config.fieldTpl.compile();
@@ -824,7 +824,7 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
     {
         return this.layoutTarget;
     },
-    
+
     add : function()
     {
         var a = arguments;
@@ -832,7 +832,7 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
         {
             a[i].form = this;
         }
-        
+
         ZUTUBI.FormPanel.superclass.add.apply(this, a);
         return this;
     },
@@ -1001,11 +1001,6 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
             var el = field.getEl();
             if(el)
             {
-                if (field.getXType() == 'checkbox')
-                {
-                    el = field.innerWrap;
-                }
-
                 el.set({tabindex: window.nextTabindex++ });
 
                 if (field.submitOnEnter)
@@ -1076,7 +1071,7 @@ Ext.extend(ZUTUBI.CheckForm, ZUTUBI.Form, {
             {
                 field = this.findField(id);
             }
-            
+
             if(field)
             {
                 field.markInvalid(fieldError.msg);
@@ -1099,70 +1094,6 @@ Ext.extend(ZUTUBI.CheckForm, ZUTUBI.Form, {
     }
 });
 
-ZUTUBI.ImageButton = function(renderTo, config)
-{
-    ZUTUBI.ImageButton.superclass.constructor.call(this, config);
-    this.addEvents({
-        'click': true,
-        'mouseover': true,
-        'mouseout': true,
-        'mousedown': true
-    });
-
-    this.defaultAutoCreate = { tag: 'img', src: this.image, cls: 'x-image-button' };
-    this.render(renderTo);
-};
-
-Ext.extend(ZUTUBI.ImageButton, Ext.BoxComponent, {
-    onRender: function(ct, position)
-    {
-        ZUTUBI.ImageButton.superclass.onRender.call(this, ct, position);
-        this.el = ct.createChild(this.getAutoCreate(), position);
-    },
-
-    afterRender: function()
-    {
-        this.el.on('click', this.onClick,  this);
-        this.el.on("mouseover", this.onMouseOver, this);
-        this.el.on("mouseout", this.onMouseOut, this);
-        this.el.on("mousedown", this.onMouseDown, this);
-    },
-
-    onClick: function(evt)
-    {
-        this.fireEvent('click', evt);
-    },
-
-    onMouseOver : function(e){
-        if(!this.disabled){
-            this.el.set({src: this.overImage});
-            this.fireEvent('mouseover', this, e);
-        }
-    },
-
-    onMouseOut : function(e){
-        if(!e.within(this.el,  true)){
-            this.el.set({src: this.image});
-            this.fireEvent('mouseout', this, e);
-        }
-    },
-
-    onMouseDown : function(e){
-        if(!this.disabled && e.button == 0){
-            this.el.set({src: this.downImage});
-            Ext.get(document).on('mouseup', this.onMouseUp, this);
-        }
-    },
-
-    onMouseUp : function(e){
-        if(e.button == 0){
-            this.el.set({src: this.image});
-            Ext.get(document).un('mouseup', this.onMouseUp, this);
-        }
-    }
-});
-
-
 ZUTUBI.ItemPicker = function(config)
 {
     ZUTUBI.ItemPicker.superclass.constructor.call(this, config);
@@ -1174,7 +1105,7 @@ ZUTUBI.ItemPicker = function(config)
 
 Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     width: 100,
-    height: 100,
+    height: 130,
     displayField: 'text',
     valueField: 'value',
     selectedClass: 'x-item-picker-selected',
@@ -1182,24 +1113,16 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     allowReordering: true,
     value: [],
     optionStore: undefined,
-    defaultAutoCreate: {tag: 'div', cls: 'x-item-picker-list', tabindex: '0'},
+    defaultAutoCreate: {tag: 'div', cls: 'x-item-picker', tabindex: '0', style:"outline:none;border:0px"},
 
     onRender: function(ct, position)
     {
         ZUTUBI.ItemPicker.superclass.onRender.call(this, ct, position);
-        this.wrap = this.el.wrap({tag: 'div', cls: 'x-item-picker'});
-        this.wrap.on('click', this.onClick, this);
-        // Allow width for buttons
-        this.wrap.setWidth(this.width + 24);
-        
-        this.el.setWidth(this.width);
-        this.el.setHeight(this.height);
-        this.el.on('focus', this.onInputFocus, this);
-        this.el.on('blur', this.onInputBlur, this);
+        this.el.on('click', this.onClick, this);
 
         if(this.optionStore)
         {
-            var fieldConfig = {
+            this.combo = new Ext.form.ComboBox({
                 store: this.optionStore,
                 mode: 'local',
                 forceSelection: true,
@@ -1207,30 +1130,106 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
                 displayField: this.displayField,
                 valueField: this.valueField,
                 triggerAction: 'all',
-                width: this.width,
                 id: this.id + '.choice'
-            };
-
-            this.combo = new Ext.form.ComboBox(fieldConfig);
-            this.combo.render(this.wrap);
-            this.choice = this.combo.getEl();
-            this.alignEl = this.combo.wrap;
+            });
+            this.choice = this.combo;
         }
         else
         {
-            this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text', id: this.id + '.choice'});
-            this.input.setWidth(this.width);
+            this.input = new Ext.form.TextField({
+                tag: 'input',
+                type: 'text',
+                cls: 'x-form-text',
+                id: this.id + '.choice'
+            });
             this.choice = this.input;
-            this.alignEl = this.input;
         }
 
-        this.choice.on('focus', this.onInputFocus, this);
-        this.choice.on('blur', this.onInputBlur, this);
+        var cls = 'x-item-picker';
+        if(!this.tpl)
+        {
+            if(Ext.isIE || Ext.isIE7)
+            {
+                this.tpl = '<tpl for="."><div unselectable="on" class="' + cls + '-item">{' + this.displayField + '}</div></tpl>';
+            }
+            else
+            {
+                this.tpl = '<tpl for="."><div class="' + cls + '-item  x-unselectable">{' + this.displayField + '}</div></tpl>';
+            }
+        }
 
-        this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-add-up.gif', overImage: window.baseUrl + '/images/buttons/sb-add-over.gif', downImage: window.baseUrl + '/images/buttons/sb-add-down.gif'});
+        this.view = new Ext.DataView({
+            cls: 'x-item-picker-list',
+            tpl: this.tpl,
+            itemSelector: '.x-item-picker-item',
+            singleSelect: true,
+            store: this.store,
+            selectedClass: this.selectedClass
+        });
+
+        this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
+
+        var icons = new Ext.Panel({
+            border:false,
+            header:false,
+            layout:"vbox",
+            padding:'1 0 0 0',
+            layoutConfig:
+            {
+                align:"center"
+            }
+        });
+
+        this.removeButton = new Ext.Button({
+            icon    : window.baseUrl + '/images/buttons/sb-delete-up.gif'
+        });
+        this.removeButton.on('click', this.onRemove, this);
+        icons.add(this.removeButton);
+        icons.add({xtype:'spacer',flex:1});
+
+        if (this.allowReordering)
+        {
+            this.upButton = new Ext.Button({
+                icon    : window.baseUrl + '/images/buttons/sb-up-up.gif'
+            });
+            this.upButton.on('click', this.onUp, this);
+            icons.add(this.upButton);
+            icons.add({xtype:'spacer',flex:1});
+            this.downButton = new Ext.Button({
+                icon    : window.baseUrl + '/images/buttons/sb-down-up.gif'
+            });
+            this.downButton.on('click', this.onDown, this);
+            icons.add(this.downButton);
+            icons.add({xtype:'spacer',flex:1});
+        }
+
+        this.addButton = new Ext.Button({
+            icon    : window.baseUrl + '/images/buttons/sb-add-up.gif'
+        });
         this.addButton.on('click', this.onAdd, this);
+        icons.add(this.addButton);
 
-        this.nav = new Ext.KeyNav(this.input || this.el, {
+        this.view.flex = 1;
+        var internalPanel = new Ext.Container({
+            width:this.width - 22,
+            layout:"vbox",
+            layoutConfig:{align:"stretch"},
+            items:[this.view,this.choice]
+        });
+
+        this.panel = new Ext.Panel({
+            border:false,
+            height:this.height,
+            layout:"hbox",
+            layoutConfig:{align:"stretch"},
+            items:[internalPanel,icons]
+        });
+        this.el.on('focus', this.doAlert, this, {stopEvent: true});
+        this.el.on('blur', this.doAlert, this, {stopEvent: true});
+
+        this.panel.render(this.el);
+
+        this.nav = new Ext.KeyNav(this.input.el || this.el, {
             "up": function(evt)
             {
                 this.navUp(evt.ctrlKey);
@@ -1251,49 +1250,19 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
             scope: this
         });
+    },
 
-        this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-delete-up.gif', overImage: window.baseUrl + '/images/buttons/sb-delete-over.gif', downImage: window.baseUrl + '/images/buttons/sb-delete-down.gif'});
-        this.removeButton.on('click', this.onRemove, this);
-
-        if (this.allowReordering)
+    doLayout: function()
+    {
+        if(this.rendered)
         {
-            this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-up-up.gif', overImage: window.baseUrl + '/images/buttons/sb-up-over.gif', downImage: window.baseUrl + '/images/buttons/sb-up-down.gif'});
-            this.upButton.on('click', this.onUp, this);
-
-            this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-down-up.gif', overImage: window.baseUrl + '/images/buttons/sb-down-over.gif', downImage: window.baseUrl + '/images/buttons/sb-down-down.gif'});
-            this.downButton.on('click', this.onDown, this);
+            this.panel.doLayout();
         }
-
-        var cls = 'x-item-picker';
-
-        if(!this.tpl)
-        {
-            if(Ext.isIE || Ext.isIE7)
-            {
-                this.tpl = '<tpl for="."><div unselectable="on" class="' + cls + '-item">{' + this.displayField + '}</div></tpl>';
-            }
-            else
-            {
-                this.tpl = '<tpl for="."><div class="' + cls + '-item  x-unselectable">{' + this.displayField + '}</div></tpl>';
-            }
-        }
-
-        this.view = new Ext.DataView({
-            renderTo: this.el,
-            tpl: this.tpl,
-            itemSelector: '.x-item-picker-item',
-            singleSelect: true,
-            store: this.store,
-            selectedClass: this.selectedClass
-        });
-
-        this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
     },
 
     afterRender: function()
     {
         ZUTUBI.ItemPicker.superclass.afterRender.call(this);
-        this.alignButtons();
         if(this.value)
         {
             this.setValue(this.value);
@@ -1301,49 +1270,16 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
     },
 
-    onPosition: function()
+    doAlert: function(evt, target)
     {
-        this.alignButtons();
+
     },
 
-    onResize: function()
-    {
-        this.alignButtons();
-    },
-
-    onClick: function()
+    onClick: function(evt)
     {
         if (!this.disabled && this.input)
         {
             this.input.focus();
-        }
-    },
-
-    onInputFocus: function()
-    {
-        this.choice.addClass('x-form-focus');
-        this.el.addClass('x-form-focus');
-    },
-
-    onInputBlur: function()
-    {
-        this.choice.removeClass('x-form-focus');
-        this.el.removeClass('x-form-focus');
-    },
-
-    alignButtons: function()
-    {
-        if(Ext.isIE)
-        {
-            this.alignEl.alignTo(this.el, 'tl-bl');
-        }
-        this.addButton.getEl().alignTo(this.el, 'tl-br', [2, 0]);
-        this.removeButton.getEl().alignTo(this.el, 'tl-tr', [2, 0]);
-
-        if (this.allowReordering)
-        {
-            this.upButton.getEl().alignTo(this.el, 'l-r', [2, 0]);
-            this.downButton.getEl().alignTo(this.upButton.getEl(), 't-b', [0, 2]);
         }
     },
 
@@ -1390,8 +1326,8 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
         if(this.input)
         {
-            text = this.input.dom.value;
-            this.input.dom.value = '';
+            text = this.input.getValue();
+            this.input.setValue('');
             value = text;
         }
         else
@@ -1428,11 +1364,11 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         {
             this.store.addSorted(r);
         }
-        
-        this.hiddenFields.push(this.wrap.createChild({tag: 'input', type: 'hidden', name: this.name, value: value}));
+
+        this.hiddenFields.push(this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: value}));
         return this.store.indexOf(r);
     },
-    
+
     onRemove: function(evt)
     {
         var selected = this.getSelection();
@@ -1515,7 +1451,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             this.hiddenFields[i].remove();
         }
         this.hiddenFields = [];
-        
+
         for(i = 0; i < value.length; i++)
         {
             var text = this.getTextForValue(value[i]);
@@ -1546,14 +1482,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     },
 
     /**
-     * Use the response data to define the options.   
+     * Use the response data to define the options.
      * @param response  data to be used as options
      * @param append    if true, the data will be appended to the existing options.
      * If false, the existing options will be replaced.
      */
     loadOptions: function(response, append)
     {
-        this.optionStore.loadData(response, append);  
+        this.optionStore.loadData(response, append);
     },
 
     /**
@@ -1607,7 +1543,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         ZUTUBI.Select.superclass.onDisable.call(this);
         if(this.input)
         {
-            this.input.dom.disabled = true;
+            this.input.disable();
         }
         else
         {
@@ -1626,7 +1562,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         ZUTUBI.Select.superclass.onEnable.call(this);
         if(this.input)
         {
-            this.input.dom.disabled = false;
+            this.input.enable();
         }
         else
         {
@@ -1638,7 +1574,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.upButton.enable();
         this.downButton.enable();
         this.view.disabled = false;
-    }    
+    }
 });
 
 ZUTUBI.DetailPanel = function(config)
@@ -1680,7 +1616,7 @@ Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
         this.helpPath = path;
         this.helpType = type || '';
     },
-    
+
     load: function(o)
     {
         this.clearHelp();
@@ -1743,7 +1679,7 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
             this.synchronise();
         }
     },
-    
+
     synchronise: function(field)
     {
         var location = detailPanel.getHelp();
@@ -1805,7 +1741,7 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
             }
             else
             {
-                this.body.update('No help available.', false, cb);                
+                this.body.update('No help available.', false, cb);
             }
         }
         else
@@ -1935,7 +1871,7 @@ Ext.override(Ext.form.ComboBox, {
             this.on('blur', this.doForce, this);
         }
     },
-    
+
     onKeyUp : function(e)
     {
         if (this.editable !== false && !e.isSpecialKey())
