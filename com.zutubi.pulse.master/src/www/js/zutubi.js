@@ -1229,7 +1229,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
         this.panel.render(this.el);
 
-        this.nav = new Ext.KeyNav(this.input.el || this.el, {
+        this.nav = new Ext.KeyNav( (this.input) ? this.input.el : this.el, {
             "up": function(evt)
             {
                 this.navUp(evt.ctrlKey);
