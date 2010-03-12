@@ -434,7 +434,8 @@ public class NativeGit
             if (LOG_COMMANDS.isLoggable(Level.FINEST))
             {
                 long currentTime = System.currentTimeMillis();
-                LOG_COMMANDS.finest(timeFormat.format(new Date(currentTime)) + "\t" + commandLine + "\t" + git.directory().getAbsolutePath() + "\t" + (currentTime - startTime) + "\t" + lineCount + "\n");
+                String workingDirectory = (git.directory() != null) ? git.directory().getAbsolutePath() + "\t" : "";
+                LOG_COMMANDS.finest(timeFormat.format(new Date(currentTime)) + "\t" + commandLine + "\t" + workingDirectory + (currentTime - startTime) + "\t" + lineCount + "\n");
             }
         }
     }
