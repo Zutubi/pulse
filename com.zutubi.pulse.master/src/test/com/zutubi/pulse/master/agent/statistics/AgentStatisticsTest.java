@@ -20,6 +20,8 @@ public class AgentStatisticsTest extends PulseTestCase
         assertEquals(0.0d, stats.getPercentDisabledTime());
         assertEquals(0L, stats.getTotalOfflineTime());
         assertEquals(0.0d, stats.getPercentOfflineTime());
+        assertEquals(0L, stats.getTotalSynchronisingTime());
+        assertEquals(0.0d, stats.getPercentSynchronisingTime());
         assertEquals(0L, stats.getTotalIdleTime());
         assertEquals(0.0d, stats.getPercentIdleTime());
         assertEquals(0L, stats.getTotalBusyTime());
@@ -64,6 +66,20 @@ public class AgentStatisticsTest extends PulseTestCase
         AgentStatistics stats = new AgentStatistics(asList(day1, day2));
         assertEquals(55, stats.getTotalOfflineTime());
         assertEquals(11.0d, stats.getPercentOfflineTime());
+    }
+
+    public void testSynchronisingTime()
+    {
+        AgentDailyStatistics day1 = new AgentDailyStatistics(1, 2);
+        day1.setOfflineTime(20);
+        day1.setSynchronisingTime(5);
+        AgentDailyStatistics day2 = new AgentDailyStatistics(1, 2);
+        day2.setOfflineTime(70);
+        day2.setSynchronisingTime(5);
+
+        AgentStatistics stats = new AgentStatistics(asList(day1, day2));
+        assertEquals(10, stats.getTotalSynchronisingTime());
+        assertEquals(10.0d, stats.getPercentSynchronisingTime());
     }
 
     public void testIdleTime()

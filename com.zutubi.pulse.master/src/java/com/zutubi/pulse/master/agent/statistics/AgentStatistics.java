@@ -20,6 +20,7 @@ public class AgentStatistics
     private int totalRecipes;
     private long totalDisabledTime;
     private long totalOfflineTime;
+    private long totalSynchronisingTime;
     private long totalIdleTime;
     private long totalBusyTime;
     private long totalRecordedTime;
@@ -36,9 +37,10 @@ public class AgentStatistics
         totalRecipes = (int) total(new ToRecipeCount());
         totalDisabledTime = total(new ToDisabledTime());
         totalOfflineTime = total(new ToOfflineTime());
+        totalSynchronisingTime = total(new ToSynchronisingTime());
         totalIdleTime = total(new ToIdleTime());
         totalBusyTime = total(new ToBusyTime());
-        totalRecordedTime = totalDisabledTime + totalOfflineTime + totalIdleTime + totalBusyTime;
+        totalRecordedTime = totalDisabledTime + totalOfflineTime + totalSynchronisingTime + totalIdleTime + totalBusyTime;
     }
 
     private long total(Mapping<AgentDailyStatistics, Long> mapping)
@@ -181,6 +183,27 @@ public class AgentStatistics
     }
 
     /**
+     * Returns the total time the agent spent synchronising over all days.
+     *
+     * @return total time spent synchronising in milliseconds
+     */
+    public long getTotalSynchronisingTime()
+    {
+        return totalSynchronisingTime;
+    }
+
+    /**
+     * Returns the proportion of time the agent spent synchronising over all
+     * days.
+     *
+     * @return proportion of time spent synchronising as a percentage (0-100).
+     */
+    public double getPercentSynchronisingTime()
+    {
+        return percentage(totalSynchronisingTime);
+    }
+
+    /**
      * Returns the total time the agent spent idle over all days.
      *
      * @return total time spent idle in milliseconds
@@ -241,6 +264,14 @@ public class AgentStatistics
         public Long map(AgentDailyStatistics statistics)
         {
             return (long) statistics.getOfflineTime();
+        }
+    }
+
+    private static class ToSynchronisingTime implements Mapping<AgentDailyStatistics, Long>
+    {
+        public Long map(AgentDailyStatistics statistics)
+        {
+            return (long) statistics.getSynchronisingTime();
         }
     }
 

@@ -35,6 +35,7 @@
                     #headingRow("utilisation.statistics" 2)
                     #dynamicRow("time.disabled" $action.renderTime($statistics.totalDisabledTime, $statistics.percentDisabledTime))
                     #dynamicRow("time.offline" $action.renderTime($statistics.totalOfflineTime, $statistics.percentOfflineTime))
+                    #dynamicRow("time.synchronising" $action.renderTime($statistics.totalSynchronisingTime, $statistics.percentSynchronisingTime))
                     #dynamicRow("time.idle" $action.renderTime($statistics.totalIdleTime, $statistics.percentIdleTime))
                     #dynamicRow("time.busy" $action.renderTime($statistics.totalBusyTime, $statistics.percentBusyTime))
                 </table>

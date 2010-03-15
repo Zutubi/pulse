@@ -71,7 +71,7 @@ public class AgentStatisticsAction extends AgentActionBase
     {
         Agent agent = getRequiredAgent();
         statistics = agentManager.getAgentStatistics(agent);
-        usageChart = ChartUtils.renderForWeb(createChart(statistics), 400, 400);
+        usageChart = ChartUtils.renderForWeb(createChart(statistics), 450, 450);
         return SUCCESS;
     }
 
@@ -80,6 +80,7 @@ public class AgentStatisticsAction extends AgentActionBase
         DefaultPieDataset dataset = new DefaultPieDataset();
         dataset.setValue(I18N.format("disabled"), statistics.getTotalDisabledTime());
         dataset.setValue(I18N.format("offline"), statistics.getTotalOfflineTime());
+        dataset.setValue(I18N.format("synchronising"), statistics.getTotalSynchronisingTime());
         dataset.setValue(I18N.format("idle"), statistics.getTotalIdleTime());
         dataset.setValue(I18N.format("busy"), statistics.getTotalBusyTime());
 
@@ -103,8 +104,9 @@ public class AgentStatisticsAction extends AgentActionBase
 
         plot.setSectionPaint(0, ChartColours.DISABLED_FILL.asColor());
         plot.setSectionPaint(1, ChartColours.FAIL_FILL.asColor());
-        plot.setSectionPaint(2, ChartColours.SUCCESS_FILL.asColor());
-        plot.setSectionPaint(3, ChartColours.BUSY_FILL.asColor());
+        plot.setSectionPaint(2, ChartColours.WARNING_FILL.asColor());
+        plot.setSectionPaint(3, ChartColours.SUCCESS_FILL.asColor());
+        plot.setSectionPaint(4, ChartColours.BUSY_FILL.asColor());
 
         return chart;
     }

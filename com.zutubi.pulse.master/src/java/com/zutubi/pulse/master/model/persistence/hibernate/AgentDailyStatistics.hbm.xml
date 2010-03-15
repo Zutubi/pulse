@@ -11,6 +11,7 @@
         <property name="recipeCount" column="RECIPE_COUNT" type="int"/>
         <property name="disabledTime" column="DISABLED_TIME" type="int"/>
         <property name="offlineTime" column="OFFLINE_TIME" type="int"/>
+        <property name="synchronisingTime" column="SYNCHRONISING_TIME" type="int"/>
         <property name="idleTime" column="IDLE_TIME" type="int"/>
         <property name="busyTime" column="BUSY_TIME" type="int"/>
     </class>

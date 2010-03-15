@@ -160,6 +160,10 @@ public class AgentStatisticsManager implements EventListener
             case VERSION_MISMATCH:
                 currentStats.setOfflineTime(currentStats.getOfflineTime() + duration);
                 break;
+           case SYNCHRONISING:
+           case SYNCHRONISED:
+               currentStats.setSynchronisingTime(currentStats.getSynchronisingTime() + duration);
+               break;
             case IDLE:
                 currentStats.setIdleTime(currentStats.getIdleTime() + duration);
                 break;

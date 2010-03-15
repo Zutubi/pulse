@@ -102,6 +102,8 @@
         </property>
     </bean>
 
+    <bean id="agentSynchronisationService" class="com.zutubi.pulse.master.agent.AgentSynchronisationService"/>
+
     <bean id="hostManager" class="com.zutubi.pulse.master.agent.DefaultHostManager"/>
 
     <bean id="hostStatusManager" class="com.zutubi.pulse.master.agent.HostStatusManager"/>

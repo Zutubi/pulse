@@ -142,7 +142,7 @@ public class DefaultAgent implements Agent
 
     public boolean isAvailable()
     {
-        return status == AgentStatus.IDLE;
+        return status.isAvailable();
     }
 
     public void updateStatus(AgentPingEvent agentPingEvent)

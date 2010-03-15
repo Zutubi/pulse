@@ -13,6 +13,7 @@ public class AgentDailyStatistics extends Entity
     private int recipeCount;
     private int disabledTime;
     private int offlineTime;
+    private int synchronisingTime;
     private int idleTime;
     private int busyTime;
 
@@ -92,6 +93,20 @@ public class AgentDailyStatistics extends Entity
     public void setOfflineTime(int offlineTime)
     {
         this.offlineTime = offlineTime;
+    }
+
+    /**
+     * @return the number of milliseconds that the agent spent synchronising on
+     *         this day
+     */
+    public int getSynchronisingTime()
+    {
+        return synchronisingTime;
+    }
+
+    public void setSynchronisingTime(int synchronisingTime)
+    {
+        this.synchronisingTime = synchronisingTime;
     }
 
     /**

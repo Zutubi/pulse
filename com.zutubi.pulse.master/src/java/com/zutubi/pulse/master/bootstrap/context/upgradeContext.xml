@@ -127,6 +127,7 @@
                 <ref local="updatePerforceSyncWorkspacePattern"/>
                 <ref local="addDependencySyncField"/>
                 <ref local="addSubversionUseExport"/>
+                <ref local="addAgentSynchronisingTime"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -616,5 +617,14 @@
 
     <bean id="addSubversionUseExport" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionUseExportUpgradeTask">
         <property name="buildNumber" value="201999001"/>
+    </bean>
+
+    <bean id="addAgentSynchronisingTime" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201999002"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

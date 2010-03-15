@@ -4,20 +4,19 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TestClock;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
+import static java.util.Arrays.asList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class AgentStatisticsManagerTest extends PulseTestCase
 {
@@ -113,9 +112,42 @@ public class AgentStatisticsManagerTest extends PulseTestCase
         stateChange(KNOWN_AGENT_1, INVALID_MASTER, TOKEN_MISMATCH);
         clock.add(DURATION_3);
         stateChange(KNOWN_AGENT_1, TOKEN_MISMATCH, IDLE);
-        
+
         AgentDailyStatistics expected = new AgentDailyStatistics(KNOWN_AGENT_1.getId(), midnights[0]);
         expected.setOfflineTime(DURATION_1 + DURATION_2 + DURATION_3);
+        assertEquals(asList(expected), agentStatisticsManager.getStatisticsForAgent(KNOWN_AGENT_1.getId()));
+    }
+
+    public void testStandardLifecycle()
+    {
+        final int DURATION_SYNC = 10;
+        final int DURATION_IDLE = 100;
+        final int DURATION_BUILDING = 50;
+        final int DURATION_POST = 10;
+        final int DURATION_OFFLINE = 30;
+
+        stateChange(KNOWN_AGENT_1, INITIAL, SYNCHRONISING);
+        clock.add(DURATION_SYNC);
+        stateChange(KNOWN_AGENT_1, SYNCHRONISING, SYNCHRONISED);
+        clock.add(DURATION_SYNC);
+        stateChange(KNOWN_AGENT_1, SYNCHRONISING, IDLE);
+        clock.add(DURATION_IDLE);
+        stateChange(KNOWN_AGENT_1, IDLE, RECIPE_ASSIGNED);
+        stateChange(KNOWN_AGENT_1, IDLE, BUILDING);
+        clock.add(DURATION_BUILDING);
+        stateChange(KNOWN_AGENT_1, BUILDING, POST_RECIPE);
+        stateChange(KNOWN_AGENT_1, BUILDING, AWAITING_PING);
+        clock.add(DURATION_POST);
+        stateChange(KNOWN_AGENT_1, AWAITING_PING, OFFLINE);
+        clock.add(DURATION_OFFLINE);
+        stateChange(KNOWN_AGENT_1, OFFLINE, SYNCHRONISING);
+
+        AgentDailyStatistics expected = new AgentDailyStatistics(KNOWN_AGENT_1.getId(), midnights[0]);
+        expected.setSynchronisingTime(DURATION_SYNC * 2);
+        expected.setIdleTime(DURATION_IDLE);
+        expected.setBusyTime(DURATION_BUILDING + DURATION_POST);
+        expected.setOfflineTime(DURATION_OFFLINE);
+        expected.setRecipeCount(1);
         assertEquals(asList(expected), agentStatisticsManager.getStatisticsForAgent(KNOWN_AGENT_1.getId()));
     }
 
@@ -342,6 +374,7 @@ public class AgentStatisticsManagerTest extends PulseTestCase
         assertEquals(expected.getDayStamp(), got.getDayStamp());
         assertEquals(expected.getDisabledTime(), got.getDisabledTime());
         assertEquals(expected.getOfflineTime(), got.getOfflineTime());
+        assertEquals(expected.getSynchronisingTime(), got.getSynchronisingTime());
         assertEquals(expected.getIdleTime(), got.getIdleTime());
         assertEquals(expected.getBusyTime(), got.getBusyTime());
         assertEquals(expected.getRecipeCount(), got.getRecipeCount());
