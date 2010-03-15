@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.io.IOUtils;
@@ -21,8 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A command that handles retrieving the dependencies for a build.  This
@@ -62,7 +61,7 @@ public class RetrieveDependenciesCommand implements Command
                         DefaultModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, DefaultModuleDescriptor.class);
                         String stageName = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_STAGE));
                         String retrievalPattern = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
-                        boolean syncDestination = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, true);
+                        boolean syncDestination = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, DEFAULT_SYNC_DESTINATION);
 
                         String targetPattern = PathUtils.getPath(context.getWorkingDir().getAbsolutePath(), retrievalPattern);
                         IvyRetrievalReport retrievalReport = ivy.retrieveArtifacts(descriptor, stageName, targetPattern, syncDestination);
