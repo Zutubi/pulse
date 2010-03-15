@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.PushDownForm;
+import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
@@ -84,6 +85,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         String parent = random + "-parent";
         String child = random + "-child";
 
+        // First try from collection page.
         ListPage listPage = prepareProperty(parent, child);
         PushDownForm pushDownForm = listPage.clickPushDown(TEST_PROPERTY_NAME);
         pushDownForm.waitFor();
@@ -91,6 +93,13 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
 
         listPage.waitFor();
         assertTrue(listPage.isItemPresent(TEST_PROPERTY_NAME));
+
+        // Also try from property's own page.
+        CompositePage propertyPage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(listPage.getPath(), TEST_PROPERTY_NAME));
+        propertyPage.clickAction(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
+        pushDownForm.waitFor();
+        pushDownForm.cancelFormElements(parent);
+        propertyPage.waitFor();
     }
 
     private ListPage prepareProperty(String parent, String child) throws Exception

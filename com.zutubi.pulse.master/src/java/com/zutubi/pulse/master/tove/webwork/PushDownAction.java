@@ -9,6 +9,7 @@ import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,7 +57,7 @@ public class PushDownAction extends ToveFormActionSupport
     @Override
     public void doCancel()
     {
-        if (newPath == null)
+        if (!StringUtils.stringSet(newPath))
         {
             newPath = path;
         }
