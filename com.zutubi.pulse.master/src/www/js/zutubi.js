@@ -1181,7 +1181,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         });
 
         this.removeButton = new Ext.Button({
-            icon    : window.baseUrl + '/images/buttons/sb-delete-up.gif'
+            icon : window.baseUrl + '/images/buttons/sb-delete-up.gif'
         });
         this.removeButton.on('click', this.onRemove, this);
         icons.add(this.removeButton);
@@ -1190,13 +1190,13 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         if (this.allowReordering)
         {
             this.upButton = new Ext.Button({
-                icon    : window.baseUrl + '/images/buttons/sb-up-up.gif'
+                icon : window.baseUrl + '/images/buttons/sb-up-up.gif'
             });
             this.upButton.on('click', this.onUp, this);
             icons.add(this.upButton);
             icons.add({xtype:'spacer',flex:1});
             this.downButton = new Ext.Button({
-                icon    : window.baseUrl + '/images/buttons/sb-down-up.gif'
+                icon : window.baseUrl + '/images/buttons/sb-down-up.gif'
             });
             this.downButton.on('click', this.onDown, this);
             icons.add(this.downButton);
@@ -1204,14 +1204,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
 
         this.addButton = new Ext.Button({
-            icon    : window.baseUrl + '/images/buttons/sb-add-up.gif'
+            icon : window.baseUrl + '/images/buttons/sb-add-up.gif'
         });
         this.addButton.on('click', this.onAdd, this);
         icons.add(this.addButton);
 
         this.view.flex = 1;
         var internalPanel = new Ext.Container({
-            width:this.width - 22,
+            width:this.width - 22, // 22 is the width needed by the icons to display correctly.
             layout:"vbox",
             layoutConfig:{align:"stretch"},
             items:[this.view,this.choice]
@@ -1224,9 +1224,6 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             layoutConfig:{align:"stretch"},
             items:[internalPanel,icons]
         });
-        this.el.on('focus', this.doAlert, this, {stopEvent: true});
-        this.el.on('blur', this.doAlert, this, {stopEvent: true});
-
         this.panel.render(this.el);
 
         this.nav = new Ext.KeyNav( (this.input) ? this.input.el : this.el, {
@@ -1268,11 +1265,6 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             this.setValue(this.value);
             this.originalValue = this.value;
         }
-    },
-
-    doAlert: function(evt, target)
-    {
-
     },
 
     onClick: function(evt)
