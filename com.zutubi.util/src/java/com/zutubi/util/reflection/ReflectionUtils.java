@@ -409,4 +409,68 @@ public class ReflectionUtils
             }
         }
     }
+
+    /**
+     * Use reflection to invoke a specified method on the target object.  The default accessibility
+     * of the method is ignored, and the usual reflection exceptions are wrapped in an unchecked
+     * expection.
+     *
+     * @param target        the object on which the method will be invoked
+     * @param methodName    the name of the method to be invoked
+     * @param args          the method arguments
+     * @param <T>           the return type
+     * @return the result of the invocation.
+     *
+     * @throws RuntimeException if any of the usual problems associated with reflection occur, such
+     * as a NoSuchMethodException etc.
+     */
+    public static <T> T invoke(Object target, String methodName, Object... args)
+    {
+        try
+        {
+            Class[] types = new Class[args.length];
+            CollectionUtils.mapToArray(args, new Mapping<Object, Class>()
+            {
+                public Class map(Object o)
+                {
+                    return o.getClass();
+                }
+            }, types);
+
+            Method method = null;
+            for (Class targetClass : getSuperclasses(target.getClass(), Object.class, false))
+            {
+                try
+                {
+                    method = targetClass.getDeclaredMethod(methodName, types);
+                }
+                catch (NoSuchMethodException e1)
+                {
+                    try
+                    {
+                        method = targetClass.getMethod(methodName, types);
+                    }
+                    catch (NoSuchMethodException e2)
+                    {
+                        // noop
+                    }
+                }
+                if (method != null)
+                {
+                    break;
+                }
+            }
+
+            if (method == null)
+            {
+                throw new NoSuchMethodException(methodName);
+            }
+            method.setAccessible(true);
+            return (T)method.invoke(target, args);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

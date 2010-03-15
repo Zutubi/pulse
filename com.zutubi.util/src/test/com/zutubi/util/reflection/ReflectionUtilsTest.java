@@ -910,4 +910,66 @@ public class ReflectionUtilsTest extends ZutubiTestCase
             this.extendsAndImplementsProperty = extendsAndImplementsProperty;
         }
     }
+
+    public void testInvokeMethodDeclaredOnClass()
+    {
+        Object target = new InvokeMethod();
+        assertEquals("public", ReflectionUtils.invoke(target, "publicNoArgMethod"));
+        assertEquals("package", ReflectionUtils.invoke(target, "packageNoArgMethod"));
+        assertEquals("protected", ReflectionUtils.invoke(target, "protectedNoArgMethod"));
+        assertEquals("private", ReflectionUtils.invoke(target, "privateNoArgMethod"));
+        assertEquals("arg", ReflectionUtils.invoke(target, "oneArgMethod", "arg"));
+        Object obj = new Object();
+        assertEquals(obj, ReflectionUtils.invoke(target, "twoArgMethod", obj, "arg"));
+    }
+
+    public void testInvokeMethodDeclaredOnSuperclass()
+    {
+        Object target = new ExtensionOfInvokeMethod();
+        assertEquals("public", ReflectionUtils.invoke(target, "publicNoArgMethod"));
+        assertEquals("package", ReflectionUtils.invoke(target, "packageNoArgMethod"));
+        assertEquals("protected", ReflectionUtils.invoke(target, "protectedNoArgMethod"));
+        assertEquals("private", ReflectionUtils.invoke(target, "privateNoArgMethod"));
+        assertEquals("arg", ReflectionUtils.invoke(target, "oneArgMethod", "arg"));
+        Object obj = new Object();
+        assertEquals(obj, ReflectionUtils.invoke(target, "twoArgMethod", obj, "arg"));
+    }
+
+    public class InvokeMethod
+    {
+        public String protectedNoArgMethod()
+        {
+            return "protected";
+        }
+
+        public String publicNoArgMethod()
+        {
+            return "public";
+        }
+
+        String packageNoArgMethod()
+        {
+            return "package";
+        }
+
+        private String privateNoArgMethod()
+        {
+            return "private";
+        }
+
+        public String oneArgMethod(String arg)
+        {
+            return arg;
+        }
+
+        public Object twoArgMethod(Object a, String b)
+        {
+            return a;
+        }
+    }
+
+    public class ExtensionOfInvokeMethod extends InvokeMethod
+    {
+
+    }
 }

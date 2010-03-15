@@ -25,7 +25,7 @@
     <dependencies>
         <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
 
-        <dependency org="apache" name="commons-httpclient" rev="3.0" conf="external,build,release->default"/>
+        <dependency org="apache" name="commons-httpclient" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-lang" rev="2.1" conf="external,build,release->default"/>
     </dependencies>
 </ivy-module>
