@@ -11,24 +11,23 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import static com.zutubi.util.CollectionUtils.*;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
 import org.acegisecurity.AccessDeniedException;
-
-import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.*;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+
+import java.util.*;
+import static java.util.Arrays.asList;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -276,6 +275,26 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertNotSame(colby, clone);
         assertEquals("clone", clone.getName());
         assertEquals(1, clone.getY());
+    }
+
+    public void testCloneCreatesSkeletons() throws TypeException
+    {
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        String child1Path = insertTemplateAInstance(parentPath, createAInstance("child1"), false);
+        String child2Path = insertTemplateAInstance(parentPath, createAInstance("child2"), false);
+
+        assertNotNull(recordManager.select(getPath(child1Path, "bmap")));
+        Listener listener = registerListener();
+
+        configurationRefactoringManager.clone(getPath(parentPath, "bmap", "colby"), "clone");
+        // Data assertions on teardown will detect any missing skeletons.
+
+        listener.assertEvents(
+                new InsertEventSpec(getPath(child1Path, "bmap", "clone"), false),
+                new PostInsertEventSpec(getPath(child1Path, "bmap", "clone"), false),
+                new InsertEventSpec(getPath(child2Path, "bmap", "clone"), false),
+                new PostInsertEventSpec(getPath(child2Path, "bmap", "clone"), false)
+        );
     }
 
     public void testMultipleClone()

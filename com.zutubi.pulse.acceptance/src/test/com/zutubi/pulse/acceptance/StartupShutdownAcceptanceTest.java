@@ -274,7 +274,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     public void testAdminTokenNotOverridenBeforeBindingPort() throws Exception
     {
         // This test fails on pal-lin, requiring manual cleanup.  The failure
-        // is within out Python process control somewhere, hard to track down.
+        // is within our Python process control somewhere, hard to track down.
         if (SystemUtils.IS_WINDOWS)
         {
             RuntimeContext commandline = new RuntimeContext();
@@ -288,9 +288,9 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
             String originalAdminToken = pulse.getAdminToken();
 
-            applyContextToPulse(commandline);
             PulseTestFactory factory = new JythonPulseTestFactory();
             Pulse secondPulse = factory.createPulse(pulse.getPulseHome());
+            applyContextToPulse(commandline, secondPulse);
             assertEquals(0, secondPulse.start(false));
             assertEquals(0, secondPulse.waitForProcessToExit(300));
 
@@ -425,13 +425,13 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     private void assertStartServer(RuntimeContext commandline) throws Exception
     {
-        applyContextToPulse(commandline);
+        applyContextToPulse(commandline, pulse);
         assertFalse(pulse.ping());
         assertEquals(0, pulse.start());
         assertTrue(pulse.ping());
     }
 
-    private void applyContextToPulse(RuntimeContext commandline)
+    private void applyContextToPulse(RuntimeContext commandline, Pulse pulse)
     {
         if (StringUtils.stringSet(commandline.getPort()))
         {

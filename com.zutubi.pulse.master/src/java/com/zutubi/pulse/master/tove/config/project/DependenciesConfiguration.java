@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -24,7 +25,7 @@ public class DependenciesConfiguration extends AbstractConfiguration
     @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
     private String retrievalPattern = "lib/[artifact](.[ext])";
     
-    private boolean syncDestination = true;  
+    private boolean syncDestination = BuildProperties.DEFAULT_SYNC_DESTINATION;  
     
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")

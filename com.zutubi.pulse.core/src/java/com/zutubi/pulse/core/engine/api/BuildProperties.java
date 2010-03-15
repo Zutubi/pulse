@@ -171,6 +171,7 @@ public class BuildProperties
      * directory (i.e. removes any files it does not put there).
      */
     public static final String PROPERTY_SYNC_DESTINATION       = "sync.destination";
+    public static final boolean DEFAULT_SYNC_DESTINATION       = true;
     /**
      * A short, human-readable summary of the test results for the build
      * (only available post-build).

@@ -3,16 +3,16 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -502,7 +502,10 @@ public class ConfigurationRefactoringManager
 
             boolean templatedCollection = configurationTemplateManager.isTemplatedCollection(parentPath);
             Collection<String> originalKeys;
-            if(templatedCollection)
+            String scope = null;
+            boolean nestedWithinTemplatedOwner = false;
+            TemplateNode templateNode = null;
+            if (templatedCollection)
             {
                 // Sort the keys in order of template depth so we can be
                 // sure that a parent is cloned before its children.
@@ -511,6 +514,16 @@ public class ConfigurationRefactoringManager
             else
             {
                 originalKeys = originalKeyToCloneKey.keySet();
+
+                String[] pathElements = getPathElements(parentPath);
+                scope = getPath(0, 1, pathElements);
+                if (configurationTemplateManager.isTemplatedCollection(scope))
+                {
+                    // We are cloning an item nested within a templated owner,
+                    // skeletons may be required if we have descendants.
+                    nestedWithinTemplatedOwner = true;
+                    templateNode = configurationTemplateManager.getTemplateNode(getPath(0, 2, pathElements));
+                }
             }
 
             // Copy each record, updating parent references if necessary as
@@ -541,13 +554,20 @@ public class ConfigurationRefactoringManager
                 recordManager.insert(clonePath, clone);
                 // CIB-2307 - we need the specific instances target type, not the generic type
                 // represented by the mapType.getTargetType()
-                ComplexType targetType = (ComplexType) mapType.getActualPropertyType(originalKey, record);
+                CompositeType targetType = (CompositeType) mapType.getActualPropertyType(originalKey, record);
                 cloneChildren(clonePath, record, targetType);
 
-                if (configurationTemplateManager.isConcrete(parentPath, clone))
+                if (nestedWithinTemplatedOwner)
+                {
+                    String remainderPath = getPath(2, getPathElements(clonePath));
+                    configurationTemplateManager.addInheritedSkeletons(scope, remainderPath, targetType, recordManager.select(clonePath), templateNode, true);
+                    newConcretePaths.addAll(configurationTemplateManager.getDescendantPaths(clonePath, false, true, false));
+                }
+                else if (configurationTemplateManager.isConcrete(parentPath, clone))
                 {
                     newConcretePaths.add(clonePath);
                 }
+
             }
 
             // Now rewrite all internal references that fall inside the clone set
@@ -1741,7 +1761,7 @@ public class ConfigurationRefactoringManager
 
         private String pullUpPath(String path)
         {
-            String[] elements = PathUtils.getPathElements(path);
+            String[] elements = getPathElements(path);
             elements[1] = ancestorKey;
             return PathUtils.getPath(elements);
         }
@@ -1796,7 +1816,7 @@ public class ConfigurationRefactoringManager
                 insertPath = ensurePullUp();
                 configurationSecurityManager.ensurePermission(insertPath, AccessManager.ACTION_CREATE);
                 
-                String[] elements = PathUtils.getPathElements(insertPath);
+                String[] elements = getPathElements(insertPath);
                 final String scope = elements[0];
                 TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
                 TemplateNode node = hierarchy.getNodeById(ancestorKey);
@@ -1945,7 +1965,7 @@ public class ConfigurationRefactoringManager
 
         private String pushDownPath(String path, String childKey)
         {
-            String[] elements = PathUtils.getPathElements(path);
+            String[] elements = getPathElements(path);
             elements[1] = childKey;
             return PathUtils.getPath(elements);
         }

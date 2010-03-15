@@ -1778,7 +1778,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private boolean isSkeleton(String path)
+    boolean isSkeleton(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
         if (elements.length > 2)
