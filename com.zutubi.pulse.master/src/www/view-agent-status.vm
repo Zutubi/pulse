@@ -19,7 +19,7 @@
     </table>
 
 #if($model.executingBuild)
-    <table id="executing.build.stage" class="content"/>
+    <table id="executing.build.stage" class="content">
         #headingRow("executing.build.stage" 2)
         <tr>
             <th class="content-row">#wwtext("name=build.project")</th>
