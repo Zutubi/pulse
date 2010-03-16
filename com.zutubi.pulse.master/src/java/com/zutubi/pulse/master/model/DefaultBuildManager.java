@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -15,7 +17,6 @@ import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.LogFile;
 import com.zutubi.pulse.master.build.log.RecipeLogFile;
-import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
@@ -26,6 +27,7 @@ import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
@@ -37,9 +39,6 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -66,10 +65,6 @@ public class DefaultBuildManager implements BuildManager
 
     public void init()
     {
-        fileDeletionService = new FileDeletionService();
-        fileDeletionService.setThreadFactory(threadFactory);
-        fileDeletionService.init();
-
         // CIB-1147: detect and remove old .dead dirs on restart.
         cleanupDeadDirectories();
     }
@@ -693,6 +688,11 @@ public class DefaultBuildManager implements BuildManager
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setFileDeletionService(FileDeletionService fileDeletionService)
+    {
+        this.fileDeletionService = fileDeletionService;
     }
 
     /**

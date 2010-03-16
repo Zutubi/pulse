@@ -1,17 +1,21 @@
 package com.zutubi.util.reflection;
 
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import static java.util.Arrays.asList;
 
 public class ReflectionUtilsTest extends ZutubiTestCase
 {
@@ -109,7 +113,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     private void superclassesHelper(Class clazz, Class stopClazz, boolean strict, Class... expectedClazzes)
     {
-        assertEquals(Arrays.asList(expectedClazzes), ReflectionUtils.getSuperclasses(clazz, stopClazz, strict));
+        assertEquals(asList(expectedClazzes), ReflectionUtils.getSuperclasses(clazz, stopClazz, strict));
     }
 
     public void testGetSuperTypesClassNoParent()
@@ -199,7 +203,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     private void supertypesHelper(Class clazz, Class stopClazz, boolean strict, Class... expectedClazzes)
     {
-        assertEquals(new HashSet<Class>(Arrays.asList(expectedClazzes)), ReflectionUtils.getSupertypes(clazz, stopClazz, strict));
+        assertEquals(new HashSet<Class>(asList(expectedClazzes)), ReflectionUtils.getSupertypes(clazz, stopClazz, strict));
     }
 
     public void testGetImplementedInterfacesInterfaceNoParent()
@@ -289,7 +293,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     private void interfacesHelper(Class clazz, Class stopClazz, boolean strict, Class... expectedClazzes)
     {
-        assertEquals(new HashSet<Class>(Arrays.asList(expectedClazzes)), ReflectionUtils.getImplementedInterfaces(clazz, stopClazz, strict));
+        assertEquals(new HashSet<Class>(asList(expectedClazzes)), ReflectionUtils.getImplementedInterfaces(clazz, stopClazz, strict));
     }
 
     public void testAcceptsParametersNoParams() throws Exception
@@ -576,66 +580,194 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         }
     }
 
+    public void testGetDeclaredFields()
+    {
+        declaredFieldsHelper(Fields.class, null,
+                             "inheritedPrivateField",
+                             "inheritedProtectedField",
+                             "inheritedPublicField",
+                             "privateField",
+                             "protectedField",
+                             "publicField",
+                             "publicFinalField");
+    }
+
+    public void testGetDeclaredFieldsStopClass()
+    {
+        declaredFieldsHelper(Fields.class, SuperFields.class,
+                             "privateField",
+                             "protectedField",
+                             "publicField",
+                             "publicFinalField");
+    }
+
+    private void declaredFieldsHelper(Class clazz, Class stopClazz, String... expected)
+    {
+        List<String> names = map(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameMapping());
+        Collections.sort(names);
+        assertEquals(asList(expected), names);
+    }
+
+    public void testGetDeclaredFieldNoSuchField()
+    {
+        assertNull(ReflectionUtils.getDeclaredField(Fields.class, null, "nosuchfield"));
+    }
+
+    public void testGetDeclaredFieldPublic()
+    {
+        getDeclaredFieldHelper(Fields.class, null, "publicField");
+    }
+
+    public void testGetDeclaredFieldPrivate()
+    {
+        getDeclaredFieldHelper(Fields.class, null, "privateField");
+    }
+
+    public void testGetDeclaredFieldInheritedPublic()
+    {
+        getDeclaredFieldHelper(Fields.class, null, "inheritedPublicField");
+    }
+
+    public void testGetDeclaredFieldInheritedPrivate()
+    {
+        getDeclaredFieldHelper(Fields.class, null, "inheritedPrivateField");
+    }
+
+    public void testGetDeclaredFieldStopClassPrivate()
+    {
+        getDeclaredFieldHelper(Fields.class, SuperFields.class, "privateField");
+    }
+
+    public void testGetDeclaredFieldStopClassInheritedPrivate()
+    {
+        assertNull(ReflectionUtils.getDeclaredField(Fields.class, SuperFields.class, "inheritedPrivateField"));
+    }
+
+    private void getDeclaredFieldHelper(Class<Fields> clazz, Class stopClazz, String fieldName)
+    {
+        Field field = ReflectionUtils.getDeclaredField(clazz, stopClazz, fieldName);
+        assertNotNull(field);
+        assertEquals(fieldName, field.getName());
+    }
+
+    public void testGetRequiredDeclaredField() throws NoSuchFieldException
+    {
+        Field field = ReflectionUtils.getRequiredDeclaredField(Fields.class, null, "publicField");
+        assertNotNull(field);
+        assertEquals("publicField", field.getName());
+    }
+
+    public void testGetRequiredDeclaredFieldNotFound()
+    {
+        try
+        {
+            ReflectionUtils.getRequiredDeclaredField(Fields.class, null, "nosuchfield");
+            fail("Should throw when field not found");
+        }
+        catch (NoSuchFieldException e)
+        {
+            assertThat(e.getMessage(), containsString("Field 'nosuchfield' does not exist in class"));
+        }
+    }
+
+    public void testSetFieldByNamePublicField() throws BeanException, NoSuchFieldException
+    {
+        setFieldByNameHelper("publicField");
+    }
+
+    public void testSetFieldByNameProtectedField() throws BeanException, NoSuchFieldException
+    {
+        setFieldByNameHelper("protectedField");
+    }
+
+    public void testSetFieldByNamePrivateField() throws NoSuchFieldException, BeanException
+    {
+        setFieldByNameHelper("privateField");
+    }
+
+    public void testSetFieldByNameInheritedPublicField() throws NoSuchFieldException, BeanException
+    {
+        setFieldByNameHelper("inheritedPublicField");
+    }
+
+    public void testSetFieldByNameInheritedProtectedField() throws NoSuchFieldException, BeanException
+    {
+        setFieldByNameHelper("inheritedProtectedField");
+    }
+
+    public void testSetFieldByNameInheritedPrivateField() throws NoSuchFieldException, BeanException
+    {
+        setFieldByNameHelper("inheritedPrivateField");
+    }
+
     public void testSetFieldPublicField() throws NoSuchFieldException, BeanException
     {
-        setFieldHelper(SetFieldValue.class.getDeclaredField("publicField"));
+        setFieldHelper(Fields.class.getDeclaredField("publicField"));
     }
 
     public void testSetFieldProtectedField() throws NoSuchFieldException, BeanException
     {
-        setFieldHelper(SetFieldValue.class.getDeclaredField("protectedField"));
+        setFieldHelper(Fields.class.getDeclaredField("protectedField"));
     }
 
     public void testSetFieldPrivateField() throws NoSuchFieldException, BeanException
     {
-        setFieldHelper(SetFieldValue.class.getDeclaredField("privateField"));
+        setFieldHelper(Fields.class.getDeclaredField("privateField"));
     }
 
     public void testSetFieldInheritedPublicField() throws NoSuchFieldException, BeanException
     {
-        setFieldHelper(SuperSetFieldValue.class.getDeclaredField("inheritedPublicField"));
+        setFieldHelper(SuperFields.class.getDeclaredField("inheritedPublicField"));
     }
 
     public void testSetFieldInheritedProtectedField() throws NoSuchFieldException, BeanException
     {
-        setFieldHelper(SuperSetFieldValue.class.getDeclaredField("inheritedProtectedField"));
+        setFieldHelper(SuperFields.class.getDeclaredField("inheritedProtectedField"));
     }
 
     public void testSetFieldInheritedPrivateField() throws NoSuchFieldException, BeanException
     {
-        setFieldHelper(SuperSetFieldValue.class.getDeclaredField("inheritedPrivateField"));
+        setFieldHelper(SuperFields.class.getDeclaredField("inheritedPrivateField"));
     }
 
     public void testSetFieldFinalField() throws NoSuchFieldException
     {
         try
         {
-            ReflectionUtils.setFieldValue(new SetFieldValue(), SetFieldValue.class.getDeclaredField("publicFinalField"), new Object());
+            ReflectionUtils.setFieldValue(new Fields(), Fields.class.getDeclaredField("publicFinalField"), new Object());
             fail("Should not be able to set final field");
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals("Cannot set final field 'com.zutubi.util.reflection.ReflectionUtilsTest$SetFieldValue.publicFinalField', even if it succeeds it may have no effect due to compiler optimisations", e.getMessage());
+            assertEquals("Cannot set final field 'com.zutubi.util.reflection.ReflectionUtilsTest$Fields.publicFinalField', even if it succeeds it may have no effect due to compiler optimisations", e.getMessage());
         }
     }
 
     public void testSetFieldPreservesAccessibility() throws NoSuchFieldException, BeanException
     {
-        Field field = SetFieldValue.class.getDeclaredField("privateField");
+        Field field = Fields.class.getDeclaredField("privateField");
         assertFalse(field.isAccessible());
-        ReflectionUtils.setFieldValue(new SetFieldValue(), field, new Object());
+        ReflectionUtils.setFieldValue(new Fields(), field, new Object());
         assertFalse(field.isAccessible());
+    }
+
+    private void setFieldByNameHelper(String name) throws BeanException, NoSuchFieldException
+    {
+        Fields instance = new Fields();
+        Object value = new Object();
+        ReflectionUtils.setFieldValue(instance, name, value);
+        assertSame(value, BeanUtils.getProperty(name, instance));
     }
 
     private void setFieldHelper(Field field) throws BeanException
     {
-        SetFieldValue instance = new SetFieldValue();
+        Fields instance = new Fields();
         Object value = new Object();
         ReflectionUtils.setFieldValue(instance, field, value);
         assertSame(value, BeanUtils.getProperty(field.getName(), instance));
     }
 
-    public static class SuperSetFieldValue
+    public static class SuperFields
     {
         private Object inheritedPrivateField = null;
         protected Object inheritedProtectedField;
@@ -657,7 +789,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         }
     }
 
-    public static class SetFieldValue extends SuperSetFieldValue
+    public static class Fields extends SuperFields
     {
         private Object privateField = null;
         protected Object protectedField;
@@ -971,5 +1103,13 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     public class ExtensionOfInvokeMethod extends InvokeMethod
     {
 
+    }
+
+    private static class FieldNameMapping implements Mapping<Field, String>
+    {
+        public String map(Field field)
+        {
+            return field.getName();
+        }
     }
 }

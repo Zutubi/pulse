@@ -62,6 +62,8 @@
 
     <bean id="serverRecipeService" class="com.zutubi.pulse.servercore.ServerRecipeService" init-method="init"/>
 
+    <bean id="synchronisationTaskExecutor" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor"/>
+
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 
     <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
@@ -112,4 +114,5 @@
     </bean>
     <alias name="dependencyManager" alias="ivyManager"/>
 
+    <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init"/>
 </beans>

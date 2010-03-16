@@ -3,8 +3,11 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Service for communication with agents.
@@ -42,4 +45,14 @@ public interface AgentService
      * @param recipeId the recipe to terminate
      */
     void terminateRecipe(long recipeId);
+
+    /**
+     * Synchronises the agent by processing all of the given messages.
+     * Messages are converted to tasks, the tasks executed and the results
+     * returned.
+     *
+     * @param messages messages to process
+     * @return results corresponding results for each of the messages
+     */
+    List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages);
 }

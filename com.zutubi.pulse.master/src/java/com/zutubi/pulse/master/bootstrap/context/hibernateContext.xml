@@ -184,6 +184,23 @@ This context requires:
         </property>
     </bean>
 
+    <bean id="agentSynchronisationMessageDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentSynchronisationMessageDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+    <bean id="agentSynchronisationMessageDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target">
+            <ref local="agentSynchronisationMessageDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="agentDailyStatisticsDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentDailyStatisticsDao">
         <property name="sessionFactory">
             <ref local="sessionFactory"/>

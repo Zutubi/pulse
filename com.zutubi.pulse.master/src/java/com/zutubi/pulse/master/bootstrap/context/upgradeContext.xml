@@ -128,6 +128,7 @@
                 <ref local="addDependencySyncField"/>
                 <ref local="addSubversionUseExport"/>
                 <ref local="addAgentSynchronisingTime"/>
+                <ref local="addAgentSynchronisationMessages"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -624,6 +625,15 @@
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="addAgentSynchronisationMessages" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201999003"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-02.hbm.xml</value>
             </list>
         </property>
     </bean>

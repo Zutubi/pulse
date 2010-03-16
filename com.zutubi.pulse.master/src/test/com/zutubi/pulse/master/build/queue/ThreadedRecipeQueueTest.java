@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.*;
@@ -25,6 +26,8 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -36,8 +39,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
@@ -677,6 +678,26 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Not implemented");
         }
 
+        public void enqueueSynchronisationMessage(Agent agent, SynchronisationMessage message, String description)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void dequeueSynchronisationMessage(AgentSynchronisationMessage message)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void saveSynchronisationMessages(List<AgentSynchronisationMessage> message)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public Agent getAgent(String name)
         {
             throw new RuntimeException("Method not implemented.");
@@ -732,6 +753,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public void terminateRecipe(long recipeId)
         {
             throw new RuntimeException("Method not implemented.");
+        }
+
+        public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+        {
+            return Collections.emptyList();
         }
 
         public long getType()

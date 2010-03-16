@@ -10,11 +10,15 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.ServerRecipeService;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A service to communicate with agents running within the master.
@@ -27,6 +31,7 @@ public class MasterAgentService implements AgentService
     private MasterConfigurationManager configurationManager;
     private ObjectFactory objectFactory;
     private ResourceManager resourceManager;
+    private SynchronisationTaskExecutor synchronisationTaskExecutor;
 
     public MasterAgentService(AgentConfiguration agentConfig)
     {
@@ -104,6 +109,11 @@ public class MasterAgentService implements AgentService
         serverRecipeService.terminateRecipe(agentConfig.getHandle(), recipeId);
     }
 
+    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+    {
+        return synchronisationTaskExecutor.synchronise(messages);
+    }
+
     @Override
     public boolean equals(Object obj)
     {
@@ -134,5 +144,10 @@ public class MasterAgentService implements AgentService
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
+    }
+
+    public void setSynchronisationTaskExecutor(SynchronisationTaskExecutor synchronisationTaskExecutor)
+    {
+        this.synchronisationTaskExecutor = synchronisationTaskExecutor;
     }
 }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.build.log;
 
-import com.zutubi.pulse.master.cleanup.FileDeletionService;
+import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.util.CircularBuffer;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.ZipUtils;

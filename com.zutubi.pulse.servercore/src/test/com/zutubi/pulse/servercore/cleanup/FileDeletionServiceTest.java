@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.cleanup;
+package com.zutubi.pulse.servercore.cleanup;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;

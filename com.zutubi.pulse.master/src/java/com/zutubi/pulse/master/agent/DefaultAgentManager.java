@@ -13,15 +13,18 @@ import com.zutubi.pulse.master.events.AgentRemovedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
+import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
@@ -64,6 +67,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private SlaveProxyFactory slaveProxyFactory;
     private ThreadFactory threadFactory;
     private AgentStateDao agentStateDao;
+    private AgentSynchronisationMessageDao agentSynchronisationMessageDao;
     private ProjectManager projectManager;
     private HostManager hostManager;
 
@@ -201,6 +205,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         if (agentState != null)
         {
             projectManager.removeReferencesToAgent(id);
+            agentSynchronisationMessageDao.deleteByAgentState(agentState);
             agentStateDao.delete(agentState);
         }
     }
@@ -287,6 +292,42 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         if (agentStatisticsManager != null)
         {
             agentStatisticsManager.update();
+        }
+    }
+
+    public void enqueueSynchronisationMessage(Agent agent, SynchronisationMessage message, String description)
+    {
+        AgentState agentState = agentStateDao.findById(agent.getId());
+        if (agentState != null)
+        {
+            AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, description);
+            agentSynchronisationMessageDao.save(agentMessage);
+        }
+    }
+
+    public void dequeueSynchronisationMessage(AgentSynchronisationMessage message)
+    {
+        agentSynchronisationMessageDao.delete(message);
+    }
+
+    public void saveSynchronisationMessages(List<AgentSynchronisationMessage> messages)
+    {
+        for (AgentSynchronisationMessage message: messages)
+        {
+            agentSynchronisationMessageDao.save(message);
+        }
+    }
+
+    public List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent)
+    {
+        AgentState agentState = agentStateDao.findById(agent.getId());
+        if (agentState != null)
+        {
+            return agentSynchronisationMessageDao.findByAgentState(agentState);
+        }
+        else
+        {
+            return Collections.emptyList();
         }
     }
 
@@ -527,5 +568,10 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public void setHostManager(HostManager hostManager)
     {
         this.hostManager = hostManager;
+    }
+
+    public void setAgentSynchronisationMessageDao(AgentSynchronisationMessageDao agentSynchronisationMessageDao)
+    {
+        this.agentSynchronisationMessageDao = agentSynchronisationMessageDao;
     }
 }

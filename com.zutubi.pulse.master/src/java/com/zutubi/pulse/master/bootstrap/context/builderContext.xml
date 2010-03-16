@@ -128,6 +128,8 @@
 
     <bean id="serverRecipeService" class="com.zutubi.pulse.servercore.ServerRecipeService" init-method="init"/>
 
+    <bean id="synchronisationTaskExecutor" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor"/>
+
     <bean id="buildResultRenderer" class="com.zutubi.pulse.master.notifications.renderer.FreemarkerBuildResultRenderer"/>
 
     <bean id="renderService" class="com.zutubi.pulse.master.notifications.renderer.DefaultRenderService"/>
@@ -266,4 +268,6 @@
     <bean id="lastAccessManager" class="com.zutubi.pulse.master.security.LastAccessManager" init-method="init" autowire="byName"/>
 
     <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener" autowire="byName"/>
+
+    <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init"/>
 </beans>

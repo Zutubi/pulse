@@ -1,9 +1,9 @@
-package com.zutubi.pulse.master.cleanup;
+package com.zutubi.pulse.servercore.cleanup;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.i18n.Messages;
 
 import java.io.File;
 import java.util.concurrent.Callable;

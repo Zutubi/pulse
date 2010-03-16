@@ -157,7 +157,61 @@ public class ReflectionUtils
 
         return result;
     }
-    
+
+    /**
+     * Returns the field with the given name declared by a class or one of its
+     * supertypes (up to, but not including, the given stop class).  All fields
+     * are found using {@link #getDeclaredFields(Class, Class)}, then the field
+     * with the given name is found within that set (if it exists).
+     *
+     * @param clazz     class to get the field for
+     * @param stopClazz ancestor class at which to stop traversing the
+     *                  hierarchy, may be null to indicate the entire hierarchy
+     *                  should be traversed
+     * @param fieldName the name of the field to found
+     * @return the found field, or null if no such field exists
+     *
+     * @see #getRequiredDeclaredField(Class, Class, String)
+     * @see #getDeclaredFields(Class, Class)
+     */
+    public static Field getDeclaredField(Class clazz, Class stopClazz, final String fieldName)
+    {
+        Set<Field> fieldSet = getDeclaredFields(clazz, stopClazz);
+        return CollectionUtils.find(fieldSet, new Predicate<Field>()
+        {
+            public boolean satisfied(Field field)
+            {
+                return field.getName().equals(fieldName);
+            }
+        });
+    }
+
+    /**
+     * Identical to {@link #getDeclaredField(Class, Class, String)}, but throws
+     * a {@link NoSuchFieldException} if the field is not found, rather than
+     * returning null.
+     *
+     * @param clazz     class to get the field for
+     * @param stopClazz ancestor class at which to stop traversing the
+     *                  hierarchy, may be null to indicate the entire hierarchy
+     *                  should be traversed
+     * @param fieldName the name of the field to found
+     * @return the found field
+     * @throws NoSuchFieldException if the field is not found
+     *
+     * @see #getDeclaredField(Class, Class, String)
+     * @see #getDeclaredFields(Class, Class)
+     */
+    public static Field getRequiredDeclaredField(Class clazz, Class stopClazz, final String fieldName) throws NoSuchFieldException
+    {
+        Field field = getDeclaredField(clazz, stopClazz, fieldName);
+        if (field == null)
+        {
+            throw new NoSuchFieldException("Field '" + fieldName + "' does not exist in class '" + clazz + " or any of its searched supertypes");
+        }
+        return field;
+    }
+
     /**
      * Returns true if the given method will accept parameters of the given
      * types.  Unlike {@link Class#getMethod(String, Class[])}, the parameter
@@ -304,9 +358,31 @@ public class ReflectionUtils
 
     public static Object getFieldValue(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException
     {
-        Field f = target.getClass().getDeclaredField(fieldName);
+        Field f = getRequiredDeclaredField(target.getClass(), null, fieldName);
         f.setAccessible(true);
         return f.get(target);
+    }
+
+    /**
+     * Sets the given instance's field with the given name to the given value
+     * via reflection, working around any accessibility constraint (e.g. fields
+     * declared private) if possible.  Note that final fields can not be set in
+     * this way.
+     *
+     * @param instance  the instance to set the field on
+     * @param fieldName the name of the field to set, must not be final
+     * @param value     the new field value, automatically unwrapped if the
+     *                  field is primitive
+     * @throws NoSuchFieldException if no field with the given name is found
+     * @throws IllegalArgumentException if the field does not match the
+     *         instance, is final or may not be made accessible
+     *
+     * @see #setFieldValue(Object, java.lang.reflect.Field, Object)
+     * @see Field#set(Object, Object)
+     */
+    public static void setFieldValue(Object instance, String fieldName, Object value) throws NoSuchFieldException
+    {
+        setFieldValue(instance, getRequiredDeclaredField(instance.getClass(), null, fieldName), value);
     }
 
     /**
@@ -322,6 +398,7 @@ public class ReflectionUtils
      * @throws IllegalArgumentException if the field does not match the
      *         instance, is final or may not be made accessible
      *
+     * @see #setFieldValue(Object, String, Object) 
      * @see Field#set(Object, Object) 
      */
     public static void setFieldValue(Object instance, Field field, Object value)

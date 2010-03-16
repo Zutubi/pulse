@@ -6,6 +6,9 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
@@ -20,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general
@@ -35,6 +39,7 @@ public class SlaveAgentService implements AgentService
     private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
     private MasterLocationProvider masterLocationProvider;
+    private SynchronisationTaskExecutor synchronisationTaskExecutor;
 
     public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
@@ -165,6 +170,11 @@ public class SlaveAgentService implements AgentService
         }
     }
 
+    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+    {
+        return synchronisationTaskExecutor.synchronise(messages);
+    }
+
     public AgentConfiguration getAgentConfig()
     {
         return agentConfig;
@@ -200,5 +210,10 @@ public class SlaveAgentService implements AgentService
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setSynchronisationTaskExecutor(SynchronisationTaskExecutor synchronisationTaskExecutor)
+    {
+        this.synchronisationTaskExecutor = synchronisationTaskExecutor;
     }
 }
