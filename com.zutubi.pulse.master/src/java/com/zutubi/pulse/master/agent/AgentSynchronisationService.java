@@ -128,11 +128,6 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     agentManager.dequeueSynchronisationMessage(completed.get(i));
                 }
             }
-
-            private void complete(boolean successful)
-            {
-            }
-
         });
     }
 
