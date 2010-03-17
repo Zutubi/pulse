@@ -20,6 +20,7 @@ import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collection;
@@ -325,10 +326,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             while (!stopRequested)
             {
-                List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
+                final List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
                 long currentTime = System.currentTimeMillis();
 
-                for (RecipeAssignmentRequest request : requestQueue)
+                for (final RecipeAssignmentRequest request : requestQueue)
                 {
                     if(request.hasTimedOut(currentTime))
                     {
@@ -337,19 +338,28 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     }
                     else
                     {
-                        Iterable<Agent> agentList = agentSorter.sort(agentManager.getAvailableAgents(), request);
-                        for (Agent agent : agentList)
+                        agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
                         {
-                            AgentService service = agent.getService();
-
-                            // can the request be sent to this service?
-                            if (request.getHostRequirements().fulfilledBy(request, service))
+                            public void run(List<Agent> agents)
                             {
-                                eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
-                                doneRequests.add(request);
-                                break;
+                                // Note that this method must be fast - we are locking agents.
+                                // The lock is require to prevent the agent state changing
+                                // before we assign the recipe to it.
+                                Iterable<Agent> agentList = agentSorter.sort(agents, request);
+                                for (Agent agent : agentList)
+                                {
+                                    AgentService service = agent.getService();
+
+                                    // can the request be sent to this service?
+                                    if (request.getHostRequirements().fulfilledBy(request, service))
+                                    {
+                                        eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
+                                        doneRequests.add(request);
+                                        break;
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
                 }
 

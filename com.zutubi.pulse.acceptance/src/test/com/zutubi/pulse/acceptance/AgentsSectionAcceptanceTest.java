@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -306,6 +307,29 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         assertEquals(1, statusPage.getSynchronisationMessageCount());
         expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.SUCCEEDED);
         assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
+    }
+
+    public void testMultipleSynchronisationMessages() throws Exception
+    {
+        final int MESSAGE_COUNT = 12;
+
+        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+        for (int i = 0; i < MESSAGE_COUNT; i++)
+        {
+            xmlRpcHelper.enqueueSynchronisationMessage(random, "Description " + i, true);
+        }
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+
+        loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
+        assertEquals(COMPLETED_MESSAGE_LIMIT, statusPage.getSynchronisationMessageCount());
+        int offset = MESSAGE_COUNT - COMPLETED_MESSAGE_LIMIT;
+        for (int i = 0; i < COMPLETED_MESSAGE_LIMIT; i++)
+        {
+            AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "Description " + (i + offset), AgentSynchronisationMessage.Status.SUCCEEDED);
+            assertEquals(expectedMessage, statusPage.getSynchronisationMessage(i));
+        }
     }
 
     private void assertBuildingStatus(String status)

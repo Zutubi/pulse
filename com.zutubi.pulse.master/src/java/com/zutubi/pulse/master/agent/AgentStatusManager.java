@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
@@ -88,6 +89,30 @@ public class AgentStatusManager implements EventListener
         }
 
         return result;
+    }
+
+    /**
+     * Allows a callback to be run under the agents lock.  During this lock no
+     * agent states will change.  Note that this lock can only be held for a
+     * very short time, so the given callback musts be fast.  This method is
+     * package local as it is not spread the ability to take this lock too
+     * widely.  Instead, wrap required logic up into more user-friendly APIs
+     * in, e.g. the {@link AgentManager}.
+     *
+     * @param fn callback to run under the lock
+     * @return the return from the callback
+     */
+    <T> T withAgentsLock(NullaryFunction<T> fn)
+    {
+        agentsLock.lock();
+        try
+        {
+            return fn.process();
+        }
+        finally
+        {
+            agentsLock.unlock();
+        }
     }
 
     private void handlePing(AgentPingEvent agentPingEvent)

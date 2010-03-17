@@ -33,8 +33,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
+import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -279,6 +278,26 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         return agents.size();
     }
 
+    public void withAvailableAgents(final UnaryProcedure<List<Agent>> fn)
+    {
+        agentStatusManager.withAgentsLock(new NullaryFunction<Object>()
+        {
+            public Object process()
+            {
+                List<Agent> availableAgents = agentStatusManager.getAgentsByStatusPredicate(new Predicate<AgentStatus>()
+                {
+                    public boolean satisfied(AgentStatus status)
+                    {
+                        return status.isAvailable();
+                    }
+                });
+
+                fn.run(availableAgents);
+                return null;
+            }
+        });
+    }
+
     public AgentStatistics getAgentStatistics(Agent agent)
     {
         return new AgentStatistics(agentStatisticsManager.getStatisticsForAgent(agent.getId()));
@@ -292,14 +311,21 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    public void enqueueSynchronisationMessage(Agent agent, SynchronisationMessage message, String description)
+    public void enqueueSynchronisationMessage(final Agent agent, final SynchronisationMessage message, final String description)
     {
-        AgentState agentState = agentStateDao.findById(agent.getId());
+        final AgentState agentState = agentStateDao.findById(agent.getId());
         if (agentState != null)
         {
-            AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, description);
-            agentSynchronisationMessageDao.save(agentMessage);
-            eventManager.publish(new AgentSynchronisationMessageEnqueuedEvent(this, agent));
+            agentStatusManager.withAgentsLock(new NullaryFunction<Object>()
+            {
+                public Object process()
+                {
+                    AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, description);
+                    agentSynchronisationMessageDao.save(agentMessage);
+                    eventManager.publish(new AgentSynchronisationMessageEnqueuedEvent(this, agent));
+                    return null;
+                }
+            });
         }
     }
 
@@ -327,6 +353,31 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             return Collections.emptyList();
         }
+    }
+
+    public boolean completeSynchronisation(final Agent agent, final boolean successful)
+    {
+        return agentStatusManager.withAgentsLock(new NullaryFunction<Boolean>()
+        {
+            public Boolean process()
+            {
+                if (!successful || noPendingSynchronisationMessages(agent))
+                {
+                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, agent, successful));
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        });
+    }
+
+    private boolean noPendingSynchronisationMessages(Agent agent)
+    {
+        List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agent);
+        return !CollectionUtils.contains(messages, new AgentSynchronisationService.PendingMessagesPredicate());
     }
 
     public void setEnableState(Agent agent, AgentState.EnableState state)
@@ -392,17 +443,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             public boolean satisfied(AgentStatus status)
             {
                 return status.isOnline();
-            }
-        });
-    }
-
-    public List<Agent> getAvailableAgents()
-    {
-        return agentStatusManager.getAgentsByStatusPredicate(new Predicate<AgentStatus>()
-        {
-            public boolean satisfied(AgentStatus status)
-            {
-                return status.isAvailable();
             }
         });
     }

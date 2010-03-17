@@ -32,6 +32,7 @@ import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.util.Constants;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
@@ -603,9 +604,9 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             return new LinkedList<Agent>(onlineAgents);
         }
 
-        public synchronized List<Agent> getAvailableAgents()
+        public synchronized void withAvailableAgents(UnaryProcedure<List<Agent>> fn)
         {
-            return new LinkedList<Agent>(availableAgents);
+            fn.run(new LinkedList<Agent>(availableAgents));
         }
 
         public synchronized Agent getAgent(long handle)
@@ -694,6 +695,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         }
 
         public List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public boolean completeSynchronisation(Agent agent, boolean successful)
         {
             throw new RuntimeException("Method not implemented.");
         }

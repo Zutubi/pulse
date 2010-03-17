@@ -4,7 +4,6 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
-import com.zutubi.pulse.master.events.AgentSynchronisationCompleteEvent;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
@@ -31,10 +30,9 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 {
     private static final Logger LOG = Logger.getLogger(AgentSynchronisationService.class);
 
-    private static final int COMPLETED_MESSAGE_LIMIT = 10;
+    public static final int COMPLETED_MESSAGE_LIMIT = 10;
 
     private AgentManager agentManager;
-    private EventManager eventManager;
 
     public AgentSynchronisationService()
     {
@@ -55,7 +53,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     if (pendingMessages.size() > 0)
                     {
                         setMessagesToProcessing(pendingMessages);
-                        successful = sendPendingMessages(agent, pendingMessages);
+                        successful = sendPendingMessages(pendingMessages);
                     }
 
                     cleanupOldCompletedMessages(messages);
@@ -66,7 +64,11 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                 }
                 finally
                 {
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, agent, successful));
+                    if (!agentManager.completeSynchronisation(agent, successful))
+                    {
+                        // More messages have come in, go around again.
+                        syncAgent(agent);
+                    }
                 }
             }
 
@@ -79,54 +81,59 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 
                 agentManager.saveSynchronisationMessages(pendingMessages);
             }
-        });
-    }
 
-    private boolean sendPendingMessages(Agent agent, List<AgentSynchronisationMessage> pendingMessages)
-    {
-        List<SynchronisationMessage> toSend = map(pendingMessages, new ExtractMessageMapping());
-
-        AgentService service = agent.getService();
-        List<SynchronisationMessageResult> results;
-        try
-        {
-            results = service.synchronise(toSend);
-        }
-        catch (Exception e)
-        {
-            // Could not complete the service call.  Mark messages for retry later.
-            LOG.warning("Unabled to synchronise agent '" + agent.getName() + "': " + e.getMessage(), e);
-            for (AgentSynchronisationMessage pending : pendingMessages)
+            private boolean sendPendingMessages(List<AgentSynchronisationMessage> pendingMessages)
             {
-                pending.applySendingException(e);
+                List<SynchronisationMessage> toSend = map(pendingMessages, new ExtractMessageMapping());
+
+                AgentService service = agent.getService();
+                List<SynchronisationMessageResult> results;
+                try
+                {
+                    results = service.synchronise(toSend);
+                }
+                catch (Exception e)
+                {
+                    // Could not complete the service call.  Mark messages for retry later.
+                    LOG.warning("Unabled to synchronise agent '" + agent.getName() + "': " + e.getMessage(), e);
+                    for (AgentSynchronisationMessage pending : pendingMessages)
+                    {
+                        pending.applySendingException(e);
+                    }
+                    agentManager.saveSynchronisationMessages(pendingMessages);
+
+                    return false;
+                }
+
+                applyResults(results, pendingMessages);
+                return true;
             }
-            agentManager.saveSynchronisationMessages(pendingMessages);
 
-            return false;
-        }
+            private void applyResults(List<SynchronisationMessageResult> results, List<AgentSynchronisationMessage> pendingMessages)
+            {
+                for (int i = 0; i < results.size(); i++)
+                {
+                    AgentSynchronisationMessage pending = pendingMessages.get(i);
+                    SynchronisationMessageResult result = results.get(i);
+                    pending.applyResult(result);
+                }
+                agentManager.saveSynchronisationMessages(pendingMessages);
+            }
 
-        applyResults(results, pendingMessages);
-        return true;
-    }
+            private void cleanupOldCompletedMessages(List<AgentSynchronisationMessage> messages)
+            {
+                List<AgentSynchronisationMessage> completed = filter(messages, new InvertedPredicate<AgentSynchronisationMessage>(new PendingMessagesPredicate()));
+                for (int i = 0; i < completed.size() - COMPLETED_MESSAGE_LIMIT; i++)
+                {
+                    agentManager.dequeueSynchronisationMessage(completed.get(i));
+                }
+            }
 
-    private void applyResults(List<SynchronisationMessageResult> results, List<AgentSynchronisationMessage> pendingMessages)
-    {
-        for (int i = 0; i < results.size(); i++)
-        {
-            AgentSynchronisationMessage pending = pendingMessages.get(i);
-            SynchronisationMessageResult result = results.get(i);
-            pending.applyResult(result);
-        }
-        agentManager.saveSynchronisationMessages(pendingMessages);
-    }
+            private void complete(boolean successful)
+            {
+            }
 
-    private void cleanupOldCompletedMessages(List<AgentSynchronisationMessage> messages)
-    {
-        List<AgentSynchronisationMessage> completed = filter(messages, new InvertedPredicate<AgentSynchronisationMessage>(new PendingMessagesPredicate()));
-        for (int i = 0; i < completed.size() - COMPLETED_MESSAGE_LIMIT; i++)
-        {
-            agentManager.dequeueSynchronisationMessage(completed.get(i));
-        }
+        });
     }
 
     public void handleEvent(Event event)
@@ -151,10 +158,9 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
     public void setEventManager(EventManager eventManager)
     {
         eventManager.register(this);
-        this.eventManager = eventManager;
     }
 
-    private static class PendingMessagesPredicate implements Predicate<AgentSynchronisationMessage>
+    public static class PendingMessagesPredicate implements Predicate<AgentSynchronisationMessage>
     {
         public boolean satisfied(AgentSynchronisationMessage message)
         {

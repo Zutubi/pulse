@@ -41,6 +41,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     private AgentState agentState;
     private AgentService agentService;
     private DefaultAgent agent;
+    private AgentManager agentManager;
 
     @Override
     protected void setUp() throws Exception
@@ -55,7 +56,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         agent = new DefaultAgent(new AgentConfiguration("test"), agentState, agentService, new DefaultHost(new HostState()));
 
-        AgentManager agentManager = mock(AgentManager.class);
+        agentManager = mock(AgentManager.class);
         doAnswer(new Answer<List<AgentSynchronisationMessage>>()
         {
             public List<AgentSynchronisationMessage> answer(InvocationOnMock invocationOnMock) throws Throwable
@@ -91,6 +92,16 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             }
         }).when(agentManager).dequeueSynchronisationMessage(Matchers.<AgentSynchronisationMessage>anyObject());
 
+        doAnswer(new Answer<Boolean>()
+        {
+            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Object[] args = invocationOnMock.getArguments();
+                eventManager.publish(new AgentSynchronisationCompleteEvent(this, (Agent) args[0], (Boolean) args[1]));
+                return true;
+            }
+        }).when(agentManager).completeSynchronisation(Matchers.<Agent>anyObject(), anyBoolean());
+        
         eventManager = new DefaultEventManager();
         listener = new RecordingEventListener(AgentSynchronisationCompleteEvent.class);
         eventManager.register(listener);
@@ -259,6 +270,42 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         awaitEvent();
         assertEquals(10, messages.size());
         assertEquals(firstId + 2, messages.get(0).getId());
+    }
+
+    public void testCompletionFails()
+    {
+        final boolean[] first = new boolean[]{true};
+        doAnswer(new Answer<Boolean>()
+        {
+            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                // First time through, reject because there is a new message.
+                if (first[0])
+                {
+                    first[0] = false;
+                    results.clear();
+                    enqueueSuccessfulMessage();
+                    return false;
+                }
+                else
+                {
+                    Object[] args = invocationOnMock.getArguments();
+                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, (Agent) args[0], (Boolean) args[1]));
+                    return true;
+                }
+            }
+        }).when(agentManager).completeSynchronisation(Matchers.<Agent>anyObject(), anyBoolean());
+
+        enqueueSuccessfulMessage();
+
+        publishStatusChange();
+
+        awaitEvent();
+        assertEquals(2, messages.size());
+        AgentSynchronisationMessage savedMessage = messages.get(0);
+        assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, savedMessage.getStatus());
+        savedMessage = messages.get(1);
+        assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, savedMessage.getStatus());
     }
 
     private AgentSynchronisationMessage enqueueSuccessfulMessage()

@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.List;
 
@@ -24,8 +25,6 @@ public interface AgentManager extends AgentPersistentStatusManager
     @SecureResult
     List<Agent> getOnlineAgents();
     @SecureResult
-    List<Agent> getAvailableAgents();
-    @SecureResult
     Agent getAgent(long handle);
     @SecureResult
     Agent getAgent(AgentConfiguration agent);
@@ -39,6 +38,16 @@ public interface AgentManager extends AgentPersistentStatusManager
     void pingAgent(AgentConfiguration agentConfig);
 
     int getAgentCount();
+
+    /**
+     * Runs a callback with available agents, locking to ensure such
+     * availability does not change while the callback is running.  Note that
+     * this means the callback must run very quickly to avoid blocking other
+     * state changes.
+     *
+     * @param fn callback to run, passed all available agents
+     */
+    void withAvailableAgents(UnaryProcedure<List<Agent>> fn);
 
     /**
      * Returns statistics gathered for the given agent.
@@ -90,4 +99,17 @@ public interface AgentManager extends AgentPersistentStatusManager
      * @return all synchronisation messages for the agent
      */
     List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent);
+
+    /**
+     * Attempts to complete the synchronisation cycle for the given agent and
+     * send out the relevant event.  This may fail if there are new messages
+     * that should be processed now.
+     *
+     * @param agent      agent to try to complete the cycle for
+     * @param successful indicates if sending of the last batch of messages
+     *                   succeeded (if not, the event is always sent indicating
+     *                   the cycle should be retried later)
+     * @return true if the cycle is complete, false if it should re-run
+     */
+    boolean completeSynchronisation(Agent agent, boolean successful);
 }
