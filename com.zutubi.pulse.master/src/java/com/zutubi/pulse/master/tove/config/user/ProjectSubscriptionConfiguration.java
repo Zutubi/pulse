@@ -10,9 +10,12 @@ import com.zutubi.pulse.master.notifications.condition.TrueNotifyCondition;
 import com.zutubi.pulse.master.notifications.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.master.notifications.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.master.notifications.condition.antlr.NotifyConditionTreeParser;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
 import java.io.StringReader;
@@ -23,19 +26,23 @@ import java.util.List;
  * A subscription to results for project builds.
  */
 @SymbolicName("zutubi.projectSubscriptionConfig")
-@Form(fieldOrder = {"name", "projects", "contact", "template"})
+@Form(fieldOrder = {"name", "allProjects", "projects", "labels", "contact", "template"})
 @Classification(single = "favourite")
 @Wire
 public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
 {
     private static final Logger LOG = Logger.getLogger(ProjectSubscriptionConfiguration.class);
 
+    @ControllingCheckbox(uncheckedFields = {"projects", "labels"})
+    boolean allProjects = false;
     /**
      * The projects to which this subscription is associated.  If empty,
      * the subscription is associated with all projects.
      */
     @Reference
     private List<ProjectConfiguration> projects = new LinkedList<ProjectConfiguration>();
+    @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.project.ProjectLabelOptionProvider")
+    private List<String> labels = new LinkedList<String>();
     /**
      * Condition to be satisfied before notifying.
      */
@@ -52,6 +59,16 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
     private ConfigurationProvider configurationProvider;
     private NotifyConditionFactory notifyFactory;
 
+    public boolean isAllProjects()
+    {
+        return allProjects;
+    }
+
+    public void setAllProjects(boolean allProjects)
+    {
+        this.allProjects = allProjects;
+    }
+
     public List<ProjectConfiguration> getProjects()
     {
         return projects;
@@ -60,6 +77,16 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
     public void setProjects(List<ProjectConfiguration> projects)
     {
         this.projects = projects;
+    }
+
+    public List<String> getLabels()
+    {
+        return labels;
+    }
+
+    public void setLabels(List<String> labels)
+    {
+        this.labels = labels;
     }
 
     public SubscriptionConditionConfiguration getCondition()
@@ -74,29 +101,42 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
 
     public boolean conditionSatisfied(BuildResult result)
     {
-        if (result.isPersonal())
+        return !result.isPersonal() && projectMatches(result.getProject()) && getNotifyCondition().satisfied(result, configurationProvider.getAncestorOfType(this, UserConfiguration.class));
+    }
+
+    private boolean projectMatches(Project project)
+    {
+        if (allProjects)
         {
-            return false;
+            return true;
         }
-        
-        Project project = result.getProject();
-        if (getProjects().size() > 0)
+        else
         {
-            boolean matchingProject = false;
-            for (ProjectConfiguration projectConfig : getProjects())
+            for (ProjectConfiguration projectConfig : projects)
             {
                 if (projectConfig.getProjectId() == project.getId())
                 {
-                    matchingProject = true;
+                    return true;
                 }
             }
-            if (!matchingProject)
+
+            List<String> projectLabels = CollectionUtils.map(project.getConfig().getLabels(), new Mapping<LabelConfiguration, String>()
             {
-                return false;
+                public String map(LabelConfiguration labelConfiguration)
+                {
+                    return labelConfiguration.getLabel();
+                }
+            });
+
+            for (String label : labels)
+            {
+                if (projectLabels.contains(label))
+                {
+                    return true;
+                }
             }
         }
-        
-        return getNotifyCondition().satisfied(result, configurationProvider.getAncestorOfType(this, UserConfiguration.class));
+        return false;
     }
 
     public NotifyCondition getNotifyCondition()

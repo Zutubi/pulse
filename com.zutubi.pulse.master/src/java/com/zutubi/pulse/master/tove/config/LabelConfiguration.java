@@ -11,6 +11,15 @@ public class LabelConfiguration extends AbstractConfiguration
 {
     private String label;
 
+    public LabelConfiguration()
+    {
+    }
+
+    public LabelConfiguration(String label)
+    {
+        this.label = label;
+    }
+
     public String getLabel()
     {
         return label;

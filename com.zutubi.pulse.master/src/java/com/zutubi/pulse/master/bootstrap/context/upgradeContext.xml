@@ -129,6 +129,7 @@
                 <ref local="addSubversionUseExport"/>
                 <ref local="addAgentSynchronisingTime"/>
                 <ref local="addAgentSynchronisationMessages"/>
+                <ref local="subscribeByLabel"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -636,5 +637,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-02.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="subscribeByLabel" class="com.zutubi.pulse.master.upgrade.tasks.SubscribeByLabelUpgradeTask">
+        <property name="buildNumber" value="201999004"/>
     </bean>
 </beans>

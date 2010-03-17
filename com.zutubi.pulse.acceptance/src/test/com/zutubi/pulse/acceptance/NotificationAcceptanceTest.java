@@ -2,8 +2,11 @@ package com.zutubi.pulse.acceptance;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
@@ -20,12 +23,8 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
 
-import java.util.*;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import com.zutubi.pulse.core.engine.api.ResultState;
-
 import static java.util.Arrays.asList;
+import java.util.*;
 
 /**
  * Sanity acceptance tests for notifications.
@@ -50,11 +49,12 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private SimpleSmtpServer server;
     private String random;
 
-    private static final String BUILDS_ALL = "A";
-    private static final String BUILDS_SUCCESSFUL = "B";
-    private static final String BUILDS_FAILED = "C";
-    private static final String BUILDS_PROJECT_SUCCESS = "D";
-    private static final String BUILDS_PROJECT_FAIL = "E";
+    private static final String BUILDS_ALL = "all";
+    private static final String BUILDS_SUCCESSFUL = "success";
+    private static final String BUILDS_FAILED = "failed";
+    private static final String BUILDS_PROJECT_SUCCESS = "project-success";
+    private static final String BUILDS_PROJECT_FAIL = "project-fail";
+    private static final String BUILDS_LABEL_SUCCESS = "label-success";
 
     private static final String PROJECT_SUCCESS = "S";
     private static final String PROJECT_FAIL = "F";
@@ -117,7 +117,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = random + "project" + PROJECT_SUCCESS;
         int buildNumber = xmlRpcHelper.runBuild(projectName);
         assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
-        assertIndividualEmailsTo(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS);
+        assertIndividualEmailsTo(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS, BUILDS_LABEL_SUCCESS);
     }
 
     private void triggerAndCheckFailedBuild() throws Exception
@@ -226,17 +226,20 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // all builds, all projects, can view project b.
         createUserAndGroup(BUILDS_PROJECT_FAIL, CONDITION_ALL_BUILDS);
 
-        createProject(true, PROJECT_SUCCESS, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_SUCCESS);
-        createProject(false, PROJECT_FAIL, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
+        // all builds, by successful label
+        createUserAndGroup(BUILDS_LABEL_SUCCESS, CONDITION_ALL_BUILDS, getLabelForSuffix(PROJECT_SUCCESS));
+
+        createProject(true, PROJECT_SUCCESS, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_SUCCESS, BUILDS_LABEL_SUCCESS);
+        createProject(false, PROJECT_FAIL, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_FAIL, BUILDS_LABEL_SUCCESS);
     }
 
-    void createUserAndGroup(String nameSuffix, int condition) throws Exception
+    void createUserAndGroup(String nameSuffix, int condition, String... labels) throws Exception
     {
-        createUser(random + "user" + nameSuffix, condition);
+        createUser(random + "user" + nameSuffix, condition, labels);
         createGroup(random + "group" + nameSuffix, random + "user" + nameSuffix);
     }
 
-    private void createUser(String name, int condition) throws Exception
+    private void createUser(String name, int condition, String... labels) throws Exception
     {
         String userPath = xmlRpcHelper.insertTrivialUser(name);
 
@@ -248,7 +251,8 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> projectSubscription = xmlRpcHelper.createDefaultConfig(ProjectSubscriptionConfiguration.class);
         projectSubscription.put("name", "all projects");
-        projectSubscription.put("projects", new Vector());
+        projectSubscription.put("allProjects", labels.length == 0);
+        projectSubscription.put("labels", new Vector<String>(asList(labels)));
         projectSubscription.put("contact", userPath + "/preferences/contacts/email");
         projectSubscription.put("template", "plain-text-email");
 
@@ -286,13 +290,14 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void createProject(boolean successful, String nameSuffix, String... viewableBy) throws Exception
     {
         String name = random + "project" + nameSuffix;
+        String projectPath;
         if (successful)
         {
-            xmlRpcHelper.insertSimpleProject(name, false);
+            projectPath = xmlRpcHelper.insertSimpleProject(name, false);
         }
         else
         {
-            xmlRpcHelper.insertSingleCommandProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+            projectPath = xmlRpcHelper.insertSingleCommandProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
         }
 
         // remove all existing permissions so that we are sure they will not get in the way.
@@ -308,7 +313,16 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
             Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
             acl.put("group", "groups/"+random + "group" + groupNameSuffix);
             acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_VIEW)));
-            xmlRpcHelper.insertConfig("projects/" + name + "/permissions", acl);
+            xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "permissions"), acl);
         }
+
+        Hashtable<String, Object> labelConfig = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        labelConfig.put("label", getLabelForSuffix(nameSuffix));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
+    }
+
+    private String getLabelForSuffix(String nameSuffix)
+    {
+        return random + "label" + nameSuffix;
     }
 }
