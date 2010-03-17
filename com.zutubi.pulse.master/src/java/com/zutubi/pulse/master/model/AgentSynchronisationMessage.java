@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
 
 import java.io.PrintWriter;
@@ -48,7 +49,18 @@ public class AgentSynchronisationMessage extends Entity
          * Indicates that the task corresponding to the message failed and the
          * task should not be retried.
          */
-        FAILED_PERMANENTLY
+        FAILED_PERMANENTLY;
+
+        public String getPrettyString()
+        {
+            return EnumUtils.toPrettyString(this);
+        }
+
+        @Override
+        public String toString()
+        {
+            return EnumUtils.toString(this);
+        }
     }
 
     /**

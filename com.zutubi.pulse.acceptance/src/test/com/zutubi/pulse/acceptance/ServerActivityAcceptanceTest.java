@@ -396,7 +396,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         public String getReason()
         {
-            // column 7 because the status column has two cells.
+            // skipped a cell because the status column has two cells.
             return getCell(row, 8);
         }
 

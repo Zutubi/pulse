@@ -27,6 +27,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -37,6 +38,7 @@ import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
+import com.zutubi.pulse.servercore.agent.TestSynchronisationTask;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
@@ -50,8 +52,6 @@ import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -1399,6 +1399,28 @@ public class RemoteApi
         tokenManager.verifyAdmin(token);
         LOG.warning(message);
         return true;
+    }
+
+    /**
+     * @internal Enqueues a test synchronisation message for the given agent.
+     * @param token       authentication token
+     * @param agent       name of the agent to queue the message for
+     * @param description description of the message
+     * @param succeed     true if the task should succeed, false otherwise
+     * @return true
+     */
+    public boolean enqueueSynchronisationMessage(String token, String agent, String description, boolean succeed)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            agentManager.enqueueSynchronisationMessage(internalGetAgent(agent), new TestSynchronisationTask(succeed).toMessage(), description);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     /**
@@ -3753,12 +3775,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = agentManager.getAgent(name);
-            if (agent == null)
-            {
-                throw new IllegalArgumentException("Unknown agent '" + name + "'");
-            }
-
+            Agent agent = internalGetAgent(name);
             return agent.getStatus().getPrettyString();
         }
         finally
@@ -3785,12 +3802,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = agentManager.getAgent(name);
-            if (agent == null)
-            {
-                throw new IllegalArgumentException("Unknown agent '" + name + "'");
-            }
-
+            Agent agent = internalGetAgent(name);
             eventManager.publish(new AgentEnableRequestedEvent(this, agent));
             return true;
         }
@@ -3819,12 +3831,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = agentManager.getAgent(name);
-            if (agent == null)
-            {
-                throw new IllegalArgumentException("Unknown agent '" + name + "'");
-            }
-
+            Agent agent = internalGetAgent(name);
             eventManager.publish(new AgentDisableRequestedEvent(this, agent));
             return true;
         }
@@ -3888,6 +3895,16 @@ public class RemoteApi
 
         List<Project> projects = projectManager.getDescendantProjects(projectName, false, allowInvalid);
         return projects.toArray(new Project[projects.size()]);
+    }
+
+    private Agent internalGetAgent(String name)
+    {
+        Agent agent = agentManager.getAgent(name);
+        if (agent == null)
+        {
+            throw new IllegalArgumentException("Unknown agent '" + name + "'");
+        }
+        return agent;
     }
 
     private BuildResult internalGetBuild(Project project, int id)

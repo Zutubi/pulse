@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -25,6 +26,7 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Pair;
@@ -36,9 +38,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  */
@@ -519,7 +518,7 @@ public class XmlRpcHelper
     }
     
     /**
-     * Wait for the named agents status to be IDLE.
+     * Wait for the named agent's status to be IDLE.
      *
      * @param agentName name of the agent being monitored.
      * @param timeout   timeout after which the method will return an exception if the agent is not yet IDLE.
@@ -528,22 +527,36 @@ public class XmlRpcHelper
      */
     public void waitForAgentToBeIdle(final String agentName, final long timeout)
     {
+        waitForAgentStatus(agentName, AgentStatus.IDLE, timeout);
+    }
+
+    /**
+     * Wait for the named agent to be in the given status.
+     *
+     * @param agentName name of the agent being monitored
+     * @param timeout   timeout after which the method will return an exception
+     *                  if the agent is not yet in the right state
+     *
+     * @throws RuntimeException on timeout.
+     */
+    public void waitForAgentStatus(final String agentName, final AgentStatus status, final long timeout)
+    {
         waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
                 try
                 {
-                    return getAgentStatus(agentName) == AgentStatus.IDLE;
+                    return getAgentStatus(agentName) == status;
                 }
                 catch (Exception e)
                 {
                     throw new RuntimeException(e);
                 }
             }
-        }, timeout, "agent " + agentName + " to become IDLE.");
-
+        }, timeout, "agent '" + agentName + "' to become '" + status + "'");
     }
+
 
     public String insertTrivialProject(String name, boolean template) throws Exception
     {
@@ -680,6 +693,14 @@ public class XmlRpcHelper
         return insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
     }
 
+    public String insertLocalAgent(String name) throws Exception
+    {
+        Hashtable<String, Object> agent = createEmptyConfig("zutubi.agentConfig");
+        agent.put("name", name);
+        agent.put("remote", false);
+        return insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
+    }
+
     public String ensureAgent(String name) throws Exception
     {
         String path = MasterConfigurationRegistry.AGENTS_SCOPE + "/" + name;
@@ -732,6 +753,11 @@ public class XmlRpcHelper
     public void logWarning(String message) throws Exception
     {
         call("logWarning", message);
+    }
+
+    public void enqueueSynchronisationMessage(String agent, String description, boolean succeed) throws Exception
+    {
+        call("enqueueSynchronisationMessage", agent, description, succeed);
     }
 
     public int getNextBuildNumber(String projectName) throws Exception

@@ -1,18 +1,22 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
+import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import static java.util.Arrays.asList;
@@ -26,6 +30,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     private static final String LOCAL_AGENT = "local-agent";
     private static final String HOST_LOCALHOST = "localhost";
     private static final String STATUS_DISABLE_ON_IDLE = "disable on idle";
+    private static final String TEST_DESCRIPTION = "test description";
 
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -229,6 +234,78 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         assertTrue(statisticsPage.isRecipeStatisticsPresent());
         assertTrue(statisticsPage.isUsageStatisticsPresent());
         assertTrue(statisticsPage.isUsageChartPresent());
+    }
+
+    public void testNoSynchronisationMessages() throws Exception
+    {
+        xmlRpcHelper.insertLocalAgent(random);
+        loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
+        assertTrue(statusPage.isSynchronisationTablePresent());
+        assertEquals(0, statusPage.getSynchronisationMessageCount());
+        assertTextPresent("no synchronisation messages found");
+    }
+
+    public void testSimpleSynchronisationMessage() throws Exception
+    {
+        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+        xmlRpcHelper.enqueueSynchronisationMessage(random, "test message", true);
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+
+        loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
+        assertEquals(1, statusPage.getSynchronisationMessageCount());
+        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "test message", AgentSynchronisationMessage.Status.SUCCEEDED);
+        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
+    }
+
+    public void testFailedSynchronisationMessage() throws Exception
+    {
+        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+        xmlRpcHelper.enqueueSynchronisationMessage(random, TEST_DESCRIPTION, false);
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+
+        loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
+        assertEquals(1, statusPage.getSynchronisationMessageCount());
+        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.FAILED_PERMANENTLY);
+        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
+        String statusMessage = statusPage.clickAndWaitForSynchronisationMessageStatus(0);
+        assertThat(statusMessage, containsString("Test failure."));
+    }
+
+    public void testSynchronisationMessageQueuedWhileBuilding() throws Exception
+    {
+        String agentName = random + "-agent";
+        String projectName = random + "-project";
+
+        xmlRpcHelper.insertLocalAgent(agentName);
+
+        WaitProject project = projects.createWaitAntProject(tempDir, projectName);
+        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
+        configurationHelper.insertProject(project.getConfig());
+        xmlRpcHelper.waitForProjectToInitialise(project.getName());
+        xmlRpcHelper.triggerBuild(project.getName());
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+
+        xmlRpcHelper.enqueueSynchronisationMessage(agentName, TEST_DESCRIPTION, true);
+
+        loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
+        assertEquals(1, statusPage.getSynchronisationMessageCount());
+        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.QUEUED);
+        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
+
+        project.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+        xmlRpcHelper.waitForAgentToBeIdle(agentName);
+
+        statusPage.openAndWaitFor();
+        assertEquals(1, statusPage.getSynchronisationMessageCount());
+        expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.SUCCEEDED);
+        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
     }
 
     private void assertBuildingStatus(String status)

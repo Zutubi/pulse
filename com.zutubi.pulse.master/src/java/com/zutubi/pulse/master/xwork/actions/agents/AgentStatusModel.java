@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.Pair;
@@ -18,6 +19,7 @@ public class AgentStatusModel
     private List<Pair<String, String>> statusInfo = new LinkedList<Pair<String, String>>();
     private BuildResult executingBuild;
     private RecipeResultNode executingNode;
+    private List<AgentSynchronisationMessage> synchronisationMessages;
 
     public AgentStatusModel(Agent agent, String location)
     {
@@ -59,5 +61,15 @@ public class AgentStatusModel
     {
         executingBuild = build;
         executingNode = node;
+    }
+
+    public List<AgentSynchronisationMessage> getSynchronisationMessages()
+    {
+        return synchronisationMessages;
+    }
+
+    public void setSynchronisationMessages(List<AgentSynchronisationMessage> synchronisationMessages)
+    {
+        this.synchronisationMessages = synchronisationMessages;
     }
 }

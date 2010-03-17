@@ -252,6 +252,7 @@ public class AgentStatusManager implements EventListener
                 checkForStatusTimeout(agent, "Agent idle after recipe expected to have commenced");
                 break;
 
+            case IDLE:
             case SYNCHRONISED:
                 agent.updateStatus(agentPingEvent);
                 break;
@@ -539,6 +540,20 @@ public class AgentStatusManager implements EventListener
         return recipeId;
     }
 
+    private void handleAgentSynchronisationMessageEnqueued(Agent agent)
+    {
+        Agent existingAgent = agentsById.get(agent.getId());
+        if (existingAgent != null)
+        {
+            AgentStatus currentStatus = existingAgent.getStatus();
+            if (currentStatus == AgentStatus.IDLE || currentStatus == AgentStatus.SYNCHRONISED)
+            {
+                existingAgent.updateStatus(AgentStatus.SYNCHRONISING);
+                publishEvent(new AgentStatusChangeEvent(this, existingAgent, currentStatus, AgentStatus.SYNCHRONISING));
+            }
+        }
+    }
+
     public void publishEvent(final Event event)
     {
         eventPump.execute(new Runnable()
@@ -600,6 +615,10 @@ public class AgentStatusManager implements EventListener
             {
                 handleAgentRemoved(((AgentRemovedEvent) event).getAgent());
             }
+            else if (event instanceof AgentSynchronisationMessageEnqueuedEvent)
+            {
+                handleAgentSynchronisationMessageEnqueued(((AgentSynchronisationMessageEnqueuedEvent) event).getAgent());
+            }
         }
         finally
         {
@@ -624,6 +643,7 @@ public class AgentStatusManager implements EventListener
                 AgentEnableRequestedEvent.class,
                 AgentPingEvent.class,
                 AgentRemovedEvent.class,
+                AgentSynchronisationMessageEnqueuedEvent.class,
                 AgentSynchronisationCompleteEvent.class,
                 RecipeAbortedEvent.class,
                 RecipeCollectedEvent.class,

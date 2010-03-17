@@ -3,13 +3,12 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.DefaultAgent;
 import com.zutubi.pulse.master.agent.Host;
-import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.HostState;
-import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.TimeStamps;
+
+import java.util.List;
 
 /**
  * Action to view the status of a single agent.
@@ -95,6 +94,9 @@ public class ViewAgentStatusAction extends AgentActionBase
         {
             model.addStatusInfo("agent.status", agent.getStatus().getPrettyString());
         }
+
+        List<AgentSynchronisationMessage> synchronisationMessages = agentManager.getSynchronisationMessages(agent);
+        model.setSynchronisationMessages(synchronisationMessages);
 
         return SUCCESS;
     }

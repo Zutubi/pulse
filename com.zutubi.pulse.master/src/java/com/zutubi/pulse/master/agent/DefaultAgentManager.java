@@ -6,10 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.agent.statistics.AgentStatisticsManager;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
-import com.zutubi.pulse.master.events.AgentAddedEvent;
-import com.zutubi.pulse.master.events.AgentChangedEvent;
-import com.zutubi.pulse.master.events.AgentPingRequestedEvent;
-import com.zutubi.pulse.master.events.AgentRemovedEvent;
+import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
@@ -302,6 +299,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, description);
             agentSynchronisationMessageDao.save(agentMessage);
+            eventManager.publish(new AgentSynchronisationMessageEnqueuedEvent(this, agent));
         }
     }
 

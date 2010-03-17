@@ -1,5 +1,7 @@
 package com.zutubi.pulse.servercore.agent;
 
+import com.zutubi.util.EnumUtils;
+
 /**
  * Defines a task run during synchronisation of an agent.  Such tasks must
  * currently:
@@ -32,7 +34,11 @@ public interface SynchronisationTask
          * An instruction to rename a directory, e.g. a persistent working
          * directory that includes a name that has changed in the config.
          */
-        RENAME_DIRECTORY(RenameDirectoryTask.class);
+        RENAME_DIRECTORY(RenameDirectoryTask.class),
+        /**
+         * A task used for testing only.
+         */
+        TEST(TestSynchronisationTask.class);
 
         private Class<? extends SynchronisationTask> clazz;
 
@@ -49,6 +55,17 @@ public interface SynchronisationTask
         public Class<? extends SynchronisationTask> getClazz()
         {
             return clazz;
+        }
+
+        public String getPrettyString()
+        {
+            return EnumUtils.toPrettyString(this);
+        }
+
+        @Override
+        public String toString()
+        {
+            return EnumUtils.toString(this);
         }
     }
 
