@@ -21,9 +21,12 @@ import java.util.regex.Pattern;
  */
 public class BuildChangesPage extends SeleniumPage
 {
-    private static final String ID_CHANGELIST_TABLE = "changelist.summaries";
+    private static final String ID_CHANGES_HEADER = "changes-header";
+    private static final String ID_COMPARE_TO_POPUP = "compare.to";
+    private static final String ID_COMPARE_TO_POPUP_BUTTON = "compare.to_button";
 
-    private static final String FORMAT_ID_CHANGELIST_ROW   = "change.%d";
+    private static final String FORMAT_ID_CHANGELIST = "change.%d";
+    private static final String FORMAT_ID_CHANGELIST_COMMENT = "change.%d.comment";
     private static final String FORMAT_ID_CHANGELIST_FILES = "change.%d.file.%d";
 
     private static final Pattern FILE_CHANGE_PATTERN = Pattern.compile("(.+) #(.+) - (.+)");
@@ -45,24 +48,24 @@ public class BuildChangesPage extends SeleniumPage
         return urls.buildChanges(projectName, Long.toString(buildId));
     }
 
-    public static String formatChangesHeader(long buildNumber)
+    public static String formatChangesSince(long buildNumber)
     {
-        return "changes between build " + Long.toString(buildNumber - 1) + " and build " + buildNumber;
+        return "Showing changes since: build " + (buildNumber - 1);
     }
 
     public boolean hasChanges()
     {
-        return browser.isElementIdPresent(ID_CHANGELIST_TABLE);
+        return browser.isElementIdPresent(ID_CHANGES_HEADER);
     }
 
-    public String getChangesHeader()
+    private String getChangelistId(int changeNumber)
     {
-        return browser.getCellContents(ID_CHANGELIST_TABLE, 0, 0);
+        return String.format(FORMAT_ID_CHANGELIST, changeNumber);
     }
 
-    private String getChangelistRowId(int changeNumber)
+    private String getChangelistCommentId(int changeNumber)
     {
-        return String.format(FORMAT_ID_CHANGELIST_ROW , changeNumber);
+        return String.format(FORMAT_ID_CHANGELIST_COMMENT, changeNumber);
     }
 
     private String getChangelistFileId(int changeNumber, int fileNumber)
@@ -73,7 +76,7 @@ public class BuildChangesPage extends SeleniumPage
     public int getChangeCount()
     {
         int count = 1;
-        while (browser.isElementIdPresent(getChangelistRowId(count)))
+        while (browser.isElementIdPresent(getChangelistId(count)))
         {
             count++;
         }
@@ -131,13 +134,14 @@ public class BuildChangesPage extends SeleniumPage
                 fileChanges.add(new FileChange(matcher.group(1), new Revision(matcher.group(2)), FileChange.Action.fromString(matcher.group(3))));
             }
 
-
-            int row = i * 3 + 2;
+            String changeId = getChangelistId(i + 1);
+            String changeHeader = browser.getCellContents(changeId, 0, 0);
+            String[] headerPieces = changeHeader.split("\\s+");
             Changelist changelist = new Changelist(
-                    new Revision(browser.getCellContents(ID_CHANGELIST_TABLE, row, 0)),
+                    new Revision(headerPieces[0]),
                     0,
-                    browser.getCellContents(ID_CHANGELIST_TABLE, row, 1),
-                    browser.getCellContents(ID_CHANGELIST_TABLE, row, 3),
+                    headerPieces[1],
+                    browser.getText(getChangelistCommentId(i + 1)),
                     fileChanges
             );
 
@@ -147,4 +151,13 @@ public class BuildChangesPage extends SeleniumPage
         return changelists;
     }
 
+    /**
+     * Clicks the button link to pop down the compare to box.  I would like to
+     * add waiting for it to appear, but this fails in Selenium (it keeps
+     * waiting, although I can see the popdown).
+     */
+    public void clickCompareToPopDown()
+    {
+        browser.click(ID_COMPARE_TO_POPUP_BUTTON);
+    }
 }

@@ -598,8 +598,12 @@ th.fit-width, td.fit-width {
     border-right: dotted 1px #bbb;
 }
 
-.understated {
+.understated, .unspacer {
     color: #999;
+}
+
+.unspacer {
+    margin-left: 15px;
 }
 
 td.health-unknown, td.health-ok, td.health-broken, td.health-warnings {
@@ -690,6 +694,43 @@ img.popdown-pressed {
 
 .invalid-configs li {
     margin: 4px 0 4px 0;
+}
+
+/*------------------------------
+Changelists
+*/
+
+p#changes-header {
+    border: dotted 1px #bbb;
+    padding: 6px;
+    background-color: #ffffe8;
+}
+
+.change {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.change-heading {
+    border-top: solid 1px #bbb;
+    border-bottom: dotted 1px #bbb;
+    padding: 4px 5px 4px 10px;
+    background-color: #f2f2ff;
+}
+
+.change-comment {
+    padding: 5px 5px 5px 10px;
+}
+
+.change-files {
+    padding: 0 5px 5px 10px;
+    border-bottom: dotted 1px #bbb;
+    font-size: smaller;
+}
+
+.change-files ul {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 /*------------------------------

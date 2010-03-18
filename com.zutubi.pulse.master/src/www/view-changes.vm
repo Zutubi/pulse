@@ -1,3 +1,14 @@
+#macro(revisionChoice $key $build)
+    #if($build)
+        #set($showLink = !$sinceBuild || $sinceBuild != $build)
+        <tr>
+            <td><a id="compare.to.$key" href="$urls.buildChanges($buildResult)sinceBuild/$build.number/">$action.getText($key)</a></td>
+            <td><a href="$urls.build($build)">#wwtext("name=build") $build.number</a></td>
+            <td>#wwtext("name=revision") $build.revision</td>
+        </tr>
+    #end
+#end
+
 #helpTag("Build+Changes+Tab")
 #authorisationTags($principle)
 #buildTags($project $buildResult)
@@ -11,67 +22,78 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#macro(revisionCell $key $build $showLink)
-    #if($build)
-        #set($revision = "build $build.number")
-        #if($build.revision)
-            #set($revision = "$revision: revision $build.revision")
-        #else
-            #set($revision = "$revision: no revision")
-        #end
-        #if($showLink)
-            #set($linkText = $action.getText("changes.since"))
-            #set($revision = "$revision [<a href='$urls.buildChanges($buildResult)sinceBuild/$build.number/'>$linkText</a>]")
-        #end
-    #else
-        #set($revision = "no build")
-    #end
-    <tr>
-        #contentRowHeading($key)
-        #staticCell($revision)
-    </tr>
-#end
-
-    <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")' class="content">
-        #headingRow("changes.revisions" 2)
-        #revisionCell("changes.build.revision" $buildResult false)
-#if(!$buildResult.userRevision)
-        #revisionCell("changes.previous.revision" $previous true)
-        #revisionCell("changes.previous.successful.revision" $previousSuccessful true)
-        #revisionCell("changes.previous.unsuccessful.revision" $previousUnsuccessful true)
-#end
-    </table>
+    <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")'>
 
 #if($changelists.size() > 0)
+    <p id="changes-header">
+        #wwtext("name=changes.build.revision") $buildResult.revision.
+
+    ##-------------------------------------------------------------------------
+    ## Information about what we are comparing against, and other options.
+    ##-------------------------------------------------------------------------
     #if($sinceResult)
-        #set($title = $action.getText("changes.between", [$sinceResult.number, $buildResult.number]))
-    #else
-        #set($title = $action.getText("changes.in.build", [$buildResult.number]))
+            #wwtext("name=changes.since") <a href="$urls.build($sinceResult)">#wwtext("name=build") $sinceResult.number</a> (#wwtext("name=revision") $sinceResult.revision).
+            #showHideButton("compare.to" "compare.to" "tl-bl?")
+        #if($changelists.size() == 1)
+            #wwtext("name=changes.found.one")
+        #else
+            $action.getText("changes.found.multiple", [$changelists.size()])
+        #end
     #end
-    <table id="changelist.summaries" class="content">
-        #headingRow($title 5)
+    </p>
+
+    ##-------------------------------------------------------------------------
+    ## Changes list (one table per change)
+    ##-------------------------------------------------------------------------
     #foreach($change in $changelists)
         #set($changeIndex = $velocityCount)
-        <tr id="change.${changeIndex}">
-            #contentHeading("change.revision" 1)
-            #contentHeading("change.who" 1)
-            #contentHeading("change.when" 1)
-            #contentHeading("change.comment" 1)
-            #contentHeading("actions" 1)
-        </tr>
         $action.updateChangeUrl($change)
         #set($url = $action.getChangeUrl())
+        #set($commitMessageSupport = $action.getCommitMessageSupport($change))
+        #set($commentId = "${change.id}_comment")
+    <table id="change.${changeIndex}" class="change">
         <tr>
-            #dynamicRightLinkCell($change.revision $url)
-            #dynamicCell($change.author)
-            #dateCell($change)
-            #commitCommentCell($change "changes")
-            #linkCell("view.$change.id" "view" "$urls.buildChangelist($buildResult, $change.id)")
+            <td class="change-heading">
+                <img src="$base/images/page_code.gif" alt="change">
+        #if($url)<a href="$url">#end$!webwork.htmlEncode($change.revision)#if($url)</a>#end
+                <span class="unspacer"></span>
+                <img src="$base/images/user.gif" alt="author">
+                $change.author
+                <span class="unspacer"></span>
+                #dateCellContent($change "" $change.getPrettyDate($locale) $change.prettyTime)
+                <span class="unspacer"></span>
+                <a class="unadorned" href="$urls.buildChangelist($buildResult, $change.id)"><img src="$base/images/magnifier.gif" alt="view details"></a>
+                <a id="view.${change.id}" href="$urls.buildChangelist($buildResult, $change.id)">#wwtext("name=change.details")</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="change-comment" id="change.${changeIndex}.comment">
+        #if ($commitMessageSupport.length > 300)
+                $commitMessageSupport.trim(300)
+                #showHideButton("comments" "${commentId}" "tr-br?")
+                <div id="$commentId" style="display: none">
+                    <table class="content" style="margin: 0">
+                        <tr>
+                            <th class="heading">
+                                <span class="action">
+                                    <a href="#" onclick="showHideFloat('comments', '$commentId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                                </span>
+                                #wwtext("name=change.comment")
+                            </th>
+                        </tr>
+                        <tr>
+                            <td><pre>$commitMessageSupport.wrap(80)</pre></td>
+                        </tr>
+                    </table>
+                </div>
+        #else
+                $commitMessageSupport.wrap(80)
+        #end
+            </td>
         </tr>
         #if($change.changes.size() > 0)
         <tr>
-            <td class="content" colspan="5">
-                <b>#wwtext("name=changes.files")</b>
+            <td class="change-files">
                 <ul>
             #if($change.changes.size() < 5)
                 #set($limit = $change.changes.size() - 1)
@@ -85,23 +107,47 @@
                     <li id="change.${changeIndex}.file.${velocityCount}">$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.toString()</li>
             #end
             #if($remaining > 0)
-                    <li>... ($remaining #wwtext("name=changes.more.files"))</li>
+                    <li>... ($remaining #wwtext("name=change.more.files"))</li>
             #end
                 </ul>
             </td>
         </tr>
         #end
-    #end
     </table>
-#else
-    <p>
-        <td class="content" colspan="5">
-    #if($buildResult.userRevision)
-            #wwtext("name=changes.user.revision")
-    #else
-            #wwtext("name=changes.none")
     #end
-        </td>
+
+    ##-------------------------------------------------------------------------
+    ## Popup to select change to compare against.
+    ##-------------------------------------------------------------------------
+    <div id="compare.to" style="display: none">
+        <table class="content" style="margin: 0">
+            <tr>
+                <th class="heading" colspan="3">
+                    <span class="action">
+                        <a href="#" onclick="showHideFloat('compare.to', 'compare.to'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                    </span>
+                    #wwtext("name=changes.compare.to")
+                </th>
+            </tr>
+            #revisionChoice("changes.previous" $previous)
+            #revisionChoice("changes.previous.successful" $previousSuccessful)
+            #revisionChoice("changes.previous.unsuccessful" $previousUnsuccessful)
+        </table>
+    </div>
+#else
+    ##-------------------------------------------------------------------------
+    ## No changes, tell the user why.
+    ##-------------------------------------------------------------------------
+    <p>
+    #if(!$buildResult.revision)
+        #wwtext("name=changes.no.revision")
+    #elseif($buildResult.userRevision)
+        #wwtext("name=changes.user.revision")
+    #else
+        #wwtext("name=changes.none")
+    #end
     </p>
 #end
+    </div>
+</body>
 </html>
