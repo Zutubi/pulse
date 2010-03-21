@@ -525,6 +525,12 @@
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
+
+        <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">data</result>
+        </action>
+
     </package>
 
     <package name="configAjax" namespace="/aconfig" extends="default">
@@ -720,22 +726,6 @@
 
         <action name="browseResources" class="com.zutubi.pulse.master.xwork.actions.project.BrowseResourcesAction">
             <result name="success" type="velocity">resource-browser.vm</result>
-        </action>
-
-        <action name="new-folder" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
-            <result name="success" type="velocity">tree/browse-new-folder.vm</result>
-        </action>
-
-        <action name="fileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.AddResourceFileDialogAction">
-            <result name="success" type="velocity">tree/filedialog.vm</result>
-        </action>
-
-        <action name="pluginFileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginFileDialogAction">
-            <result name="success" type="velocity">tree/filedialog.vm</result>
-        </action>
-
-        <action name="scmFileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.ScmFileDialogAction">
-            <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
         <action name="reference" class="com.zutubi.pulse.master.xwork.actions.ReferencePopupAction">

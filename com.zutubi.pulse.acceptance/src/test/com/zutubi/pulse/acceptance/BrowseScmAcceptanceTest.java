@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
-import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
+import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.model.ProjectManager;
 
@@ -103,13 +103,6 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
 
-    public void testBrowseLinkAvailableForGitAntProjectConfiguration() throws Exception
-    {
-        AntCommandForm antForm = insertTestGitProjectAndNavigateToCommandConfig();
-        assertTrue(antForm.isBrowseBuildFileLinkPresent());
-        assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
-    }
-
     //---( test the browse window . )---
 
     public void testBrowseSelectionOfScmFile() throws Exception
@@ -118,12 +111,12 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
-        BrowseScmWindow browse = antForm.clickBrowseBuildFile();
+        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
         browse.waitForNode("junit-3.8.1.jar");
         browse.selectNode("junit-3.8.1.jar");
-        browse.clickOkay();
+        browse.clickOk();
 
         assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
     }
@@ -133,12 +126,12 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
 
-        BrowseScmWindow browse = antForm.clickBrowseWorkingDirectory();
+        PulseFileSystemBrowserWindow browse = antForm.clickBrowseWorkingDirectory();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
         assertFalse(browse.isNodePresent("junit-3.8.1.jar"));
         browse.selectNode("lib");
-        browse.clickOkay();
+        browse.clickOk();
 
         assertEquals("lib", antForm.getWorkingDirectoryFieldValue());
     }
@@ -149,7 +142,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
-        BrowseScmWindow browse = antForm.clickBrowseBuildFile();
+        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
         browse.waitForNode("junit-3.8.1.jar");
@@ -164,7 +157,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         antForm.setFieldValue("workingDir", "src");
 
-        BrowseScmWindow browse = antForm.clickBrowseBuildFile();
+        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("java");
         assertFalse(browse.isNodePresent("lib"));
         assertFalse(browse.isNodePresent("build.xml"));
@@ -172,7 +165,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.expandPath("java", "com", "zutubi", "testant");
         browse.waitForNode("Unit.java");
         browse.selectNode("Unit.java");
-        browse.clickOkay();
+        browse.clickOk();
 
         assertEquals("java/com/zutubi/testant/Unit.java", antForm.getBuildFileFieldValue());
     }
@@ -180,18 +173,6 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig() throws Exception
     {
         configurationHelper.insertProject(projects.createTestAntProject(random).getConfig());
-        return navigateToCommandConfig();
-    }
-
-    private AntCommandForm insertTestGitProjectAndNavigateToCommandConfig() throws Exception
-    {
-        configurationHelper.insertProject(projects.createGitAntProject(random).getConfig());
-        Thread.sleep(1000); // the browse links seem to be a little slow rendering for git, so add this pause.
-        return navigateToCommandConfig();
-    }
-
-    private AntCommandForm navigateToCommandConfig()
-    {
         browser.open(urls.adminProject(random) + "/" +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +

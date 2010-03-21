@@ -2,52 +2,37 @@ package com.zutubi.pulse.acceptance.windows;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
-/**
- * The browse scm popup window.
- */
-public class BrowseScmWindow
+public class PulseFileSystemBrowserWindow
 {
-    private SeleniumBrowser browser;
-    private String windowName = "Browse SCM";
-    private String originalWindow = null;
+    private static final String BROWSER_ID = "pulse-file-system-browser";
 
-    public BrowseScmWindow(SeleniumBrowser browser)
+    private SeleniumBrowser browser;
+
+    public PulseFileSystemBrowserWindow(SeleniumBrowser browser)
     {
         this.browser = browser;
     }
 
     public boolean isWindowPresent()
     {
-        return browser.isWindowPresent(windowName);
+        return browser.isElementPresent(BROWSER_ID);
     }
 
     public void waitForWindow()
     {
-        browser.waitForWindow(windowName);
+        browser.waitForElement(BROWSER_ID);
     }
 
-    public void selectWindow()
-    {
-        waitForWindow();
-
-        originalWindow = browser.getTitle();
-        browser.selectWindow(windowName);
-    }
-
-    public void clickOkay()
+    public void clickOk()
     {
         // would be quicker if we add an id to the field?
-        browser.click("//form[@name='form']//input[@value='okay']");
-        browser.selectWindow(originalWindow);
-        originalWindow = null;
+        browser.click("//div[@id='"+BROWSER_ID+"']//button[text()='ok']");
     }
 
     public void clickCancel()
     {
         // would be quicker if we add an id to the field? 
-        browser.click("//form[@name='form']//input[@value='cancel']");
-        browser.selectWindow(originalWindow);
-        originalWindow = null;
+        browser.click("//div[@id='"+BROWSER_ID+"']//button[text()='cancel']");
     }
 
     public void selectNode(String path)

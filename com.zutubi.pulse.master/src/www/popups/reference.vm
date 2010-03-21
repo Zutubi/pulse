@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
     <title>:: pulse :: #if ($title) $title #end</title>
-    <link rel="shortcut icon" href="$base/favicon.ico">
-    <link rel="icon" type="image/png" href="$base/favicon.png">
-    <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css"></link>
-    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"></link>
+    <link rel="shortcut icon" href="$base/favicon.ico"/>
+    <link type="image/png" rel="icon" href="$base/favicon.png"/>
+    <link type="text/css" rel="stylesheet" href="$base/css/ext-all.css"/>
+    <link type="text/css" rel="stylesheet" href="$base/css/main.css" media="screen"/>
     <script type="text/javascript" src="$base/js/ext-base.js"></script>
     <script type="text/javascript" src="$base/js/ext-all.js"></script>
     <script type="text/javascript" src="$base/js/main.js"></script>
@@ -49,7 +49,7 @@
         var Layout = function() {
             return {
                 init : function() {
-                    var loader = new ZUTUBI.FSTreeLoader('$base');
+                    var loader = new ZUTUBI.FSTreeLoader({baseUrl:'$base', showFiles:true, fs:'pulse', basePath:''});
                     tree = new Ext.tree.TreePanel({
                         loader: loader,
                         layout: 'fit',

@@ -161,11 +161,6 @@
             <result name="success" type="startupajax"/>
         </action>
         
-        <action name="ls" class="com.zutubi.pulse.master.xwork.actions.vfs.LsAction">
-            <result name="success" type="json">ls.xml</result>
-            <result name="error" type="json">error.xml</result>
-        </action>
-
         <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MkdirAction">
             <result name="success" type="json">mkdir.xml</result>
             <result name="error" type="json">error.xml</result>
@@ -181,6 +176,17 @@
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">result</result>
         </action>
+
+        <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">data</result>
+        </action>
+
+        <action name="xls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
+            <result name="success" type="flexjson">listing</result>
+            <result name="error" type="json">error.xml</result>
+        </action>
+
     </package>
 
     <package name="aconfig" namespace="/aconfig" extends="webwork-default-package">
@@ -223,19 +229,4 @@
         </action>
     </package>
     
-    <package name="popups" namespace="/popups" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="fileDialog" class="com.zutubi.pulse.master.xwork.actions.setup.PulseDataFileDialogAction">
-            <result name="success" type="velocity">tree/filedialog.vm</result>
-        </action>
-
-        <action name="databaseFileDialog" class="com.zutubi.pulse.master.xwork.actions.setup.DatabaseFileDialogAction">
-            <result name="success" type="velocity">tree/filedialog.vm</result>
-        </action>
-
-        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
-            <result name="success" type="velocity">tree/browse-new-folder.vm</result>
-        </action>
-    </package>
 </xwork>

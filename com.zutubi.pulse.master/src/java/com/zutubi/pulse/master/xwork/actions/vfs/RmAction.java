@@ -1,42 +1,42 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
 import com.zutubi.util.StringUtils;
+import com.zutubi.tove.type.record.PathUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.UriParser;
 
 /**
  * <class comment/>
  */
 public class RmAction extends VFSActionSupport
 {
-    /**
-     * @deprecated
-     */
-    private String root;
-
+    private String basePath;
     private String path;
-
-    /**
-     * @deprecated
-     */
-    public void setRoot(String root)
-    {
-        this.root = root;
-    }
 
     public void setPath(String path)
     {
         this.path = path;
     }
 
+    public void setBasePath(String basePath)
+    {
+        this.basePath = basePath;
+    }
+
     public String execute() throws Exception
     {
-        if (StringUtils.stringSet(root))
+        String fullPath = "local://";
+        if (StringUtils.stringSet(basePath))
         {
-            path = root + path;
+            fullPath += "/" + UriParser.encode(PathUtils.normalisePath(basePath));
+        }
+        if(StringUtils.stringSet(path))
+        {
+            fullPath += "/" + UriParser.encode(PathUtils.normalisePath(path));
         }
 
-        FileObject fo = getFS().resolveFile(path);
+        final FileObject fo = getFS().resolveFile(fullPath);
 
         // we only support deleting empty directories for safety.
         FileType type = fo.getType();

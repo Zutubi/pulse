@@ -1,4 +1,9 @@
 ${form.name}.items.last().on('browse', function(field)
 {
-    openFileDialog('${base}/popups/databaseFileDialog.action', '${form.name}', field.name, 'local:///', '', true, false, true);
+    var browser = new ZUTUBI.LocalFileSystemBrowser({
+        baseUrl : '${base}',
+        title : 'select database driver',
+        target : '${parameters.id?js_string}'
+    });
+    browser.show(this);
 });

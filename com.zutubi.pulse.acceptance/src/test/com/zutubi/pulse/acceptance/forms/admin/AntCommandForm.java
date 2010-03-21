@@ -2,8 +2,10 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
-import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
+import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.util.Condition;
 
 /**
  * Form for configuration of ant commands.
@@ -43,20 +45,16 @@ public class AntCommandForm extends ConfigurationForm
         return browser.isElementIdPresent(getBrowseLinkId(FIELD_BUILD_FILE));
     }
 
-    public BrowseScmWindow clickBrowseWorkingDirectory()
+    public PulseFileSystemBrowserWindow clickBrowseWorkingDirectory()
     {
         browser.click(getBrowseLinkId(FIELD_WORKING_DIR));
-        BrowseScmWindow window = new BrowseScmWindow(browser);
-        window.selectWindow();
-        return window;
+        return new PulseFileSystemBrowserWindow(browser);
     }
 
-    public BrowseScmWindow clickBrowseBuildFile()
+    public PulseFileSystemBrowserWindow clickBrowseBuildFile()
     {
         browser.click(getBrowseLinkId(FIELD_BUILD_FILE));
-        BrowseScmWindow window = new BrowseScmWindow(browser);
-        window.selectWindow();
-        return window;
+        return new PulseFileSystemBrowserWindow(browser);
     }
 
     private String getBrowseLinkId(String field)

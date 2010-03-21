@@ -67,7 +67,7 @@ public class SetupDataAction extends TransientAction<SetupDataConfiguration>
         }
 
         // make the path the shortest possible.
-        config.setData(new File(data).getCanonicalPath());
+        config.setData(new File(data).getCanonicalPath().replace('\\', '/'));
         return config;
     }
 

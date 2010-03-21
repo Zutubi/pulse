@@ -36,13 +36,13 @@
     text-align:left;
 }
 
-ul {
+#description ul {
 	font-size: 11px;
 	line-height: 15px;
     text-align:left;
 }
 
-li {
+#description li {
     list-style: disc;
     padding: 4px;
     margin-left: 20px;

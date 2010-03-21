@@ -19,5 +19,14 @@ ${form.name}.items.last().on('browse', function(field)
     }
 
     var projectPath = findProjectPath('${field.parameters.parentPath?js_string}');
-    openSCMSelectDialog('${base}', false, '${form.name}', field.name, projectPath, '', 'scm');
+
+    var browser = new ZUTUBI.PulseFileSystemBrowser({
+        baseUrl : '${base}',
+        showFiles: false,
+        prefix:'scm',
+        basePath: projectPath + '/scm/',
+        title : 'select directory',
+        target : '${parameters.id?js_string}'
+    });
+    browser.show(this);
 });

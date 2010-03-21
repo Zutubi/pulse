@@ -80,15 +80,14 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         SetPulseDataForm form = browser.createForm(SetPulseDataForm.class);
         assertTrue(form.isFormPresent());
+        assertTrue(form.isBrowseDataLinkPresent());
         assertFormFieldNotEmpty("zfid.data");
-
-        String defaultDataDir = "data";
 
         form.nextFormElements("");
         form.waitFor();
         assertTextPresent("pulse data directory requires a value");
 
-        form.nextFormElements(defaultDataDir);
+        form.nextFormElements("data");
     }
 
     private void assertPulseTabsNotVisible()

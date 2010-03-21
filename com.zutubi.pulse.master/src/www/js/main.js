@@ -169,18 +169,6 @@ function submitenter(field, evt, value)
     }
 }
 
-// Function for opening an SCM browse window used on several forms.
-//   - contextPath: the web app context path.
-//   - selectDir: set to true for selecting a directory, false for a file
-//   - elementId: ID of textbox to set the value of to the selected path
-//   - extraArgs: optional extra arguments for param string (e.g. "&prefix=foo")
-function openBrowseWindow(contextPath, selectDir, elementId, extraArgs)
-{
-    var browseWindow = window.open(contextPath + "/popups/browseScm.action?selectDir=" + selectDir + "&elementId=" + elementId + extraArgs, "scm", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
-    browseWindow.opener = self;
-    browseWindow.focus();
-}
-
 // Function for opening a resource browse window used on several forms.
 //   - resourceId: ID of textbox to receive the resource name
 //   - versionId: ID of textbox to receive the resource version
@@ -191,64 +179,6 @@ function openResourceBrowser(contextPath, resourceId, versionId, defaultVersionI
     browseWindow.opener = self;
     browseWindow.focus();
 }
-
-function openFileDialog(path, formname, fieldname, root, prefix, showFiles, showHidden, showToolbar)
-{
-    var browseWindow = window.open(path + '?formname=' + formname +
-                                   '&fieldname=' + fieldname + '&root=' + root +
-                                   '&prefix=' + prefix + '&showFiles=' + showFiles +
-                                   '&showHidden=' + showHidden + '&showToolbar=' + showToolbar,
-            'files', 'width=400, height=550, resizable=yes', false);
-    browseWindow.opener = self;
-    browseWindow.focus();
-}
-
-function openResourceDialog(base, agent, formname, fieldname)
-{
-    var root;
-
-    if (agent == -1)
-    {
-        root = 'local:///';
-    }
-    else
-    {
-        root = 'agent://$agentId/';
-    }
-
-    openFileDialog(base + '/popups/fileDialog.action', formname, fieldname, root, '', false, false, false);
-}
-
-function openSCMSelectDialog(base, showFiles, formName, fieldName, projectPath, path, prefix)
-{
-    if(path)
-    {
-        var pieces = path.split("/");
-
-        // Reassemble, removing empty pieces
-        path = "";
-        for(var i = 0; i < pieces.length; i++)
-        {
-            if(pieces[i])
-            {
-                if(path)
-                {
-                    path += "/";
-                }
-
-                path += pieces[i];
-            }
-        }
-
-        if(path)
-        {
-            path += "/";
-        }
-    }
-
-    openFileDialog(base + '/popups/scmFileDialog.action', formName, fieldName, 'pulse:///' + encodeURIPath(projectPath) + '/scm/' + path, prefix, showFiles, false, false);
-}
-
 
 // @deprecated. Use the Prototype function Element.toggle instead.
 function toggleElementDisplay(element)

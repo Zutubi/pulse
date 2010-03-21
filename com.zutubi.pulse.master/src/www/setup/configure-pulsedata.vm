@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>#i18n("key=data.setup")</title>
-    <link rel="stylesheet" type="text/css" href="$base/css/setup.css"></link>
+    <link rel="stylesheet" type="text/css" href="$base/css/setup.css"/>
 </head>
 <body>
     <div id="rightcolumn">

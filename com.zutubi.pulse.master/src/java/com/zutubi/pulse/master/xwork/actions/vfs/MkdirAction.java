@@ -1,28 +1,18 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
 import com.zutubi.util.StringUtils;
+import com.zutubi.tove.type.record.PathUtils;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.provider.UriParser;
 
 /**
  * <class comment/>
  */
 public class MkdirAction extends VFSActionSupport
 {
-    /**
-     * @deprecated
-     */
-    private String root;
-
+    private String basePath;
     private String path;
     private String name;
-
-    /**
-     * @deprecated
-     */
-    public void setRoot(String root)
-    {
-        this.root = root;
-    }
 
     public void setPath(String path)
     {
@@ -34,19 +24,29 @@ public class MkdirAction extends VFSActionSupport
         this.name = name;
     }
 
+    public void setBasePath(String basePath)
+    {
+        this.basePath = basePath;
+    }
+
     public String execute() throws Exception
     {
-        if (StringUtils.stringSet(root))
+        String fullPath = "local://";
+        if (StringUtils.stringSet(basePath))
         {
-            path = root + path;
+            fullPath += "/" + UriParser.encode(PathUtils.normalisePath(basePath));
+        }
+        if(StringUtils.stringSet(path))
+        {
+            fullPath += "/" + UriParser.encode(PathUtils.normalisePath(path));
         }
 
-        FileObject fo = getFS().resolveFile(path);
+        FileObject fo = getFS().resolveFile(fullPath);
 
         FileObject newFolder = fo.resolveFile(name);
         if (newFolder.exists())
         {
-            addActionError(String.format("The folder '%s' already exists. Please use a different name", name));
+            addActionError(String.format("The folder '%s' already exists.", name));
             return ERROR;
         }
 

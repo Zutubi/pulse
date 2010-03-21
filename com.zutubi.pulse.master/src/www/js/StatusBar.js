@@ -195,7 +195,7 @@ sb.setStatus({
         Ext.ux.StatusBar.superclass.afterRender.call(this);
 
         var right = this.statusAlign == 'right';
-        this.currIconCls = this.iconCls || this.defaultIconCls;
+        this.currIconCls = this.currIconCls || this.iconCls || this.defaultIconCls;
         this.statusEl = new Ext.Toolbar.TextItem({
             cls: 'x-status-text ' + (this.currIconCls || ''),
             text: this.text || this.defaultText || ''

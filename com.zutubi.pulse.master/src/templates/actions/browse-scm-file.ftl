@@ -25,5 +25,13 @@ ${form.name}.items.last().on('browse', function(field)
     prefix += dirField.getValue();
 </#if>
 
-    openSCMSelectDialog('${base}', true, '${form.name}', field.name, projectPath, prefix, '/');
+    var browser = new ZUTUBI.PulseFileSystemBrowser({
+        baseUrl : '${base}',
+        showFiles: true,
+        prefix:prefix,
+        basePath: projectPath + '/scm/' + prefix,
+        title : 'select file',
+        target : '${parameters.id?js_string}'
+    });
+    browser.show(this);
 });
