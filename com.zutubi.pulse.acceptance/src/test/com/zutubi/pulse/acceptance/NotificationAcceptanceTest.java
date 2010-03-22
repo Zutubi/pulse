@@ -159,6 +159,28 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEmailsTo(1, user1, user2);
     }
 
+    public void testDeleteSubscribedProject() throws Exception
+    {
+        String discerningUserLogin = random + "-user-discerning";
+        String promiscuousUserLogin = random + "-user-promiscuous";
+        String subscribedProject = random + "-project-subscribed";
+        String notSubscribedProject = random + "-project-not-subscribed";
+
+        String subscribedProjectPath = xmlRpcHelper.insertSimpleProject(subscribedProject);
+        xmlRpcHelper.insertSimpleProject(notSubscribedProject);
+        createUserWithSubscription(discerningUserLogin, subscribedProject, null, CONDITION_ALL_BUILDS);
+        createUserWithSubscription(promiscuousUserLogin, null, null, CONDITION_ALL_BUILDS);
+
+        xmlRpcHelper.runBuild(subscribedProject);
+        assertEmailsTo(2, discerningUserLogin, promiscuousUserLogin);
+
+        clearSmtpServer();
+
+        xmlRpcHelper.deleteConfig(subscribedProjectPath);
+        xmlRpcHelper.runBuild(notSubscribedProject);
+        assertEmailsTo(1, promiscuousUserLogin);
+    }
+
     private String insertUserWithPrimaryContact(String login) throws Exception
     {
         String userPath = xmlRpcHelper.insertTrivialUser(login);
@@ -227,19 +249,24 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         createUserAndGroup(BUILDS_PROJECT_FAIL, CONDITION_ALL_BUILDS);
 
         // all builds, by successful label
-        createUserAndGroup(BUILDS_LABEL_SUCCESS, CONDITION_ALL_BUILDS, getLabelForSuffix(PROJECT_SUCCESS));
+        createUserAndGroup(BUILDS_LABEL_SUCCESS, getLabelForSuffix(PROJECT_SUCCESS), CONDITION_ALL_BUILDS);
 
         createProject(true, PROJECT_SUCCESS, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_SUCCESS, BUILDS_LABEL_SUCCESS);
         createProject(false, PROJECT_FAIL, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_FAIL, BUILDS_LABEL_SUCCESS);
     }
 
-    void createUserAndGroup(String nameSuffix, int condition, String... labels) throws Exception
+    void createUserAndGroup(String nameSuffix, int condition) throws Exception
     {
-        createUser(random + "user" + nameSuffix, condition, labels);
+        createUserAndGroup(nameSuffix, null, condition);
+    }
+
+    void createUserAndGroup(String nameSuffix, String label, int condition) throws Exception
+    {
+        createUserWithSubscription(random + "user" + nameSuffix, null, label, condition);
         createGroup(random + "group" + nameSuffix, random + "user" + nameSuffix);
     }
 
-    private void createUser(String name, int condition, String... labels) throws Exception
+    private void createUserWithSubscription(String name, String project, String label, int condition) throws Exception
     {
         String userPath = xmlRpcHelper.insertTrivialUser(name);
 
@@ -249,10 +276,22 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         contactPoint.put("address", name + EMAIL_DOMAIN);
         xmlRpcHelper.insertConfig(userPath + "/preferences/contacts", contactPoint);
 
+        insertProjectSubscription(userPath, project, label, condition);
+    }
+
+    private void insertProjectSubscription(String userPath, String project, String label, int condition) throws Exception
+    {
         Hashtable<String, Object> projectSubscription = xmlRpcHelper.createDefaultConfig(ProjectSubscriptionConfiguration.class);
-        projectSubscription.put("name", "all projects");
-        projectSubscription.put("allProjects", labels.length == 0);
-        projectSubscription.put("labels", new Vector<String>(asList(labels)));
+        projectSubscription.put("name", "a subscription");
+        projectSubscription.put("allProjects", project == null && label == null);
+        if (project != null)
+        {
+            projectSubscription.put("projects", new Vector<String>(asList("projects/" + project)));
+        }
+        if (label != null)
+        {
+            projectSubscription.put("labels", new Vector<String>(asList(label)));
+        }
         projectSubscription.put("contact", userPath + "/preferences/contacts/email");
         projectSubscription.put("template", "plain-text-email");
 
