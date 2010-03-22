@@ -9,8 +9,8 @@ public class MessageDialog
 {
     private static final String LOCATOR_INPUT_SINGLE = "css=input.ext-mb-input";
     private static final String LOCATOR_INPUT_MULTI = "css=textarea.ext-mb-textarea";
-    private static final String LOCATOR_OK = "css=button:contains('OK')";
-    private static final String LOCATOR_CANCEL = "css=button:contains('Cancel')";
+    private static final String LOCATOR_OK = "css=button:contains('ok')";
+    private static final String LOCATOR_CANCEL = "css=button:contains('cancel')";
 
     private SeleniumBrowser browser;
     private boolean multiline;
