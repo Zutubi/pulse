@@ -95,7 +95,7 @@ public class AgentStatusManager implements EventListener
      * Allows a callback to be run under the agents lock.  During this lock no
      * agent states will change.  Note that this lock can only be held for a
      * very short time, so the given callback musts be fast.  This method is
-     * package local as it is not spread the ability to take this lock too
+     * package local so as not to spread the ability to take this lock too
      * widely.  Instead, wrap required logic up into more user-friendly APIs
      * in, e.g. the {@link AgentManager}.
      *
