@@ -5,83 +5,57 @@
 <head>
     <title>#wwtext("name=project") $project.name</title>
     <script type="text/javascript">
+        function updaterCallback()
+        {
+            var now = new Date();
+            Ext.get('refresh-time').update('refreshed ' + now.format('g:i:s a, D F j'));
+        }
+
         #updater("$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle)
 
         Ext.onReady(function() {
-            var form = new Ext.form.FormPanel({
-                labelWidth: 200,
-                labelAlign: 'right',
-                method: 'POST',
-                border: false,
-                items: [{
-                    layout: 'column',
-                    border: false,
-                    items: [{
-                        columnWidth: .4,
-                        layout: 'form',
-                        border: false,
-                        items: [{
-                            xtype: 'textfield',
-                            name: 'maxLines',
-                            fieldLabel: '$action.getText("tail.max.lines")',
-                            value: '$maxLines',
-                            width: 50
-                        }]
-                    }, {
-                        columnWidth: .4,
-                        layout: 'form',
-                        border: false,
-                        items: [{
-                            xtype: 'textfield',
-                            name: 'refreshInterval',
-                            fieldLabel: '$action.getText("tail.refresh.interval")',
-                            value: '$refreshInterval',
-                            width: 50
-                        }]
-                    }, {
-                        columnWidth: .2,
-                        xtype: 'panel',
-                        border: false,
-                        items: [{
-                            xtype: 'button',
-                            text: 'update',
-                            listeners: {
-                                click: function() {
-                                    form.getForm().el.dom.submit();
-                                }
-                            }
-                        }]
-                    }]
-                }]
-            });
-
-            form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '#jss(${urls.projectLog($project)})';
-
-                new Ext.KeyNav(this.getForm().getEl(), {
-                    'enter': function(e) {
-                        this.getForm().el.dom.submit();
-                    },
-                    'scope': this
-                });
-            }, form, {single: true});
-
-
-            form.render("params-form");
+            updaterCallback();
         });
+
+        function configureSettings()
+        {
+            var popup = new ZUTUBI.TailSettingsWindow({
+                initialMaxLines: '$maxLines',
+                initialRefreshInterval: '$refreshInterval',
+            });
+            popup.show();
+        }
     </script>
 </head>
 <body>
     #projectTabs("log")
 
-    <div class="config-panel">
-        <h3 class="config-header config-header-small">$action.getText("tail.settings")</h3>
-        <div class="config-container" id="params-form">
-        </div>
+    <div class="build-page-header">
+        <table class="log-header">
+            <tr>
+#if($logExists)
+                <td>
+                    <a class="unadorned" href="raw/true/"><img alt="down" src="$base/images/script_save.gif"/></a>
+                    <a id="download-full-log" href="raw/true/">#wwtext("name=download.full.log")</a>
+                </td>
+                <td>
+                    <span class="understated">//</span>
+                </td>
+#end
+                <td id="current-settings">
+                    $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$refreshInterval"])
+                    <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
+                    <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <h3 class="heading">#wwtext("name=project.tail.box") #if($logExists) &nbsp;<a href="$urls.projectLog($project)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=project.full.log")</a> #end</h3>
-    <div id="project-log-${project.name}" class="box">
+    <h3 class="two-heading">
+        <span id="refresh-time"></span>
+        #wwtext("name=tail.box")
+    </h3>
+    <div id='#id("project-log-${project.name}")' class="two-box">
         <div id="panel">
             #parse("ajax/tail-log-panel.vm")
         </div>

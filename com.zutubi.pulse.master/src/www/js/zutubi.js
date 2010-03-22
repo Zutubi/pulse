@@ -1819,6 +1819,105 @@ Ext.form.Checkbox.prototype.onResize = function()
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
 };
 
+ZUTUBI.TailSettingsWindow = function(config)
+{
+    ZUTUBI.TailSettingsWindow.superclass.constructor.call(this, config);
+};
+
+Ext.extend(ZUTUBI.TailSettingsWindow, Ext.Window, {
+    modal: true,
+    title: 'tail view settings',
+    closeAction: 'close',
+
+    initComponent: function()
+    {
+        var tailWindow = this;
+        this.form = new Ext.FormPanel({
+            method: 'POST',
+            labelWidth: 180,
+            width: 255,
+            labelAlign: 'right',
+            bodyStyle: 'padding: 10px; background: transparent;',
+            border: false,
+            items: [{
+                xtype: 'textfield',
+                name: 'maxLines',
+                id: 'settings-max-lines',
+                fieldLabel: 'maximum lines to show',
+                value: tailWindow.initialMaxLines,
+                width: 50
+            }, {
+                xtype: 'textfield',
+                name: 'refreshInterval',
+                id: 'settings-refresh-interval',
+                fieldLabel: 'refresh interval (seconds)',
+                value: tailWindow.initialRefreshInterval,
+                width: 50
+            }],
+            buttons: [{
+                text: 'apply',
+                handler: function() {
+                    tailWindow.apply();
+                }
+            }, {
+                text: 'cancel',
+                handler: function() {
+                    tailWindow.close();
+                }
+            }],
+            listeners: {
+                afterLayout: {
+                    fn: function() {
+                        new Ext.KeyNav(this.getForm().getEl(), {
+                            'enter': function() {
+                                tailWindow.apply();
+                            },
+                            scope: this
+                        });
+                    },
+                    single: true
+                }
+            }
+        });
+
+        Ext.apply(this, {
+            layout: 'form',
+            autoHeight: true,
+            items: [this.form],
+            focus: function() {
+                this.form.items.get(0).focus(true);
+            }
+        });
+
+        ZUTUBI.TailSettingsWindow.superclass.initComponent.call(this);
+    },
+
+    apply: function()
+    {
+        var tailWindow = this;
+        this.form.getForm().submit({
+            clientValidation: true,
+            url: window.baseUrl + '/ajax/saveTailSettings.action',
+            success: function() {
+                tailWindow.close();
+                var mask = new Ext.LoadMask(Ext.getBody(), {msg:"Applying..."});
+                mask.show();
+                window.location.reload(true);
+            },
+            failure: function(form, action) {
+                tailWindow.close();
+                switch (action.failureType) {
+                    case Ext.form.Action.CONNECT_FAILURE:
+                        Ext.Msg.alert('Ajax communication failed.', 'failure');
+                        break;
+                    case Ext.form.Action.SERVER_INVALID:
+                       Ext.Msg.alert('Server error.', 'failure');
+               }
+            }
+        });
+    }
+});
+
 /**
  * A tree browser window that supports navigation of the Pulse File System.
  *

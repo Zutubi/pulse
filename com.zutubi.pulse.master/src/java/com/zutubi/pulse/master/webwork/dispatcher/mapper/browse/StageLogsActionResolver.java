@@ -1,26 +1,31 @@
 package com.zutubi.pulse.master.webwork.dispatcher.mapper.browse;
 
-import com.zutubi.pulse.master.webwork.dispatcher.mapper.ParameterisedActionResolver;
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.ActionResolver;
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.ActionResolverSupport;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 /**
+ * Resolves down to the collection of stage logs, requires a stage name to be
+ * specified.
  */
-public class StageLogsActionResolver extends ParameterisedActionResolver
+public class StageLogsActionResolver extends ActionResolverSupport
 {
-    private String stage;
-
-    public StageLogsActionResolver(String stage)
+    public StageLogsActionResolver()
     {
-        super("tailRecipeLog");
-        this.stage = stage;
+        super(null);
     }
 
-    public Map<String, String> getParameters()
+    @Override
+    public List<String> listChildren()
     {
-        Map<String, String> params = new HashMap<String, String>(1);
-        params.put("stageName", stage);
-        return params;
+        return Arrays.asList("<stage>");
+    }
+
+    @Override
+    public ActionResolver getChild(String name)
+    {
+        return new StageLogActionResolver(name);
     }
 }

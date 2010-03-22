@@ -14,7 +14,6 @@ public class BuildActionResolver extends StaticMapActionResolver
         addMapping("summary", new BuildSummaryActionResolver());
         addMapping("details", new BuildDetailsActionResolver());
         addMapping("logs", new BuildLogsActionResolver());
-        addMapping("log", new BuildLogActionResolver());
         addMapping("changes", new BuildChangesActionResolver());
         addMapping("tests", new BuildTestsActionResolver());
         addMapping("file", new BuildPulseFileActionResolver());

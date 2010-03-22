@@ -18,6 +18,11 @@ public class IDs
         return "tab.build." + name;
     }
 
+    public static String buildLogsTab()
+    {
+        return buildTab("logs");
+    }
+
     public static String buildDetailsTab()
     {
         return buildTab("details");

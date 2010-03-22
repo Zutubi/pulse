@@ -456,7 +456,7 @@ Shows a list of links to build stage logs.
     <p style="font-size: 85%">
         stage logs ::
     [#list result.root.children as child]
-        <a href="${externalUrls.stageLogs(result, child)}">${child.stageName?html}</a> [#if child_has_next]|[/#if]
+        <a href="${externalUrls.stageLog(result, child)}">${child.stageName?html}</a> [#if child_has_next]|[/#if]
     [/#list]
     </p>
 [/#macro]

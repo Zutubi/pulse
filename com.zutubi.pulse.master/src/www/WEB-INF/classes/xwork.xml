@@ -169,15 +169,6 @@
             </result>
         </action>
 
-        <action name="tailBuildLog" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
-            <interceptor-ref name="completeStack"/>
-            <result name="tail" type="velocity">/tail-build-log.vm</result>
-            <result name="raw" type="stream">
-                <param name="contentType">text/plain</param>
-                <param name="contentDisposition">filename="build.log"</param>
-            </result>
-        </action>
-
         <action name="tailProjectLog" class="com.zutubi.pulse.master.xwork.actions.project.TailProjectLogAction">
             <interceptor-ref name="completeStack"/>
             <result name="tail" type="velocity">/tail-project-log.vm</result>
@@ -439,10 +430,6 @@
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
-        <action name="tailBuildLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
-            <result name="tail" type="velocity">tail-log-panel.vm</result>
-        </action>
-
         <action name="tailProjectLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailProjectLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
@@ -526,11 +513,15 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
+        <action name="saveTailSettings" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveTailSettingsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
+
         <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">data</result>
         </action>
-
     </package>
 
     <package name="configAjax" namespace="/aconfig" extends="default">

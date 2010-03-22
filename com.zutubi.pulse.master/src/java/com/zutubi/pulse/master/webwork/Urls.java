@@ -287,22 +287,22 @@ public class Urls
 
     public String buildLog(BuildResult build)
     {
-        return build(build) + "log/";
+        return buildLogs(build) + "build/";
     }
 
     public String buildLog(Object project, String number)
     {
-        return build(project, number) + "log/";
+        return buildLogs(project, number) + "build/";
     }
 
-    public String stageLogs(BuildResult build, RecipeResultNode node)
+    public String stageLog(BuildResult build, RecipeResultNode node)
     {
-        return buildLogs(build) + getStageComponent(node);
+        return buildLogs(build) + "stage/" + getStageComponent(node);
     }
 
-    public String stageLogs(Object project, String number, Object stage)
+    public String stageLog(Object project, String number, Object stage)
     {
-        return buildLogs(project, number) + getStageComponent(stage);
+        return buildLogs(project, number) + "stage/" + getStageComponent(stage);
     }
 
     public String buildChanges(BuildResult build)

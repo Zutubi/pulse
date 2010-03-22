@@ -22,4 +22,9 @@ public class BuildLogPage extends AbstractLogPage
     {
         return urls.buildLog(project, buildNumber);
     }
+
+    public void selectStage(String stageName)
+    {
+        browser.evalExpression("var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('select-log-combo'); combo.setValue('" + stageName + "'); combo.fireEvent('select', combo, combo.getStore().getAt(1));");
+    }
 }

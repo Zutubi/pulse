@@ -220,6 +220,7 @@
 #macro(buildTabs $result $selected)
     #openTabs()
         #buildTab($result "summary" $selected)
+        #buildTab($result "logs" $selected)
         #buildTab($result "details" $selected)
         #buildTab($result "changes" $selected)
         #buildTab($result "tests" $selected)
@@ -847,20 +848,20 @@
 #end
 
 ##
-## Outputs an action cell for viewing the details for a build
+## Outputs an action cell for viewing the log for a build
 ##
-#macro(logCell $project $result)
+#macro(buildLogCell $project $result)
     <td class="content">
-        <a id="details-#uce($project.name)-${result.number}" href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+        <a id="log-#uce($project.name)-${result.number}" href="$urls.buildLog($result)" class="unadorned" title="view log"><img alt="view log" src="$base/images/script.gif"/></a>
     </td>
 #end
 
 ##
 ## Outputs an action cell for viewing the details for a build
 ##
-#macro(buildLogCell $project $result)
+#macro(detailsCell $project $result)
     <td class="content">
-        <a id="log-#uce($project.name)-${result.number}" href="$urls.buildLog($result)" class="unadorned" title="view log"><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log") </a>
+        <a id="details-#uce($project.name)-${result.number}" href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
     </td>
 #end
 
@@ -981,7 +982,7 @@
         #dateClassCell($recipe)
         #elapsedCell($recipe)
         <td class="content">
-            <a id="log-#uce($build.project.name)-${build.number}-${resultNode.stageName}" href="$urls.stageLogs($build, $resultNode)" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
+            <a id="log-#uce($build.project.name)-${build.number}-${resultNode.stageName}" href="$urls.stageLog($build, $resultNode)" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
         </td>
     </tr>
 #end
@@ -1713,7 +1714,8 @@
                     updater.showLoadIndicator = false;
                     updater.update({
                         url: '#jss($url)',
-                        scripts: true
+                        scripts: true,
+                        callback: updaterCallback
                     });
                 },
                 interval: 1000 * #if($refreshInterval) $refreshInterval #else $user.preferences.refreshInterval #end
@@ -1921,11 +1923,11 @@
         #elapsedCell($buildResult)
     #elseif($key == "actions")
         #viewCell($project $buildResult)
-        #logCell($project $buildResult)
+        #buildLogCell($project $buildResult)
+        #detailsCell($project $buildResult)
         #changesCell($project $buildResult)
         #artifactsCell($project $buildResult)
         #workingCopyCell($project $buildResult $multiProject)
-        #buildLogCell($project $buildResult)
     #elseif($key == "warnings")
         #rightClassCell($buildResult.warningFeatureCount)
     #elseif($key == "errors")

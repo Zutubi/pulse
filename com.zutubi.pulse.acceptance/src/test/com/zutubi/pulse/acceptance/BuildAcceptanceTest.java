@@ -81,6 +81,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String ANT_PROCESSOR = "ant output processor";
     private static final String JUNIT_PROCESSOR = "junit xml report processor";
 
+    private static final String MESSAGE_BUILD_COMPLETED = "Build completed with status success";
+    private static final String MESSAGE_RECIPE_COMPLETED = "Recipe '[default]' completed with status success";
+
     private Repository repository;
 
     protected void setUp() throws Exception
@@ -446,18 +449,37 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent(TRIVIAL_ANT_REPOSITORY);
     }
 
-    public void testBuildLogAvailable() throws Exception
+    public void testBuildLogs() throws Exception
     {
         addProject(random, true);
 
         loginAsAdmin();
         triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
 
-        BuildDetailedViewPage page = browser.openAndWaitFor(BuildDetailedViewPage.class, random, 1L);
+        // The logs tab, which should show us the first stage.
+        BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, ProjectConfigurationWizard.DEFAULT_STAGE);
+        assertTrue(logsPage.isLogAvailable());
+        assertTextPresent(MESSAGE_RECIPE_COMPLETED);
 
-        assertTrue(page.isBuildLogLinkPresent());
-        BuildLogPage log = page.clickBuildLogLink();
-        assertTrue(log.isLogAvailable());
+        // Direct to the build log (high-level build messages).
+        BuildLogPage logPage = browser.openAndWaitFor(BuildLogPage.class, random, 1L);
+        assertTrue(logPage.isLogAvailable());
+        assertTextPresent(MESSAGE_BUILD_COMPLETED);
+
+        // Use the combo to switch to a stage log.
+        logPage.selectStage(ProjectConfigurationWizard.DEFAULT_STAGE);
+        StageLogPage stageLogPage = browser.createPage(StageLogPage.class, random, 1L, ProjectConfigurationWizard.DEFAULT_STAGE);
+        stageLogPage.waitFor();
+        assertTrue(stageLogPage.isLogAvailable());
+        assertTextPresent(MESSAGE_RECIPE_COMPLETED);
+
+        // Change the settings via the popup
+        int maxLines = stageLogPage.getMaxLines();
+        TailSettingsDialog dialog = stageLogPage.clickConfigureAndWaitForDialog();
+        dialog.setMaxLines(maxLines + 5);
+        dialog.clickApply();
+        browser.waitForPageToLoad();
+        assertEquals(maxLines + 5, stageLogPage.getMaxLines());
     }
 
     public void testDownloadArtifactLink() throws Exception

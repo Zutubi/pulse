@@ -1,87 +1,115 @@
-#helpTag("Build+Stage+Log+View")
+#helpTag("Build+Log+View")
 #authorisationTags($principle)
 #stageTags($buildResult)
 <html>
 <head>
-    <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $h_stageName</title>
+    <title>
+        #wwtext("name=build") $buildResult.number
+#if($h_stageName)
+        :: #wwtext("name=build.stage") $h_stageName
+#end
+    </title>
     <script type="text/javascript">
+        function updaterCallback()
+        {
+            var now = new Date();
+            Ext.get('refresh-time').update('refreshed ' + now.format('g:i:s a, D F j'));
+        }
+        
+#if($u_stageName)
         #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle)
-
+#else
+        #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle)
+#end
         Ext.onReady(function() {
-            var form = new Ext.form.FormPanel({
-                labelWidth: 200,
-                labelAlign: 'right',
-                method: 'POST',
-                border: false,
-                items: [{
-                    layout: 'column',
-                    border: false,
-                    items: [{
-                        columnWidth: .4,
-                        layout: 'form',
-                        border: false,
-                        items: [{
-                            xtype: 'textfield',
-                            name: 'maxLines',
-                            fieldLabel: '$action.getText("tail.max.lines")',
-                            value: '$maxLines',
-                            width: 50
-                        }]
-                    }, {
-                        columnWidth: .4,
-                        layout: 'form',
-                        border: false,
-                        items: [{
-                            xtype: 'textfield',
-                            name: 'refreshInterval',
-                            fieldLabel: '$action.getText("tail.refresh.interval")',
-                            value: '$refreshInterval',
-                            width: 50
-                        }]
-                    }, {
-                        columnWidth: .2,
-                        xtype: 'panel',
-                        border: false,
-                        items: [{
-                            xtype: 'button',
-                            text: 'update',
-                            listeners: {
-                                click: function() {
-                                    form.getForm().el.dom.submit();
-                                }
-                            }
-                        }]
-                    }]
-                }]
+            var combo = new Ext.form.ComboBox({
+                transform: 'log-combo',
+                id: 'select-log-combo',
+                editable: false,
+                triggerAction: 'all',
+                width: 240,
+#if($u_stageName)
+                value: '#jss($u_stageName)'
+#else
+                value: ''
+#end
             });
 
-            form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '${urls.stageLogs($buildResult, $recipeResultNode)}';
+            combo.on('select', function(combo, record)
+            {
+                var choice = record.get('value');
+                if (choice == '')
+                {
+                    window.location = '$urls.buildLogs($buildResult)build/';
+                }
+                else
+                {
+                    window.location = '$urls.buildLogs($buildResult)stage/' + choice + '/';
+                }
+            });
 
-                new Ext.KeyNav(this.getForm().getEl(), {
-                    'enter': function(e) {
-                        this.getForm().el.dom.submit();
-                    },
-                    'scope': this
-                });
-            }, form, {single: true});
-
-
-            form.render("params-form");
+            updaterCallback();
         });
+
+        function configureSettings()
+        {
+            var popup = new ZUTUBI.TailSettingsWindow({
+                initialMaxLines: '$maxLines',
+                initialRefreshInterval: '$refreshInterval',
+            });
+            popup.show();
+        }
     </script>
 </head>
 <body>
-    #buildTabs($buildResult "details")
+    #buildTabs($buildResult "logs")
 
-    <div class="config-panel">
-        <h3 class="config-header config-header-small">$action.getText("tail.settings")</h3>
-        <div class="config-container" id="params-form">
+    <form>
+        <div class="build-page-header">
+            <table class="log-header">
+                <tr>
+                    <td>
+                        #wwtext("name=select.log"):
+                    </td>
+                    <td>
+                        <select id="log-combo" name="chooseLog">
+#foreach($stage in $stages.entrySet())
+                            <option value="#uce($stage.getKey())">#html($stage.getValue())</option>
+#end
+                        </select>
+                    </td>
+#if($logExists)
+                    <td>
+                        <span class="understated">//</span>
+                    </td>
+                    <td>
+                        <a class="unadorned" href="raw/true/"><img alt="down" src="$base/images/script_save.gif"/></a>
+                        <a id="download-full-log" href="raw/true/">#wwtext("name=download.full.log")</a>
+                    </td>
+#end
+                    <td>
+                        <span class="understated">//</span>
+                    </td>
+                    <td id="current-settings">
+                        $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$refreshInterval"])
+                        <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
+                        <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
+                    </td>
+                </tr>
+            </table>
         </div>
-    </div>
+    </form>
 
-    <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="$urls.stageLogs($buildResult, $recipeResultNode)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
-    <div id="stage-log-${project.name}-${buildResult.number}-${recipeResultNode.stageName}" class="box">
+    <h3 class="two-heading">
+        <span id="refresh-time"></span>
+        #wwtext("name=tail.box")
+    </h3>
+#if($stageName)
+    #set($boxId = "stage-log-${project.name}-${buildResult.number}-${recipeResultNode.stageName}")
+#else
+    #set($boxId = "build-log-${project.name}-${buildResult.number}")
+#end
+    <div id='#id($boxId)' class="two-box">
         <div id="panel">
             #parse("ajax/tail-log-panel.vm")
         </div>

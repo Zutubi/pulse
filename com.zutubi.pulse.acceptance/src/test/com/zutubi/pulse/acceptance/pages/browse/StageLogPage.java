@@ -8,9 +8,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class StageLogPage extends AbstractLogPage
 {
-    private String project;
-    private String buildNumber;
-    private String stageName;
+    protected String project;
+    protected String buildNumber;
+    protected String stageName;
 
     public StageLogPage(SeleniumBrowser browser, Urls urls, String projectName, long buildNumber, String stageName)
     {
@@ -22,6 +22,6 @@ public class StageLogPage extends AbstractLogPage
 
     public String getUrl()
     {
-        return urls.stageLogs(project, buildNumber, stageName);
+        return urls.stageLog(project, buildNumber, stageName);
     }
 }

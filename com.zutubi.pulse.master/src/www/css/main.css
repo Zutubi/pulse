@@ -543,9 +543,9 @@ Browse view
     padding: 4px;
 }
 
-td.group-header, th.two-heading {
+td.group-header, th.two-heading, h3.two-heading {
     border-top: solid 1px #bbb;
-    border-bottom: solid 1px #bbb;
+    border-bottom: dotted 1px #bbb;
     padding: 6px 4px;
     background-color: #f2f2ff;
     font-weight: bold;
@@ -700,10 +700,11 @@ img.popdown-pressed {
 Changelists
 */
 
-p#changes-header {
+.build-page-header {
     border: dotted 1px #bbb;
     padding: 6px;
     background-color: #ffffe8;
+    margin: 10px 0 10px 0;
 }
 
 .change {
@@ -734,6 +735,21 @@ p#changes-header {
 }
 
 /*------------------------------
+Build logs
+*/
+
+.log-header td {
+    padding: 0 5px 0 5px;
+}
+
+#refresh-time {
+    font-size: 0.8em;
+    font-weight: normal;
+    font-style: italic;
+    float: right    
+}
+
+/*------------------------------
 Boxes
 */
 
@@ -742,10 +758,14 @@ h3.heading {
     border-bottom: 0;
 }
 
-div.box {
+div.box, div.two-box {
     margin: 0;
     margin-bottom: 16px;
     padding: 6px;
+}
+
+div.two-box {
+    border-bottom: dotted 1px #bbb;
 }
 
 div.floating {

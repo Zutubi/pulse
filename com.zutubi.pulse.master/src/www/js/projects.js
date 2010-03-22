@@ -222,7 +222,7 @@ ZUTUBI.ConcreteProject.prototype = {
         {
             items = [
                 this.getBuildMenuItem(menuArg, 'summary', 'information.gif'),
-                this.getBuildMenuItem(menuArg, 'log', 'script.gif'),
+                this.getBuildMenuItem(menuArg, 'logs', 'script.gif'),
                 this.getBuildMenuItem(menuArg, 'details', 'magnifier.gif', 'detailed view'),
                 this.getBuildMenuItem(menuArg, 'changes', 'page_code.gif'),
                 this.getBuildMenuItem(menuArg, 'artifacts', 'folder_page.gif')
