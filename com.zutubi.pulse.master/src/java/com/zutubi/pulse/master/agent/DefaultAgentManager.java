@@ -329,9 +329,12 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    public void dequeueSynchronisationMessage(AgentSynchronisationMessage message)
+    public void dequeueSynchronisationMessages(List<AgentSynchronisationMessage> messages)
     {
-        agentSynchronisationMessageDao.delete(message);
+        for (AgentSynchronisationMessage message: messages)
+        {
+            agentSynchronisationMessageDao.delete(message);
+        }
     }
 
     public void saveSynchronisationMessages(List<AgentSynchronisationMessage> messages)

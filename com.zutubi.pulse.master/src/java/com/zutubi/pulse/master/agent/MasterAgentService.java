@@ -12,7 +12,7 @@ import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -31,7 +31,7 @@ public class MasterAgentService implements AgentService
     private MasterConfigurationManager configurationManager;
     private ObjectFactory objectFactory;
     private ResourceManager resourceManager;
-    private SynchronisationTaskExecutor synchronisationTaskExecutor;
+    private SynchronisationTaskRunner synchronisationTaskRunner;
 
     public MasterAgentService(AgentConfiguration agentConfig)
     {
@@ -111,7 +111,7 @@ public class MasterAgentService implements AgentService
 
     public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
-        return synchronisationTaskExecutor.synchronise(messages);
+        return synchronisationTaskRunner.synchronise(messages);
     }
 
     @Override
@@ -146,8 +146,8 @@ public class MasterAgentService implements AgentService
         this.resourceManager = resourceManager;
     }
 
-    public void setSynchronisationTaskExecutor(SynchronisationTaskExecutor synchronisationTaskExecutor)
+    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
     {
-        this.synchronisationTaskExecutor = synchronisationTaskExecutor;
+        this.synchronisationTaskRunner = synchronisationTaskRunner;
     }
 }

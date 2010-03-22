@@ -38,6 +38,8 @@ import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.pulse.servercore.agent.TestSynchronisationTask;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
@@ -82,6 +84,7 @@ public class RemoteApi
     private FatController fatController;
     private BuildResultDao buildResultDao;
     private BuildRequestRegistry buildRequestRegistry;
+    private SynchronisationTaskFactory synchronisationTaskFactory;
 
     public RemoteApi()
     {
@@ -1414,7 +1417,8 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            agentManager.enqueueSynchronisationMessage(internalGetAgent(agent), new TestSynchronisationTask(succeed).toMessage(), description);
+            SynchronisationMessage message = synchronisationTaskFactory.toMessage(new TestSynchronisationTask(succeed));
+            agentManager.enqueueSynchronisationMessage(internalGetAgent(agent), message, description);
             return true;
         }
         finally
@@ -4042,5 +4046,10 @@ public class RemoteApi
     public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
     {
         this.buildRequestRegistry = buildRequestRegistry;
+    }
+
+    public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
+    {
+        this.synchronisationTaskFactory = synchronisationTaskFactory;
     }
 }

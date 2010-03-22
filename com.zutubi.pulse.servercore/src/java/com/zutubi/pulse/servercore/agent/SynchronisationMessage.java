@@ -9,13 +9,13 @@ import java.util.Properties;
  */
 public class SynchronisationMessage
 {
-    private SynchronisationTask.Type type;
+    private String typeName;
     private Properties arguments = new Properties();
 
     /**
      * For hibernate.
      *
-     * @see #SynchronisationMessage(com.zutubi.pulse.servercore.agent.SynchronisationTask.Type, java.util.Properties)
+     * @see #SynchronisationMessage(String, java.util.Properties)
      */
     public SynchronisationMessage()
     {
@@ -26,12 +26,12 @@ public class SynchronisationMessage
      * type with the given arguments.  These details are used to convert this
      * message into an executable task on the agent side.
      *
-     * @param type      type of task this message represents
+     * @param typeName  name of the type of task this message represents
      * @param arguments arguments for the task (name-value string pairs)
      */
-    public SynchronisationMessage(SynchronisationTask.Type type, Properties arguments)
+    public SynchronisationMessage(String typeName, Properties arguments)
     {
-        this.type = type;
+        this.typeName = typeName;
         this.arguments = arguments;
     }
 
@@ -40,22 +40,22 @@ public class SynchronisationMessage
      */
     public SynchronisationTask.Type getType()
     {
-        return type;
+        return SynchronisationTask.Type.valueOf(typeName);
     }
 
     public void setType(SynchronisationTask.Type type)
     {
-        this.type = type;
+        this.typeName = type.name();
     }
 
-    private String getTypeName()
+    public String getTypeName()
     {
-        return type.name();
+        return typeName;
     }
 
-    private void setTypeName(String typeName)
+    public void setTypeName(String typeName)
     {
-        this.type = SynchronisationTask.Type.valueOf(typeName);
+        this.typeName = typeName;
     }
 
     /**
@@ -89,7 +89,7 @@ public class SynchronisationMessage
         {
             return false;
         }
-        if (type != that.type)
+        if (!typeName.equals(that.typeName))
         {
             return false;
         }
@@ -100,7 +100,7 @@ public class SynchronisationMessage
     @Override
     public int hashCode()
     {
-        int result = type != null ? type.hashCode() : 0;
+        int result = typeName != null ? typeName.hashCode() : 0;
         result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
         return result;
     }

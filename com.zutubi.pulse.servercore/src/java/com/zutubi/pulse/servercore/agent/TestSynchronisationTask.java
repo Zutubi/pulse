@@ -1,13 +1,15 @@
 package com.zutubi.pulse.servercore.agent;
 
-import java.util.Properties;
-
 /**
  * A synchronisation task that exists purely for testing purposes.
  */
-public class TestSynchronisationTask extends SynchronisationTaskSupport implements SynchronisationTask
+public class TestSynchronisationTask implements SynchronisationTask
 {
     private boolean succeed;
+
+    public TestSynchronisationTask()
+    {
+    }
 
     /**
      * Create a new task for testing.
@@ -20,14 +22,9 @@ public class TestSynchronisationTask extends SynchronisationTaskSupport implemen
         this.succeed = succeed;
     }
 
-    public TestSynchronisationTask(Properties properties)
+    public boolean isSucceed()
     {
-        super(properties);
-    }
-
-    public Type getType()
-    {
-        return Type.TEST;
+        return succeed;
     }
 
     public void execute()

@@ -4,17 +4,20 @@ import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * A synchronisation task that renames a directory.  If the source does not
  * exist, the request is ignored (this should also catch retries).  If the
  * destination already exists, the task fails.
  */
-public class RenameDirectoryTask extends SynchronisationTaskSupport implements SynchronisationTask
+public class RenameDirectoryTask implements SynchronisationTask
 {
     private String source;
     private String dest;
+
+    public RenameDirectoryTask()
+    {
+    }
 
     /**
      * Create a new task to rename source to dest.
@@ -26,16 +29,6 @@ public class RenameDirectoryTask extends SynchronisationTaskSupport implements S
     {
         this.source = source;
         this.dest = dest;
-    }
-
-    public RenameDirectoryTask(Properties properties)
-    {
-        super(properties);
-    }
-
-    public Type getType()
-    {
-        return Type.RENAME_DIRECTORY;
     }
 
     public void execute()

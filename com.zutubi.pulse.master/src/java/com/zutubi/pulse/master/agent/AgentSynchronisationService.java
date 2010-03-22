@@ -123,9 +123,9 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             private void cleanupOldCompletedMessages(List<AgentSynchronisationMessage> messages)
             {
                 List<AgentSynchronisationMessage> completed = filter(messages, new InvertedPredicate<AgentSynchronisationMessage>(new PendingMessagesPredicate()));
-                for (int i = 0; i < completed.size() - COMPLETED_MESSAGE_LIMIT; i++)
+                if (completed.size() > COMPLETED_MESSAGE_LIMIT)
                 {
-                    agentManager.dequeueSynchronisationMessage(completed.get(i));
+                    agentManager.dequeueSynchronisationMessages(completed.subList(0, completed.size() - COMPLETED_MESSAGE_LIMIT));
                 }
             }
         });
@@ -159,14 +159,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
     {
         public boolean satisfied(AgentSynchronisationMessage message)
         {
-            switch (message.getStatus())
-            {
-                case FAILED_PERMANENTLY:
-                case SUCCEEDED:
-                    return false;
-                default:
-                    return true;
-            }
+            return message.getStatus().isPending();
         }
     }
 

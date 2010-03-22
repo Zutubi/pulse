@@ -77,11 +77,11 @@ public interface AgentManager extends AgentPersistentStatusManager
     void enqueueSynchronisationMessage(Agent agent, SynchronisationMessage message, String description);
 
     /**
-     * Dequeues (deletes) the given agent synchronisation message.
+     * Dequeues (deletes) the given agent synchronisation messages.
      *
-     * @param message the message to delete
+     * @param messages the messages to delete
      */
-    void dequeueSynchronisationMessage(AgentSynchronisationMessage message);
+    void dequeueSynchronisationMessages(List<AgentSynchronisationMessage> messages);
 
     /**
      * Saves changes to the given agent synchronisation messages.

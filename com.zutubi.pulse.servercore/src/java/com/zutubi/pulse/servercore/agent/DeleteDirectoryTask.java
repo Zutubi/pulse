@@ -3,7 +3,6 @@ package com.zutubi.pulse.servercore.agent;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
  * A synchronisation task that deletes a directory.  If the directory does not
@@ -12,10 +11,14 @@ import java.util.Properties;
  * As deleting can take time, the directory is just marked as dead and cleaned
  * asynchronously.
  */
-public class DeleteDirectoryTask extends SynchronisationTaskSupport implements SynchronisationTask
+public class DeleteDirectoryTask implements SynchronisationTask
 {
     private String path;
     private transient FileDeletionService fileDeletionService;
+
+    public DeleteDirectoryTask()
+    {
+    }
 
     /**
      * Creates a task to delete a directory.
@@ -25,16 +28,6 @@ public class DeleteDirectoryTask extends SynchronisationTaskSupport implements S
     public DeleteDirectoryTask(String path)
     {
         this.path = path;
-    }
-
-    public DeleteDirectoryTask(Properties properties)
-    {
-        super(properties);
-    }
-
-    public Type getType()
-    {
-        return Type.CLEANUP_DIRECTORY;
     }
 
     public void execute()

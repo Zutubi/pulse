@@ -14,7 +14,9 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.util.Constants;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import org.mockito.InOrder;
@@ -42,6 +44,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     private AgentService agentService;
     private DefaultAgent agent;
     private AgentManager agentManager;
+    private SynchronisationTaskFactory synchronisationTaskFactory;
 
     @Override
     protected void setUp() throws Exception
@@ -61,7 +64,8 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         {
             public List<AgentSynchronisationMessage> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                // Return a copy so we force calls to save to update our list.
+                // Return a copy to enforce the fact that messages need to be
+                // saved to affect the "persistent" list.
                 return copy(messages);
             }
         }).when(agentManager).getSynchronisationMessages(Matchers.<Agent>anyObject());
@@ -86,11 +90,14 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         {
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                AgentSynchronisationMessage message = (AgentSynchronisationMessage) invocationOnMock.getArguments()[0];
-                messages.remove(message);
+                List<AgentSynchronisationMessage> toRemove = (List<AgentSynchronisationMessage>) invocationOnMock.getArguments()[0];
+                for (AgentSynchronisationMessage message: toRemove)
+                {
+                    messages.remove(message);
+                }
                 return null;
             }
-        }).when(agentManager).dequeueSynchronisationMessage(Matchers.<AgentSynchronisationMessage>anyObject());
+        }).when(agentManager).dequeueSynchronisationMessages(Matchers.<List<AgentSynchronisationMessage>>anyObject());
 
         doAnswer(new Answer<Boolean>()
         {
@@ -106,6 +113,9 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         listener = new RecordingEventListener(AgentSynchronisationCompleteEvent.class);
         eventManager.register(listener);
 
+        synchronisationTaskFactory = new SynchronisationTaskFactory();
+        synchronisationTaskFactory.setObjectFactory(new DefaultObjectFactory());
+        
         AgentSynchronisationService service = new AgentSynchronisationService();
         service.setAgentManager(agentManager);
         service.setEventManager(eventManager);
@@ -137,7 +147,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     {
         Properties arguments = new Properties();
         arguments.putAll(message.getArguments());
-        return new SynchronisationMessage(message.getType(), arguments);
+        return new SynchronisationMessage(message.getTypeName(), arguments);
     }
 
     public void testNoMessages()
@@ -310,19 +320,24 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
     private AgentSynchronisationMessage enqueueSuccessfulMessage()
     {
-        AgentSynchronisationMessage message = new AgentSynchronisationMessage(agentState, new DeleteDirectoryTask("blah").toMessage(), "desc");
-        message.setId(nextId.getAndIncrement());
-        messages.add(message);
+        AgentSynchronisationMessage message = enqueueNewMessage();
         results.add(new SynchronisationMessageResult());
         return message;
     }
 
     private void enqueueFailedMessage(String statusMessage)
     {
-        AgentSynchronisationMessage message = new AgentSynchronisationMessage(agentState, new DeleteDirectoryTask("blah").toMessage(), "desc");
-        message.setId(nextId.getAndIncrement());
-        messages.add(message);
+        enqueueNewMessage();
         results.add(new SynchronisationMessageResult(false, statusMessage));
+    }
+
+    private AgentSynchronisationMessage enqueueNewMessage()
+    {
+        SynchronisationMessage message = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("blah"));
+        AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, "desc");
+        agentMessage.setId(nextId.getAndIncrement());
+        messages.add(agentMessage);
+        return agentMessage;
     }
 
     private void publishStatusChange()

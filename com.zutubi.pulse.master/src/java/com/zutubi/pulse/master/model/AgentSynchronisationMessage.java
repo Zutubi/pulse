@@ -30,26 +30,44 @@ public class AgentSynchronisationMessage extends Entity
          * The initial state for a message that has been queued and not yet
          * processed.
          */
-        QUEUED,
+        QUEUED(true),
         /**
          * The state for a message that has been sent to an agent for
          * processing, before the agent has responded.
          */
-        PROCESSING,
+        PROCESSING(true),
         /**
          * Indicates the message has been successfully processed.
          */
-        SUCCEEDED,
+        SUCCEEDED(false),
         /**
          * Indicates that the message failed to be sent to the agent, or the
          * agent failed to respond.  The message should be retried.
          */
-        SENDING_FAILED,
+        SENDING_FAILED(true),
         /**
          * Indicates that the task corresponding to the message failed and the
          * task should not be retried.
          */
-        FAILED_PERMANENTLY;
+        FAILED_PERMANENTLY(false);
+
+        private boolean pending;
+
+        Status(boolean pending)
+        {
+            this.pending = pending;
+        }
+
+        /**
+         * Indicates if this status is for pending messages: i.e. messages that
+         * should be sent (or resent) on the next synchronisation cycle.
+         *
+         * @return true if messages with this status are pending
+         */
+        public boolean isPending()
+        {
+            return pending;
+        }
 
         public String getPrettyString()
         {

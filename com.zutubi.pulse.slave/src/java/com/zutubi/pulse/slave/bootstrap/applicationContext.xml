@@ -62,7 +62,9 @@
 
     <bean id="serverRecipeService" class="com.zutubi.pulse.servercore.ServerRecipeService" init-method="init"/>
 
-    <bean id="synchronisationTaskExecutor" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor"/>
+    <bean id="synchronisationTaskFactory" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory"/>
+    
+    <bean id="synchronisationTaskRunner" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner"/>
 
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 

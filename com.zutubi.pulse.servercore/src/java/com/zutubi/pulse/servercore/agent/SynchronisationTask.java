@@ -11,10 +11,21 @@ import com.zutubi.util.EnumUtils;
  *   <li>be robust to multiple execution</li>
  * </ul>
  *
- * To implement a task, add a new type in the enum here, and subclass {@link SynchronisationTaskSupport}.
- * Note that all tasks must include a constructor that takes a {@link java.util.Properties}
- * instance as its only argument.  These properties should be bound to the
- * task's fields (this comes for free using the support base class).
+ * To implement a task, add a new type in the enum here, add a corresponding
+ * entry to register the type in the static block of the {@link com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory}
+ * and in the implementing class:
+ *
+ * <ul>
+ *   <li>Declare all arguments required for the task as fields.  These will be
+ *       handled by the {@link SynchronisationTaskFactory}.</li>
+ *   <li>Use only field types that have corresponding {@link com.zutubi.tove.squeezer.Squeezers}.</li>
+ *   <li>Mark any fields that should not be sent in messages as transient.
+ *       (Note that static and final fields are also ignored during binding.)</li>
+ *   <li>Include a constructor that takes a single {@link java.util.Properties}
+ *       argument and forwards to the corresponding constructor in this class.</li>
+ *   <li>Avoid initialising fields, as this will overwrite changes made by the
+ *       binding implementation.</li>
+ * </ul>
  */
 public interface SynchronisationTask
 {
@@ -29,33 +40,16 @@ public interface SynchronisationTask
          * An instruction to remove a specific directory, e.g. a directory that
          * corresponds to a project that has been removed.
          */
-        CLEANUP_DIRECTORY(DeleteDirectoryTask.class),
+        CLEANUP_DIRECTORY,
         /**
          * An instruction to rename a directory, e.g. a persistent working
          * directory that includes a name that has changed in the config.
          */
-        RENAME_DIRECTORY(RenameDirectoryTask.class),
+        RENAME_DIRECTORY,
         /**
          * A task used for testing only.
          */
-        TEST(TestSynchronisationTask.class);
-
-        private Class<? extends SynchronisationTask> clazz;
-
-        Type(Class<? extends SynchronisationTask> clazz)
-        {
-            this.clazz = clazz;
-        }
-
-        /**
-         * Indicates which class implements tasks of this type.
-         *
-         * @return the class that implements this type of task
-         */
-        public Class<? extends SynchronisationTask> getClazz()
-        {
-            return clazz;
-        }
+        TEST;
 
         public String getPrettyString()
         {
@@ -68,22 +62,6 @@ public interface SynchronisationTask
             return EnumUtils.toString(this);
         }
     }
-
-    /**
-     * Returns the type of this task, from a pre-defined enumeration.
-     *
-     * @return the task type
-     */
-    Type getType();
-
-    /**
-     * Converts this task to a message which can be sent to an agent.  The
-     * message can be converted back on the agent side by constructing the
-     * correct task type using the message's arguments.
-     *
-     * @return a message encoding this task and its arguments
-     */
-    SynchronisationMessage toMessage();
 
     /**
      * Executes this task.  Implementations of this method:

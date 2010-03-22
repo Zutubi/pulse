@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskExecutor;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
@@ -39,7 +39,7 @@ public class SlaveAgentService implements AgentService
     private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
     private MasterLocationProvider masterLocationProvider;
-    private SynchronisationTaskExecutor synchronisationTaskExecutor;
+    private SynchronisationTaskRunner synchronisationTaskRunner;
 
     public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
@@ -172,7 +172,7 @@ public class SlaveAgentService implements AgentService
 
     public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
-        return synchronisationTaskExecutor.synchronise(messages);
+        return synchronisationTaskRunner.synchronise(messages);
     }
 
     public AgentConfiguration getAgentConfig()
@@ -212,8 +212,8 @@ public class SlaveAgentService implements AgentService
         this.masterLocationProvider = masterLocationProvider;
     }
 
-    public void setSynchronisationTaskExecutor(SynchronisationTaskExecutor synchronisationTaskExecutor)
+    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
     {
-        this.synchronisationTaskExecutor = synchronisationTaskExecutor;
+        this.synchronisationTaskRunner = synchronisationTaskRunner;
     }
 }
