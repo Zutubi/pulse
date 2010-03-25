@@ -69,13 +69,6 @@ public class NamedFileArtifactFileObject extends AbstractPulseFileObject impleme
         String path = artifactPath.substring(basePath.length() + 1);
         path = path.replace('\\', '/');
 
-/*
-        if (file.isDirectory())
-        {
-            path = path + "/";
-        }
-*/
-
         return "/file/artifacts/" + getArtifact().getId() + "/" + path;
     }
 
@@ -90,13 +83,13 @@ public class NamedFileArtifactFileObject extends AbstractPulseFileObject impleme
 
     protected StoredArtifact getArtifact() throws FileSystemException
     {
-        ArtifactProvider provider = (ArtifactProvider) getAncestor(ArtifactProvider.class);
+        ArtifactProvider provider = getAncestor(ArtifactProvider.class);
         return provider.getArtifact();
     }
 
     protected CommandResult getCommandResult() throws FileSystemException
     {
-        CommandResultProvider provider = (CommandResultProvider) getAncestor(CommandResultProvider.class);
+        CommandResultProvider provider = getAncestor(CommandResultProvider.class);
         return provider.getCommandResult();
     }
 }

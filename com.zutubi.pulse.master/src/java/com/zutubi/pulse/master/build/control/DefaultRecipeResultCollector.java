@@ -33,18 +33,12 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
-    public void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean collectWorkingCopy, boolean incremental, AgentService agentService)
+    public void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, AgentService agentService)
     {
         if (agentService != null)
         {
             File outputDest = paths.getOutputDir(result, recipeId);
-            File workDest = null;
-            if (collectWorkingCopy)
-            {
-                workDest = paths.getBaseDir(result, recipeId);
-            }
-
-            agentService.collectResults(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental), outputDest, workDest);
+            agentService.collectResults(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental), outputDest);
         }
     }
 

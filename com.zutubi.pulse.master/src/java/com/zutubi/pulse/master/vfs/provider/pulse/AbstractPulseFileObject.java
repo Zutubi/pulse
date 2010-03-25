@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.tove.security.AccessManager;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -22,10 +23,12 @@ import java.util.Map;
  */
 public abstract class AbstractPulseFileObject extends AbstractFileObject
 {
+    protected static final String[] NO_CHILDREN = {};
+
     protected ObjectFactory objectFactory;
 
     protected BuildManager buildManager;
-
+    protected AccessManager accessManager;
     protected ProjectManager projectManager;
 
     /**
@@ -131,14 +134,17 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      */
     public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
-        for(AbstractPulseFileObject ancestor = this; ancestor != null; ancestor = (AbstractPulseFileObject) ancestor.getParent())
+        AbstractPulseFileObject parent = (AbstractPulseFileObject) this.getParent();
+        if (parent != null)
         {
-            if (type.isInstance(ancestor))
+            for(AbstractPulseFileObject ancestor = parent; ancestor != null; ancestor = (AbstractPulseFileObject) ancestor.getParent())
             {
-                return type.cast(ancestor);
+                if (type.isInstance(ancestor))
+                {
+                    return type.cast(ancestor);
+                }
             }
         }
-
         return null;
     }
 
@@ -213,5 +219,10 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

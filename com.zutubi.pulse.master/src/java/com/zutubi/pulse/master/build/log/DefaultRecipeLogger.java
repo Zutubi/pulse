@@ -105,9 +105,9 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
         logMarker("Recipe '" + result.getRecipeNameSafe() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
     }
 
-    public void collecting(RecipeResult recipeResult, boolean collectWorkingCopy)
+    public void collecting(RecipeResult recipeResult)
     {
-        logMarker("Collecting recipe artifacts" + (collectWorkingCopy ? " and working copy..." : "..."));
+        logMarker("Collecting recipe artifacts...");
     }
 
     public void collectionComplete()

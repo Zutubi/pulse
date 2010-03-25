@@ -52,14 +52,9 @@ public class CleanupConfigurationFormatterTest extends PulseTestCase
         assertEquals("whole builds", formatter.getWhat(createConfig()));
     }
 
-    public void testFormatWhatWorkingDirectories()
-    {
-        assertEquals("working copy snapshots", formatter.getWhat(createConfig(WORKING_COPY_SNAPSHOT)));
-    }
-
     public void testFormatWhatAllOptions()
     {
-        assertEquals("working copy snapshots, build artifac...", formatter.getWhat(createConfig(WORKING_COPY_SNAPSHOT, BUILD_ARTIFACTS, REPOSITORY_ARTIFACTS)));
+        assertEquals("build artifacts, repository artifacts", formatter.getWhat(createConfig(BUILD_ARTIFACTS, REPOSITORY_ARTIFACTS)));
     }
 
     private CleanupConfiguration createConfig(CleanupWhat... whats)

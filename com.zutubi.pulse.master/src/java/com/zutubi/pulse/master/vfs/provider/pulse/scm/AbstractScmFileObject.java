@@ -17,6 +17,7 @@ import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
@@ -66,9 +67,18 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
 
         // now we need to determine the scm relative path to be used with the ScmFile instance.
 
-        ScmRootFileObject scmRoot = getAncestor(ScmRootFileObject.class);
+        FileObject root = null;
+        if (this instanceof ScmRootFileObject)
+        {
+            root = this;
+        }
+        else
+        {
+            root = getAncestor(ScmRootFileObject.class);
+        }
 
-        ScmFile fi = new ScmFile(UriParser.decode(scmRoot.getName().getRelativeName(name)), name.getType() == FileType.FOLDER);
+        String relativeName = root.getName().getRelativeName(name);
+        ScmFile fi = new ScmFile(UriParser.decode(relativeName), name.getType() == FileType.FOLDER);
 
         return objectFactory.buildBean(ScmFileObject.class,
                 new Class[]{ScmFile.class, FileName.class, AbstractFileSystem.class},

@@ -254,7 +254,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses, final Boolean hasWorkDir)
+    public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses)
     {
         return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -262,10 +262,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
                 addStatusesToCriteria(statuses, criteria);
-                if (hasWorkDir != null)
-                {
-                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
-                }
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
             }
@@ -287,12 +283,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final long earliestStartTime, final long latestStartTime, final Boolean hasWorkDir, final int first, final int max, final boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
     {
-        return queryBuilds(projects, states, null, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
+        return queryBuilds(projects, states, null, earliestStartTime, latestStartTime, first, max, mostRecentFirst);
     }
 
-    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] statuses, final long earliestStartTime, final long latestStartTime, final Boolean hasWorkDir, final int first, final int max, final boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] statuses, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -304,11 +300,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 addStatesToCriteria(states, criteria);
                 addStatusesToCriteria(statuses, criteria);
                 addDatesToCriteria(earliestStartTime, latestStartTime, criteria);
-
-                if (hasWorkDir != null)
-                {
-                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
-                }
 
                 if (first >= 0)
                 {
@@ -477,11 +468,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
     {
-        int total = getBuildCount(project, states, null, hasWorkDir);
+        int total = getBuildCount(project, states, null);
         if (total > limit)
         {
             // Clean out the difference
-            return queryBuilds(new Project[]{project}, states, 0, 0, hasWorkDir, 0, total - limit, false);
+            return queryBuilds(new Project[]{project}, states, 0, 0, 0, total - limit, false);
         }
 
         return Collections.emptyList();

@@ -101,7 +101,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     {
         if (isHtmlArtifact || isLinkArtifact)
         {
-            return new String[0];
+            return NO_CHILDREN;
         }
 
         File base = getArtifactBase();
@@ -109,7 +109,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         {
             return UriParser.encode(base.list());
         }
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class TemplateScopeFileObject extends AbstractPulseFileObject
             return new String[] { UriParser.encode(hierarchy.getRoot().getId()) };
         }
 
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public TemplateHierarchy getTemplateHierarchy() throws FileSystemException

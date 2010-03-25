@@ -2,7 +2,8 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class WorkingCopyContextFileObject extends AbstractPulseFileObject implements AddressableFileObject
+public class WorkingCopyContextFileObject extends AbstractPulseFileObject
 {
     public WorkingCopyContextFileObject(final FileName name, final AbstractFileSystem fs)
     {
@@ -39,31 +40,21 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
 
     protected String[] doListChildren() throws Exception
     {
-        List<String> recipeIds = new LinkedList<String>();
-        // list the recipe ids.
         BuildResult result = getBuildResult();
-        for (RecipeResultNode node : result.getRoot().getChildren())
-        {
-            recipeIds.add(Long.toString(node.getResult().getId()));
-        }
 
-        // can not list this node.
-        return recipeIds.toArray(new String[recipeIds.size()]);
+        List<RecipeResultNode> stages = result.getRoot().getChildren();
+        return CollectionUtils.mapToArray(stages, new Mapping<RecipeResultNode, String>()
+        {
+            public String map(RecipeResultNode node)
+            {
+                return Long.toString(node.getResult().getId());
+            }
+        }, new String[stages.size()]);
     }
 
     private BuildResult getBuildResult() throws FileSystemException
     {
         BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         return provider.getBuildResult();
-    }
-
-    public boolean isLocal()
-    {
-        return true;
-    }
-
-    public String getUrlPath() throws FileSystemException
-    {
-        return Urls.getBaselessInstance().buildWorkingCopy(getBuildResult());
     }
 }

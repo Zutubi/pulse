@@ -227,11 +227,6 @@ ZUTUBI.ConcreteProject.prototype = {
                 this.getBuildMenuItem(menuArg, 'changes', 'page_code.gif'),
                 this.getBuildMenuItem(menuArg, 'artifacts', 'folder_page.gif')
             ];
-
-            if (this.data.canViewSource)
-            {
-                items.push(this.getBuildMenuItem(menuArg, 'wc', 'page_gear.gif', 'working copy'));
-            }
         }
 
         return items;

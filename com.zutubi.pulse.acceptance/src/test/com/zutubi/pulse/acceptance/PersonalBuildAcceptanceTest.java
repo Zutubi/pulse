@@ -559,11 +559,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         PersonalBuildArtifactsPage artifactsPage = browser.openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
         browser.waitForLocator(artifactsPage.getCommandLocator("build"));
-
-        browser.click(IDs.buildWorkingCopyTab());
-        PersonalBuildWorkingCopyPage wcPage = browser.createPage(PersonalBuildWorkingCopyPage.class, buildNumber);
-        wcPage.waitFor();
-        assertTrue(wcPage.isWorkingCopyNotPresent());
     }
 
     private static class AcceptancePersonalBuildUI extends TestPersonalBuildUI

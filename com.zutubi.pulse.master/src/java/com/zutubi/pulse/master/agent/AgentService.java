@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 
@@ -25,15 +26,13 @@ public interface AgentService
 
     /**
      * Collects files produced by the recipe execution to the given local
-     * directories.  Note that working copy collection is optional.
+     * directories.
      *
      * @param recipeDetails details of the recipe used to find the results
      * @param outputDest    local directory to receive the output files
      *                      (artifacts)
-     * @param workDest      local directory to receive the working copy, or null
-     *                      if the working copy should not be collected
      */
-    void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest);
+    void collectResults(AgentRecipeDetails recipeDetails, File outputDest);
 
     void cleanup(AgentRecipeDetails recipeDetails);
 
@@ -55,4 +54,25 @@ public interface AgentService
      * @return results corresponding results for each of the messages
      */
     List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages);
+
+    /**
+     * List the path relative to the base directory of the defined recipe.
+     *
+     * @param recipeDetails details used to identify the base directory
+     * @param path          path relative to the base directory
+     *
+     * @return a list of file info instances representing the requested listing.
+     */
+    List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String path);
+
+    /**
+     * Retrieve the file info for the path relative to the base directory of the
+     * defined recipe.
+     *
+     * @param recipeDetails     the recipe details
+     * @param path              the path relative to the recipes base directory
+     *
+     * @return a file info object for the requested path.
+     */
+    FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String path);
 }

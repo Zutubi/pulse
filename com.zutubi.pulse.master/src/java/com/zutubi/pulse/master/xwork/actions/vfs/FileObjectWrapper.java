@@ -76,9 +76,6 @@ public class FileObjectWrapper
         return "";
     }
 
-    /**
-     *
-     */
     public String getType()
     {
         try
@@ -143,9 +140,6 @@ public class FileObjectWrapper
         return "";
     }
 
-    /**
-     *
-     */
     public boolean isContainer()
     {
         try
@@ -183,9 +177,16 @@ public class FileObjectWrapper
 
     public String getIconCls()
     {
-        if (fo instanceof AbstractPulseFileObject)
+        try
         {
-            return ((AbstractPulseFileObject)fo).getIconCls();
+            if (fo instanceof AbstractPulseFileObject)
+            {
+                return ((AbstractPulseFileObject)fo).getIconCls();
+            }
+        }
+        catch (Exception e)
+        {
+            // noop.
         }
         return null;
     }

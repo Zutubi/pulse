@@ -91,93 +91,80 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
         result.complete();
         result.getStamps().setEndTime(end);
-        result.setHasWorkDir(hasWorkDir);
         buildResultDao.save(result);
         allResults.add(0, result);
     }
 
     public void testQueryAll()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, -1, -1, true);
         EqualityAssertions.assertEquals(allResults, results);
     }
 
     public void testAllOldestFirst()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, -1, -1, false);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, -1, -1, false);
         EqualityAssertions.assertEquals(getReversed(), results);
     }
 
     public void testProjectP1()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1 }, null, 0, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1 }, null, 0, 0, -1, -1, true);
         EqualityAssertions.assertEquals(getFiltered(p1), results);
     }
 
     public void testProjectBoth()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1, p2 }, null, 0, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1, p2 }, null, 0, 0, -1, -1, true);
         EqualityAssertions.assertEquals(allResults, results);
     }
 
     public void testSuccessful()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.SUCCESS } , 0, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.SUCCESS } , 0, 0, -1, -1, true);
         EqualityAssertions.assertEquals(getFiltered(ResultState.SUCCESS), results);
     }
 
     public void testErrorOrFail()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, ResultState.getBrokenStates() , 0, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, ResultState.getBrokenStates() , 0, 0, -1, -1, true);
         EqualityAssertions.assertEquals(getFiltered(ResultState.getBrokenStates()), results);
     }
 
     public void testEarliestTime()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 15000, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 15000, 0, -1, -1, true);
         EqualityAssertions.assertEquals(getFiltered(15000, 0), results);
     }
 
     public void testLatestTime()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 15000, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 15000, -1, -1, true);
         EqualityAssertions.assertEquals(getFiltered(0, 15000), results);
     }
 
     public void testEarliestAndLatestTime()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 15000, 15000, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 15000, 15000, -1, -1, true);
         assertEquals(1, results.size());
         EqualityAssertions.assertEquals(getFiltered(15000, 15000), results);
     }
 
     public void testEarliestTimeBeyond()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 150000, 0, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 150000, 0, -1, -1, true);
         assertEquals(0, results.size());
     }
 
     public void testLatestTimeBefore()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 1, null, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 1, -1, -1, true);
         assertEquals(0, results.size());
-    }
-
-    public void testHasWorkDir()
-    {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, true, -1, -1, true);
-        EqualityAssertions.assertEquals(getFiltered(true), results);
-    }
-
-    public void testHasNoWorkDir()
-    {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, false, -1, -1, true);
-        EqualityAssertions.assertEquals(getFiltered(false), results);
     }
 
     public void testPage()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, 2, 5, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, 2, 5, true);
         EqualityAssertions.assertEquals(getPaged(2, 5), results);
     }
 
@@ -235,16 +222,6 @@ public class BuildQueryTest extends MasterPersistenceTestCase
                 }
 
                 return true;
-            }
-        });
-    }
-
-    private List<BuildResult> getFiltered(final boolean hasWorkDir)
-    {
-        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
-            public boolean satisfied(BuildResult t)
-            {
-                return t.getHasWorkDir() == hasWorkDir;
             }
         });
     }

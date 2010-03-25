@@ -340,12 +340,12 @@ public class RecipeController
         return finished;
     }
 
-    public void collect(BuildResult buildResult, boolean collectWorkingCopy)
+    public void collect(BuildResult buildResult)
     {
         try
         {
-            logger.collecting(recipeResult, collectWorkingCopy);
-            collector.collect(buildResult, recipeResultNode.getStageHandle(), recipeResultNode.getStageName(), recipeResult.getId(), collectWorkingCopy, recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            logger.collecting(recipeResult);
+            collector.collect(buildResult, recipeResultNode.getStageHandle(), recipeResultNode.getStageName(), recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
             copyBuildScopedData();
         }
         catch (BuildException e)

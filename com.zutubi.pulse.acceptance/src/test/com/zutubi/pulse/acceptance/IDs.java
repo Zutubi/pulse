@@ -48,11 +48,6 @@ public class IDs
         return buildTab("artifacts");
     }
 
-    public static String buildWorkingCopyTab()
-    {
-        return buildTab("wc");
-    }
-
     private static String buildCell(String project, long number)
     {
         return project + ".build." + Long.toString(number);

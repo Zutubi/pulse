@@ -1,20 +1,17 @@
 package com.zutubi.pulse.servercore.filesystem;
 
 /**
- * <class comment/>
+ * The FileInfo is a value object used to hold information file
+ * related information for serialisation via hessian.
  */
 public class FileInfo
 {
+    private boolean exists;
     private boolean hidden;
     private boolean directory;
     private boolean file;
     private String name;
-    private String absolutePath;
-    private String separator;
-    private String path;
     private long length;
-
-    private String[] list;
 
     public FileInfo()
     {
@@ -23,20 +20,17 @@ public class FileInfo
 
     public FileInfo(java.io.File f)
     {
+        exists = f.exists();
         hidden = f.isHidden();
         file = f.isFile();
         directory = f.isDirectory();
         name = f.getName();
-        absolutePath = f.getAbsolutePath();
-        separator = java.io.File.separator;
-        path = f.getPath();
         length = f.length();
-        list = f.list();
     }
 
-    public String getSeparator()
+    public boolean exists()
     {
-        return separator;
+        return exists;
     }
 
     public boolean isHidden()
@@ -54,28 +48,13 @@ public class FileInfo
         return file;
     }
 
-    public String getPath()
-    {
-        return path;
-    }
-
     public String getName()
     {
         return name;
     }
 
-    public String getAbsolutePath()
-    {
-        return absolutePath;
-    }
-
     public long length()
     {
         return length;
-    }
-
-    public String[] list()
-    {
-        return list;
     }
 }

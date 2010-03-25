@@ -6,16 +6,19 @@ import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
+import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
 import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -159,27 +162,30 @@ public class SlaveServiceImpl implements SlaveService
         Runtime.getRuntime().gc();
     }
 
-    //---( Remote File API )---
-
-    public FileInfo getFileInfo(String token, String path)
+    public List<FileInfo> getFileInfos(String token, AgentRecipeDetails recipeDetails, String relativePath)
     {
         serviceTokenManager.validateToken(token);
 
-        return new FileInfo(new File(path));
-    }
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
 
-    public String[] listRoots(String token)
-    {
-        serviceTokenManager.validateToken(token);
-
-        List<String> roots = new LinkedList<String>();
-        for (File root : File.listRoots())
+        File path = new File(recipePaths.getBaseDir(), relativePath);
+        File[] listing = path.listFiles();
+        if (listing != null)
         {
-            roots.add(root.getAbsolutePath());
+            return CollectionUtils.map(listing,  new ToFileInfoMapping());
         }
-        return roots.toArray(new String[roots.size()]);
+
+        return new LinkedList<FileInfo>();
     }
 
+    public FileInfo getFileInfo(String token, AgentRecipeDetails recipeDetails, String relativePath)
+    {
+        serviceTokenManager.validateToken(token);
+
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
+        File base = recipePaths.getBaseDir();
+        return new FileInfo(new File(base, relativePath));
+    }
 
     public ServiceTokenManager getServiceTokenManager()
     {

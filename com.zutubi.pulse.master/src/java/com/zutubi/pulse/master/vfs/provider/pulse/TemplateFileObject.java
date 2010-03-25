@@ -90,7 +90,7 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
             return UriParser.encode(children);
         }
 
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public String getCls()

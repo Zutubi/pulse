@@ -40,7 +40,7 @@ public class NamedStageFileObject extends AbstractPulseFileObject implements Rec
     protected String[] doListChildren() throws Exception
     {
         // do not support listing for now.
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public RecipeResult getRecipeResult() throws FileSystemException
@@ -72,7 +72,7 @@ public class NamedStageFileObject extends AbstractPulseFileObject implements Rec
 
     protected BuildResult getBuildResult() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         if (provider == null)
         {
             throw new FileSystemException("Missing build result context.");

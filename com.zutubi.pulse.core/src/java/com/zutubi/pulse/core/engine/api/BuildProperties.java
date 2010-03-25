@@ -96,11 +96,6 @@ public class BuildProperties
      */
     public static final String PROPERTY_COMPRESS_ARTIFACTS      = "compress.artifacts";
     /**
-     * An internal property used by the master to instruct agents to compress
-     * a working copy snapshot for download.
-     */
-    public static final String PROPERTY_COMPRESS_WORKING_DIR    = "compress.working.dir";
-    /**
      * The dependency descriptor instance for a build.  This is an instance of the ivy ModuleDescriptor.
      */
     public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";

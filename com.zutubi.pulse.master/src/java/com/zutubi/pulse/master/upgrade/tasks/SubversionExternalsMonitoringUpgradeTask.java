@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import com.zutubi.tove.type.record.RecordManager;
 
 import static java.util.Arrays.asList;
 import java.util.List;
@@ -35,10 +34,5 @@ public class SubversionExternalsMonitoringUpgradeTask extends AbstractRecordProp
     protected List<RecordUpgrader> getRecordUpgraders()
     {
         return asList(RecordUpgraders.newAddProperty(PROPERTY_MONITORING, "MONITOR_SELECTED"));
-    }
-
-    public void setRecordManager(RecordManager recordManager)
-    {
-        this.recordManager = recordManager;
     }
 }

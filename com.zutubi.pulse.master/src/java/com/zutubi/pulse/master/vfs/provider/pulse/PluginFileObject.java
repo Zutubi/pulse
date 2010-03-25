@@ -31,7 +31,7 @@ public class PluginFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public String getId()
@@ -43,7 +43,6 @@ public class PluginFileObject extends AbstractPulseFileObject
     {
         return plugin.getName();
     }
-
 
     public String getFileType() throws FileSystemException
     {

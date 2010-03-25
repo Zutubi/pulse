@@ -31,6 +31,6 @@ public class NamedArtifactsFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         // do not list
-        return new String[0];
+        return NO_CHILDREN;
     }
 }

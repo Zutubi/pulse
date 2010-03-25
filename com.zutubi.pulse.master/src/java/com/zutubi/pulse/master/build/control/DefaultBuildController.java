@@ -741,7 +741,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
             if (collect)
             {
-                controller.collect(buildResult, projectConfig.getOptions().getRetainWorkingCopy());
+                controller.collect(buildResult);
             }
 
             controller.cleanup(buildResult);
@@ -853,7 +853,6 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
             }
 
-            buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
             buildResult.complete();
             buildLogger.completed(buildResult);
 

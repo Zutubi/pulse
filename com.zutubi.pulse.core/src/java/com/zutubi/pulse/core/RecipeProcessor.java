@@ -100,7 +100,12 @@ public class RecipeProcessor
             RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
             storeTestResults(paths, recipeResult, testResults);
             storeCustomFields(paths, customFields);
-            compressResults(paths, context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, false), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, false));
+            
+            boolean compress = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, false);
+            if (compress)
+            {
+                compressResults(paths);
+            }
 
             recipeResult.complete();
             eventManager.publish(new RecipeCompletedEvent(this, recipeResult));
@@ -167,24 +172,12 @@ public class RecipeProcessor
         executeRecipe(recipeConfiguration, status, context, outputDir);
     }
 
-    private void compressResults(RecipePaths paths, boolean compressArtifacts, boolean compressWorkingCopy)
+    private void compressResults(RecipePaths paths)
     {
-        if (compressArtifacts)
+        eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing recipe artifacts..."));
+        if (zipDir(paths.getOutputDir()))
         {
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing recipe artifacts..."));
-            if (zipDir(paths.getOutputDir()))
-            {
-                eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Artifacts compressed."));
-            }
-        }
-
-        if (compressWorkingCopy)
-        {
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing working copy snapshot..."));
-            if (zipDir(paths.getBaseDir()))
-            {
-                eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Working copy snapshot compressed."));
-            }
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Artifacts compressed."));
         }
     }
 

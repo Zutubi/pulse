@@ -43,7 +43,7 @@ public class WizardsFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         // do not support listing.
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public boolean isLocal()

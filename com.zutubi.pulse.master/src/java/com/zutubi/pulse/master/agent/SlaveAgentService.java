@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
@@ -36,7 +36,6 @@ public class SlaveAgentService implements AgentService
 
     private SlaveService service;
     private AgentConfiguration agentConfig;
-    private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
     private MasterLocationProvider masterLocationProvider;
     private SynchronisationTaskRunner synchronisationTaskRunner;
@@ -59,16 +58,7 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
-    {
-        collect(recipeDetails, true, outputDest);
-        if (workDest != null)
-        {
-            collect(recipeDetails, false, workDest);
-        }
-    }
-
-    private void collect(AgentRecipeDetails recipeDetails, boolean output, File destination)
+    public void collectResults(AgentRecipeDetails recipeDetails, File destination)
     {
         FileOutputStream fos = null;
         File tempDir = null;
@@ -96,7 +86,7 @@ public class SlaveAgentService implements AgentService
                                             asPair(PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId())),
                                             asPair(PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental())),
                                             asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getProjectPersistentPattern()),
-                                            asPair(PARAM_OUTPUT, Boolean.toString(output)));
+                                            asPair(PARAM_OUTPUT, Boolean.toString(true)));
 
             URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
             URLConnection urlConnection = resultUrl.openConnection();
@@ -175,6 +165,16 @@ public class SlaveAgentService implements AgentService
         return synchronisationTaskRunner.synchronise(messages);
     }
 
+    public List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String path)
+    {
+        return service.getFileInfos(serviceTokenManager.getToken(), recipeDetails, path);
+    }
+
+    public FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String path)
+    {
+        return service.getFileInfo(serviceTokenManager.getToken(), recipeDetails, path);    
+    }
+
     public AgentConfiguration getAgentConfig()
     {
         return agentConfig;
@@ -195,11 +195,6 @@ public class SlaveAgentService implements AgentService
         }
 
         return false;
-    }
-
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
     }
 
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)

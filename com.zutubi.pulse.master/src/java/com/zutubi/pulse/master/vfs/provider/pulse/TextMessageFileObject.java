@@ -30,7 +30,7 @@ public class TextMessageFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public String getIconCls()

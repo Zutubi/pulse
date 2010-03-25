@@ -1,30 +1,34 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.master.MasterBuildPaths;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.vfs.provider.pulse.file.FileInfoRootFileObject;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-import org.apache.commons.vfs.provider.UriParser;
 
-import java.io.File;
+import java.util.List;
 
 /**
  * <class comment/>
  */
-public class WorkingCopyStageFileObject extends AbstractPulseFileObject implements RecipeResultProvider
+public class WorkingCopyStageFileObject extends FileInfoRootFileObject implements RecipeResultProvider
 {
-    private MasterConfigurationManager configurationManager;
+    private AgentManager agentManager;
+
+    private static final String NO_WORKING_COPY_AVAILABLE = "no working copy available";
 
     private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
 
     private final long recipeId;
-
-    private static final String NO_WORKING_COPY_AVAILABLE = "no working copy available";
 
     public WorkingCopyStageFileObject(final FileName name, final long recipeId, final AbstractFileSystem fs)
     {
@@ -35,8 +39,8 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
-        String child = fileName.getBaseName();
-        if (child.equals(NO_WORKING_COPY_AVAILABLE))
+        String childName = fileName.getBaseName();
+        if (childName.equals(NO_WORKING_COPY_AVAILABLE))
         {
             return objectFactory.buildBean(TextMessageFileObject.class,
                     new Class[]{FileName.class, String.class, AbstractFileSystem.class},
@@ -44,47 +48,63 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
             );
         }
 
-        File newBase = new File(getWorkingCopyBase(), child);
-
-        return objectFactory.buildBean(WorkingCopyFileObject.class,
-                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
-                new Object[]{fileName, newBase, pfs}
-        );
+        return super.createFile(fileName);
     }
 
-    protected FileType doGetType() throws Exception
+    protected String[] doListChildren() throws FileSystemException
     {
-        return FileType.FOLDER;
+        String[] children = super.doListChildren();
+        if (children.length == 0)
+        {
+            return new String[]{NO_WORKING_COPY_AVAILABLE};
+        }
+        return children;
     }
 
-    protected String[] doListChildren() throws Exception
+    public List<FileInfo> getFileInfos(String path)
     {
-        if (!getRecipeResult().completed())
-        {
-            // only look at the commands is the recipe is complete.
-            return new String[0];
-        }
+        RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
+        BuildResult buildResult = buildManager.getByRecipeId(recipeId);
+        ProjectConfiguration projectConfig = buildResult.getProject().getConfig();
 
-        File copyBase = getWorkingCopyBase();
-        if (copyBase.isDirectory())
-        {
-            return UriParser.encode(copyBase.list());
-        }
-        
-        return new String[]{NO_WORKING_COPY_AVAILABLE};
+        Agent agent = agentManager.getAgent(node.getHost());
+        AgentConfiguration agentConfig = agent.getConfig();
+
+        AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
+
+        return agent.getService().getFileInfos(details, path);
     }
 
-    protected File getWorkingCopyBase() throws FileSystemException
+    public FileInfo getFileInfo(String path)
     {
-        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
-        if (provider == null)
-        {
-            return null;
-        }
+        RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
+        BuildResult buildResult = buildManager.getByRecipeId(recipeId);
+        ProjectConfiguration projectConfig = buildResult.getProject().getConfig();
 
-        BuildResult buildResult = provider.getBuildResult();
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        return paths.getBaseDir(buildResult, recipeId);
+        Agent agent = agentManager.getAgent(node.getHost());
+        AgentConfiguration agentConfig = agent.getConfig();
+
+        AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
+
+        return agent.getService().getFileInfo(details, path);
+    }
+
+    private AgentRecipeDetails getAgentRecipeDetails(RecipeResultNode node, BuildResult buildResult, ProjectConfiguration projectConfig, AgentConfiguration agentConfig)
+    {
+        AgentRecipeDetails details = new AgentRecipeDetails();
+        details.setAgent(agentConfig.getName());
+        details.setAgentDataPattern(agentConfig.getDataDirectory());
+        details.setAgentHandle(agentConfig.getHandle());
+
+        details.setIncremental(!buildResult.isPersonal() && projectConfig.getScm().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE);
+        details.setProject(projectConfig.getName());
+        details.setProjectHandle(projectConfig.getHandle());
+        details.setProjectPersistentPattern(projectConfig.getOptions().getPersistentWorkDir());
+
+        details.setRecipeId(recipeId);
+        details.setStage(node.getStageName());
+        details.setStageHandle(node.getStageHandle());
+        return details;
     }
 
     public String getDisplayName()
@@ -103,13 +123,8 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
         return recipeId;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationManager instance.
-     */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setAgentManager(AgentManager agentManager)
     {
-        this.configurationManager = configurationManager;
-    }    
+        this.agentManager = agentManager;
+    }
 }

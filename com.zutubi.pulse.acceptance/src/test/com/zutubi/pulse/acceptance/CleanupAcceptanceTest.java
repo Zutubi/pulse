@@ -1,19 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
-import com.zutubi.pulse.acceptance.SeleniumTestBase;
-import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
-import com.zutubi.util.RandomUtils;
 import static com.zutubi.util.Constants.SECOND;
+import com.zutubi.util.RandomUtils;
 
-import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -51,52 +48,16 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         super.tearDown();
     }
 
-    public void testCleanupWorkingDirectories() throws Exception
-    {
-        final String projectName = random;
-
-        utils.setRetainWorkingCopy(projectName, true);
-        utils.addCleanupRule(projectName, "working_directory", CleanupWhat.WORKING_COPY_SNAPSHOT);
-
-        xmlRpcHelper.runBuild(projectName);
-        waitForCleanupToRunAsynchronously();
-
-        assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
-        assertTrue(isBuildPresentViaUI(projectName, 1));
-
-        xmlRpcHelper.runBuild(projectName);
-        waitForCleanupToRunAsynchronously(new InvertedCondition()
-        {
-            public boolean notSatisfied() throws Exception
-            {
-                return utils.hasBuildWorkingCopy(projectName, 1);
-            }
-        });
-
-        assertTrue(isBuildPresentViaUI(projectName, 2));
-        assertTrue(utils.hasBuildWorkingCopy(projectName, 2));
-
-        assertFalse(utils.hasBuildWorkingCopy(projectName, 1));
-
-        // verify that the UI is as expected - the working copy tab exists and displays the
-        // appropriate messages.
-
-        assertFalse(isWorkingCopyPresentViaUI(projectName, 1));
-        assertTrue(isWorkingCopyPresentViaUI(projectName, 2));
-    }
-
     public void testCleanupBuildArtifacts() throws Exception
     {
         final String projectName = random;
 
-        utils.setRetainWorkingCopy(projectName, true);
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildDirectory(projectName, 1));
-        assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
@@ -116,7 +77,6 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertTrue(utils.hasBuildDirectory(projectName, 2));
 
         assertTrue(utils.hasBuildDirectory(projectName, 1));
-        assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
         assertFalse(utils.hasBuildOutputDirectory(projectName, 1));
         assertFalse(utils.hasBuildFeaturesDirectory(projectName, 1));
 
@@ -327,12 +287,6 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
                 // noop.
             }
         }
-    }
-
-    public boolean isWorkingCopyPresentViaUI(String projectName, long buildNumber)
-    {
-        BuildWorkingCopyPage page = browser.openAndWaitFor(BuildWorkingCopyPage.class, projectName, buildNumber);
-        return page.isWorkingCopyPresent();
     }
 
     public boolean isBuildPresentViaUI(String projectName, long buildNumber)

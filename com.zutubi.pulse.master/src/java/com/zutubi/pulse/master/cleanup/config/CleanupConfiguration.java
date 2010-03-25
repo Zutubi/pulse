@@ -126,16 +126,6 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
 
     public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao)
     {
-        // The build query allows us to filter on builds that have working directories or not.  If
-        // the cleanup rule is only for builds with working directories, we can make use of this filter
-        // to optimise the query.  If things other than the working directories are being cleaned, then
-        // we can not make use of the filter.
-        Boolean filterHasWorkDir = null;
-        if(what != null && what.size() == 1 && what.contains(CleanupWhat.WORKING_COPY_SNAPSHOT))
-        {
-            filterHasWorkDir = true;
-        }
-
         ResultState[] allowedStates = null;
         if (states != null)
         {
@@ -162,17 +152,17 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             // See if there are too many builds of our states.  We assume here
             // we are called from within the build manager (so these two dao
             // calls are within the same transaction).
-            int total = dao.getBuildCount(project, allowedStates, allowedStatuses, filterHasWorkDir);
+            int total = dao.getBuildCount(project, allowedStates, allowedStatuses);
             if(total > retain)
             {
                 // Clean out the difference
-                results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, 0, filterHasWorkDir, 0, total - retain, false));
+                results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, 0, 0, total - retain, false));
             }
         }
         else if (unit == CleanupUnit.DAYS)
         {
             long startTime = System.currentTimeMillis() - retain * Constants.DAY;
-            results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, filterHasWorkDir, -1, -1, false));
+            results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, -1, -1, false));
         }
         return results;
     }

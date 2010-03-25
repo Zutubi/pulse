@@ -1943,7 +1943,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
     layout:'fit',
     width:300,
     height:500,
-    closeAction:'hide',
+    closeAction:'close',
     modal: true,
     plain: true,
 
@@ -1991,7 +1991,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             statusBar.setStatus({
                 text: 'An error has occured',
                 iconCls: 'x-status-error',
-                clear: true // auto-clear after a set interval
+                clear: true
             });
         });
 
@@ -2017,45 +2017,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         this.loader.on('load', this.hideMask, this, {single:true});
         this.loader.on('loadexception', this.hideMask, this, {single:true});
 
-        this.sbmtBtn = new Ext.Button({
-            text:'ok',
-            disabled:true,
-            handler: function()
-            {
-                var node = this.tree.getSelectionModel().getSelectedNode();
-                var p = node.getPath('baseName');
-                if (!this.tree.rootVisible)
-                {
-                    p = p.substring(this.tree.root.attributes.baseName.length + 1);
-                }
-
-                if(p.length > 0 && p.substring(0, 1) == '/')
-                {
-                    p = p.substring(1);
-                }
-
-                this.target.setValue(p);
-                // hax - this works because it is globally available.
-                // Not worth trying change this at the moment.
-                updateButtons();
-                
-                this.close();
-            }.createDelegate(this)
-        });
-
-        this.clsBtn = new Ext.Button({
-            text: 'cancel',
-            handler: function()
-            {
-                this.close();
-            }.createDelegate(this)
-        });
-
         this.add(this.tree);
-        this.addButton(this.sbmtBtn);
-        this.addButton(this.clsBtn);
-
-        this.tree.getSelectionModel().on('selectionchange', this.onSelectionChange.createDelegate(this));
     },
 
     showMask: function()
@@ -2068,39 +2030,22 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         this.initialLoadingMask.hide();
     },
 
-    onSelectionChange: function(selectionModel, node) {
-        if (node)
-        {
-            this.sbmtBtn.disabled && this.sbmtBtn.enable();
-            node.ensureVisible();
-        }
-        else
-        {
-            this.sbmtBtn.disabled || this.sbmtBtn.disable();
-        }
-    },
-
     show: function() {
         ZUTUBI.PulseFileSystemBrowser.superclass.show.apply(this, arguments);
 
-        var initVal = this.target.getValue();
-        if (initVal)
+        if (this.target)
         {
-            this.tree.selectConfigPath(initVal);
+            var initVal = this.target.getValue();
+            if (initVal)
+            {
+                this.tree.selectConfigPath(initVal);
+            }
         }
-    },
-
-    showMaskOnInitialLoad: function() {
-
-    },
-    hideMaskAfterInitialLoad: function() {
-
     }
 });
 
 /**
- * Same as a PulseFileSystemBrowser, but with a toolbar for interacting with
- * the local file system.
+ * A PulseFileSystemBrowser with a toolbar and some buttons.
  */
 ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
 
@@ -2118,17 +2063,17 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
         var statusBar = this.tree.getBottomToolbar();
 
         var uhbtn = new ZUTUBI.SelectNodeButton({
-            icon: '../images/house.gif',
+            icon: this.baseUrl + '/images/house.gif',
             tooltip: 'go to user home',
             tree: this.tree
         });
         var rbtn = new ZUTUBI.ReloadSelectedNodeButton({
-            icon: '../images/arrow_refresh.gif',
+            icon: this.baseUrl + '/images/arrow_refresh.gif',
             tooltip: 'refresh folder',
             tree: this.tree
         });
         var afbtn = new ZUTUBI.CreateFolderButton({
-            icon: '../images/folder_add.gif',
+            icon: this.baseUrl + '/images/folder_add.gif',
             tooltip: 'create new folder',
             baseUrl:this.baseUrl,
             basePath:this.basePath,
@@ -2136,7 +2081,7 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
             sbar: statusBar
         });
         var dfbtn = new ZUTUBI.DeleteFolderButton({
-            icon: '../images/folder_delete.gif',
+            icon: this.baseUrl + '/images/folder_delete.gif',
             cls: 'x-btn-icon',
             tooltip: 'delete folder',
             baseUrl:this.baseUrl,
@@ -2167,8 +2112,94 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
                 });
             }
         });
+
+        this.sbmtBtn = new Ext.Button({
+            text:'ok',
+            disabled:true,
+            handler: function()
+            {
+                var node = this.tree.getSelectionModel().getSelectedNode();
+                var p = node.getPath('baseName');
+                if (!this.tree.rootVisible)
+                {
+                    p = p.substring(this.tree.root.attributes.baseName.length + 1);
+                }
+
+                if(p.length > 0 && p.substring(0, 1) == '/')
+                {
+                    p = p.substring(1);
+                }
+
+                this.target.setValue(p);
+                // hax - this works because it is globally available.
+                // Not worth trying change this at the moment.
+                updateButtons();
+
+                this.close();
+            }.createDelegate(this)
+        });
+
+        this.clsBtn = new Ext.Button({
+            text: 'cancel',
+            handler: function()
+            {
+                this.close();
+            }.createDelegate(this)
+        });
+
+        this.addButton(this.sbmtBtn);
+        this.addButton(this.clsBtn);
+
+        this.tree.getSelectionModel().on('selectionchange', this.onSelectionChange.createDelegate(this));
+    },
+
+    onSelectionChange: function(selectionModel, node) {
+        if (node)
+        {
+            this.sbmtBtn.disabled && this.sbmtBtn.enable();
+            node.ensureVisible();
+        }
+        else
+        {
+            this.sbmtBtn.disabled || this.sbmtBtn.disable();
+        }
+    }
+
+});
+
+ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
+
+    initComponent: function() {
+
+        this.defaultTreeConfig = {
+            tbar : new Ext.Toolbar()
+        };
+
+        ZUTUBI.WorkingCopyFileSystemBrowser.superclass.initComponent.apply(this, arguments);
+
+        var toolbar = this.tree.getTopToolbar();
+
+        var rbtn = new ZUTUBI.ReloadSelectedNodeButton({
+            icon: this.baseUrl + '/images/arrow_refresh.gif',
+            tooltip: 'refresh',
+            disabled: false,
+            tree: this.tree
+        });
+
+        toolbar.add(rbtn);
+
+        this.clsBtn = new Ext.Button({
+            text: 'close',
+            handler: function()
+            {
+                this.close();
+            }.createDelegate(this)
+        });
+
+        this.addButton(this.clsBtn);
     }
 });
+
 
 /**
  * Button used to select a node in a tree.
@@ -2213,9 +2244,9 @@ ZUTUBI.SelectNodeButton = Ext.extend(Ext.Button, {
 ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
 
     cls: 'x-btn-icon',
+    disabled: true,
 
     initComponent: function() {
-        this.disabled = true;
         
         ZUTUBI.ReloadSelectedNodeButton.superclass.initComponent.apply(this, arguments);
 

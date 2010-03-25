@@ -7,11 +7,6 @@ package com.zutubi.pulse.master.cleanup.config;
 public enum CleanupWhat
 {
     /**
-     * Cleanup the working directories if retained.
-     */
-    WORKING_COPY_SNAPSHOT,
-    
-    /**
      * Cleanup the build directories and captured artifacts.
      */
     BUILD_ARTIFACTS,

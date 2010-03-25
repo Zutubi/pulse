@@ -4,7 +4,6 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.tove.security.AccessManager;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -13,8 +12,6 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
  */
 public abstract class AbstractBuildFileObject extends AbstractPulseFileObject implements BuildResultProvider, AddressableFileObject, ProjectProvider
 {
-    private AccessManager accessManager;
-
     public AbstractBuildFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -84,9 +81,4 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
 
     public abstract BuildResult getBuildResult();
     public abstract long getBuildResultId();
-
-    public void setAccessManager(AccessManager accessManager)
-    {
-        this.accessManager = accessManager;
-    }
 }

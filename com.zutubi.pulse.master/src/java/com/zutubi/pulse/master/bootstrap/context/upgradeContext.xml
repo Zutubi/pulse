@@ -130,6 +130,10 @@
                 <ref local="addAgentSynchronisingTime"/>
                 <ref local="addAgentSynchronisationMessages"/>
                 <ref local="subscribeByLabel"/>
+                <ref local="removeHasWorkingDirColumn"/>
+                <ref local="removeRetainWorkingCopyOption"/>
+                <ref local="removeWorkingCopyCleanupWhat"/>
+                <ref local="cleanupAllCapturedWorkingCopies"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -642,4 +646,26 @@
     <bean id="subscribeByLabel" class="com.zutubi.pulse.master.upgrade.tasks.SubscribeByLabelUpgradeTask">
         <property name="buildNumber" value="201999004"/>
     </bean>
+
+    <bean id="removeHasWorkingDirColumn" class="com.zutubi.pulse.master.upgrade.tasks.RemoveHasWorkingDirColumnUpgradeTask">
+        <property name="buildNumber" value="201999005"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-partial-03.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="removeRetainWorkingCopyOption" class="com.zutubi.pulse.master.upgrade.tasks.RemoveRetainWorkingCopyOptionUpgradeTask">
+        <property name="buildNumber" value="201999006"/>
+    </bean>
+
+    <bean id="removeWorkingCopyCleanupWhat" class="com.zutubi.pulse.master.upgrade.tasks.RemoveWorkingCopyCleanupWhatUpgradeTask">
+        <property name="buildNumber" value="201999007"/>
+    </bean>
+
+    <bean id="cleanupAllCapturedWorkingCopies" class="com.zutubi.pulse.master.upgrade.tasks.CleanupAllCapturedWorkingCopiesUpgradeTask">
+        <property name="buildNumber" value="201999008"/>
+    </bean>
+
 </beans>

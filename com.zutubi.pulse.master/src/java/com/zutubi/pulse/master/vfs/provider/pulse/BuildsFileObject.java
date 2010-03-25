@@ -2,16 +2,24 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.core.model.ToEntityIdMapping;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.CompositeMapping;
+import com.zutubi.util.ToStringMapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+
+import java.util.List;
 
 /**
  * <class comment/>
  */
 public class BuildsFileObject extends AbstractPulseFileObject
 {
+    private static final int MAX_BUILDS = 10;
+
     public BuildsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -19,7 +27,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
-        long buildId = convertToBuildId(fileName.getBaseName());
+        long buildId = getBuildId(fileName.getBaseName());
         if (buildId != -1)
         {
             return objectFactory.buildBean(BuildFileObject.class,
@@ -31,11 +39,10 @@ public class BuildsFileObject extends AbstractPulseFileObject
         return null;
     }
 
-    private long convertToBuildId(String str) throws FileSystemException
+    private long getBuildId(String str) throws FileSystemException
     {
         long id = Long.parseLong(str);
 
-        // else, is it a build number?
         ProjectProvider provider = getAncestor(ProjectProvider.class);
         if (provider != null)
         {
@@ -64,7 +71,18 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        // do not support listing of the builds.
-        return new String[0];
+        ProjectProvider provider = getAncestor(ProjectProvider.class);
+        if (provider != null)
+        {
+            Project project = provider.getProject();
+
+            List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project, MAX_BUILDS);
+            List<String> buildIds = CollectionUtils.map(builds, 
+                    new CompositeMapping<BuildResult, Long, String>(new ToEntityIdMapping(), new ToStringMapping())
+            );
+            return buildIds.toArray(new String[buildIds.size()]);
+        }
+
+        return NO_CHILDREN;
     }
 }

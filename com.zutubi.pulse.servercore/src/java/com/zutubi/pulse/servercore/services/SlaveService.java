@@ -64,9 +64,28 @@ public interface SlaveService
 
     List<ResourceConfiguration> discoverResources(String token);
 
-    FileInfo getFileInfo(String token, String path);
-
-    String[] listRoots(String token);
-
     void garbageCollect();
+
+    /**
+     * List the path relative to the base directory of the defined recipe.
+     *
+     * @param token     secure token for inter-agent communication
+     * @param details   used to identify the base directory
+     * @param path      path relative to the base directory
+     *
+     * @return a list of file info instances representing the requested listing.
+     */
+    List<FileInfo> getFileInfos(String token, AgentRecipeDetails details, String path);
+
+    /**
+     * Retrieve the file info for the path relative to the base directory of the
+     * defined recipe.
+     *
+     * @param token     secure token for inter-agent communication
+     * @param details   the recipe details
+     * @param path      the path relative to the recipes base directory
+     *
+     * @return a file info object for the requested path.
+     */
+    FileInfo getFileInfo(String token, AgentRecipeDetails details, String path);
 }

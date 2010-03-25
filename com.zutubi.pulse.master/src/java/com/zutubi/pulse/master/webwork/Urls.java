@@ -107,11 +107,6 @@ public class Urls
         return dashboardMyBuildArtifacts(number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
-    public String dashboardMyBuildWorkingCopy(String number)
-    {
-        return dashboardMyBuild(number) + "wc/";
-    }
-
     public String dashboardPreferences()
     {
         return dashboard() + "preferences/";
@@ -420,16 +415,6 @@ public class Urls
     public String commandDownload(BuildResult build, CommandResult commandResult, String artifact)
     {
         return commandDownloads(build, commandResult) + uriComponentEncode(artifact) + "/";
-    }
-
-    public String buildWorkingCopy(BuildResult build)
-    {
-        return build(build) + "wc/";
-    }
-
-    public String buildWorkingCopy(Object project, String number)
-    {
-        return build(project, number) + "wc/";
     }
 
     private String getStageComponent(Object stage)

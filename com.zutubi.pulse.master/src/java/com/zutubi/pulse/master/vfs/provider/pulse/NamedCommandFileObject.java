@@ -39,12 +39,12 @@ public class NamedCommandFileObject extends AbstractPulseFileObject implements C
     protected String[] doListChildren() throws Exception
     {
         // do not support listing for now.
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public CommandResult getCommandResult() throws FileSystemException
     {
-        RecipeResultProvider provider = (RecipeResultProvider) getAncestor(RecipeResultProvider.class);
+        RecipeResultProvider provider = getAncestor(RecipeResultProvider.class);
         if (provider == null)
         {
             throw new FileSystemException("Missing build stage context.");

@@ -24,7 +24,7 @@ public interface RecipeLogger extends HookLogger
 
     void complete(RecipeResult result);
 
-    void collecting(RecipeResult recipeResult, boolean collectWorkingCopy);
+    void collecting(RecipeResult recipeResult);
     void collectionComplete();
 
     void cleaning();

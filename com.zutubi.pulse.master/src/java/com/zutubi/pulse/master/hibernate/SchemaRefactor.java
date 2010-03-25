@@ -204,10 +204,10 @@ public class SchemaRefactor
      * NOTE: The mapping definition should represent what you want to column to look like AFTER the refresh.  This is
      * a little different from the other methods which need to know what the mappings are BEFORE the refactor.
      *
-     * @param tableName
-     * @param columnName
+     * @param tableName     the name of the table containing the column to be refreshed
+     * @param columnName    the name of the column to be refreshed
      * 
-     * @throws SQLException
+     * @throws SQLException is thrown on error
      */
     public void refreshColumn(final String tableName, final String columnName) throws SQLException
     {
@@ -249,10 +249,13 @@ public class SchemaRefactor
         {
             public Object execute(Connection con) throws SQLException
             {
-                Table table = getTable(tableName);
-                Column column = getColumn(table, columnName);
-                dropColumnConstraints(con, table, column);
-                sqlDropColumn(con, table, columnName);
+                if (JDBCUtils.columnExists(con,  tableName, columnName))
+                {
+                    Table table = getTable(tableName);
+                    Column column = getColumn(table, columnName);
+                    dropColumnConstraints(con, table, column);
+                    sqlDropColumn(con, table, columnName);
+                }
                 return null;
             }
         });
@@ -264,8 +267,11 @@ public class SchemaRefactor
         {
             public Object execute(Connection con) throws SQLException
             {
-                Table table = getTable(tableName);
-                dropTable(con, table);
+                if (JDBCUtils.tableExists(con, tableName))
+                {
+                    Table table = getTable(tableName);
+                    dropTable(con, table);
+                }
                 return null;
             }
         });
@@ -362,10 +368,10 @@ public class SchemaRefactor
      * Executes a set of alter table statements to synchronize the underlying database table with the hibernate schema.
      * NOTE: This will only add columns that do not already exist.
      * 
-     * @param table
-     * @param connection
+     * @param table         the table to be altered
+     * @param connection    the database connection providing access to the table
      * 
-     * @throws SQLException
+     * @throws SQLException is thrown on error
      */
     private void updateTableSchema(Table table, Connection connection) throws SQLException
     {

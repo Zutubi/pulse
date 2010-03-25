@@ -37,22 +37,14 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         projectDao.save(p1);
         projectDao.save(p2);
 
-        createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 6, ResultState.SUCCESS, false, STATUS_INTEGRATION);
-        b1 = createBuild(p1, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false, STATUS_MILESTONE);
-        b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, false, STATUS_RELEASE);
-        b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true, STATUS_INTEGRATION);
-        b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true, STATUS_MILESTONE);
-        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true, STATUS_RELEASE);
+        createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 6, ResultState.SUCCESS, STATUS_INTEGRATION);
+        b1 = createBuild(p1, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, STATUS_MILESTONE);
+        b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, STATUS_RELEASE);
+        b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, STATUS_INTEGRATION);
+        b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, STATUS_MILESTONE);
+        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, STATUS_RELEASE);
         // Create a build that has started but is not in progress yet: -1 timestamp
-        createBuild(p1, 6, -1, ResultState.PENDING, true, STATUS_INTEGRATION);
-
-    }
-
-    public void testWorkAfterBuilds()
-    {
-        CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.BUILDS);
-        List<BuildResult> results = workBuildsRule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b3), results);
+        createBuild(p1, 6, -1, ResultState.PENDING, STATUS_INTEGRATION);
     }
 
     public void testAllAfterBuilds()
@@ -60,13 +52,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3), results);
-    }
-
-    public void testWorkAfterDays()
-    {
-        CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.DAYS);
-        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b3, b4), results);
     }
 
     public void testAllAfterDays()
@@ -106,7 +91,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }
 
-    private BuildResult createBuild(Project project, long number, long startTime, ResultState state, boolean hasWorkDir, String status)
+    private BuildResult createBuild(Project project, long number, long startTime, ResultState state, String status)
     {
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, number, false);
         if (startTime >= 0)
@@ -123,7 +108,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
             }
             result.complete();
         }
-        result.setHasWorkDir(hasWorkDir);
         result.setStatus(status);
         buildResultDao.save(result);
         return result;

@@ -42,11 +42,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private RecipeResultNode root;
     private String version;
     
-    /**
-     * Set to false when the working directory is cleaned up.
-     */
-    private boolean hasWorkDir;
-
     private String status;
 
     /**
@@ -87,7 +82,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.userRevision = userRevision;
         state = ResultState.PENDING;
         root = new RecipeResultNode(null, 0, null);
-        hasWorkDir = true;
     }
 
     public BuildResult(BuildReason reason, User user, Project project, long number)
@@ -154,16 +148,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private void setRoot(RecipeResultNode root)
     {
         this.root = root;
-    }
-
-    public boolean getHasWorkDir()
-    {
-        return hasWorkDir;
-    }
-
-    public void setHasWorkDir(boolean hasWorkDir)
-    {
-        this.hasWorkDir = hasWorkDir;
     }
 
     public long getMetaBuildId()

@@ -14,9 +14,6 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
-import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
-import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
@@ -259,16 +256,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // Project admins can do just that
                 group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), GroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_ADMINISTER));
-
-                // Default cleanup rule to blow away working copy snapshots
-                CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
-                cleanupConfiguration.setName("default");
-                cleanupConfiguration.setWhat(Arrays.asList(CleanupWhat.WORKING_COPY_SNAPSHOT));
-                cleanupConfiguration.setRetain(10);
-                cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
-                Map<String, CleanupConfiguration> cleanupMap = new HashMap<String, CleanupConfiguration>();
-                cleanupMap.put("default", cleanupConfiguration);
-                globalProject.addExtension("cleanup", cleanupMap);
 
                 addDefaultReports(globalProject);
 

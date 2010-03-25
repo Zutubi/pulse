@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.model.*;
@@ -210,6 +211,7 @@ public class ProjectHomeAction extends ProjectActionBase
             }
         }
 
+        addViewWorkingCopyActions(project, messages, contentRoot);
         addResponsibilityActions(project, messages, contentRoot);
 
         BuildQueueSnapshot snapshot = schedulingController.getSnapshot();
@@ -235,6 +237,18 @@ public class ProjectHomeAction extends ProjectActionBase
             {
                 canClearResponsible = true;
                 actions.add(ToveUtils.getActionLink(ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
+            }
+        }
+    }
+
+    private void addViewWorkingCopyActions(Project project, Messages messages, File contentRoot)
+    {
+        ProjectConfiguration config = project.getConfig();
+        if (config.getScm().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)
+        {
+            if (accessManager.hasPermission(ACTION_VIEW_SOURCE, project))
+            {
+                actions.add(ToveUtils.getActionLink(ACTION_VIEW_SOURCE, messages, contentRoot));
             }
         }
     }

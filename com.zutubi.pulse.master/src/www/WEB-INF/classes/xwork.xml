@@ -208,11 +208,6 @@
             <result name="success" type="redirect">${url}</result>
         </action>
 
-        <action name="browseProjectDir" class="com.zutubi.pulse.master.xwork.actions.project.BrowseProjectDirAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/browse-project-dir.vm</result>
-        </action>
-
         <action name="cat" class="com.zutubi.pulse.master.xwork.actions.vfs.CatAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
@@ -269,10 +264,6 @@
 
         <action name="garbageCollect" class="com.zutubi.pulse.master.xwork.actions.console.GarbageCollectAction">
             <result name="success" type="redirect">/viewSystemInfo.action</result>
-        </action>
-
-        <action name="quartzSystemInfo" class="com.zutubi.pulse.master.xwork.actions.console.QuartzAdminAction">
-            <result name="success" type="velocity">/view-quartz.vm</result>
         </action>
 
         <action name="deleteBuild" class="com.zutubi.pulse.master.xwork.actions.project.DeleteBuildAction">

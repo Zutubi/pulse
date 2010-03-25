@@ -13,11 +13,15 @@ import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
+import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -50,7 +54,7 @@ public class MasterAgentService implements AgentService
         return true;
     }
 
-    public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
+    public void collectResults(AgentRecipeDetails recipeDetails, File outputDest)
     {
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File outputDir = recipePaths.getOutputDir();
@@ -62,33 +66,6 @@ public class MasterAgentService implements AgentService
         catch (IOException e)
         {
             throw new BuildException("Renaming output directory: " + e.getMessage(), e);
-        }
-
-        if (workDest != null)
-        {
-            File workDir = recipePaths.getBaseDir();
-            if (recipeDetails.isIncremental())
-            {
-                try
-                {
-                    FileSystemUtils.copy(workDest, workDir);
-                }
-                catch (IOException e)
-                {
-                    throw new BuildException("Unable to snapshot work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "': " + e.getMessage());
-                }
-            }
-            else
-            {
-                try
-                {
-                    FileSystemUtils.rename(workDir, workDest, true);
-                }
-                catch (IOException e)
-                {
-                    throw new BuildException("Renaming work directory: " + e.getMessage(), e);
-                }
-            }
         }
     }
 
@@ -112,6 +89,26 @@ public class MasterAgentService implements AgentService
     public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
         return synchronisationTaskRunner.synchronise(messages);
+    }
+
+    public List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String relativePath)
+    {
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
+        File path = new File(recipePaths.getBaseDir(), relativePath);
+        File[] listing = path.listFiles();
+        if (listing != null)
+        {
+            return CollectionUtils.map(listing,  new ToFileInfoMapping());
+        }
+
+        return new LinkedList<FileInfo>();
+    }
+
+    public FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String relativePath)
+    {
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
+        File base = recipePaths.getBaseDir();
+        return new FileInfo(new File(base, relativePath));
     }
 
     @Override

@@ -32,6 +32,6 @@ public class ArtifactsFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         // this object does not support listing.
-        return new String[0];
+        return NO_CHILDREN;
     }
 }

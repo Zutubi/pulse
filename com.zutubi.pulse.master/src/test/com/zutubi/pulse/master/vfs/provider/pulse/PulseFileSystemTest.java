@@ -110,11 +110,6 @@ public class PulseFileSystemTest extends PulseTestCase
         assertEquals("a.txt", selected.get(0).getName().getBaseName());
 
         assertEquals(b, selected.get(0).getParent());
-
-/*
-        verify(client, times(1)).browse(null, "", null);
-        verify(client, times(1)).browse(null, "b.dir", null);
-*/
     }
 
     private List<ScmFile> asFiles(String... filenames)

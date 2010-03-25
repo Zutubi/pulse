@@ -19,7 +19,6 @@ public class BuildActionResolver extends StaticMapActionResolver
         addMapping("file", new BuildPulseFileActionResolver());
         addMapping("artifacts", new BuildArtifactsActionResolver());
         addMapping("downloads", new BuildDownloadsActionResolver());
-        addMapping("wc", new BuildWorkingCopyActionResolver());
 
         addParameter("buildVID", id);
     }

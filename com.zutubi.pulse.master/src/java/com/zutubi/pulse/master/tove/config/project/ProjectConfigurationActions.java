@@ -42,7 +42,7 @@ public class ProjectConfigurationActions
     public static final String ACTION_INITIALISE           = "initialise";
     public static final String ACTION_PAUSE                = "pause";
     public static final String ACTION_RESUME               = "resume";
-    public static final String ACTION_VIEW_SOURCE          = "view source";
+    public static final String ACTION_VIEW_SOURCE          = "viewSource";
     public static final String ACTION_TRIGGER              = "trigger";
     public static final String ACTION_MARK_CLEAN           = "clean";
     public static final String ACTION_REBUILD              = "rebuild";

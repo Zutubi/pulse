@@ -45,14 +45,12 @@ public class ProjectCleanupRequestTest extends PulseTestCase
         Project project = createProject("project");
         BuildResult resultA = createResult(project, 1);
         addCleanupRule(project, "a", CleanupWhat.BUILD_ARTIFACTS, resultA);
-        addCleanupRule(project, "b", CleanupWhat.WORKING_COPY_SNAPSHOT, resultA);
 
         ProjectCleanupRequest request = new ProjectCleanupRequest(project);
         request.setBuildManager(buildManager);
         request.run();
 
         verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(CleanupWhat.BUILD_ARTIFACTS));
-        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(CleanupWhat.WORKING_COPY_SNAPSHOT));
     }
 
     private void addCleanupRule(Project project, String name, CleanupWhat what, BuildResult... results)

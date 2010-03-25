@@ -30,7 +30,7 @@ public class ProjectConfigsFileObject extends AbstractPulseFileObject implements
     protected String[] doListChildren() throws Exception
     {
         // do not support listing.
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public boolean isLocal()

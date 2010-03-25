@@ -2,9 +2,14 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
+
+import java.util.List;
 
 /**
  * <class comment/>
@@ -63,8 +68,14 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
 
     protected String[] doListChildren() throws Exception
     {
-        // do not support listing.
-        return new String[0];
+        List<ProjectConfiguration> configs = projectManager.getAllProjectConfigs(false);
+        return UriParser.encode(CollectionUtils.mapToArray(configs, new Mapping<ProjectConfiguration, String>()
+        {
+            public String map(ProjectConfiguration projectConfiguration)
+            {
+                return projectConfiguration.getName();
+            }
+        }, new String[configs.size()]));
     }
 
     public boolean isLocal()

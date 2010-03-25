@@ -212,9 +212,6 @@
 
     <!-- re create the file system manager now that the slave details are available. -->
     <bean id="fileSystemManager" class="com.zutubi.pulse.master.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
-        <property name="agentManager"><ref local="agentManager"/></property>
-        <property name="slaveProxyFactory"><ref local="slaveProxyFactory"/></property>
-        <property name="serviceTokenManager"><ref local="serviceTokenManager"/></property>
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
 

@@ -1967,7 +1967,7 @@ public class RemoteApi
         {
             Project[] projects = internalGetProjectSet(projectName, true);
 
-            List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, null, firstResult, maxResults, mostRecentFirst);
+            List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, firstResult, maxResults, mostRecentFirst);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
             for (BuildResult build : builds)
             {
@@ -2195,7 +2195,7 @@ public class RemoteApi
                 states = ResultState.getCompletedStates();
             }
 
-            List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, null, 0, maxResults, true);
+            List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
             for (BuildResult build : builds)
             {

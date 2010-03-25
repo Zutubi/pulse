@@ -54,10 +54,8 @@ public class DefaultBuildManager implements BuildManager
     private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
     private MasterConfigurationManager configurationManager;
-    private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
 
-    private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
     private FileDeletionService fileDeletionService;
 
     private MasterLocationProvider masterLocationProvider;
@@ -324,9 +322,9 @@ public class DefaultBuildManager implements BuildManager
         return extractResult(buildResultDao.getLatestByUser(user, null, 1));
     }
 
-    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst)
     {
-        return buildResultDao.queryBuilds(projects, states, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
+        return buildResultDao.queryBuilds(projects, states, earliestStartTime, latestStartTime, first, max, mostRecentFirst);
     }
 
     public List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
@@ -441,7 +439,7 @@ public class DefaultBuildManager implements BuildManager
 
     public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
     {
-        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{project}, ResultState.getIncompleteStates(), -1, -1, null, -1, -1, true);
+        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{project}, ResultState.getIncompleteStates(), -1, -1, -1, -1, true);
         for (BuildResult r : incompleteBuilds)
         {
             abortBuild(r, message);
@@ -558,14 +556,6 @@ public class DefaultBuildManager implements BuildManager
             if (options.isCleanBuildArtifacts())
             {
                 cleanupBuildArtifacts(build);
-            }
-
-            if (options.isCleanWorkDir() && build.getHasWorkDir())
-            {
-                build.setHasWorkDir(false);
-                buildResultDao.save(build);
-
-                cleanupWorkDirectories(build);
             }
 
             if (options.isCleanupLogs())
@@ -726,24 +716,6 @@ public class DefaultBuildManager implements BuildManager
     }
 
     /**
-     * Cleanup the work directories from each of the nodes.  That is, cleanup the 'base' directory
-     * from each of the built recipes.
-     * 
-     * @param build     the build for which all of the work directory snapshots will be cleaned.
-     */
-    private void cleanupWorkDirectories(final BuildResult build)
-    {
-        final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
-        {
-            public void cleanup(RecipeResult recipe)
-            {
-                scheduleCleanup(paths.getBaseDir(build, recipe.getId()));
-            }
-        });
-    }
-
-    /**
      * Cleanup the output and features directories from each of the nodes.
      *
      * @param build     the build for which all of the artifact directories will be cleaned.
@@ -815,18 +787,8 @@ public class DefaultBuildManager implements BuildManager
         this.databaseConsole = databaseConsole;
     }
 
-    public void setThreadFactory(PulseThreadFactory threadFactory)
-    {
-        this.threadFactory = threadFactory;
-    }
-
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
-    }
-
-    public void setRepositoryAuthenticationProvider(RepositoryAuthenticationProvider repositoryAuthenticationProvider)
-    {
-        this.repositoryAuthenticationProvider = repositoryAuthenticationProvider;
     }
 }

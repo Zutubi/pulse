@@ -4,9 +4,7 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.util.RandomUtils;
 import static com.zutubi.util.RandomUtils.randomInt;
 import static org.mockito.Mockito.*;
 
@@ -35,7 +33,7 @@ public class DefaultBuildManagerTest extends PulseTestCase
         BuildResult result = createResult(project);
         result.commence(10);
 
-        stub(buildResultDao.queryBuilds((Project[])anyObject(), (ResultState[]) anyObject(), anyLong(), anyLong(), anyBoolean(), anyInt(), anyInt(), anyBoolean())).toReturn(asList(result));
+        stub(buildResultDao.queryBuilds((Project[])anyObject(), (ResultState[]) anyObject(), anyLong(), anyLong(), anyInt(), anyInt(), anyBoolean())).toReturn(asList(result));
 
         assertTrue(result.commenced());
         assertFalse(result.completed());

@@ -25,6 +25,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
@@ -746,7 +747,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             return acceptBuild;
         }
 
-        public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
+        public void collectResults(AgentRecipeDetails recipeDetails, File outputDest)
         {
             throw new RuntimeException("Not implemented");
         }
@@ -764,6 +765,16 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
         {
             return Collections.emptyList();
+        }
+
+        public List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String path)
+        {
+            return Collections.emptyList();
+        }
+
+        public FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String path)
+        {
+            return null;
         }
 
         public long getType()

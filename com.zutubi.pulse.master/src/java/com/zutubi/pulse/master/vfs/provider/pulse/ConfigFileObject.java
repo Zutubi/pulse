@@ -9,6 +9,7 @@ import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.opensymphony.util.TextUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -126,7 +127,12 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
 
     public String getDisplayName()
     {
-        return ToveUtils.getDisplayName(path, type, parentType, value);
+        String displayName = ToveUtils.getDisplayName(path, type, parentType, value);
+        if (!TextUtils.stringSet(displayName))
+        {
+            displayName = getName().getBaseName();
+        }
+        return displayName;
     }
 
     protected FileType doGetType() throws Exception

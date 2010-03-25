@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
-import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.LogFile;
@@ -29,7 +28,6 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECI
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKING_COPY;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 
 /**
@@ -42,14 +40,6 @@ public class CleanupTestUtils
     public CleanupTestUtils(XmlRpcHelper xmlRpcHelper)
     {
         this.xmlRpcHelper = xmlRpcHelper;
-    }
-
-    public void setRetainWorkingCopy(String projectName, boolean b) throws Exception
-    {
-        String optionsPath = "projects/" + projectName + "/options";
-        Hashtable<String, Object> data = xmlRpcHelper.getConfig(optionsPath);
-        data.put(RETAIN_WORKING_COPY, b);
-        xmlRpcHelper.saveConfig(optionsPath, data, false);
     }
 
     public void deleteCleanupRule(String projectName, String name) throws Exception
@@ -114,11 +104,6 @@ public class CleanupTestUtils
     {
         File buildDir = getBuildDirectory(projectName, buildNumber);
         return new LogFile(new File(buildDir, BuildLogFile.LOG_FILENAME), false).exists();
-    }
-
-    public boolean hasBuildWorkingCopy(String projectName, int buildNumber) throws Exception
-    {
-        return hasStageDirectory(projectName, buildNumber, "base");
     }
 
     public boolean hasBuildOutputDirectory(String projectName, int buildNumber) throws Exception

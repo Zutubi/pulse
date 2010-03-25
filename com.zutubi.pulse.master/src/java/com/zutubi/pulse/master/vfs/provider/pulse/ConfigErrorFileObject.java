@@ -88,7 +88,7 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public void setClassificationManager(ClassificationManager classificationManager)

@@ -36,18 +36,6 @@ public class BuildCleanupOptions
     }
 
     /**
-     * Indicated whether or not a builds working copy should be cleaned up.
-     * Note, this has no effect on builds that have not retained their working
-     * copy.
-     *
-     * @return true if the working copy will be cleaned up.
-     */
-    public boolean isCleanWorkDir()
-    {
-        return isCleanup(CleanupWhat.WORKING_COPY_SNAPSHOT);
-    }
-
-    /**
      * Indicates whether or not a builds captured artifacts should be cleaned up.  This
      * includes artifacts such as the environment listing as well as anything captured
      * during the build.

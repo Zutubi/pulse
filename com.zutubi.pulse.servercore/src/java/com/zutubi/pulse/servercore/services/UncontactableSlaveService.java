@@ -67,17 +67,17 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public FileInfo getFileInfo(String token, String path)
-    {
-        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
-    }
-
-    public String[] listRoots(String token)
-    {
-        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
-    }
-
     public void garbageCollect()
+    {
+        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
+    }
+
+    public List<FileInfo> getFileInfos(String token, AgentRecipeDetails recipeDetails, String path)
+    {
+        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
+    }
+
+    public FileInfo getFileInfo(String token, AgentRecipeDetails recipeDetails, String path)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

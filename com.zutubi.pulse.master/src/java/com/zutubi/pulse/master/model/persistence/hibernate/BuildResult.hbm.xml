@@ -60,8 +60,6 @@
         
         <property name="status" column="STATUS" type="string" length="255"/>
 
-        <property name="hasWorkDir" type="boolean"/>
-
         <property name="revisionString" column="REVISION_STRING" type="string" length="8191"/>
 
         <property name="metaBuildId" column="META_BUILD_ID" type="long"/>

@@ -77,7 +77,7 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
             return results.toArray(new String[results.size()]);
         }
 
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public Comparator<FileObject> getComparator()

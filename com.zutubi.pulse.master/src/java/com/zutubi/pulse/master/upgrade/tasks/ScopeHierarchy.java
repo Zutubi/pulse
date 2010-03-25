@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -122,6 +124,14 @@ public class ScopeHierarchy
         public List<Node> getChildren()
         {
             return Collections.unmodifiableList(children);
+        }
+
+        /**
+         * @return true if this node has children, false otherwise.
+         */
+        public boolean hasChildren()
+        {
+            return children.size() > 0;
         }
 
         /**

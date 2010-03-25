@@ -205,7 +205,6 @@ public class Constants
             public static final String AUTO_CLEAR_RESPONSIBILITY = "autoClearResponsibility";
             public static final String ID_LEADER = "idLeader";
             public static final String PERSISTENT_WORK_DIR = "persistentWorkDir";
-            public static final String RETAIN_WORKING_COPY = "retainWorkingCopy";
         }
 
         public class Cleanup

@@ -42,7 +42,7 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[0];
+        return NO_CHILDREN;
     }
 
     public boolean isLocal() throws FileSystemException
