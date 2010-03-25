@@ -9,7 +9,7 @@
     <script type="text/javascript">
     //<![CDATA[
         #set($ajaxUrl = "$base/ajax/projectHomePanel.action?projectName=$u_projectName")
-        #updater($ajaxUrl "project-home-$project.name" $principle)
+        #updater($ajaxUrl "project-home-$project.name" $principle "Ext.emptyFn")
 
         var summaryPopup;
         var recentPopup;

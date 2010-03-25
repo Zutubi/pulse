@@ -11,7 +11,7 @@
             Ext.get('refresh-time').update('refreshed ' + now.format('g:i:s a, D F j'));
         }
 
-        #updater("$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle)
+        #updater("$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
 
         Ext.onReady(function() {
             updaterCallback();

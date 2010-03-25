@@ -9,7 +9,7 @@
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
-        #updater("$base/ajax/myBuildsPanel.action" "panel" $principle)
+        #updater("$base/ajax/myBuildsPanel.action" "panel" $principle "Ext.emptyFn")
 
         var popup;
         YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("my", "$base", "$base/ajax/myBuildsPanel.action", "panel"); });

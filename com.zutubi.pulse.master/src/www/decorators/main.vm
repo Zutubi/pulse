@@ -206,7 +206,7 @@
                         'success': 'accept',
                         'failure': 'exclamation',
                         'working': 'inprogress'
-                    }
+                    };
 
                     message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="[' + type + ']"/> ' + message;
                 }

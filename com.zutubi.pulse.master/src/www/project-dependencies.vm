@@ -5,7 +5,7 @@
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript">
-        #updater("$base/ajax/projectDependenciesPanel.action?projectName=$u_projectName" "panel" $principle)
+        #updater("$base/ajax/projectDependenciesPanel.action?projectName=$u_projectName" "panel" $principle "Ext.emptyFn")
 
         Ext.onReady(function() {
             var form = new Ext.form.FormPanel({

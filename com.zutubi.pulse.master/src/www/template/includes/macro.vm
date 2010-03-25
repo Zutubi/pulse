@@ -1703,7 +1703,7 @@
 ## Inserts javascript for an auto-updating panel.  Assumes we don't care
 ## about errors.
 ##
-#macro(updater $url $panelId $user)
+#macro(updater $url $panelId $user $callback)
     ## We should be able to use Updater.setAutoRefresh but for some reason it
     ## gives aborted transactions after a few refreshes (no idea why as yet).
     #if($refreshInterval || $user.preferences.refreshingEnabled)
@@ -1715,7 +1715,7 @@
                     updater.update({
                         url: '#jss($url)',
                         scripts: true,
-                        callback: updaterCallback
+                        callback: $callback
                     });
                 },
                 interval: 1000 * #if($refreshInterval) $refreshInterval #else $user.preferences.refreshInterval #end

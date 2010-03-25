@@ -2463,7 +2463,7 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
 });
 
 
-ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
+if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 {
     style: 'padding: 8px',
     border: true,

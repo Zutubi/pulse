@@ -12,7 +12,7 @@
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript">
-        #updater("$base/ajax/viewBuildPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle)
+        #updater("$base/ajax/viewBuildPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle "Ext.emptyFn")
 
         function triggerHook(hookHandle)
         {
