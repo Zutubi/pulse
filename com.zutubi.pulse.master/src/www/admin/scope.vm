@@ -17,7 +17,6 @@
 
         var Layout = function()
         {
-            var centerRegion;
 #if($path)
             var path = '$path';
 #else
@@ -68,14 +67,14 @@
 
                     nestedWest.show();
                     nestedWest.setWidth(300);
-                    Ext.getCmp('nested-east').show()
+                    Ext.getCmp('nested-east').show();
                     viewport.doLayout();
 
                     treesInitialised = true;
                     configTree.selectConfigPath(path);
                     root.expand();
                 }
-            }
+            };
         }();
         
         Ext.onReady(Layout.init, Layout, true);

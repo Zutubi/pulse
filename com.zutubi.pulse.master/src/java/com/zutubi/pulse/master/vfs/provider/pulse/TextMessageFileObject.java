@@ -1,21 +1,21 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
- * <class comment/>
+ * A file object that can be used to insert an arbitrary text message into a
+ * tree, with an arbitrary icon.
  */
 public class TextMessageFileObject extends AbstractPulseFileObject
 {
-    private final String type;
+    private final String iconCls;
 
-    public TextMessageFileObject(final FileName name, final String type, final AbstractFileSystem fs)
+    public TextMessageFileObject(final FileName name, final String iconCls, final AbstractFileSystem fs)
     {
         super(name, fs);
-        this.type = type;
+        this.iconCls = iconCls;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
@@ -33,8 +33,8 @@ public class TextMessageFileObject extends AbstractPulseFileObject
         return new String[0];
     }
 
-    public String getFileType() throws FileSystemException
+    public String getIconCls()
     {
-        return type;
+        return iconCls;
     }
 }

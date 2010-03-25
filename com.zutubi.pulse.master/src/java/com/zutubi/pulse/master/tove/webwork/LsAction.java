@@ -1,13 +1,12 @@
 package com.zutubi.pulse.master.tove.webwork;
 
-import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
 import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
+import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
 import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
-import com.zutubi.pulse.master.xwork.actions.vfs.FileDepthFilterSelector;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -16,8 +15,8 @@ import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 
 /**
@@ -53,6 +52,12 @@ public class LsAction extends VFSActionSupport
      * Show files that are marked as hidden. The default value for this is false.
      */
     private boolean showHidden;
+
+    /**
+     * Number of levels, under the one being listed, to also load.  The default
+     * of zero means just list this path's direct children.
+     */
+    private int depth = 0;
 
     public String getBasePath()
     {
@@ -92,6 +97,11 @@ public class LsAction extends VFSActionSupport
     public void setShowHidden(boolean showHidden)
     {
         this.showHidden = showHidden;
+    }
+
+    public void setDepth(int depth)
+    {
+        this.depth = depth;
     }
 
     public ExtFile[] getListing()
@@ -134,29 +144,50 @@ public class LsAction extends VFSActionSupport
             acceptedTypes.add(FileType.FILE);
         }
 
-        FileObject[] children = fileObject.findFiles(
-                new FileDepthFilterSelector(
-                        new CompoundFileFilter(
-                                new FileTypeFilter(acceptedTypes),
-                                new HiddenFileFilter(showHidden),
-                                new FilePrefixFilter(prefix)
-                        ), 1
+        FileFilterSelector selector = new FileFilterSelector(
+                new CompoundFileFilter(
+                        new FileTypeFilter(acceptedTypes),
+                        new HiddenFileFilter(showHidden),
+                        new FilePrefixFilter(prefix)
                 )
         );
+
+        listing = listChildren(fileObject, selector, 0);
+
+        return SUCCESS;
+    }
+
+    private ExtFile[] listChildren(final FileObject fileObject, final FileFilterSelector selector, final int currentDepth) throws FileSystemException
+    {
+        ExtFile[] extFiles = null;
+        FileObject[] children = fileObject.findFiles(selector);
         if (children != null)
         {
             sortChildren(fileObject, children);
-            listing = new ExtFile[children.length];
+            extFiles = new ExtFile[children.length];
             CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
             {
                 public ExtFile map(FileObject child)
                 {
-                    return new ExtFile(new FileObjectWrapper(child, fileObject));
+                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject));
+                    if (!extFile.isLeaf() && currentDepth < depth)
+                    {
+                        try
+                        {
+                            extFile.addChildren(listChildren(child, selector, currentDepth + 1));
+                        }
+                        catch (FileSystemException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    return extFile;
                 }
-            }, listing);
+            }, extFiles);
         }
 
-        return SUCCESS;
+        return extFiles;
     }
 
     private void sortChildren(FileObject fileObject, FileObject[] children)

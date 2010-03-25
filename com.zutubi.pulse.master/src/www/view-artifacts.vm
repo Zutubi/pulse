@@ -5,68 +5,22 @@
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>
 
-    <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/utilities.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
-    <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
     <script type="text/javascript">
-        SetupTree = function()
-        {
-            return {
-                init: function()
-                {
-                    var tree = new ZUTUBI.widget.PulseTreeView('browseTree');
-                    tree.setSeparator('$separator');
-                    tree.setFSRoot('pulse:///projects/$project.id/builds/$buildResult.id/artifacts/');
-                    tree.setBase('$base');
+        Ext.onReady(function() {
+            var tree = new ZUTUBI.ArtifactsTree({
+                projectId: '$project.id',
+                buildId: '$buildResult.id',
+                id: '#id("${project.name}-build-${buildResult.number}-artifacts")'
+            });
 
-                    // load the root nodes for the file system, then draw the tree.
-                    Element.show($('loading'));
-                    tree.ls(tree.getRoot(), function()
-                    {
-                        Element.hide($('loading'));
-                        tree.draw();
-                    }, true, false, 3);
-                }
-            }
-        }();
-
-        Ext.onReady(SetupTree.init, SetupTree, true);
+            var nestedCenter = Ext.getCmp('nested-center');
+            nestedCenter.update('');
+            nestedCenter.add(tree);
+            viewport.doLayout();
+        });
     </script>
 </head>
 <body>
     #buildTabs($buildResult "artifacts")
-
-    <h3>#wwtext("name=artifacts.all")</h3>
-
-    <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-artifacts")'>
-        <tr>
-            <td class="columns" width="75%">
-
-                <p>
-                    The tree below allows you to navigate through the artifacts for this build.
-                </p>
-                <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
-                <div id="error"></div>
-                <div id="artifactTree">
-                    <div id="browseTree"></div>
-                </div>
-
-            </td>
-            <td class="columns">
-
-                <p><strong>Legend:</strong>
-                    <ul class="legend">
-                        <li class="download">Download an artifact file.</li>
-                        <li class="archive">Download an archive file containing the nested artifacts.</li>
-                        <li class="decorate">View a decorated view of the artifact.</li>
-                        <li class="link">Navigate to an external artifact.</li>
-                        <li class="broken">The artifact does not exist on disk.</li>
-                    </ul>
-                </p>
-
-            </td>
-        </tr>
-    </table>
+</body>
 </html>

@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asMap;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -11,12 +13,20 @@ import org.apache.commons.vfs.provider.UriParser;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * The LocalArtifact File Object represents a StoredArtifact instance.
+ * Represents a single artifact in an artifacts tree.
  */
 public class ArtifactFileObject extends AbstractPulseFileObject implements ArtifactProvider, AddressableFileObject
 {
+    public static final String CLASS_PREFIX = "artifact-";
+    public static final String CLASS_SUFFIX_LINK = "link";
+    public static final String CLASS_SUFFIX_UNKNOWN = "unknown";
+    public static final String CLASS_SUFFIX_BROKEN = "broken";
+    public static final String CLASS_SUFFIX_HTML = "html";
+    public static final String CLASS_SUFFIX_IN_PROGRESS = "inprogress";
+
     private final long artifactId;
 
     private boolean isHtmlArtifact;
@@ -102,6 +112,37 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         return new String[0];
     }
 
+    @Override
+    public String getIconCls()
+    {
+        String suffix = null;
+        if (isLinkArtifact)
+        {
+            suffix = CLASS_SUFFIX_LINK;
+        }
+        else if (getArtifactBase() == null)
+        {
+            suffix = CLASS_SUFFIX_UNKNOWN;
+        }
+        else if(!getArtifactBase().isDirectory())
+        {
+            suffix = CLASS_SUFFIX_BROKEN;
+        }
+        else if (isHtmlArtifact)
+        {
+            suffix = CLASS_SUFFIX_HTML;
+        }
+
+        if (suffix == null)
+        {
+            // Just show the normal folder/file icons.
+            return null;
+        }
+        else
+        {
+            return CLASS_PREFIX + suffix;
+        }
+    }
 
     public String getFileType() throws FileSystemException
     {
@@ -133,7 +174,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     public List<FileAction> getActions()
     {
         List<FileAction> actions = new ArrayList<FileAction>(3);
-        if(isLinkArtifact)
+        if (isLinkArtifact)
         {
             actions.add(new FileAction(FileAction.TYPE_LINK, getUrlPath()));
         }
@@ -141,7 +182,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         {
             if (isHtmlArtifact)
             {
-                actions.add(new FileAction(FileAction.TYPE_DOWNLOAD, getUrlPath()));
+                actions.add(new FileAction(FileAction.TYPE_VIEW, getUrlPath()));
             }
             actions.add(new FileAction(FileAction.TYPE_ARCHIVE, "/zip.action?path=" + getName().getURI()));
         }
@@ -193,5 +234,11 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     public long getCommandResultId()
     {
         return getCommandResult().getId();
+    }
+
+    @Override
+    public Map<String, Object> getExtraAttributes()
+    {
+        return asMap(CollectionUtils.<String, Object>asPair("actions", getActions()));
     }
 }

@@ -729,7 +729,8 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
 ZUTUBI.FSTreeLoader = function(config)
 {
     var baseUrl = config.baseUrl;
-
+    this.preloadDepth = config.preloadDepth || 0;
+    
     ZUTUBI.FSTreeLoader.superclass.constructor.call(this, {
         dataUrl: baseUrl + '/ajax/xls.action',
         baseParams: config
@@ -749,6 +750,10 @@ Ext.extend(ZUTUBI.FSTreeLoader, Ext.tree.TreeLoader, {
             }
         }
         buf.push("path=", encodeURIComponent(node.getPath("baseName")));
+        if (this.preloadDepth && node.getDepth() == 0)
+        {
+            buf.push("&depth=", this.preloadDepth);
+        }
         return buf.join("");
     }
 });
@@ -2454,5 +2459,163 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
 
     isFolder: function(node) {
         return node && node.reload;
+    }
+});
+
+
+ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
+{
+    style: 'padding: 8px',
+    border: true,
+    layout: 'fit',
+    enableHdMenu: false,
+
+    tooltips: {
+        archive: 'download a zip archive of this artifact',
+        decorate: 'go to a decorated view of this file',
+        download: 'download this file',
+        link: 'navigate to the external link',
+        view: 'view this html artifact'
+    },
+
+    initComponent: function()
+    {
+        var tree = this;
+        var config = {
+            loader: new ZUTUBI.FSTreeLoader({
+                baseUrl: window.baseUrl,
+                fs: 'pulse',
+                basePath: 'projects/' + this.initialConfig.projectId + '/builds/' + this.initialConfig.buildId + '/artifacts',
+                showFiles: true,
+                preloadDepth: 3
+            }),
+
+            selModel: new Ext.tree.DefaultSelectionModel({onNodeClick: Ext.emptyFn}),
+
+            tbar: {
+                items: [{
+                    xtype: 'label',
+                    text: 'filter:'
+                }, ' ', {
+                    xtype: 'combo',
+                    width: 200,
+                    mode: 'local',
+                    triggerAction: 'all',
+                    editable: false,
+                    store: new Ext.data.ArrayStore({
+                        idIndex: 0,
+                        fields: [
+                            'itemId',
+                            'itemText'
+                        ],
+                        data: [
+                            [1, 'all artifacts'],
+                            [2, 'explicit artifacts only'],
+                            [3, 'featured artifacts only']
+                        ]
+                    }),
+                    valueField: 'itemId',
+                    displayField: 'itemText',
+                    value: 1,
+                    listeners: {
+                        select: function() {
+                            tree.getEl().mask('Reloading...');
+                            tree.on('expandnode', tree.initialExpand, tree, {single: true});
+                            tree.getRootNode().reload(function() {
+                                tree.getEl().unmask();
+                            });
+                        }
+                    }
+                }, '->', {
+                    text: 'expand all',
+                    icon: window.baseUrl + '/images/expand.gif',
+                    onClick: function() {
+                        tree.expandAll();
+                    }
+                }, {
+                    text: 'collapse all',
+                    icon: window.baseUrl + '/images/collapse.gif',
+                    onClick: function() {
+                        tree.collapseAll();
+                    }
+                }]
+            },
+
+            columns: [{
+                header: 'name',
+                tpl: '{text:htmlEncode}',
+                width: 400
+            }, {
+                header: 'size',
+                width: 100,
+                dataIndex: 'size',
+                tpl: '<tpl if="extraAttributes.size">{[Ext.util.Format.fileSize(values.extraAttributes.size)]}</tpl>',
+                align: 'right',
+                sortType: 'asInt'
+            }, {
+                header: 'actions',
+                width: 120,
+                tpl: '<tpl if="extraAttributes.actions">' +
+                         '<tpl for="extraAttributes.actions">' +
+                             '&nbsp;<a href="#" onclick="window.location=\'{url}\';">' +
+                                 '<img alt="{type}" src="'+ window.baseUrl + '/images/artifacts/{type}.gif" ext:qtip="{[ZUTUBI.ArtifactsTree.prototype.tooltips[values.type]]}"/>' +
+                             '</a>' +
+                         '</tpl>' +
+                     '</tpl>'
+            }]
+        };
+
+        Ext.apply(this, config);
+        Ext.apply(this.initialConfig, config);
+
+        ZUTUBI.ArtifactsTree.superclass.initComponent.apply(this, arguments);
+
+        this.on('beforerender', this.setInitialColumnWidths, this, {single: true});
+        this.on('expandnode', this.initialExpand, this, {single: true});
+    },
+
+    setInitialColumnWidths: function()
+    {
+        // If there is more than enough width for our columns,
+        // stretch the first one to fill.
+        var availableWidth = this.ownerCt.getSize().width;
+        var columns = this.columns;
+        var firstWidth = columns[0].width;
+        var remainingWidth = 0;
+        var count = columns.length;
+        for (var i = 1; i < count; i++)
+        {
+            remainingWidth += columns[i].width;
+        }
+
+        var buffer = Ext.getScrollBarWidth() + 20;
+        if (availableWidth > firstWidth + remainingWidth + buffer)
+        {
+            this.columns[0].width = availableWidth - remainingWidth - buffer;
+        }
+    },
+
+    smallEnough: function(node)
+    {
+        var children = node.attributes.children;
+        return children && children.length < 9;
+    },
+
+    initialExpand: function(node)
+    {
+        var depth = node.getDepth();
+        if (depth < 3)
+        {
+            var children = node.childNodes;
+            var count = children.length;
+            for (var i = 0; i < count; i++)
+            {
+                var child = children[i];
+                if (depth < 2 || this.smallEnough(child))
+                {
+                    child.expand(false, false, this.initialExpand, this);
+                }
+            }
+        }
     }
 });

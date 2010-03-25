@@ -171,9 +171,9 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     }
 
     @Override
-    public Map<String, String> getExtraAttributes()
+    public Map<String, Object> getExtraAttributes()
     {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, Object> result = new HashMap<String, Object>();
         String collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
         if (collapsedCollection != null)
         {

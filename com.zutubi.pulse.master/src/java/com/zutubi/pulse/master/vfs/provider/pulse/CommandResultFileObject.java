@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class comment/>
+ * File representing a single command in an artifacts tree.
  */
 public class CommandResultFileObject extends AbstractPulseFileObject implements CommandResultProvider
 {

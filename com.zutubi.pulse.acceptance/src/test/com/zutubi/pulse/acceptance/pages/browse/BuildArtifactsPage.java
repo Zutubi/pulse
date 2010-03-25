@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.master.vfs.provider.pulse.ArtifactFileObject;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
 
@@ -45,7 +46,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public String getArtifactLocator(String artifact)
     {
-        return "link=" + artifact;
+        return "//a[contains(@class, 'x-tree-node-anchor')]/span[text()='" + artifact + "']";
     }
 
     /**
@@ -72,11 +73,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean isArtifactAvailable(String artifactName)
     {
-        // look up the icon, if it is the artifact broken icon, then the artifact is
-        // not available.  Is there a better way to test this via the UI?.
-        String id = browser.getAttribute(getArtifactLocator(artifactName) + "@id");
-        int nodeNumber = Integer.valueOf(id.substring(11));
-        String clazz = browser.getAttribute("id=ygtvfile" + nodeNumber + "@class");
-        return !clazz.equals("treeview_broken");
+        String iconCls = browser.getAttribute(getArtifactLocator(artifactName) + "/preceding::img[position()=1]/@class");
+        return !iconCls.contains(ArtifactFileObject.CLASS_PREFIX + ArtifactFileObject.CLASS_SUFFIX_BROKEN);
     }
 }

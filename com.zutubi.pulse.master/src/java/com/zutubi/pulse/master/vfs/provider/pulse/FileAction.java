@@ -25,6 +25,11 @@ public class FileAction
      * of the file.
      */
     public static final String TYPE_DECORATE = "decorate";
+    /**
+     * Similar to the download action, but used when the target in HTML where
+     * it will be viewed in the browser.
+     */
+    public static final String TYPE_VIEW = "view";
 
     /**
      * This action type determines how it is rendered.

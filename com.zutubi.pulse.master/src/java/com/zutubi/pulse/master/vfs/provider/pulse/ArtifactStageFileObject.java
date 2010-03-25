@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class comment/>
+ * File object representing a stage in the artifacts tree.
  */
 public class ArtifactStageFileObject extends AbstractPulseFileObject implements RecipeResultProvider
 {
@@ -35,7 +35,7 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
         {
             return objectFactory.buildBean(TextMessageFileObject.class,
                     new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                    new Object[]{fileName, FileTypeConstants.IN_PROGRESS, pfs}
+                    new Object[]{fileName, ArtifactFileObject.CLASS_PREFIX + ArtifactFileObject.CLASS_SUFFIX_IN_PROGRESS, pfs}
             );
         }
 

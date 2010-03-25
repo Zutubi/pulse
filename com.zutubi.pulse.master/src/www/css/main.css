@@ -750,6 +750,40 @@ Build logs
 }
 
 /*------------------------------
+Artifacts
+*/
+
+.x-tree-node-collapsed .artifact-broken, .x-tree-node-expanded .artifact-broken, .x-tree-node-leaf .artifact-broken
+{
+	background-image: url(../images/folder_error.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .artifact-unknown, .x-tree-node-expanded .artifact-unknown, .x-tree-node-leaf .artifact-unknown
+{
+	background-image: url(../images/unknown.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .artifact-link, .x-tree-node-expanded .artifact-link, .x-tree-node-leaf .artifact-link
+{
+	background-image: url(../images/link_go.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .artifact-html, .x-tree-node-expanded .artifact-html, .x-tree-node-leaf .artifact-html
+{
+	background-image: url(../images/page_world.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .artifact-inprogress, .x-tree-node-expanded .artifact-inprogress, .x-tree-node-leaf .artifact-inprogress
+{
+	background-image: url(../images/cog.gif);
+    width: 20px;
+}
+
+/*------------------------------
 Boxes
 */
 

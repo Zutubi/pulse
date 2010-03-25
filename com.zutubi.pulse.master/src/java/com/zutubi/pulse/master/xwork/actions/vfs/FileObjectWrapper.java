@@ -190,7 +190,7 @@ public class FileObjectWrapper
         return null;
     }
 
-    public Map<String, String> getExtraAttributes()
+    public Map<String, Object> getExtraAttributes()
     {
         if (fo instanceof AbstractPulseFileObject)
         {

@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileContentInfoFactory;
@@ -19,7 +21,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Represents a single file or directory of an artifact in an artifacts tree.
+ */
 public class FileArtifactFileObject extends AbstractPulseFileObject implements AddressableFileObject, FileArtifactProvider
 {
     private static final Logger LOG = Logger.getLogger(FileArtifactFileObject.class);
@@ -83,7 +89,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         return UriParser.encode(base.list());
     }
 
-    protected long doGetContentSize() throws Exception
+    protected long doGetContentSize()
     {
         return base.length();
     }
@@ -183,5 +189,14 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     {
         AbstractPulseFileObject fo = (AbstractPulseFileObject) getAncestor(ArtifactProvider.class);
         return fo.getName().getRelativeName(getName());
+    }
+
+    @Override
+    public Map<String, Object> getExtraAttributes()
+    {
+        return asMap(
+                asPair("size", Long.toString(doGetContentSize())),
+                asPair("actions", getActions())
+        );
     }
 }

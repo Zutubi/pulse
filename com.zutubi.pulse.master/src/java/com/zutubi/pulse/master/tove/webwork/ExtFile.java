@@ -3,6 +3,10 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import flexjson.JSON;
 
+import static java.util.Arrays.asList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,7 +20,19 @@ public class ExtFile
     private boolean leaf;
     private String cls;
     private String iconCls;
-    private Map<String, String> extraAttributes;
+    private Map<String, Object> extraAttributes;
+    /**
+     * A list of children, if this is not a leaf.  Note that this may be left
+     * empty for trees that are loaded dynamically.
+     */
+    private List<ExtFile> children;
+
+    public ExtFile(String baseName, String text, boolean leaf)
+    {
+        this.baseName = baseName;
+        this.text = text;
+        this.leaf = leaf;
+    }
 
     public ExtFile(FileObjectWrapper fo)
     {
@@ -26,6 +42,10 @@ public class ExtFile
         cls = fo.getCls();
         iconCls = fo.getIconCls();
         extraAttributes = fo.getExtraAttributes();
+        if (extraAttributes == null)
+        {
+            extraAttributes = new HashMap<String, Object>();
+        }
     }
 
     public String getBaseName()
@@ -54,8 +74,24 @@ public class ExtFile
     }
 
     @JSON
-    public Map<String, String> getExtraAttributes()
+    public Map<String, Object> getExtraAttributes()
     {
         return extraAttributes;
+    }
+
+    @JSON
+    public List<ExtFile> getChildren()
+    {
+        return children;
+    }
+
+    public void addChildren(ExtFile... toAdd)
+    {
+        if (children == null)
+        {
+            children = new LinkedList<ExtFile>();
+        }
+
+        this.children.addAll(asList(toAdd));
     }
 }

@@ -189,7 +189,7 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      * @return a mapping of name-value pairs containing extra attributes, may
      *         be null if there are no such attributes
      */
-    public Map<String, String> getExtraAttributes()
+    public Map<String, Object> getExtraAttributes()
     {
         return null;
     }
