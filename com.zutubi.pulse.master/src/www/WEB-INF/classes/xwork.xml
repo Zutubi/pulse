@@ -160,12 +160,12 @@
             </result>
         </action>
 
-        <action name="tailRecipeLog" class="com.zutubi.pulse.master.xwork.actions.project.TailRecipeLogAction">
+        <action name="tailBuildLog" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
             <interceptor-ref name="completeStack"/>
-            <result name="tail" type="velocity">/tail-recipe-log.vm</result>
+            <result name="tail" type="velocity">/tail-build-log.vm</result>
             <result name="raw" type="stream">
                 <param name="contentType">text/plain</param>
-                <param name="contentDisposition">filename="recipe.log"</param>
+                <param name="contentDisposition">filename="build.log"</param>
             </result>
         </action>
 
@@ -417,7 +417,7 @@
             <result name="success" type="velocity">view-build-panel.vm</result>
         </action>
 
-        <action name="tailRecipeLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailRecipeLogAction">
+        <action name="tailBuildLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 

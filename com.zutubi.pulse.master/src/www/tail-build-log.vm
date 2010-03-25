@@ -17,9 +17,9 @@
         }
         
 #if($u_stageName)
-        #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
+        #updater("$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
 #else
-        #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
+        #updater("$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
 #end
         Ext.onReady(function() {
             var combo = new Ext.form.ComboBox({

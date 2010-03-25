@@ -10,7 +10,7 @@ public class BuildLogsActionResolver extends StaticMapActionResolver
 {
     public BuildLogsActionResolver()
     {
-        super("tailRecipeLog");
+        super("tailBuildLog");
 
         addMapping("build", new BuildLogActionResolver());
         addMapping("stage", new StageLogsActionResolver());        

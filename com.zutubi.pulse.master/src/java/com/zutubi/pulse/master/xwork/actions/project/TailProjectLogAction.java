@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.project.ProjectLoggerManager;
 
 import java.io.IOException;
 
-public class TailProjectLogAction extends TailRecipeLogAction
+public class TailProjectLogAction extends TailBuildLogAction
 {
     private ProjectLoggerManager projectLoggerManager;
 

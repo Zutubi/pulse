@@ -24,9 +24,9 @@ import java.util.Map;
  * Action to get a build or recipe log.  If a stage is specified, a recipe log
  * is returned.  Otherwise, the build log is returned.
  */
-public class TailRecipeLogAction extends StageActionBase
+public class TailBuildLogAction extends StageActionBase
 {
-    private static final Messages I18N = Messages.getInstance(TailRecipeLogAction.class);
+    private static final Messages I18N = Messages.getInstance(TailBuildLogAction.class);
 
     private static final int DEFAULT_MAX_LINES = 30;
     private static final int DEFAULT_REFRESH_INTERVAL = 60;

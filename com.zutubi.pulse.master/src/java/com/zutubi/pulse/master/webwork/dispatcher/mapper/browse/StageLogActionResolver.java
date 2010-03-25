@@ -14,7 +14,7 @@ public class StageLogActionResolver extends ParameterisedActionResolver
 
     public StageLogActionResolver(String stage)
     {
-        super("tailRecipeLog");
+        super("tailBuildLog");
         this.stage = stage;
     }
 

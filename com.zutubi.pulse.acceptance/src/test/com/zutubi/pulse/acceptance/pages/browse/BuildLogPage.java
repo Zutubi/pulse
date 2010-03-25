@@ -25,6 +25,11 @@ public class BuildLogPage extends AbstractLogPage
 
     public void selectStage(String stageName)
     {
-        browser.evalExpression("var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('select-log-combo'); combo.setValue('" + stageName + "'); combo.fireEvent('select', combo, combo.getStore().getAt(1));");
+        browser.evalExpression(
+                "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('select-log-combo');" +
+                "combo.setValue('" + stageName + "');" +
+                "var store = combo.getStore();" +
+                "combo.fireEvent('select', combo, store.getAt(store.find('value', '" + stageName + "')));"
+        );
     }
 }

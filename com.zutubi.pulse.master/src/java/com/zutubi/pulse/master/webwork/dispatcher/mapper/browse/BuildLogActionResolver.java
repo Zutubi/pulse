@@ -9,7 +9,7 @@ public class BuildLogActionResolver extends ParameterisedActionResolver
 {
     public BuildLogActionResolver()
     {
-        super("tailRecipeLog");
+        super("tailBuildLog");
         addParameter("buildSelected", "true");
     }
 }
