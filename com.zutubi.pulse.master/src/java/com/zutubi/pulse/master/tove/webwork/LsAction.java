@@ -8,16 +8,17 @@ import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * The ls action provides access to 'ls' style functionality for the web ui.
@@ -59,6 +60,13 @@ public class LsAction extends VFSActionSupport
      */
     private int depth = 0;
 
+    /**
+     * If not null, the name of a property to filter files by.  This is the
+     * name of a boolean bean property on the file object.  Files without such
+     * a property are always passed by the filter.
+     */
+    private String filterFlag = null;
+
     public String getBasePath()
     {
         return basePath;
@@ -97,6 +105,11 @@ public class LsAction extends VFSActionSupport
     public void setShowHidden(boolean showHidden)
     {
         this.showHidden = showHidden;
+    }
+
+    public void setFilterFlag(String filterFlag)
+    {
+        this.filterFlag = filterFlag;
     }
 
     public void setDepth(int depth)
@@ -148,7 +161,8 @@ public class LsAction extends VFSActionSupport
                 new CompoundFileFilter(
                         new FileTypeFilter(acceptedTypes),
                         new HiddenFileFilter(showHidden),
-                        new FilePrefixFilter(prefix)
+                        new FilePrefixFilter(prefix),
+                        new FlagFileFilter(filterFlag)
                 )
         );
 
@@ -268,6 +282,104 @@ public class LsAction extends VFSActionSupport
             {
                 return false;
             }
+        }
+    }
+
+    /**
+     * Filter based on arbitrary flags represented by bean properties.  The
+     * property must be true for the filter to pass.
+     */
+    private static class FlagFileFilter implements FileFilter
+    {
+        /**
+         * Keeps a cache of (class, flag name) pairs mapped to (boolean,
+         * method) pairs.  The map entry boolean indicates if a read method
+         * exists.
+         */
+        private static final Map<Pair<Class, String>, Pair<Boolean, Method>> cache = new HashMap<Pair<Class, String>, Pair<Boolean, Method>>();
+
+        private String flag;
+
+        private FlagFileFilter(String flag)
+        {
+            this.flag = flag;
+        }
+
+        public boolean accept(FileSelectInfo fileSelectInfo)
+        {
+            if (!StringUtils.stringSet(flag))
+            {
+                return true;
+            }
+
+            FileObject file = fileSelectInfo.getFile();
+            Class fileClass = file.getClass();
+            Pair<Boolean, Method> entry = lookup(fileClass);
+            if (entry.first)
+            {
+                try
+                {
+                    return (Boolean) entry.second.invoke(file);
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Flag doesn't exist in the file class, don't filter this type
+                // of file.
+                return true;
+            }
+        }
+
+        private Pair<Boolean, Method> lookup(Class fileClass)
+        {
+            Pair<Boolean, Method> entry;
+            synchronized (cache)
+            {
+                Pair<Class, String> key = asPair(fileClass, flag);
+                entry = cache.get(key);
+                if (entry == null)
+                {
+                    entry = introspect(fileClass);
+                    cache.put(key, entry);
+                }
+            }
+            return entry;
+        }
+
+        private Pair<Boolean, Method> introspect(Class fileClass)
+        {
+            try
+            {
+                BeanInfo beanInfo = Introspector.getBeanInfo(fileClass);
+                PropertyDescriptor descriptor = CollectionUtils.find(beanInfo.getPropertyDescriptors(), new Predicate<PropertyDescriptor>()
+                {
+                    public boolean satisfied(PropertyDescriptor propertyDescriptor)
+                    {
+                        if (propertyDescriptor.getName().equals(flag))
+                        {
+                            Method readMethod = propertyDescriptor.getReadMethod();
+                            return readMethod != null && readMethod.getReturnType() == Boolean.TYPE;
+                        }
+
+                        return false;
+                    }
+                });
+
+                if (descriptor != null)
+                {
+                    return asPair(true, descriptor.getReadMethod());
+                }
+            }
+            catch (IntrospectionException e)
+            {
+                // Fall through.
+            }
+
+            return asPair(false, null);
         }
     }
 }

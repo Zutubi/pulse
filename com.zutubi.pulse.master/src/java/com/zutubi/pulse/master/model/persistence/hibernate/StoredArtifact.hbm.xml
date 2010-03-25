@@ -14,6 +14,10 @@
 
         <property name="url" column="URL" type="string" length="1023"/>
 
+        <property name="explicit" column="EXPLICIT" type="boolean"/>
+
+        <property name="featured" column="FEATURED" type="boolean"/>
+
         <bag name="children" cascade="all,delete-orphan" lazy="false">
             <key column="ARTIFACT_ID" not-null="true"/>
             <one-to-many class="com.zutubi.pulse.core.model.StoredFileArtifact"/>

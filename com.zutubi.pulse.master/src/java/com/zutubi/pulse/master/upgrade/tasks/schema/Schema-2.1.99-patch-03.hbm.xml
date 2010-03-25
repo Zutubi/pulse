@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.core.model.StoredArtifact" table="ARTIFACT" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="explicit" type="boolean">
+            <column name="EXPLICIT" default="true"/>
+        </property>
+
+        <property name="featured" type="boolean">
+            <column name="FEATURED" default="false"/>
+        </property>
+    </class>
+
+    <class name="com.zutubi.pulse.master.model.User" table="LOCAL_USER" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="artifactsFilter" type="string" length="63">
+            <column name="ARTIFACTS_FILTER" default="'explicit'"/>
+        </property>
+    </class>
+</hibernate-mapping>

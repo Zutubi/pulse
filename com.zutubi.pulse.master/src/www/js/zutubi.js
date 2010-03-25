@@ -2518,7 +2518,8 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 fs: 'pulse',
                 basePath: 'projects/' + this.initialConfig.projectId + '/builds/' + this.initialConfig.buildId + '/artifacts',
                 showFiles: true,
-                preloadDepth: 3
+                preloadDepth: 3,
+                filterFlag: this.initialConfig.filter
             }),
 
             selModel: new Ext.tree.DefaultSelectionModel({onNodeClick: Ext.emptyFn}),
@@ -2529,6 +2530,7 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     text: 'filter:'
                 }, ' ', {
                     xtype: 'combo',
+                    id: 'filter-combo',
                     width: 200,
                     mode: 'local',
                     triggerAction: 'all',
@@ -2536,26 +2538,28 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     store: new Ext.data.ArrayStore({
                         idIndex: 0,
                         fields: [
-                            'itemId',
-                            'itemText'
+                            'filter',
+                            'text'
                         ],
                         data: [
-                            [1, 'all artifacts'],
-                            [2, 'explicit artifacts only'],
-                            [3, 'featured artifacts only']
+                            ['', 'all artifacts'],
+                            ['explicit', 'explicit artifacts only'],
+                            ['featured', 'featured artifacts only']
                         ]
                     }),
-                    valueField: 'itemId',
-                    displayField: 'itemText',
-                    value: 1,
+                    valueField: 'filter',
+                    displayField: 'text',
+                    value: this.initialConfig.filter,
                     listeners: {
-                        select: function() {
-                            tree.getEl().mask('Reloading...');
-                            tree.on('expandnode', tree.initialExpand, tree, {single: true});
-                            tree.getRootNode().reload(function() {
-                                tree.getEl().unmask();
-                            });
+                        select: function(combo, record) {
+                            tree.setFilterFlag(record.get('filter'));
                         }
+                    }
+                }, {
+                    text: 'save',
+                    icon: window.baseUrl + '/images/save.gif',
+                    onClick: function() {
+                        tree.saveFilterFlag(Ext.getCmp('filter-combo').getValue());
                     }
                 }, '->', {
                     text: 'expand all',
@@ -2648,5 +2652,25 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 }
             }
         }
+    },
+
+    setFilterFlag: function(flag)
+    {
+        this.loader.baseParams.filterFlag = flag;
+        this.getEl().mask('Reloading...');
+        this.on('expandnode', this.initialExpand, this, {single: true});
+        this.getRootNode().reload(function() {
+            this.getOwnerTree().getEl().unmask();
+        });
+    },
+
+    saveFilterFlag: function(flag)
+    {
+        Ext.Ajax.request({
+           url: window.baseUrl + '/ajax/saveArtifactsFilter.action',
+           success: function() { showStatus('Filter saved.','success'); },
+           failure: function() { showStatus('Unable to save filter.','failure'); },
+           params: { filter: flag }
+        });
     }
 });

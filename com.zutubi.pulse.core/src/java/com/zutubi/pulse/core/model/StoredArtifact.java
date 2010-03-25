@@ -44,6 +44,18 @@ public class StoredArtifact extends Entity
      */
     private String url;
 
+    /**
+     * Indicates if this artifact was explicitly captured due to user
+     * configuration, or automatically captured by Pulse (e.g. command output).
+     */
+    private boolean explicit = false;
+
+    /**
+     * Configurable flag that can be turned on to indicate that an artifact has
+     * special importance, and should be made more prominent.
+     */
+    private boolean featured = false;
+
     //---(non persistent dependency fields)---
 
     /**
@@ -63,15 +75,19 @@ public class StoredArtifact extends Entity
     {
     }
 
-    public StoredArtifact(String name)
+    public StoredArtifact(String name, boolean explicit, boolean featured)
     {
         this.name = name;
+        this.explicit = explicit;
+        this.featured = featured;
     }
 
-    public StoredArtifact(String name, String url)
+    public StoredArtifact(String name, String url, boolean explicit, boolean featured)
     {
         this.name = name;
         this.url = url;
+        this.explicit = explicit;
+        this.featured = featured;
     }
 
     public StoredArtifact(String name, StoredFileArtifact file)
@@ -88,6 +104,26 @@ public class StoredArtifact extends Entity
     private void setName(String name)
     {
         this.name = name;
+    }
+
+    public boolean isExplicit()
+    {
+        return explicit;
+    }
+
+    public void setExplicit(boolean explicit)
+    {
+        this.explicit = explicit;
+    }
+
+    public boolean isFeatured()
+    {
+        return featured;
+    }
+
+    public void setFeatured(boolean featured)
+    {
+        this.featured = featured;
     }
 
     public void add(StoredFileArtifact child)

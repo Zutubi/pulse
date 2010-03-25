@@ -87,7 +87,7 @@ public class TestCommandContext implements CommandContext
     }
 
     /**
-     * Returns all links registered via {@link #registerLink(String, String)}.
+     * Returns all links registered via {@link CommandContext#registerLink(String, String,boolean,boolean)}.
      *
      * @return all registered link artifacts
      */
@@ -97,7 +97,7 @@ public class TestCommandContext implements CommandContext
     }
 
     /**
-     * Returns all artifacts registered via {@link #registerArtifact(String, String)}.
+     * Returns all artifacts registered via {@link CommandContext#registerArtifact(String, String,boolean,boolean)}.
      * These artifact instances in turn include details of processors etc
      * registered against them.
      *
@@ -143,7 +143,7 @@ public class TestCommandContext implements CommandContext
         properties.put(name, value);
     }
 
-    public void registerLink(String name, String url)
+    public void registerLink(String name, String url, boolean explicit, boolean featured)
     {
         links.put(name, url);
     }
@@ -153,7 +153,7 @@ public class TestCommandContext implements CommandContext
         artifacts.get(name).setPublish(true);
     }
 
-    public File registerArtifact(String name, String type)
+    public File registerArtifact(String name, String type, boolean explicit, boolean featured)
     {
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
         if (!toDir.mkdirs())
@@ -204,7 +204,7 @@ public class TestCommandContext implements CommandContext
     /**
      * Records information about a registered artifact.
      *
-     * @see TestCommandContext#registerArtifact(String, String)
+     * @see CommandContext#registerArtifact(String, String,boolean,boolean)
      */
     public static class Artifact
     {

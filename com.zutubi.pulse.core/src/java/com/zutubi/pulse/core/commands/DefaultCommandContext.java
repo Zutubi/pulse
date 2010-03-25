@@ -93,14 +93,14 @@ public class DefaultCommandContext implements CommandContext
         result.getProperties().put(name, value);
     }
 
-    public void registerLink(String name, String url)
+    public void registerLink(String name, String url, boolean explicit, boolean featured)
     {
-        result.addArtifact(new StoredArtifact(name, url));
+        result.addArtifact(new StoredArtifact(name, url, explicit, featured));
     }
 
-    public File registerArtifact(String name, String type)
+    public File registerArtifact(String name, String type, boolean explicit, boolean featured)
     {
-        StoredArtifact artifact = new StoredArtifact(name);
+        StoredArtifact artifact = new StoredArtifact(name, explicit, featured);
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
         if (!toDir.mkdirs())
         {

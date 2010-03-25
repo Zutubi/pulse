@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  * @see LinkArtifact
  */
 @SymbolicName("zutubi.linkArtifactConfig")
-@Form(fieldOrder = {"name", "url"})
+@Form(fieldOrder = {"name", "url", "featured"})
 public class LinkArtifactConfiguration extends ArtifactConfigurationSupport
 {
     @Required

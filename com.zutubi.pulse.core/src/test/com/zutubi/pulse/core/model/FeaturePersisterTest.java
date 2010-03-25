@@ -73,7 +73,7 @@ public class FeaturePersisterTest extends PulseTestCase
     public void testSomeArtifactsWithFeatures() throws Exception
     {
         CommandResult result = getResultWithFeatures(getFeature("summary here"));
-        result.addArtifact(new StoredArtifact("featureless artifact"));
+        result.addArtifact(new StoredArtifact("featureless artifact", true, false));
         roundTrip(result);
     }
 
@@ -91,7 +91,7 @@ public class FeaturePersisterTest extends PulseTestCase
     private CommandResult getResultWithFeatures(PersistentPlainFeature... features)
     {
         CommandResult result = new CommandResult("dummy");
-        StoredArtifact artifact = new StoredArtifact("artifact");
+        StoredArtifact artifact = new StoredArtifact("artifact", true, false);
         StoredFileArtifact file = new StoredFileArtifact("path/to/file");
         result.addArtifact(artifact);
         artifact.add(file);

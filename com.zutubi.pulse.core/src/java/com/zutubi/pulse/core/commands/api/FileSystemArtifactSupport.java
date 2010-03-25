@@ -29,7 +29,7 @@ public abstract class FileSystemArtifactSupport extends ArtifactSupport
     public void capture(CommandContext context)
     {
         FileSystemArtifactConfigurationSupport config = (FileSystemArtifactConfigurationSupport) getConfig();
-        File file = context.registerArtifact(config.getName(), config.getType());
+        File file = context.registerArtifact(config.getName(), config.getType(), true, config.isFeatured());
         captureFiles(file, context);
         if (config.isPublish())
         {

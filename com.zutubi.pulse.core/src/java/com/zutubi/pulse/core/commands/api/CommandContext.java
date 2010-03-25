@@ -76,8 +76,12 @@ public interface CommandContext
      *
      * @param name name of the artifact
      * @param url  url of the external resource to link to
+     * @param explicit if true, the link artifact is being captured due to an
+     *                 explicit choice by the user
+     * @param featured if true, the user has marked the link artifact as
+     *                 "featured", i.e. it should be given extra prominence
      */
-    void registerLink(String name, String url);
+    void registerLink(String name, String url, boolean explicit, boolean featured);
 
     /**
      * Registers a local artifact with the given name, returning the directory
@@ -86,21 +90,27 @@ public interface CommandContext
      * and/or permanent storage.  All files written under the returned
      * directory will be captured as part of the artifact.
      *
-     * @param name the name of the artifact, e.g. "my report"
-     * @param type the MIME type of the captured files, or null if their types
-     *             are unknown and should be guessed
+     * @param name     the name of the artifact, e.g. "my report"
+     * @param type     the MIME type of the captured files, or null if their
+     *                 types are unknown and should be guessed
+     * @param explicit if true, the artifact is being captured due to an
+     *                 explicit choice by the user (as opposed to, for example
+     *                 output artifacts automatically captured by some
+     *                 commands)
+     * @param featured if true, the user has marked the artifact as "featured",
+     *                 i.e. it should be given extra prominence
      * @return the directory to which all files that are part of this artifact
      *         should be captured
      *
      * @see #registerProcessors(String, java.util.List)
      * @see #setArtifactIndex(String, String)
      */
-    File registerArtifact(String name, String type);
+    File registerArtifact(String name, String type, boolean explicit, boolean featured);
 
     /**
      * Registers post-processors that should be applied to all files in the
      * artifact with the given name.  The artifact should have been previously
-     * registered via {@link #registerArtifact(String, String)}.  The processors
+     * registered via {@link #registerArtifact(String, String,boolean,boolean)}.  The processors
      * are applied after the command completes to all files captured under the
      * given artifact.
      *

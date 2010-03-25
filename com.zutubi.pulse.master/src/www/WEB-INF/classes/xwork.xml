@@ -509,6 +509,11 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
+        <action name="saveArtifactsFilter" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveArtifactsFilterAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
+
         <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">data</result>

@@ -9,6 +9,8 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 @SymbolicName("zutubi.artifactConfigSupport")
 public abstract class ArtifactConfigurationSupport extends AbstractNamedConfiguration implements ArtifactConfiguration
 {
+    private boolean featured;
+
     protected ArtifactConfigurationSupport()
     {
     }
@@ -16,5 +18,15 @@ public abstract class ArtifactConfigurationSupport extends AbstractNamedConfigur
     protected ArtifactConfigurationSupport(String name)
     {
         super(name);
+    }
+
+    public boolean isFeatured()
+    {
+        return featured;
+    }
+
+    public void setFeatured(boolean featured)
+    {
+        this.featured = featured;
     }
 }

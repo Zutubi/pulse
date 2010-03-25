@@ -194,6 +194,16 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         return !isLinkArtifact;
     }
 
+    public boolean isExplicit()
+    {
+        return getArtifact().isExplicit();
+    }
+
+    public boolean isFeatured()
+    {
+        return getArtifact().isFeatured();
+    }
+    
     public String getUrlPath()
     {
         if (isHtmlArtifact)

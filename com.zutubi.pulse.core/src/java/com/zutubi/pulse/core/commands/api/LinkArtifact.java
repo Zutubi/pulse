@@ -20,6 +20,6 @@ public class LinkArtifact implements Artifact
 
     public void capture(CommandContext context)
     {
-        context.registerLink(config.getName(), config.getUrl());
+        context.registerLink(config.getName(), config.getUrl(), true, config.isFeatured());
     }
 }

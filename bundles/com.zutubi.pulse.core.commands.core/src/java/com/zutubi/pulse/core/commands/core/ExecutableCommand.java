@@ -267,7 +267,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
     private void captureExecutionEnvironmentArtifact(CommandContext commandContext, ProcessBuilder builder) throws IOException
     {
-        File envFileDir = commandContext.registerArtifact(ENV_ARTIFACT_NAME, null);
+        File envFileDir = commandContext.registerArtifact(ENV_ARTIFACT_NAME, null, false, false);
         File file = new File(envFileDir, ENV_FILENAME);
 
         final String separator = Constants.LINE_SEPARATOR;

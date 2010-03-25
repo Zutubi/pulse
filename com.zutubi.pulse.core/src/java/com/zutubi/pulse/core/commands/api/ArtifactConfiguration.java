@@ -16,4 +16,12 @@ public interface ArtifactConfiguration extends NamedConfiguration
      * @return the type of artifact to create for this configuration
      */
     Class<? extends Artifact> artifactType();
+
+    /**
+     * Indicates if this artifact is marked by the user as "featured", i.e.
+     * deserving extra prominence.
+     *
+     * @return true if this artifact is marked as featured
+     */
+    boolean isFeatured();
 }

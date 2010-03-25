@@ -2,7 +2,10 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.util.Predicate;
 import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
@@ -69,5 +72,41 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
     public long getCommandResultId()
     {
         return commandResultId;
+    }
+
+    public boolean isExplicit() throws FileSystemException
+    {
+        return isAnyChild(new Predicate<ArtifactFileObject>()
+        {
+            public boolean satisfied(ArtifactFileObject file)
+            {
+                return file.isExplicit();
+            }
+        });
+    }
+
+    public boolean isFeatured() throws FileSystemException
+    {
+        return isAnyChild(new Predicate<ArtifactFileObject>()
+        {
+            public boolean satisfied(ArtifactFileObject file)
+            {
+                return file.isFeatured();
+            }
+        });
+    }
+
+    private boolean isAnyChild(Predicate<ArtifactFileObject> p) throws FileSystemException
+    {
+        FileObject[] children = getChildren();
+        for (FileObject child: children)
+        {
+            if (p.satisfied((ArtifactFileObject) child))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

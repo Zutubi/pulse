@@ -10,7 +10,8 @@
             var tree = new ZUTUBI.ArtifactsTree({
                 projectId: '$project.id',
                 buildId: '$buildResult.id',
-                id: '#id("${project.name}-build-${buildResult.number}-artifacts")'
+                id: '#id("${project.name}-build-${buildResult.number}-artifacts")',
+                filter: '$filter'
             });
 
             var nestedCenter = Ext.getCmp('nested-center');

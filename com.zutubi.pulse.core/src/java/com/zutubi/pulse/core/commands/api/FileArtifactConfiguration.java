@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  * @see FileArtifact
  */
 @SymbolicName("zutubi.fileArtifactConfig")
-@Form(fieldOrder = {"name", "file", "postProcessors", "type", "failIfNotPresent", "ignoreStale", "publish", "artifactPattern"})
+@Form(fieldOrder = {"name", "file", "featured", "postProcessors", "type", "failIfNotPresent", "ignoreStale", "publish", "artifactPattern"})
 public class FileArtifactConfiguration extends FileSystemArtifactConfigurationSupport
 {
     @Required

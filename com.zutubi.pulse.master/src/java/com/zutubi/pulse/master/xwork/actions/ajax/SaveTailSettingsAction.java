@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
- * Action to save tail view settings to a user's preferences.  Invalid settins
+ * Action to save tail view settings to a user's preferences.  Invalid settings
  * are ignored.
  */
 public class SaveTailSettingsAction extends ActionSupport

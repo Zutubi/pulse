@@ -1,14 +1,16 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import java.io.File;
+import com.zutubi.pulse.master.model.User;
 
 /**
  */
 public class ViewArtifactsAction extends CommandActionBase
 {
-    public String getSeparator()
+    private String filter = User.DEFAULT_ARTIFACTS_FILTER;
+
+    public String getFilter()
     {
-        return File.separator.replace("\\", "\\\\");
+        return filter;
     }
 
     public String execute()
@@ -17,6 +19,13 @@ public class ViewArtifactsAction extends CommandActionBase
         getCommandResult();
         // We require at least down to the build level
         getRequiredBuildResult();
+
+        User user = getLoggedInUser();
+        if (user != null)
+        {
+            filter = user.getArtifactsFilter();
+        }
+        
         return SUCCESS;
     }
 }

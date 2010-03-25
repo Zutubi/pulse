@@ -106,7 +106,7 @@ public class RetrieveDependenciesCommand implements Command
 
     private void captureRetrievalReport(IvyRetrievalReport retrievalReport, CommandContext commandContext) throws IOException, TransformerConfigurationException, SAXException
     {
-        final File outDir = commandContext.registerArtifact(OUTPUT_NAME, null);
+        final File outDir = commandContext.registerArtifact(OUTPUT_NAME, null, false, false);
 
         File reportFile = new File(outDir, IVY_REPORT_FILE);
         if (!outDir.isDirectory() && !outDir.mkdirs())

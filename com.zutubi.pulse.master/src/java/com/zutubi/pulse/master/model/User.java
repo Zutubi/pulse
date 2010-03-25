@@ -13,7 +13,8 @@ import java.util.Set;
  */
 public class User extends Entity implements NamedEntity
 {
-    public static int REFRESH_DISABLED = 0;
+    public static final int REFRESH_DISABLED = 0;
+    public static final String DEFAULT_ARTIFACTS_FILTER = "explicit";
 
     /**
      * Indicates whether or not the user is enabled. Only enabled users can
@@ -37,6 +38,10 @@ public class User extends Entity implements NamedEntity
      * Collapsed groups/projects on the dashboard.
      */
     private Set<LabelProjectTuple> dashboardCollapsed = new HashSet<LabelProjectTuple>();
+    /**
+     * Name of the property to filter artifacts by, empty for none.
+     */
+    private String artifactsFilter = DEFAULT_ARTIFACTS_FILTER;
 
     private UserConfiguration config;
 
@@ -129,5 +134,15 @@ public class User extends Entity implements NamedEntity
     public void setDashboardCollapsed(Set<LabelProjectTuple> dashboardCollapsed)
     {
         this.dashboardCollapsed = dashboardCollapsed;
+    }
+
+    public String getArtifactsFilter()
+    {
+        return artifactsFilter;
+    }
+
+    public void setArtifactsFilter(String artifactsFilter)
+    {
+        this.artifactsFilter = artifactsFilter;
     }
 }

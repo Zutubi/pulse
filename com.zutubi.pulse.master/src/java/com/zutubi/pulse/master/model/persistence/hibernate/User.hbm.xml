@@ -29,5 +29,7 @@
                 <property name="projectHandle" type="long" column="PROJECT_HANDLE" not-null="true"/>
             </composite-element>
         </set>
+
+        <property name="artifactsFilter" type="string" column="ARTIFACTS_FILTER" length="63"/>
     </class>
 </hibernate-mapping>

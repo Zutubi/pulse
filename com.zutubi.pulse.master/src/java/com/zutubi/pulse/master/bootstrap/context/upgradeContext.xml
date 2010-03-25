@@ -134,6 +134,9 @@
                 <ref local="removeRetainWorkingCopyOption"/>
                 <ref local="removeWorkingCopyCleanupWhat"/>
                 <ref local="cleanupAllCapturedWorkingCopies"/>
+                <ref local="artifactFlags"/>
+                <ref local="explicitArtifacts"/>
+                <ref local="featuredArtifacts"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -668,4 +671,20 @@
         <property name="buildNumber" value="201999008"/>
     </bean>
 
+    <bean id="artifactFlags" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201999009"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-03.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="explicitArtifacts" class="com.zutubi.pulse.master.upgrade.tasks.ExplicitArtifactsUpgradeTask">
+        <property name="buildNumber" value="201999010"/>
+    </bean>
+
+    <bean id="featuredArtifacts" class="com.zutubi.pulse.master.upgrade.tasks.AddFeaturedArtifactsUpgradeTask">
+        <property name="buildNumber" value="201999011"/>
+    </bean>
 </beans>
