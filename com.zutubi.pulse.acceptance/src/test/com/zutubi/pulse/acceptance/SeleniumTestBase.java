@@ -15,11 +15,12 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.ExceptionWrappingRunnable;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.util.*;
 
@@ -28,8 +29,6 @@ import java.util.*;
  */
 public class SeleniumTestBase extends PulseTestCase
 {
-    private static final long STATUS_TIMEOUT = 30000;
-
     /**
      * If a test fails during setup, after starting a browser, tearDown never
      * runs and the browser is never stopped.  This leads to an unholy build
@@ -146,17 +145,7 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(String message)
     {
-        browser.waitForElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
-        AcceptanceTestUtils.waitForCondition(new Condition()
-        {
-            public boolean satisfied()
-            {
-                return StringUtils.stringSet(browser.getText(IDs.STATUS_MESSAGE));
-            }
-        }, STATUS_TIMEOUT, "status message to be set.");
-
-        String text = browser.getText(IDs.STATUS_MESSAGE);
-        assertThat(text, containsString(message));        
+        AcceptanceTestUtils.waitForStatus(browser, message);
     }
 
     protected String addProject(String name, boolean useAPI)

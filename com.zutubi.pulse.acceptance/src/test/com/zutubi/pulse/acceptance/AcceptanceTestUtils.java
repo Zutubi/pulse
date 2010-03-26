@@ -13,6 +13,8 @@ import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +41,9 @@ public class AcceptanceTestUtils
      * The acceptance test system property for the agent startup port.
      */
     public static final String PROPERTY_AGENT_PORT = "agent.port";
-    
+
+    private static final long STATUS_TIMEOUT = 30000;
+
     public static int getPulsePort()
     {
         return Integer.getInteger(PROPERTY_PULSE_PORT, 8080);
@@ -331,5 +335,26 @@ public class AcceptanceTestUtils
         {
             get.releaseConnection();
         }
+    }
+
+    /**
+     * Waits for the pop-down status pane to appear with the given message.
+     *
+     * @param browser browser pointing at pulse
+     * @param message message to wait for
+     */
+    public static void waitForStatus(final SeleniumBrowser browser, String message)
+    {
+        browser.waitForElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return StringUtils.stringSet(browser.getText(IDs.STATUS_MESSAGE));
+            }
+        }, STATUS_TIMEOUT, "status message to be set.");
+
+        String text = browser.getText(IDs.STATUS_MESSAGE);
+        assertThat(text, containsString(message));
     }
 }

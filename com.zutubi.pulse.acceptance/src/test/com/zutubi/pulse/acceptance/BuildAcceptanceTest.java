@@ -18,10 +18,10 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.acceptance.utils.Repository;
-import com.zutubi.pulse.acceptance.utils.SubversionWorkspace;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
@@ -37,6 +37,7 @@ import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import com.zutubi.pulse.master.model.User;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
@@ -480,6 +481,55 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         dialog.clickApply();
         browser.waitForPageToLoad();
         assertEquals(maxLines + 5, stageLogPage.getMaxLines());
+    }
+
+    public void testArtifactTab() throws Exception
+    {
+        String userLogin = random + "-user";
+        String projectName = random + "-project";
+
+        xmlRpcHelper.insertTrivialUser(userLogin);
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        ConfigurationHelper configurationHelper = factory.create(xmlRpcHelper);
+        ProjectConfigurations projects = new ProjectConfigurations(configurationHelper);
+        AntProjectHelper project = projects.createTrivialAntProject(projectName);
+        FileArtifactConfiguration explicitArtifact = project.addArtifact("explicit", "build.xml");
+        FileArtifactConfiguration featuredArtifact = project.addArtifact("featured", "build.xml");
+        featuredArtifact.setFeatured(true);
+        configurationHelper.insertProject(project.getConfig());
+
+        long buildNumber = xmlRpcHelper.runBuild(projectName);
+
+        login(userLogin, "");
+
+        BuildArtifactsPage page = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
+        assertEquals(User.DEFAULT_ARTIFACTS_FILTER, page.getCurrentFilter());
+        assertFalse(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));
+        assertTrue(page.isArtifactListed(explicitArtifact.getName()));
+        assertTrue(page.isArtifactListed(featuredArtifact.getName()));
+
+        page.setFilterAndWait("");
+        assertTrue(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));
+        assertTrue(page.isArtifactListed(explicitArtifact.getName()));
+        assertTrue(page.isArtifactListed(featuredArtifact.getName()));
+
+        page.setFilterAndWait("featured");
+        assertFalse(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));
+        assertFalse(page.isArtifactListed(explicitArtifact.getName()));
+        assertTrue(page.isArtifactListed(featuredArtifact.getName()));
+
+        page.clickSaveFilterAndWait();
+
+        browser.refresh();
+        page.waitFor();
+        
+        assertEquals("featured", page.getCurrentFilter());
+        assertFalse(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));
+        assertFalse(page.isArtifactListed(explicitArtifact.getName()));
+        assertTrue(page.isArtifactListed(featuredArtifact.getName()));
+
+        assertTrue(page.isArtifactFileListed(featuredArtifact.getName(), "build.xml"));
     }
 
     public void testDownloadArtifactLink() throws Exception

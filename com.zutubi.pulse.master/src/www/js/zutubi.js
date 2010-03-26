@@ -2561,6 +2561,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     }
                 }, {
                     xtype: 'xztblink',
+                    id: 'save-filter-link',
                     text: 'save',
                     icon: window.baseUrl + '/images/save.gif',
                     listeners: {
@@ -2573,6 +2574,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     text: '<span class="understated">//</span>'
                 }, {
                     xtype: 'xztblink',
+                    id: 'expand-all-link',
                     text: 'expand all',
                     icon: window.baseUrl + '/images/expand.gif',
                     listeners: {
@@ -2582,6 +2584,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     }
                 }, {
                     xtype: 'xztblink',
+                    id: 'collapse-all-link',
                     text: 'collapse all',
                     icon: window.baseUrl + '/images/collapse.gif',
                     listeners: {
@@ -2621,6 +2624,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 
         ZUTUBI.ArtifactsTree.superclass.initComponent.apply(this, arguments);
 
+        this.loading = true;
         this.on('beforerender', this.setInitialColumnWidths, this, {single: true});
         this.on('expandnode', this.initialExpand, this, {single: true});
     },
@@ -2672,12 +2676,18 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     child.expand(false, false, this.initialExpand, this);
                 }
             }
+
+            if (depth == 0)
+            {
+                this.loading = false;
+            }
         }
     },
 
     setFilterFlag: function(flag)
     {
         this.loader.baseParams.filterFlag = flag;
+        this.loading = true;
         this.getEl().mask('Reloading...');
         this.on('expandnode', this.initialExpand, this, {single: true});
         this.getRootNode().reload(function() {
