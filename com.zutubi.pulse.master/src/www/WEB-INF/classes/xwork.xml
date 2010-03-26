@@ -343,6 +343,11 @@
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
 
+        <action name="configCheck" class="com.zutubi.pulse.master.xwork.actions.admin.debug.ConfigurationCheckAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="redirect">/admin/settings/</result>
+        </action>
+
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.xwork.actions.admin.ToggleRecipeQueueAction">
             <result name="success" type="redirect">/server/activity/</result>
         </action>
