@@ -10,7 +10,7 @@
             var tree = new ZUTUBI.ArtifactsTree({
                 projectId: '$project.id',
                 buildId: '$buildResult.id',
-                id: '#id("${project.name}-build-${buildResult.number}-artifacts")',
+                id: 'artifacts-tree',
                 filter: '$filter'
             });
 

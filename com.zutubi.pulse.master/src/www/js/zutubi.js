@@ -2494,10 +2494,13 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
 });
 
 
-if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
+if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 {
-    style: 'padding: 8px',
-    border: true,
+    MAX_COLUMN_WIDTH: 600,
+
+    style: 'padding: 0 8px 8px 8px',
+    bodyStyle: 'border-top: solid 1px #bbb; border-bottom: dotted 1px #bbb;',
+    border: false,
     layout: 'fit',
     enableHdMenu: false,
 
@@ -2525,6 +2528,7 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
             selModel: new Ext.tree.DefaultSelectionModel({onNodeClick: Ext.emptyFn}),
 
             tbar: {
+                id: 'artifacts-toolbar',
                 items: [{
                     xtype: 'label',
                     text: 'filter:'
@@ -2556,22 +2560,34 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                         }
                     }
                 }, {
+                    xtype: 'xztblink',
                     text: 'save',
                     icon: window.baseUrl + '/images/save.gif',
-                    onClick: function() {
-                        tree.saveFilterFlag(Ext.getCmp('filter-combo').getValue());
-                    }
-                }, '->', {
-                    text: 'expand all',
-                    icon: window.baseUrl + '/images/expand.gif',
-                    onClick: function() {
-                        tree.expandAll();
+                    listeners: {
+                        click: function() {
+                            tree.saveFilterFlag(Ext.getCmp('filter-combo').getValue());
+                        }
                     }
                 }, {
+                    xtype: 'tbtext',
+                    text: '<span class="understated">//</span>'
+                }, {
+                    xtype: 'xztblink',
+                    text: 'expand all',
+                    icon: window.baseUrl + '/images/expand.gif',
+                    listeners: {
+                        click: function() {
+                            tree.expandAll();
+                        }
+                    }
+                }, {
+                    xtype: 'xztblink',
                     text: 'collapse all',
                     icon: window.baseUrl + '/images/collapse.gif',
-                    onClick: function() {
-                        tree.collapseAll();
+                    listeners: {
+                        click: function() {
+                            tree.collapseAll();
+                        }
                     }
                 }]
             },
@@ -2626,7 +2642,12 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         var buffer = Ext.getScrollBarWidth() + 20;
         if (availableWidth > firstWidth + remainingWidth + buffer)
         {
-            this.columns[0].width = availableWidth - remainingWidth - buffer;
+            var newWidth = availableWidth - remainingWidth - buffer;
+            if (newWidth > this.MAX_COLUMN_WIDTH)
+            {
+                newWidth = this.MAX_COLUMN_WIDTH;
+            }
+            this.columns[0].width = newWidth;
         }
     },
 
@@ -2673,4 +2694,64 @@ if(Ext.ux.tree) ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
            params: { filter: flag }
         });
     }
+}); }
+
+ZUTUBI.Toolbar = {};
+ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
+    /**
+     * @cfg {String} icon  URL of the image to show beside the link.
+     * @cfg {String} text  The text to be shown in the link.
+     * @cfg {String} url   The URL to link to.
+     */
+
+    initComponent: function()
+    {
+        ZUTUBI.Toolbar.LinkItem.superclass.initComponent.call(this);
+
+        this.addEvents(
+            /**
+             * @event click
+             * Fires when this button is clicked
+             * @param {LinkItem} this
+             * @param {EventObject} e The click event
+             */
+            'click'
+        );
+    },
+
+    // private
+    onRender: function(ct, position) 
+    {
+        this.autoEl = {
+            tag: 'span',
+            cls: 'xz-tblink',
+            children: [{
+                tag: 'a',
+                cls: 'unadorned',
+                href: '#',
+                children: [{
+                    tag: 'img',
+                    alt: this.text || '',
+                    src: this.icon
+                }]
+            }, {
+                tag: 'a',
+                href: '#',
+                html: this.text || ''
+            }]
+        };
+        ZUTUBI.Toolbar.LinkItem.superclass.onRender.call(this, ct, position);
+        this.mon(this.el, {scope: this, click: this.onClick});
+    },
+
+    onClick: function(e)
+    {
+        if (e)
+        {
+            e.preventDefault();
+        }
+
+        this.fireEvent('click', this, e);
+    }
 });
+Ext.reg('xztblink', ZUTUBI.Toolbar.LinkItem);

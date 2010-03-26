@@ -697,14 +697,54 @@ img.popdown-pressed {
 }
 
 /*------------------------------
-Changelists
+Build tabs
 */
 
-.build-page-header {
+.build-page-header, #artifacts-toolbar {
     border: dotted 1px #bbb;
     padding: 6px;
     background-color: #ffffe8;
+    background-image: none;
     margin: 10px 0 10px 0;
+}
+
+#artifacts-toolbar .x-btn td {
+    background: none;
+}
+
+#artifacts-toolbar table.x-btn-over {
+    border: 1px solid #bbb;
+}
+
+.xz-tblink {
+    margin: 7px;
+}
+
+.xz-tblink img {
+    margin-right: 5px;
+}
+
+#artifacts-tree .x-grid3-header {
+    border: none;
+    border-bottom: dotted 1px #bbb;
+    background-color: #f2f2ff;
+    background-image: none;
+}
+
+#artifacts-tree .x-grid3-header td {
+    border: none;
+    border-right: dotted 1px #bbb;
+}
+
+#artifacts-tree .x-grid3-header td div {
+    font-size: 120%;
+    font-weight: bold;
+    padding: 6px;
+}
+
+#artifacts-tree .x-grid3-hd-inner
+{
+    background-image: none;
 }
 
 .change {
@@ -734,10 +774,6 @@ Changelists
     margin-bottom: 0;
 }
 
-/*------------------------------
-Build logs
-*/
-
 .log-header td {
     padding: 0 5px 0 5px;
 }
@@ -748,10 +784,6 @@ Build logs
     font-style: italic;
     float: right    
 }
-
-/*------------------------------
-Artifacts
-*/
 
 .x-tree-node-collapsed .artifact-broken, .x-tree-node-expanded .artifact-broken, .x-tree-node-leaf .artifact-broken
 {
@@ -1225,10 +1257,19 @@ table.template-actions
     vertical-align: middle;
 }
 
-.x-tree-node
+.x-tree-node,
+.x-grid3-hd-row td, .x-grid3-row td, .x-grid3-summary-row td
 {
-    font-family: verdana;
-    font-size: 10px;
+    font-family: verdana, sans-serif;
+    font-size: 11px;
+}
+
+.x-btn button,
+.x-small-editor .x-form-field, .x-combo-list,
+.x-toolbar td, .x-toolbar span, .x-toolbar input, .x-toolbar div, .x-toolbar select, .x-toolbar label
+{
+    font-family: verdana, sans-serif;
+    font-size: 12px;
 }
 
 .form-cell .x-panel-bwrap, .form-cell .x-panel-body 
