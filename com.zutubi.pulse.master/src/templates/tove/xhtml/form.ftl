@@ -5,7 +5,7 @@ width of its contents.  Floating it works, but hurts other things.
 <table class="eform">
     <tr>
         <td id="${form.name}.status">
-<#if actionErrors?exists>
+<#if actionErrors?exists && actionErrors?size &gt; 0>
             <ul class="validation-error">
     <#list actionErrors as error>
                 <li>${error?html}</li>

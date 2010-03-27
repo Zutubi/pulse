@@ -703,17 +703,12 @@ Build tabs
 .build-page-header, #artifacts-toolbar {
     border: dotted 1px #bbb;
     padding: 6px;
-    background-color: #ffffe8;
-    background-image: none;
+    background: #ffffe8 none;
     margin: 10px 0 10px 0;
 }
 
 #artifacts-toolbar .x-btn td {
     background: none;
-}
-
-#artifacts-toolbar table.x-btn-over {
-    border: 1px solid #bbb;
 }
 
 .xz-tblink {
