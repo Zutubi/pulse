@@ -211,11 +211,7 @@ public class TransactionManager
 
     private boolean isRollbackOnly(Transaction transaction)
     {
-        if (transaction == null)
-        {
-            return false;
-        }
-        return transaction.getStatus() == TransactionStatus.ROLLBACKONLY;
+        return transaction != null && transaction.getStatus() == TransactionStatus.ROLLBACKONLY;
     }
 
     /**

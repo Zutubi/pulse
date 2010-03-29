@@ -9,12 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *
- *
+ * An in memory implementation of the Record Store interface.
  */
 public class InMemoryRecordStore implements RecordStore
 {
-    private TransactionalWrapper<MutableRecordHolder> wrapper;
+    private TransactionalWrapper<MutableRecord> wrapper;
 
     public InMemoryRecordStore()
     {
@@ -28,21 +27,15 @@ public class InMemoryRecordStore implements RecordStore
             base = new MutableRecordImpl();
         }
 
-        // use a default transaction manager.  This will not participate in any of the
-        // external transactions and as such act as a noop transaction manager.  Why use it then?
-        // To allow this record store to be used in the absence of an external transaction manager.
-
-        wrapper = new MutableRecordHolderTransactionalWrapper(new MutableRecordHolder(base));
+        wrapper = new MutableRecordTransactionalWrapper(base);
         wrapper.setTransactionManager(new TransactionManager());
     }
 
     public void insert(final String path, final Record record)
     {
-        // all methods that modify the internal structure of this memory store
-        // are wrapped.
-        wrapper.execute(new UnaryFunction<MutableRecordHolder, Object>()
+        wrapper.execute(new UnaryFunction<MutableRecord, Object>()
         {
-            public Object process(MutableRecordHolder base)
+            public Object process(MutableRecord base)
             {
                 insert(base, path, record);
                 return null;
@@ -52,11 +45,9 @@ public class InMemoryRecordStore implements RecordStore
 
     public void update(final String path, final Record record)
     {
-        // all methods that modify the internal structure of this memory store
-        // are wrapped.
-        wrapper.execute(new UnaryFunction<MutableRecordHolder, Object>()
+        wrapper.execute(new UnaryFunction<MutableRecord, Object>()
         {
-            public Object process(MutableRecordHolder base)
+            public Object process(MutableRecord base)
             {
                 update(base, path, record);
                 return null;
@@ -66,11 +57,9 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record delete(final String path)
     {
-        // all methods that modify the internal structure of this memory store
-        // are wrapped.
-        return wrapper.execute(new UnaryFunction<MutableRecordHolder, Record>()
+        return wrapper.execute(new UnaryFunction<MutableRecord, Record>()
         {
-            public Record process(MutableRecordHolder base)
+            public Record process(MutableRecord base)
             {
                 return delete(base, path);
             }
@@ -84,14 +73,11 @@ public class InMemoryRecordStore implements RecordStore
 
     public void importRecords(final Record r)
     {
-        // all methods that modify the internal structure of this memory store
-        // are wrapped.
-        wrapper.execute(new UnaryFunction<MutableRecordHolder, Object>()
+        wrapper.execute(new UnaryFunction<MutableRecord, Object>()
         {
-            public Object process(MutableRecordHolder holder)
+            public Object process(MutableRecord base)
             {
                 // update the base to contain the contents of r.
-                MutableRecord base = new MutableRecordImpl();
                 for (String key : r.keySet())
                 {
                     base.put(key, r.get(key));
@@ -100,8 +86,6 @@ public class InMemoryRecordStore implements RecordStore
                 {
                     base.put(key, r.getMeta(key));
                 }
-                holder.setRecord(base);
-                
                 return null;
             }
         });
@@ -112,10 +96,8 @@ public class InMemoryRecordStore implements RecordStore
         wrapper.setTransactionManager(transactionManager);
     }
 
-    private Record insert(MutableRecordHolder holder, String path, Record newRecord)
+    private Record insert(MutableRecord base, String path, Record newRecord)
     {
-        MutableRecord base = holder.getRecord().copy(true, true);
-
         String[] parentPathElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
 
@@ -139,15 +121,11 @@ public class InMemoryRecordStore implements RecordStore
         
         parent.put(baseName, record);
 
-        holder.setRecord(base);
-
         return record;
     }
 
-    private Record update(MutableRecordHolder holder, String path, Record updatedRecord)
+    private Record update(MutableRecord base, String path, Record updatedRecord)
     {
-        MutableRecord base = holder.getRecord().copy(true, true);
-
         String[] parentPathElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
 
@@ -193,15 +171,11 @@ public class InMemoryRecordStore implements RecordStore
             }
         }
 
-        holder.setRecord(base);
-        
         return targetRecord;
     }
 
-    private Record delete(MutableRecordHolder holder, String path)
+    private Record delete(MutableRecord base, String path)
     {
-        MutableRecord base = holder.getRecord().copy(true, true);
-
         String[] parentPathElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
 
@@ -216,9 +190,7 @@ public class InMemoryRecordStore implements RecordStore
         MutableRecord targetRecord = getChildRecord(parentRecord, baseName);
         if (targetRecord != null)
         {
-            Record result = (Record) parentRecord.remove(baseName);
-            holder.setRecord(base);
-            return result;
+            return (Record) parentRecord.remove(baseName);
         }
 
         // paths need to refer to records, not values within a record. Therefore,
@@ -254,44 +226,23 @@ public class InMemoryRecordStore implements RecordStore
     public Record select()
     {
         // Ensure the internal integrity by returning an immutable reference to the record.
-        return new ImmutableRecord(wrapper.get().getRecord());
+        return new ImmutableRecord(wrapper.get().copy(true, true));
     }
 
-    private class MutableRecordHolderTransactionalWrapper extends TransactionalWrapper<MutableRecordHolder>
+    /**
+     * Extension of the TransactionalWrapper that holds a mutable record as its
+     * transactional data.
+     */
+    private class MutableRecordTransactionalWrapper extends TransactionalWrapper<MutableRecord>
     {
-        public MutableRecordHolderTransactionalWrapper(MutableRecordHolder global)
+        public MutableRecordTransactionalWrapper(MutableRecord global)
         {
             super(global);
         }
 
-        public MutableRecordHolder copy(MutableRecordHolder v)
+        public MutableRecord copy(MutableRecord v)
         {
-            return v.copy();
-        }
-    }
-
-    private class MutableRecordHolder
-    {
-        private MutableRecord record;
-
-        public MutableRecordHolder(MutableRecord record)
-        {
-            this.record = record;
-        }
-
-        public MutableRecord getRecord()
-        {
-            return record;
-        }
-
-        public void setRecord(MutableRecord record)
-        {
-            this.record = record;
-        }
-
-        public MutableRecordHolder copy()
-        {
-            return new MutableRecordHolder(record.copy(true, true));
+            return v.copy(true, true);
         }
     }
 }
