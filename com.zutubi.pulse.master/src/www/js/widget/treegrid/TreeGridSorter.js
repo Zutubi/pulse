@@ -45,7 +45,7 @@ Ext.ux.tree.TreeGridSorter = Ext.extend(Ext.tree.TreeSorter, {
             config = {
                 property: tree.columns[0].dataIndex || 'text',
                 folderSort: true
-            }
+            };
         }
 
         Ext.ux.tree.TreeGridSorter.superclass.constructor.apply(this, arguments);
@@ -105,13 +105,13 @@ Ext.ux.tree.TreeGridSorter = Ext.extend(Ext.tree.TreeSorter, {
     },
 
     onHeaderClick : function(c, el, i) {
-        if(c && !this.tree.headersDisabled){
+        if(c && c.sortable && !this.tree.headersDisabled){
             var me = this;
 
             me.property = c.dataIndex;
             me.dir = c.dir = (c.dir === 'desc' ? 'asc' : 'desc');
             me.sortType = c.sortType;
-            me.caseSensitive === Ext.isBoolean(c.caseSensitive) ? c.caseSensitive : this.caseSensitive;
+            me.caseSensitive = Ext.isBoolean(c.caseSensitive) ? c.caseSensitive : this.caseSensitive;
             me.sortFn = c.sortFn || this.defaultSortFn;
 
             this.tree.root.cascade(function(n) {

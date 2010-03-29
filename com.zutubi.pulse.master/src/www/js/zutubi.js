@@ -2605,10 +2605,21 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 dataIndex: 'size',
                 tpl: '<tpl if="extraAttributes.size">{[Ext.util.Format.fileSize(values.extraAttributes.size)]}</tpl>',
                 align: 'right',
-                sortType: 'asInt'
+                sortType: function(node) {
+                    var extraAttributes = node.attributes.extraAttributes;
+                    if (extraAttributes && extraAttributes.size)
+                    {
+                        return extraAttributes.size;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
             }, {
                 header: 'actions',
                 width: 120,
+                sortable: false,
                 tpl: '<tpl if="extraAttributes.actions">' +
                          '<tpl for="extraAttributes.actions">' +
                              '&nbsp;<a href="#" onclick="window.location=\'{url}\';">' +

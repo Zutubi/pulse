@@ -286,9 +286,8 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
             var ms = this.hmenu.items,
                 cs = this.columns,
                 index = this.findHeaderIndex(hd),
-                c = cs[index],
-                sort = c.sortable;
-                
+                c = cs[index];
+
             e.stopEvent();
             Ext.fly(hd).addClass('x-grid3-hd-menu-open');
             this.hdCtxIndex = index;
@@ -309,17 +308,20 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
 
     // private
     handleHdOver : function(e, t){                    
-        var hd = e.getTarget('.x-treegrid-hd');                        
+        var hd = e.getTarget('.x-treegrid-hd');
         if(hd && !this.headersDisabled){
             index = this.findHeaderIndex(hd);
-            this.activeHdRef = t;
-            this.activeHdIndex = index;
-            var el = Ext.get(hd);
-            this.activeHdRegion = el.getRegion();
-            el.addClass('x-grid3-hd-over');
-            this.activeHdBtn = el.child('.x-grid3-hd-btn');
-            if(this.activeHdBtn){
-                this.activeHdBtn.dom.style.height = (hd.firstChild.offsetHeight-1)+'px';
+            if (this.enableHdMenu || this.columns[index].sortable)
+            {
+                this.activeHdRef = t;
+                this.activeHdIndex = index;
+                var el = Ext.get(hd);
+                this.activeHdRegion = el.getRegion();
+                el.addClass('x-grid3-hd-over');
+                this.activeHdBtn = el.child('.x-grid3-hd-btn');
+                if(this.activeHdBtn){
+                    this.activeHdBtn.dom.style.height = (hd.firstChild.offsetHeight-1)+'px';
+                }
             }
         }
     },
