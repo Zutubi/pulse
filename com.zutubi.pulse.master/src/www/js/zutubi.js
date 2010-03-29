@@ -2597,7 +2597,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 
             columns: [{
                 header: 'name',
-                tpl: '{text:htmlEncode}',
+                tpl: '{text}',
                 width: 400
             }, {
                 header: 'size',

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import flexjson.JSON;
 
@@ -55,7 +56,7 @@ public class ExtFile
 
     public String getText()
     {
-        return text;
+        return TextUtils.htmlEncode(text);
     }
 
     public boolean isLeaf()
