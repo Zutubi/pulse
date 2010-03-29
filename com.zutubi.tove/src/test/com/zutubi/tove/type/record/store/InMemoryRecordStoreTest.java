@@ -172,7 +172,6 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
                 assertNotNull(recordStore.select().get("path"));
             }
         });
-
     }
 
     public void testCopyOnSelectWithinSingleTransaction()
