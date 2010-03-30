@@ -51,6 +51,12 @@ public class PluginsFileObject extends AbstractPulseFileObject
         return UriParser.encode(CollectionUtils.mapToArray(allPlugins, new ToPluginIdMapping(), new String[allPlugins.size()]));
     }
 
+    @Override
+    public String getIconCls()
+    {
+        return "plugins-icon";
+    }
+
     public void setPluginManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;

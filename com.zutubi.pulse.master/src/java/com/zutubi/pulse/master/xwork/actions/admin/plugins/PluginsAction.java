@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- An action showing for the administration > plugins page.
+ * An action showing for the administration > plugins page.
  */
 public class PluginsAction extends PluginActionSupport
 {

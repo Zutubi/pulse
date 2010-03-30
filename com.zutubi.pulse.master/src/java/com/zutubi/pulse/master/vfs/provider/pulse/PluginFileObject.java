@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.plugins.Plugin;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
@@ -44,7 +43,8 @@ public class PluginFileObject extends AbstractPulseFileObject
         return plugin.getName();
     }
 
-    public String getFileType() throws FileSystemException
+    @Override
+    public String getIconCls()
     {
         switch(plugin.getState())
         {
@@ -53,14 +53,14 @@ public class PluginFileObject extends AbstractPulseFileObject
             case UNINSTALLING:
                 if(plugin.getErrorMessage() != null)
                 {
-                        return FileTypeConstants.PLUGIN_ERROR;
+                    return "plugin-error-icon";
                 }
                 else
                 {
-                    return FileTypeConstants.PLUGIN_DISABLED;
+                    return "plugin-disabled-icon";
                 }
             default:
-                return FileTypeConstants.PLUGIN;
+                return "plugin-icon";
         }
     }
 }

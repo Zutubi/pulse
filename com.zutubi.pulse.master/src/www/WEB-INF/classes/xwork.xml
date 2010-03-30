@@ -442,11 +442,6 @@
             <result name="success" type="velocity">view-server-queues-panel.vm</result>
         </action>
 
-        <action name="ls" class="com.zutubi.pulse.master.xwork.actions.vfs.LsAction">
-            <result name="success" type="json">ls.xml</result>
-            <result name="error" type="json">error.xml</result>
-        </action>
-
         <action name="xls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="json">error.xml</result>

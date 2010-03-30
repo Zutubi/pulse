@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.AddressableFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
-import com.zutubi.pulse.master.vfs.provider.pulse.FileTypeConstants;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -74,35 +73,6 @@ public class FileObjectWrapper
             //noop.
         }
         return "";
-    }
-
-    public String getType()
-    {
-        try
-        {
-            if (fo instanceof AbstractPulseFileObject)
-            {
-                return ((AbstractPulseFileObject)fo).getFileType();
-            }
-            else
-            {
-                FileType type = fo.getType();
-                if (type == FileType.FOLDER)
-                {
-                    return FileTypeConstants.FOLDER;
-                }
-                if (type == FileType.FILE)
-                {
-                    return FileTypeConstants.FILE;
-                }
-                return FileTypeConstants.UNKNOWN;
-            }
-        }
-        catch (FileSystemException e)
-        {
-            LOG.warning(e);
-            return FileTypeConstants.UNKNOWN;
-        }
     }
 
     public String getId()

@@ -93,25 +93,6 @@ public class ScmRootFileObjectTest extends PulseTestCase
         assertEquals(2, cfos.length);
     }
 
-    public void testRootGetFileType() throws FileSystemException
-    {
-        ScmRootFileObject srfo = resolveRoot();
-
-        assertEquals(FileTypeConstants.FOLDER, srfo.getFileType());
-    }
-
-    public void testChildFolderGetFileType() throws ScmException, FileSystemException
-    {
-        FileObject c = createAndRetrieveFileObject("a");
-        assertEquals(FileTypeConstants.FOLDER, ((ScmFileObject)c).getFileType());
-    }
-
-    public void testChildFileGetFileType() throws FileSystemException, ScmException
-    {
-        FileObject c = createAndRetrieveFileObject("a.txt");
-        assertEquals(FileTypeConstants.FILE, ((ScmFileObject)c).getFileType());
-    }
-
     public void testChildGetDisplayName() throws ScmException, FileSystemException
     {
         FileObject c = createAndRetrieveFileObject("a.txt");
@@ -162,17 +143,14 @@ public class ScmRootFileObjectTest extends PulseTestCase
         assertEquals(1, cfos.length);
         FileObject cfo = cfos[0];
         assertEquals("a", cfo.getName().getBaseName());
-        assertEquals(FileTypeConstants.FOLDER,((ScmFileObject)cfo).getFileType());
 
         cfos = cfo.getChildren();
         cfo = cfos[0];
         assertEquals("b", cfo.getName().getBaseName());
-        assertEquals(FileTypeConstants.FOLDER,((ScmFileObject)cfo).getFileType());
 
         cfos = cfo.getChildren();
         cfo = cfos[0];
         assertEquals("c.txt", cfo.getName().getBaseName());
-        assertEquals(FileTypeConstants.FILE,((ScmFileObject)cfo).getFileType());
     }
 
     public void testScmFileAvailableActions() throws ScmException, FileSystemException

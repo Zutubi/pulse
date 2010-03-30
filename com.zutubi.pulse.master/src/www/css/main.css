@@ -1426,6 +1426,30 @@ table.template-actions
     width: 20px;
 }
 
+.x-tree-node-collapsed .plugins-icon, .x-tree-node-expanded .plugins-icon, .x-tree-node-leaf .plugins-icon
+{
+    background-image: url(../images/pluggable.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .plugin-icon, .x-tree-node-expanded .plugin-icon, .x-tree-node-leaf .plugin-icon
+{
+    background-image: url(../images/plugin.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .plugin-disabled-icon, .x-tree-node-expanded .plugin-disabled-icon, .x-tree-node-leaf .plugin-disabled-icon
+{
+    background-image: url(../images/plugin_disabled.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .plugin-error-icon, .x-tree-node-expanded .plugin-error-icon, .x-tree-node-leaf .plugin-error-icon
+{
+    background-image: url(../images/plugin_error.gif);
+    width: 20px;
+}
+
 .config-panel
 {
     border: dotted 1px gray;

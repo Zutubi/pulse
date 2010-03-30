@@ -3,11 +3,10 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
@@ -170,20 +169,6 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     protected InputStream doGetInputStream() throws Exception
     {
         return null;
-    }
-
-    public String getFileType() throws FileSystemException
-    {
-        FileType type = getType();
-        if (type == FileType.FOLDER)
-        {
-            return FileTypeConstants.FOLDER;
-        }
-        if (type == FileType.FILE)
-        {
-            return FileTypeConstants.FILE;
-        }
-        return FileTypeConstants.UNKNOWN;
     }
 
     /**

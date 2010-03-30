@@ -2776,3 +2776,114 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
     }
 });
 Ext.reg('xztblink', ZUTUBI.Toolbar.LinkItem);
+
+/**
+ * Displays all plugins in a tree, handling selection and actions performed on
+ * them.
+ * 
+ * @cfg detailPanel panel to load plugin details into
+ */
+ZUTUBI.PluginsTree = function(config)
+{
+    ZUTUBI.PluginsTree.superclass.constructor.call(this, config);
+};
+
+Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.ConfigTree,
+{
+    layout: 'fit',
+    border: false,
+    animate: false,
+    autoScroll: true,
+    bodyStyle: 'padding: 10px',
+
+    initComponent: function()
+    {
+        var config = {
+            loader: new ZUTUBI.FSTreeLoader({
+                baseUrl: window.baseUrl
+            }),
+
+            root: new Ext.tree.AsyncTreeNode({
+                id: 'plugins',
+                baseName: 'plugins',
+                text: 'plugins',
+                iconCls: 'plugins-icon'
+            })
+        };
+
+        Ext.apply(this, config);
+        Ext.apply(this.initialConfig, config);
+
+        this.getSelectionModel().on('selectionchange', this.onPluginSelect);
+
+        ZUTUBI.PluginsTree.superclass.initComponent.apply(this, arguments);
+    },
+
+    selectPlugin: function(id)
+    {
+        this.getSelectionModel().select(this.getRootNode().findChild('baseName', id));
+    },
+
+    pluginAction: function(id, action)
+    {
+        var model = this.getSelectionModel();
+        var selectedNode = model.getSelectedNode();
+        var selectedId = '';
+        if (selectedNode && selectedNode.parentNode)
+        {
+            selectedId = selectedNode.attributes.baseName;
+        }
+
+        var pluginsTree = this;
+        Ext.Ajax.request({
+            url: window.baseUrl + '/ajax/admin/' + action + 'Plugin.action?id=' + id,
+
+            success: function()
+            {
+                pluginsTree.getRootNode().reload(function() {
+                    model.clearSelections();
+                    if (selectedId)
+                    {
+                        pluginsTree.selectPlugin(selectedId);
+                    }
+                    else
+                    {
+                        model.select(pluginsTree.getRootNode());
+                    }
+                });
+            },
+
+            failure: function()
+            {
+                showStatus('Unable to perform plugin action.', 'failure');
+            }
+        });
+    },
+
+    onPluginSelect: function(model, node)
+    {
+        if (model.tree.detailPanel && node)
+        {
+            var url;
+            if(node.parentNode)
+            {
+                url = window.baseUrl + '/ajax/admin/viewPlugin.action?id=' + node.attributes.baseName;
+            }
+            else
+            {
+                url = window.baseUrl + '/ajax/admin/allPlugins.action';
+            }
+
+            model.tree.detailPanel.load({
+                url: url,
+                scripts: true,
+                callback: function(element, success) {
+                    if(!success)
+                    {
+                        showStatus('Could not get plugin details.', 'failure');
+                    }
+                }
+            });
+        }
+    }
+});

@@ -44,7 +44,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         {
             return objectFactory.buildBean(TextMessageFileObject.class,
                     new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                    new Object[]{fileName, FileTypeConstants.MESSAGE, pfs}
+                    new Object[]{fileName, null, pfs}
             );
         }
 

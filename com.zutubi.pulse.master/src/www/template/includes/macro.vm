@@ -2012,21 +2012,21 @@
 #end
 
 #macro(pluginLink $plugin)
-    <a id="select:$plugin.id" href="#" onclick="selectPlugin('$plugin.id'); return false;">
+    <a id="select:$plugin.id" href="#" onclick="pluginsTree.selectPlugin('$plugin.id'); return false;">
         $!webwork.htmlEncode($plugin.name)
     </a>
 #end
 
 #macro(pluginDisable $plugin)
-    <img alt="disable" src="$base/images/cancel.gif"/> <a href="#" id="disable:$plugin.id" onclick="pluginAction('$plugin.id', 'disable'); return false;">#wwtext("name=plugin.disable")</a>
+    <img alt="disable" src="$base/images/cancel.gif"/> <a href="#" id="disable:$plugin.id" onclick="pluginsTree.pluginAction('$plugin.id', 'disable'); return false;">#wwtext("name=plugin.disable")</a>
 #end
 
 #macro(pluginEnable $plugin)
-    <img alt="enable" src="$base/images/accept.gif"/> <a href="#" id="enable:$plugin.id" onclick="pluginAction('$plugin.id', 'enable'); return false;">#wwtext("name=plugin.enable")</a>
+    <img alt="enable" src="$base/images/accept.gif"/> <a href="#" id="enable:$plugin.id" onclick="pluginsTree.pluginAction('$plugin.id', 'enable'); return false;">#wwtext("name=plugin.enable")</a>
 #end
 
 #macro(pluginUninstall $plugin)
-    <img alt="delete" src="$base/images/delete.gif"/> <a href="#" id="uninstall:$plugin.id" onclick="pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
+    <img alt="delete" src="$base/images/delete.gif"/> <a href="#" id="uninstall:$plugin.id" onclick="pluginsTree.pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
 #end
 
 #macro(checkForm $path $type $formName $namespace)

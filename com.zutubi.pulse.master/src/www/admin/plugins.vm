@@ -4,150 +4,35 @@
 <html>
 <head>
     <title>#wwtext("name=plugins")</title>
-    <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/utilities.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
-    <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
     <script type="text/javascript">
-        Layout = function() {
-                var tree;
-                var centerRegion;
-#if($path)
-                var path = '$path';
-#else
-                var path = 'plugins';
-#end
+        var pluginsTree;
+        var detailPanel = new ZUTUBI.DetailPanel();
 
-                return {
-                    init : function() {
-                        var centerEl = Ext.get('nested-layout');
-                        centerEl.setStyle('margin', '0');
-                        
-                        var nestedWest = Ext.getCmp('nested-west');
-                        nestedWest.add({
-                            applyTo: 'plugin-tree',
-                            id: 'tree-panel',
-                            layout: 'fit',
-                            autoScroll: true,
-                            bodyStyle: 'padding: 10px',
-                            border: false
-                        });
+        Ext.onReady(function() {
+    #if($path)
+            var path = '$path';
+    #else
+            var path = 'plugins';
+    #end
+            var center = Ext.getCmp('nested-center');
+            center.add(detailPanel);
 
-                        var bodyEl = Ext.getCmp('tree-panel').el.child('.x-panel-body');
-                        bodyEl.createChild({tag: 'div', id: 'error'});
-                        bodyEl.createChild({
-                            tag: 'div',
-                            id: 'loading',
-                            style: 'display: none',
-                            children: [{
-                                tag: 'img',
-                                src: '$base/images/treeview/loading.gif',
-                                alt: 'loading...'
-                            }]
-                        });
-                        bodyEl.createChild({tag: 'div', id: 'tree'});
-                        this.createTree();
-
-                        nestedWest.show();
-                        nestedWest.setWidth(300);
-                        viewport.doLayout();
-                   },
-
-                   createTree: function()
-                   {
-                       Element.show($('loading'));
-
-                       tree = new ZUTUBI.widget.PulseTreeView('tree');
-                       tree.setSeparator('/');
-                       tree.setFSRoot('pulse:///');
-                       tree.setBase('$base');
-
-                       tree.onSelect = function(node)
-                       {
-                           var url;
-
-                           path = node.getIdPath();
-                           if(path == 'plugins')
-                           {
-                               url = '$base/ajax/admin/allPlugins.action';
-                           }
-                           else
-                           {
-                               url = '$base/ajax/admin/viewPlugin.action?id=' + node.data.id;
-                           }
-
-                           new Ajax.Updater({ success: 'detail-pane' }, url, {
-                               method: 'get',
-                               
-                               on403: function()
-                               {
-                                   this.redirectToLogin();
-                               }
-                           });
-                           
-                           this.selected = node;
-                       };
-
-                       // load the root nodes for the file system, then draw the tree.
-                       tree.ls(tree.getRoot(), function()
-                       {
-                           Element.hide($('loading'));
-                           tree.draw();
-
-                           var node = tree.getNodeByPath(tree.getRoot(), path);
-                           if(!node)
-                           {
-                               node = tree.getRoot().children[0];
-                           }
-
-                           tree.select(node);
-                           Element.show('tree');
-                       }, true, false, 2, '/plugins');
-                   },
-
-                   reload: function()
-                   {
-                       Element.hide('tree');
-                       this.createTree();
-                   },
-
-                   selectNode: function(id)
-                   {
-                       var node = tree.getNodeByPath(tree.getRoot(), 'plugins/' + id);
-                       if(node)
-                       {
-                           tree.select(node);
-                       }
-                   },
-
-                   redirectToLogin: function()
-                   {
-                       document.location = '$base/admin/plugins.action?path=' + path;
-                   }
-             }
-        }();
-        Ext.onReady(Layout.init, Layout, true);
-
-        function pluginAction(id, action)
-        {
-            new Ajax.Request('$base/ajax/admin/' + action + 'Plugin.action?id=' + id, {
-                onSuccess: function()
-                {
-                    Layout.reload();
-                },
-
-                on403: function()
-                {
-                    Layout.redirectToLogin();
-                }
+            pluginsTree = new ZUTUBI.PluginsTree({
+                el: 'plugin-tree',
+                detailPanel: detailPanel
             });
-        }
 
-        function selectPlugin(id)
-        {
-            Layout.selectNode(id);
-        }
+            var nestedWest = Ext.getCmp('nested-west');
+            nestedWest.add(pluginsTree);
+
+            pluginsTree.render();
+            nestedWest.show();
+            nestedWest.setWidth(300);
+            Ext.getCmp('nested-east').show();
+            viewport.doLayout();
+            pluginsTree.selectConfigPath(path);
+            pluginsTree.getRootNode().expand();
+        });
     </script>
 </head>
 <body>

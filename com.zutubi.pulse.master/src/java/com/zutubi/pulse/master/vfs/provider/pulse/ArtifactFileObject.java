@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
@@ -142,28 +141,6 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         {
             return CLASS_PREFIX + suffix;
         }
-    }
-
-    public String getFileType() throws FileSystemException
-    {
-        if(isLinkArtifact)
-        {
-            return FileTypeConstants.LINK;
-        }
-        else if (getArtifactBase() == null)
-        {
-            return FileTypeConstants.UNKNOWN;
-        }
-        else if(!getArtifactBase().isDirectory())
-        {
-            return FileTypeConstants.BROKEN;
-        }
-        else if (isHtmlArtifact)
-        {
-            return FileTypeConstants.HTML_REPORT;
-        }
-
-        return super.getFileType();
     }
 
     public String getDisplayName()
