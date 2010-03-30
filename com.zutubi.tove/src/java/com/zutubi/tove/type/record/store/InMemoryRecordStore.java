@@ -81,6 +81,7 @@ public class InMemoryRecordStore implements RecordStore
             public Object process(MutableRecord base)
             {
                 // update the base to contain the contents of r.
+                base.clear();
                 for (String key : r.keySet())
                 {
                     base.put(key, r.get(key));
