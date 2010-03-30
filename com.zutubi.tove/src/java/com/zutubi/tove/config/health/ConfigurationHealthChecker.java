@@ -146,10 +146,7 @@ public class ConfigurationHealthChecker
                             report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': record is not a template.");
                         }
 
-                        if (!structuresMatch(path, record, templateParentRecord, report))
-                        {
-                            // structuresMatch will have added the details of the problem.
-                        }
+                        checkStructuresMatch(path, record, templateParentRecord, report);
                     }
                     catch (NumberFormatException e)
                     {
@@ -167,7 +164,7 @@ public class ConfigurationHealthChecker
         return Boolean.valueOf(record.getMeta(TemplateRecord.TEMPLATE_KEY));
     }
 
-    private boolean structuresMatch(String path, Record record, Record templateParentRecord, ConfigurationHealthReport report)
+    private boolean checkStructuresMatch(String path, Record record, Record templateParentRecord, ConfigurationHealthReport report)
     {
         for (String key : templateParentRecord.nestedKeySet())
         {
@@ -189,7 +186,7 @@ public class ConfigurationHealthChecker
                     return false;
                 }
 
-                if (!structuresMatch(path, nestedRecord, nestedTemplateParentRecord, report))
+                if (!checkStructuresMatch(path, nestedRecord, nestedTemplateParentRecord, report))
                 {
                     return false;
                 }

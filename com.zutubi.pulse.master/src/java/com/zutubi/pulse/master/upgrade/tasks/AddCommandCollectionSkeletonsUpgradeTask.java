@@ -61,7 +61,6 @@ public class AddCommandCollectionSkeletonsUpgradeTask extends AbstractRecordProp
 
     public boolean haltOnFailure()
     {
-        // this is not fatal.
-        return false;
+        return true;
     }
 }
