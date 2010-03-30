@@ -291,7 +291,6 @@ public class InMemoryRecordStore implements RecordStore
 
         public MutableRecord copy(MutableRecord v)
         {
-            System.out.println("InMemoryRecordStore$MutableRecordTransactionalWrapper.copy");
             return v.copy(true, true);
         }
     }
