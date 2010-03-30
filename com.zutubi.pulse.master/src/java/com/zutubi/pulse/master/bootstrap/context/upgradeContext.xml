@@ -126,6 +126,7 @@
                 <ref local="addPropagateRevisionToDependentBuildTrigger"/>
                 <ref local="updatePerforceSyncWorkspacePattern"/>
                 <ref local="addDependencySyncField"/>
+                <ref local="addCommandCollectionSkeletons"/>
                 <ref local="addSubversionUseExport"/>
                 <ref local="addAgentSynchronisingTime"/>
                 <ref local="addAgentSynchronisationMessages"/>
@@ -624,6 +625,10 @@
         <property name="buildNumber" value="201021002"/>
     </bean>
 
+    <bean id="addCommandCollectionSkeletons" class="com.zutubi.pulse.master.upgrade.tasks.AddCommandCollectionSkeletonsUpgradeTask">
+        <property name="buildNumber" value="201023001"/>
+    </bean>
+
     <bean id="addSubversionUseExport" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionUseExportUpgradeTask">
         <property name="buildNumber" value="201999001"/>
     </bean>
@@ -670,7 +675,7 @@
     <bean id="cleanupAllCapturedWorkingCopies" class="com.zutubi.pulse.master.upgrade.tasks.CleanupAllCapturedWorkingCopiesUpgradeTask">
         <property name="buildNumber" value="201999008"/>
     </bean>
-
+    
     <bean id="artifactFlags" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
         <property name="buildNumber" value="201999009"/>
         <property name="mappings">
