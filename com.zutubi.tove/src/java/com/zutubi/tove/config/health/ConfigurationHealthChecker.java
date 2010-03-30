@@ -92,6 +92,8 @@ public class ConfigurationHealthChecker
 
     private boolean checkTemplateHierarchy(String scopeName, CompositeType type, Record templateCollectionRecord, ConfigurationHealthReport report)
     {
+        int problemsBefore = report.getProblemCount();
+
         checkForSimpleKeys(scopeName, templateCollectionRecord, report);
 
         String rootItem = null;
@@ -131,25 +133,22 @@ public class ConfigurationHealthChecker
                         if (parentPathElements.length != 2 || !parentPathElements[0].equals(scopeName))
                         {
                             report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': not an item of the same templated collection.");
-                            return false;
                         }
 
                         Record templateParentRecord = recordManager.select(parentPath);
                         if (templateParentRecord == null)
                         {
                             report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': path does not exist.");
-                            return false;
                         }
 
                         if (!isTemplate(templateParentRecord))
                         {
                             report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': record is not a template.");
-                            return false;
                         }
 
                         if (!structuresMatch(path, record, templateParentRecord, report))
                         {
-                            return false;
+                            // structuresMatch will have added the details of the problem.
                         }
                     }
                     catch (NumberFormatException e)
@@ -160,7 +159,7 @@ public class ConfigurationHealthChecker
             }
         }
 
-        return true;
+        return problemsBefore == report.getProblemCount();
     }
 
     private Boolean isTemplate(Record record)
@@ -352,6 +351,17 @@ public class ConfigurationHealthChecker
 
                 ComplexType actualType = checkType(nestedPath, nestedType, nestedRecord, report);
                 checkRecord(nestedPath, actualType, nestedRecord, report);
+            }
+        }
+
+        // check that collection types have the expected base record.
+        for (String key : type.getNestedPropertyNames())
+        {
+            Type propertyType = type.getPropertyType(key);
+            Record nestedRecord = (Record) record.get(key);
+            if (nestedRecord == null && propertyType instanceof CollectionType)
+            {
+                report.addProblem(path, "Expected nested record for " + key + " was missing.");
             }
         }
 

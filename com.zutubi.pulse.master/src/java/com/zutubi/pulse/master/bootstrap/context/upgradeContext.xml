@@ -126,6 +126,7 @@
                 <ref local="addPropagateRevisionToDependentBuildTrigger"/>
                 <ref local="updatePerforceSyncWorkspacePattern"/>
                 <ref local="addDependencySyncField"/>
+                <ref local="addCommandCollectionSkeletons"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -612,4 +613,9 @@
     <bean id="addDependencySyncField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencySyncFieldUpgradeTask">
         <property name="buildNumber" value="201021002"/>
     </bean>
+
+    <bean id="addCommandCollectionSkeletons" class="com.zutubi.pulse.master.upgrade.tasks.AddCommandCollectionSkeletonsUpgradeTask">
+        <property name="buildNumber" value="201023001"/>
+    </bean>
+
 </beans>
