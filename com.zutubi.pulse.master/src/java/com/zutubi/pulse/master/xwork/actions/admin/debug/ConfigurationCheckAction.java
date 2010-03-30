@@ -26,7 +26,7 @@ public class ConfigurationCheckAction extends ActionSupport
         }
         else
         {
-            LOG.error("Configuration check: Errors detected.");
+            LOG.warning("Configuration check: Errors detected.");
             LOG.warning(report.toString());
         }
 
