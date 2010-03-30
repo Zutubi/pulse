@@ -36,9 +36,4 @@ public class SubversionExternalsMonitoringUpgradeTask extends AbstractRecordProp
     {
         return asList(RecordUpgraders.newAddProperty(PROPERTY_MONITORING, "MONITOR_SELECTED"));
     }
-
-    public void setRecordManager(RecordManager recordManager)
-    {
-        this.recordManager = recordManager;
-    }
 }

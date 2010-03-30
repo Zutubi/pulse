@@ -231,7 +231,7 @@ public class TransactionManager
         return activeTransaction.getStatus();
     }
 
-    public Object runInTransaction(Executable action, TransactionResource resource)
+    public Object runInTransaction(Executable action, TransactionResource... resources)
     {
         // ensure that we are part of the transaction.
         boolean activeTransaction = getTransaction() != null;
@@ -241,7 +241,10 @@ public class TransactionManager
             begin();
         }
 
-        getTransaction().enlistResource(resource);
+        for (TransactionResource resource: resources)
+        {
+            getTransaction().enlistResource(resource);
+        }
 
         if (!activeTransaction)
         {
