@@ -174,28 +174,6 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
         });
     }
 
-    public void testCopyOnSelectWithinSingleTransaction()
-    {
-        MutableRecordImpl record = new MutableRecordImpl();
-        record.put("a", "b");
-        recordStore.insert("path", record);
-
-        Record selected = (Record) recordStore.select().get("path");
-        assertRecordsEquals(selected, record);
-
-        assertNull(selected.get("c"));
-
-        MutableRecord update = selected.copy(true, true);
-        update.put("c", "d");
-
-        recordStore.update("path", update);
-
-        assertNull(selected.get("c"));
-
-        selected = (Record) recordStore.select().get("path");
-        assertNotNull(selected.get("c"));
-    }
-
     public void testUpdateRemovesValueConcurrentModificationException()
     {
         MutableRecordImpl record = new MutableRecordImpl();
@@ -211,5 +189,74 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
         update.setHandle(stored.getHandle());
         
         recordStore.update("path", update);
+    }
+
+    public void testSelectIsolatedFromUpdate()
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        recordStore.insert("path", record);
+
+        Record selected = (Record) recordStore.select().get("path");
+        assertNull(selected.get("c"));
+
+        MutableRecord update = selected.copy(true, true);
+        update.put("c", "d");
+
+        recordStore.update("path", update);
+
+        assertNull(selected.get("c"));
+
+        selected = (Record) recordStore.select().get("path");
+        assertNotNull(selected.get("c"));
+    }
+
+    public void testSelectIsolatedFromInsert()
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        recordStore.insert("path", record);
+
+        Record selected = (Record) recordStore.select().get("path");
+        assertNull(selected.get("c"));
+
+        recordStore.insert("path/c", new MutableRecordImpl());
+
+        assertNull(selected.get("c"));
+
+        selected = (Record) recordStore.select().get("path");
+        assertNotNull(selected.get("c"));
+    }
+
+    public void testSelectIsolatedFromDelete()
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        record.put("c", new MutableRecordImpl());
+        recordStore.insert("path", record);
+
+        Record selected = (Record) recordStore.select().get("path");
+        assertNotNull(selected.get("c"));
+
+        recordStore.delete("path/c");
+
+        assertNotNull(selected.get("c"));
+
+        selected = (Record) recordStore.select().get("path");
+        assertNull(selected.get("c"));
+    }
+
+    public void testSelectRootIsolationFromInsert()
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        recordStore.insert("path", record);
+
+        Record root = recordStore.select();
+        assertNull(((Record)root.get("path")).get("c"));
+
+        recordStore.insert("path/c", new MutableRecordImpl());
+
+        assertNull(((Record)root.get("path")).get("c"));
+
+        root = recordStore.select();
+        assertNotNull(((Record)root.get("path")).get("c"));
+
     }
 }

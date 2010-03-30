@@ -37,6 +37,7 @@ public class InMemoryRecordStore implements RecordStore
         {
             public Object process(MutableRecord base)
             {
+                isolate(PathUtils.getParentPath(path));
                 insert(base, path, record);
                 return null;
             }
@@ -49,6 +50,7 @@ public class InMemoryRecordStore implements RecordStore
         {
             public Object process(MutableRecord base)
             {
+                isolate(path);
                 update(base, path, record);
                 return null;
             }
@@ -61,6 +63,7 @@ public class InMemoryRecordStore implements RecordStore
         {
             public Record process(MutableRecord base)
             {
+                isolate(path);
                 return delete(base, path);
             }
         });
@@ -118,7 +121,7 @@ public class InMemoryRecordStore implements RecordStore
         // ensure the integrity of the internal datastructure of the record sture, we must run a
         // deep copy prior to the insertion so that no external reference remains.
         MutableRecord record = newRecord.copy(true, true);
-        
+
         parent.put(baseName, record);
 
         return record;
@@ -225,8 +228,54 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record select()
     {
+        MutableRecord root = wrapper.get();
+
+        // Copy the root so that we do not need to copy it during the isolation processing.
+        // It is much simpler if we never give out a reference to the root record.
+        MutableRecord clone = new MutableRecordImpl();
+        for (String key : root.metaKeySet())
+        {
+            clone.putMeta(key, root.getMeta(key));
+        }
+
+        for (String key : root.keySet())
+        {
+            clone.put(key, root.get(key));
+        }
+
         // Ensure the internal integrity by returning an immutable reference to the record.
-        return new ImmutableRecord(wrapper.get().copy(true, true));
+        return new ImmutableRecord(clone);
+    }
+
+    /**
+     * Isolate the specified path, meaning that anyone that previously acquired a reference
+     * to the record will no longer see any changes made to the record at the specified path
+     * or its nested records.
+     *
+     * Essentially, any existing selected records that have access to the specified path will
+     * not see any updates made to that path.
+     *
+     * @param path  the path to be isolated
+     */
+    public void isolate(String path)
+    {
+        MutableRecord root = wrapper.get();
+
+        String[] pathElements = PathUtils.getPathElements(path);
+
+        MutableRecord parent = root;
+        for (String pathElement : pathElements)
+        {
+            Record r = (Record) parent.get(pathElement);
+            if (r == null)
+            {
+                return;
+            }
+            
+            MutableRecord copy = r.copy(false, true);
+            parent.put(pathElement, copy);
+            parent = copy;
+        }
     }
 
     /**
@@ -242,6 +291,7 @@ public class InMemoryRecordStore implements RecordStore
 
         public MutableRecord copy(MutableRecord v)
         {
+            System.out.println("InMemoryRecordStore$MutableRecordTransactionalWrapper.copy");
             return v.copy(true, true);
         }
     }
