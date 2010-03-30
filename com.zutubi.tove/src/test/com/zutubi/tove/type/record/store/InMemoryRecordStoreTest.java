@@ -207,7 +207,7 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
         assertNull(selected.get("c"));
 
         selected = (Record) recordStore.select().get("path");
-        assertNotNull(selected.get("c"));
+        assertEquals("d", selected.get("c"));
     }
 
     public void testSelectIsolatedFromInsert()
@@ -257,6 +257,5 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
 
         root = recordStore.select();
         assertNotNull(((Record)root.get("path")).get("c"));
-
     }
 }
