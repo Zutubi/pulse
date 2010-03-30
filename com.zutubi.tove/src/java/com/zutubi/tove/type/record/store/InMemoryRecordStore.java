@@ -232,19 +232,9 @@ public class InMemoryRecordStore implements RecordStore
 
         // Copy the root so that we do not need to copy it during the isolation processing.
         // It is much simpler if we never give out a reference to the root record.
-        MutableRecord clone = new MutableRecordImpl();
-        for (String key : root.metaKeySet())
-        {
-            clone.putMeta(key, root.getMeta(key));
-        }
-
-        for (String key : root.keySet())
-        {
-            clone.put(key, root.get(key));
-        }
 
         // Ensure the internal integrity by returning an immutable reference to the record.
-        return new ImmutableRecord(clone);
+        return new ImmutableRecord(root.copy(false, true));
     }
 
     /**
