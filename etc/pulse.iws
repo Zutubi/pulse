@@ -44,7 +44,7 @@
     <configuration default="false" name="SetPassword" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.master.cli.SetPasswordCommand" />
       <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml" />
-      <option name="PROGRAM_PARAMETERS" value="<username> <password>" />
+      <option name="PROGRAM_PARAMETERS" value="username password" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
