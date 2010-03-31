@@ -6,6 +6,7 @@ import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wizard;
+import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
 
 import java.util.LinkedList;
@@ -20,6 +21,11 @@ import java.util.List;
 @SymbolicName("zutubi.fileSystemArtifactConfigSupport")
 public abstract class FileSystemArtifactConfigurationSupport extends ArtifactConfigurationSupport
 {
+
+    @ControllingCheckbox(checkedFields = {"hashAlgorithm"})
+    private boolean calculateHash;
+    @Required
+    private CommandContext.HashAlgorithm hashAlgorithm = CommandContext.HashAlgorithm.MD5;
     @Wizard.Ignore
     private boolean failIfNotPresent = true;
     @Wizard.Ignore
@@ -53,6 +59,26 @@ public abstract class FileSystemArtifactConfigurationSupport extends ArtifactCon
     protected FileSystemArtifactConfigurationSupport(String name)
     {
         super(name);
+    }
+
+    public boolean isCalculateHash()
+    {
+        return calculateHash;
+    }
+
+    public void setCalculateHash(boolean calculateHash)
+    {
+        this.calculateHash = calculateHash;
+    }
+
+    public CommandContext.HashAlgorithm getHashAlgorithm()
+    {
+        return hashAlgorithm;
+    }
+
+    public void setHashAlgorithm(CommandContext.HashAlgorithm hashAlgorithm)
+    {
+        this.hashAlgorithm = hashAlgorithm;
     }
 
     public boolean isFailIfNotPresent()

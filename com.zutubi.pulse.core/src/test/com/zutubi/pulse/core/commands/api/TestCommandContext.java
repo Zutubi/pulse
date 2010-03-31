@@ -97,7 +97,7 @@ public class TestCommandContext implements CommandContext
     }
 
     /**
-     * Returns all artifacts registered via {@link CommandContext#registerArtifact(String, String,boolean,boolean)}.
+     * Returns all artifacts registered via {@link CommandContext#registerArtifact(String, String,boolean,boolean, com.zutubi.pulse.core.commands.api.CommandContext.HashAlgorithm)}.
      * These artifact instances in turn include details of processors etc
      * registered against them.
      *
@@ -153,7 +153,7 @@ public class TestCommandContext implements CommandContext
         artifacts.get(name).setPublish(true);
     }
 
-    public File registerArtifact(String name, String type, boolean explicit, boolean featured)
+    public File registerArtifact(String name, String type, boolean explicit, boolean featured, HashAlgorithm hashAlgorithm)
     {
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
         if (!toDir.mkdirs())
@@ -204,7 +204,7 @@ public class TestCommandContext implements CommandContext
     /**
      * Records information about a registered artifact.
      *
-     * @see CommandContext#registerArtifact(String, String,boolean,boolean)
+     * @see CommandContext#registerArtifact(String, String,boolean,boolean, com.zutubi.pulse.core.commands.api.CommandContext.HashAlgorithm)
      */
     public static class Artifact
     {

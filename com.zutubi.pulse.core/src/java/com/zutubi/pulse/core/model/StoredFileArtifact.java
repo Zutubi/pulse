@@ -16,6 +16,7 @@ public class StoredFileArtifact extends Entity
 
     private String path;
     private String type;
+    private String hash;
     private List<PersistentFeature> features = new LinkedList<PersistentFeature>();
 
     public StoredFileArtifact()
@@ -120,6 +121,16 @@ public class StoredFileArtifact extends Entity
     private void setType(String type)
     {
         this.type = type;
+    }
+
+    public String getHash()
+    {
+        return hash;
+    }
+
+    public void setHash(String hash)
+    {
+        this.hash = hash;
     }
 
     public List<PersistentFeature> getFeatures()

@@ -15,9 +15,16 @@ import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +35,10 @@ import java.util.Map;
  */
 public class DefaultCommandContext implements CommandContext
 {
+    private static final Logger LOG = Logger.getLogger(DefaultCommandContext.class);
+
+    private static final int BUFFER_SIZE = 16384;
+
     private ExecutionContext executionContext;
     private CommandResult result;
     private Map<String, ArtifactSpec> registeredArtifacts = new LinkedHashMap<String, ArtifactSpec>();
@@ -98,7 +109,7 @@ public class DefaultCommandContext implements CommandContext
         result.addArtifact(new StoredArtifact(name, url, explicit, featured));
     }
 
-    public File registerArtifact(String name, String type, boolean explicit, boolean featured)
+    public File registerArtifact(String name, String type, boolean explicit, boolean featured, HashAlgorithm hashAlgorithm)
     {
         StoredArtifact artifact = new StoredArtifact(name, explicit, featured);
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
@@ -107,7 +118,7 @@ public class DefaultCommandContext implements CommandContext
             throw new BuildException("Unable to create storage directory '" + toDir.getAbsolutePath() + "' for artifact '" + name + "'");
         }
 
-        registeredArtifacts.put(name, new ArtifactSpec(artifact, type, toDir));
+        registeredArtifacts.put(name, new ArtifactSpec(artifact, type, toDir, hashAlgorithm));
         return toDir;
     }
 
@@ -176,13 +187,52 @@ public class DefaultCommandContext implements CommandContext
             for (String path : scanner.getIncludedFiles())
             {
                 StoredFileArtifact fileArtifact = new StoredFileArtifact(prefix + path, spec.getType());
+                File file = new File(spec.getToDir(), path);
+
+                HashAlgorithm hashAlgorithm = spec.getHashAlgorithm();
+                if (hashAlgorithm != null)
+                {
+                    calculateHash(fileArtifact, file, hashAlgorithm);
+                }
+
                 spec.getArtifact().add(fileArtifact);
                 PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, executionContext);
                 for (PostProcessor pp: processors)
                 {
-                    pp.process(new File(spec.getToDir(), path), ppContext);
+                    pp.process(file, ppContext);
                 }
             }            
+        }
+    }
+
+    private void calculateHash(StoredFileArtifact fileArtifact, File file, HashAlgorithm hashAlgorithm)
+    {
+        InputStream is = null;
+        try
+        {
+            MessageDigest digest = MessageDigest.getInstance(hashAlgorithm.getDigestName());
+            is = new FileInputStream(file);
+            byte buffer[] = new byte[BUFFER_SIZE];
+
+            int n;
+            while ((n = is.read(buffer)) >= 0)
+            {
+                digest.update(buffer, 0, n);
+            }
+
+            fileArtifact.setHash(StringUtils.toHexString(digest.digest()));
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            LOG.warning(e);
+        }
+        catch (IOException e)
+        {
+            LOG.warning("I/O error calculating hash for file '" + file.getAbsolutePath() + "' " + e.getMessage(), e);
+        }
+        finally
+        {
+            IOUtils.close(is);
         }
     }
 
@@ -191,13 +241,15 @@ public class DefaultCommandContext implements CommandContext
         private StoredArtifact artifact;
         private String type;
         private File toDir;
+        private HashAlgorithm hashAlgorithm;
         private List<PostProcessorConfiguration> processors = new LinkedList<PostProcessorConfiguration>();
 
-        private ArtifactSpec(StoredArtifact artifact, String type, File toDir)
+        private ArtifactSpec(StoredArtifact artifact, String type, File toDir, HashAlgorithm hashAlgorithm)
         {
             this.artifact = artifact;
             this.type = type;
             this.toDir = toDir;
+            this.hashAlgorithm = hashAlgorithm;
         }
 
         public void addAll(List<PostProcessorConfiguration> postProcessors)
@@ -218,6 +270,11 @@ public class DefaultCommandContext implements CommandContext
         public File getToDir()
         {
             return toDir;
+        }
+
+        public HashAlgorithm getHashAlgorithm()
+        {
+            return hashAlgorithm;
         }
 
         public List<PostProcessorConfiguration> getProcessors()

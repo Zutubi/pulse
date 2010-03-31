@@ -16,6 +16,33 @@ import java.util.List;
 public interface CommandContext
 {
     /**
+     * Algorithms supported for calculating file hashes.
+     */
+    enum HashAlgorithm
+    {
+        /**
+         * The MD5 Message-Digest algorithm (http://tools.ietf.org/html/rfc1321).
+         */
+        MD5("MD5"),
+        /**
+         * US Secure Hash Algorithm 1 (http://tools.ietf.org/html/rfc3174).
+         */
+        SHA1("SHA-1");
+
+        private String digestName;
+
+        HashAlgorithm(String digestName)
+        {
+            this.digestName = digestName;
+        }
+
+        public String getDigestName()
+        {
+            return digestName;
+        }
+    }
+
+    /**
      * Returns the execution context for the build in which this command is
      * running.
      *
@@ -90,27 +117,29 @@ public interface CommandContext
      * and/or permanent storage.  All files written under the returned
      * directory will be captured as part of the artifact.
      *
-     * @param name     the name of the artifact, e.g. "my report"
-     * @param type     the MIME type of the captured files, or null if their
-     *                 types are unknown and should be guessed
-     * @param explicit if true, the artifact is being captured due to an
-     *                 explicit choice by the user (as opposed to, for example
-     *                 output artifacts automatically captured by some
-     *                 commands)
-     * @param featured if true, the user has marked the artifact as "featured",
-     *                 i.e. it should be given extra prominence
+     * @param name          the name of the artifact, e.g. "my report"
+     * @param type          the MIME type of the captured files, or null if
+     *                      their types are unknown and should be guessed
+     * @param explicit      if true, the artifact is being captured due to an
+     *                      explicit choice by the user (as opposed to, for
+     *                      example output artifacts automatically captured by
+     *                      some commands)
+     * @param featured      if true, the user has marked the artifact as
+     *                      "featured", i.e. it should be given extra prominence
+     * @param hashAlgorithm if not null, specifies an algorithm to use for
+     *                      calculating hashes of all files in the artifact
      * @return the directory to which all files that are part of this artifact
      *         should be captured
      *
      * @see #registerProcessors(String, java.util.List)
      * @see #setArtifactIndex(String, String)
      */
-    File registerArtifact(String name, String type, boolean explicit, boolean featured);
+    File registerArtifact(String name, String type, boolean explicit, boolean featured, HashAlgorithm hashAlgorithm);
 
     /**
      * Registers post-processors that should be applied to all files in the
      * artifact with the given name.  The artifact should have been previously
-     * registered via {@link #registerArtifact(String, String,boolean,boolean)}.  The processors
+     * registered via {@link #registerArtifact(String, String,boolean,boolean, com.zutubi.pulse.core.commands.api.CommandContext.HashAlgorithm)}.  The processors
      * are applied after the command completes to all files captured under the
      * given artifact.
      *

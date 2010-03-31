@@ -165,6 +165,24 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         return actions;
     }
 
+    private String getHash()
+    {
+        try
+        {
+            String hash = getFileArtifact().getHash();
+            if (hash == null)
+            {
+                hash = "";
+            }
+
+            return hash;
+        }
+        catch (FileSystemException e)
+        {
+            return "";
+        }
+    }
+
     public StoredFileArtifact getFileArtifact() throws FileSystemException
     {
         return getArtifact().findFileBase(getArtifactPath());
@@ -195,6 +213,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     public Map<String, Object> getExtraAttributes()
     {
         return asMap(
+                asPair("hash", getHash()),
                 asPair("size", Long.toString(doGetContentSize())),
                 asPair("actions", getActions())
         );

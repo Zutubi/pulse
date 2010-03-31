@@ -2617,6 +2617,11 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     }
                 }
             }, {
+                header: 'hash',
+                width: 300,
+                tpl: '<tpl if="extraAttributes.hash">{values.extraAttributes.hash}</tpl>',
+                align: 'right'
+            }, {
                 header: 'actions',
                 width: 120,
                 sortable: false,

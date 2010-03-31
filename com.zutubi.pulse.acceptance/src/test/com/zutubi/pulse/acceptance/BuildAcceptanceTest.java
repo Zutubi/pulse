@@ -19,6 +19,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
@@ -86,6 +87,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String MESSAGE_RECIPE_COMPLETED = "Recipe '[default]' completed with status success";
 
     private Repository repository;
+    private ConfigurationHelperFactory configurationHelperFactory;
+    private ConfigurationHelper configurationHelper;
+    private ProjectConfigurations projects;
 
     protected void setUp() throws Exception
     {
@@ -102,6 +106,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         }
 
         repository = new Repository();
+
+        configurationHelperFactory = new SingletonConfigurationHelperFactory();
+        configurationHelper = configurationHelperFactory.create(xmlRpcHelper);
+        projects = new ProjectConfigurations(configurationHelper);
     }
 
     protected void tearDown() throws Exception
@@ -490,9 +498,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertTrivialUser(userLogin);
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        ConfigurationHelper configurationHelper = factory.create(xmlRpcHelper);
-        ProjectConfigurations projects = new ProjectConfigurations(configurationHelper);
         AntProjectHelper project = projects.createTrivialAntProject(projectName);
         FileArtifactConfiguration explicitArtifact = project.addArtifact("explicit", "build.xml");
         FileArtifactConfiguration featuredArtifact = project.addArtifact("featured", "build.xml");
@@ -537,16 +542,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // CIB-1724: download raw artifacts via 2.0 url scheme.
         addProject(random, true);
         long buildNumber = xmlRpcHelper.runBuild(random);
-        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(random, buildNumber);
-        Hashtable<String, Object> outputArtifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
-        {
-            public boolean satisfied(Hashtable<String, Object> artifact)
-            {
-                return "command output".equals(artifact.get("name"));
-            }
-        });
-
-        assertNotNull(outputArtifact);
+        Hashtable<String, Object> outputArtifact = getArtifact(random, buildNumber, "command output");
         String permalink = (String) outputArtifact.get("permalink");
         // This is to check for the new 2.0-ised URL.
         assertTrue(permalink.contains("/downloads/"));
@@ -574,27 +570,65 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(random, buildNumber);
+        Hashtable<String, Object> artifact = getArtifact(random, buildNumber, ARTIFACT_NAME);
+        String url = getArtifactFileUrl(ARTIFACT_FILENAME, artifact);
+        Header contentTypeHeader = AcceptanceTestUtils.readHttpHeader(url, "Content-Type");
+        assertNotNull(contentTypeHeader);
+        assertEquals(CONTENT_TYPE, contentTypeHeader.getValue().trim());
+    }
+
+    public void testArtifactHashing() throws Exception
+    {
+        final String NAME_NOT_HASHED = "unabashed";
+        final String NAME_HASHED = "hashed";
+        final String BUILD_FILE = "build.xml";
+
+        AntProjectHelper project = projects.createTrivialAntProject(random);
+        project.addArtifact(NAME_NOT_HASHED, BUILD_FILE);
+        FileArtifactConfiguration hashedArtifact = project.addArtifact(NAME_HASHED, BUILD_FILE);
+        hashedArtifact.setCalculateHash(true);
+        hashedArtifact.setHashAlgorithm(CommandContext.HashAlgorithm.MD5);
+        configurationHelper.insertProject(project.getConfig());
+
+        long buildNumber = xmlRpcHelper.runBuild(random);
+
+        Hashtable<String, Object> hashedInfo = getArtifact(random, buildNumber, NAME_HASHED);
+        String content = AcceptanceTestUtils.readUriContent(getArtifactFileUrl(BUILD_FILE, hashedInfo));
+        String expectedHash = SecurityUtils.md5Digest(content);
+
+        loginAsAdmin();
+
+        BuildArtifactsPage page = browser.openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
+        assertTrue(page.isArtifactFileListed(NAME_NOT_HASHED, BUILD_FILE));
+        assertEquals("", page.getArtifactFileHash(NAME_NOT_HASHED, BUILD_FILE));
+        assertTrue(page.isArtifactFileListed(NAME_HASHED, BUILD_FILE));
+        assertEquals(expectedHash, page.getArtifactFileHash(NAME_HASHED, BUILD_FILE));
+    }
+
+    private Hashtable<String, Object> getArtifact(String project, long buildNumber, final String name) throws Exception
+    {
+        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(project, buildNumber);
         Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> artifact)
             {
-                return ARTIFACT_NAME.equals(artifact.get("name"));
+                return name.equals(artifact.get("name"));
             }
         });
 
         assertNotNull(artifact);
+        return artifact;
+    }
 
+    private String getArtifactFileUrl(String filename, Hashtable<String, Object> artifact)
+    {
         String base = browser.getBaseUrl();
         if (base.endsWith("/"))
         {
             base = base.substring(0, base.length() - 1);
         }
-        
-        String url = base + artifact.get("permalink") + ARTIFACT_FILENAME;
-        Header contentTypeHeader = AcceptanceTestUtils.readHttpHeader(url, "Content-Type");
-        assertNotNull(contentTypeHeader);
-        assertEquals(CONTENT_TYPE, contentTypeHeader.getValue().trim());
+
+        return base + artifact.get("permalink") + filename;
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception

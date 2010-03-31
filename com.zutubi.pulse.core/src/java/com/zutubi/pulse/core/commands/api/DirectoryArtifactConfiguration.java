@@ -16,7 +16,7 @@ import java.util.List;
  * @see DirectoryArtifact
  */
 @SymbolicName("zutubi.directoryArtifactConfig")
-@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "featured", "postProcessors", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks", "publish", "artifactPattern"})
+@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "featured", "postProcessors", "calculateHash", "hashAlgorithm", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks", "publish", "artifactPattern"})
 public class DirectoryArtifactConfiguration extends FileSystemArtifactConfigurationSupport
 {
     private String base;

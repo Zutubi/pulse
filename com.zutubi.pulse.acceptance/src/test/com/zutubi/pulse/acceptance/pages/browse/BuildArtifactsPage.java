@@ -135,7 +135,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean isArtifactAvailable(String artifactName)
     {
-        String iconCls = browser.getAttribute(getArtifactLocator(artifactName) + "/preceding::img[position()=1]/@class");
+        String iconCls = browser.getAttribute(getArtifactLocator(artifactName) + "/preceding::img[1]/@class");
         return !iconCls.contains(ArtifactFileObject.CLASS_PREFIX + ArtifactFileObject.CLASS_SUFFIX_BROKEN);
     }
 
@@ -150,7 +150,24 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean isArtifactFileListed(String artifactName, String fileName)
     {
-        String locator = getArtifactLocator(artifactName) + "/ancestor::tbody[position()=1]" + getArtifactLocator(fileName);
-        return browser.isElementPresent(locator);
+        return browser.isElementPresent(getArtifactFileLocator(artifactName, fileName));
+    }
+
+    private String getArtifactFileLocator(String artifactName, String fileName)
+    {
+        return getArtifactLocator(artifactName) + "/ancestor::tbody[1]" + getArtifactLocator(fileName);
+    }
+
+    /**
+     * Returns the contents of the hash column for the given artifact file.
+     *
+     * @param artifactName name of the artifact the file is captured within
+     * @param fileName     name of the file to get the hash for
+     * @return the contents of the has column for the given file
+     */
+    public String getArtifactFileHash(String artifactName, String fileName)
+    {
+        String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]/td[3]/div";
+        return browser.getText(locator).trim();
     }
 }

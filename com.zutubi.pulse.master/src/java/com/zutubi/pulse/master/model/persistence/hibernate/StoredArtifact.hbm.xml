@@ -33,6 +33,10 @@
         <property name="path" column="FILE" type="string" length="1023"/>
 
         <property name="type" column="TYPE" type="string" length="255"/>
+
+        <property name="hash" type="string" length="63">
+            <column name="HASH" index="idx_file_artifact_hash"/>
+        </property>
     </class>
 
 </hibernate-mapping>

@@ -94,7 +94,7 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
     
     public void execute(CommandContext commandContext)
     {
-        File outputDir = commandContext.registerArtifact(OUTPUT_NAME, null, false, false);
+        File outputDir = commandContext.registerArtifact(OUTPUT_NAME, null, false, false, null);
         File outputArtifact = new File(outputDir, OUTPUT_FILE);
 
         OutputStream stream = null;
