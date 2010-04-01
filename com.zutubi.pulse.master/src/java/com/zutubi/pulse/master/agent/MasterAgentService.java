@@ -91,7 +91,7 @@ public class MasterAgentService implements AgentService
         return synchronisationTaskRunner.synchronise(messages);
     }
 
-    public List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String relativePath)
+    public List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String relativePath)
     {
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File path = new File(recipePaths.getBaseDir(), relativePath);
@@ -104,7 +104,7 @@ public class MasterAgentService implements AgentService
         return new LinkedList<FileInfo>();
     }
 
-    public FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String relativePath)
+    public FileInfo getFile(AgentRecipeDetails recipeDetails, String relativePath)
     {
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File base = recipePaths.getBaseDir();

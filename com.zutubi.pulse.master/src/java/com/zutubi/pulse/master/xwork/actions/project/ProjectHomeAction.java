@@ -211,7 +211,7 @@ public class ProjectHomeAction extends ProjectActionBase
             }
         }
 
-        addViewWorkingCopyActions(project, messages, contentRoot);
+        addViewWorkingCopyAction(project, messages, contentRoot);
         addResponsibilityActions(project, messages, contentRoot);
 
         BuildQueueSnapshot snapshot = schedulingController.getSnapshot();
@@ -241,7 +241,7 @@ public class ProjectHomeAction extends ProjectActionBase
         }
     }
 
-    private void addViewWorkingCopyActions(Project project, Messages messages, File contentRoot)
+    private void addViewWorkingCopyAction(Project project, Messages messages, File contentRoot)
     {
         ProjectConfiguration config = project.getConfig();
         if (config.getScm().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)

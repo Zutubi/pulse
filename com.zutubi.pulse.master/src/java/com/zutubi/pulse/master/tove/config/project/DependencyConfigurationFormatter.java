@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.config.api.ToConfigurationNameMapping;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 
 import java.util.List;
@@ -36,13 +36,7 @@ public class DependencyConfigurationFormatter
             case CORRESPONDING_STAGES:
                 return I18N.format("corresponding.label");
         }
-        List<String> stageNames = CollectionUtils.map(config.getStages(), new Mapping<BuildStageConfiguration, String>()
-        {
-            public String map(BuildStageConfiguration stage)
-            {
-                return stage.getName();
-            }
-        });
+        List<String> stageNames = CollectionUtils.map(config.getStages(), new ToConfigurationNameMapping<BuildStageConfiguration>());
         String joinedStageNames = StringUtils.join(", ", stageNames);
         return StringUtils.trimmedString(joinedStageNames, 15, "...");
     }

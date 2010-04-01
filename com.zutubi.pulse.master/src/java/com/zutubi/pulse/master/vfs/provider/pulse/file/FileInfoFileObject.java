@@ -1,13 +1,9 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.file;
 
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.ProjectProvider;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -22,8 +18,6 @@ import java.util.List;
  */
 public class FileInfoFileObject extends AbstractPulseFileObject
 {
-    private static final Logger LOG = Logger.getLogger(FileInfoFileObject.class);
-
     private FileInfo fileInfo;
 
     public FileInfoFileObject(FileInfo fileInfo, FileName name, AbstractFileSystem fs)
@@ -81,28 +75,5 @@ public class FileInfoFileObject extends AbstractPulseFileObject
     protected long doGetContentSize() throws Exception
     {
         return fileInfo.length();
-    }
-
-    protected boolean doIsReadable() throws Exception
-    {
-        try
-        {
-            ProjectProvider provider = getAncestor(ProjectProvider.class);
-            if (provider != null)
-            {
-                Project project = provider.getProject();
-                accessManager.ensurePermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project);
-            }
-            return true;
-        }
-        catch (FileSystemException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            LOG.warning(e);
-            return false;
-        }
     }
 }

@@ -67,15 +67,7 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
 
         // now we need to determine the scm relative path to be used with the ScmFile instance.
 
-        FileObject root = null;
-        if (this instanceof ScmRootFileObject)
-        {
-            root = this;
-        }
-        else
-        {
-            root = getAncestor(ScmRootFileObject.class);
-        }
+        FileObject root = getAncestor(ScmRootFileObject.class);
 
         String relativeName = root.getName().getRelativeName(name);
         ScmFile fi = new ScmFile(UriParser.decode(relativeName), name.getType() == FileType.FOLDER);

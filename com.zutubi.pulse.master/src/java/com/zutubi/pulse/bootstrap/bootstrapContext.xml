@@ -27,9 +27,7 @@
     <bean id="configurationManager" class="com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager"/>
 
     <bean id="pluginPaths" class="com.zutubi.pulse.servercore.bootstrap.ServerPluginPaths" init-method="init">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
+        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>

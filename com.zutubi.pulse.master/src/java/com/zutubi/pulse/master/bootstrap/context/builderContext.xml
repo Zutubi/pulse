@@ -267,6 +267,4 @@
     <bean id="lastAccessManager" class="com.zutubi.pulse.master.security.LastAccessManager" init-method="init" autowire="byName"/>
 
     <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener" autowire="byName"/>
-
-    <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init"/>
 </beans>

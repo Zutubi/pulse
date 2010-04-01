@@ -61,11 +61,6 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
 
     public String getStaticPath() throws FileSystemException
     {
-        if (this instanceof ReferenceRootFileObject)
-        {
-            return "";
-        }
-
         ReferenceRootFileObject rootFile = getAncestor(ReferenceRootFileObject.class);
         return rootFile.getName().getRelativeName(getName());
     }

@@ -7,6 +7,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
@@ -123,7 +124,7 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
 
     /**
      * This method searches through the file object hierarchy looking for, and returning when found, a file object
-     * that matches the specified type.
+     * that matches the specified type.  This search includes the file object itself.  
      *
      * @param type  the type of the ancestor being searched for.
      *
@@ -133,10 +134,28 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      */
     public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
-        AbstractPulseFileObject parent = (AbstractPulseFileObject) this.getParent();
-        if (parent != null)
+        return getAncestor(type, false);
+    }
+
+    /**
+     * This method searches through the file object hierarchy looking for, and returning when found, a file object
+     * that matches the specified type.  The strict parameter determines whether or not the search is strictly
+     * through the file objects ancestors (strict is true), or if the search includes the current file object
+     * (strict is false).
+     *
+     * @param type      the type of the ancestor being searched for.
+     * @param strict    if strict, the search will not include the current file object.
+     *
+     * @return the matching ancestor, or null if no match is found.
+     *
+     * @throws FileSystemException if there are any problems that prevent searching the hierarchy.
+     */
+    public <T> T getAncestor(Class<T> type, boolean strict) throws FileSystemException
+    {
+        FileObject initial = (strict) ? this.getParent() : this;
+        if (initial != null)
         {
-            for(AbstractPulseFileObject ancestor = parent; ancestor != null; ancestor = (AbstractPulseFileObject) ancestor.getParent())
+            for(FileObject ancestor = initial; ancestor != null; ancestor = ancestor.getParent())
             {
                 if (type.isInstance(ancestor))
                 {

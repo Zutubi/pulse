@@ -169,10 +169,11 @@ public class JDBCUtils
     public static Object executeSimpleQuery(Connection con, String sql) throws SQLException
     {
         PreparedStatement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = con.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             if (rs.next())
             {
                 return rs.getObject(1);
@@ -184,6 +185,7 @@ public class JDBCUtils
         }
         finally
         {
+            JDBCUtils.close(rs);
             JDBCUtils.close(stmt);
         }
     }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.Agent;
@@ -15,16 +16,19 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class comment/>
+ * A file object that represents the root of a working copy within the pulse file system.
  */
 public class WorkingCopyStageFileObject extends FileInfoRootFileObject implements RecipeResultProvider
 {
+    private static final Messages I18N = Messages.getInstance(WorkingCopyStageFileObject.class);
+
     private AgentManager agentManager;
 
-    private static final String NO_WORKING_COPY_AVAILABLE = "no working copy available";
+    private static final String NO_WORKING_COPY_AVAILABLE = I18N.format("no.working.copy.available");
 
     private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
 
@@ -48,7 +52,12 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
             );
         }
 
-        return super.createFile(fileName);
+        FileInfo child = getFileInfo(fileName.getBaseName());
+
+        return objectFactory.buildBean(WorkingCopyFileInfoFileObject.class,
+                new Class[]{FileInfo.class, FileName.class, AbstractFileSystem.class},
+                new Object[]{child, fileName, pfs}
+        );
     }
 
     protected String[] doListChildren() throws FileSystemException
@@ -67,12 +76,17 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         BuildResult buildResult = buildManager.getByRecipeId(recipeId);
         ProjectConfiguration projectConfig = buildResult.getProject().getConfig();
 
+        if (node.getHost() == null)
+        {
+            return new LinkedList<FileInfo>();
+        }
+
         Agent agent = agentManager.getAgent(node.getHost());
         AgentConfiguration agentConfig = agent.getConfig();
 
         AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
 
-        return agent.getService().getFileInfos(details, path);
+        return agent.getService().getFileListing(details, path);
     }
 
     public FileInfo getFileInfo(String path)
@@ -86,7 +100,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
 
         AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
 
-        return agent.getService().getFileInfo(details, path);
+        return agent.getService().getFile(details, path);
     }
 
     private AgentRecipeDetails getAgentRecipeDetails(RecipeResultNode node, BuildResult buildResult, ProjectConfiguration projectConfig, AgentConfiguration agentConfig)

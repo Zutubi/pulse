@@ -657,8 +657,12 @@
         <property name="buildNumber" value="201999004"/>
     </bean>
 
-    <bean id="removeHasWorkingDirColumn" class="com.zutubi.pulse.master.upgrade.tasks.RemoveHasWorkingDirColumnUpgradeTask">
+    <bean id="cleanupAllCapturedWorkingCopies" class="com.zutubi.pulse.master.upgrade.tasks.CleanupAllCapturedWorkingCopiesUpgradeTask">
         <property name="buildNumber" value="201999005"/>
+    </bean>
+
+    <bean id="removeHasWorkingDirColumn" class="com.zutubi.pulse.master.upgrade.tasks.RemoveHasWorkingDirColumnUpgradeTask">
+        <property name="buildNumber" value="201999006"/>
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-partial-03.hbm.xml</value>
@@ -667,17 +671,13 @@
     </bean>
 
     <bean id="removeRetainWorkingCopyOption" class="com.zutubi.pulse.master.upgrade.tasks.RemoveRetainWorkingCopyOptionUpgradeTask">
-        <property name="buildNumber" value="201999006"/>
-    </bean>
-
-    <bean id="removeWorkingCopyCleanupWhat" class="com.zutubi.pulse.master.upgrade.tasks.RemoveWorkingCopyCleanupWhatUpgradeTask">
         <property name="buildNumber" value="201999007"/>
     </bean>
 
-    <bean id="cleanupAllCapturedWorkingCopies" class="com.zutubi.pulse.master.upgrade.tasks.CleanupAllCapturedWorkingCopiesUpgradeTask">
+    <bean id="removeWorkingCopyCleanupWhat" class="com.zutubi.pulse.master.upgrade.tasks.RemoveWorkingCopyCleanupWhatUpgradeTask">
         <property name="buildNumber" value="201999008"/>
     </bean>
-    
+
     <bean id="artifactFlags" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
         <property name="buildNumber" value="201999009"/>
         <property name="mappings">

@@ -20,7 +20,6 @@ public class RemoveRetainWorkingCopyOptionUpgradeTask extends AbstractRecordProp
 
     public boolean haltOnFailure()
     {
-        // not a fatal, but does leave undesired rubbish around.
-        return false;
+        return true;
     }
 }

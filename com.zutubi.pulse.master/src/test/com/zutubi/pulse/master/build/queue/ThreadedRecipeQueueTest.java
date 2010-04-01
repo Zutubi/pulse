@@ -767,12 +767,12 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             return Collections.emptyList();
         }
 
-        public List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String path)
+        public List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String path)
         {
             return Collections.emptyList();
         }
 
-        public FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String path)
+        public FileInfo getFile(AgentRecipeDetails recipeDetails, String path)
         {
             return null;
         }

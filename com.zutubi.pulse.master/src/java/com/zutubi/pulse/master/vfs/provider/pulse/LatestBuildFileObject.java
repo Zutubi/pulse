@@ -24,7 +24,7 @@ public class LatestBuildFileObject extends AbstractBuildFileObject
     {
         try
         {
-            ProjectProvider provider = getAncestor(ProjectProvider.class);
+            ProjectProvider provider = getAncestor(ProjectProvider.class, true);
             if (provider != null)
             {
                 Project project = provider.getProject();

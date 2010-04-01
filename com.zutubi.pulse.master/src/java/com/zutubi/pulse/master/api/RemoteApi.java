@@ -46,6 +46,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.ToConfigurationNameMapping;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
@@ -1660,13 +1661,7 @@ public class RemoteApi
     private Vector<String> getConfigNames(Collection<ProjectConfiguration> projects)
     {
         Vector<String> result = new Vector<String>(projects.size());
-        CollectionUtils.map(projects, new Mapping<ProjectConfiguration, String>()
-        {
-            public String map(ProjectConfiguration config)
-            {
-                return config.getName();
-            }
-        }, result);
+        CollectionUtils.map(projects, new ToConfigurationNameMapping<ProjectConfiguration>(), result);
 
         return result;
     }

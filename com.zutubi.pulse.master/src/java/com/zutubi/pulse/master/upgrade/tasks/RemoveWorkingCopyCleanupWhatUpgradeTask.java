@@ -1,19 +1,19 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.events.EventManager;
-import com.zutubi.pulse.master.upgrade.UpgradeException;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
-import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.TemplateRecord.HIDDEN_KEY;
-import com.zutubi.tove.type.record.store.FileSystemRecordStore;
+import com.zutubi.pulse.master.upgrade.UpgradeException;
+import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgradeUtils.hideItem;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.UnaryFunction;
-import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
-import static org.mockito.Mockito.mock;
 
-import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This cleanup task is responsible for removing all of the WORKING_COPY_SNAPSHOT
@@ -38,7 +38,7 @@ public class RemoveWorkingCopyCleanupWhatUpgradeTask extends AbstractUpgradeTask
 
     public boolean haltOnFailure()
     {
-        return false;
+        return true;
     }
 
     public void execute() throws UpgradeException
@@ -170,26 +170,6 @@ public class RemoveWorkingCopyCleanupWhatUpgradeTask extends AbstractUpgradeTask
         }
     }
 
-    public static void hideItem(MutableRecord record, String key)
-    {
-        Set<String> hiddenKeys = getHiddenKeys(record);
-        hiddenKeys.add(key);
-        record.putMeta(HIDDEN_KEY, WebUtils.encodeAndJoin(',', hiddenKeys));
-    }
-
-    public static Set<String> getHiddenKeys(Record record)
-    {
-        String hidden = record.getMeta(HIDDEN_KEY);
-        if(hidden == null)
-        {
-            return new HashSet<String>();
-        }
-        else
-        {
-            return new HashSet<String>(WebUtils.splitAndDecode(',', hidden));
-        }
-    }
-
     private Boolean getCleanupAll(ScopeHierarchy.Node node, String cleanupName)
     {
         Record r = recordManager.select("projects/" + node.getId() + "/cleanup/" + cleanupName);
@@ -248,26 +228,5 @@ public class RemoveWorkingCopyCleanupWhatUpgradeTask extends AbstractUpgradeTask
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        TransactionManager transactionManager = new TransactionManager();
-        
-        RecordManager recordManager = new RecordManager();
-        recordManager.setEventManager(mock(EventManager.class));
-        recordManager.setTransactionManager(transactionManager);
-
-        FileSystemRecordStore recordStore = new FileSystemRecordStore();
-        recordStore.setTransactionManager(transactionManager);
-        recordStore.setPersistenceDirectory(new File("C:\\projects\\pulse\\branches\\2.1.x\\data\\records"));
-        recordStore.init();
-        
-        recordManager.setRecordStore(recordStore);
-        recordManager.init();
-
-        RemoveWorkingCopyCleanupWhatUpgradeTask task = new RemoveWorkingCopyCleanupWhatUpgradeTask();
-        task.setRecordManager(recordManager);
-        task.execute();
     }
 }

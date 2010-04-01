@@ -9,7 +9,6 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**

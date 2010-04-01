@@ -24,13 +24,12 @@ import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
-import com.zutubi.pulse.master.security.PulseThreadFactory;
-import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.DirectoryFileFilter;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -72,13 +71,7 @@ public class DefaultBuildManager implements BuildManager
         File projectRoot = configurationManager.getUserPaths().getProjectRoot();
         if (projectRoot.isDirectory())
         {
-            File[] projectDirs = projectRoot.listFiles(new FileFilter()
-            {
-                public boolean accept(File f)
-                {
-                    return f.isDirectory();
-                }
-            });
+            File[] projectDirs = projectRoot.listFiles(new DirectoryFileFilter());
 
             for (File projectDir : projectDirs)
             {

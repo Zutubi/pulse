@@ -63,7 +63,7 @@ public interface AgentService
      *
      * @return a list of file info instances representing the requested listing.
      */
-    List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String path);
+    List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String path);
 
     /**
      * Retrieve the file info for the path relative to the base directory of the
@@ -74,5 +74,5 @@ public interface AgentService
      *
      * @return a file info object for the requested path.
      */
-    FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String path);
+    FileInfo getFile(AgentRecipeDetails recipeDetails, String path);
 }

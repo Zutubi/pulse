@@ -763,7 +763,7 @@ function viewWorkingCopy(project) {
 
     var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
         baseUrl : window.baseUrl,
-        basePath: 'projects/' + project + "/latest/wc",
+        basePath: 'projects/' + project + '/latest/wc',
         title : 'browse working copy'
     });
     browser.show(this);

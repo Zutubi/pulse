@@ -165,12 +165,12 @@ public class SlaveAgentService implements AgentService
         return synchronisationTaskRunner.synchronise(messages);
     }
 
-    public List<FileInfo> getFileInfos(AgentRecipeDetails recipeDetails, String path)
+    public List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String path)
     {
         return service.getFileInfos(serviceTokenManager.getToken(), recipeDetails, path);
     }
 
-    public FileInfo getFileInfo(AgentRecipeDetails recipeDetails, String path)
+    public FileInfo getFile(AgentRecipeDetails recipeDetails, String path)
     {
         return service.getFileInfo(serviceTokenManager.getToken(), recipeDetails, path);    
     }
