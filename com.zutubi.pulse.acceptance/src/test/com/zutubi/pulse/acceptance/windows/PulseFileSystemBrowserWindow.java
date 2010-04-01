@@ -2,6 +2,10 @@ package com.zutubi.pulse.acceptance.windows;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
+/**
+ * A ext popup window containing a tree view of a portion of the
+ * pulse file system.
+ */
 public class PulseFileSystemBrowserWindow
 {
     private static final String BROWSER_ID = "pulse-file-system-browser";
@@ -26,13 +30,18 @@ public class PulseFileSystemBrowserWindow
     public void clickOk()
     {
         // would be quicker if we add an id to the field?
-        browser.click("//div[@id='"+BROWSER_ID+"']//button[text()='ok']");
+        browser.click(buttonLocator("ok"));
     }
 
     public void clickCancel()
     {
         // would be quicker if we add an id to the field? 
-        browser.click("//div[@id='"+BROWSER_ID+"']//button[text()='cancel']");
+        browser.click(buttonLocator("cancel"));
+    }
+
+    private String buttonLocator(String buttonText)
+    {
+        return "//div[@id='" + BROWSER_ID + "']//button[text()='" + buttonText + "']";
     }
 
     public void selectNode(String path)
@@ -66,6 +75,6 @@ public class PulseFileSystemBrowserWindow
 
     private String toSelector(String linkText)
     {
-        return "link="+linkText+"";
+        return "link=" + linkText + "";
     }
 }

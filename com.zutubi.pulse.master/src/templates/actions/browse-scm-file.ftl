@@ -21,17 +21,21 @@ ${form.name}.items.last().on('browse', function(field)
     var projectPath = findProjectPath('${field.parameters.parentPath?js_string}');
     var prefix = '';
 <#if field.parameters.baseDirField?exists>
-    var dirField = Ext.getCmp('zfid.${field.parameters.baseDirField}')
+    var dirField = Ext.getCmp('zfid.${field.parameters.baseDirField}');
     prefix += dirField.getValue();
 </#if>
-
-    var browser = new ZUTUBI.PulseFileSystemBrowser({
+<#assign title = "${field.name}" + ".popup.title"/>
+    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
         baseUrl : '${base}',
         showFiles: true,
         prefix:prefix,
         basePath: projectPath + '/scm/' + prefix,
-        title : 'select file',
-        target : '${parameters.id?js_string}'
+        title : '${title?i18n}',
+        target : '${parameters.id?js_string}',
+        onClose: function()
+        {
+            updateButtons();
+        }
     });
-    browser.show(this);
+    browser.show();
 });

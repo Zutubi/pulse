@@ -6,9 +6,9 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.UriParser;
 
 /**
- * <class comment/>
+ * An action to make a new directory in the local file system
  */
-public class MkdirAction extends VFSActionSupport
+public class MakeDirectoryAction extends VFSActionSupport
 {
     private String basePath;
     private String path;

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
@@ -65,6 +66,6 @@ public class ExcludePathPredicate implements Predicate<String>
 
     private String normalisePath(String path)
     {
-        return path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+        return FileSystemUtils.localiseSeparators(path);
     }
 }

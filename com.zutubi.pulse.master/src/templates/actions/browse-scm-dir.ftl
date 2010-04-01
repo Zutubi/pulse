@@ -20,13 +20,18 @@ ${form.name}.items.last().on('browse', function(field)
 
     var projectPath = findProjectPath('${field.parameters.parentPath?js_string}');
 
-    var browser = new ZUTUBI.PulseFileSystemBrowser({
+<#assign title = "${field.name}" + ".popup.title"/>
+    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
         baseUrl : '${base}',
         showFiles: false,
         prefix:'scm',
         basePath: projectPath + '/scm/',
-        title : 'select directory',
-        target : '${parameters.id?js_string}'
+        title : '${title?i18n}',
+        target : '${parameters.id?js_string}',
+        onClose: function()
+        {
+            updateButtons();
+        }
     });
-    browser.show(this);
+    browser.show();
 });

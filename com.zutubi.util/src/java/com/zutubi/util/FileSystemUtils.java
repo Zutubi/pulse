@@ -758,6 +758,10 @@ public class FileSystemUtils
      */
     public static String normaliseSeparators(String path)
     {
+        if (path == null)
+        {
+            return null;
+        }
         return path.replace('\\', NORMAL_SEPARATOR_CHAR);
     }
 

@@ -7,9 +7,9 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.UriParser;
 
 /**
- * <class comment/>
+ *  An action to remove a directory from the local file system
  */
-public class RmAction extends VFSActionSupport
+public class RemoveDirectoryAction extends VFSActionSupport
 {
     private String basePath;
     private String path;

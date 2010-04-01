@@ -172,19 +172,19 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
     /**
      * @cfg {Number} size The size of the select element.
      */
-    size : undefined,
+    size: undefined,
     /**
      * @cfg {String} displayField The store field to use as item text.
      */
-    displayField : 'text',
+    displayField: 'text',
     /**
      * @cfg {String} valueField The store field to use as item values.
      */
-    valueField : 'value',
+    valueField: 'value',
     hiddenFields: {},
     entryHeight: 22,
 
-    onRender : function(ct, position)
+    onRender: function(ct, position)
     {
         this.el = ct.createChild({tag: 'div', cls: 'x-select', id: this.id});
         if(!this.tpl){
@@ -202,7 +202,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
             renderTo: this.el,
             tpl: this.tpl,
             itemSelector: '.x-select-item',
-            multiSelect :this.multiple,
+            multiSelect: this.multiple,
             store: this.store,
             selectedClass: 'x-select-selected'
         });
@@ -275,7 +275,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
         this.hiddenFields[value] = this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: value});
     },
 
-    findRecord : function(prop, value)
+    findRecord: function(prop, value)
     {
         var record;
         if(this.store.getCount() > 0)
@@ -348,14 +348,14 @@ ZUTUBI.ConfigTreeLoader = function(base)
 };
 
 Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
-    getNodeURL : function(node)
+    getNodeURL: function(node)
     {
         var tree = node.getOwnerTree();
         var path = tree.toConfigPathPrefix(node.getPath('baseName'));
         return this.dataUrl + '/' + encodeURIPath(path);
     },
 
-    requestData : function(node, callback)
+    requestData: function(node, callback)
     {
         if(this.fireEvent("beforeload", this, node, callback))
         {
@@ -390,17 +390,15 @@ ZUTUBI.ConfigTree = function(config)
 
 Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 
-    getSelectedConfigPath: function(){
-        var node = this.getSelectionModel().getSelectedNode();
-        if (node)
-        {
-            return this.toConfigPathPrefix(node.getPath('baseName'));
-        }
-        return null;
+    getSelectedConfigPath: function()
+    {
+        var treePath = this.getSelectedTreePath();
+        return treePath == null ? null : this.toConfigPathPrefix(treePath);
     },
 
-    getSelectedTreePath: function(){
-        var node = this.tree.getSelectionModel().getSelectedNode();
+    getSelectedTreePath: function()
+    {
+        var node = this.getSelectionModel().getSelectedNode();
         if (node)
         {
             return node.getPath('baseName');
@@ -468,7 +466,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         });
     },
 
-    expandToPath : function(path, callback)
+    expandToPath: function(path, callback)
     {
         path = this.toTreePathPrefix(path);
         var keys = path.split(this.pathSeparator);
@@ -738,7 +736,7 @@ ZUTUBI.FSTreeLoader = function(config)
 };
 
 Ext.extend(ZUTUBI.FSTreeLoader, Ext.tree.TreeLoader, {
-    getParams : function(node)
+    getParams: function(node)
     {
         var buf = [];
         var bp = this.baseParams;
@@ -836,12 +834,14 @@ ZUTUBI.FormPanel = function(config)
 Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
     displayMode: false,
 
-    createForm: function(){
+    createForm: function()
+    {
         delete this.initialConfig.listeners;
         return new ZUTUBI.Form(this.initialConfig);
     },
 
-    onRender : function(ct, position){
+    onRender: function(ct, position)
+    {
         ZUTUBI.FormPanel.superclass.onRender.call(this, ct, position);
         this.form.el.update('<table><tbody></tbody></table>');
         this.layoutTarget = this.form.el.first().first();
@@ -852,7 +852,7 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
         return this.layoutTarget;
     },
 
-    add : function()
+    add: function()
     {
         var a = arguments;
         for(var i = 0, len = a.length; i < len; i++)
@@ -1208,7 +1208,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         });
 
         this.removeButton = new Ext.Button({
-            icon : window.baseUrl + '/images/buttons/sb-delete-up.gif'
+            icon: window.baseUrl + '/images/buttons/sb-delete-up.gif'
         });
         this.removeButton.on('click', this.onRemove, this);
         icons.add(this.removeButton);
@@ -1217,13 +1217,13 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         if (this.allowReordering)
         {
             this.upButton = new Ext.Button({
-                icon : window.baseUrl + '/images/buttons/sb-up-up.gif'
+                icon: window.baseUrl + '/images/buttons/sb-up-up.gif'
             });
             this.upButton.on('click', this.onUp, this);
             icons.add(this.upButton);
             icons.add({xtype:'spacer',flex:1});
             this.downButton = new Ext.Button({
-                icon : window.baseUrl + '/images/buttons/sb-down-up.gif'
+                icon: window.baseUrl + '/images/buttons/sb-down-up.gif'
             });
             this.downButton.on('click', this.onDown, this);
             icons.add(this.downButton);
@@ -1231,7 +1231,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
 
         this.addButton = new Ext.Button({
-            icon : window.baseUrl + '/images/buttons/sb-add-up.gif'
+            icon: window.baseUrl + '/images/buttons/sb-add-up.gif'
         });
         this.addButton.on('click', this.onAdd, this);
         icons.add(this.addButton);
@@ -1903,13 +1903,15 @@ Ext.extend(ZUTUBI.TailSettingsWindow, Ext.Window, {
         this.form.getForm().submit({
             clientValidation: true,
             url: window.baseUrl + '/ajax/saveTailSettings.action',
-            success: function() {
+            success: function()
+            {
                 tailWindow.close();
                 var mask = new Ext.LoadMask(Ext.getBody(), {msg:"Applying..."});
                 mask.show();
                 window.location.reload(true);
             },
-            failure: function(form, action) {
+            failure: function(form, action)
+            {
                 tailWindow.close();
                 switch (action.failureType) {
                     case Ext.form.Action.CONNECT_FAILURE:
@@ -1939,11 +1941,11 @@ Ext.extend(ZUTUBI.TailSettingsWindow, Ext.Window, {
 ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
     // window configuration defaults.
-    id:'pulse-file-system-browser',
-    layout:'fit',
-    width:300,
-    height:500,
-    closeAction:'close',
+    id: 'pulse-file-system-browser',
+    layout: 'fit',
+    width: 300,
+    height: 500,
+    closeAction: 'close',
     modal: true,
     plain: true,
 
@@ -1954,10 +1956,9 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
     showRoot: false,
     autoExpandRoot: true,
     rootBaseName: '',
+    basePath: '',
 
-    basePath : '',
-
-    defaultTreeConfig : {},
+    defaultTreeConfig: {},
 
     initComponent: function() {
 
@@ -1966,16 +1967,16 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         this.target = Ext.getCmp(this.target);
 
         var statusBar = new Ext.ux.StatusBar({
-            defaultText:'',
-            useDefaults:true
+            defaultText: '',
+            useDefaults: true
         });
 
         this.loader = new ZUTUBI.FSTreeLoader({
-            baseUrl:this.baseUrl,
-            fs:this.fs,
-            basePath:this.basePath,
-            showFiles:this.showFiles,
-            showHidden:this.showHidden
+            baseUrl: this.baseUrl,
+            fs: this.fs,
+            basePath: this.basePath,
+            showFiles: this.showFiles,
+            showHidden: this.showHidden
         });
 
         this.loader.on('beforeload', function()
@@ -2002,7 +2003,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             animate: false,
             autoScroll: true,
             bbar: statusBar,
-            rootVisible:this.showRoot,
+            rootVisible: this.showRoot,
             bodyStyle: 'padding: 10px'
         }, this.defaultTreeConfig));
 
@@ -2018,6 +2019,43 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         this.loader.on('loadexception', this.hideMask, this, {single:true});
 
         this.add(this.tree);
+
+        if (this.target)
+        {
+            this.submitButton = new Ext.Button({
+                text: 'ok',
+                disabled: true,
+                handler: function()
+                {
+                    var node = this.tree.getSelectionModel().getSelectedNode();
+                    var p = node.getPath('baseName');
+                    if (!this.tree.rootVisible)
+                    {
+                        p = p.substring(this.tree.root.attributes.baseName.length + 1);
+                    }
+
+                    if(p.length > 0 && p.substring(0, 1) == '/')
+                    {
+                        p = p.substring(1);
+                    }
+
+                    this.target.setValue(p);
+                    this.close();
+                }.createDelegate(this)
+            });
+            this.addButton(this.submitButton);
+
+            this.tree.getSelectionModel().on('selectionchange', this.onSelectionChange.createDelegate(this));
+        }        
+
+        this.closeButton = new Ext.Button({
+            text: 'cancel',
+            handler: function()
+            {
+                this.close();
+            }.createDelegate(this)
+        });
+        this.addButton(this.closeButton);
     },
 
     showMask: function()
@@ -2028,6 +2066,18 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
     hideMask: function() {
         this.initialLoadingMask.hide();
+    },
+
+    onSelectionChange: function(selectionModel, node) {
+        if (node)
+        {
+            this.submitButton.disabled && this.submitButton.enable();
+            node.ensureVisible();
+        }
+        else
+        {
+            this.submitButton.disabled || this.submitButton.disable();
+        }
     },
 
     show: function() {
@@ -2054,7 +2104,7 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
         this.fs = 'local';
         
         this.defaultTreeConfig = {
-            tbar : new Ext.Toolbar()
+            tbar: new Ext.Toolbar()
         };
 
         ZUTUBI.LocalFileSystemBrowser.superclass.initComponent.apply(this, arguments);
@@ -2062,17 +2112,17 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
         var toolbar = this.tree.getTopToolbar();
         var statusBar = this.tree.getBottomToolbar();
 
-        var uhbtn = new ZUTUBI.SelectNodeButton({
+        var userHomeButton = new ZUTUBI.SelectNodeButton({
             icon: this.baseUrl + '/images/house.gif',
             tooltip: 'go to user home',
             tree: this.tree
         });
-        var rbtn = new ZUTUBI.ReloadSelectedNodeButton({
+        var reloadButton = new ZUTUBI.ReloadSelectedNodeButton({
             icon: this.baseUrl + '/images/arrow_refresh.gif',
             tooltip: 'refresh folder',
             tree: this.tree
         });
-        var afbtn = new ZUTUBI.CreateFolderButton({
+        var createFolderButton = new ZUTUBI.CreateFolderButton({
             icon: this.baseUrl + '/images/folder_add.gif',
             tooltip: 'create new folder',
             baseUrl:this.baseUrl,
@@ -2080,28 +2130,28 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
             tree: this.tree,
             sbar: statusBar
         });
-        var dfbtn = new ZUTUBI.DeleteFolderButton({
+        var deleteFolderButton = new ZUTUBI.DeleteFolderButton({
             icon: this.baseUrl + '/images/folder_delete.gif',
             cls: 'x-btn-icon',
             tooltip: 'delete folder',
-            baseUrl:this.baseUrl,
-            basePath:this.basePath,
+            baseUrl: this.baseUrl,
+            basePath: this.basePath,
             tree: this.tree,
             sbar: statusBar
         });
 
-        toolbar.add(uhbtn);
+        toolbar.add(userHomeButton);
         toolbar.add('-');
-        toolbar.add(afbtn);
-        toolbar.add(dfbtn);
-        toolbar.add(rbtn);
+        toolbar.add(createFolderButton);
+        toolbar.add(deleteFolderButton);
+        toolbar.add(reloadButton);
 
         Ext.Ajax.request({
             url: this.baseUrl + '/ajax/getHome.action',
             success: function(rspObj)
             {
                 var data = Ext.util.JSON.decode(rspObj.responseText);
-                uhbtn.setPath(data.userHome);
+                userHomeButton.setPath(data.userHome);
             },
             failure: function(rspObj)
             {
@@ -2112,59 +2162,7 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
                 });
             }
         });
-
-        this.sbmtBtn = new Ext.Button({
-            text:'ok',
-            disabled:true,
-            handler: function()
-            {
-                var node = this.tree.getSelectionModel().getSelectedNode();
-                var p = node.getPath('baseName');
-                if (!this.tree.rootVisible)
-                {
-                    p = p.substring(this.tree.root.attributes.baseName.length + 1);
-                }
-
-                if(p.length > 0 && p.substring(0, 1) == '/')
-                {
-                    p = p.substring(1);
-                }
-
-                this.target.setValue(p);
-                // hax - this works because it is globally available.
-                // Not worth trying change this at the moment.
-                updateButtons();
-
-                this.close();
-            }.createDelegate(this)
-        });
-
-        this.clsBtn = new Ext.Button({
-            text: 'cancel',
-            handler: function()
-            {
-                this.close();
-            }.createDelegate(this)
-        });
-
-        this.addButton(this.sbmtBtn);
-        this.addButton(this.clsBtn);
-
-        this.tree.getSelectionModel().on('selectionchange', this.onSelectionChange.createDelegate(this));
-    },
-
-    onSelectionChange: function(selectionModel, node) {
-        if (node)
-        {
-            this.sbmtBtn.disabled && this.sbmtBtn.enable();
-            node.ensureVisible();
-        }
-        else
-        {
-            this.sbmtBtn.disabled || this.sbmtBtn.disable();
-        }
     }
-
 });
 
 ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
@@ -2172,31 +2170,21 @@ ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, 
     initComponent: function() {
 
         this.defaultTreeConfig = {
-            tbar : new Ext.Toolbar()
+            tbar: new Ext.Toolbar()
         };
 
         ZUTUBI.WorkingCopyFileSystemBrowser.superclass.initComponent.apply(this, arguments);
 
         var toolbar = this.tree.getTopToolbar();
 
-        var rbtn = new ZUTUBI.ReloadSelectedNodeButton({
+        var reloadButton = new ZUTUBI.ReloadSelectedNodeButton({
             icon: this.baseUrl + '/images/arrow_refresh.gif',
             tooltip: 'refresh',
             disabled: false,
             tree: this.tree
         });
 
-        toolbar.add(rbtn);
-
-        this.clsBtn = new Ext.Button({
-            text: 'close',
-            handler: function()
-            {
-                this.close();
-            }.createDelegate(this)
-        });
-
-        this.addButton(this.clsBtn);
+        toolbar.add(reloadButton);
     }
 });
 
@@ -2211,20 +2199,23 @@ ZUTUBI.SelectNodeButton = Ext.extend(Ext.Button, {
 
     cls: 'x-btn-icon',
 
-    initComponent : function() {
-        if (this.path === undefined) {
+    initComponent: function()
+    {
+        if (this.path === undefined)
+        {
             this.disabled = true;
         }
 
         ZUTUBI.SelectNodeButton.superclass.initComponent.apply(this, arguments);
     },
         
-    onClick : function()
+    onClick: function()
     {
         this.tree.selectConfigPath(this.path);
     },
 
-    setPath: function(path){
+    setPath: function(path)
+    {
         this.path = path;
         if (this.path !== undefined)
         {
@@ -2246,14 +2237,16 @@ ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
     cls: 'x-btn-icon',
     disabled: true,
 
-    initComponent: function() {
+    initComponent: function()
+    {
         
         ZUTUBI.ReloadSelectedNodeButton.superclass.initComponent.apply(this, arguments);
 
         this.tree.getSelectionModel().on('selectionchange', this.onNodeSelectionChange.createDelegate(this));
     },
 
-    onNodeSelectionChange: function(selectionModel, node) {
+    onNodeSelectionChange: function(selectionModel, node)
+    {
         if (this.canReload(node) && this.disabled)
         {
             this.enable();
@@ -2264,11 +2257,12 @@ ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
         }
     },
 
-    canReload: function(node) {
+    canReload: function(node)
+    {
         return !node || node.reload;
     },
 
-    onClick : function()
+    onClick: function()
     {
         if (!this.disabled)
         {
@@ -2284,8 +2278,10 @@ ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
 
 ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
 
-    initComponent : function() {
-        if (this.path === undefined) {
+    initComponent: function()
+    {
+        if (this.path === undefined)
+        {
             this.disabled = true;
         }
 
@@ -2294,7 +2290,8 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
         this.tree.getSelectionModel().on('selectionchange', this.onNodeSelectionChange.createDelegate(this));
     },
 
-    onNodeSelectionChange: function(selectionModel, node) {
+    onNodeSelectionChange: function(selectionModel, node)
+    {
         if (this.isFolder(node) && this.disabled)
         {
             this.enable();
@@ -2305,13 +2302,16 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
         }
     },
 
-    isFolder: function(node) {
+    isFolder: function(node)
+    {
         return node && node.reload;
     },
 
-    onClick: function(){
+    onClick: function()
+    {
         var that = this;
-        Ext.MessageBox.confirm('confirm', 'Are you sure you want to delete the folder?', function(btn){
+        Ext.MessageBox.confirm('confirm', 'Are you sure you want to delete the folder?', function(btn)
+        {
             if (btn == 'yes')
             {
                 that.onDelete();
@@ -2319,8 +2319,8 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
         });
     },
 
-    onDelete: function() {
-
+    onDelete: function()
+    {
         this.sbar.setStatus({
             text: 'Deleting folder...'
         });
@@ -2330,8 +2330,8 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
         Ext.Ajax.request({
             url: this.baseUrl + '/ajax/rmdir.action',
             params: {
-                path:path,
-                basePath:this.basePath
+                path: path,
+                basePath: this.basePath
             },
             success: this.onSuccess,
             failure: this.onFailure,
@@ -2339,7 +2339,8 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
         });
     },
 
-    onFailure : function(response, options){
+    onFailure: function(response, options)
+    {
         this.sbar.setStatus({
             text: 'Failed to delete folder.',
             iconCls: 'x-status-error',
@@ -2347,7 +2348,8 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
         });
     },
 
-    onSuccess : function(response, options){
+    onSuccess: function(response, options)
+    {
         // check for errors.
         var decodedResponse = Ext.util.JSON.decode(response.responseText);
         if (decodedResponse.actionErrors[0])
@@ -2389,10 +2391,12 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
  */
 ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
 
-    win : undefined,
+    win: undefined,
 
-    initComponent : function() {
-        if (this.path === undefined) {
+    initComponent: function()
+    {
+        if (this.path === undefined)
+        {
             this.disabled = true;
         }
 
@@ -2401,9 +2405,11 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
         this.tree.getSelectionModel().on('selectionchange', this.onNodeSelectionChange.createDelegate(this));
     },
 
-    onClick: function(){
+    onClick: function()
+    {
         var that = this;
-        Ext.MessageBox.prompt('create folder', 'folder name:', function(btn, txt) {
+        Ext.MessageBox.prompt('create folder', 'folder name:', function(btn, txt)
+        {
             if (btn == 'ok')
             {
                 that.onOk(txt);
@@ -2411,7 +2417,8 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
         });
     },
 
-    onOk: function(name) {
+    onOk: function(name)
+    {
 
         this.sbar.setStatus({
             text: 'Creating folder...'
@@ -2432,14 +2439,16 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
         });
     },
 
-    onFailure : function(response, options){
+    onFailure: function(response, options)
+    {
         this.sbar.setStatus({
             text: 'Failed to create folder.',
             clear: true // auto-clear after a set interval
         });
     },
 
-    onSuccess : function(response, options){
+    onSuccess: function(response, options)
+    {
         // check for errors.
         var decodedResponse = Ext.util.JSON.decode(response.responseText);
         if (decodedResponse.actionErrors[0])
@@ -2469,15 +2478,15 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
         }
         else
         {
-            this.tree.addNode(this.tree.getSelectedConfigPath(), name);
-            // newly added nodes have a text field rather than a baseName
-            var newFolder = selected.findChild('text', name);
+            this.tree.addNode(this.tree.getSelectedConfigPath(), { baseName: name, text: name, leaf: false });
+            var newFolder = selected.findChild('baseName', name);
             newFolder.attributes['baseName'] = name; // since everything else uses baseName, lets add it here.
             newFolder.select();
         }
     },
 
-    onNodeSelectionChange: function(selectionModel, node) {
+    onNodeSelectionChange: function(selectionModel, node)
+    {
         if (this.isFolder(node) && this.disabled)
         {
             this.enable();
@@ -2488,8 +2497,9 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
         }
     },
 
-    isFolder: function(node) {
-        return node && node.reload;
+    isFolder: function(node)
+    {
+        return node && !node.leaf;
     }
 });
 

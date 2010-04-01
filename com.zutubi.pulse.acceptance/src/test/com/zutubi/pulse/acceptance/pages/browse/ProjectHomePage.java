@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_REBUILD;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_TRIGGER;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_VIEW_SOURCE;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
 
@@ -33,6 +34,11 @@ public class ProjectHomePage extends ResponsibilityPage
     public boolean isRebuildActionPresent()
     {
         return isActionPresent(ACTION_REBUILD);
+    }
+
+    public boolean isViewWorkingCopyPresent()
+    {
+        return isActionPresent(ACTION_VIEW_SOURCE);
     }
 
     public String getUrl()

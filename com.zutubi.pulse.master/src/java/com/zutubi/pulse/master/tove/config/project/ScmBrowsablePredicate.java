@@ -58,7 +58,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
         try
         {
             AbstractPulseFileObject pfo = (AbstractPulseFileObject) fileSystemManager.resolveFile("pulse:///" + UriParser.encode(projectPath));
-            ProjectConfigProvider projectConfigProvider = pfo.getAncestor(ProjectConfigProvider.class);
+            ProjectConfigProvider projectConfigProvider = (ProjectConfigProvider)pfo;
             if (projectConfigProvider != null && projectConfigProvider.getProjectConfig() != null)
             {
                 ProjectConfiguration projectConfig = projectConfigProvider.getProjectConfig();

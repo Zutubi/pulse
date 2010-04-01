@@ -447,12 +447,12 @@
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MkdirAction">
+        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MakeDirectoryAction">
             <result name="success" type="json">mkdir.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RmAction">
+        <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RemoveDirectoryAction">
             <result name="success" type="json">rmdir.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
@@ -514,7 +514,7 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
-        <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeAction">
+        <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeDirectoryAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">data</result>
         </action>

@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.util.FileSystemUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -67,7 +68,7 @@ public class NamedFileArtifactFileObject extends AbstractPulseFileObject impleme
         String basePath = getArtifactBase().getAbsolutePath();
         String artifactPath = file.getAbsolutePath();
         String path = artifactPath.substring(basePath.length() + 1);
-        path = path.replace('\\', '/');
+        path = FileSystemUtils.normaliseSeparators(path);
 
         return "/file/artifacts/" + getArtifact().getId() + "/" + path;
     }

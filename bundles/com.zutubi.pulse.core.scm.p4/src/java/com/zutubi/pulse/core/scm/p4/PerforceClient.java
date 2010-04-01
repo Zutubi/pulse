@@ -79,7 +79,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                 }
 
                 // Separators must be normalised
-                localFile = localFile.replace('\\', '/');
+                localFile = FileSystemUtils.normaliseSeparators(localFile);
                 if (localFile.startsWith("/"))
                 {
                     localFile = localFile.substring(1);
