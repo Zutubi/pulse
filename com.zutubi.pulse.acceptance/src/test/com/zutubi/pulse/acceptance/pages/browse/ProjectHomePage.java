@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_REBUILD;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_TRIGGER;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_VIEW_SOURCE;
@@ -39,6 +40,12 @@ public class ProjectHomePage extends ResponsibilityPage
     public boolean isViewWorkingCopyPresent()
     {
         return isActionPresent(ACTION_VIEW_SOURCE);
+    }
+
+    public PulseFileSystemBrowserWindow viewWorkingCopy()
+    {
+        clickAction(ACTION_VIEW_SOURCE);
+        return new PulseFileSystemBrowserWindow(browser);
     }
 
     public String getUrl()

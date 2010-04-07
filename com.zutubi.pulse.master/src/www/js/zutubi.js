@@ -1981,12 +1981,14 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
         this.loader.on('beforeload', function()
         {
+            this.loading = true;
             statusBar.setStatus({text: 'Loading...'});
-        });
+        }, this);
         this.loader.on('load', function()
         {
             statusBar.clearStatus();
-        });
+            this.loading = false;
+        }, this);
         this.loader.on('loadexception', function()
         {
             statusBar.setStatus({
@@ -1994,7 +1996,8 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
                 iconCls: 'x-status-error',
                 clear: true
             });
-        });
+            this.loading = false;
+        }, this);
 
         this.tree = new ZUTUBI.ConfigTree(Ext.apply({
             loader: this.loader,

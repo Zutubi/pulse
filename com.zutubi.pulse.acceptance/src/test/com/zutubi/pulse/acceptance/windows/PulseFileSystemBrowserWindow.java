@@ -27,6 +27,11 @@ public class PulseFileSystemBrowserWindow
         browser.waitForElement(BROWSER_ID);
     }
 
+    public void waitForLoading()
+    {
+        browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + BROWSER_ID + "').loading === false");
+    }
+
     public void clickOk()
     {
         // would be quicker if we add an id to the field?
@@ -76,5 +81,15 @@ public class PulseFileSystemBrowserWindow
     private String toSelector(String linkText)
     {
         return "link=" + linkText + "";
+    }
+
+    public String getHeader()
+    {
+        return browser.getText("//div[@id='" + BROWSER_ID + "']//span[contains(@class, 'x-window-header-text')]");
+    }
+
+    public String getStatus()
+    {
+        return browser.getText("//div[@id='" + BROWSER_ID + "']//div[contains(@class, 'x-status-text')]");
     }
 }
