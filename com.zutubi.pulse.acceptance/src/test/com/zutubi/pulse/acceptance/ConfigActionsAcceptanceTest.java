@@ -43,7 +43,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(random, false);
         loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
-        projectConfigPage.clickAction("clean");
+        projectConfigPage.clickAction(ProjectConfigurationActions.ACTION_MARK_CLEAN);
         waitForStatus("the next build on each agent will be clean");
     }
 

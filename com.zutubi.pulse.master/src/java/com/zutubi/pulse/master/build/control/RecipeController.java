@@ -3,7 +3,9 @@ package com.zutubi.pulse.master.build.control;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.*;
@@ -14,6 +16,7 @@ import com.zutubi.pulse.core.model.ResultCustomFields;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.MasterBuildProperties;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -27,6 +30,8 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
@@ -37,12 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import java.util.Set;
 
 /**
  *
@@ -53,6 +53,7 @@ public class RecipeController
 
     private ProjectConfiguration projectConfiguration;
     private BuildResult buildResult;
+    private Set<Long> forceCleanAgents;
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeAssignmentRequest assignmentRequest;
@@ -79,10 +80,11 @@ public class RecipeController
     private RecipeDispatchService recipeDispatchService;
     private ScmManager scmManager;
 
-    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
+    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, Set<Long> forceCleanAgents)
     {
         this.projectConfiguration = projectConfiguration;
         this.buildResult = buildResult;
+        this.forceCleanAgents = forceCleanAgents;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.assignmentRequest = assignmentRequest;
@@ -198,7 +200,7 @@ public class RecipeController
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HOST_ID, agent.getHost().getId());
-        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
+        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(forceCleanAgents.contains(agent.getId())));
 
         addScmProperties(agentContext);
 

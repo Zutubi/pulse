@@ -48,6 +48,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
@@ -61,8 +62,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -1378,12 +1377,12 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         RecipeRequest request = rde.getRequest();
         ProjectConfiguration projectConfig = getProjectConfig(request.getProject(), true);
-        if(projectConfig != null)
+        if (projectConfig != null)
         {
             Project project = projectDao.findById(projectConfig.getProjectId());
-            if(ProjectPredicates.exists(project))
+            if (ProjectPredicates.exists(project))
             {
-                if(project.clearForceCleanForAgent(rde.getAgent().getId()))
+                if (project.clearForceCleanForAgent(rde.getAgent().getId()))
                 {
                     projectDao.save(project);
                 }
