@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
@@ -13,6 +13,7 @@ public abstract class AbstractLogPage extends SeleniumPage
     {
         super(browser, urls, id);
     }
+    
     public boolean isDownloadLinkAvailable()
     {
         return browser.isElementIdPresent("link=full log");

@@ -20,6 +20,8 @@ import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.utils.SubversionWorkspace;
+import com.zutubi.pulse.core.BootstrapCommand;
+import com.zutubi.pulse.core.BootstrapCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
@@ -33,6 +35,7 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
+import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -64,8 +67,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -384,7 +385,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
         ensureProject(projectName);
-        assignStageToMasterAgent(projectName, "default");
+        assignStageToAgent(projectName, "default", MASTER_AGENT_NAME);
         xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
         loginAsAdmin();
@@ -411,7 +412,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
         ensureProject(projectName);
-        assignStageToMasterAgent(projectName, "default");
+        assignStageToAgent(projectName, "default", MASTER_AGENT_NAME);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
         xmlRpcHelper.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
@@ -829,7 +830,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(optionsPath, options, false);
 
         setSchemeToIncrementalUpdate(random);
-        assignStageToMasterAgent(random, "default");
+        assignStageToAgent(random, "default", MASTER_AGENT_NAME);
 
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
@@ -842,7 +843,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailure() throws Exception
     {
-        String projectPath = createProjectWithTwoAntStages("nosuchbuildfile.xml", "another-stage");
+        String projectPath = createProjectWithTwoAntStages(random, "nosuchbuildfile.xml", "another-stage");
         setTerminateStageOnFailure(projectPath);
 
         long buildId = xmlRpcHelper.runBuild(random, ResultState.ERROR.getPrettyString(), BUILD_TIMEOUT);
@@ -854,7 +855,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailureStageSucceeds() throws Exception
     {
-        String projectPath = createProjectWithTwoAntStages("build.xml", "another-stage");
+        String projectPath = createProjectWithTwoAntStages(random, "build.xml", "another-stage");
         setTerminateStageOnFailure(projectPath);
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
@@ -866,7 +867,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailureLimit() throws Exception
     {
-        String projectPath = createProjectWithTwoAntStages("nosuchbuildfile.xml", "another-stage");
+        String projectPath = createProjectWithTwoAntStages(random, "nosuchbuildfile.xml", "another-stage");
         String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
         Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
         options.put("stageFailureLimit", 1);
@@ -902,41 +903,50 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         final String SECOND_STAGE_NAME = "stage-left";
 
-        String projectPath = createProjectWithTwoAntStages("build.xml", SECOND_STAGE_NAME);
-        setSchemeToIncrementalUpdate(random);
+        String projectName = random + "-project";
+        String agentName = random + "-agent";
 
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
-        xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        Hashtable<String, Object> agent = xmlRpcHelper.createEmptyConfig("zutubi.agentConfig");
+        agent.put("name", agentName);
+        agent.put("remote", false);
 
-        loginAsAdmin();
+        String agentPath = xmlRpcHelper.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
 
-        StageLogPage logPage = browser.openAndWaitFor(StageLogPage.class, random, buildId, ProjectConfigurationWizard.DEFAULT_STAGE);
-        logPage.clickDownloadLink();
-        waitForBuildFileCheckout();
-
-        logPage = browser.openAndWaitFor(StageLogPage.class, random, buildId, SECOND_STAGE_NAME);
-        logPage.clickDownloadLink();
-        waitForBuildFileCheckout();
-    }
-
-    private void waitForBuildFileCheckout()
-    {
-        final Pattern regex = Pattern.compile("A    .*build.xml");
-        browser.refreshUntil(BUILD_TIMEOUT, new Condition()
+        try
         {
-            public boolean satisfied()
-            {
-                Matcher matcher = regex.matcher(browser.getBodyText());
-                return matcher.find();
-            }
-        }, "build.xml checkout to appear in log");
+            String projectPath = createProjectWithTwoAntStages(projectName, "build.xml", SECOND_STAGE_NAME);
+            setSchemeToIncrementalUpdate(projectName);
+
+            // First build establishes directories for both stages on master agent.
+            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            // For the next build, mark clean, but send the second stage to a
+            // different agent.
+            assignStageToAgent(projectName, SECOND_STAGE_NAME, agentName);
+            xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
+            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            // Finally, set the second stage back to the original agent.  Check
+            // that it does not end up with the directory from the first build.
+            // This is verified by ensuring the build.xml file is checked out.
+            assignStageToAgent(projectName, SECOND_STAGE_NAME, AgentManager.MASTER_AGENT_NAME);
+            long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            loginAsAdmin();
+
+            browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, SECOND_STAGE_NAME, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
+            assertTextPresent("build.xml");
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(agentPath);
+        }
     }
 
-    private String createProjectWithTwoAntStages(String buildFile, String secondStageName) throws Exception
+    private String createProjectWithTwoAntStages(String projectName, String buildFile, String secondStageName) throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
-        assignStageToMasterAgent(random, ProjectConfigurationWizard.DEFAULT_STAGE);
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
+        assignStageToAgent(projectName, ProjectConfigurationWizard.DEFAULT_STAGE, MASTER_AGENT_NAME);
         Hashtable<String, String> keys = new Hashtable<String, String>();
         keys.put(ProjectConfigurationWizard.DEFAULT_STAGE, secondStageName);
         xmlRpcHelper.cloneConfig(PathUtils.getPath(projectPath, Project.STAGES), keys);
@@ -1016,11 +1026,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.waitForProjectToInitialise(projectName);
     }
 
-    private void assignStageToMasterAgent(String projectName, String stageName) throws Exception
+    private void assignStageToAgent(String projectName, String stageName, String agentName) throws Exception
     {
         String stagePath = getPath(PROJECTS_SCOPE, projectName, "stages", stageName);
         Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(AGENTS_SCOPE, MASTER_AGENT_NAME));
+        defaultStage.put("agent", getPath(AGENTS_SCOPE, agentName));
         xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
     }
 

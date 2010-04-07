@@ -4,15 +4,14 @@ import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
 import com.zutubi.tove.variables.VariableResolver;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
-import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
 
 /**
  * The server recipe paths, which by default live at:
@@ -65,13 +64,18 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
+        return resolveStageDir(recipeDetails.getStage(), recipeDetails.getStageHandle());
+    }
+
+    public File resolveStageDir(String stage, long stageHandle)
+    {
         VariableMap references = new HashVariableMap();
         references.add(new GenericVariable<String>("agent.data.dir", getAgentDataDir().getAbsolutePath()));
         references.add(new GenericVariable<String>("data.dir", dataDir.getAbsolutePath()));
         references.add(new GenericVariable<String>("project", encodeFilenameComponent(recipeDetails.getProject())));
         references.add(new GenericVariable<String>("project.handle", Long.toString(recipeDetails.getProjectHandle())));
-        references.add(new GenericVariable<String>("stage", encodeFilenameComponent(recipeDetails.getStage())));
-        references.add(new GenericVariable<String>("stage.handle", Long.toString(recipeDetails.getStageHandle())));
+        references.add(new GenericVariable<String>("stage", encodeFilenameComponent(stage)));
+        references.add(new GenericVariable<String>("stage.handle", Long.toString(stageHandle)));
 
         try
         {

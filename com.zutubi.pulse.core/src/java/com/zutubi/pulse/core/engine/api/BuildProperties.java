@@ -162,6 +162,12 @@ public class BuildProperties
      */
     public static final String PROPERTY_SCM_CONFIGURATION       = "scm.config";
     /**
+     * Temporary property to solve CIB-2416: this contains a list of pairs,
+     * each pair holding a stage handle and name.  Only present for clean
+     * builds.
+     */
+    public static final String PROPERTY_STAGE_PAIRS             = "stage.pairs";
+    /**
      * The number of times the project has been built successfully before the
      * running build.
      */

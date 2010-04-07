@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.commands.api.CommandConfigurationSupport;
  */
 public class BootstrapCommandConfiguration extends CommandConfigurationSupport
 {
+    public static final String COMMAND_NAME = "bootstrap";
     public static final String OUTPUT_NAME = "bootstrap output";
     public static final String FILES_FILE = "files.txt";
 
@@ -15,7 +16,7 @@ public class BootstrapCommandConfiguration extends CommandConfigurationSupport
     {
         super(BootstrapCommand.class);
         this.bootstrapper = bootstrapper;
-        setName("bootstrap");
+        setName(COMMAND_NAME);
     }
 
     public Bootstrapper getBootstrapper()

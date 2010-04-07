@@ -10,12 +10,14 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.*;
+import com.zutubi.util.Pair;
 import com.zutubi.util.WebUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * The Project Repo Bootstrapper checks out a project into the:
@@ -47,8 +49,17 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
         checkForOldWorkDir(context, persistentWorkDir);
 
-        // run the scm bootstrapper on the local directory,
         boolean cleanBuild = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, false);
+
+        // This is a temporary solution for CIB-2416.  It can be removed when
+        // persistent messaging is used to clean agents.
+        if (cleanBuild && paths instanceof ServerRecipePaths)
+        {
+            @SuppressWarnings({"unchecked"})
+            List<Pair<Long, String>> stagePairs = context.getValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_PAIRS, List.class);
+            cleanAllStages((ServerRecipePaths)paths, stagePairs);
+        }
+
         childBootstrapper = selectBootstrapper(cleanBuild, persistentWorkDir);
 
         RecipePaths mungedPaths = new RecipePaths()
@@ -136,6 +147,21 @@ public class ProjectRepoBootstrapper implements Bootstrapper
                     {
                         writeStatusMessage(context, "Move failed.  A new working directory will be used.");
                     }
+                }
+            }
+        }
+    }
+
+    private void cleanAllStages(ServerRecipePaths serverRecipePaths, List<Pair<Long, String>> stagePairs)
+    {
+        if (stagePairs != null)
+        {
+            for (Pair<Long, String> stagePair: stagePairs)
+            {
+                File stageDir = serverRecipePaths.resolveStageDir(stagePair.second, stagePair.first);
+                if (stageDir.exists() && !rmdir(stageDir))
+                {
+                    throw new BuildException("Unable to remove directory '" + stageDir.getAbsolutePath() + "'");
                 }
             }
         }

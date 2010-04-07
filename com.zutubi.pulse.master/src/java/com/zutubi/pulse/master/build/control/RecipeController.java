@@ -33,13 +33,16 @@ import com.zutubi.pulse.master.model.ResourceManager;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -200,7 +203,19 @@ public class RecipeController
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HOST_ID, agent.getHost().getId());
-        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(forceCleanAgents.contains(agent.getId())));
+
+        boolean clean = forceCleanAgents.contains(agent.getId());
+        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(clean));
+        if (clean)
+        {
+            List<Pair<Long, String>> stagePairs = new LinkedList<Pair<Long, String>>();
+            for (BuildStageConfiguration stage: projectConfiguration.getStages().values())
+            {
+                stagePairs.add(new Pair<Long, String>(stage.getHandle(), stage.getName()));
+            }
+
+            agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_PAIRS, stagePairs);
+        }
 
         addScmProperties(agentContext);
 
