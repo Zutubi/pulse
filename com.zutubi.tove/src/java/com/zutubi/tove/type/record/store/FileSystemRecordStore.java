@@ -6,6 +6,7 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -509,9 +510,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void insert(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new TransactionManager.Executable()
+        transactionManager.runInTransaction(new NullaryFunction()
         {
-            public Object execute()
+            public Object process()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_INSERT, path, record, nextJournalEntryId++);
 
@@ -525,9 +526,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void update(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new TransactionManager.Executable()
+        transactionManager.runInTransaction(new NullaryFunction()
         {
-            public Object execute()
+            public Object process()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
@@ -540,9 +541,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public Record delete(final String path)
     {
-        return (Record) transactionManager.runInTransaction(new TransactionManager.Executable()
+        return (Record) transactionManager.runInTransaction(new NullaryFunction()
         {
-            public Object execute()
+            public Object process()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_DELETE, path, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
@@ -564,9 +565,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void importRecords(final Record record)
     {
-        transactionManager.runInTransaction(new TransactionManager.Executable()
+        transactionManager.runInTransaction(new NullaryFunction()
         {
-            public Object execute()
+            public Object process()
             {
                 activeJournal.add(new JournalEntry(ACTION_IMPORT, "", record, nextJournalEntryId++));
                 inMemoryDelegate.importRecords(record);

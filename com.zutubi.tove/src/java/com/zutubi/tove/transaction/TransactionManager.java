@@ -1,6 +1,7 @@
 package com.zutubi.tove.transaction;
 
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -231,7 +232,7 @@ public class TransactionManager
         return activeTransaction.getStatus();
     }
 
-    public Object runInTransaction(Executable action, TransactionResource... resources)
+    public Object runInTransaction(NullaryFunction action, TransactionResource... resources)
     {
         // ensure that we are part of the transaction.
         boolean activeTransaction = getTransaction() != null;
@@ -250,7 +251,7 @@ public class TransactionManager
         {
             try
             {
-                Object result = action.execute();
+                Object result = action.process();
 
                 // execute a manual transaction.
                 commit();
@@ -272,7 +273,7 @@ public class TransactionManager
         {
             try
             {
-                return action.execute();
+                return action.process();
             }
             catch (RuntimeException e)
             {
@@ -285,10 +286,5 @@ public class TransactionManager
                 throw new RuntimeException(t);
             }
         }
-    }
-
-    public static interface Executable
-    {
-        Object execute();
     }
 }

@@ -11,6 +11,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,9 +58,9 @@ public class ConfigurationStateManager
         if (manager != null)
         {
             final long[] hax = {-1};
-            transactionManager.runInTransaction(new TransactionManager.Executable()
+            transactionManager.runInTransaction(new NullaryFunction()
             {
-                public Object execute()
+                public Object process()
                 {
                     CompositeType type = typeRegistry.getType(instance.getClass());
 

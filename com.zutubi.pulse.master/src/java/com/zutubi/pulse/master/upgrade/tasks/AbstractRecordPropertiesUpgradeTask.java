@@ -4,6 +4,8 @@ import com.zutubi.pulse.master.upgrade.UpgradeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.List;
 import java.util.Map;
@@ -34,25 +36,33 @@ import java.util.Map;
 public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgradeTask
 {
     protected RecordManager recordManager;
+    protected TransactionManager transactionManager;
 
     public void execute() throws UpgradeException
     {
-        RecordLocator recordLocator = getRecordLocator();
-        List<RecordUpgrader> recordUpgraders = getRecordUpgraders();
+        final RecordLocator recordLocator = getRecordLocator();
+        final List<RecordUpgrader> recordUpgraders = getRecordUpgraders();
         wireExternalDependencies(recordLocator, recordUpgraders);
 
-        Map<String, Record> recordsToUpgrade = recordLocator.locate(recordManager);
-        for (Map.Entry<String, Record> recordEntry: recordsToUpgrade.entrySet())
+        transactionManager.runInTransaction(new NullaryFunction()
         {
-            String path = recordEntry.getKey();
-            MutableRecord mutableRecord = recordEntry.getValue().copy(false, true);
-            for (RecordUpgrader upgrader: recordUpgraders)
+            public Object process()
             {
-                upgrader.upgrade(path, mutableRecord);
-            }
+                Map<String, Record> recordsToUpgrade = recordLocator.locate(recordManager);
+                for (Map.Entry<String, Record> recordEntry: recordsToUpgrade.entrySet())
+                {
+                    String path = recordEntry.getKey();
+                    MutableRecord mutableRecord = recordEntry.getValue().copy(false, true);
+                    for (RecordUpgrader upgrader: recordUpgraders)
+                    {
+                        upgrader.upgrade(path, mutableRecord);
+                    }
 
-            recordManager.update(path, mutableRecord);
-        }
+                    recordManager.update(path, mutableRecord);
+                }
+                return null;
+            }
+        });
     }
 
     private void wireExternalDependencies(RecordLocator recordLocator, List<RecordUpgrader> recordUpgraders) throws UpgradeException
@@ -99,5 +109,10 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void setPulseTransactionManager(TransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
     }
 }
