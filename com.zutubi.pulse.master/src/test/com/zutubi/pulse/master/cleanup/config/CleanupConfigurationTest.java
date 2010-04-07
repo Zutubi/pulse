@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.util.Constants;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.List;
 
 public class CleanupConfigurationTest extends MasterPersistenceTestCase
@@ -52,58 +52,66 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     {
         CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = workBuildsRule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b3), results);
+        EqualityAssertions.assertEquals(asList(b3), results);
     }
 
     public void testAllAfterBuilds()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3), results);
+        EqualityAssertions.assertEquals(asList(b1, b2, b3), results);
+    }
+
+    public void testAllAfterBuildsWorkSet()
+    {
+        CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.BUILDS);
+        allBuildsRule.setWhat(asList(CleanupWhat.WORKING_COPY_SNAPSHOT));
+        List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
+        EqualityAssertions.assertEquals(asList(b1, b2, b3), results);
     }
 
     public void testWorkAfterDays()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.DAYS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b3, b4), results);
+        EqualityAssertions.assertEquals(asList(b3, b4), results);
     }
 
     public void testAllAfterDays()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.DAYS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3, b4), results);
+        EqualityAssertions.assertEquals(asList(b1, b2, b3, b4), results);
     }
 
     public void testStatesBuilds()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.BUILDS);
+        CleanupConfiguration rule = new CleanupConfiguration(null, asList(ResultState.SUCCESS), 1, CleanupUnit.BUILDS);
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b1, b3), results);
+        EqualityAssertions.assertEquals(asList(b1, b3), results);
     }
 
     public void testStatesDays()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
+        CleanupConfiguration rule = new CleanupConfiguration(null, asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
+        EqualityAssertions.assertEquals(asList(b1, b3, b4), results);
     }
 
     public void testSingleStatus()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
-        rule.setStatuses(Arrays.asList(STATUS_INTEGRATION));
+        CleanupConfiguration rule = new CleanupConfiguration(null, asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
+        rule.setStatuses(asList(STATUS_INTEGRATION));
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b3), results);
+        EqualityAssertions.assertEquals(asList(b3), results);
     }
 
     public void testMultipleStatuses()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
-        rule.setStatuses(Arrays.asList(STATUS_INTEGRATION, STATUS_MILESTONE));
+        CleanupConfiguration rule = new CleanupConfiguration(null, asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
+        rule.setStatuses(asList(STATUS_INTEGRATION, STATUS_MILESTONE));
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
-        EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
+        EqualityAssertions.assertEquals(asList(b1, b3, b4), results);
     }
 
     private BuildResult createBuild(Project project, long number, long startTime, ResultState state, boolean hasWorkDir, String status)

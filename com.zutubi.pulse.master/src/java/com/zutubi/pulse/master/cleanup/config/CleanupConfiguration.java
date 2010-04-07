@@ -126,16 +126,6 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
 
     public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao)
     {
-        // The build query allows us to filter on builds that have working directories or not.  If
-        // the cleanup rule is only for builds with working directories, we can make use of this filter
-        // to optimise the query.  If things other than the working directories are being cleaned, then
-        // we can not make use of the filter.
-        Boolean filterHasWorkDir = null;
-        if(what != null && what.size() == 1 && what.contains(CleanupWhat.WORKING_COPY_SNAPSHOT))
-        {
-            filterHasWorkDir = true;
-        }
-
         ResultState[] allowedStates = null;
         if (states != null)
         {
@@ -157,6 +147,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
         }
 
         List<BuildResult> results = new LinkedList<BuildResult>();
+        Boolean filterHasWorkDir = getFilterByWorkDir();
         if(unit == CleanupUnit.BUILDS)
         {
             // See if there are too many builds of our states.  We assume here
@@ -175,5 +166,21 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, filterHasWorkDir, -1, -1, false));
         }
         return results;
+    }
+
+    private Boolean getFilterByWorkDir()
+    {
+        // The build query allows us to filter on builds that have working directories or not.  If
+        // the cleanup rule is only for builds with working directories, we can make use of this filter
+        // to optimise the query.  If things other than the working directories are being cleaned, then
+        // we can not make use of the filter.
+        if (!cleanupAll && what != null && what.size() == 1 && what.contains(CleanupWhat.WORKING_COPY_SNAPSHOT))
+        {
+            return true;
+        }
+        else
+        {
+            return null;
+        }
     }
 }
