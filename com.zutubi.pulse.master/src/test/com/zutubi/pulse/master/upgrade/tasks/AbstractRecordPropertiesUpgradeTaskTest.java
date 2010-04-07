@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.upgrade.UpgradeException;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.transaction.TransactionManager;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -18,11 +19,13 @@ public class AbstractRecordPropertiesUpgradeTaskTest extends PulseTestCase
     private static final String SYMBOLIC_NAME = "symname";
 
     private RecordManager recordManager;
+    private TransactionManager transactionManager;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         recordManager = mock(RecordManager.class);
+        transactionManager = new TransactionManager();
     }
 
     public void testExecute() throws UpgradeException
@@ -40,6 +43,7 @@ public class AbstractRecordPropertiesUpgradeTaskTest extends PulseTestCase
 
         TrivialRecordPropertiesUpgradeTask task = new TrivialRecordPropertiesUpgradeTask(locator, upgrader1, upgrader2);
         task.setRecordManager(recordManager);
+        task.setPulseTransactionManager(transactionManager);
         task.execute();
 
         // Should only locate once, and should pass the records to the
