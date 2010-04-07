@@ -4,6 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.security.LastAccessManager;
 import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.util.TimeStamps;
+import com.zutubi.util.Constants;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,7 +40,13 @@ public class UserConfigurationStateDisplay implements MessagesAware
                 dayAndTime = LAST_ACCESS_FORMAT.format(new Date(time));
             }
 
-            return messages.format("lastAccess.format", dayAndTime, TimeStamps.getPrettyElapsed(System.currentTimeMillis() - time));
+            long elapsed = System.currentTimeMillis() - time;
+            if (elapsed < Constants.SECOND)
+            {
+                return messages.format("lastAccess.now");
+            }
+            int maxUnits = (elapsed < Constants.MINUTE) ? 1 : 2;
+            return messages.format("lastAccess.format", dayAndTime, TimeStamps.getPrettyElapsed(elapsed, maxUnits));
         }
 
         return messages.format("lastAccess.never");

@@ -26,6 +26,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 {
     private static final String STATE_LAST_ACCESS = "lastAccess";
     private static final String ACCESS_NEVER = "never";
+    private static final String ACCESS_NOW = "now";
 
     @Override
     protected void setUp() throws Exception
@@ -78,6 +79,17 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         userPage.openAndWaitFor();
         assertFalse(userPage.getStateField(STATE_LAST_ACCESS).equals(ACCESS_NEVER));
+    }
+
+    public void testLastAccessTimeForSelf()
+    {
+        loginAsAdmin();
+        CompositePage userPage = browser.openAndWaitFor(CompositePage.class, "users/admin");
+
+        assertTrue(userPage.isStateFieldPresent(STATE_LAST_ACCESS));
+        assertEquals(ACCESS_NOW, userPage.getStateField(STATE_LAST_ACCESS));
+
+        logout();
     }
 
     public void testPrimaryContactPointCreation()
