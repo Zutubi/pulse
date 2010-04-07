@@ -20,7 +20,7 @@ public class StatusMappingConfiguration extends AbstractConfiguration implements
 {
     @Required
     private int code;
-    @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private ResultState status;
 
     public int getCode()
