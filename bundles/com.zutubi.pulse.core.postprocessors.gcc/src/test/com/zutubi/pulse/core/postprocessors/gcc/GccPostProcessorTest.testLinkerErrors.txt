@@ -1,0 +1,2 @@
+/tmp/ccYjFg0f.o:main.c:(.text+0x2b): undefined reference to `_doit'
+collect2: ld returned 1 exit status

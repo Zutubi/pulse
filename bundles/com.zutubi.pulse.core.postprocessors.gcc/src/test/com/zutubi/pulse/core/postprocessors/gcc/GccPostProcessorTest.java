@@ -32,6 +32,15 @@ public class GccPostProcessorTest extends PostProcessorTestCase
         ));
     }
 
+    public void testLinkerErrors() throws Exception
+    {
+        TestPostProcessorContext context = runProcessor(pp);
+        assertThat(context.getFeatures(), hasOrderedErrors(
+                "/tmp/ccYjFg0f.o:main.c:(.text+0x2b): undefined reference to `_doit'",
+                "collect2: ld returned 1 exit status"
+        ));
+    }
+
     public void testWarnings() throws Exception
     {
         TestPostProcessorContext context = runProcessor(pp);
