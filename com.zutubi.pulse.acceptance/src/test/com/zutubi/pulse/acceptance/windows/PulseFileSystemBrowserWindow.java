@@ -55,7 +55,7 @@ public class PulseFileSystemBrowserWindow
             {
                 return !isWindowPresent();
             }
-        }, CLOSE_TIMEOUT, "Window did not close in time.");
+        }, CLOSE_TIMEOUT, "window to close");
     }
 
     private String buttonLocator(String buttonText)
