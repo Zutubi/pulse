@@ -5,7 +5,7 @@ import com.zutubi.util.Mapping;
 /**
  * Maps from entities to their ids.
  */
-public class ToEntityIdMapping<T extends Entity> implements Mapping<T, Long>
+public class EntityToIdMapping<T extends Entity> implements Mapping<T, Long>
 {
     public Long map(T t)
     {

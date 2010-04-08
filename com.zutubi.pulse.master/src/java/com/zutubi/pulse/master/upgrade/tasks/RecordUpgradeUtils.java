@@ -45,6 +45,4 @@ public class RecordUpgradeUtils
             return new HashSet<String>(WebUtils.splitAndDecode(',', hidden));
         }
     }
-
-
 }

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.core.model.ToEntityIdMapping;
+import com.zutubi.pulse.core.model.EntityToIdMapping;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.CompositeMapping;
 import com.zutubi.util.ToStringMapping;
@@ -78,7 +78,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
             List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project, MAX_BUILDS);
             List<String> buildIds = CollectionUtils.map(builds, 
-                    new CompositeMapping<BuildResult, Long, String>(new ToEntityIdMapping(), new ToStringMapping())
+                    new CompositeMapping<BuildResult, Long, String>(new EntityToIdMapping(), new ToStringMapping())
             );
             return buildIds.toArray(new String[buildIds.size()]);
         }
