@@ -361,6 +361,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
             return false;
         }
 
+        // reset the filter to ensure that what we need is available.
+        page.resetFilter();
+
         // if artifacts are available, we should have the build command open in the tree.
         browser.waitForLocator(page.getArtifactLocator("environment"));
         return page.isArtifactAvailable("environment");

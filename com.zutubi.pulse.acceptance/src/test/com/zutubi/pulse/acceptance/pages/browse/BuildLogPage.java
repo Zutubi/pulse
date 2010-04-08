@@ -8,8 +8,8 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class BuildLogPage extends AbstractLogPage
 {
-    private String project;
-    private String buildNumber;
+    protected String project;
+    protected String buildNumber;
 
     public BuildLogPage(SeleniumBrowser browser, Urls urls, String projectName, long buildNumber)
     {

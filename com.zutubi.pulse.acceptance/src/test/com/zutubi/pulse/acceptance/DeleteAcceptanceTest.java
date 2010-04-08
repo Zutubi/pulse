@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
+import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -26,9 +27,9 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 {
     private static final String ACTION_DELETE_RECORD = "delete record";
     private static final String ACTION_DELETE_BUILDS = "delete all build results";
-    private static final String ACTION_HIDE_RECORD   = "hide record";
+    private static final String ACTION_HIDE_RECORD = "hide record";
 
-    private static final String ACTION_RESTORE       = "restore";
+    private static final String ACTION_RESTORE = "restore";
 
     protected void setUp() throws Exception
     {
@@ -160,7 +161,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         confirmPage.clickCancel();
         hierarchyPage.waitFor();
         logout();
-        
+
         login(noAuthLogin, "");
         hierarchyPage.openAndWaitFor();
         confirmPage = hierarchyPage.clickDelete();
@@ -212,7 +213,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectName = "project-" + random;
         String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
 
-        Hashtable <String, Object> stage = xmlRpcHelper.createEmptyConfig(BuildStageConfiguration.class);
+        Hashtable<String, Object> stage = xmlRpcHelper.createEmptyConfig(BuildStageConfiguration.class);
         stage.put("name", "agent");
         stage.put("agent", agentPath);
         stage.put("recipe", "");
@@ -238,7 +239,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     {
         String path = xmlRpcHelper.insertTrivialUser(random);
         loginAsAdmin();
-        
+
         ListPage usersPage = browser.openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
         assertItemPresent(usersPage, random, null, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE, UserConfigurationActions.ACTION_SET_PASSWORD);
         DeleteConfirmPage confirmPage = usersPage.clickDelete(random);
@@ -252,7 +253,10 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void testHideMapItem() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String templateProjectName = random + "-parent";
+        setupTemplateProjectWithDefaultCleanup(templateProjectName);
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
         loginAsAdmin();
         String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
@@ -276,7 +280,10 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void testCancelHide() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String templateProjectName = random + "-parent";
+        setupTemplateProjectWithDefaultCleanup(templateProjectName);
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
         loginAsAdmin();
         String cleanupssPath = PathUtils.getPath(projectPath, "cleanup");
@@ -292,12 +299,23 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
     }
 
+    private void setupTemplateProjectWithDefaultCleanup(String name) throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(name, true);
+
+        CleanupTestUtils cleanupUtils = new CleanupTestUtils(xmlRpcHelper);
+        cleanupUtils.addCleanupRule(name, "default");
+    }
+
     public void testHideMapItemWithSkeletonDescendant() throws Exception
     {
+        String grandParentName = random + "-grandparent";
         String parentName = random + "-parent";
         String childName = random + "-child";
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        setupTemplateProjectWithDefaultCleanup(grandParentName);
+
+        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, grandParentName, true);
         String parentCleanupsPath = PathUtils.getPath(parentPath, "cleanup");
         String parentCleanupPath = PathUtils.getPath(parentCleanupsPath, "default");
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
@@ -321,10 +339,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void testHideMapItemWithDescendantOverride() throws Exception
     {
+        String grandParentName = random + "-grandparent";
         String parentName = random + "-parent";
         String childName = random + "-child";
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        setupTemplateProjectWithDefaultCleanup(grandParentName);
+
+        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, grandParentName, true);
         String parentCleanupsPath = PathUtils.getPath(parentPath, "cleanup");
         String parentCleanupPath = PathUtils.getPath(parentCleanupsPath, "default");
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
@@ -351,7 +372,11 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void testRestoreMapItem() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String parentName = random + "-parent";
+
+        setupTemplateProjectWithDefaultCleanup(parentName);
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, parentName, false);
         String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
         String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
         xmlRpcHelper.deleteConfig(cleanupPath);
@@ -461,13 +486,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void assertTasks(DeleteConfirmPage page, String... pathActionPairs)
     {
-        if(pathActionPairs.length % 2 != 0)
+        if (pathActionPairs.length % 2 != 0)
         {
             fail("Tasks must be made up of (path, action) pairs");
         }
 
         int i;
-        for(i = 0; i < pathActionPairs.length / 2; i++)
+        for (i = 0; i < pathActionPairs.length / 2; i++)
         {
             assertEquals(pathActionPairs[i * 2], browser.getCellContents(page.getId(), i + 1, 0));
             assertEquals(pathActionPairs[i * 2 + 1], browser.getCellContents(page.getId(), i + 1, 1));

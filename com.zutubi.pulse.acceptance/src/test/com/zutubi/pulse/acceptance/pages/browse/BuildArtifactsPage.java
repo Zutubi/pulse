@@ -52,6 +52,14 @@ public class BuildArtifactsPage extends SeleniumPage
     }
 
     /**
+     * Reset the current filter to show all artifacts.
+     */
+    public void resetFilter()
+    {
+        setFilterAndWait("");
+    }
+
+    /**
      * Sets the current filter to the given value, then waits for the tree to
      * reload.
      *
@@ -60,14 +68,14 @@ public class BuildArtifactsPage extends SeleniumPage
     public void setFilterAndWait(String filter)
     {
         String indexExpression;
-        // Annoyingly ext stores can't find the empty strnig value...
+        // Annoyingly ext stores can't find the empty string value...
         if (StringUtils.stringSet(filter))
         {
             indexExpression = "store.find('filter', '" + filter + "')";
         }
         else
         {
-            indexExpression ="0";
+            indexExpression = "0";
         }
 
         browser.evalExpression(EXPRESSION_COMBO +
@@ -91,7 +99,7 @@ public class BuildArtifactsPage extends SeleniumPage
     /**
      * Generate the selenium locator for the named command node on the build artifacts page.
      *
-     * @param command   name of the command in question.
+     * @param command name of the command in question.
      * @return the selenium locator for the command node
      */
     public String getCommandLocator(String command)
@@ -102,9 +110,8 @@ public class BuildArtifactsPage extends SeleniumPage
     /**
      * Generate the selenium locator for a named artifact node on the build artifacts page.
      *
-     * @param artifact  name of the artifact in question
-     *
-     * @return  the selenium locator for the artifact node.
+     * @param artifact name of the artifact in question
+     * @return the selenium locator for the artifact node.
      */
     public String getArtifactLocator(String artifact)
     {
@@ -116,9 +123,8 @@ public class BuildArtifactsPage extends SeleniumPage
      * build.  Note, this does not imply that the artifact is available for
      * download.
      *
-     * @param artifactName  name of the artifact being tested.
-     * @return  true if the artifact exists, false otherwise.
-     *
+     * @param artifactName name of the artifact being tested.
+     * @return true if the artifact exists, false otherwise.
      * @see #isArtifactAvailable(String)
      */
     public boolean isArtifactListed(String artifactName)
@@ -130,8 +136,8 @@ public class BuildArtifactsPage extends SeleniumPage
      * Indicates whether or not an artifact of the given name exists and was captured
      * / is available for download.
      *
-     * @param artifactName  name of the artifact being tested.
-     * @return  true if the artifact is available, false otherwise.
+     * @param artifactName name of the artifact being tested.
+     * @return true if the artifact is available, false otherwise.
      */
     public boolean isArtifactAvailable(String artifactName)
     {
@@ -142,7 +148,7 @@ public class BuildArtifactsPage extends SeleniumPage
     /**
      * Indicates if a file with the given name is listed under the artifact
      * with the given name.
-     * 
+     *
      * @param artifactName name of the artifact to look under
      * @param fileName     name of the file to look for
      * @return true if a file of the given name is listed under the given

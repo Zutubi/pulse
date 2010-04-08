@@ -330,7 +330,6 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectPath = call("insertTemplatedConfig", "projects/global project template", project, true);
         Hashtable<String, Object> loadedProject = call("getConfig", projectPath);
         assertEquals(projectName, loadedProject.get("name"));
-        assertEquals(1, ((Hashtable<String, Object>) loadedProject.get("cleanup")).size());
     }
 
     public void testSaveConfigEmptyPath() throws Exception

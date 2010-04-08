@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
+import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
+import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
@@ -204,13 +206,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         // Finally check that only the enabled hooks ran.
-        String text = getLogText(urls.dashboardMyBuildLog(Long.toString(buildNumber)));
+        String text = getLogText(random, buildNumber);
         assertFalse("Pre-build hook not for personal should not have run", text.contains("prebuildno"));
         assertTrue("Pre-build hook for personal should have run", text.contains("prebuildyes"));
         assertFalse("Post-build hook not for personal should not have run", text.contains("postbuildno"));
         assertTrue("Post-build hook for personal should have run", text.contains("postbuildyes"));
 
-        text = getLogText(urls.dashboardMyStageLog(Long.toString(buildNumber), ProjectConfigurationWizard.DEFAULT_STAGE));
+        text = getLogText(random, buildNumber, ProjectConfigurationWizard.DEFAULT_STAGE);
         assertFalse("Post-stage hook not for personal should not have run", text.contains("poststageno"));
         assertTrue("Post-stage hook for personal should have run", text.contains("poststageyes"));
     }
@@ -409,11 +411,16 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         return hook;
     }
 
-    private String getLogText(String url)
+    private String getLogText(String projectName, long buildNumber)
     {
-        browser.open(url);
-        browser.waitForPageToLoad();
-        return browser.getText("panel");
+        PersonalBuildLogPage page = browser.openAndWaitFor(PersonalBuildLogPage.class, projectName, buildNumber);
+        return page.getLog();
+    }
+
+    private String getLogText(String projectName, long buildNumber, String stageName)
+    {
+        PersonalBuildLogsPage page = browser.openAndWaitFor(PersonalBuildLogsPage.class, projectName, buildNumber, stageName);
+        return page.getLog();
     }
 
     private void checkout(String url) throws SVNException

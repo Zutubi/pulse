@@ -77,9 +77,14 @@ public class Urls
         return dashboardMyBuildDetails(number) + stageName + "/";
     }
 
+    public String dashboardMyBuildLogs(String number)
+    {
+        return dashboardMyBuild(number) + "logs/";
+    }
+
     public String dashboardMyBuildLog(String number)
     {
-        return dashboardMyBuild(number) + "log/";
+        return dashboardMyBuildLogs(number) + "build/";
     }
 
     public String dashboardMyBuildTests(String number)

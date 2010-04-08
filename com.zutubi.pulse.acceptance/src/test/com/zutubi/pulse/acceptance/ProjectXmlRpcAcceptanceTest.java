@@ -27,7 +27,6 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Hashtable<String, Object> globalProject = call("getConfig", "projects/global project template");
         assertProject(globalProject, "global project template");
-        assertDefaultCleanups(globalProject);
         assertDefaultOptions(globalProject);
     }
 
@@ -40,7 +39,6 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> createdProject = call("getConfig", path);
         assertProject(createdProject, projectName);
-        assertDefaultCleanups(createdProject);
         assertDefaultOptions(createdProject);
 
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
@@ -102,7 +100,6 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> editedProject = call("getConfig", editedPath);
         assertProject(editedProject, editedName);
-        assertDefaultCleanups(editedProject);
         assertDefaultOptions(editedProject);
 
         Hashtable<String, Object> editedScm = (Hashtable<String, Object>) editedProject.get("scm");
@@ -157,22 +154,6 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         assertEquals("zutubi.projectConfig", struct.get(SYMBOLIC_NAME_KEY));
         assertEquals(name, struct.get("name"));
-    }
-
-    private void assertDefaultCleanups(Hashtable<String, Object> project)
-    {
-        Hashtable<String, Object> cleanups = (Hashtable<String, Object>) project.get("cleanup");
-        assertNotNull(cleanups);
-        assertDefaultCleanup(cleanups);
-    }
-
-    private void assertDefaultCleanup(Hashtable<String, Object> cleanups)
-    {
-        Hashtable<String, Object> defaultCleanup = (Hashtable<String, Object>) cleanups.get("default");
-        assertNotNull(defaultCleanup);
-        assertEquals("zutubi.cleanupConfig", defaultCleanup.get(SYMBOLIC_NAME_KEY));
-        assertEquals("default", defaultCleanup.get("name"));
-        assertEquals(10, defaultCleanup.get("retain"));
     }
 
     private void assertDefaultOptions(Hashtable<String, Object> project)
