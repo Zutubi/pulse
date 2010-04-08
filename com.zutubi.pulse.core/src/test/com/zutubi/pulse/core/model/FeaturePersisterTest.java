@@ -9,8 +9,6 @@ import nu.xom.ParsingException;
 import java.io.File;
 import java.io.IOException;
 
-/**
- */
 public class FeaturePersisterTest extends PulseTestCase
 {
     private File tempDir;
@@ -81,6 +79,14 @@ public class FeaturePersisterTest extends PulseTestCase
     {
         CommandResult result = getResultWithFeatures(getFeature("\nleading and trailing whitespace  "));
         roundTrip(result);
+    }
+
+    public void testFeaturesDirectoryNotCreatedOnRead() throws IOException, ParsingException
+    {
+        File featuresDir = FeaturePersister.getFeaturesDirectory(tempDir);
+        assertFalse(featuresDir.exists());
+        persister.readFeatures(new CommandResult("dummy"), tempDir);
+        assertFalse(featuresDir.exists());
     }
 
     private PersistentPlainFeature getFeature(String summary)

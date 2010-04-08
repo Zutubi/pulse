@@ -30,17 +30,17 @@ public class FeaturePersister
 
     public void writeFeatures(CommandResult result, File recipeDir) throws IOException
     {
-        File featuresFile = getFeaturesFile(result, recipeDir);
+        File featuresFile = getFeaturesFile(result, recipeDir, true);
         Element root = new Element(ELEMENT_ARTIFACTS);
         Document doc = new Document(root);
         addArtifacts(root, result);
         XMLUtils.writeDocument(featuresFile, doc);
     }
 
-    private File getFeaturesFile(CommandResult result, File recipeDir) throws IOException
+    private File getFeaturesFile(CommandResult result, File recipeDir, boolean ensureDir) throws IOException
     {
         File featuresDir = getFeaturesDirectory(recipeDir);
-        if(!featuresDir.exists() && !featuresDir.mkdirs())
+        if (ensureDir && !featuresDir.exists() && !featuresDir.mkdirs())
         {
             throw new IOException("Failed to create new directory: '" + featuresDir.getAbsolutePath() + "'");
         }
@@ -99,7 +99,7 @@ public class FeaturePersister
 
     public void readFeatures(CommandResult result, File recipeDir) throws ParsingException, IOException
     {
-        File featuresFile = getFeaturesFile(result, recipeDir);
+        File featuresFile = getFeaturesFile(result, recipeDir, false);
         Builder builder = new Builder();
         if (featuresFile.exists())
         {
