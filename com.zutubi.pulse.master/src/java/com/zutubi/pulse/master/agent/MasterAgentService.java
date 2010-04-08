@@ -65,7 +65,17 @@ public class MasterAgentService implements AgentService
         }
         catch (IOException e)
         {
-            throw new BuildException("Renaming output directory: " + e.getMessage(), e);
+            try
+            {
+                // As a fallback, try copying.  This may be required when
+                // different filesystems are involved.
+                FileSystemUtils.copy(outputDest, outputDir);
+            }
+            catch (IOException unused)
+            {
+                // Report initial error.
+                throw new BuildException("Capturing output directory: " + e.getMessage(), e);
+            }
         }
     }
 
