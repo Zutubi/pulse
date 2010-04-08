@@ -273,6 +273,13 @@ public class ConfigurationHealthChecker
 
     private void checkCollectionOrder(String path, Record record, ConfigurationHealthReport report)
     {
+        // Only check orders where they are defined.  Inherited orders may
+        // validly contain references to items not visible at this level.
+        if (record instanceof TemplateRecord)
+        {
+            record = ((TemplateRecord) record).getMoi();
+        }
+        
         List<String> orderKeys = CollectionType.getDeclaredOrder(record);
         for (String orderKey : orderKeys)
         {
@@ -281,8 +288,7 @@ public class ConfigurationHealthChecker
             {
                 report.addProblem(path, "Order contains reference to unknown item '" + orderKey + "'.");
             }
-
-            if (!(item instanceof Record))
+            else if (!(item instanceof Record))
             {
                 report.addProblem(path, "Order contains reference to simple key '" + orderKey + "'.");
 

@@ -686,6 +686,26 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(newOrder, getOrder(inheritedStagesPath));
     }
 
+    public void testInheritedOrderRefersToHiddenItem()
+    {
+        // This scenario is fine, we're just ensuring that the health check
+        // doesn't trip on it.
+        insertGlobal();
+        insertChild();
+        String stagesPath = "project/global/stages";
+        configurationTemplateManager.insertRecord(stagesPath, createStage("another"));
+
+        // Reorder in parent
+        Project global = (Project) configurationTemplateManager.getInstance("project/global");
+        List<String> originalOrder = new LinkedList<String>(global.getStages().keySet());
+        List<String> newOrder = new LinkedList<String>(originalOrder);
+        Collections.reverse(newOrder);
+        configurationTemplateManager.setOrder(stagesPath, newOrder);
+        
+        // Hide an ordered item in the child.
+        configurationTemplateManager.delete("project/child/stages/another");
+    }
+
     public void testDelete()
     {
         insertGlobal();
