@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance.windows;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.util.Condition;
 
 /**
  * A ext popup window containing a tree view of a portion of the
@@ -8,6 +10,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
  */
 public class PulseFileSystemBrowserWindow
 {
+    private static final long CLOSE_TIMEOUT = 1000;
     private static final String BROWSER_ID = "pulse-file-system-browser";
 
     private SeleniumBrowser browser;
@@ -27,7 +30,7 @@ public class PulseFileSystemBrowserWindow
         browser.waitForElement(BROWSER_ID);
     }
 
-    public void waitForLoading()
+    public void waitForLoadingToComplete()
     {
         browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + BROWSER_ID + "').loading === false");
     }
@@ -42,6 +45,17 @@ public class PulseFileSystemBrowserWindow
     {
         // would be quicker if we add an id to the field? 
         browser.click(buttonLocator("cancel"));
+    }
+
+    public void waitForClose()
+    {
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !isWindowPresent();
+            }
+        }, CLOSE_TIMEOUT, "Window did not close in time.");
     }
 
     private String buttonLocator(String buttonText)

@@ -1,12 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentStatus.DISABLED;
+import static com.zutubi.pulse.master.agent.AgentStatus.IDLE;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
@@ -104,12 +109,14 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         assertTrue(homePage.isViewWorkingCopyPresent());
 
         PulseFileSystemBrowserWindow window = homePage.viewWorkingCopy();
-        window.waitForLoading();
+        window.waitForLoadingToComplete();
 
         assertEquals("browse working copy", window.getHeader());
         assertTrue(window.isNodePresent("stage :: " + DEFAULT_STAGE + " :: [" + DEFAULT_RECIPE + "]@" + agentName));
 
         window.clickCancel();
+        window.waitForClose();
+        
         assertFalse(window.isWindowPresent());
     }
 
@@ -124,7 +131,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         assertTrue(homePage.isViewWorkingCopyPresent());
 
         PulseFileSystemBrowserWindow window = homePage.viewWorkingCopy();
-        window.waitForLoading();
+        window.waitForLoadingToComplete();
 
         assertEquals("browse working copy", window.getHeader());
         assertFalse(window.isNodePresent("stage :: default :: [default]@master"));
@@ -134,14 +141,47 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         assertFalse(window.isWindowPresent());
     }
 
-/*
-    public void testViewWorkingCopyWhereAgentIsOffline()
+    public void testViewWorkingCopyWhereAgentIsDisabled() throws Exception
     {
-        // Awkward to test since we need control of an agent process.
-        // a) we need it online so we can run the build.
-        // b) we then need it to go offline so that we can run the test.
+        xmlRpcHelper.ensureAgent(AGENT_NAME);
+
+        ProjectConfiguration project = createProject(random, AGENT_NAME);
+        updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        buildRunner.triggerSuccessfulBuild(project);
+
+        loginAsAdmin();
+
+        disableAgent(AGENT_NAME);
+
+        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        assertTrue(homePage.isViewWorkingCopyPresent());
+
+        PulseFileSystemBrowserWindow window = homePage.viewWorkingCopy();
+        window.waitForLoadingToComplete();
+
+        assertEquals("browse working copy", window.getHeader());
+        assertEquals("", window.getStatus());
+
+        enableAgent(AGENT_NAME);
     }
-*/
+
+    private void disableAgent(String name)
+    {
+        AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
+        assertTrue(agentsPage.isActionAvailable(name, ACTION_DISABLE));
+        agentsPage.clickAction(name, ACTION_DISABLE);
+
+        browser.refreshUntilText(agentsPage.getStatusId(name), DISABLED.getPrettyString());
+    }
+
+    private void enableAgent(String name)
+    {
+        AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
+        assertTrue(agentsPage.isActionAvailable(name, ACTION_ENABLE));
+        agentsPage.clickAction(name, ACTION_ENABLE);
+
+        browser.refreshUntilText(agentsPage.getStatusId(name), IDLE.getPrettyString());
+    }
 
     private ProjectConfiguration createProject(String projectName) throws Exception
     {

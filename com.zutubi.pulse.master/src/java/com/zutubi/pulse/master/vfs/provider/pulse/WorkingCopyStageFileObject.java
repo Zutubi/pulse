@@ -82,6 +82,10 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         }
 
         Agent agent = agentManager.getAgent(node.getHost());
+        if (!agent.isAvailable())
+        {
+            return new LinkedList<FileInfo>();
+        }
         AgentConfiguration agentConfig = agent.getConfig();
 
         AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
