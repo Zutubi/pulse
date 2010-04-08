@@ -2515,8 +2515,6 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 {
     MAX_COLUMN_WIDTH: 600,
 
-    style: 'padding: 0 8px 8px 8px',
-    bodyStyle: 'border-top: solid 1px #bbb; border-bottom: dotted 1px #bbb;',
     border: false,
     layout: 'fit',
     enableHdMenu: false,

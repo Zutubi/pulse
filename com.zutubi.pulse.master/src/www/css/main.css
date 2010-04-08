@@ -719,6 +719,15 @@ Build tabs
     margin-right: 5px;
 }
 
+#artifacts-tree {
+    padding: 0 8px 8px 8px;
+}
+
+#artifacts-tree .x-panel-body {
+    border-top: solid 1px #bbb;
+    border-bottom: dotted 1px #bbb;
+}
+
 #artifacts-tree .x-grid3-header {
     border: none;
     border-bottom: dotted 1px #bbb;
