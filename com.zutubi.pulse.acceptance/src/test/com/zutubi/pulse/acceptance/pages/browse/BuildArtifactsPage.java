@@ -173,7 +173,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public String getArtifactFileHash(String artifactName, String fileName)
     {
-        String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]/td[3]/div";
+        String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]/td[contains(@class, 'artifact-hash')]/div";
         return browser.getText(locator).trim();
     }
 }

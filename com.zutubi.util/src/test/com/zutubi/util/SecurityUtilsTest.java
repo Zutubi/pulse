@@ -3,6 +3,8 @@ package com.zutubi.util;
 import static com.zutubi.util.SecurityUtils.*;
 import com.zutubi.util.junit.ZutubiTestCase;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
@@ -115,5 +117,32 @@ public class SecurityUtilsTest extends ZutubiTestCase
     public void testSHA1DigestString()
     {
         assertEquals(SHA1_HELLO, sha1Digest(STRING_HELLO));
+    }
+
+    public void testMD5File() throws IOException, NoSuchAlgorithmException
+    {
+        File file = FileSystemUtils.createTempFile(FileSystemUtils.getSystemTempDir());
+        FileSystemUtils.createFile(file, STRING_HELLO);
+        try
+        {
+            assertEquals(MD5_HELLO, SecurityUtils.digest(ALGORITHM_MD5, file));
+        }
+        finally
+        {
+            assertTrue(file.delete());
+        }
+    }
+
+    public void testMD5EmptyFile() throws IOException, NoSuchAlgorithmException
+    {
+        File file = FileSystemUtils.createTempFile(FileSystemUtils.getSystemTempDir());
+        try
+        {
+            assertEquals(MD5_EMPTY, SecurityUtils.digest(ALGORITHM_MD5, file));
+        }
+        finally
+        {
+            assertTrue(file.delete());
+        }
     }
 }

@@ -10,20 +10,13 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
-import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -36,8 +29,6 @@ import java.util.Map;
 public class DefaultCommandContext implements CommandContext
 {
     private static final Logger LOG = Logger.getLogger(DefaultCommandContext.class);
-
-    private static final int BUFFER_SIZE = 16384;
 
     private ExecutionContext executionContext;
     private CommandResult result;
@@ -207,20 +198,9 @@ public class DefaultCommandContext implements CommandContext
 
     private void calculateHash(StoredFileArtifact fileArtifact, File file, HashAlgorithm hashAlgorithm)
     {
-        InputStream is = null;
         try
         {
-            MessageDigest digest = MessageDigest.getInstance(hashAlgorithm.getDigestName());
-            is = new FileInputStream(file);
-            byte buffer[] = new byte[BUFFER_SIZE];
-
-            int n;
-            while ((n = is.read(buffer)) >= 0)
-            {
-                digest.update(buffer, 0, n);
-            }
-
-            fileArtifact.setHash(StringUtils.toHexString(digest.digest()));
+            fileArtifact.setHash(SecurityUtils.digest(hashAlgorithm.getDigestName(), file));
         }
         catch (NoSuchAlgorithmException e)
         {
@@ -229,10 +209,6 @@ public class DefaultCommandContext implements CommandContext
         catch (IOException e)
         {
             LOG.warning("I/O error calculating hash for file '" + file.getAbsolutePath() + "' " + e.getMessage(), e);
-        }
-        finally
-        {
-            IOUtils.close(is);
         }
     }
 

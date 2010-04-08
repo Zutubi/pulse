@@ -1,6 +1,8 @@
 package com.zutubi.util;
 
-import java.io.UnsupportedEncodingException;
+import com.zutubi.util.io.IOUtils;
+
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -9,6 +11,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class SecurityUtils
 {
+    private static final int BUFFER_SIZE = 16384;
+
     public static final String ALGORITHM_MD5 = "MD5";
     public static final String ALGORITHM_SHA1 = "SHA-1";
     
@@ -158,5 +162,40 @@ public class SecurityUtils
     public static String sha1Digest(String input)
     {
         return digestUnsafe(ALGORITHM_SHA1, input);
+    }
+
+    /**
+     * Returns the specified type of digest of the content of the given input
+     * file as a hexadecimal string.
+     *
+     * @param algorithm the name of the digest algorithm (see the ALGORITHM_*
+     *                  constants, and {@link java.security.MessageDigest})
+     * @param file      the input file to digest
+     * @return the digest as a hexadecimal string
+     *
+     * @throws NoSuchAlgorithmException if the given algorithm is unrecognised
+     * @throws java.io.IOException      if there is an error reading the file
+     */
+    public static String digest(String algorithm, File file) throws NoSuchAlgorithmException, IOException
+    {
+        InputStream is = null;
+        try
+        {
+            MessageDigest digest = MessageDigest.getInstance(algorithm);
+            is = new FileInputStream(file);
+            byte buffer[] = new byte[BUFFER_SIZE];
+
+            int n;
+            while ((n = is.read(buffer)) >= 0)
+            {
+                digest.update(buffer, 0, n);
+            }
+
+            return StringUtils.toHexString(digest.digest());
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
     }
 }
