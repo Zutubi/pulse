@@ -83,6 +83,14 @@ public class FeaturePersisterTest extends PulseTestCase
         roundTrip(result);
     }
 
+    public void testFeaturesDirectoryNotCreatedOnRead() throws IOException, ParsingException
+    {
+        File featuresDir = FeaturePersister.getFeaturesDirectory(tempDir);
+        assertFalse(featuresDir.exists());
+        persister.readFeatures(new CommandResult("dummy"), tempDir);
+        assertFalse(featuresDir.exists());
+    }
+
     private PersistentPlainFeature getFeature(String summary)
     {
         return new PersistentPlainFeature(Feature.Level.INFO, summary, 1, 10, 3);
