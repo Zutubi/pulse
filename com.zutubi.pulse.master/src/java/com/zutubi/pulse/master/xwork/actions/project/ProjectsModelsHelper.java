@@ -174,9 +174,14 @@ public class ProjectsModelsHelper
                     String name = node.getId();
                     if (node.isConcrete())
                     {
+                        List<BuildResult> builds = Collections.emptyList();
+                        boolean prompt = false;
                         Project project = projectManager.getProject(name, true);
-                        List<BuildResult> builds = getBuilds(project, configuration, buildCache);
-                        boolean prompt = project.getConfig().getOptions().getPrompt();
+                        if (project != null)
+                        {
+                            builds = getBuilds(project, configuration, buildCache);
+                            prompt = project.getConfig().getOptions().getPrompt();
+                        }
                         model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project));
                     }
                     else
