@@ -12,7 +12,11 @@ public class GccPostProcessorConfiguration extends RegexPostProcessorConfigurati
 {
     public GccPostProcessorConfiguration()
     {
-        addErrorRegexes("^.+:[0-9]+: error:");
+        addErrorRegexes(
+                "^.+:[0-9]+: error:",
+                ": undefined reference to",
+                "^collect2: ld returned [1-9][0-9]* exit status"
+        );
         addWarningRegexes("^.+:[0-9]+: warning:");
 
         setFailOnError(false);

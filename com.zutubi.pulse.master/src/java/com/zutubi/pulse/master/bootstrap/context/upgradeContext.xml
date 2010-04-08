@@ -127,6 +127,7 @@
                 <ref local="updatePerforceSyncWorkspacePattern"/>
                 <ref local="addDependencySyncField"/>
                 <ref local="addCommandCollectionSkeletons"/>
+                <ref local="gccLinkerPatterns"/>
                 <ref local="addSubversionUseExport"/>
                 <ref local="addAgentSynchronisingTime"/>
                 <ref local="addAgentSynchronisationMessages"/>
@@ -629,6 +630,10 @@
 
     <bean id="addCommandCollectionSkeletons" class="com.zutubi.pulse.master.upgrade.tasks.AddCommandCollectionSkeletonsUpgradeTask">
         <property name="buildNumber" value="201023001"/>
+    </bean>
+
+    <bean id="gccLinkerPatterns" class="com.zutubi.pulse.master.upgrade.tasks.GccLinkerPatternsUpgradeTask">
+        <property name="buildNumber" value="201023002"/>
     </bean>
 
     <bean id="addSubversionUseExport" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionUseExportUpgradeTask">
