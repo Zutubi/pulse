@@ -26,7 +26,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 {
     private static final String STATE_LAST_ACCESS = "lastAccess";
     private static final String ACCESS_NEVER = "never";
-    private static final String ACCESS_NOW = "now";
+    private static final String ACCESS_NOW = "less than 1 second ago";
 
     @Override
     protected void setUp() throws Exception
