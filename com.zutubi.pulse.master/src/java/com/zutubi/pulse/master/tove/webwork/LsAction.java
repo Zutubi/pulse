@@ -296,7 +296,7 @@ public class LsAction extends VFSActionSupport
          * method) pairs.  The map entry boolean indicates if a read method
          * exists.
          */
-        private static final Map<Pair<Class, String>, Pair<Boolean, Method>> cache = new HashMap<Pair<Class, String>, Pair<Boolean, Method>>();
+        private static final Map<Pair<Class, String>, Method> cache = new HashMap<Pair<Class, String>, Method>();
 
         private String flag;
 
@@ -314,12 +314,12 @@ public class LsAction extends VFSActionSupport
 
             FileObject file = fileSelectInfo.getFile();
             Class fileClass = file.getClass();
-            Pair<Boolean, Method> entry = lookup(fileClass);
-            if (entry.first)
+            Method method = lookup(fileClass);
+            if (method != null)
             {
                 try
                 {
-                    return (Boolean) entry.second.invoke(file);
+                    return (Boolean) method.invoke(file);
                 }
                 catch (Exception e)
                 {
@@ -334,23 +334,26 @@ public class LsAction extends VFSActionSupport
             }
         }
 
-        private Pair<Boolean, Method> lookup(Class fileClass)
+        private Method lookup(Class fileClass)
         {
-            Pair<Boolean, Method> entry;
+            Method method;
             synchronized (cache)
             {
                 Pair<Class, String> key = asPair(fileClass, flag);
-                entry = cache.get(key);
-                if (entry == null)
+                if (cache.containsKey(key))
                 {
-                    entry = introspect(fileClass);
-                    cache.put(key, entry);
+                    method = cache.get(key);
+                }
+                else
+                {
+                    method = introspect(fileClass);
+                    cache.put(key, method);
                 }
             }
-            return entry;
+            return method;
         }
 
-        private Pair<Boolean, Method> introspect(Class fileClass)
+        private Method introspect(Class fileClass)
         {
             try
             {
@@ -371,7 +374,7 @@ public class LsAction extends VFSActionSupport
 
                 if (descriptor != null)
                 {
-                    return asPair(true, descriptor.getReadMethod());
+                    return descriptor.getReadMethod();
                 }
             }
             catch (IntrospectionException e)
@@ -379,7 +382,7 @@ public class LsAction extends VFSActionSupport
                 // Fall through.
             }
 
-            return asPair(false, null);
+            return null;
         }
     }
 }

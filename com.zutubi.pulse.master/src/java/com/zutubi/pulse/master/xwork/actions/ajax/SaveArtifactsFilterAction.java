@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.StringUtils;
 
 /**
  * Action to save tail view settings to a user's preferences.  Invalid settings
@@ -12,8 +12,6 @@ public class SaveArtifactsFilterAction extends ActionSupport
 {
     private String filter;
     private SimpleResult result;
-
-    private ConfigurationProvider configurationProvider;
 
     public void setFilter(String filter)
     {
@@ -32,7 +30,7 @@ public class SaveArtifactsFilterAction extends ActionSupport
         if (principle != null)
         {
             User user = userManager.getUser((String) principle);
-            if (user != null)
+            if (user != null && !StringUtils.equals(user.getArtifactsFilter(), filter))
             {
                 user.setArtifactsFilter(filter);
                 userManager.save(user);
@@ -41,10 +39,5 @@ public class SaveArtifactsFilterAction extends ActionSupport
 
         result = new SimpleResult(true, "filter saved");
         return SUCCESS;
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 }
