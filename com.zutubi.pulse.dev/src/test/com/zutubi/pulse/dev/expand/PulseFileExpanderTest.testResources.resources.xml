@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<resources>
+    <resource name="my-resource">
+        <property name="resource-property" value="requirements-rock"/>
+    </resource>
+</resources>

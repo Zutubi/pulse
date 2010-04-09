@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default-recipe="default">
+    <macro name="mark">
+        <noop name="$(command-name)"/>
+    </macro>
+    
+    <recipe name="default">
+        <scope>
+            <property name="command-name" value="one"/>
+            <macro-ref macro="$(mark)"/>
+        </scope>
+        <scope>
+            <property name="command-name" value="two"/>
+            <macro-ref macro="$(mark)"/>
+        </scope>
+    </recipe>
+</project>

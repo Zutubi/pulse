@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <scope>
+            <property name="command-name" value="one"/>
+            <import path="testProcessImports.fragment.xml"/>
+        </scope>
+        <scope>
+            <property name="command-name" value="two"/>
+            <import path="testProcessImports.fragment.xml"/>
+        </scope>
+    </recipe>
+</project>

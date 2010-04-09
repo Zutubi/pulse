@@ -1,12 +1,13 @@
 package com.zutubi.pulse.dev.personal;
 
-import static com.zutubi.util.CollectionUtils.asPair;
 import org.apache.commons.cli.ParseException;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class PersonalBuildClientFactoryTest extends AbstractPersonalBuildTestCase
 {
@@ -125,32 +126,6 @@ public class PersonalBuildClientFactoryTest extends AbstractPersonalBuildTestCas
         else
         {
             assertEquals(expectedValue.toString(), config.getProperty(name));
-        }
-    }
-
-    public void testDefineEmptyValue() throws ParseException
-    {
-        try
-        {
-            PersonalBuildClientFactory.newInstance("-d", "foo=");
-            fail("Empty values should not be allowed");
-        }
-        catch (ParseException e)
-        {
-            assertThat(e.getMessage(), containsString("Invalid property definition syntax"));
-        }
-    }
-
-    public void testDefineBadSyntax() throws ParseException
-    {
-        try
-        {
-            PersonalBuildClientFactory.newInstance("-d", "huh");
-            fail("Lack of = should not be allowed");
-        }
-        catch (ParseException e)
-        {
-            assertThat(e.getMessage(), containsString("Invalid property definition syntax"));
         }
     }
 

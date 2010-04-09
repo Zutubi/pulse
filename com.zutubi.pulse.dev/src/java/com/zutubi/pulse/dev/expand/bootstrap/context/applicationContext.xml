@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="byName" >
-    <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/dev/bootstrap/context/fileLoadContext.xml"/>
 
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
-    <bean id="ivyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
-
     <bean id="resourceFileLoader" class="com.zutubi.pulse.core.engine.marshal.ResourceFileLoader" init-method="init"/>
-
-    <bean id="localBuild" class="com.zutubi.pulse.dev.local.LocalBuild"/>
 </beans>

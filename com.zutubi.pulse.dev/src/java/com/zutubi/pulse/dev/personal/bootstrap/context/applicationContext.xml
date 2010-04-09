@@ -2,12 +2,5 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="byName">
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
-
-    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry"/>
-    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory" init-method="init"/>
-    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
-    <bean id="outputFactory" class="com.zutubi.pulse.core.commands.DefaultArtifactFactory"/>
-    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
-    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
+    <import resource="classpath:/com/zutubi/pulse/dev/bootstrap/context/fileLoadContext.xml"/>
 </beans>

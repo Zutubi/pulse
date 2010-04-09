@@ -2,7 +2,7 @@ package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.util.StringUtils;
+import com.zutubi.pulse.dev.util.OptionUtils;
 import org.apache.commons.cli.*;
 
 import java.util.LinkedList;
@@ -82,7 +82,7 @@ public class LocalBuildOptions
         {
             for (String value: commandLine.getOptionValues('q'))
             {
-                resourceRequirements.add(parseResourceRequirement(value));
+                resourceRequirements.add(OptionUtils.parseResourceRequirement(value));
             }
         }
 
@@ -99,29 +99,6 @@ public class LocalBuildOptions
         if (commandLine.hasOption('l'))
         {
            failureLimit = ((Number) commandLine.getOptionObject('l')).intValue();
-        }
-    }
-
-    private static ResourceRequirement parseResourceRequirement(String arg) throws PulseException
-    {
-        int slashOffset = arg.indexOf('/');
-        if (slashOffset < 0)
-        {
-            return new ResourceRequirement(arg, false);
-        }
-        else if (slashOffset == arg.length() - 1)
-        {
-            return new ResourceRequirement(arg.substring(0, slashOffset), false);
-        }
-        else
-        {
-            String name = arg.substring(0, slashOffset);
-            if (!StringUtils.stringSet(name))
-            {
-                throw new PulseException("Resource requirement '" + arg + "' has empty resource name");
-            }
-
-            return new ResourceRequirement(name, arg.substring(slashOffset + 1), false);
         }
     }
 

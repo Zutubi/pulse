@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <recipe name="one">
+        <noop name="$(unresolvable)"/>
+    </recipe>
+    <recipe name="two">
+        <noop name="tow"/>
+    </recipe>
+</project>
