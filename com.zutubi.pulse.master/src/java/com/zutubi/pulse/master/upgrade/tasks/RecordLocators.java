@@ -68,10 +68,20 @@ public class RecordLocators
      *
      * @param delegate  delegate locator used to find records to filter
      * @param predicate defines the records that this filter will allow to pass
-     * @return a predicate-filtering locater
+     * @return a predicate-filtering locator
      */
     public static RecordLocator newPredicateFilter(RecordLocator delegate, Predicate<Record> predicate)
     {
         return new PredicateFilterRecordLocator(delegate, predicate);
+    }
+    
+    /**
+     * Create a new record locator that filters records found by another
+     * locator, only passing records that are not inherited.  That is, records
+     * that are the first definition of a path in a hierarchy.
+     */
+    public static RecordLocator newFirstDefinedFilter(RecordLocator delegate, TemplatedScopeDetails scope)
+    {
+        return new FirstDefinedFilterRecordLocator(delegate, scope);
     }
 }

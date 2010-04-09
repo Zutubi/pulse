@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.*;
+import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.WebUtils;
 
 import java.util.HashSet;
@@ -44,5 +44,51 @@ public class RecordUpgradeUtils
         {
             return new HashSet<String>(WebUtils.splitAndDecode(',', hidden));
         }
+    }
+
+    /**
+     * Inserts the given record at the given path, also inserting any necessary
+     * inherited skeletons.
+     * 
+     * @param path           path to insert the record at
+     * @param record         the record to insert
+     * @param scope          details of the templated scope being inserted into
+     * @param recordManager  used to manipulate the records
+     */
+    public static void insertWithSkeletons(String path, Record record, TemplatedScopeDetails scope, final RecordManager recordManager)
+    {
+        recordManager.insert(path, record);
+        
+        final String[] elements = PathUtils.getPathElements(path);
+        final String remainderPath = PathUtils.getPath(2, elements);
+        ScopeHierarchy.Node owner = scope.getHierarchy().findNodeById(elements[1]);
+
+        final Record skeleton = createSkeletonOf(record);
+        owner.forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        {
+            public Boolean process(ScopeHierarchy.Node node)
+            {
+                String path = PathUtils.getPath(elements[0], node.getId(), remainderPath);
+                if (!recordManager.containsRecord(path))
+                {
+                    recordManager.insert(path, skeleton);
+                }
+
+                return true;
+            }
+        });
+    }
+
+    private static Record createSkeletonOf(Record record)
+    {
+        MutableRecord result = new MutableRecordImpl();
+        result.setSymbolicName(record.getSymbolicName());
+        for (String key : record.nestedKeySet())
+        {
+            Record child = (Record) record.get(key);
+            result.put(key, createSkeletonOf(child));
+        }
+
+        return result;
     }
 }
