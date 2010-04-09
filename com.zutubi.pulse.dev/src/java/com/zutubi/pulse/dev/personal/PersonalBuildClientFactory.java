@@ -1,6 +1,7 @@
 package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
+import com.zutubi.pulse.dev.util.OptionUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
@@ -127,23 +128,9 @@ public class PersonalBuildClientFactory
             String[] values = commandLine.getOptionValues('d');
             for (String value: values)
             {
-                addDefinedOption(defines, value);
+                OptionUtils.addDefinedOption(value, defines);
             }
         }
         return new PropertiesConfig(defines);
-    }
-
-    private static void addDefinedOption(Properties defines, String value) throws ParseException
-    {
-        int index = value.indexOf('=');
-        if (index <= 0 || index >= value.length() - 1)
-        {
-            throw new ParseException("Invalid property definition syntax '" + value + "' (expected name=value)");
-        }
-
-        String propertyName = value.substring(0, index);
-        String propertyValue = value.substring(index + 1);
-
-        defines.put(propertyName, propertyValue);
     }
 }

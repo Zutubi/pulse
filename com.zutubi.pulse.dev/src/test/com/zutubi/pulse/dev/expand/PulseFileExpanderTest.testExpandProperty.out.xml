@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default-recipe="default">
+    <property name="foo" value="bar"/>
+    <recipe name="default">
+        <noop name="bar"/>
+    </recipe>
+</project>

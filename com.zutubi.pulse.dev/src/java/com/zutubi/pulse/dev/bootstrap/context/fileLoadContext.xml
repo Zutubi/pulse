@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+    <!--
+      This context contains beans that:
+        - initialise the config types
+        - can be used for loading Tove files
+    -->
+    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry"/>
+    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory" init-method="init"/>
+    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
+    <bean id="outputFactory" class="com.zutubi.pulse.core.commands.DefaultArtifactFactory"/>
+    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
+</beans>
