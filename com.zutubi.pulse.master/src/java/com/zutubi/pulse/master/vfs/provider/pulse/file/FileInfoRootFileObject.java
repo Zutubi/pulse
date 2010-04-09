@@ -6,7 +6,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
@@ -25,7 +24,7 @@ public abstract class FileInfoRootFileObject extends AbstractPulseFileObject imp
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws FileSystemException
+    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
     {
         FileInfo child = getFileInfo(fileName.getBaseName());
 
@@ -35,12 +34,12 @@ public abstract class FileInfoRootFileObject extends AbstractPulseFileObject imp
         );
     }
 
-    protected FileType doGetType() throws FileSystemException
+    protected FileType doGetType() throws Exception
     {
         return FileType.FOLDER;
     }
 
-    protected String[] doListChildren() throws FileSystemException
+    protected String[] doListChildren() throws Exception
     {
         List<FileInfo> children = getFileInfos(ROOT_PATH);
         if (children == null)

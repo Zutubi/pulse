@@ -1988,9 +1988,21 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             this.loading = true;
             statusBar.setStatus({text: 'Loading...'});
         }, this);
-        this.loader.on('load', function()
+        this.loader.on('load', function(self, node, response)
         {
-            statusBar.clearStatus();
+            var data = Ext.util.JSON.decode(response.responseText);
+            if (data.actionErrors && data.actionErrors.length > 0)
+            {
+                statusBar.setStatus({
+                    text: data.actionErrors[0],
+                    iconCls: 'x-status-error',
+                    clear: true
+                });
+            }
+            else
+            {
+                statusBar.clearStatus();
+            }
             this.loading = false;
         }, this);
         this.loader.on('loadexception', function()

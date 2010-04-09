@@ -23,7 +23,7 @@ public class WorkingCopyFileInfoFileObject extends FileInfoFileObject
         super(fileInfo, name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         FileInfoProvider provider = getAncestor(FileInfoProvider.class);
         String relativePath = ((FileObject)provider).getName().getRelativeName(fileName);

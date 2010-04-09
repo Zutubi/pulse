@@ -16,7 +16,6 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         this.recipeId = recipeId;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String childName = fileName.getBaseName();
         if (childName.equals(NO_WORKING_COPY_AVAILABLE))
@@ -60,7 +59,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         );
     }
 
-    protected String[] doListChildren() throws FileSystemException
+    protected String[] doListChildren() throws Exception
     {
         String[] children = super.doListChildren();
         if (children.length == 0)
@@ -70,7 +69,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         return children;
     }
 
-    public List<FileInfo> getFileInfos(String path)
+    public List<FileInfo> getFileInfos(String path) throws Exception
     {
         RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
         BuildResult buildResult = buildManager.getByRecipeId(recipeId);
@@ -78,16 +77,16 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
 
         if (node.getHost() == null)
         {
-            return new LinkedList<FileInfo>();
+            throw new FileSystemException("host.not.assigned");
         }
 
         Agent agent = agentManager.getAgent(node.getHost());
         if (!agent.isAvailable())
         {
-            return new LinkedList<FileInfo>();
+            throw new FileSystemException("host.not.available");
         }
-        AgentConfiguration agentConfig = agent.getConfig();
 
+        AgentConfiguration agentConfig = agent.getConfig();
         AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
 
         return agent.getService().getFileListing(details, path);

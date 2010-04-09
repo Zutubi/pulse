@@ -40,6 +40,10 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         BuildResult result = getBuildResult();
+        if (result == null)
+        {
+            throw new FileSystemException("buildResult.not.available");
+        }
 
         List<RecipeResultNode> stages = result.getRoot().getChildren();
         return CollectionUtils.mapToArray(stages, new Mapping<RecipeResultNode, String>()

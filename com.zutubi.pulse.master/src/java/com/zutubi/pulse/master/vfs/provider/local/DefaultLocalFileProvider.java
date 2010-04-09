@@ -6,9 +6,11 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.provider.local.GenericFileNameParser;
 import org.apache.commons.vfs.provider.local.LocalFileName;
+import org.apache.commons.vfs.provider.local.WindowsFileNameParser;
 
 /**
- * <class comment/>
+ * An override of the vfs {@link DefaultLocalFileProvider} that uses a {@link GenericFileNameParser}
+ * instead of a {@link WindowsFileNameParser} on windows file systems. 
  */
 public class DefaultLocalFileProvider extends org.apache.commons.vfs.provider.local.DefaultLocalFileProvider
 {

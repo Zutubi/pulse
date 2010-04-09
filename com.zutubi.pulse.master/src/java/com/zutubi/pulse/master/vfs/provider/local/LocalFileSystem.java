@@ -25,13 +25,9 @@ public class LocalFileSystem extends org.apache.commons.vfs.provider.local.Local
 
     private List<FileName> rootNames;
 
-    private final String rootFile;
-
     public LocalFileSystem(final FileName rootName, final String rootFile, final FileSystemOptions opts)
     {
         super(rootName, rootFile, opts);
-
-        this.rootFile = rootFile;
     }
 
     public void init() throws FileSystemException
@@ -43,7 +39,7 @@ public class LocalFileSystem extends org.apache.commons.vfs.provider.local.Local
 
     protected FileObject createFile(final FileName name) throws FileSystemException
     {
-        return new LocalFile(this, rootFile, name);
+        return new LocalFile(this, name);
     }
 
     private void loadFileSystemRoots() throws FileSystemException

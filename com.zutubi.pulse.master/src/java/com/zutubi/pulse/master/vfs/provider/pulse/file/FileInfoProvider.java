@@ -17,8 +17,10 @@ public interface FileInfoProvider
      *
      * @return a list of file info instances representing the files at the
      * specified path.
+     *
+     * @throws Exception on error
      */
-    List<FileInfo> getFileInfos(String path);
+    List<FileInfo> getFileInfos(String path) throws Exception;
 
     /**
      * Get the file info for a specific file.
@@ -26,6 +28,8 @@ public interface FileInfoProvider
      * @param path  the path relative to the provider node that identifies
      *              the requested file info.
      * @return the file info for the specified path.
+     *
+     * @throws Exception on error
      */
-    FileInfo getFileInfo(String path);
+    FileInfo getFileInfo(String path) throws Exception;
 }

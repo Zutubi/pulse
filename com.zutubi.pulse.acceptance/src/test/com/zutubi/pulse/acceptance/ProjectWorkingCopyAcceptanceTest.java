@@ -135,7 +135,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
 
         assertEquals("browse working copy", window.getHeader());
         assertFalse(window.isNodePresent("stage :: default :: [default]@master"));
-        assertEquals("An error has occured", window.getStatus());
+        assertEquals("No build available", window.getStatus());
 
         window.clickCancel();
         assertFalse(window.isWindowPresent());
@@ -145,11 +145,12 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.ensureAgent(AGENT_NAME);
 
+        loginAsAdmin();
+        enableAgent(AGENT_NAME);
+
         ProjectConfiguration project = createProject(random, AGENT_NAME);
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
         buildRunner.triggerSuccessfulBuild(project);
-
-        loginAsAdmin();
 
         disableAgent(AGENT_NAME);
 
@@ -162,25 +163,34 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         assertEquals("browse working copy", window.getHeader());
         assertEquals("", window.getStatus());
 
+        String node = "stage :: default :: [default]@localhost";
+        assertTrue(window.isNodePresent(node));
+        window.doubleClickNode(node);
+        window.waitForLoadingToComplete();
+        
+        assertEquals("Host not available", window.getStatus());
+
         enableAgent(AGENT_NAME);
     }
 
     private void disableAgent(String name)
     {
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
-        assertTrue(agentsPage.isActionAvailable(name, ACTION_DISABLE));
-        agentsPage.clickAction(name, ACTION_DISABLE);
-
-        browser.refreshUntilText(agentsPage.getStatusId(name), DISABLED.getPrettyString());
+        if(agentsPage.isActionAvailable(name, ACTION_DISABLE))
+        {
+            agentsPage.clickAction(name, ACTION_DISABLE);
+            browser.refreshUntilText(agentsPage.getStatusId(name), DISABLED.getPrettyString());
+        }
     }
 
     private void enableAgent(String name)
     {
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
-        assertTrue(agentsPage.isActionAvailable(name, ACTION_ENABLE));
-        agentsPage.clickAction(name, ACTION_ENABLE);
-
-        browser.refreshUntilText(agentsPage.getStatusId(name), IDLE.getPrettyString());
+        if (agentsPage.isActionAvailable(name, ACTION_ENABLE))
+        {
+            agentsPage.clickAction(name, ACTION_ENABLE);
+            browser.refreshUntilText(agentsPage.getStatusId(name), IDLE.getPrettyString());
+        }
     }
 
     private ProjectConfiguration createProject(String projectName) throws Exception

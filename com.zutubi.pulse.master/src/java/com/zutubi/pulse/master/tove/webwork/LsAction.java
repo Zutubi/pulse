@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
@@ -123,6 +124,22 @@ public class LsAction extends VFSActionSupport
     }
 
     public String execute() throws Exception
+    {
+        try
+        {
+            return doListing();
+        }
+        catch (FileSystemException e)
+        {
+            String className = e.getStackTrace()[0].getClassName();
+            Class cls = ClassLoaderUtils.loadClass(className, LsAction.class);
+            Messages i18n = Messages.getInstance(cls);
+            addActionError(i18n.format(e.getCode(), e.getInfo()));
+            return ERROR;
+        }
+    }
+
+    private String doListing() throws FileSystemException
     {
         String fullPath = fs + "://";
         if(StringUtils.stringSet(basePath))

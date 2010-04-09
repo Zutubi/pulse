@@ -25,7 +25,6 @@ public class LocalFile extends AbstractFileObject implements FileObject
      * Creates a non-root file.
      */
     protected LocalFile(final LocalFileSystem fileSystem,
-                        final String rootFile,
                         final FileName name) throws FileSystemException
     {
         super(name, fileSystem);

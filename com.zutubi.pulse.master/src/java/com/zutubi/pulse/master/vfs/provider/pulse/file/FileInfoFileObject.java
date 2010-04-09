@@ -6,7 +6,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
@@ -26,7 +25,7 @@ public class FileInfoFileObject extends AbstractPulseFileObject
         this.fileInfo = fileInfo;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         FileInfoProvider provider = getAncestor(FileInfoProvider.class);
         String relativePath = ((FileObject)provider).getName().getRelativeName(fileName);
