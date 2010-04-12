@@ -5,18 +5,50 @@
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>
     <link href="$base/css/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
+
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var panel = new Ext.Panel({
+                id: 'build-panel',
+                layout: 'fit',
+                border: false,
+                
+                tbar: {
+                    id: 'build-toolbar',
+                    items: [{
+                        xtype: 'xztblink',
+                        id: 'download-file',
+                        text: '#wwtext("name=download.full.file")',
+                        icon: '$base/images/page_put.gif',
+                        url: '$urls.buildFileDownload($buildResult)'
+                    }]
+                },
+                
+                items: [{
+                    xtype: 'xzcontentpanel',
+                    contentEl: 'center',
+                    title: '#wwtext("name=pulse.file")'
+                }]
+            });
+
+            var center = Ext.get('center');
+            center.setStyle({margin: '0', padding: '0'});
+            var nestedCenter = Ext.getCmp('nested-center');
+            nestedCenter.add(panel);
+            viewport.doLayout();
+        });
+    </script>
 </head>
 <body>
     #buildTabs($buildResult "file")
 
     <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-file")'>
 #if($highlightedFile)
-    <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a id="download.file" href="$urls.buildFileDownload($buildResult)"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
-    <div id="highlighted.file" class="box">
+    <div id="highlighted-file" class="build-panel-content">
         $highlightedFile
     </div>
 #else
-    <p id="no.file">No pulse file available.</p>
+    <div id="no-file" class="build-panel-content">No pulse file available.</div>
 #end
     </div>
 </html>

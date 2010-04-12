@@ -10,6 +10,9 @@ import com.zutubi.util.WebUtils;
  */
 public class BuildFilePage extends SeleniumPage
 {
+    private static final String ID_DOWNLOAD_LINK = "download-file";
+    private static final String ID_HIGHLIGHTED_FILE = "highlighted-file";
+
     private String projectName;
     private long buildId;
 
@@ -27,11 +30,16 @@ public class BuildFilePage extends SeleniumPage
 
     public boolean isHighlightedFilePresent()
     {
-        return browser.isElementIdPresent("highlighted.file");
+        return browser.isElementIdPresent(ID_HIGHLIGHTED_FILE);
+    }
+
+    public boolean isDownloadLinkPresent()
+    {
+        return browser.isElementPresent(ID_DOWNLOAD_LINK);
     }
 
     public void clickDownload()
     {
-        browser.click("download.file");
+        browser.click(ID_DOWNLOAD_LINK);
     }
 }

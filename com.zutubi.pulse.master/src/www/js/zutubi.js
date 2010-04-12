@@ -2522,6 +2522,30 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
     }
 });
 
+/**
+ * Displays a content panel on a build page, with a heading and scrollable
+ * content.
+ */
+ZUTUBI.ContentPanel = function(config)
+{
+    ZUTUBI.ContentPanel.superclass.constructor.call(this, config);
+};
+
+Ext.extend(ZUTUBI.ContentPanel, Ext.Panel,
+{
+    layout: 'fit',
+    border: false,
+    animate: false,
+    autoScroll: true,
+    id: 'content-panel',
+
+    initComponent: function()
+    {
+        ZUTUBI.ContentPanel.superclass.initComponent.apply(this, arguments);
+    }
+});
+Ext.reg('xzcontentpanel', ZUTUBI.ContentPanel);
+
 
 if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 {
@@ -2555,7 +2579,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
             selModel: new Ext.tree.DefaultSelectionModel({onNodeClick: Ext.emptyFn}),
 
             tbar: {
-                id: 'artifacts-toolbar',
+                id: 'build-toolbar',
                 items: [{
                     xtype: 'label',
                     text: 'filter:'
@@ -2782,7 +2806,7 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
             children: [{
                 tag: 'a',
                 cls: 'unadorned',
-                href: '#',
+                href: this.url || '#',
                 children: [{
                     tag: 'img',
                     alt: this.text || '',
@@ -2790,7 +2814,7 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
                 }]
             }, {
                 tag: 'a',
-                href: '#',
+                href: this.url || '#',
                 html: this.text || ''
             }]
         };
@@ -2800,7 +2824,7 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
 
     onClick: function(e)
     {
-        if (e)
+        if (e && !this.url)
         {
             e.preventDefault();
         }

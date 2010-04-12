@@ -700,15 +700,21 @@ img.popdown-pressed {
 Build tabs
 */
 
-.build-page-header, #artifacts-toolbar {
+.build-page-header, #build-toolbar {
     border: dotted 1px #bbb;
     padding: 6px;
     background: #ffffe8 none;
     margin: 10px 0 10px 0;
 }
 
-#artifacts-toolbar .x-btn td {
+#build-toolbar .x-btn td {
     background: none;
+}
+
+.build-panel-heading {
+    border-bottom: dotted 1px #bbb;
+    padding: 6px 4px;
+    background-color: #f2f2ff;
 }
 
 .xz-tblink {
@@ -719,11 +725,11 @@ Build tabs
     margin-right: 5px;
 }
 
-#artifacts-tree {
+#build-panel, #artifacts-tree {
     padding: 0 8px 8px 8px;
 }
 
-#artifacts-tree .x-panel-body {
+#build-panel .x-panel-body, #artifacts-tree .x-panel-body {
     border-top: solid 1px #bbb;
     border-bottom: dotted 1px #bbb;
 }
@@ -749,6 +755,21 @@ Build tabs
 #artifacts-tree .x-grid3-hd-inner
 {
     background-image: none;
+}
+
+#content-panel .x-panel-body {
+    border: none;
+    padding: 6px;
+}
+
+#content-panel .x-panel-header {
+    border-bottom: dotted 1px #bbb;
+    padding: 6px 4px;
+    background-color: #f2f2ff;
+    background-image: none;
+    font-weight: bold;
+    color: #000;
+    font-size: 1.2em;
 }
 
 .change {
@@ -1270,7 +1291,8 @@ table.template-actions
 
 .x-btn button,
 .x-small-editor .x-form-field, .x-combo-list,
-.x-toolbar td, .x-toolbar span, .x-toolbar input, .x-toolbar div, .x-toolbar select, .x-toolbar label
+.x-toolbar td, .x-toolbar span, .x-toolbar input, .x-toolbar div, .x-toolbar select, .x-toolbar label,
+.x-panel-header
 {
     font-family: verdana, sans-serif;
     font-size: 12px;
