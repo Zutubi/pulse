@@ -14,7 +14,7 @@ public class OptionUtils
 {
     /**
      * Parses a resource requirement.  Requirements are must have at least a
-     * resource now, optionally followed by a forward slash and version.
+     * resource name, optionally followed by a forward slash and version.
      * 
      * @param arg the argument to parse
      * @return a resource requirement parse from the argument

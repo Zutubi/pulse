@@ -3,10 +3,10 @@ package com.zutubi.pulse.dev.expand;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.cli.ParseException;
 
 import java.util.Arrays;
@@ -33,8 +33,8 @@ public class ExpandCommand implements Command
         DevBootstrapManager.startup("com/zutubi/pulse/dev/expand/bootstrap/context/applicationContext.xml");
         try
         {
-            PulseFileExpander expander = new PulseFileExpander();
-            expander.setFileLoaderFactory((PulseFileLoaderFactory) SpringComponentContext.getBean("fileLoaderFactory"));
+            ObjectFactory objectFactory = SpringComponentContext.getBean("objectFactory");
+            PulseFileExpander expander = objectFactory.buildBean(PulseFileExpander.class);
             expander.expand(new PulseFileExpanderOptions(argv));
             return 0;
         }
