@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Pair;
 
 import java.util.Map;
@@ -33,6 +35,7 @@ public abstract class AbstractRegexProcessorPatternsUpgradeTask extends Abstract
     
     private RecordManager recordManager;
     private TemplatedScopeDetails scope;
+    private TransactionManager transactionManager;
 
     public boolean haltOnFailure()
     {
@@ -44,12 +47,20 @@ public abstract class AbstractRegexProcessorPatternsUpgradeTask extends Abstract
         PersistentScopes scopes = new PersistentScopes(recordManager);
         scope = (TemplatedScopeDetails) scopes.getScopeDetails(SCOPE_PROJECTS);
 
-        RecordLocator locator = newFirstDefinedFilter(newTypeFilter(newPathPattern(PATH_PATTERN_ALL_PROCESSORS), getProcessorType()), scope);
-        Map<String, Record> processors = locator.locate(recordManager);
-        for (Map.Entry<String, Record> entry: processors.entrySet())
+        transactionManager.runInTransaction(new NullaryFunction()
         {
-            addPatternsIfNotPresent(entry.getKey(), entry.getValue());
-        }
+            public Object process()
+            {
+                RecordLocator locator = newFirstDefinedFilter(newTypeFilter(newPathPattern(PATH_PATTERN_ALL_PROCESSORS), getProcessorType()), scope);
+                Map<String, Record> processors = locator.locate(recordManager);
+                for (Map.Entry<String, Record> entry: processors.entrySet())
+                {
+                    addPatternsIfNotPresent(entry.getKey(), entry.getValue());
+                }
+                
+                return null;
+            }
+        });
     }
 
     private void addPatternsIfNotPresent(String path, Record processorRecord)
@@ -102,5 +113,10 @@ public abstract class AbstractRegexProcessorPatternsUpgradeTask extends Abstract
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void setPulseTransactionManager(TransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
     }
 }
