@@ -1196,11 +1196,17 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
         this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
 
+        // spacing for a gap between the buttons and the widget:
+        // 1) buttons are 22 px wide.
+        // 2) give them 26 px and place them in the middle, giving 2px padding on the left
+        // 3) place them such that the right edge of the button lines up with the desired width.
+        // note: align right in the icon panel would be nice but does not work.
+
         var icons = new Ext.Panel({
             border:false,
             header:false,
+            width:26,
             layout:"vbox",
-            padding:'1 0 0 0',
             layoutConfig:
             {
                 align:"center"
@@ -1242,7 +1248,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
         this.view.flex = 1;
         var internalPanel = new Ext.Container({
-            width:this.width - 22, // 22 is the width needed by the icons to display correctly.
+            width:this.width - 24,
             layout:"vbox",
             layoutConfig:{align:"stretch"},
             items:[this.view,this.choice]
