@@ -593,7 +593,7 @@ ZUTUBI.ProjectsTable.prototype = {
             defaultText: 'Layout Controls:',
             renderTo: this.toolbarEl,
             style: { 'background': '#F2F2FF', 'border-width': '1px' },
-            width: 170,
+            width: 176,
             items:  [ {
                          icon: window.baseUrl + '/images/expand.gif',
                          cls: 'x-btn-icon',

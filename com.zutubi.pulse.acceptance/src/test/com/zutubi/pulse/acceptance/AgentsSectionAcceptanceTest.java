@@ -7,21 +7,23 @@ import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
-import static java.util.Arrays.asList;
 import java.util.Vector;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Acceptance test for basic agents section functionality.
@@ -203,6 +205,28 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         agentForm.waitFor();
         assertEquals(asList("", HOST_1, HOST_2), asList(agentForm.getComboBoxOptions("host")));
     }
+    
+    public void testAgentsExecutingBuild() throws Exception
+    {
+        loginAsAdmin();
+        final AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
+        assertFalse(agentsPage.isExecutingBuildPresent(AgentManager.MASTER_AGENT_NAME));
+
+        WaitProject project = startBuildOnAgent(random, AgentManager.MASTER_AGENT_NAME);
+
+        browser.refreshUntil(SeleniumBrowser.REFRESH_TIMEOUT, new Condition()
+        {
+            public boolean satisfied()
+            {
+                return agentsPage.isExecutingBuildPresent(AgentManager.MASTER_AGENT_NAME);
+            }
+        }, "executing build to appear on master agent");
+        
+        assertEquals(project.getName() + " :: build 1 :: default", agentsPage.getExecutingBuildDetails(AgentManager.MASTER_AGENT_NAME));
+
+        project.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+    }
 
     public void testAgentStatusExecutingBuild() throws Exception
     {
@@ -210,12 +234,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
         assertFalse(statusPage.isExecutingBuildPresent());
 
-        WaitProject project = projects.createWaitAntProject(tempDir, random);
-        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
-        configurationHelper.insertProject(project.getConfig());
-        xmlRpcHelper.waitForProjectToInitialise(project.getName());
-        xmlRpcHelper.triggerBuild(project.getName());
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        WaitProject project = startBuildOnAgent(random, AgentManager.MASTER_AGENT_NAME);
 
         browser.refreshUntilElement(AgentStatusPage.ID_BUILD_TABLE);
         assertEquals(project.getName(), statusPage.getExecutingProject());
@@ -284,12 +303,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertLocalAgent(agentName);
 
-        WaitProject project = projects.createWaitAntProject(tempDir, projectName);
-        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
-        configurationHelper.insertProject(project.getConfig());
-        xmlRpcHelper.waitForProjectToInitialise(project.getName());
-        xmlRpcHelper.triggerBuild(project.getName());
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        WaitProject project = startBuildOnAgent(projectName, agentName);
 
         xmlRpcHelper.enqueueSynchronisationMessage(agentName, TEST_DESCRIPTION, true);
 
@@ -330,6 +344,17 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
             AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "Description " + (i + offset), AgentSynchronisationMessage.Status.SUCCEEDED);
             assertEquals(expectedMessage, statusPage.getSynchronisationMessage(i));
         }
+    }
+
+    private WaitProject startBuildOnAgent(String projectName, String agentName) throws Exception
+    {
+        WaitProject project = projects.createWaitAntProject(tempDir, projectName);
+        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
+        configurationHelper.insertProject(project.getConfig());
+        xmlRpcHelper.waitForProjectToInitialise(project.getName());
+        xmlRpcHelper.triggerBuild(project.getName());
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        return project;
     }
 
     private void assertBuildingStatus(String status)

@@ -17,11 +17,12 @@
 #end
 
 <table id="agents-table" class="content">
-    #headingRow("agents" 5)
+    #headingRow("agents" 6)
     <tr>
         #contentHeading("agent.name" 1)
         #contentHeading("agent.location" 1)
         #contentHeading("agent.status" 1)
+        #contentHeading("agent.build" 1)
         #contentHeading("actions" 1)
         #contentHeading("edit" 1)
     </tr>
@@ -31,11 +32,28 @@
         #dynamicLinkCell($model.name "$urls.agentStatus($model.agent)")
         #dynamicIdCell("agent.${model.name}.location" $model.location)
         #dynamicIdCell("agent.${model.name}.status" $model.status)
-        <td class="content">
+        <td id='#id("agent.${model.name}.build")' class="content-wrap">
+   #if($model.executingBuild)
+       #if($model.executingBuild.personal)
+           <img alt="user" src="$base/images/user.gif"/> #html($model.executingBuild.user.login) ::
+           <a href="$urls.projectHome($model.executingBuild.project)">#html($model.executingBuild.project.name)</a>  ::
+           #html($model.executingNode.stageName)
+       #else
+           <a href="$urls.projectHome($model.executingBuild.project)">#html($model.executingBuild.project.name)</a> ::
+           <a href="$urls.build($model.executingBuild)">#wwtext("name=build") $model.executingBuild.number</a> ::
+           <a href="$urls.stageDetails($model.executingBuild, $model.executingNode)">#html($model.executingNode.stageName)</a>
+       #end
+   #else
+            #wwtext("name=none")
+   #end
+        </td>
+        <td class="content-wrap">
     #if($model.hasActions())
         #foreach($action in $model.actions)
+            <span class="nowrap">
             #if($action.icon)<img alt="${action.label}" src="${base}/images/config/actions/${action.icon}.gif"/>#end
-            <a id='#id("agent.${model.name}.action.${action.action}")' href="$urls.agentAction($model.agent, $action.action)">$action.label</a>
+                <a id='#id("agent.${model.name}.action.${action.action}")' href="$urls.agentAction($model.agent, $action.action)">$action.label</a>
+            </span>
             #if($velocityCount < $model.actions.size())
             <span class="understated">//</span>
             #end

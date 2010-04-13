@@ -5,7 +5,6 @@ import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -17,7 +16,6 @@ import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.git.GitPatchFormat;
 import com.zutubi.pulse.core.scm.git.GitWorkingCopy;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy;
 import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
@@ -33,7 +31,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDepth;
@@ -48,8 +45,12 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.*;
+
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -565,6 +566,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("<ant");
 
         PersonalBuildArtifactsPage artifactsPage = browser.openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
+        artifactsPage.setFilterAndWait("");
         browser.waitForLocator(artifactsPage.getCommandLocator("build"));
     }
 

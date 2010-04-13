@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 
 import java.util.LinkedList;
@@ -16,6 +18,8 @@ public class AgentRowModel
     private String location;
     private String status;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
+    private BuildResult executingBuild;
+    private RecipeResultNode executingNode;
 
     public AgentRowModel(Agent agent, String name, String location, String status)
     {
@@ -58,6 +62,22 @@ public class AgentRowModel
     public void setStatus(String status)
     {
         this.status = status;
+    }
+
+    public BuildResult getExecutingBuild()
+    {
+        return executingBuild;
+    }
+
+    public RecipeResultNode getExecutingNode()
+    {
+        return executingNode;
+    }
+
+    public void setExecutingStage(BuildResult buildResult, RecipeResultNode node)
+    {
+        this.executingBuild = buildResult;
+        this.executingNode = node;
     }
 
     public boolean hasActions()

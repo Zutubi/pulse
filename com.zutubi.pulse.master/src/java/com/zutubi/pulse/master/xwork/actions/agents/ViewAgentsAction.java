@@ -3,12 +3,16 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationFormatter;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -32,6 +36,7 @@ public class ViewAgentsAction extends ActionSupport
     private ActionManager actionManager;
     private SystemPaths systemPaths;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private BuildManager buildManager;
 
     public List<AgentRowModel> getModels()
     {
@@ -72,6 +77,7 @@ public class ViewAgentsAction extends ActionSupport
             }
         });
 
+        final Messages messages = Messages.getInstance(AgentConfiguration.class);
         final AgentConfigurationFormatter formatter = new AgentConfigurationFormatter();
         models = CollectionUtils.map(agents, new Mapping<Agent, AgentRowModel>()
         {
@@ -79,12 +85,8 @@ public class ViewAgentsAction extends ActionSupport
             {
                 AgentRowModel rowModel = new AgentRowModel(agent, agent.getConfig().getName(), agent.getHost().getLocation(), formatter.getStatus(agent));
 
-                Messages messages = Messages.getInstance(AgentConfiguration.class);
-                File contentRoot = systemPaths.getContentRoot();
-                for(String actionName: actionManager.getActions(agent.getConfig(), false, true))
-                {
-                    rowModel.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
-                }
+                addExecutingBuild(agent, rowModel, messages);
+                addActions(agent, rowModel, messages);
 
                 return rowModel;
             }
@@ -98,6 +100,32 @@ public class ViewAgentsAction extends ActionSupport
             }
         });
         return SUCCESS;
+    }
+
+    private void addExecutingBuild(Agent agent, AgentRowModel rowModel, Messages messages)
+    {
+        long recipeId = agent.getRecipeId();
+        if (recipeId != HostStatus.NO_RECIPE)
+        {
+            BuildResult buildResult = buildManager.getByRecipeId(recipeId);
+            if (buildResult != null)
+            {
+                RecipeResultNode node = buildResult.findResultNodeByRecipeId(recipeId);
+                if (node != null)
+                {
+                    rowModel.setExecutingStage(buildResult, node);
+                }
+            }
+        }
+    }
+
+    private void addActions(Agent agent, AgentRowModel rowModel, Messages messages)
+    {
+        File contentRoot = systemPaths.getContentRoot();
+        for (String actionName: actionManager.getActions(agent.getConfig(), false, true))
+        {
+            rowModel.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
+        }
     }
 
     public void setAgentManager(AgentManager agentManager)
@@ -118,5 +146,10 @@ public class ViewAgentsAction extends ActionSupport
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

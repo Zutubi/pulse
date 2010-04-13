@@ -17,6 +17,7 @@ import java.util.List;
 public class AgentsPage extends SeleniumPage
 {
     private static final String ID_AGENTS_TABLE = "agents-table";
+    private static final String EXECUTING_NONE = "none";
 
     public AgentsPage(SeleniumBrowser browser, Urls urls)
     {
@@ -75,5 +76,28 @@ public class AgentsPage extends SeleniumPage
     {
         browser.click(getActionId(agent, action));
         browser.waitForPageToLoad();
+    }
+
+    /**
+     * Indicates if there is info about an executing build on the given agent.
+     * 
+     * @param agentName name of the agent to test
+     * @return true if there is a build executing on the agent, false otherwise
+     */
+    public boolean isExecutingBuildPresent(String agentName)
+    {
+        String details = getExecutingBuildDetails(agentName);
+        return !EXECUTING_NONE.equals(details);
+    }
+
+    /**
+     * Returns details of an executing build on the given agent.
+     * 
+     * @param agentName name of the agent to get the info for
+     * @return text of the executing build stage cell for the agent
+     */
+    public String getExecutingBuildDetails(String agentName)
+    {
+        return browser.getText("agent." + agentName + ".build");
     }
 }
