@@ -316,12 +316,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     public String insert(final String path, Object instance)
     {
-        CompositeType type = typeRegistry.getType(instance.getClass());
-        if (type == null)
-        {
-            throw new IllegalArgumentException("Attempt to insert object of unregistered class '" + instance.getClass().getName() + "'");
-        }
-
+        CompositeType type = getInstanceType(instance);
         try
         {
             final MutableRecord record = type.unstantiate(instance, getTemplateOwnerPath(path));
@@ -337,6 +332,112 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             throw new ToveRuntimeException(e);
         }
+    }
+
+    /**
+     * Inserts an instance into a templated collection, setting its parent and
+     * marking it as a template if necessary.
+     * 
+     * @param scope              scope to insert the instance into (must be
+     *                           templated)
+     * @param instance           the instance to insert
+     * @param templateParentPath path of the template parent for this instance,
+     *                           or null if it should be the root of the
+     *                           hierarchy
+     * @param template           if true, mark the inserted record as a
+     *                           template, must be true if templateParentPath
+     *                           is null
+     * @return
+     */
+    public String insertTemplated(final String scope, Object instance, String templateParentPath, boolean template)
+    {
+        ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+        if (scopeInfo == null)
+        {
+            throw new IllegalArgumentException("Scope '" + scope + "' is invalid");            
+        }
+        
+        if (!scopeInfo.isTemplated())
+        {
+            throw new IllegalArgumentException("Scope '" + scope + "' is not templated");
+        }
+        
+        CompositeType instanceType = getInstanceType(instance);
+        CompositeType scopeItemType = (CompositeType) scopeInfo.getTargetType();
+        if (!instanceType.equals(scopeItemType))
+        {
+            throw new IllegalArgumentException("Instance type '" + instanceType.getSymbolicName() + "' does not match scope item type '" + scopeItemType.getSymbolicName() + "'");
+        }
+
+        Record templateParentRecord = null;
+        if (templateParentPath == null)
+        {
+            if (!template)
+            {
+                throw new IllegalArgumentException("Inserted item must have a parent or be a template itself");
+            }
+            
+            Record templatedCollectionRecord = recordManager.select(scope);
+            if (templatedCollectionRecord.nestedKeySet().size() != 0)
+            {
+                throw new IllegalArgumentException("Scope '" + scope + "' already has a root item");
+            }
+        }
+        else
+        {
+            String[] templateParentPathElements = PathUtils.getPathElements(templateParentPath);
+            if (templateParentPathElements.length != 2 || !templateParentPathElements[0].equals(scope))
+            {
+                throw new IllegalArgumentException("Template parent path '" + templateParentPath + "' does not refer to an element of the same templated collection");
+            }
+            
+            templateParentRecord = recordManager.select(templateParentPath);
+            if (templateParentRecord == null)
+            {
+                throw new IllegalArgumentException("Template parent path '" + templateParentPath + "' is invalid");
+            }
+            
+            if (!isTemplate(templateParentRecord))
+            {
+                throw new IllegalArgumentException("Template parent path '" + templateParentPath + "' refers to a concrete record");
+            }
+        }
+        
+        try
+        {
+            final MutableRecord record = instanceType.unstantiate(instance, null);
+            if (templateParentRecord != null)
+            {
+                setParentTemplate(record, templateParentRecord.getHandle());
+            }
+            
+            if (template)
+            {
+                markAsTemplate(record);
+            }
+            
+            return executeInsideTransaction(new NullaryFunction<String>()
+            {
+                public String process()
+                {
+                    return insertRecord(scope, record);
+                }
+            });
+        }
+        catch (TypeException e)
+        {
+            throw new ToveRuntimeException(e);
+        }
+    }
+
+    private CompositeType getInstanceType(Object instance)
+    {
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Attempt to insert object of unregistered class '" + instance.getClass().getName() + "'");
+        }
+        return type;
     }
 
     public String insertRecord(final String path, final MutableRecord r)
@@ -2425,6 +2526,19 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
 
         return false;
+    }
+
+    /**
+     * Indicates if the given record is directly marked as a template.  Note
+     * that records nested uner a template instance are not marked in this way
+     * (only owner records are marked).
+     * 
+     * @param record the record to test
+     * @return true if the record is directly marked as a template
+     */
+    public boolean isTemplate(Record record)
+    {
+        return Boolean.valueOf(record.getMeta(TemplateRecord.TEMPLATE_KEY));
     }
 
     public void markAsTemplate(MutableRecord record)

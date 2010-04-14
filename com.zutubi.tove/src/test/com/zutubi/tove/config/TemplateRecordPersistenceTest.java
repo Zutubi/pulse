@@ -8,13 +8,14 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests that the records returned by the CTM are template records with
@@ -684,26 +685,6 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         // Verify order is unchanged
         Collections.replaceAll(newOrder, PathUtils.getBaseName(firstStagePath), "renamed");
         assertEquals(newOrder, getOrder(inheritedStagesPath));
-    }
-
-    public void testInheritedOrderRefersToHiddenItem()
-    {
-        // This scenario is fine, we're just ensuring that the health check
-        // doesn't trip on it.
-        insertGlobal();
-        insertChild();
-        String stagesPath = "project/global/stages";
-        configurationTemplateManager.insertRecord(stagesPath, createStage("another"));
-
-        // Reorder in parent
-        Project global = (Project) configurationTemplateManager.getInstance("project/global");
-        List<String> originalOrder = new LinkedList<String>(global.getStages().keySet());
-        List<String> newOrder = new LinkedList<String>(originalOrder);
-        Collections.reverse(newOrder);
-        configurationTemplateManager.setOrder(stagesPath, newOrder);
-        
-        // Hide an ordered item in the child.
-        configurationTemplateManager.delete("project/child/stages/another");
     }
 
     public void testDelete()

@@ -110,7 +110,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record select(String path)
     {
-        checkPath(path);
+        checkPath(path, false);
 
         RecordQueries queries = new RecordQueries(recordStore.select());
         return queries.select(path);
@@ -131,7 +131,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Map<String, Record> selectAll(String pattern)
     {
-        checkPath(pattern);
+        checkPath(pattern, false);
 
         RecordQueries queries = new RecordQueries(recordStore.select());
         return queries.selectAll(pattern);
@@ -145,7 +145,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized boolean containsRecord(String path)
     {
-        checkPath(path);
+        checkPath(path, false);
 
         return select(path) != null;
     }
@@ -161,7 +161,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized void update(final String path, final Record values)
     {
-        checkPath(path);
+        checkPath(path, false);
 
         // sanity check - we expect the states handle/path to match that of the
         // record we are updating.  If not we fail early.
@@ -195,7 +195,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized void insert(final String path, final Record record)
     {
-        checkPath(path);
+        checkPath(path, true);
 
         if (record == null)
         {
@@ -228,7 +228,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record delete(final String path)
     {
-        checkPath(path);
+        checkPath(path, true);
 
         Record record = stateWrapper.execute(new UnaryFunction<RecordManagerState, Record>()
         {
@@ -261,7 +261,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record move(String sourcePath, final String destinationPath)
     {
-        checkPath(destinationPath);
+        checkPath(destinationPath, true);
         checkDoesNotExist(destinationPath, "Failed to move to destination path: '" + destinationPath + "'. An entry already exists at this path.");
 
         final Record record = delete(sourcePath);
@@ -310,9 +310,9 @@ public class RecordManager implements HandleAllocator
         }
     }
 
-    private void checkPath(String path)
+    private void checkPath(String path, boolean disallowEmpty)
     {
-        if (path == null || path.equals(""))
+        if (path == null || disallowEmpty && path.length() == 0)
         {
             throw new IllegalArgumentException("Invalid path '" + path + "'");
         }

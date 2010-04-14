@@ -1,9 +1,6 @@
 package com.zutubi.tove.config.cleanup;
 
-import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.type.record.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -13,11 +10,13 @@ import com.zutubi.util.Predicate;
 public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
 {
     private String deletedHandle;
+    private String[] inheritedReferences;
 
-    public RemoveReferenceCleanupTask(String referencingPath, long deletedHandle)
+    public RemoveReferenceCleanupTask(String referencingPath, long deletedHandle, String[] inheritedReferences)
     {
         super(referencingPath);
         this.deletedHandle = Long.toString(deletedHandle);
+        this.inheritedReferences = inheritedReferences;
     }
 
     public void run(RecordManager recordManager)
@@ -38,17 +37,38 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
             if (references != null && CollectionUtils.contains(references, deletedHandle))
             {
                 MutableRecord newValues = parentRecord.copy(false, true);
-                String[] newReferences = CollectionUtils.filterToArray(references, new Predicate<String>()
-                {
-                    public boolean satisfied(String handle)
-                    {
-                        return !handle.equals(deletedHandle);
-                    }
-                });
+                String[] newReferences = filter(references);
+                String[] newInheritedReferences = filter(inheritedReferences);
 
-                newValues.put(baseName, newReferences);
+                if (RecordUtils.valuesEqual(newReferences, newInheritedReferences))
+                {
+                    newValues.remove(baseName);
+                }
+                else
+                {
+                    newValues.put(baseName, newReferences);
+                }
+                
                 recordManager.update(parentPath, newValues);
             }
+        }
+    }
+
+    private String[] filter(String[] references)
+    {
+        if (references == null)
+        {
+            return null;
+        }
+        else
+        {
+            return CollectionUtils.filterToArray(references, new Predicate<String>()
+            {
+                public boolean satisfied(String handle)
+                {
+                    return !handle.equals(deletedHandle);
+                }
+            });
         }
     }
 }

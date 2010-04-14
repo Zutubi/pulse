@@ -14,10 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- *
- */
 public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 {
     private CompositeType typeA;
@@ -96,12 +92,6 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         record.put("name", name);
         record.put("thing", "edited");
         return record;
-    }
-
-    protected void tearDown() throws Exception
-    {
-        configurationProvider = null;
-        super.tearDown();
     }
 
     public void testInstanceInserted()

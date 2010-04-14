@@ -3,6 +3,7 @@ package com.zutubi.tove.config.health;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,15 @@ public class ConfigurationHealthReport
      */
     private List<ConfigurationHealthProblem> problems = new LinkedList<ConfigurationHealthProblem>();
 
+    public ConfigurationHealthReport()
+    {
+    }
+
+    public ConfigurationHealthReport(ConfigurationHealthProblem... problems)
+    {
+        this.problems.addAll(Arrays.asList(problems));
+    }
+    
     public boolean isHealthy()
     {
         return problems.isEmpty();
@@ -49,6 +59,34 @@ public class ConfigurationHealthReport
     public void addProblem(String path, String message)
     {
         problems.add(new ConfigurationHealthProblem(path, message));
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ConfigurationHealthReport report = (ConfigurationHealthReport) o;
+
+        if (problems != null ? !problems.equals(report.problems) : report.problems != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return problems != null ? problems.hashCode() : 0;
     }
 
     @Override

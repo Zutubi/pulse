@@ -62,7 +62,18 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         }
         else
         {
-            return new RemoveReferenceCleanupTask(referencingPath, recordManager.select(deletedPath).getHandle());
+            String[] inheritedValues = null;
+            Record referencingRecord = configurationTemplateManager.getRecord(parentPath);
+            if (referencingRecord instanceof TemplateRecord)
+            {
+                TemplateRecord templateParent = ((TemplateRecord) referencingRecord).getParent();
+                if (templateParent != null)
+                {
+                    inheritedValues = (String[]) templateParent.get(baseName);
+                }
+            }
+            
+            return new RemoveReferenceCleanupTask(referencingPath, recordManager.select(deletedPath).getHandle(), inheritedValues);
         }
     }
 

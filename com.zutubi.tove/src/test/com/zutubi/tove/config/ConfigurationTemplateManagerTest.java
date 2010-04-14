@@ -28,6 +28,9 @@ import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 public class ConfigurationTemplateManagerTest extends AbstractConfigurationSystemTestCase
 {
     private static final String SCOPE_SAMPLE = "sample";
@@ -135,7 +138,157 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             assertEquals("Permission to create at path 'sample' denied", e.getMessage());
         }
     }
+    
+    public void testInsertTemplatedRoot()
+    {
+        String path = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
+        assertEquals(PathUtils.getPath(SCOPE_TEMPLATED, "root"), path);
+        
+        Record record = configurationTemplateManager.getRecord(path);
+        assertNotNull(record);
+        assertTrue(configurationTemplateManager.isTemplate(record));
+        assertEquals("configA", record.getSymbolicName());
+        assertEquals("root", record.get("name"));
+    }
 
+    public void testInsertTemplatedConcreteChild()
+    {
+        ConfigA root = new ConfigA("root");
+        root.setB("b");
+        root.setC("c");
+        root.getCs().put("c1", new ConfigC("c1"));
+        
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
+        
+        ConfigA child = new ConfigA("child");
+        child.setB("b");
+        child.setC("override");
+
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child, rootPath, false);
+
+        assertEquals(PathUtils.getPath(SCOPE_TEMPLATED, "child"), childPath);
+        
+        Record record = configurationTemplateManager.getRecord(childPath);
+        assertNotNull(record);
+        assertFalse(configurationTemplateManager.isTemplate(record));
+        assertEquals("child", record.get("name"));
+        assertEquals("b", record.get("b"));
+        assertEquals("override", record.get("c"));
+
+        Record collectionRecord = (Record) record.get("cs");
+        Record itemRecord = (Record) collectionRecord.get("c1");
+        assertNotNull(itemRecord);
+        assertEquals("c1", itemRecord.get("name"));
+    }
+    
+    public void testInsertTemplatedInvalidScope()
+    {
+        try
+        {
+            configurationTemplateManager.insertTemplated("invalid", new ConfigA(), null, true);
+            fail("Should not be able to insert into invalid scope");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Scope 'invalid' is invalid"));
+        }
+    }
+    
+    public void testInsertTemplatedNonTemplatedScope()
+    {
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_SAMPLE, new ConfigA(), null, true);
+            fail("Should not be able to insert into a non-templated scope");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("is not templated"));
+        }
+    }
+
+    public void testInsertTemplatedBadType()
+    {
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigB(), null, true);
+            fail("Should not be able to insert an item of the wrong type");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Instance type 'configB' does not match scope item type 'configA'"));
+        }
+    }
+
+    public void testInsertTemplatedInvalidTemplateParentPath()
+    {
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), PathUtils.getPath(SCOPE_TEMPLATED, "invalid"), true);
+            fail("Should not be able to insert an item with an invalid parent");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Template parent path 'template/invalid' is invalid"));
+        }
+    }
+
+    public void testInsertTemplatedTemplateParentNotItemOfSameCollection()
+    {
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bad parental"));
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), path, true);
+            fail("Should not be able to insert an item with a bad parent");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("does not refer to an element of the same templated collection"));
+        }
+    }
+
+    public void testInsertTemplatedTemplateParentConcrete()
+    {
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
+        String concretePath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("conker"), rootPath, false);
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), concretePath, false);
+            fail("Should not be able to insert an item with a concrete parent");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("refers to a concrete record"));
+        }
+    }
+    
+    public void testInsertTemplatedNoParentNotTemplate()
+    {
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, false);
+            fail("Should not be able to insert a concrete item as the scope root");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Inserted item must have a parent or be a template itself"));
+        }
+    }
+
+    public void testInsertTemplatedSecondRoot()
+    {
+        configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
+        try
+        {
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("twoot"), null, true);
+            fail("Should not be able to insert a second root");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("already has a root item"));
+        }
+    }
+    
     public void testSave()
     {
         ConfigA a = new ConfigA("a");

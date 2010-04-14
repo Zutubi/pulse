@@ -130,17 +130,8 @@ public class InMemoryRecordStore implements RecordStore
 
     private Record update(MutableRecord base, String path, Record updatedRecord)
     {
-        String[] parentPathElements = PathUtils.getParentPathElements(path);
-        String baseName = PathUtils.getBaseName(path);
-
         // quick validation.
-        MutableRecord parentRecord = getRecord(base, parentPathElements);
-        if (parentRecord == null)
-        {
-            throw new IllegalArgumentException("No record for path '" + path + "'");
-        }
-
-        MutableRecord targetRecord = getChildRecord(parentRecord, baseName);
+        MutableRecord targetRecord = getRecord(base, PathUtils.getPathElements(path));
         if (targetRecord == null)
         {
             throw new IllegalArgumentException("No record for path '" + path + "'");

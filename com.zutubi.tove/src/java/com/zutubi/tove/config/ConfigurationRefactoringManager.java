@@ -3,16 +3,17 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.tove.type.record.PathUtils.getPathElements;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -1915,7 +1916,7 @@ public class ConfigurationRefactoringManager
             ensureMovable();
 
             // Path must not be inherited.
-            if( configurationTemplateManager.getTemplateParentRecord(path) != null)
+            if (configurationTemplateManager.getTemplateParentRecord(path) != null)
             {
                 throw new IllegalArgumentException("Path is inherited");
             }

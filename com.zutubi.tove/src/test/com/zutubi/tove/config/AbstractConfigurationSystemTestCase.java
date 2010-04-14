@@ -46,7 +46,8 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
     protected TransactionManager transactionManager;
     protected DefaultAccessManager accessManager;
     protected DefaultConfigurationProvider configurationProvider = null;
-
+    protected boolean checkHealthOnTeardown = true;
+    
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -175,16 +176,24 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
     @Override
     protected void tearDown() throws Exception
     {
-        ConfigurationHealthChecker checker = objectFactory.buildBean(ConfigurationHealthChecker.class);
-        ConfigurationHealthReport report = checker.checkAll();
-        if (!report.isHealthy())
+        if (checkHealthOnTeardown)
         {
-            throw new AssertionError(report.toString());
+            ConfigurationHealthChecker checker = objectFactory.buildBean(ConfigurationHealthChecker.class);
+            ConfigurationHealthReport report = checker.checkAll();
+            if (!report.isHealthy())
+            {
+                throw new AssertionError(report.toString());
+            }
         }
 
         super.tearDown();
     }
 
+    protected void disableHealthCheckOnTeardown()
+    {
+        checkHealthOnTeardown = false;
+    }
+    
     public MutableRecord unstantiate(Configuration c) throws TypeException
     {
         CompositeType type = typeRegistry.getType(c.getClass());

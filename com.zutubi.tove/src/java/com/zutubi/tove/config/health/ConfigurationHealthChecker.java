@@ -5,10 +5,7 @@ import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationScopeInfo;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.*;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.tove.type.record.*;
 import com.zutubi.util.StringUtils;
 
 import java.util.List;
@@ -42,6 +39,69 @@ public class ConfigurationHealthChecker
         ConfigurationHealthReport report = new ConfigurationHealthReport();
         checkRoot(report);
         return report;
+    }
+
+    /**
+     * Runs checks over the given path, reporting any problems found.  If the
+     * path is empty, the entire record store is checked.  The path must exist.
+     * <p/>
+     * Note that template parent pointers are only checked at the level of the
+     * templated collection items - if you pass a path with more than two
+     * elements the parent pointer is unchecked.
+     * 
+     * @param path path to check
+     * @return a report listing all problems found
+     */
+    public ConfigurationHealthReport checkPath(String path)
+    {        
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length == 0)
+        {
+            return checkAll();
+        }
+        else
+        {
+            if (!configurationTemplateManager.pathExists(path))
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
+
+            ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(elements[0]);
+            ConfigurationHealthReport report = new ConfigurationHealthReport();
+
+            if (elements.length == 1)
+            {
+                checkScope(scope, recordManager.select(scope.getScopeName()), report);
+            }
+            else if (scope.isTemplated())
+            {
+                if (elements.length == 2)
+                {
+                    CompositeType templatedItemType = (CompositeType) scope.getType().getTargetType();
+                    Record templatedCollectionRecord = recordManager.select(scope.getScopeName());
+                    String itemKey = elements[1];
+                    if (checkTemplatedCollectionItemStructure(scope.getScopeName(), templatedItemType, templatedCollectionRecord, itemKey, report))
+                    {
+                        checkTemplatedCollectionItem(scope.getScopeName(), templatedItemType, itemKey, report);
+                    }
+                }
+                else
+                {
+                    TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
+                    TemplateRecord templateParentRecord = record.getParent();
+                    if (templateParentRecord == null || checkStructuresMatch(path, record.getMoi(), templateParentRecord.getMoi(), report))
+                    {
+                        checkRecord(path, configurationTemplateManager.getType(path), record, report);
+                    }
+                }
+            }
+            else
+            {
+                checkRecord(path, configurationTemplateManager.getType(path), recordManager.select(path), report);
+            }
+
+            return report;
+        }
     }
 
     private void checkRoot(ConfigurationHealthReport report)
@@ -95,7 +155,19 @@ public class ConfigurationHealthChecker
         int problemsBefore = report.getProblemCount();
 
         checkForSimpleKeys(scopeName, templateCollectionRecord, report);
+        if (checkRootItem(scopeName, type, templateCollectionRecord, report))
+        {
+            for (String item : templateCollectionRecord.nestedKeySet())
+            {
+                checkTemplatedCollectionItemStructure(scopeName, type, templateCollectionRecord, item, report);
+            }
+        }
+        
+        return problemsBefore == report.getProblemCount();
+    }
 
+    private boolean checkRootItem(String scopeName, CompositeType type, Record templateCollectionRecord, ConfigurationHealthReport report)
+    {
         String rootItem = null;
         for (String item : templateCollectionRecord.nestedKeySet())
         {
@@ -103,7 +175,6 @@ public class ConfigurationHealthChecker
             Record record = (Record) templateCollectionRecord.get(item);
             if (checkType(path, type, record, report) != null)
             {
-                boolean isTemplate = isTemplate(record);
                 String parentHandleString = record.getMeta(TemplateRecord.PARENT_KEY);
                 if (parentHandleString == null)
                 {
@@ -117,51 +188,73 @@ public class ConfigurationHealthChecker
                         return false;
                     }
 
-                    if (!isTemplate)
+                    if (!configurationTemplateManager.isTemplate(record))
                     {
                         report.addProblem(path, "Scope has a root '" + item + "' not marked as a template.");
                         return false;
                     }
                 }
-                else
+            }
+        }
+
+        return true;
+    }
+
+    private boolean checkTemplatedCollectionItemStructure(String scopeName, CompositeType type, Record templateCollectionRecord, String itemKey, ConfigurationHealthReport report)
+    {
+        int problemsBefore = report.getProblemCount();
+
+        String path = PathUtils.getPath(scopeName, itemKey);
+        Record record = (Record) templateCollectionRecord.get(itemKey);
+        if (checkType(path, type, record, report) != null)
+        {
+            String parentHandleString = record.getMeta(TemplateRecord.PARENT_KEY);
+            if (parentHandleString != null)
+            {
+                try
                 {
-                    try
+                    long parentHandle = Long.parseLong(parentHandleString);
+                    String parentPath = recordManager.getPathForHandle(parentHandle);
+                    if (parentPath == null)
                     {
-                        long parentHandle = Long.parseLong(parentHandleString);
-                        String parentPath = recordManager.getPathForHandle(parentHandle);
+                        report.addProblem(path, "Unknown parent handle '" + parentHandle + "'.");
+                    }
+                    else
+                    {
                         String[] parentPathElements = PathUtils.getPathElements(parentPath);
                         if (parentPathElements.length != 2 || !parentPathElements[0].equals(scopeName))
                         {
                             report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': not an item of the same templated collection.");
                         }
-
-                        Record templateParentRecord = recordManager.select(parentPath);
-                        if (templateParentRecord == null)
+                        else
                         {
-                            report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': path does not exist.");
+                            Record templateParentRecord = recordManager.select(parentPath);
+                            if (templateParentRecord == null)
+                            {
+                                report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': path does not exist.");
+                            }
+                            else
+                            {
+                                if (!configurationTemplateManager.isTemplate(templateParentRecord))
+                                {
+                                    report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': record is not a template.");
+                                }
+                                else
+                                {
+                                    checkStructuresMatch(path, record, templateParentRecord, report);
+                                }
+                            }
                         }
-
-                        if (!isTemplate(templateParentRecord))
-                        {
-                            report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': record is not a template.");
-                        }
-
-                        checkStructuresMatch(path, record, templateParentRecord, report);
                     }
-                    catch (NumberFormatException e)
-                    {
-                        report.addProblem(path, "Illegal parent handle value '" + parentHandleString + "'.");
-                    }
+                }
+                catch (NumberFormatException e)
+                {
+                    report.addProblem(path, "Illegal parent handle value '" + parentHandleString + "'.");
                 }
             }
         }
 
         return problemsBefore == report.getProblemCount();
-    }
-
-    private Boolean isTemplate(Record record)
-    {
-        return Boolean.valueOf(record.getMeta(TemplateRecord.TEMPLATE_KEY));
     }
 
     private boolean checkStructuresMatch(String path, Record record, Record templateParentRecord, ConfigurationHealthReport report)
@@ -206,22 +299,27 @@ public class ConfigurationHealthChecker
         return TemplateRecord.getHiddenKeys(record).contains(key);
     }
 
-    private void checkTemplatedCollection(String path, CompositeType itemType, Record record, ConfigurationHealthReport report)
+    private void checkTemplatedCollection(String scopeName, CompositeType itemType, Record record, ConfigurationHealthReport report)
     {
-        checkForSimpleKeys(path, record, report);
+        checkForSimpleKeys(scopeName, record, report);
         for (String item : record.nestedKeySet())
         {
-            String nestedPath = PathUtils.getPath(path, item);
-            // Go to the CTM so we get a templatised record.
-            Record nestedRecord = configurationTemplateManager.getRecord(nestedPath);
-            if (StringUtils.equals(nestedRecord.getSymbolicName(), itemType.getSymbolicName()))
-            {
-                checkRecord(nestedPath, itemType, nestedRecord, report);
-            }
-            else
-            {
-                report.addProblem(nestedPath, "Template collection item has incorrect type, expected '" + itemType.getSymbolicName() + "', got '" + nestedRecord.getSymbolicName() + "'.");
-            }
+            checkTemplatedCollectionItem(scopeName, itemType, item, report);
+        }
+    }
+
+    private void checkTemplatedCollectionItem(String scopeName, CompositeType itemType, String itemKey, ConfigurationHealthReport report)
+    {
+        String nestedPath = PathUtils.getPath(scopeName, itemKey);
+        // Go to the CTM so we get a templatised record.
+        Record nestedRecord = configurationTemplateManager.getRecord(nestedPath);
+        if (StringUtils.equals(nestedRecord.getSymbolicName(), itemType.getSymbolicName()))
+        {
+            checkRecord(nestedPath, itemType, nestedRecord, report);
+        }
+        else
+        {
+            report.addProblem(nestedPath, "Template collection item has incorrect type, expected '" + itemType.getSymbolicName() + "', got '" + nestedRecord.getSymbolicName() + "'.");
         }
     }
 
@@ -242,10 +340,17 @@ public class ConfigurationHealthChecker
         int problemsBefore = report.getProblemCount();
 
         checkForSimpleKeys(path, record, report);
-        checkCollectionOrder(path, record, report);
         if (record instanceof TemplateRecord)
         {
-            checkHiddenItems(path, (TemplateRecord) record, report);
+            TemplateRecord templateRecord = (TemplateRecord) record;
+            // Only check orders where they are defined.  Inherited orders may
+            // validly contain references to items not visible at this level.
+            checkCollectionOrder(path, templateRecord.getMoi(), report);
+            checkHiddenItems(path, templateRecord, report);
+        }
+        else
+        {
+            checkCollectionOrder(path, record, report);
         }
 
         CompositeType targetType = (CompositeType) type.getTargetType();
@@ -273,13 +378,6 @@ public class ConfigurationHealthChecker
 
     private void checkCollectionOrder(String path, Record record, ConfigurationHealthReport report)
     {
-        // Only check orders where they are defined.  Inherited orders may
-        // validly contain references to items not visible at this level.
-        if (record instanceof TemplateRecord)
-        {
-            record = ((TemplateRecord) record).getMoi();
-        }
-        
         List<String> orderKeys = CollectionType.getDeclaredOrder(record);
         for (String orderKey : orderKeys)
         {
@@ -335,6 +433,27 @@ public class ConfigurationHealthChecker
 
         checkReferences(path, type, record, report);
 
+        if (record instanceof TemplateRecord)
+        {
+            checkScrubbed(path, type, (TemplateRecord) record, report);
+        }
+        
+        for (String key : record.simpleKeySet())
+        {
+            TypeProperty property = type.getProperty(key);
+            if (property == null)
+            {
+                if (!type.getInternalPropertyNames().contains(key))
+                {
+                    report.addProblem(path, "Record contains unrecognised key '" + key + "'.");
+                }
+            }
+            else if (!isTypeSimple(property.getType()))
+            {
+                report.addProblem(path, "Simple value found at key '" + key + "' but corresponding property has complex type.");
+            }
+        }
+
         for (String key : record.nestedKeySet())
         {
             TypeProperty property = type.getProperty(key);
@@ -342,7 +461,7 @@ public class ConfigurationHealthChecker
             {
                 report.addProblem(path, "Record contains unrecognised key '" + key + "'.");
             }
-            else if (!(property.getType() instanceof ComplexType))
+            else if (isTypeSimple(property.getType()))
             {
                 report.addProblem(path, "Nested record found at key '" + key + "' but corresponding property has simple type.");
             }
@@ -353,7 +472,10 @@ public class ConfigurationHealthChecker
                 ComplexType nestedType = (ComplexType) property.getType();
 
                 ComplexType actualType = checkType(nestedPath, nestedType, nestedRecord, report);
-                checkRecord(nestedPath, actualType, nestedRecord, report);
+                if (actualType != null)
+                {
+                    checkRecord(nestedPath, actualType, nestedRecord, report);
+                }
             }
         }
 
@@ -361,14 +483,25 @@ public class ConfigurationHealthChecker
         for (String key : type.getNestedPropertyNames())
         {
             Type propertyType = type.getPropertyType(key);
-            Record nestedRecord = (Record) record.get(key);
-            if (nestedRecord == null && propertyType instanceof CollectionType)
+            if (propertyType instanceof CollectionType && !record.containsKey(key))
             {
-                report.addProblem(path, "Expected nested record for " + key + " was missing.");
+                report.addProblem(path, "Expected nested record for key '" + key + "' was missing.");
             }
         }
 
         return report.getProblemCount() == problemsBefore;
+    }
+
+    private boolean isTypeSimple(Type type)
+    {
+        if (type instanceof SimpleType)
+        {
+            return true;
+        }
+        else
+        {
+            return type instanceof CollectionType && type.getTargetType() instanceof SimpleType;
+        }
     }
 
     private void checkReferences(String path, CompositeType type, Record record, ConfigurationHealthReport report)
@@ -435,6 +568,23 @@ public class ConfigurationHealthChecker
         catch (TypeException e)
         {
             report.addProblem(path, "Getting handle for reference property '" + property.getName() + "': " + e.getMessage());
+        }
+    }
+
+    private void checkScrubbed(String path, ComplexType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
+    {
+        Record moi = templateRecord.getMoi();
+        TemplateRecord templateParent = templateRecord.getParent();
+        TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
+
+        for (String key: moi.simpleKeySet())
+        {
+            Object value = moi.get(key);
+            Object inheritedValue = emptyChild.get(key);
+            if (RecordUtils.valuesEqual(value, inheritedValue))
+            {
+                report.addProblem(path, "Value of simple key '" + key + "' should be scrubbed as it is identical in the template parent.");
+            }
         }
     }
 

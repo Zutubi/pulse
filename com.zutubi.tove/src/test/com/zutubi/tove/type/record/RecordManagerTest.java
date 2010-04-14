@@ -21,6 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
+
 public class RecordManagerTest extends AbstractTransactionTestCase
 {
     private File tempDir;
@@ -312,28 +315,12 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
     public void testSelectAllEmptyPath()
     {
-        try
-        {
-            recordManager.selectAll("");
-            fail();
-        }
-        catch (IllegalArgumentException e)
-        {
-            // noop.
-        }
+        assertEquals(asMap(asPair("", recordManager.select())), recordManager.selectAll(""));
     }
 
     public void testSelectEmptyPath()
     {
-        try
-        {
-            recordManager.select("");
-            fail();
-        }
-        catch (IllegalArgumentException e)
-        {
-            // noop.
-        }
+        assertEquals(recordManager.select(), recordManager.select(""));
     }
 
     public void testSelectHandlesNullInput()
