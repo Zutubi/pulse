@@ -83,4 +83,34 @@ public class RecordUtilsTest extends ZutubiTestCase
     {
         assertFalse(RecordUtils.valuesEqual(new String[0], new Object[0]));
     }
+    
+    public void testCreateSkeletonOfTrivial()
+    {
+        assertEquals(new MutableRecordImpl(), RecordUtils.createSkeletonOf(new MutableRecordImpl()));
+    }
+
+    public void testCreateSkeletonOfEliminatesSimple()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.putMeta("meta", "value");
+        record.put("simple", "value");
+        assertEquals(new MutableRecordImpl(), RecordUtils.createSkeletonOf(record));
+    }
+
+    public void testCreateSkeletonOfPreservesNested()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("nested", new MutableRecordImpl());
+        assertEquals(record, RecordUtils.createSkeletonOf(record));
+    }
+
+    public void testCreateSkeletonOfPreservesSymbolicNames()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.setSymbolicName("foo");
+        MutableRecord nested = new MutableRecordImpl();
+        nested.setSymbolicName("bar");
+        record.put("nested", nested);
+        assertEquals(record, RecordUtils.createSkeletonOf(record));
+    }
 }

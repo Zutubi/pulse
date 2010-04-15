@@ -1,16 +1,16 @@
 package com.zutubi.tove.config.health;
 
+import com.zutubi.util.StringUtils;
+
 /**
- * Represents a single problem found in a tove config store.
- *
- * @see ConfigurationHealthReport
+ * Abstract base to support implementation of health problems.
  */
-public class ConfigurationHealthProblem
+public abstract class HealthProblemSupport implements HealthProblem
 {
     private String path;
     private String message;
 
-    public ConfigurationHealthProblem(String path, String message)
+    protected HealthProblemSupport(String path, String message)
     {
         this.path = path;
         this.message = message;
@@ -26,6 +26,11 @@ public class ConfigurationHealthProblem
         return message;
     }
 
+    public boolean isSolvable()
+    {
+        return true;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -38,7 +43,7 @@ public class ConfigurationHealthProblem
             return false;
         }
 
-        ConfigurationHealthProblem that = (ConfigurationHealthProblem) o;
+        HealthProblemSupport that = (HealthProblemSupport) o;
 
         if (message != null ? !message.equals(that.message) : that.message != null)
         {
@@ -63,6 +68,6 @@ public class ConfigurationHealthProblem
     @Override
     public String toString()
     {
-        return path + ": " + message;
+        return (StringUtils.stringSet(path) ? path : "<root>") + ": " + message;
     }
 }

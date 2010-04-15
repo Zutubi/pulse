@@ -63,7 +63,7 @@ public class RecordUpgradeUtils
         final String remainderPath = PathUtils.getPath(2, elements);
         ScopeHierarchy.Node owner = scope.getHierarchy().findNodeById(elements[1]);
 
-        final Record skeleton = createSkeletonOf(record);
+        final Record skeleton = RecordUtils.createSkeletonOf(record);
         owner.forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
         {
             public Boolean process(ScopeHierarchy.Node node)
@@ -77,18 +77,5 @@ public class RecordUpgradeUtils
                 return true;
             }
         });
-    }
-
-    private static Record createSkeletonOf(Record record)
-    {
-        MutableRecord result = new MutableRecordImpl();
-        result.setSymbolicName(record.getSymbolicName());
-        for (String key : record.nestedKeySet())
-        {
-            Record child = (Record) record.get(key);
-            result.put(key, createSkeletonOf(child));
-        }
-
-        return result;
     }
 }

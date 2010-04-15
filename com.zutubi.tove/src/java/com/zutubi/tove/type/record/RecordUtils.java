@@ -62,4 +62,24 @@ public class RecordUtils
     {
         return (o instanceof String) && ((String) o).length() == 0;
     }
+
+    /**
+     * Creates and returns a skeleton record that shares the same structure as
+     * the given record.
+     * 
+     * @param record record to copy the structure from
+     * @return a new skeleton of the given record
+     */
+    public static Record createSkeletonOf(Record record)
+    {
+        MutableRecord result = new MutableRecordImpl();
+        result.setSymbolicName(record.getSymbolicName());
+        for (String key : record.nestedKeySet())
+        {
+            Record child = (Record) record.get(key);
+            result.put(key, createSkeletonOf(child));
+        }
+
+        return result;
+    }
 }

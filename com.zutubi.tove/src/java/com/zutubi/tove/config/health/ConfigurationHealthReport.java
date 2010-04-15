@@ -5,8 +5,8 @@ import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A report on the health (internal consistency) of a tove configuration store.
@@ -16,16 +16,16 @@ import java.util.List;
 public class ConfigurationHealthReport
 {
     /**
-     * List of all detected problems.  Maintains the order in which problems
+     * Set of all detected problems.  Maintains the order in which problems
      * are reported.
      */
-    private List<ConfigurationHealthProblem> problems = new LinkedList<ConfigurationHealthProblem>();
+    private Set<HealthProblem> problems = new LinkedHashSet<HealthProblem>();
 
     public ConfigurationHealthReport()
     {
     }
 
-    public ConfigurationHealthReport(ConfigurationHealthProblem... problems)
+    public ConfigurationHealthReport(HealthProblem... problems)
     {
         this.problems.addAll(Arrays.asList(problems));
     }
@@ -40,25 +40,25 @@ public class ConfigurationHealthReport
         return problems.size();
     }
     
-    public Iterable<ConfigurationHealthProblem> getProblems()
+    public Iterable<HealthProblem> getProblems()
     {
-        return Collections.unmodifiableList(problems);
+        return Collections.unmodifiableSet(problems);
     }
 
-    public Iterable<ConfigurationHealthProblem> getProblems(final String path, final boolean includeNested)
+    public Iterable<HealthProblem> getProblems(final String path, final boolean includeNested)
     {
-        return CollectionUtils.filter(problems, new Predicate<ConfigurationHealthProblem>()
+        return CollectionUtils.filter(problems, new Predicate<HealthProblem>()
         {
-            public boolean satisfied(ConfigurationHealthProblem problem)
+            public boolean satisfied(HealthProblem problem)
             {
                 return problem.getPath().startsWith(path) && (includeNested || problem.getPath().length() == path.length());
             }
         });
     }
 
-    public void addProblem(String path, String message)
+    public void addProblem(HealthProblem problem)
     {
-        problems.add(new ConfigurationHealthProblem(path, message));
+        problems.add(problem);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ConfigurationHealthReport
         {
             StringBuilder result = new StringBuilder();
             result.append(String.format("%d configuration problem%s found:", problemCount, problemCount == 1 ? "" : "s"));
-            for (ConfigurationHealthProblem problem: problems)
+            for (HealthProblem problem: problems)
             {
                 result.append("\n  - ");
                 result.append(problem);

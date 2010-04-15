@@ -1,5 +1,6 @@
 package com.zutubi.tove.config.health;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationScopeInfo;
@@ -8,8 +9,13 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 
 /**
  * The health checker can be used to check the internal consistency of a tove
@@ -23,10 +29,13 @@ import java.util.Set;
  */
 public class ConfigurationHealthChecker
 {
+    private static final Messages I18N = Messages.getInstance(ConfigurationHealthChecker.class);
+    
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private RecordManager recordManager;
+    private TypeRegistry typeRegistry;
 
     /**
      * Run all checks over the entire record store, reporting any problems
@@ -54,7 +63,7 @@ public class ConfigurationHealthChecker
      */
     public ConfigurationHealthReport checkPath(String path)
     {        
-        String[] elements = PathUtils.getPathElements(path);
+        String[] elements = getPathElements(path);
         if (elements.length == 0)
         {
             return checkAll();
@@ -89,7 +98,7 @@ public class ConfigurationHealthChecker
                 {
                     TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
                     TemplateRecord templateParentRecord = record.getParent();
-                    if (templateParentRecord == null || checkStructuresMatch(path, record.getMoi(), templateParentRecord.getMoi(), report))
+                    if (templateParentRecord == null || checkStructuresMatch(path, record.getMoi(), getTemplateParentPath(path, templateParentRecord), templateParentRecord.getMoi(), report))
                     {
                         checkRecord(path, configurationTemplateManager.getType(path), record, report);
                     }
@@ -104,12 +113,19 @@ public class ConfigurationHealthChecker
         }
     }
 
+    private String getTemplateParentPath(String path, TemplateRecord templateParentRecord)
+    {
+        String[] elements = getPathElements(path);
+        elements[1] = templateParentRecord.getOwner();
+        return getPath(elements);
+    }
+    
     private void checkRoot(ConfigurationHealthReport report)
     {
         Record root = recordManager.select();
         for (String key : root.simpleKeySet())
         {
-            report.addProblem("", "Root record contains unexpected simple key '" + key + "'.");
+            report.addProblem(new UnexpectedSimpleValueProblem("", I18N.format("root.simple.key", key), key));
         }
 
         for (String key : root.nestedKeySet())
@@ -117,7 +133,7 @@ public class ConfigurationHealthChecker
             ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(key);
             if (scope == null)
             {
-                report.addProblem("", "Root record contains unexpected nested record '" + key + "' (no matching scope registered).");
+                report.addProblem(new UnexpectedNestedRecordProblem("", I18N.format("root.unexpected.scope", key), key));
             }
             else
             {
@@ -171,7 +187,7 @@ public class ConfigurationHealthChecker
         String rootItem = null;
         for (String item : templateCollectionRecord.nestedKeySet())
         {
-            String path = PathUtils.getPath(scopeName, item);
+            String path = getPath(scopeName, item);
             Record record = (Record) templateCollectionRecord.get(item);
             if (checkType(path, type, record, report) != null)
             {
@@ -184,13 +200,17 @@ public class ConfigurationHealthChecker
                     }
                     else
                     {
-                        report.addProblem(scopeName, "Scope has multiple roots '" + rootItem + "' and '" + item + "'.");
+                        List<String> roots = Arrays.asList(rootItem, item);
+                        Collections.sort(roots);
+                        report.addProblem(new UnsolvableHealthProblem(scopeName, I18N.format("scope.multiple.roots", roots.get(0), roots.get(1))));
                         return false;
                     }
 
                     if (!configurationTemplateManager.isTemplate(record))
                     {
-                        report.addProblem(path, "Scope has a root '" + item + "' not marked as a template.");
+                        // We could mark it as a template, but we are in
+                        // unknown territory so it seems safer not to try.
+                        report.addProblem(new UnsolvableHealthProblem(path, I18N.format("scope.root.not.template", rootItem)));
                         return false;
                     }
                 }
@@ -204,60 +224,60 @@ public class ConfigurationHealthChecker
     {
         int problemsBefore = report.getProblemCount();
 
-        String path = PathUtils.getPath(scopeName, itemKey);
+        String path = getPath(scopeName, itemKey);
         Record record = (Record) templateCollectionRecord.get(itemKey);
-        if (checkType(path, type, record, report) != null)
+        String parentHandleString = record.getMeta(TemplateRecord.PARENT_KEY);
+        if (parentHandleString != null)
         {
-            String parentHandleString = record.getMeta(TemplateRecord.PARENT_KEY);
-            if (parentHandleString != null)
+            try
             {
-                try
+                long templateParentHandle = Long.parseLong(parentHandleString);
+                String templateParentPath = recordManager.getPathForHandle(templateParentHandle);
+                if (templateParentPath == null)
                 {
-                    long parentHandle = Long.parseLong(parentHandleString);
-                    String parentPath = recordManager.getPathForHandle(parentHandle);
-                    if (parentPath == null)
+                    report.addProblem(new UnsolvableHealthProblem(path, I18N.format("parent.handle.unknown", templateParentHandle)));
+                }
+                else
+                {
+                    String[] templateParentPathElements = getPathElements(templateParentPath);
+                    if (templateParentPathElements.length != 2 || !templateParentPathElements[0].equals(scopeName))
                     {
-                        report.addProblem(path, "Unknown parent handle '" + parentHandle + "'.");
+                        report.addProblem(new UnsolvableHealthProblem(path, I18N.format("parent.not.in.collection", templateParentPath)));
                     }
                     else
                     {
-                        String[] parentPathElements = PathUtils.getPathElements(parentPath);
-                        if (parentPathElements.length != 2 || !parentPathElements[0].equals(scopeName))
+                        Record templateParentRecord = recordManager.select(templateParentPath);
+                        if (templateParentRecord == null)
                         {
-                            report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': not an item of the same templated collection.");
+                            // This should not happen, since we looked up
+                            // the handle using the record manager.  But
+                            // the checker is a paranoid beast.
+                            report.addProblem(new UnsolvableHealthProblem(path, I18N.format("parent.path.invalid", templateParentPath)));
                         }
                         else
                         {
-                            Record templateParentRecord = recordManager.select(parentPath);
-                            if (templateParentRecord == null)
+                            if (!configurationTemplateManager.isTemplate(templateParentRecord))
                             {
-                                report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': path does not exist.");
+                                report.addProblem(new UnsolvableHealthProblem(path, I18N.format("parent.not.template", templateParentPath)));
                             }
                             else
                             {
-                                if (!configurationTemplateManager.isTemplate(templateParentRecord))
-                                {
-                                    report.addProblem(path, "Parent handle references invalid path '" + parentPath + "': record is not a template.");
-                                }
-                                else
-                                {
-                                    checkStructuresMatch(path, record, templateParentRecord, report);
-                                }
+                                checkStructuresMatch(path, record, templateParentPath, templateParentRecord, report);
                             }
                         }
                     }
                 }
-                catch (NumberFormatException e)
-                {
-                    report.addProblem(path, "Illegal parent handle value '" + parentHandleString + "'.");
-                }
+            }
+            catch (NumberFormatException e)
+            {
+                report.addProblem(new UnsolvableHealthProblem(path, I18N.format("parent.handle.illegal", parentHandleString)));
             }
         }
 
         return problemsBefore == report.getProblemCount();
     }
 
-    private boolean checkStructuresMatch(String path, Record record, Record templateParentRecord, ConfigurationHealthReport report)
+    private boolean checkStructuresMatch(String path, Record record, String templateParentPath, Record templateParentRecord, ConfigurationHealthReport report)
     {
         for (String key : templateParentRecord.nestedKeySet())
         {
@@ -266,27 +286,27 @@ public class ConfigurationHealthChecker
                 Object nested = record.get(key);
                 if (!(nested instanceof Record))
                 {
-                    report.addProblem(path, "Template parent contains nested record '" + key + "' which is not a record in this child.");
+                    report.addProblem(new UnsolvableHealthProblem(path, I18N.format("inherited.record.simple.in.child", key)));
                     return false;
                 }
 
-                String childPath = PathUtils.getPath(path, key);
+                String childPath = getPath(path, key);
                 Record nestedRecord = (Record) nested;
                 Record nestedTemplateParentRecord = (Record) templateParentRecord.get(key);
                 if (!StringUtils.equals(nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName()))
                 {
-                    report.addProblem(childPath, "Type does not match template parent: this type '" + nestedRecord.getSymbolicName() + "', parent type '" + nestedTemplateParentRecord.getSymbolicName() + "'.");
+                    report.addProblem(new UnsolvableHealthProblem(childPath, I18N.format("inherited.type.mismatch", nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName())));
                     return false;
                 }
 
-                if (!checkStructuresMatch(path, nestedRecord, nestedTemplateParentRecord, report))
+                if (!checkStructuresMatch(path, nestedRecord, getPath(templateParentPath, key), nestedTemplateParentRecord, report))
                 {
                     return false;
                 }
             }
             else if (!isHidden(key, record))
             {
-                report.addProblem(path, "Template parent contains nested record '" + key + "' not present or hidden in this child.");
+                report.addProblem(new MissingSkeletonsProblem(path, I18N.format("inherited.missing.skeletons", key), templateParentPath, key));
                 return false;
             }
         }
@@ -310,7 +330,7 @@ public class ConfigurationHealthChecker
 
     private void checkTemplatedCollectionItem(String scopeName, CompositeType itemType, String itemKey, ConfigurationHealthReport report)
     {
-        String nestedPath = PathUtils.getPath(scopeName, itemKey);
+        String nestedPath = getPath(scopeName, itemKey);
         // Go to the CTM so we get a templatised record.
         Record nestedRecord = configurationTemplateManager.getRecord(nestedPath);
         if (StringUtils.equals(nestedRecord.getSymbolicName(), itemType.getSymbolicName()))
@@ -319,7 +339,7 @@ public class ConfigurationHealthChecker
         }
         else
         {
-            report.addProblem(nestedPath, "Template collection item has incorrect type, expected '" + itemType.getSymbolicName() + "', got '" + nestedRecord.getSymbolicName() + "'.");
+            report.addProblem(new UnsolvableHealthProblem(nestedPath, I18N.format("templated.item.type.mismatch", itemType.getSymbolicName(), nestedRecord.getSymbolicName())));
         }
     }
 
@@ -356,7 +376,7 @@ public class ConfigurationHealthChecker
         CompositeType targetType = (CompositeType) type.getTargetType();
         for (String item : record.nestedKeySet())
         {
-            String nestedPath = PathUtils.getPath(path, item);
+            String nestedPath = getPath(path, item);
             Record nestedRecord = (Record) record.get(item);
             CompositeType actualType = (CompositeType) checkType(nestedPath, targetType, nestedRecord, report);
             if (actualType != null)
@@ -372,7 +392,7 @@ public class ConfigurationHealthChecker
     {
         for (String key : record.simpleKeySet())
         {
-            report.addProblem(path, "Unexpected simple key '" + key + "'.");
+            report.addProblem(new UnexpectedSimpleValueProblem(path, I18N.format("unexpected.simple.key", key), key));
         }
     }
 
@@ -384,12 +404,11 @@ public class ConfigurationHealthChecker
             Object item = record.get(orderKey);
             if (item == null)
             {
-                report.addProblem(path, "Order contains reference to unknown item '" + orderKey + "'.");
+                report.addProblem(new InvalidOrderKeyProblem(path, I18N.format("order.key.invalid", orderKey), orderKey));
             }
             else if (!(item instanceof Record))
             {
-                report.addProblem(path, "Order contains reference to simple key '" + orderKey + "'.");
-
+                report.addProblem(new InvalidOrderKeyProblem(path, I18N.format("order.key.refers.to.simple", orderKey), orderKey));
             }
         }
     }
@@ -402,26 +421,26 @@ public class ConfigurationHealthChecker
         {
             if (!hiddenKeys.isEmpty())
             {
-                report.addProblem(path, "Hidden keys " + hiddenKeys + " found when there is no template parent.");
+                report.addProblem(new UnexpectedHiddenKeysProblem(path, I18N.format("hidden.keys.unexpected", hiddenKeys)));
             }
         }
         else
         {
             for (String hiddenKey : hiddenKeys)
             {
-                if (record.containsKey(hiddenKey))
+                if (record.getMoi().containsKey(hiddenKey))
                 {
-                    report.addProblem(path, "Hidden key '" + hiddenKey + "' exists in this record.");
+                    report.addProblem(new InvalidHiddenKeyProblem(path, I18N.format("hidden.key.exists", hiddenKey), hiddenKey));
                 }
 
                 Object value = templateParentRecord.get(hiddenKey);
                 if (value == null)
                 {
-                    report.addProblem(path, "Hidden key '" + hiddenKey + "' does not exist in template parent.");
+                    report.addProblem(new InvalidHiddenKeyProblem(path, I18N.format("hidden.key.not.in.parent", hiddenKey), hiddenKey));
                 }
                 else if (!(value instanceof Record))
                 {
-                    report.addProblem(path, "Hidden key '" + hiddenKey + "' does not refer to a record");
+                    report.addProblem(new InvalidHiddenKeyProblem(path, I18N.format("hidden.key.refers.to.simple", hiddenKey), hiddenKey));
                 }
             }
         }
@@ -445,12 +464,12 @@ public class ConfigurationHealthChecker
             {
                 if (!type.getInternalPropertyNames().contains(key))
                 {
-                    report.addProblem(path, "Record contains unrecognised key '" + key + "'.");
+                    report.addProblem(new UnexpectedSimpleValueProblem(path, I18N.format("unexpected.simple.key", key), key));
                 }
             }
             else if (!isTypeSimple(property.getType()))
             {
-                report.addProblem(path, "Simple value found at key '" + key + "' but corresponding property has complex type.");
+                report.addProblem(new UnsolvableHealthProblem(path, I18N.format("complex.property.simple.value", key)));
             }
         }
 
@@ -459,15 +478,15 @@ public class ConfigurationHealthChecker
             TypeProperty property = type.getProperty(key);
             if (property == null)
             {
-                report.addProblem(path, "Record contains unrecognised key '" + key + "'.");
+                report.addProblem(new UnexpectedNestedRecordProblem(path, I18N.format("unexpected.nested.record", key), key));
             }
             else if (isTypeSimple(property.getType()))
             {
-                report.addProblem(path, "Nested record found at key '" + key + "' but corresponding property has simple type.");
+                report.addProblem(new UnsolvableHealthProblem(path, I18N.format("simple.property.complex.value", key)));
             }
             else
             {
-                String nestedPath = PathUtils.getPath(path, key);
+                String nestedPath = getPath(path, key);
                 Record nestedRecord = (Record) record.get(key);
                 ComplexType nestedType = (ComplexType) property.getType();
 
@@ -485,7 +504,7 @@ public class ConfigurationHealthChecker
             Type propertyType = type.getPropertyType(key);
             if (propertyType instanceof CollectionType && !record.containsKey(key))
             {
-                report.addProblem(path, "Expected nested record for key '" + key + "' was missing.");
+                report.addProblem(new MissingCollectionProblem(path, I18N.format("collection.missing", key), key));
             }
         }
 
@@ -544,7 +563,7 @@ public class ConfigurationHealthChecker
                 String handlePath = recordManager.getPathForHandle(toHandle);
                 if (handlePath == null)
                 {
-                    report.addProblem(path, "Broken reference for property '" + property.getName() + "': raw handle does not exist.");
+                    report.addProblem(new InvalidReferenceProblem(path, I18N.format("reference.handle.unknown", property.getName()), property.getName(), handleString));
                 }
                 else if (record instanceof TemplateRecord)
                 {
@@ -552,14 +571,14 @@ public class ConfigurationHealthChecker
                     String referencedPath = referenceType.getReferencedPath(templateOwnerPath, handleString);
                     if (recordManager.select(referencedPath) == null)
                     {
-                        report.addProblem(path, "Broken reference for property '" + property.getName() + "': path is invalid when pushed down.");
+                        report.addProblem(new InvalidReferenceProblem(path, I18N.format("reference.cannot.push.down", property.getName()), property.getName(), handleString));
                     }
                     else
                     {
                         long canonicalHandle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, referencedPath);
                         if (toHandle != canonicalHandle)
                         {
-                            report.addProblem(path, "Reference for property '" + property.getName() + "' is not pulled up to highest level.");
+                            report.addProblem(new NonCanonicalReferenceProblem(path, I18N.format("reference.not.canonical", property.getName()), property.getName(), handleString, Long.toString(canonicalHandle)));
                         }
                     }
                 }
@@ -567,7 +586,7 @@ public class ConfigurationHealthChecker
         }
         catch (TypeException e)
         {
-            report.addProblem(path, "Getting handle for reference property '" + property.getName() + "': " + e.getMessage());
+            report.addProblem(new InvalidReferenceProblem(path, I18N.format("reference.handle.invalid", property.getName()), property.getName(), handleString));
         }
     }
 
@@ -583,7 +602,7 @@ public class ConfigurationHealthChecker
             Object inheritedValue = emptyChild.get(key);
             if (RecordUtils.valuesEqual(value, inheritedValue))
             {
-                report.addProblem(path, "Value of simple key '" + key + "' should be scrubbed as it is identical in the template parent.");
+                report.addProblem(new NonScrubbedSimpleValueProblem(path, I18N.format("simple.value.not.scrubbed", key), key, inheritedValue));
             }
         }
     }
@@ -595,11 +614,16 @@ public class ConfigurationHealthChecker
         {
             if (symbolicName != null)
             {
-                report.addProblem(path, "Expected a collection, but got symbolic name '" + symbolicName + "'.");
+                report.addProblem(new UnsolvableHealthProblem(path, I18N.format("type.mismatch.expected.collection", symbolicName)));
                 return null;
             }
 
             return expectedType;
+        }
+        else if (typeRegistry.getType(symbolicName) == null)
+        {
+            report.addProblem(new UnsolvableHealthProblem(path, I18N.format("type.invalid", symbolicName)));
+            return null;
         }
         else
         {
@@ -609,7 +633,7 @@ public class ConfigurationHealthChecker
             }
             catch (IllegalArgumentException e)
             {
-                report.addProblem(path, e.getMessage());
+                report.addProblem(new UnsolvableHealthProblem(path, I18N.format("type.mismatch.composites", expectedType.getSymbolicName(), symbolicName)));
                 return null;
             }
         }
@@ -633,5 +657,10 @@ public class ConfigurationHealthChecker
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

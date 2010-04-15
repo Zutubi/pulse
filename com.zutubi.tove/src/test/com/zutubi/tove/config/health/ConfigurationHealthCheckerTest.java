@@ -77,14 +77,14 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         mutable.put("simple", "value");
         recordManager.update("", mutable);
 
-        checkAllTest(new ConfigurationHealthProblem("", "Root record contains unexpected simple key 'simple'."));
+        checkAllTest(new UnexpectedSimpleValueProblem("", "Root record contains unexpected simple key 'simple'.", "simple"));
     }
     
     public void testCheckAllRootContainsUnknownScope()
     {
         recordManager.insert("unknown", new MutableRecordImpl());
 
-        checkAllTest(new ConfigurationHealthProblem("", "Root record contains unexpected nested record 'unknown' (no matching scope registered)."));
+        checkAllTest(new UnexpectedNestedRecordProblem("", "Root record contains unexpected nested record 'unknown' (no matching scope registered).", "unknown"));
     }
 
     public void testCheckAllCollectionWithSymbolicName()
@@ -95,7 +95,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         stagesRecord.setSymbolicName("atype");
         recordManager.update(stagesPath, stagesRecord);
 
-        checkAllTest(new ConfigurationHealthProblem(stagesPath, "Expected a collection, but got symbolic name 'atype'."));
+        checkAllTest(new UnsolvableHealthProblem(stagesPath, "Expected a collection, but got symbolic name 'atype'."));
     }
 
     public void testCheckAllCollectionWithSimpleKey()
@@ -106,7 +106,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         stagesRecord.put("simple", "value");
         recordManager.update(stagesPath, stagesRecord);
 
-        checkAllTest(new ConfigurationHealthProblem(stagesPath, "Unexpected simple key 'simple'."));
+        checkAllTest(new UnexpectedSimpleValueProblem(stagesPath, "Unexpected simple key 'simple'.", "simple"));
     }
 
     public void testCheckAllCollectionWithBadOrder()
@@ -117,7 +117,20 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         MapType.setOrder(stagesRecord, asList("bad"));
         recordManager.update(stagesPath, stagesRecord);
 
-        checkAllTest(new ConfigurationHealthProblem(stagesPath, "Order contains reference to unknown item 'bad'."));
+        checkAllTest(new InvalidOrderKeyProblem(stagesPath, "Order contains reference to unknown item 'bad'.", "bad"));
+    }
+    
+    public void testCheckAllCollectionWithOrderReferringToSimple()
+    {
+        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("pro"));
+        String stagesPath = getPath(projectPath, "stages");
+        MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
+        MapType.setOrder(stagesRecord, asList("simple"));
+        stagesRecord.put("simple", "value");
+        recordManager.update(stagesPath, stagesRecord);
+
+        checkAllTest(new UnexpectedSimpleValueProblem(stagesPath, "Unexpected simple key 'simple'.", "simple"),
+                new InvalidOrderKeyProblem(stagesPath, "Order contains reference to simple key 'simple'.", "simple"));
     }
     
     public void testCheckAllInheritedOrderRefersToHiddenItem()
@@ -131,7 +144,32 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         checkAllTest();
     }
 
-    public void testCheckAllCollectionWithBadHiddenItem()
+    public void testCheckAllRootCollectionWithHiddenKeys()
+    {
+        String rootPath = insertRootProjectWithStages("s1", "s2");
+
+        String stagesPath = getPath(rootPath, "stages");
+        MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
+        TemplateRecord.hideItem(stagesRecord, "invalid");
+        recordManager.update(stagesPath, stagesRecord);
+
+        checkAllTest(new UnexpectedHiddenKeysProblem(stagesPath, "Hidden keys [invalid] found when there is no template parent."));
+    }
+
+    public void testCheckAllCollectionHiddenItemExists()
+    {
+        String rootPath = insertRootProjectWithStages("s1", "s2");
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+
+        String stagesPath = getPath(childPath, "stages");
+        MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
+        TemplateRecord.hideItem(stagesRecord, "s1");
+        recordManager.update(stagesPath, stagesRecord);
+
+        checkAllTest(new InvalidHiddenKeyProblem(stagesPath, "Hidden key 's1' exists in this record.", "s1"));
+    }
+    
+    public void testCheckAllCollectionHiddenItemNotInParent()
     {
         String rootPath = insertRootProjectWithStages("s1", "s2");
         String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
@@ -141,9 +179,28 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         TemplateRecord.hideItem(stagesRecord, "invalid");
         recordManager.update(stagesPath, stagesRecord);
 
-        checkAllTest(new ConfigurationHealthProblem(stagesPath, "Hidden key 'invalid' does not exist in template parent."));
+        checkAllTest(new InvalidHiddenKeyProblem(stagesPath, "Hidden key 'invalid' does not exist in template parent.", "invalid"));
     }
 
+    public void testCheckAllCollectionHiddenItemRefersToSimple()
+    {
+        String rootPath = insertRootProjectWithStages("s1", "s2");
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+
+        String rootStagesPath = getPath(rootPath, "stages");
+        MutableRecord rootStagesRecord = recordManager.select(rootStagesPath).copy(false, true);
+        rootStagesRecord.put("simple", "value");
+        recordManager.update(rootStagesPath, rootStagesRecord);
+        
+        String childStagesPath = getPath(childPath, "stages");
+        MutableRecord childStagesRecord = recordManager.select(childStagesPath).copy(false, true);
+        TemplateRecord.hideItem(childStagesRecord, "simple");
+        recordManager.update(childStagesPath, childStagesRecord);
+
+        checkAllTest(new InvalidHiddenKeyProblem(childStagesPath, "Hidden key 'simple' does not refer to a record.", "simple"),
+                new UnexpectedSimpleValueProblem(rootStagesPath, "Unexpected simple key 'simple'.", "simple"));
+    }
+    
     public void testCheckAllCollectionItemTypeInvalid()
     {
         MutableRecordImpl record = new MutableRecordImpl();
@@ -151,7 +208,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String path = getPath(SCOPE_NORMAL, "item");
         recordManager.insert(path, record);
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Unrecognised symbolic name 'invalid' when expecting type 'class com.zutubi.tove.config.health.ConfigurationHealthCheckerTest$Project'"));
+        checkAllTest(new UnsolvableHealthProblem(path, "Invalid type 'invalid', possibly due to a missing plugin."));
     }
 
     public void testCheckAllCollectionItemTypeMismatch()
@@ -161,7 +218,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String path = getPath(SCOPE_NORMAL, "item");
         recordManager.insert(path, record);
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Expected type: class com.zutubi.tove.config.health.ConfigurationHealthCheckerTest$Project but instead found class com.zutubi.tove.config.health.ConfigurationHealthCheckerTest$Stage"));
+        checkAllTest(new UnsolvableHealthProblem(path, "Expected type compatible with 'project' but got 'stage'."));
     }
 
     public void testCheckAllCompositeUnrecognisedSimpleProperty()
@@ -171,7 +228,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         record.put("unknown", "value");
         recordManager.update(path, record);
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Record contains unrecognised key 'unknown'."));
+        checkAllTest(new UnexpectedSimpleValueProblem(path, "Unexpected simple key 'unknown'.", "unknown"));
     }
     
     public void testCheckAllCompositeUnrecognisedComplexProperty()
@@ -179,7 +236,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
         recordManager.insert(getPath(path, "unknown"), new MutableRecordImpl());
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Record contains unrecognised key 'unknown'."));
+        checkAllTest(new UnexpectedNestedRecordProblem(path, "Unexpected nested record 'unknown'.", "unknown"));
     }
     
     public void testCheckAllCompositeCompositePropertySimple()
@@ -189,7 +246,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         record.put("options", "value");
         recordManager.update(path, record);
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Simple value found at key 'options' but corresponding property has complex type."));
+        checkAllTest(new UnsolvableHealthProblem(path, "Simple value found at key 'options' but corresponding property has complex type."));
     }
     
     public void testCheckAllCompositeCollectionPropertySimple()
@@ -199,7 +256,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         record.put("stages", "value");
         recordManager.update(path, record);
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Simple value found at key 'stages' but corresponding property has complex type."));
+        checkAllTest(new UnsolvableHealthProblem(path, "Simple value found at key 'stages' but corresponding property has complex type."));
     }
     
     public void testCheckAllCompositeCollectionPropertyMissing()
@@ -208,7 +265,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String stagesPath = getPath(rootPath, "stages");
         recordManager.delete(stagesPath);
         
-        checkAllTest(new ConfigurationHealthProblem(rootPath, "Expected nested record for key 'stages' was missing."));
+        checkAllTest(new MissingCollectionProblem(rootPath, "Expected nested record for key 'stages' was missing.", "stages"));
     }
     
     public void testCheckAllCompositeSimplePropertyCollection()
@@ -216,7 +273,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
         recordManager.insert(getPath(path, "description"), new MutableRecordImpl());
         
-        checkAllTest(new ConfigurationHealthProblem(path, "Nested record found at key 'description' but corresponding property has simple type."));
+        checkAllTest(new UnsolvableHealthProblem(path, "Nested record found at key 'description' but corresponding property has simple type."));
     }
     
     public void testCheckAllReferenceHandleInvalid()
@@ -229,7 +286,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         hookRecord.put("stage", "invalid");
         recordManager.update(hookPath, hookRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(hookPath, "Getting handle for reference property 'stage': Illegal reference 'invalid'"));
+        checkAllTest(new InvalidReferenceProblem(hookPath, "Illegal reference handle value for key 'stage'.", "stage", "invalid"));
     }
 
     public void testCheckAllReferenceHandleUnknown()
@@ -242,7 +299,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         hookRecord.put("stage", "388765");
         recordManager.update(hookPath, hookRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(hookPath, "Broken reference for property 'stage': raw handle does not exist."));
+        checkAllTest(new InvalidReferenceProblem(hookPath, "Broken reference for key 'stage': raw handle does not exist.", "stage", "388765"));
     }
 
     public void testCheckAllReferenceHandleInvalidInChild()
@@ -256,8 +313,9 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         Project rootProject = configurationTemplateManager.getInstance(rootPath, Project.class);
         rootProject.addHook(new Hook("h", rootProject.getStages().get("default")));
         configurationTemplateManager.save(rootProject);
-        
-        checkAllTest(new ConfigurationHealthProblem(getPath(childPath, "hooks", "h"), "Broken reference for property 'stage': path is invalid when pushed down."));
+
+        long rootStageHandle = recordManager.select(getPath(rootPath, "stages", "default")).getHandle();
+        checkAllTest(new InvalidReferenceProblem(getPath(childPath, "hooks", "h"), "Broken reference for key 'stage': path is invalid when pushed down.", "stage", Long.toString(rootStageHandle)));
     }
 
     public void testCheckAllReferenceHandleNotPulledUp()
@@ -271,12 +329,14 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         String childHookPath = getPath(childPath, "hooks", "h");
-        long childStageHandle = recordManager.select(getPath(childPath, "stages", "default")).getHandle();
+        long nonCanonicalHandle = recordManager.select(getPath(childPath, "stages", "default")).getHandle();
         MutableRecord childHookRecord = recordManager.select(childHookPath).copy(false, true);
-        childHookRecord.put("stage", Long.toString(childStageHandle));
+        String nonCanonicalHandleString = Long.toString(nonCanonicalHandle);
+        childHookRecord.put("stage", nonCanonicalHandleString);
         recordManager.update(childHookPath, childHookRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(childHookPath, "Reference for property 'stage' is not pulled up to highest level."));
+        long canonicalHandle = recordManager.select(getPath(rootPath, "stages", "default")).getHandle();
+        checkAllTest(new NonCanonicalReferenceProblem(childHookPath, "Reference for property 'stage' is not pulled up to highest level.", "stage", nonCanonicalHandleString, Long.toString(canonicalHandle)));
     }
     
     public void testCheckAllInheritanceTypeMismatch()
@@ -294,9 +354,26 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         recordManager.delete(childScmPath);
         recordManager.insert(childScmPath, childScmRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(childScmPath, "Type does not match template parent: this type 'subversion', parent type 'perforce'."));
+        checkAllTest(new UnsolvableHealthProblem(childScmPath, "Type does not match template parent: this type 'subversion', parent type 'perforce'."));
     }
     
+    public void testCheckAllSimpleOverridesRecord()
+    {
+        Project rootProject = new Project("root");
+        rootProject.setScm(new Perforce());
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        
+        Project childProject = createChildProject(rootPath, "child");
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+
+        recordManager.delete(getPath(childPath, "scm"));
+        MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
+        childRecord.put("scm", "value");
+        recordManager.update(childPath, childRecord);
+        
+        checkAllTest(new UnsolvableHealthProblem(childPath, "Template parent contains nested record 'scm' which is not a record in this child."));
+    }
+
     public void testCheckAllMissingSkeleton()
     {
         Project rootProject = new Project("root");
@@ -308,7 +385,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
         recordManager.delete(getPath(childPath, "scm"));
         
-        checkAllTest(new ConfigurationHealthProblem(childPath, "Template parent contains nested record 'scm' not present or hidden in this child."));
+        checkAllTest(new MissingSkeletonsProblem(childPath, "Template parent contains nested record 'scm' not present or hidden in this child.", rootPath, "scm"));
     }
 
     public void testCheckAllInheritedSimpleValueNotScrubbed()
@@ -324,7 +401,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         childRecord.put("description", "mundane");
         recordManager.update(childPath, childRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(childPath, "Value of simple key 'description' should be scrubbed as it is identical in the template parent."));
+        checkAllTest(new NonScrubbedSimpleValueProblem(childPath, "Value of simple key 'description' should be scrubbed as it is identical in the template parent.", "description", "mundane"));
     }
     
     public void testCheckAllTemplateParentInvalid()
@@ -337,7 +414,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         childRecord.putMeta(TemplateRecord.PARENT_KEY, "invalid");
         recordManager.update(childPath, childRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(childPath, "Illegal parent handle value 'invalid'."));
+        checkAllTest(new UnsolvableHealthProblem(childPath, "Illegal parent handle value 'invalid'."));
     }
     
     public void testCheckAllTemplateParentUnknown()
@@ -350,7 +427,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         childRecord.putMeta(TemplateRecord.PARENT_KEY, "33115599");
         recordManager.update(childPath, childRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(childPath, "Unknown parent handle '33115599'."));
+        checkAllTest(new UnsolvableHealthProblem(childPath, "Unknown parent handle '33115599'."));
     }
 
     public void testCheckAllTemplateParentNotItemOfTemplateCollection()
@@ -366,7 +443,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         childRecord.putMeta(TemplateRecord.PARENT_KEY, Long.toString(normalHandle));
         recordManager.update(childPath, childRecord);
         
-        checkAllTest(new ConfigurationHealthProblem(childPath, "Parent handle references invalid path 'normal/norm': not an item of the same templated collection."));
+        checkAllTest(new UnsolvableHealthProblem(childPath, "Parent handle references invalid path 'normal/norm': not an item of the same templated collection."));
     }
 
     public void testCheckAllTemplateParentNotTemplate()
@@ -382,7 +459,28 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         child1Record.putMeta(TemplateRecord.PARENT_KEY, Long.toString(child2Handle));
         recordManager.update(child1Path, child1Record);
         
-        checkAllTest(new ConfigurationHealthProblem(child1Path, "Parent handle references invalid path 'templated/child2': record is not a template."));
+        checkAllTest(new UnsolvableHealthProblem(child1Path, "Parent handle references invalid path 'templated/child2': record is not a template."));
+    }
+    
+    public void testCheckAllScopeHasMultipleRoots()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.setSymbolicName("project");
+        configurationTemplateManager.markAsTemplate(record);
+        recordManager.insert(getPath(SCOPE_TEMPLATED, "1"), record);
+        recordManager.insert(getPath(SCOPE_TEMPLATED, "2"), record);
+        
+        checkAllTest(new UnsolvableHealthProblem(SCOPE_TEMPLATED, "Scope has multiple roots '1' and '2'."));
+    }
+    
+    public void testCheckAllScopeHasRootNotMarkedAsTemplate()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.setSymbolicName("project");
+        String path = getPath(SCOPE_TEMPLATED, "root");
+        recordManager.insert(path, record);
+        
+        checkAllTest(new UnsolvableHealthProblem(path, "Scope has a root 'root' not marked as a template."));
     }
     
     public void testCheckPathEmpty()
@@ -394,7 +492,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     public void testCheckPathScope()
     {
         breakScope(SCOPE_NORMAL);
-        checkPathTest(SCOPE_NORMAL, new ConfigurationHealthProblem(SCOPE_NORMAL, "Unexpected simple key 'simple'."));
+        checkPathTest(SCOPE_NORMAL, new UnexpectedSimpleValueProblem(SCOPE_NORMAL, "Unexpected simple key 'simple'.", "simple"));
         checkPathTest(SCOPE_TEMPLATED);
     }
 
@@ -411,9 +509,22 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         childRecord.putMeta(TemplateRecord.PARENT_KEY, "invalid");
         recordManager.update(childPath, childRecord);
 
-        checkPathTest(childPath, new ConfigurationHealthProblem(childPath, "Illegal parent handle value 'invalid'."));
+        checkPathTest(childPath, new UnsolvableHealthProblem(childPath, "Illegal parent handle value 'invalid'."));
     }
 
+    public void testCheckPathTemplatedCollectionItemTypeMismatch()
+    {
+        String rootPath = insertRootProjectWithStages();
+        Project childProject = createChildProject(rootPath, "child");
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        
+        MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
+        childRecord.setSymbolicName("stage");
+        recordManager.update(childPath, childRecord);
+
+        checkPathTest(childPath, new UnsolvableHealthProblem(childPath, "Template collection item has incorrect type, expected 'project', got 'stage'."));
+    }
+    
     public void testCheckPathWithinTemplatedCollectionItem()
     {
         Project rootProject = new Project("root");
@@ -428,7 +539,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         // Now mess up the structure and ensure it is detected.
         recordManager.delete(getPath(childPath, "scm"));
 
-        checkPathTest(childPath, new ConfigurationHealthProblem(childPath, "Template parent contains nested record 'scm' not present or hidden in this child."));
+        checkPathTest(childPath, new MissingSkeletonsProblem(childPath, "Template parent contains nested record 'scm' not present or hidden in this child.", rootPath, "scm"));
     }
 
     public void testCheckPathNormalPath()
@@ -442,7 +553,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         record.put("stages", "value");
         recordManager.update(path, record);
 
-        checkPathTest(path, new ConfigurationHealthProblem(path, "Simple value found at key 'stages' but corresponding property has complex type."));
+        checkPathTest(path, new UnsolvableHealthProblem(path, "Simple value found at key 'stages' but corresponding property has complex type."));
     }
     
     public void testCheckPathPathInvalid()
@@ -491,12 +602,12 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         return child;
     }
 
-    private void checkAllTest(ConfigurationHealthProblem... expectedProblems)
+    private void checkAllTest(HealthProblem... expectedProblems)
     {
         assertEquals(new ConfigurationHealthReport(expectedProblems), configurationHealthChecker.checkAll());        
     }
 
-    private void checkPathTest(String path, ConfigurationHealthProblem... expectedProblems)
+    private void checkPathTest(String path, HealthProblem... expectedProblems)
     {
         assertEquals(new ConfigurationHealthReport(expectedProblems), configurationHealthChecker.checkPath(path));
     }
