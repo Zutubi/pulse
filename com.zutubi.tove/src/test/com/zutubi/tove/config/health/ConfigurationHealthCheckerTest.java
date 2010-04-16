@@ -314,8 +314,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         rootProject.addHook(new Hook("h", rootProject.getStages().get("default")));
         configurationTemplateManager.save(rootProject);
 
-        long rootStageHandle = recordManager.select(getPath(rootPath, "stages", "default")).getHandle();
-        checkAllTest(new InvalidReferenceProblem(getPath(childPath, "hooks", "h"), "Broken reference for key 'stage': path is invalid when pushed down.", "stage", Long.toString(rootStageHandle)));
+        checkAllTest(new UnsolvableHealthProblem(getPath(childPath, "hooks", "h"), "Broken reference for key 'stage': path is invalid when pushed down."));
     }
 
     public void testCheckAllReferenceHandleNotPulledUp()
@@ -569,6 +568,23 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         }
     }
     
+    public void testHealAllDeleteInvalidReferenceThenScrub()
+    {
+        // A healing process that we know takes multiple steps.  A reference is
+        // zeroed out, then the zero needs scrubbing.
+        Project rootProject = new Project("root");
+        rootProject.addHook(new Hook("h"));
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+        String hookPath = getPath(childPath, "hooks", "h");
+        MutableRecord hookRecord = recordManager.select(hookPath).copy(false, true);
+        hookRecord.put("stage", "invalid");
+        recordManager.update(hookPath, hookRecord);
+        
+        checkAllTest(new InvalidReferenceProblem(hookPath, "Illegal reference handle value for key 'stage'.", "stage", "invalid"));
+    }
+    
     private void breakBothScopes()
     {
         breakScope(SCOPE_NORMAL);
@@ -604,12 +620,20 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
     private void checkAllTest(HealthProblem... expectedProblems)
     {
-        assertEquals(new ConfigurationHealthReport(expectedProblems), configurationHealthChecker.checkAll());        
+        ConfigurationHealthReport expectedReport = new ConfigurationHealthReport(expectedProblems);
+        assertEquals(expectedReport, configurationHealthChecker.checkAll());
+
+        ConfigurationHealthReport healedReport = configurationHealthChecker.healAll();
+        assertEquals(expectedReport.isSolvable(), healedReport.isHealthy());
     }
 
     private void checkPathTest(String path, HealthProblem... expectedProblems)
     {
-        assertEquals(new ConfigurationHealthReport(expectedProblems), configurationHealthChecker.checkPath(path));
+        ConfigurationHealthReport expectedReport = new ConfigurationHealthReport(expectedProblems);
+        assertEquals(expectedReport, configurationHealthChecker.checkPath(path));
+
+        ConfigurationHealthReport healedReport = configurationHealthChecker.healPath(path);
+        assertEquals(expectedReport.isSolvable(), healedReport.isHealthy());
     }
 
     @SymbolicName("project")

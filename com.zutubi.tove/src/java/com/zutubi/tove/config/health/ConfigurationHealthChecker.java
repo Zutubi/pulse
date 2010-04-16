@@ -30,7 +30,12 @@ import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 public class ConfigurationHealthChecker
 {
     private static final Messages I18N = Messages.getInstance(ConfigurationHealthChecker.class);
-    
+
+    /**
+     * Maximum number of passes we will attempt to make to heal a path.
+     */
+    private static final int PASS_LIMIT = 6;
+
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -42,6 +47,8 @@ public class ConfigurationHealthChecker
      * found.
      *
      * @return a report listing all problems found
+     * 
+     * @see #checkPath(String) 
      */
     public ConfigurationHealthReport checkAll()
     {
@@ -60,6 +67,8 @@ public class ConfigurationHealthChecker
      * 
      * @param path path to check
      * @return a report listing all problems found
+     * 
+     * @see #checkAll() 
      */
     public ConfigurationHealthReport checkPath(String path)
     {        
@@ -112,7 +121,60 @@ public class ConfigurationHealthChecker
             return report;
         }
     }
+    
+    /**
+     * Finds and automatically heals all configuration problems, if possible.
+     * This may involve a few passes over the configuration, as healing one
+     * problem can allow others to be uncovered (or even cause others - e.g. a
+     * value may be fixed and then need to be scrubbed).
+     * <p/>
+     * If a pass results in no changes, too many passes are required, or an
+     * unsolvable problem is found, healing is stopped.
+     * 
+     * @return a health report giving the current state of the configuration
+     *         when this method returns.  If the report is healthy, then no
+     *         further problems exist.  Otherwise, there may be unsolvable
+     *         problems, or the pass limit may have been reached.
+     * 
+     * @see #healPath(String) 
+     */
+    public ConfigurationHealthReport healAll()
+    {
+        return healPath("");
+    }
+    
+    /**
+     * Finds and automatically heals configuration problems under the given
+     * path, if possible.  Refer to {@link #healAll()} for more details. 
+     * 
+     * @return a health report giving the current state of the configuration
+     *         when this method returns
+     * 
+     * @see #healAll()  
+     */
+    public ConfigurationHealthReport healPath(String path)
+    {
+        ConfigurationHealthReport previousReport = null;
+        ConfigurationHealthReport report = checkPath(path);
+        int passes = 0;
+        while (!report.isHealthy() && report.isSolvable() && passes++ < PASS_LIMIT && !report.equals(previousReport))
+        {
+            solve(report);
+            previousReport = report;
+            report = checkPath(path);
+        }
+        
+        return report;
+    }
 
+    private void solve(ConfigurationHealthReport report)
+    {
+        for (HealthProblem problem: report.getProblems())
+        {
+            problem.solve(recordManager);
+        }
+    }
+    
     private String getTemplateParentPath(String path, TemplateRecord templateParentRecord)
     {
         String[] elements = getPathElements(path);
@@ -571,7 +633,13 @@ public class ConfigurationHealthChecker
                     String referencedPath = referenceType.getReferencedPath(templateOwnerPath, handleString);
                     if (recordManager.select(referencedPath) == null)
                     {
-                        report.addProblem(new InvalidReferenceProblem(path, I18N.format("reference.cannot.push.down", property.getName()), property.getName(), handleString));
+                        // This is tricky to solve, as at the level where the
+                        // handle is defined (somewhere up the hierarchy) it is
+                        // valid.  Fixing it at this inherited level runs into
+                        // the problem that it may not appear in this record.
+                        // It is possible to fix this, but currently we do not
+                        // support it.
+                        report.addProblem(new UnsolvableHealthProblem(path, I18N.format("reference.cannot.push.down", property.getName())));
                     }
                     else
                     {

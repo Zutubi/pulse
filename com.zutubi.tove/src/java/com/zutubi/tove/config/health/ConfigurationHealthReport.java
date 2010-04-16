@@ -25,26 +25,67 @@ public class ConfigurationHealthReport
     {
     }
 
-    public ConfigurationHealthReport(HealthProblem... problems)
+    ConfigurationHealthReport(HealthProblem... problems)
     {
         this.problems.addAll(Arrays.asList(problems));
     }
-    
+
+    /**
+     * Indicates if any problems were found.
+     * 
+     * @return true if no problems were found
+     */
     public boolean isHealthy()
     {
         return problems.isEmpty();
     }
 
+    /**
+     * Indicates how many problems were found.
+     * 
+     * @return the number of problems found
+     */
     public int getProblemCount()
     {
         return problems.size();
     }
+
+    /**
+     * Indicates if all found problems can be solved.
+     * 
+     * @return true if all problems in this report can be solved, false if
+     *         there is at least one unsolvable problem
+     */
+    public boolean isSolvable()
+    {
+        return !CollectionUtils.contains(problems, new Predicate<HealthProblem>()
+        {
+            public boolean satisfied(HealthProblem healthProblem)
+            {
+                return !healthProblem.isSolvable();
+            }
+        });
+    }
     
+    /**
+     * Returns all problems that were found.
+     * 
+     * @return an iterator over the foudn problems
+     */
     public Iterable<HealthProblem> getProblems()
     {
         return Collections.unmodifiableSet(problems);
     }
 
+    /**
+     * Returns all problems found at (and optionally under) the given path.
+     * 
+     * @param path          the path to find problems under
+     * @param includeNested if true, all problems at or nested under the path
+     *                      are returned; otherwise only problems directly at
+     *                      the path are returned
+     * @return the problems at or under the given path
+     */
     public Iterable<HealthProblem> getProblems(final String path, final boolean includeNested)
     {
         return CollectionUtils.filter(problems, new Predicate<HealthProblem>()
@@ -56,7 +97,12 @@ public class ConfigurationHealthReport
         });
     }
 
-    public void addProblem(HealthProblem problem)
+    /**
+     * Adds the given problem to this report.
+     * 
+     * @param problem the problem to add
+     */
+    void addProblem(HealthProblem problem)
     {
         problems.add(problem);
     }
