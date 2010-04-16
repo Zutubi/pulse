@@ -982,7 +982,8 @@ ZUTUBI.ActiveView.prototype = {
 
         Ext.Ajax.request({
             url: view.url,
-
+            timeout: 120000,
+            
             success: function(transport/*, options*/)
             {
                 view.updateFn.call(view.updateScope, eval('(' + transport.responseText + ')'));

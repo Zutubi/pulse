@@ -5,10 +5,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
-import com.zutubi.util.TruePredicate;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.*;
@@ -22,6 +20,7 @@ public class BrowseDataAction extends ProjectActionSupport
 
     private ObjectFactory objectFactory;
     private ConfigurationManager configurationManager;
+    private TransactionManager pulseTransactionManager;
 
     public BrowseModel getModel()
     {
@@ -30,37 +29,43 @@ public class BrowseDataAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        User user = getLoggedInUser();
-        final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
-        Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
-
-        Collection<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
-        List<ProjectConfiguration> allConcreteProjects = CollectionUtils.filter(allProjects, ProjectPredicates.concrete());
-
-        // Filter invalid projects into a separate list.
-        List<String> invalidProjects = new LinkedList<String>();
-        for (ProjectConfiguration project: allConcreteProjects)
+        return pulseTransactionManager.runInTransaction(new NullaryFunction<String>()
         {
-            if (!projectManager.isProjectValid(project))
+            public String process()
             {
-                invalidProjects.add(project.getName());
-            }
-        }
+                User user = getLoggedInUser();
+                final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
+                Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
 
-        Collections.sort(invalidProjects, new Sort.StringComparator());
-        model.setInvalidProjects(invalidProjects);
+                Collection<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
+                List<ProjectConfiguration> allConcreteProjects = CollectionUtils.filter(allProjects, ProjectPredicates.concrete());
 
-        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        model.setProjectGroups(helper.createProjectsModels(user, browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
-        {
-            public boolean satisfied(ProjectGroup projectGroup)
-            {
-                return browseConfig.isGroupsShown();
+                // Filter invalid projects into a separate list.
+                List<String> invalidProjects = new LinkedList<String>();
+                for (ProjectConfiguration project: allConcreteProjects)
+                {
+                    if (!projectManager.isProjectValid(project))
+                    {
+                        invalidProjects.add(project.getName());
+                    }
+                }
+
+                Collections.sort(invalidProjects, new Sort.StringComparator());
+                model.setInvalidProjects(invalidProjects);
+
+                Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
+                ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
+                model.setProjectGroups(helper.createProjectsModels(user, browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
+                {
+                    public boolean satisfied(ProjectGroup projectGroup)
+                    {
+                        return browseConfig.isGroupsShown();
+                    }
+                }, true));
+
+                return SUCCESS;
             }
-        }, true));
-        
-        return SUCCESS;
+        });
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
@@ -71,5 +76,10 @@ public class BrowseDataAction extends ProjectActionSupport
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setPulseTransactionManager(TransactionManager pulseTransactionManager)
+    {
+        this.pulseTransactionManager = pulseTransactionManager;
     }
 }
