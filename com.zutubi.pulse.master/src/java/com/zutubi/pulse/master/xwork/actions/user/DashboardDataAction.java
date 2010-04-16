@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectsModel;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelSorter;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -37,7 +38,8 @@ public class DashboardDataAction extends ActionSupport
     private ResultNotifier resultNotifier;
     private ObjectFactory objectFactory;
     private ConfigurationManager configurationManager;
-
+    private TransactionManager pulseTransactionManager;
+    
     public User getUser()
     {
         return user;
@@ -50,109 +52,115 @@ public class DashboardDataAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUsername();
-        if (login == null)
+        return (String) pulseTransactionManager.runInTransaction(new TransactionManager.Executable()
         {
-            return "guest";
-        }
-        user = userManager.getUser(login);
-        if (user == null)
-        {
-            return ERROR;
-        }
-
-        List<String> contactPointsWithErrors = new LinkedList<String>();
-        for (ContactConfiguration contact : user.getConfig().getPreferences().getContacts().values())
-        {
-            if (resultNotifier.hasError(contact))
+            public String execute()
             {
-                contactPointsWithErrors.add(contact.getName());
-            }
-        }
-
-        List<Project> responsibleFor = projectManager.findByResponsible(user);
-        List<ResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<Project, ResponsibilityModel>()
-        {
-            public ResponsibilityModel map(Project project)
-            {
-                return new ResponsibilityModel(project.getName(), project.getId());
+                String login = AcegiUtils.getLoggedInUsername();
+                if (login == null)
+                {
+                    return "guest";
+                }
+                user = userManager.getUser(login);
+                if (user == null)
+                {
+                    return ERROR;
+                }
+    
+                List<String> contactPointsWithErrors = new LinkedList<String>();
+                for (ContactConfiguration contact : user.getConfig().getPreferences().getContacts().values())
+                {
+                    if (resultNotifier.hasError(contact))
+                    {
+                        contactPointsWithErrors.add(contact.getName());
+                    }
+                }
+    
+                List<Project> responsibleFor = projectManager.findByResponsible(user);
+                List<ResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<Project, ResponsibilityModel>()
+                {
+                    public ResponsibilityModel map(Project project)
+                    {
+                        return new ResponsibilityModel(project.getName(), project.getId());
+                    }
+                });
+    
+                final DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
+    
+                Predicate<Project> projectPredicate;
+                ProjectsModelSorter sorter = new ProjectsModelSorter();
+    
+                if (dashboardConfig.isShowAllProjects())
+                {
+                    projectPredicate = new TruePredicate<Project>();
+                }
+                else
+                {
+                    projectPredicate = new Predicate<Project>()
+                    {
+                        public boolean satisfied(Project project)
+                        {
+                            return dashboardConfig.getShownProjects().contains(project.getConfig());
+                        }
+                    };
+                    if (!dashboardConfig.isSortProjectsAlphabetically())
+                    {
+                        sorter.setProjectNameComparator(new DashboardConfigurationProjectComparator(dashboardConfig));
+                        sorter.sortTemplatesToStart();
+                    }
+                }
+    
+                boolean showUngrouped;
+                Predicate<ProjectGroup> groupPredicate;
+    
+                if (dashboardConfig.isGroupsShown())
+                {
+                    showUngrouped = dashboardConfig.isShowUngrouped();
+                    if (dashboardConfig.isShowAllGroups())
+                    {
+                        groupPredicate = new TruePredicate<ProjectGroup>();
+                    }
+                    else
+                    {
+                        groupPredicate = new Predicate<ProjectGroup>()
+                        {
+                            public boolean satisfied(ProjectGroup projectGroup)
+                            {
+                                return dashboardConfig.getShownGroups().contains(projectGroup.getName());
+                            }
+                        };
+                        if (!dashboardConfig.isSortGroupsAlphabetically())
+                        {
+                            sorter.setGroupNameComparator(new DashboardConfigurationProjectGroupComparator(dashboardConfig));
+                        }
+                    }
+                }
+                else
+                {
+                    showUngrouped = true;
+                    groupPredicate = new FalsePredicate<ProjectGroup>();
+                }
+    
+                ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
+                Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
+                List<ProjectsModel> projectsModels = helper.createProjectsModels(user, dashboardConfig, user.getDashboardCollapsed(), urls, projectPredicate, groupPredicate, showUngrouped);
+                sorter.sort(projectsModels);
+    
+                List<PersistentChangelist> changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
+                Collections.sort(changelists, new ChangelistComparator());
+    
+                Set<Project> projects = userManager.getUserProjects(user, projectManager);
+                List<PersistentChangelist> projectChangelists = new LinkedList<PersistentChangelist>();
+                if (projects.size() > 0 && dashboardConfig.isShowProjectChanges())
+                {
+                    projectChangelists.addAll(buildManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount()));
+                }
+    
+                model = new DashboardModel(contactPointsWithErrors, responsibilities, projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
+    
+                return SUCCESS;
             }
         });
-
-        final DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
-
-        Predicate<Project> projectPredicate;
-        ProjectsModelSorter sorter = new ProjectsModelSorter();
-
-        if (dashboardConfig.isShowAllProjects())
-        {
-            projectPredicate = new TruePredicate<Project>();
-        }
-        else
-        {
-            projectPredicate = new Predicate<Project>()
-            {
-                public boolean satisfied(Project project)
-                {
-                    return dashboardConfig.getShownProjects().contains(project.getConfig());
-                }
-            };
-            if (!dashboardConfig.isSortProjectsAlphabetically())
-            {
-                sorter.setProjectNameComparator(new DashboardConfigurationProjectComparator(dashboardConfig));
-                sorter.sortTemplatesToStart();
-            }
-        }
-
-        boolean showUngrouped;
-        Predicate<ProjectGroup> groupPredicate;
-
-        if (dashboardConfig.isGroupsShown())
-        {
-            showUngrouped = dashboardConfig.isShowUngrouped();
-            if (dashboardConfig.isShowAllGroups())
-            {
-                groupPredicate = new TruePredicate<ProjectGroup>();
-            }
-            else
-            {
-                groupPredicate = new Predicate<ProjectGroup>()
-                {
-                    public boolean satisfied(ProjectGroup projectGroup)
-                    {
-                        return dashboardConfig.getShownGroups().contains(projectGroup.getName());
-                    }
-                };
-                if (!dashboardConfig.isSortGroupsAlphabetically())
-                {
-                    sorter.setGroupNameComparator(new DashboardConfigurationProjectGroupComparator(dashboardConfig));
-                }
-            }
-        }
-        else
-        {
-            showUngrouped = true;
-            groupPredicate = new FalsePredicate<ProjectGroup>();
-        }
-
-        ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        List<ProjectsModel> projectsModels = helper.createProjectsModels(user, dashboardConfig, user.getDashboardCollapsed(), urls, projectPredicate, groupPredicate, showUngrouped);
-        sorter.sort(projectsModels);
-
-        List<PersistentChangelist> changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
-        Collections.sort(changelists, new ChangelistComparator());
-
-        Set<Project> projects = userManager.getUserProjects(user, projectManager);
-        List<PersistentChangelist> projectChangelists = new LinkedList<PersistentChangelist>();
-        if (projects.size() > 0 && dashboardConfig.isShowProjectChanges())
-        {
-            projectChangelists.addAll(buildManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount()));
-        }
-
-        model = new DashboardModel(contactPointsWithErrors, responsibilities, projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
-
-        return SUCCESS;
     }
 
     private List<ChangelistModel> mapChangelists(List<PersistentChangelist> changelists)
@@ -231,6 +239,11 @@ public class DashboardDataAction extends ActionSupport
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setPulseTransactionManager(TransactionManager pulseTransactionManager)
+    {
+        this.pulseTransactionManager = pulseTransactionManager;
     }
 
     /**
