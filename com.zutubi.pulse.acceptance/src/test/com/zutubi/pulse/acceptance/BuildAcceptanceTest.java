@@ -23,7 +23,6 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -60,6 +59,7 @@ import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.Constants.SECOND;
@@ -467,7 +467,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
 
         // The logs tab, which should show us the first stage.
-        BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, ProjectConfigurationWizard.DEFAULT_STAGE);
+        BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
         assertTrue(logsPage.isLogAvailable());
         assertTextPresent(MESSAGE_RECIPE_COMPLETED);
 
@@ -477,8 +477,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent(MESSAGE_BUILD_COMPLETED);
 
         // Use the combo to switch to a stage log.
-        logPage.selectStage(ProjectConfigurationWizard.DEFAULT_STAGE);
-        StageLogPage stageLogPage = browser.createPage(StageLogPage.class, random, 1L, ProjectConfigurationWizard.DEFAULT_STAGE);
+        logPage.selectStage(DEFAULT_STAGE);
+        StageLogPage stageLogPage = browser.createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
         stageLogPage.waitFor();
         assertTrue(stageLogPage.isLogAvailable());
         assertTextPresent(MESSAGE_RECIPE_COMPLETED);
@@ -974,7 +974,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTextPresent(String.format("Build terminated due to failure of stage '%s'", ProjectConfigurationWizard.DEFAULT_STAGE));
+        assertTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE));
     }
 
     public void testTerminateOnStageFailureStageSucceeds() throws Exception
@@ -1035,18 +1035,40 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("default-recipe=\"default\"");
     }
 
+    public void testPulseFilePropertiesAddedToEnvironment() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+        String stagePath = getPath(projectPath, Constants.Project.STAGES, DEFAULT_STAGE);
+        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
+        defaultStage.put(Project.Stage.RECIPE, "properties");
+        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c1");
+        assertTrue(envPage.isPropertyPresentWithValue("outerp", "original-value"));
+        assertTrue(envPage.isPropertyPresentWithValue("p1", "original-value"));
+        assertFalse(envPage.isPropertyPresent("p2"));
+        
+        envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c2");
+        assertTrue(envPage.isPropertyPresentWithValue("outerp", "new-value"));
+        assertTrue(envPage.isPropertyPresentWithValue("p1", "new-value"));
+        assertTrue(envPage.isPropertyPresentWithValue("p2", "value"));
+    }
+    
     private String createProjectWithTwoAntStages(String buildFile) throws Exception
     {
         String projectPath = xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
         Hashtable<String, String> keys = new Hashtable<String, String>();
-        keys.put(ProjectConfigurationWizard.DEFAULT_STAGE, "another-stage");
+        keys.put(DEFAULT_STAGE, "another-stage");
         xmlRpcHelper.cloneConfig(PathUtils.getPath(projectPath, Project.STAGES), keys);
         return projectPath;
     }
 
     private void setTerminateStageOnFailure(String projectPath) throws Exception
     {
-        String defaultStagePath = PathUtils.getPath(projectPath, Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE);
+        String defaultStagePath = PathUtils.getPath(projectPath, Project.STAGES, DEFAULT_STAGE);
         Hashtable<String, Object> stage = xmlRpcHelper.getConfig(defaultStagePath);
         stage.put("terminateBuildOnFailure", true);
         xmlRpcHelper.saveConfig(defaultStagePath, stage, false);

@@ -10,10 +10,10 @@ import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
-import com.zutubi.pulse.core.marshal.DefaultTypeLoadPredicate;
+import com.zutubi.pulse.core.marshal.DefaultToveFileLoadInterceptor;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
+import com.zutubi.pulse.core.marshal.ToveFileLoadInterceptor;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
-import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Element;
@@ -105,15 +105,15 @@ public class PulseFileExpander
         return resourceRepository;
     }
 
-    private TypeLoadPredicate getLoadPredicate(ProjectRecipesConfiguration recipes, String recipe)
+    private ToveFileLoadInterceptor getLoadPredicate(ProjectRecipesConfiguration recipes, String recipe)
     {
         if (StringUtils.stringSet(recipe))
         {
-            return new RecipeLoadPredicate(recipes, recipe);
+            return new RecipeLoadInterceptor(recipes, recipe);
         }
         else
         {
-            return new DefaultTypeLoadPredicate();
+            return new DefaultToveFileLoadInterceptor();
         }
     }
 

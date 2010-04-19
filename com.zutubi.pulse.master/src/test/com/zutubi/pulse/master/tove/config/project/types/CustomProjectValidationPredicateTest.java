@@ -23,7 +23,7 @@ public class CustomProjectValidationPredicateTest extends FileLoaderTestBase
     private ProjectRecipesConfiguration load() throws PulseException
     {
         ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
-        loader.load(getInput("xml"), prc, new PulseScope(), new ImportingNotSupportedFileResolver(), new CustomProjectValidationPredicate());
+        loader.load(getInput("xml"), prc, new PulseScope(), new ImportingNotSupportedFileResolver(), new CustomProjectValidationInterceptor());
         return prc;
     }
 }

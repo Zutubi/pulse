@@ -15,8 +15,6 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.VariableResolver;
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
@@ -35,6 +33,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 
 /**
  * Loads configuration objects from XML files, using the type properties and
@@ -72,11 +73,11 @@ public class ToveFileLoader
         load(input, root, null, fileResolver, null);
     }
 
-    public void load(InputStream input, Configuration root, Scope globalScope, FileResolver fileResolver, TypeLoadPredicate predicate) throws PulseException
+    public void load(InputStream input, Configuration root, Scope globalScope, FileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws PulseException
     {
-        if (predicate == null)
+        if (interceptor == null)
         {
-            predicate = new DefaultTypeLoadPredicate();
+            interceptor = new DefaultToveFileLoadInterceptor();
         }
 
         CompositeType type = lookupType(root.getClass());
@@ -106,7 +107,7 @@ public class ToveFileLoader
             // brief bootstraping of the loading process
             Element rootElement = doc.getRootElement();
 
-            mapAttributesToProperties(rootElement, root, type, predicate, globalScope);
+            mapAttributesToProperties(rootElement, root, type, interceptor, globalScope);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
             {
@@ -115,7 +116,7 @@ public class ToveFileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, type, globalScope, 1, new ToveFileResolver(fileResolver), predicate);
+                loadType((Element) node, root, type, globalScope, 1, new ToveFileResolver(fileResolver), interceptor);
             }
         }
         finally
@@ -124,7 +125,7 @@ public class ToveFileLoader
         }
     }
 
-    private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, ToveFileResolver fileResolver, TypeLoadPredicate predicate) throws PulseException
+    private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws PulseException
     {
         String name = e.getLocalName();
         Object instance;
@@ -136,20 +137,20 @@ public class ToveFileLoader
                 throw new FileLoadException(String.format("Maximum recursion depth %s exceeded", MAX_RECURSION_DEPTH));
             }
 
-            if (handleInternalElement(e, parent, parentType, scope, depth, fileResolver, predicate))
+            if (handleInternalElement(e, parent, parentType, scope, depth, fileResolver, interceptor))
             {
                 return;
             }
 
             Binder binder = getBinder(parentType, name);
-            VariableResolver.ResolutionStrategy resolutionStrategy = getResolutionStrategy(predicate, parent, e);
+            VariableResolver.ResolutionStrategy resolutionStrategy = getResolutionStrategy(interceptor, parent, e);
             instance = binder.getInstance(e, scope, resolutionStrategy);
             if (binder.initInstance())
             {
                 CompositeType type = binder.getType();
                 Configuration configuration = (Configuration) instance;
                 // initialise attributes
-                mapAttributesToProperties(e, configuration, type, predicate, scope);
+                mapAttributesToProperties(e, configuration, type, interceptor, scope);
 
                 Referenceable referenceable = type.getAnnotation(Referenceable.class, true);
                 if (referenceable != null)
@@ -170,13 +171,13 @@ public class ToveFileLoader
                     }
                 }
 
-                boolean loadType = predicate.loadType(configuration, e);
+                boolean loadType = interceptor.loadInstance(configuration, e, scope);
                 if (loadType)
                 {
                     scope = scope.createChild();
 
                     // initialise sub-elements.
-                    loadSubElements(e, configuration, type, scope, depth, fileResolver, predicate);
+                    loadSubElements(e, configuration, type, scope, depth, fileResolver, interceptor);
                 }
 
                 binder.set(parent, configuration);
@@ -190,7 +191,7 @@ public class ToveFileLoader
                 }
 
                 // Apply declarative validation
-                if (predicate.validate(configuration, e))
+                if (interceptor.validate(configuration, e))
                 {
                     validate(configuration, resolutionStrategy);
                 }
@@ -663,7 +664,7 @@ public class ToveFileLoader
         }
     }
 
-    private void loadSubElements(Element e, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, TypeLoadPredicate predicate)
+    private void loadSubElements(Element e, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor)
             throws Exception
     {
         String text = null;
@@ -675,7 +676,7 @@ public class ToveFileLoader
             if (node instanceof Element)
             {
                 Element element = (Element) node;
-                loadType(element, instance, type, scope, depth + 1, fileResolver, predicate);
+                loadType(element, instance, type, scope, depth + 1, fileResolver, interceptor);
             }
             else if (node instanceof Text)
             {
@@ -695,7 +696,7 @@ public class ToveFileLoader
             TypeProperty contentProperty = findContentProperty(type);
             if (contentProperty != null)
             {
-                text = VariableResolver.resolveVariables(text, scope, getResolutionStrategy(predicate, instance, e));
+                text = VariableResolver.resolveVariables(text, scope, getResolutionStrategy(interceptor, instance, e));
                 contentProperty.setValue(instance, text);
             }
         }
@@ -712,12 +713,12 @@ public class ToveFileLoader
         });
     }
 
-    private VariableResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Configuration type, Element e)
+    private VariableResolver.ResolutionStrategy getResolutionStrategy(ToveFileLoadInterceptor interceptor, Configuration type, Element e)
     {
-        return predicate.allowUnresolved(type, e) ? RESOLVE_NON_STRICT : RESOLVE_STRICT;
+        return interceptor.allowUnresolved(type, e) ? RESOLVE_NON_STRICT : RESOLVE_STRICT;
     }
 
-    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, TypeLoadPredicate predicate) throws Exception
+    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws Exception
     {
         String localName = element.getLocalName();
         if (localName.equals("macro"))
@@ -768,7 +769,7 @@ public class ToveFileLoader
 
                     try
                     {
-                        loadSubElements(lae, instance, type, scope, depth, fileResolver, predicate);
+                        loadSubElements(lae, instance, type, scope, depth, fileResolver, interceptor);
                     }
                     catch (Exception e)
                     {
@@ -792,7 +793,7 @@ public class ToveFileLoader
         else if (localName.equals("scope"))
         {
             // Just load children in new scope and redirect to parent
-            loadSubElements(element, instance, type, scope.createChild(), depth, fileResolver, predicate);
+            loadSubElements(element, instance, type, scope.createChild(), depth, fileResolver, interceptor);
             return true;
         }
         else if (localName.equals("import"))
@@ -843,7 +844,7 @@ public class ToveFileLoader
             try
             {
                 Document doc = loadDocument(input, fileResolver.getCurrentPath());
-                loadSubElements(doc.getRootElement(), instance, type, scope, depth, fileResolver, predicate);
+                loadSubElements(doc.getRootElement(), instance, type, scope, depth, fileResolver, interceptor);
                 return true;
             }
             catch (Exception e)
@@ -920,7 +921,7 @@ public class ToveFileLoader
         return name;
     }
 
-    private void mapAttributesToProperties(Element source, Configuration target, CompositeType type, TypeLoadPredicate predicate, Scope scope) throws FileLoadException
+    private void mapAttributesToProperties(Element source, Configuration target, CompositeType type, ToveFileLoadInterceptor interceptor, Scope scope) throws FileLoadException
     {
         for (int i = 0; i < source.getAttributeCount(); i++)
         {
@@ -935,7 +936,7 @@ public class ToveFileLoader
 
             try
             {
-                Object value = coerce(a.getValue(), property.getType(), getResolutionStrategy(predicate, target, source), scope);
+                Object value = coerce(a.getValue(), property.getType(), getResolutionStrategy(interceptor, target, source), scope);
 
                 try
                 {

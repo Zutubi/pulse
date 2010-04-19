@@ -129,7 +129,7 @@ public class RecipeProcessor
 
         RecipeStatus status = new RecipeStatus();
         BootstrapCommandConfiguration bootstrapConfig = new BootstrapCommandConfiguration(request.getBootstrapper());
-        if (pushContextAndExecute(context, bootstrapConfig, outputDir, status) || !status.isSuccess())
+        if (pushContextAndExecute(context, bootstrapConfig, null, outputDir, status) || !status.isSuccess())
         {
             return;
         }
@@ -144,7 +144,7 @@ public class RecipeProcessor
 
                 RetrieveDependenciesCommandConfiguration retrieveCommandConfig = new RetrieveDependenciesCommandConfiguration();
                 retrieveCommandConfig.setIvy(ivy);
-                if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
+                if (pushContextAndExecute(context, retrieveCommandConfig, null, outputDir, status) || !status.isSuccess())
                 {
                     return;
                 }
@@ -152,7 +152,9 @@ public class RecipeProcessor
         }
 
         // Now we can load the recipe from the pulse file
-        ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
+        ProjectRecipesConfiguration recipesConfiguration = new ProjectRecipesConfiguration();
+        RecipeLoadInterceptor recipeLoadPredicate = new RecipeLoadInterceptor(recipesConfiguration, request.getRecipeName());
+        loadPulseFile(request, recipesConfiguration, recipeLoadPredicate, context);
         String recipeName = request.getRecipeName();
         if (!StringUtils.stringSet(recipeName))
         {
@@ -169,7 +171,7 @@ public class RecipeProcessor
             throw new BuildException("Undefined recipe '" + recipeName + "'");
         }
 
-        executeRecipe(recipeConfiguration, status, context, outputDir);
+        executeRecipe(recipeConfiguration, recipeLoadPredicate, status, context, outputDir);
     }
 
     private void compressResults(RecipePaths paths)
@@ -280,7 +282,7 @@ public class RecipeProcessor
         }
     }
 
-    private ProjectRecipesConfiguration loadPulseFile(RecipeRequest request, PulseExecutionContext context) throws BuildException
+    private void loadPulseFile(RecipeRequest request, ProjectRecipesConfiguration recipesConfiguration, RecipeLoadInterceptor recipeLoadPredicate, PulseExecutionContext context) throws BuildException
     {
         context.setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());
@@ -306,7 +308,7 @@ public class RecipeProcessor
             // load the pulse file from the source.
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
             FileResolver relativeResolver = new RelativeFileResolver(pulseFileProvider.getPath(), localResolver);
-            return fileLoader.loadRecipe(pulseFileContent, request.getRecipeName(), globalScope, relativeResolver);
+            fileLoader.loadRecipe(pulseFileContent, recipesConfiguration, recipeLoadPredicate, globalScope, relativeResolver);
         }
         catch (Exception e)
         {
@@ -320,7 +322,7 @@ public class RecipeProcessor
         FileSystemUtils.createFile(new File(paths.getOutputDir(), PULSE_FILE), pulseFileContent);
     }
 
-    public void executeRecipe(RecipeConfiguration config, RecipeStatus status, PulseExecutionContext context, File outputDir)
+    public void executeRecipe(RecipeConfiguration config, RecipeLoadInterceptor loadInterceptor, RecipeStatus status, PulseExecutionContext context, File outputDir)
     {
         context.push();
         try
@@ -329,7 +331,7 @@ public class RecipeProcessor
             {
                 if (status.isSuccess() || commandConfig.isForce())
                 {
-                    boolean recipeTerminated = pushContextAndExecute(context, commandConfig, outputDir, status);
+                    boolean recipeTerminated = pushContextAndExecute(context, commandConfig, loadInterceptor.getCommandScope(commandConfig.getName()), outputDir, status);
                     if (recipeTerminated)
                     {
                         return;
@@ -351,7 +353,7 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, FileSystemUtils.encodeFilenameComponent(result.getCommandName()));
     }
 
-    private boolean pushContextAndExecute(PulseExecutionContext context, CommandConfiguration commandConfig, File outputDir, RecipeStatus status)
+    private boolean pushContextAndExecute(PulseExecutionContext context, CommandConfiguration commandConfig, Scope scope, File outputDir, RecipeStatus status)
     {
         CommandResult result = new CommandResult(commandConfig.getName());
         File commandOutput = new File(outputDir, getCommandDirName(status.nextCommandIndex(), result));
@@ -364,6 +366,11 @@ public class RecipeProcessor
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
 
+        if (scope != null)
+        {
+            context.getScope().add((PulseScope) scope);
+        }
+        
         boolean recipeTerminated = !executeCommand(context, commandOutput, result, commandConfig);
         status.commandCompleted(result.getState());
         context.popTo(LABEL_EXECUTE);
