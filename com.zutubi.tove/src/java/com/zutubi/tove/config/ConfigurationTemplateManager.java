@@ -2530,7 +2530,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     /**
      * Indicates if the given record is directly marked as a template.  Note
-     * that records nested uner a template instance are not marked in this way
+     * that records nested under a template instance are not marked in this way
      * (only owner records are marked).
      * 
      * @param record the record to test

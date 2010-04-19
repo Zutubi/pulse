@@ -6,7 +6,7 @@ import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.tove.type.record.RecordUtils;
 
 /**
- * Indicates that skeleton records are missing.  This occurs where records are
+ * Identifies that skeleton records are missing.  This occurs where records are
  * present in the template parent, but absent in the child (and not hidden).
  */
 public class MissingSkeletonsProblem extends HealthProblemSupport
@@ -34,6 +34,8 @@ public class MissingSkeletonsProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // If there is nothing where the skeletons should appear, create a new
+        // skeleton structure from the template parent and insert it.
         String inheritedPath = PathUtils.getPath(templateParentPath, key);
 
         if (recordManager.containsRecord(getPath()) && recordManager.containsRecord(inheritedPath))

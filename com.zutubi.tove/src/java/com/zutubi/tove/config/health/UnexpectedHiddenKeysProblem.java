@@ -25,6 +25,8 @@ public class UnexpectedHiddenKeysProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // Just wipe out the hidden keys - they are not sensible when we have
+        // no template parent.
         Record record = recordManager.select(getPath());
         if (record != null && record.containsMetaKey(TemplateRecord.HIDDEN_KEY))
         {

@@ -6,7 +6,7 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 
 /**
- * Indicates that an empty collection record is missing.  All collections
+ * Identifies that an empty collection record is missing.  All collections
  * should be initialised as empty records.
  */
 public class MissingCollectionProblem extends HealthProblemSupport
@@ -21,6 +21,8 @@ public class MissingCollectionProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // If the collection is still missing, insert a blank record to
+        // represent an empty collection.
         Record parent = recordManager.select(getPath());
         if (parent != null && !parent.containsKey(key))
         {

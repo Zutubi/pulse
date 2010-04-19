@@ -6,7 +6,7 @@ import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.tove.type.record.RecordUtils;
 
 /**
- * Marks a simple value that should be scrubbed as it is identical to the
+ * Identifies a simple value that should be scrubbed as it is identical to the
  * parent.
  */
 public class NonScrubbedSimpleValueProblem extends HealthProblemSupport
@@ -33,6 +33,8 @@ public class NonScrubbedSimpleValueProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // Scrubs out the simple value by removing it from the record, after
+        // double-checking it still matches the inherited value.
         Record record = recordManager.select(getPath());
         if (record != null && RecordUtils.valuesEqual(value, record.get(key)))
         {

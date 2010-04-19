@@ -10,7 +10,7 @@ import com.zutubi.util.NotEqualsPredicate;
 import java.util.List;
 
 /**
- * Marks a key in a collection order that does not reference a valid item.
+ * Identifies a key in a collection order that does not reference a valid item.
  */
 public class InvalidOrderKeyProblem extends HealthProblemSupport
 {
@@ -32,6 +32,9 @@ public class InvalidOrderKeyProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // If the record still exists with the order key, and it still does not
+        // refer to an item of the collection, remove all instances of the key
+        // from the order and update.
         Record record = recordManager.select(getPath());
         if (record != null && !(record.get(key) instanceof Record))
         {

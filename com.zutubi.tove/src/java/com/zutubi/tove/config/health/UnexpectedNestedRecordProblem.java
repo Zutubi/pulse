@@ -4,7 +4,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.RecordManager;
 
 /**
- * Marks an unexpected nested record under a record.
+ * Identifies an unexpected nested record under a record.
  */
 public class UnexpectedNestedRecordProblem extends HealthProblemSupport
 {
@@ -25,6 +25,7 @@ public class UnexpectedNestedRecordProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // If the unexpected record is still there, just blow it away.
         String nestedPath = PathUtils.getPath(getPath(), key);
         if (recordManager.containsRecord(nestedPath))
         {

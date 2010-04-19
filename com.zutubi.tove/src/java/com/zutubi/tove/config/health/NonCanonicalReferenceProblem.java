@@ -9,7 +9,7 @@ import com.zutubi.util.Mapping;
 import java.util.Arrays;
 
 /**
- * Marks a reference that is not pulled up to the highest level.  All
+ * Identifies a reference that is not pulled up to the highest level.  All
  * references to inherited items should use the handle where that item is first
  * defined in the hierarchy.
  */
@@ -39,6 +39,8 @@ public class NonCanonicalReferenceProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // Replace all instances of the bad handle with the canonical one
+        // provided on construction of this problem.
         Record record = recordManager.select(getPath());
         if (record != null)
         {

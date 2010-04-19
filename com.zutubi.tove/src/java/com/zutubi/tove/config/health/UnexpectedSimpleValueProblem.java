@@ -5,7 +5,7 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 
 /**
- * Marks an unexpected simple value in a record.
+ * Identifies an unexpected simple value in a record.
  */
 public class UnexpectedSimpleValueProblem extends HealthProblemSupport
 {
@@ -26,6 +26,7 @@ public class UnexpectedSimpleValueProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // If the value is still there, just remove it and update.
         Record record = recordManager.select(getPath());
         if (record != null && record.containsKey(key))
         {

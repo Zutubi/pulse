@@ -8,7 +8,9 @@ import com.zutubi.tove.type.record.TemplateRecord;
 import java.util.Set;
 
 /**
- * Marks a hidden key that does not reference a valid item.
+ * Identifies a hidden key that does not reference a valid item.  This could
+ * be a bad string value (not convertable to an integer), a non-existant handle
+ * etc.
  */
 public class InvalidHiddenKeyProblem extends HealthProblemSupport
 {
@@ -30,6 +32,8 @@ public class InvalidHiddenKeyProblem extends HealthProblemSupport
 
     public void solve(RecordManager recordManager)
     {
+        // If the record still exists with the bad hidden key, remove all
+        // occurences of that key and update.  
         Record record = recordManager.select(getPath());
         if (record != null)
         {
