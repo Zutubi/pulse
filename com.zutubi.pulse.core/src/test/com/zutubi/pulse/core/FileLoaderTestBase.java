@@ -16,8 +16,9 @@ import com.zutubi.util.bean.WiringObjectFactory;
 public abstract class FileLoaderTestBase extends PulseTestCase
 {
     protected TypeRegistry typeRegistry;
+    protected PulseFileLoaderFactory fileLoaderFactory;
     protected PulseFileLoader loader;
-    private WiringObjectFactory objectFactory;
+    protected WiringObjectFactory objectFactory;
 
     public void setUp() throws Exception
     {
@@ -31,8 +32,8 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         CoreConfigurationRegistry configurationRegistry = new CoreConfigurationRegistry();
         configurationRegistry.setTypeRegistry(typeRegistry);
         configurationRegistry.init();
-        
-        PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+
+        fileLoaderFactory = new PulseFileLoaderFactory();
         fileLoaderFactory.setTypeRegistry(typeRegistry);
         fileLoaderFactory.setObjectFactory(objectFactory);
         fileLoaderFactory.init();

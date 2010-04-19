@@ -77,12 +77,7 @@ public class VariableResolver
          * Try to resolve all variables but leave non-existant variables as
          * they are.
          */
-        RESOLVE_NON_STRICT(true),
-        /**
-         * Don't resolve any variables, just process the input (e.g.
-         * backslash escaping).
-         */
-        RESOLVE_NONE(false);
+        RESOLVE_NON_STRICT(true);
 
         private boolean resolve;
 
@@ -527,7 +522,7 @@ public class VariableResolver
         return false;
     }
 
-    public static Object resolveVariable(String input, VariableMap variables) throws ResolutionException
+    public static Object resolveVariable(String input, VariableMap variables, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         List<ParseElement> elements = parse(input, false);
         if (elements.size() != 1 || elements.get(0).type != ParseElementType.VARIABLE)
@@ -544,8 +539,14 @@ public class VariableResolver
         {
             return element.defaultValue;
         }
-
-        throw new ResolutionException("Unknown variable '" + element.name + "'");
+        else if (resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
+        {
+            throw new ResolutionException("Unknown variable '" + element.name + "'");
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public static String resolveVariables(String input, VariableMap variables) throws ResolutionException

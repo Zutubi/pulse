@@ -466,29 +466,32 @@ public class ToveFileLoader
 
         public void set(Configuration parent, Object instance) throws Exception
         {
-            try
+            if (instance != null)
             {
-                CollectionType type = (CollectionType) property.getType();
-                if (type instanceof ListType)
+                try
                 {
-                    @SuppressWarnings("unchecked")
-                    List<Object> list = (List) property.getValue(parent);
-                    list.add(instance);
+                    CollectionType type = (CollectionType) property.getType();
+                    if (type instanceof ListType)
+                    {
+                        @SuppressWarnings("unchecked")
+                        List<Object> list = (List) property.getValue(parent);
+                        list.add(instance);
+                    }
+                    else
+                    {
+                        MapType mapType = (MapType) type;
+                        CompositeType elementType = mapType.getTargetType();
+    
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> map = (Map) property.getValue(parent);
+                        String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
+                        map.put(key, instance);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    MapType mapType = (MapType) type;
-                    CompositeType elementType = mapType.getTargetType();
-
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> map = (Map) property.getValue(parent);
-                    String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
-                    map.put(key, instance);
+                    throw new FileLoadException("Unable to add value to property '" + property.getName() + "': " + e.getMessage(), e);
                 }
-            }
-            catch (Exception e)
-            {
-                throw new FileLoadException("Unable to add value to property '" + property.getName() + "': " + e.getMessage(), e);
             }
         }
     }
@@ -564,14 +567,21 @@ public class ToveFileLoader
         public Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             String value = getAddableValue(element, attribute);
-            Object resolved = VariableResolver.resolveVariable(value, scope);
-            Class<? extends Configuration> clazz = referenceType.getReferencedType().getClazz();
-            if (!clazz.isInstance(resolved))
+            Object resolved = VariableResolver.resolveVariable(value, scope, resolutionStrategy);
+            if (resolved == null)
             {
-                throw new FileLoadException("Referenced value '" + value + "' has unexpected type (expected '" + clazz.getName() + "', got '" + resolved.getClass().getName() + "')");
+                return null;
             }
+            else
+            {
+                Class<? extends Configuration> clazz = referenceType.getReferencedType().getClazz();
+                if (!clazz.isInstance(resolved))
+                {
+                    throw new FileLoadException("Referenced value '" + value + "' has unexpected type (expected '" + clazz.getName() + "', got '" + resolved.getClass().getName() + "')");
+                }
 
-            return clazz.cast(resolved);
+                return clazz.cast(resolved);
+            }
         }
 
         public boolean initInstance()
@@ -759,7 +769,7 @@ public class ToveFileLoader
                 {
                     String macroName = attribute.getValue();
 
-                    Object o = VariableResolver.resolveVariable(macroName, scope);
+                    Object o = VariableResolver.resolveVariable(macroName, scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT);
                     if (!LocationAwareElement.class.isAssignableFrom(o.getClass()))
                     {
                         throw new FileLoadException("Variable '" + macroName + "' does not resolve to a macro");
@@ -951,7 +961,6 @@ public class ToveFileLoader
             {
                 throw new FileLoadException("Unable to convert value of attribute '" + a.getLocalName() + "' to expected type '" + property.getType().getClazz().getName() + "': " + e.getMessage(), e);
             }
-
         }
     }
 
@@ -961,7 +970,7 @@ public class ToveFileLoader
         {
             if (type instanceof ReferenceType)
             {
-                return resolveReference(value, ((ReferenceType) type).getReferencedType().getClazz(), scope);
+                return resolveReference(value, ((ReferenceType) type).getReferencedType().getClazz(), resolutionStrategy, scope);
             }
             else
             {
@@ -975,7 +984,7 @@ public class ToveFileLoader
 
             if (compositeType.hasAnnotation(Referenceable.class, true))
             {
-                return resolveReference(value, clazz, scope);
+                return resolveReference(value, clazz, resolutionStrategy, scope);
             }
             else
             {
@@ -1012,15 +1021,15 @@ public class ToveFileLoader
         throw new FileLoadException("No conversion available to property type '" + type.toString() + "'");
     }
 
-    private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, Scope scope) throws ResolutionException
+    private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, VariableResolver.ResolutionStrategy resolutionStrategy, Scope scope) throws ResolutionException
     {
         if (!StringUtils.stringSet(rawReference))
         {
             return null;
         }
         
-        Object obj = VariableResolver.resolveVariable(rawReference, scope);
-        if (!expectedType.isInstance(obj))
+        Object obj = VariableResolver.resolveVariable(rawReference, scope, resolutionStrategy);
+        if (obj != null && !expectedType.isInstance(obj))
         {
             throw new ResolutionException("Referenced property '" + rawReference + "' has unexpected type.  Expected '" + expectedType.getName() + "', got '" + obj.getClass().getName() + "'");
         }
