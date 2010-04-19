@@ -11,12 +11,10 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.cli.HelpCommand;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
-import com.zutubi.pulse.core.marshal.DefaultTypeLoadPredicate;
+import com.zutubi.pulse.core.marshal.DefaultToveFileLoadInterceptor;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
@@ -41,6 +39,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 
 /**
  * A command to run a post-processor manually over a single file.  Used to
@@ -231,7 +232,7 @@ public class PostProcessCommand implements Command
         {
             PulseScope pulseScope = new PulseScope();
             pulseScope.add(new GenericVariable<ResourceRepository>(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository));
-            loader.load(new FileInputStream(f), result, pulseScope, new LocalFileResolver(f.getParentFile()), new DefaultTypeLoadPredicate());
+            loader.load(new FileInputStream(f), result, pulseScope, new LocalFileResolver(f.getParentFile()), new DefaultToveFileLoadInterceptor());
             return result;
         }
         catch (Exception e)

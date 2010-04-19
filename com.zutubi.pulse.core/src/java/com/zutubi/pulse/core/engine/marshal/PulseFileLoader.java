@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.engine.marshal;
 
 import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.RecipeListingPredicate;
-import com.zutubi.pulse.core.RecipeLoadPredicate;
+import com.zutubi.pulse.core.RecipeListingInterceptor;
+import com.zutubi.pulse.core.RecipeLoadInterceptor;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -23,18 +23,16 @@ public class PulseFileLoader extends ToveFileLoader
      * Loads a pulse file, isolating a single recipe.
      *
      * @param pulseFile    source of the pulse file (an XML string)
-     * @param recipeName   name of the recipe to load
+     * @param recipes      root recipes object to load into
+     * @param interceptor  interceptor to load with
      * @param globalScope  scope to use as basis for loading
      * @param fileResolver used to resolve any imported files
      * @return configuration for the loaded recipe
      * @throws PulseException if the file cannot be loaded
      */
-    public ProjectRecipesConfiguration loadRecipe(String pulseFile, String recipeName, PulseScope globalScope, FileResolver fileResolver) throws PulseException
+    public void loadRecipe(String pulseFile, ProjectRecipesConfiguration recipes, RecipeLoadInterceptor interceptor, PulseScope globalScope, FileResolver fileResolver) throws PulseException
     {
-        ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
-        RecipeLoadPredicate predicate = new RecipeLoadPredicate(recipes, recipeName);
-        load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, globalScope, fileResolver, predicate);
-        return recipes;
+        load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, globalScope, fileResolver, interceptor);
     }
 
     /**
@@ -48,7 +46,7 @@ public class PulseFileLoader extends ToveFileLoader
     public List<String> loadAvailableRecipes(String pulseFile, FileResolver fileResolver) throws PulseException
     {
         ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
-        RecipeListingPredicate predicate = new RecipeListingPredicate();
+        RecipeListingInterceptor predicate = new RecipeListingInterceptor();
         load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, new PulseScope(), fileResolver, predicate);
 
         return CollectionUtils.map(recipes.getRecipes().values(), new Mapping<RecipeConfiguration, String>()

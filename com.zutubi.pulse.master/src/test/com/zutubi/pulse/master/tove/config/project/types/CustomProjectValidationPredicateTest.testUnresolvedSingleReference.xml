@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<holder>
+    <referee name="ee"/>
+    
+    <referer ref="$(none)">
+        <ee ref="$(ee)"/>
+        <ee ref="$(none)"/>
+    </referer>
+</holder>

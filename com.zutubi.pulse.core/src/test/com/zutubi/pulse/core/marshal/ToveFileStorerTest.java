@@ -452,7 +452,7 @@ public class ToveFileStorerTest extends PulseTestCase
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         storer.store(os, in, new Element("root"));
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        loader.load(is, out, scope, new ImportingNotSupportedFileResolver(), new DefaultTypeLoadPredicate());
+        loader.load(is, out, scope, new ImportingNotSupportedFileResolver(), new DefaultToveFileLoadInterceptor());
         return out;
     }
 }

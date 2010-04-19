@@ -6,8 +6,11 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class VariableResolverTest extends ZutubiTestCase
 {
@@ -423,7 +426,7 @@ public class VariableResolverTest extends ZutubiTestCase
 
     public void testDefaultSingleVariable() throws Exception
     {
-        assertEquals("def", VariableResolver.resolveVariable("$(undefined?def)", scope));
+        assertEquals("def", VariableResolver.resolveVariable("$(undefined?def)", scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT));
     }
 
     public void testMixedBracketsBraceParen()
@@ -482,6 +485,24 @@ public class VariableResolverTest extends ZutubiTestCase
     public void testFilterUnknownNonStrict() throws Exception
     {
         assertEquals("foo", VariableResolver.resolveVariables("$(foo|nosuchfilter)", scope, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
+    }
+
+    public void testSingleUndefinedStrict() throws Exception
+    {
+        try
+        {
+            VariableResolver.resolveVariable("$(undefined)", scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT);
+            fail("Should throw in strict mode when variable is undefined");
+        }
+        catch (ResolutionException e)
+        {
+            assertThat(e.getMessage(), containsString("Unknown variable 'undefined'"));
+        }
+    }
+
+    public void testSingleUndefinedNonStrict() throws Exception
+    {
+        assertNull(VariableResolver.resolveVariable("$(undefined)", scope, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT));
     }
 
     public void testNormalise() throws Exception

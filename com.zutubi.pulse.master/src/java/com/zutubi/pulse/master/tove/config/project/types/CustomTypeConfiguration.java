@@ -69,7 +69,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
             PulseFileLoader loader = fileLoaderFactory.createLoader();
             loader.setObjectFactory(new DefaultObjectFactory());
 
-            loader.load(new ByteArrayInputStream(pulseFileString.getBytes()), new ProjectRecipesConfiguration(), new PulseScope(), new ImportingNotSupportedFileResolver(), new CustomProjectValidationPredicate());
+            loader.load(new ByteArrayInputStream(pulseFileString.getBytes()), new ProjectRecipesConfiguration(), new PulseScope(), new ImportingNotSupportedFileResolver(), new CustomProjectValidationInterceptor());
         }
         catch(ParseException pe)
         {
