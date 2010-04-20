@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A predicate to ensure only the recipe of the given name is loaded.
+ * An interceptor to ensure only the recipe of the given name is loaded.  This
+ * interceptor also collects scope information for all commands in the recipe.
  */
 public class RecipeLoadInterceptor implements ToveFileLoadInterceptor
 {
@@ -30,12 +31,13 @@ public class RecipeLoadInterceptor implements ToveFileLoadInterceptor
 
     public boolean loadInstance(Configuration instance, Element element, Scope scope)
     {
-        if (instance instanceof CommandConfiguration)
+        boolean load = acceptInstance(instance);
+        if (load && instance instanceof CommandConfiguration)
         {
             commandScopes.put(((CommandConfiguration)instance).getName(), scope.copyTo(scope.getAncestor(BuildProperties.SCOPE_RECIPE)));
         }
-        
-        return acceptInstance(instance);
+
+        return load;
     }
 
     public boolean allowUnresolved(Configuration instance, Element element)
