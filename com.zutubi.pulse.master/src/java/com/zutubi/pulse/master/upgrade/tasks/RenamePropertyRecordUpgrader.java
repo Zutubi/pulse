@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.RecordUtils;
 
 /**
  * Renames an existing property on a record.
@@ -33,7 +32,7 @@ class RenamePropertyRecordUpgrader implements RecordUpgrader
             return;
         }
 
-        if (!RecordUtils.isSimpleValue(value))
+        if (!RecordUpgradeUtils.isSimpleValue(value))
         {
             throw new IllegalArgumentException("Attempt to rename a non-simple property (existing value has type '" + value.getClass() + "')");
         }

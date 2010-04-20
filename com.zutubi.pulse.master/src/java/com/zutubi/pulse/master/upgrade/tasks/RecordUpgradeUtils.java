@@ -15,6 +15,20 @@ public class RecordUpgradeUtils
     private static final String HIDDEN_KEY = "hidden";
 
     /**
+     * Copy of {@link com.zutubi.tove.type.record.RecordUtils#isSimpleValue(Object)},
+     * duplicated here to prevent incompatible changes.
+     * 
+     * @param value value to test
+     * @return true if the value is simple, false if it is not
+     */
+    public static boolean isSimpleValue(Object value)
+    {
+        // The given object may not have come from a record at all, so don't
+        // just test for it not being a record itself.
+        return (value instanceof String) || (value instanceof String[]);
+    }
+
+    /**
      * Mark the item identified by the key as hidden.
      *
      * @param record    the record to be updated
@@ -63,7 +77,7 @@ public class RecordUpgradeUtils
         final String remainderPath = PathUtils.getPath(2, elements);
         ScopeHierarchy.Node owner = scope.getHierarchy().findNodeById(elements[1]);
 
-        final Record skeleton = RecordUtils.createSkeletonOf(record);
+        final Record skeleton = createSkeletonOf(record);
         owner.forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
         {
             public Boolean process(ScopeHierarchy.Node node)
@@ -77,5 +91,25 @@ public class RecordUpgradeUtils
                 return true;
             }
         });
+    }
+    
+    /**
+     * Copy of {@link com.zutubi.tove.type.record.RecordUtils#createSkeletonOf(com.zutubi.tove.type.record.Record)},
+     * duplicated here to prevent incompatible changes.
+     * 
+     * @param record record to copy the structure from
+     * @return a new skeleton of the given record
+     */
+    public static Record createSkeletonOf(Record record)
+    {
+        MutableRecord result = new MutableRecordImpl();
+        result.setSymbolicName(record.getSymbolicName());
+        for (String key : record.nestedKeySet())
+        {
+            Record child = (Record) record.get(key);
+            result.put(key, createSkeletonOf(child));
+        }
+
+        return result;
     }
 }

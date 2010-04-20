@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.RecordUtils;
 
 /**
  * Adds a new property to an existing record, with a fixed default value.  The
@@ -22,7 +21,7 @@ class AddPropertyRecordUpgrader implements RecordUpgrader, PersistentScopesAware
      */
     public AddPropertyRecordUpgrader(String name, Object value)
     {
-        if (!RecordUtils.isSimpleValue(value))
+        if (!RecordUpgradeUtils.isSimpleValue(value))
         {
             throw new IllegalArgumentException("Value must be a string or string array - only simple properties can be added with this upgrader.");
         }
