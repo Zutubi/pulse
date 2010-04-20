@@ -85,6 +85,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String JUNIT_PROCESSOR = "junit xml report processor";
 
     private static final String MESSAGE_BUILD_COMPLETED = "Build completed with status success";
+    private static final String MESSAGE_CHECKING_REQUIREMENTS = "Checking recipe agent requirements...";
     private static final String MESSAGE_RECIPE_COMPLETED = "Recipe '[default]' completed with status success";
 
     private Repository repository;
@@ -470,6 +471,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
         assertTrue(logsPage.isLogAvailable());
         assertTextPresent(MESSAGE_RECIPE_COMPLETED);
+
+        if (browser.isFirefox())
+        {
+            logsPage.clickDownloadLink();
+            browser.waitForPageToLoad();
+            assertTextPresent(MESSAGE_CHECKING_REQUIREMENTS);
+        }
 
         // Direct to the build log (high-level build messages).
         BuildLogPage logPage = browser.openAndWaitFor(BuildLogPage.class, random, 1L);

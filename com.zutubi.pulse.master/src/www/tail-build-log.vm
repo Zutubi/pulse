@@ -79,12 +79,17 @@
                         </select>
                     </td>
 #if($logExists)
+    #if($u_stageName)
+        #set($thisUrl = "$urls.buildLogs($buildResult)stage/${u_stageName}")
+    #else
+        #set($thisUrl = "$urls.buildLogs($buildResult)build")
+    #end
                     <td>
                         <span class="understated">//</span>
                     </td>
                     <td>
-                        <a class="unadorned" href="raw/true/"><img alt="down" src="$base/images/script_save.gif"/></a>
-                        <a id="download-full-log" href="raw/true/">#wwtext("name=download.full.log")</a>
+                        <a class="unadorned" href="${thisUrl}/raw/true/"><img alt="down" src="$base/images/script_save.gif"/></a>
+                        <a id="download-full-log" href="${thisUrl}/raw/true/">#wwtext("name=download.full.log")</a>
                     </td>
 #end
                     <td>
