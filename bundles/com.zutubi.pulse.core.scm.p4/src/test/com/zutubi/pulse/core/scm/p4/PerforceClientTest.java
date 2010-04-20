@@ -593,6 +593,21 @@ public class PerforceClientTest extends PerforceTestBase
         assertEquals(">> p4 -c " + expectedWorkspace + " sync -f @1", handler.getStatusMessages().get(0));
     }
 
+    public void testErrorIncludesCommandLine() throws ScmException, IOException
+    {
+        PerforceConfiguration configuration = new PerforceConfiguration(getP4Port(), "invalid", "", DEPOT_WORKSPACE);
+        client = new PerforceClient(configuration, new PerforceWorkspaceManager());
+        try
+        {
+            client.testConnection();
+            fail("Connection test should fail with bad user");
+        }
+        catch (ScmException e)
+        {
+            assertThat(e.getMessage(), containsString("'p4 -c depot-client client -o' returned non-zero exit code"));
+        }
+    }
+    
     private PerforceCore getCore()
     {
         PerforceCore core = new PerforceCore();
