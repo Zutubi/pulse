@@ -14,6 +14,7 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceF
     private static final String ERROR_PROXY_CACHE = "Proxy could not update its cache";
 
     private boolean throwOnStderr = false;
+    private String commandLine;
     private boolean haveSignificantError = false;
     private StringBuffer stderr;
 
@@ -25,6 +26,7 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceF
 
     public void handleCommandLine(String line)
     {
+        this.commandLine = line;
     }
 
     public void handleStderr(String line)
@@ -40,9 +42,10 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceF
 
     public void handleExitCode(int code) throws ScmException
     {
+        String prefix = commandLine == null ? "p4 process" : "'" + commandLine + "'";
         if (code != 0)
         {
-            String message = "p4 process returned non-zero exit code: " + Integer.toString(code);
+            String message = prefix + " returned non-zero exit code: " + Integer.toString(code);
 
             if (stderr.length() > 0)
             {
@@ -54,7 +57,7 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceF
 
         if (haveSignificantError && throwOnStderr)
         {
-            throw new ScmException("p4 process returned error '" + stderr.toString().trim() + "'");
+            throw new ScmException(prefix + " returned error '" + stderr.toString().trim() + "'");
         }
     }
 
