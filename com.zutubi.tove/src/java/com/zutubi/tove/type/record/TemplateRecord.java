@@ -185,15 +185,26 @@ public class TemplateRecord extends AbstractRecord
 
     public Collection<Object> values()
     {
-        return flatten().values();
+        return flatten(false).values();
     }
 
-    public MutableRecord flatten()
+    /**
+     * Flattens this templated record into a regular record with the same
+     * contents.  Inherited values are represented directly in the returned
+     * record.
+     * 
+     * @param preserveHandles if true, the returned records will maintain the
+     *                        handles in this record (from the lowest level),
+     *                        if false the returned records will have no
+     *                        handles
+     * @return a flattened version of this record
+     */
+    public MutableRecord flatten(boolean preserveHandles)
     {
         MutableRecord record = new MutableRecordImpl();
         for (String metaKey : metaKeySet())
         {
-            if (!metaKey.equals(Configuration.HANDLE_KEY))
+            if (preserveHandles || !metaKey.equals(Configuration.HANDLE_KEY))
             {
                 record.putMeta(metaKey, getMeta(metaKey));
             }
@@ -206,7 +217,7 @@ public class TemplateRecord extends AbstractRecord
             {
                 if (value instanceof TemplateRecord)
                 {
-                    value = ((TemplateRecord) value).flatten();
+                    value = ((TemplateRecord) value).flatten(preserveHandles);
                 }
 
                 record.put(key, value);
@@ -337,7 +348,7 @@ public class TemplateRecord extends AbstractRecord
 
     public MutableRecord copy(boolean deep, boolean preserveHandles)
     {
-        return flatten();
+        return flatten(false);
     }
 
     public Set<String> getHiddenKeys()

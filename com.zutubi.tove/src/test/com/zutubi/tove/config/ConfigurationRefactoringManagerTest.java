@@ -6,28 +6,27 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
-import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.MapType;
-import com.zutubi.tove.type.TemplatedMapType;
-import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import static com.zutubi.util.CollectionUtils.*;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
 import org.acegisecurity.AccessDeniedException;
+
+import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.*;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-
-import java.util.*;
-import static java.util.Arrays.asList;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -48,6 +47,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationRefactoringManager.setConfigurationReferenceManager(configurationReferenceManager);
         configurationRefactoringManager.setConfigurationSecurityManager(configurationSecurityManager);
         configurationRefactoringManager.setRecordManager(recordManager);
+        configurationRefactoringManager.setConfigurationHealthChecker(configurationHealthChecker);
 
         CompositeType typeA = typeRegistry.register(ConfigA.class);
         MapType mapA = new MapType(typeA, typeRegistry);
@@ -61,6 +61,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.markAsTemplate(root);
         rootPath = configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, root);
         rootHandle = configurationTemplateManager.getRecord(rootPath).getHandle();
+        
+        typeRegistry.register(ConfigAntCommand.class);
+        typeRegistry.register(ConfigMavenCommand.class);
     }
 
     public void testCanCloneEmptyPath()
@@ -119,13 +122,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
      */
     public void testCanCloneCollectionItems() throws Exception
     {
-        CompositeType type = typeRegistry.register(ConfigRecipe.class);
-        typeRegistry.register(ConfigAntCommand.class);
-
         ConfigRecipe recipe = new ConfigRecipe("recipe");
         recipe.getCommands().put("ant", new ConfigAntCommand("ant", new ConfigEnvironment("key", "value")));
 
-        MapType map = new MapType(type, typeRegistry);
+        MapType map = new MapType(typeRegistry.getType(ConfigRecipe.class), typeRegistry);
         configurationPersistenceManager.register("recipes", map);
 
         configurationTemplateManager.insert("recipes", recipe);
@@ -1736,6 +1736,531 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertSame(childA.getRef(), childA.getB().getRefToRef());
     }
 
+    public void testMoveEmptyPath()
+    {
+        failedMoveHelper("", rootPath, "Path is required");
+    }
+
+    public void testMoveInvalidPath()
+    {
+        failedMoveHelper("invalid", rootPath, "Path 'invalid' does not exist");
+    }
+
+    public void testMoveScope()
+    {
+        failedMoveHelper(TEMPLATE_SCOPE, rootPath, "Path '" + TEMPLATE_SCOPE + "' does not refer to a templated collection item");
+    }
+    
+    public void testMoveNonTemplatedPath()
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, new ConfigA("non templated"));
+        failedMoveHelper(path, rootPath, "Path '" + path + "' does not refer to a templated collection item");
+    }
+
+    public void testMoveUnderTemplatedItem()
+    {
+        String itemPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        String path = getPath(itemPath, "recipes");
+        failedMoveHelper(path, rootPath, "Path '" + path + "' does not refer to a templated collection item");
+    }
+
+    public void testMoveRoot()
+    {
+        failedMoveHelper(rootPath, rootPath, "Cannot move the root of an inheritance hierarchy");
+    }
+    
+    public void testMoveNewTemplateParentPathEmpty()
+    {
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        failedMoveHelper(path, "", "New template parent path is required");
+    }
+
+    public void testMoveNewTemplateParentPathInvalid()
+    {
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        failedMoveHelper(path, "invalid", "New template parent path 'invalid' does not refer to an element of the same templated collection as path 'template/templated'");
+    }
+
+    public void testMoveNewTemplateParentPathAScope()
+    {
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        failedMoveHelper(path, TEMPLATE_SCOPE, "New template parent path '" + TEMPLATE_SCOPE + "' does not refer to an element of the same templated collection as path 'template/templated'");
+    }
+
+    public void testMoveNewTemplateParentPathNotATemplate()
+    {
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        failedMoveHelper(path, path, "New template parent path '" + path + "' refers to a concrete instance");
+    }
+    
+    private void failedMoveHelper(String path, String newTemplateParentPath, String expectedMessage)
+    {
+        try
+        {
+            configurationRefactoringManager.move(path, newTemplateParentPath);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertThat(e.getMessage(), containsString(expectedMessage));
+        }
+    }
+
+    public void testMoveTrivial()
+    {
+        MoveHierarchy hierarchy = setupSimpleMoveHierarchy();
+
+        Listener listener = registerListener();
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(hierarchy.childPath, hierarchy.originalTemplateParentPath);
+        assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
+        listener.assertEvents();
+    }
+    
+    public void testMoveComplexConcrete()
+    {
+        // original parent
+        //   x: 1
+        //   blist: [original b]
+        //   bmap: {}
+        //   ref: original referee
+        //
+        // new parent
+        //   x: 2
+        //   blist: [new b]
+        //   bmap: {map new b, map both b}
+        //   ref: null
+        //
+        // child
+        //   x: 1 (scrubbed before move, should be preserved)
+        //   blist: [original b] (inherited before move, should be preserved)
+        //   bmap: {map child b, map both b}
+        //   ref: original referee (inherited before move, should be preserved)
+        ConfigA originalTemplateParent = new ConfigA("original parent");
+        originalTemplateParent.setX(1);
+        originalTemplateParent.getBlist().add(new ConfigB("original b"));
+        originalTemplateParent.setRef(new Referee("original referee"));
+        String originalTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, originalTemplateParent, rootPath, true);
+
+        ConfigA newTemplateParent = new ConfigA("new template parent");
+        newTemplateParent.setX(2);
+        newTemplateParent.getBlist().add(new ConfigB("new b"));
+        newTemplateParent.getBmap().put("map new b", new ConfigB("map new b"));
+        newTemplateParent.getBmap().put("map both b", new ConfigB("map both b"));
+        String newTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, newTemplateParent, rootPath, true);
+
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("child"), originalTemplateParentPath, false);
+        ConfigA child = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(childPath, ConfigA.class));
+        child.setX(1);
+        child.getBmap().put("map child b", new ConfigB("map child b"));
+        child.getBmap().put("map both b", new ConfigB("map both b"));
+        configurationTemplateManager.save(child);
+
+        Listener listener = registerListener();
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(childPath, newTemplateParentPath);
+        assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
+        
+        // expected child
+        //   x: 1
+        //   blist: [original b, new b]
+        //   bmap: {map child b, map both b, map new b}
+        //   ref: original referee
+        child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
+        assertEquals(1, child.getX());
+        Referee referee = child.getRef();
+        assertNotNull(referee);
+        assertEquals("original referee", referee.getName());
+        List<ConfigB> blist = child.getBlist();
+        assertEquals(2, blist.size());
+        assertEquals("original b", blist.get(0).getName());
+        assertEquals("new b", blist.get(1).getName());
+        Map<String, ConfigB> bmap = child.getBmap();
+        assertEquals(3, bmap.size());
+        assertEquals(CollectionUtils.asSet("map new b", "map both b", "map child b"), bmap.keySet());
+
+        String newBPath = blist.get(1).getConfigurationPath();
+        String newMapBPath = getPath(childPath, "bmap", "map new b");
+        listener.assertEvents(
+                new InsertEventSpec(newBPath, false),
+                new PostInsertEventSpec(newBPath, false),
+                new InsertEventSpec(newMapBPath, false),
+                new PostInsertEventSpec(newMapBPath, false)
+        );
+    }
+
+    public void testMoveSubtree()
+    {
+        MoveHierarchy moveHierarchy = setupSubtreeMoveHierarchy();
+        
+        ConfigA newTemplateParent = moveHierarchy.cloneNewTemplateParent();
+        newTemplateParent.setX(-1);
+        newTemplateParent.addRecipe(new ConfigRecipe("newp recipe"));
+        configurationTemplateManager.save(newTemplateParent);
+        
+        ConfigA originalTemplateParent = moveHierarchy.cloneOriginalTemplateParent();
+        originalTemplateParent.setX(1);
+        originalTemplateParent.addRecipe(new ConfigRecipe("originalp recipe"));
+        configurationTemplateManager.save(originalTemplateParent);
+        
+        ConfigA child = moveHierarchy.cloneChild();
+        child.setX(2);
+        child.addRecipe(new ConfigRecipe("child recipe"));
+        configurationTemplateManager.save(child);
+        
+        ConfigA grandchild1 = moveHierarchy.cloneGrandchild1();
+        grandchild1.setX(3);
+        grandchild1.addRecipe(new ConfigRecipe("grandchild1 recipe"));
+        configurationTemplateManager.save(grandchild1);
+        
+        Listener listener = registerListener();
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
+        
+        child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertEquals(2, child.getX());
+        assertEquals(asSet("child recipe", "originalp recipe", "newp recipe"), child.getRecipes().keySet());
+
+        grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
+        assertEquals(3, grandchild1.getX());
+        assertEquals(asSet("grandchild1 recipe", "child recipe", "originalp recipe", "newp recipe"), grandchild1.getRecipes().keySet());
+
+        ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
+        assertEquals(2, grandchild2.getX());
+        assertEquals(asSet("child recipe", "originalp recipe", "newp recipe"), grandchild2.getRecipes().keySet());
+        
+        String newRecipeRemainderPath = getPath("recipes", "newp recipe");
+        listener.assertEvents(
+                new InsertEventSpec(getPath(moveHierarchy.grandchild1Path, newRecipeRemainderPath), false),
+                new PostInsertEventSpec(getPath(moveHierarchy.grandchild1Path, newRecipeRemainderPath), false),
+                new InsertEventSpec(getPath(moveHierarchy.grandchild2Path, newRecipeRemainderPath), false),
+                new PostInsertEventSpec(getPath(moveHierarchy.grandchild2Path, newRecipeRemainderPath), false)
+        );
+    }
+
+    public void testMoveDeleteIncompatible()
+    {
+        final String RECIPE_NAME = "recipe";
+        final String COMMAND_NAME = "command";
+
+        // New template parent and child both have commands at the same path,
+        // one is an ant command, the other a maven command. 
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+
+        ConfigA newTemplateParent = moveHierarchy.cloneNewTemplateParent();
+        ConfigRecipe newTemplateParentRecipe = new ConfigRecipe(RECIPE_NAME);
+        newTemplateParentRecipe.addCommand(new ConfigMavenCommand(COMMAND_NAME));
+        newTemplateParent.addRecipe(newTemplateParentRecipe);
+        configurationTemplateManager.save(newTemplateParent);
+
+        ConfigA child = moveHierarchy.cloneChild();
+        ConfigRecipe childRecipe = new ConfigRecipe(RECIPE_NAME);
+        childRecipe.addCommand(new ConfigAntCommand(COMMAND_NAME, new ConfigEnvironment()));
+        child.addRecipe(childRecipe);
+        configurationTemplateManager.save(child);
+
+        child = moveHierarchy.cloneChild();
+        ConfigAntCommand childCommand = (ConfigAntCommand) child.getRecipes().get(RECIPE_NAME).getCommands().get(COMMAND_NAME);
+        String deletedEnvironmentPath = childCommand.getEnvironments().get(0).getConfigurationPath();
+
+        Listener listener = registerListener();
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        String deletedCommandPath = getPath(moveHierarchy.childPath, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
+        assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
+
+        child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertEquals(asSet(RECIPE_NAME), child.getRecipes().keySet());
+        ConfigRecipe recipe = child.getRecipes().get(RECIPE_NAME);
+        assertEquals(asSet(COMMAND_NAME), recipe.getCommands().keySet());
+        assertTrue(recipe.getCommands().get(COMMAND_NAME) instanceof ConfigMavenCommand);
+
+        listener.assertEvents(
+                new DeleteEventSpec(deletedCommandPath, false),
+                new PostDeleteEventSpec(deletedCommandPath, false),
+                new DeleteEventSpec(deletedEnvironmentPath, true),
+                new PostDeleteEventSpec(deletedEnvironmentPath, true)
+        );
+    }
+
+    public void testMoveDeleteIncompatibleInSubtree()
+    {
+        final String RECIPE_NAME = "recipe";
+        final String COMMAND_NAME = "command";
+
+        // New template parent and grandchild1 both have commands at the same
+        // path, one is an ant command, the other a maven command.  The recipe
+        // does not exist at all in grandchild2, where it will be added.
+        MoveHierarchy moveHierarchy = setupSubtreeMoveHierarchy();
+
+        ConfigA newTemplateParent = moveHierarchy.cloneNewTemplateParent();
+        ConfigRecipe newTemplateParentRecipe = new ConfigRecipe(RECIPE_NAME);
+        newTemplateParentRecipe.addCommand(new ConfigMavenCommand(COMMAND_NAME));
+        newTemplateParent.addRecipe(newTemplateParentRecipe);
+        configurationTemplateManager.save(newTemplateParent);
+
+        ConfigA grandchild1 = moveHierarchy.cloneGrandchild1();
+        ConfigRecipe grandchild1Recipe = new ConfigRecipe(RECIPE_NAME);
+        grandchild1Recipe.addCommand(new ConfigAntCommand(COMMAND_NAME, new ConfigEnvironment()));
+        grandchild1.addRecipe(grandchild1Recipe);
+        configurationTemplateManager.save(grandchild1);
+
+        grandchild1 = moveHierarchy.cloneGrandchild1();
+        ConfigAntCommand grandchild1Command = (ConfigAntCommand) grandchild1.getRecipes().get(RECIPE_NAME).getCommands().get(COMMAND_NAME);
+        String deletedEnvironmentPath = grandchild1Command.getEnvironments().get(0).getConfigurationPath();
+
+        Listener listener = registerListener();
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        String deletedCommandPath = getPath(moveHierarchy.grandchild1Path, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
+        assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
+
+        grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
+        assertEquals(asSet(RECIPE_NAME), grandchild1.getRecipes().keySet());
+        ConfigRecipe recipe = grandchild1.getRecipes().get(RECIPE_NAME);
+        assertEquals(asSet(COMMAND_NAME), recipe.getCommands().keySet());
+        assertTrue(recipe.getCommands().get(COMMAND_NAME) instanceof ConfigMavenCommand);
+
+        ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
+        ConfigRecipe grandchild2Recipe = grandchild2.getRecipes().get(RECIPE_NAME);
+        String grandchild2RecipePath = grandchild2Recipe.getConfigurationPath();
+        String grandchild2CommandPath = grandchild2Recipe.getCommands().get(COMMAND_NAME).getConfigurationPath();
+        listener.assertEvents(
+                new DeleteEventSpec(deletedCommandPath, false),
+                new PostDeleteEventSpec(deletedCommandPath, false),
+                new DeleteEventSpec(deletedEnvironmentPath, true),
+                new PostDeleteEventSpec(deletedEnvironmentPath, true),
+                new InsertEventSpec(grandchild2RecipePath, false),
+                new PostInsertEventSpec(grandchild2RecipePath, false),
+                new InsertEventSpec(grandchild2CommandPath, true),
+                new InsertEventSpec(grandchild2CommandPath, true)
+        );
+    }
+    
+    public void testMoveInternalReference()
+    {
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA child = moveHierarchy.cloneChild();
+        child.setRef(new Referee("ee"));
+        configurationTemplateManager.save(child);
+
+        moveInternalReferenceHelper(moveHierarchy);
+    }
+
+    public void testMoveReferenceToItemDefinedInOriginalParent()
+    {
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA originalTemplateParent = moveHierarchy.cloneOriginalTemplateParent();
+        originalTemplateParent.setRef(new Referee("ee"));
+        configurationTemplateManager.save(originalTemplateParent);
+
+        moveInternalReferenceHelper(moveHierarchy);
+    }
+
+    public void testMoveReferenceToItemDefinedInCommonAncestor()
+    {
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA root = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(rootPath, ConfigA.class));
+        root.setRef(new Referee("ee"));
+        configurationTemplateManager.save(root);
+
+        moveInternalReferenceHelper(moveHierarchy);
+    }
+
+    private void moveInternalReferenceHelper(MoveHierarchy moveHierarchy)
+    {
+        ConfigA child = moveHierarchy.cloneChild();
+        child.setRefToRef(child.getRef());
+        child.getListOfRefs().add(child.getRef());
+        configurationTemplateManager.save(child);
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+
+        child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertSame(child.getRef(), child.getRefToRef());
+        List<Referee> refs = child.getListOfRefs();
+        assertEquals(1, refs.size());
+        assertSame(child.getRef(), refs.get(0));
+    }
+
+    public void testMoveWithHiddenMapItem()
+    {
+        // The child hides a recipe defined in its template parent.  Ensure it
+        // is not pushed down, and the bad hidden key is healed post-move. 
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA originalTemplateParent = moveHierarchy.cloneOriginalTemplateParent();
+        originalTemplateParent.addRecipe(new ConfigRecipe("recipe"));
+        configurationTemplateManager.save(originalTemplateParent);
+        
+        configurationTemplateManager.delete(getPath(moveHierarchy.childPath, "recipes", "recipe"));
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+
+        ConfigA child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertEquals(Collections.<String>emptySet(), child.getRecipes().keySet());
+    }
+
+    public void testMoveWithHiddenMapItemDefinedInCommonAncestor()
+    {
+        // The child hides a recipe defined in the root.  Ensure it is still
+        // hidden after the move. 
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA root = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(rootPath, ConfigA.class));
+        root.addRecipe(new ConfigRecipe("recipe"));
+        configurationTemplateManager.save(root);
+        
+        configurationTemplateManager.delete(getPath(moveHierarchy.childPath, "recipes", "recipe"));
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+        
+        ConfigA child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertEquals(Collections.<String>emptySet(), child.getRecipes().keySet());
+    }
+
+    public void testMoveWithHiddenMapItemInOneSubtree()
+    {
+        // grandchild1 hides a recipe defined in the child.  Ensure it is still
+        // hidden after the move.  grandchild2 doesn't hide it - ensure it is
+        // still there.
+        MoveHierarchy moveHierarchy = setupSubtreeMoveHierarchy();
+        
+        ConfigA child = moveHierarchy.cloneChild();
+        child.addRecipe(new ConfigRecipe("recipe"));
+        configurationTemplateManager.save(child);
+        
+        configurationTemplateManager.delete(getPath(moveHierarchy.grandchild1Path, "recipes", "recipe"));
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+        
+        ConfigA grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
+        assertEquals(Collections.<String>emptySet(), grandchild1.getRecipes().keySet());
+
+        ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
+        assertEquals(asSet("recipe"), grandchild2.getRecipes().keySet());
+    }
+
+    public void testMoveWithHiddenListItem()
+    {
+        // The child hides a blist item defined in its template parent.  Ensure
+        // it is not pushed down, and the bad hidden key is healed post-move. 
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA originalTemplateParent = moveHierarchy.cloneOriginalTemplateParent();
+        originalTemplateParent.getBlist().add(new ConfigB("b"));
+        configurationTemplateManager.save(originalTemplateParent);
+        
+        ConfigA child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        configurationTemplateManager.delete(child.getBlist().get(0).getConfigurationPath());
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+
+        child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertEquals(Collections.<ConfigB>emptyList(), child.getBlist());
+    }
+
+    public void testMoveWithHiddenListItemDefinedInCommonAncestor()
+    {
+        // The child hides a blist item defined in the root.  Ensure it is
+        // still hidden after the move. 
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        ConfigA root = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(rootPath, ConfigA.class));
+        root.getBlist().add(new ConfigB("b"));
+        configurationTemplateManager.save(root);
+        
+        ConfigA child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        configurationTemplateManager.delete(child.getBlist().get(0).getConfigurationPath());
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+
+        child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertEquals(Collections.<ConfigB>emptyList(), child.getBlist());
+    }
+
+    public void testMoveWithHiddenListItemInOneSubtree()
+    {
+        // grandchild1 hides a blist item defined in the child.  Ensure it is
+        // still hidden after the move.  grandchild2 doesn't hide it - ensure
+        // it is still there.
+        MoveHierarchy moveHierarchy = setupSubtreeMoveHierarchy();
+        
+        ConfigA child = moveHierarchy.cloneChild();
+        child.getBlist().add(new ConfigB("b"));
+        configurationTemplateManager.save(child);
+        
+        ConfigA grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
+        configurationTemplateManager.delete(grandchild1.getBlist().get(0).getConfigurationPath());
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+        
+        grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
+        assertEquals(Collections.<ConfigB>emptyList(), grandchild1.getBlist());
+
+        ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
+        assertEquals(1, grandchild2.getBlist().size());
+    }
+    
+    public void testMoveListOrderedInOriginalParent()
+    {
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+
+        String originalTemplateParentListPath = getPath(moveHierarchy.originalTemplateParentPath, "orderedBlist");
+        configurationTemplateManager.insert(originalTemplateParentListPath, new ConfigB("1"));
+        configurationTemplateManager.insert(originalTemplateParentListPath, new ConfigB("2"));
+        
+        reverseOrder(getPath(moveHierarchy.originalTemplateParentPath, "orderedBlist"));
+        
+        doMoveWithNoExpectedEvents(moveHierarchy);
+        
+        checkMovedOrderedList(moveHierarchy.childPath);
+    }
+
+    public void testMoveListOrderedInChild()
+    {
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+        
+        String originalTemplateParentListPath = getPath(moveHierarchy.originalTemplateParentPath, "orderedBlist");
+        configurationTemplateManager.insert(originalTemplateParentListPath, new ConfigB("1"));
+        configurationTemplateManager.insert(originalTemplateParentListPath, new ConfigB("2"));
+        
+        reverseOrder(getPath(moveHierarchy.childPath, "orderedBlist"));
+        
+        doMoveWithNoExpectedEvents(moveHierarchy);
+
+        checkMovedOrderedList(moveHierarchy.childPath);
+    }
+
+    public void testMoveSubtreeListOrderedInChild()
+    {
+        MoveHierarchy moveHierarchy = setupSubtreeMoveHierarchy();
+        
+        String originalTemplateParentListPath = getPath(moveHierarchy.originalTemplateParentPath, "orderedBlist");
+        configurationTemplateManager.insert(originalTemplateParentListPath, new ConfigB("1"));
+        configurationTemplateManager.insert(originalTemplateParentListPath, new ConfigB("2"));
+        
+        reverseOrder(getPath(moveHierarchy.childPath, "orderedBlist"));
+
+        doMoveWithNoExpectedEvents(moveHierarchy);
+
+        checkMovedOrderedList(moveHierarchy.childPath);
+        checkMovedOrderedList(moveHierarchy.grandchild1Path);
+        checkMovedOrderedList(moveHierarchy.grandchild2Path);
+    }
+
+    private void checkMovedOrderedList(String path)
+    {
+        ConfigA instance = configurationTemplateManager.getInstance(path, ConfigA.class);
+        List<ConfigB> list = instance.getOrderedBlist();
+        assertEquals(2, list.size());
+        assertEquals("2", list.get(0).getName());
+        assertEquals("1", list.get(1).getName());
+    }
+
     private ConfigA createAInstance(String name)
     {
         ConfigA instance = new ConfigA(name);
@@ -1814,9 +2339,109 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         return configurationTemplateManager.insert(getPath(aPath, "bmap"), new ConfigB(name));
     }
 
-    private HashSet<String> asSet(String... items)
+    private MoveHierarchy setupSimpleMoveHierarchy()
     {
-        return new HashSet<String>(asList(items));
+        ConfigA originalTemplateParent = new ConfigA("originalp");
+        String originalTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, originalTemplateParent, rootPath, true);
+
+        ConfigA newTemplateParent = new ConfigA("newp");
+        String newTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, newTemplateParent, rootPath, true);
+        
+        ConfigA child = new ConfigA("child");
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, originalTemplateParentPath, false);
+
+        return new MoveHierarchy(originalTemplateParentPath, newTemplateParentPath, childPath);
+    }
+
+    private MoveHierarchy setupSubtreeMoveHierarchy()
+    {
+        ConfigA originalTemplateParent = new ConfigA("originalp");
+        String originalTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, originalTemplateParent, rootPath, true);
+
+        ConfigA newTemplateParent = new ConfigA("newp");
+        String newTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, newTemplateParent, rootPath, true);
+        
+        ConfigA child = new ConfigA("child");
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, originalTemplateParentPath, true);
+        
+        ConfigA grandchild1 = new ConfigA("grand1");
+        String grandchild1Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, grandchild1, childPath, false);
+
+        ConfigA grandchild2 = new ConfigA("grand2");
+        String grandchild2Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, grandchild2, childPath, false);
+        
+        return new MoveHierarchy(originalTemplateParentPath, newTemplateParentPath, childPath, grandchild1Path, grandchild2Path);
+    }
+
+    private void doMoveWithNoExpectedEvents(MoveHierarchy moveHierarchy)
+    {
+        Listener listener = registerListener();
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
+        listener.assertEvents();
+    }
+
+    private void reverseOrder(String path)
+    {
+        CollectionType type = configurationTemplateManager.getType(path, CollectionType.class);
+        List<String> order = type.getOrder(recordManager.select(path));
+        Collections.reverse(order);
+        configurationTemplateManager.setOrder(path, order);
+    }
+
+    private class MoveHierarchy
+    {
+        String originalTemplateParentPath;
+        String newTemplateParentPath;
+        String childPath;
+        String grandchild1Path;
+        String grandchild2Path;
+
+        private MoveHierarchy(String originalTemplateParentPath, String newTemplateParentPath, String childPath)
+        {
+            this.originalTemplateParentPath = originalTemplateParentPath;
+            this.newTemplateParentPath = newTemplateParentPath;
+            this.childPath = childPath;
+        }
+
+        private MoveHierarchy(String originalTemplateParentPath, String newTemplateParentPath, String childPath, String grandchild1Path, String grandchild2Path)
+        {
+            this.originalTemplateParentPath = originalTemplateParentPath;
+            this.newTemplateParentPath = newTemplateParentPath;
+            this.childPath = childPath;
+            this.grandchild1Path = grandchild1Path;
+            this.grandchild2Path = grandchild2Path;
+        }
+
+        ConfigA cloneOriginalTemplateParent()
+        {
+            return deepClone(originalTemplateParentPath);
+        }
+
+        ConfigA cloneNewTemplateParent()
+        {
+            return deepClone(newTemplateParentPath);
+        }
+
+        ConfigA cloneChild()
+        {
+            return deepClone(childPath);
+        }
+        
+        ConfigA cloneGrandchild1()
+        {
+            return deepClone(grandchild1Path);
+        }
+
+        ConfigA cloneGrandchild2()
+        {
+            return deepClone(grandchild2Path);
+        }
+        
+        private ConfigA deepClone(String path)
+        {
+            return configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(path, ConfigA.class));
+        }
     }
 
     @SymbolicName("a")
@@ -1835,6 +2460,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         private Referee refToRef;
         @Reference
         private List<Referee> listOfRefs = new LinkedList<Referee>();
+        
+        private Map<String, ConfigRecipe> recipes = new LinkedHashMap<String, ConfigRecipe>();
 
         public ConfigA()
         {
@@ -1933,6 +2560,21 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setListOfRefs(List<Referee> listOfRefs)
         {
             this.listOfRefs = listOfRefs;
+        }
+
+        public Map<String, ConfigRecipe> getRecipes()
+        {
+            return recipes;
+        }
+
+        public void setRecipes(Map<String, ConfigRecipe> recipes)
+        {
+            this.recipes = recipes;
+        }
+        
+        public void addRecipe(ConfigRecipe recipe)
+        {
+            recipes.put(recipe.getName(), recipe);
         }
     }
 
@@ -2050,7 +2692,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     @SymbolicName("recipe")
     public static class ConfigRecipe extends AbstractNamedConfiguration
     {
-        private Map<String, ConfigCommand> extensionField = new HashMap<String, ConfigCommand>();
+        private Map<String, ConfigCommand> commands = new HashMap<String, ConfigCommand>();
 
         public ConfigRecipe()
         {
@@ -2063,12 +2705,17 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         public Map<String, ConfigCommand> getCommands()
         {
-            return extensionField;
+            return commands;
         }
 
-        public void setExtensionField(Map<String, ConfigCommand> extensionField)
+        public void addCommand(ConfigCommand command)
         {
-            this.extensionField = extensionField;
+            commands.put(command.getName(), command);
+        }
+        
+        public void setCommands(Map<String, ConfigCommand> commands)
+        {
+            this.commands = commands;
         }
     }
 
@@ -2104,6 +2751,19 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
     }
 
+    @SymbolicName("command.maven")
+    public static class ConfigMavenCommand extends AbstractNamedConfiguration implements ConfigCommand
+    {
+        public ConfigMavenCommand()
+        {
+        }
+
+        public ConfigMavenCommand(String name)
+        {
+            super(name);
+        }
+    }
+    
     @SymbolicName("environment")
     public static class ConfigEnvironment extends AbstractConfiguration
     {

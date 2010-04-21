@@ -393,7 +393,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
 
-        MutableRecord overridingProperty = childProperty.flatten();
+        MutableRecord overridingProperty = childProperty.flatten(false);
         overridingProperty.put("value", "cv");
 
         configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
@@ -414,7 +414,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
 
-        MutableRecord overridingProperty = childProperty.flatten();
+        MutableRecord overridingProperty = childProperty.flatten(false);
         overridingProperty.put("value", "cv");
 
         configurationTemplateManager.saveRecord("project/child/properties/p", overridingProperty);
@@ -533,7 +533,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         TemplateRecord child = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
         assertEquals(CHILD_PROJECT, child.getOwner("description"));
         assertEquals(CHILD_DESCRIPTION, child.get("description"));
-        MutableRecord record = child.flatten();
+        MutableRecord record = child.flatten(false);
         
         record.put("description", GLOBAL_DESCRIPTION);
         configurationTemplateManager.saveRecord("project/child", record);
@@ -549,7 +549,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
 
         TemplateRecord template = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
-        MutableRecord record = template.flatten();
+        MutableRecord record = template.flatten(false);
         record.put("name", "newname");
         configurationTemplateManager.saveRecord("project/global", record);
 
@@ -565,7 +565,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertChild();
 
         TemplateRecord template = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
-        MutableRecord record = template.flatten();
+        MutableRecord record = template.flatten(false);
         record.put("name", "newname");
         configurationTemplateManager.saveRecord("project/global", record);
 
@@ -585,7 +585,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.insertRecord("project/child/stages/default/properties", createProperty("foo", "bar"));
 
         TemplateRecord stageTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/global/stages/default");
-        MutableRecord record = stageTemplate.flatten();
+        MutableRecord record = stageTemplate.flatten(false);
         record.put("name", "newname");
         String newPath = configurationTemplateManager.saveRecord("project/global/stages/default", record);
         assertEquals("project/global/stages/newname", newPath);

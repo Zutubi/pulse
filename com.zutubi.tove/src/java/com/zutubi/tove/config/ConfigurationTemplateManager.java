@@ -552,7 +552,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
             TemplateRecord parentSkeleton = new TemplateRecord(null, null, actualType, createSkeletonRecord(actualType, templateParent.getMoi()));
             TemplateRecord template = new TemplateRecord(null, parentSkeleton, actualType, record);
-            record = template.flatten();
+            record = template.flatten(false);
             scrubInheritedValues(templateParent, record, true);
         }
 
@@ -2398,6 +2398,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
 
         return deepClone(instance);
+    }
+    
+    public Set<String> getAllPaths(String path)
+    {
+        return CollectionUtils.map(getAllInstances(path, Configuration.class, true), new ConfigurationToPathMapping(), new HashSet<String>());
     }
 
     public <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)

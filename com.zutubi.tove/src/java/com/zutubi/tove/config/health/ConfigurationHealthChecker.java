@@ -361,7 +361,7 @@ public class ConfigurationHealthChecker
                     return false;
                 }
 
-                if (!checkStructuresMatch(path, nestedRecord, getPath(templateParentPath, key), nestedTemplateParentRecord, report))
+                if (!checkStructuresMatch(getPath(path, key), nestedRecord, getPath(templateParentPath, key), nestedTemplateParentRecord, report))
                 {
                     return false;
                 }

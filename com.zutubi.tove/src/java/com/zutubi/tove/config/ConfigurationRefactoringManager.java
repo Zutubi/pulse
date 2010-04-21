@@ -1,5 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.health.ConfigurationHealthChecker;
+import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
@@ -30,6 +32,7 @@ public class ConfigurationRefactoringManager
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationHealthChecker configurationHealthChecker;
     private RecordManager recordManager;
 
     /**
@@ -447,6 +450,61 @@ public class ConfigurationRefactoringManager
         return configurationTemplateManager.executeInsideTransaction(new PushDownAction(path, childKeys));
     }
 
+    /**
+     * Moves an item of a templated collection to a new location in the
+     * template hierarchy.  If the moved item has descendants, they are moved
+     * too.
+     * <p/>
+     * When moving an item, some paths may need to be deleted.  Any path in the
+     * record to be moved that is type-incompatible with the corresponding path
+     * in the new template parent will be deleted.
+     * <p/>
+     * Note that moving can also create new concrete instances - if they are
+     * defined in the new template parent and did not previous exist in the
+     * concrete leaves of the moved subtree.
+     * 
+     * @param path                  path of the item to move, must refer to a
+     *                              non-root templated collection item
+     * @param newTemplateParentPath path of the new template parent to move to,
+     *                              must be a template item in the same
+     *                              collection as path
+     * @return a result instance giving details of the move
+     */
+    public MoveResult move(String path, String newTemplateParentPath)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new MoveAction(path, newTemplateParentPath));
+    }
+
+    /**
+     * Contains information about what happened during a move of a templated
+     * collection item.
+     */
+    public static class MoveResult
+    {
+        private List<String> deletedPaths = new LinkedList<String>();
+
+        /**
+         * Indicates paths that were deleted by the move, due to
+         * incompatibilities with the new template parent.
+         * 
+         * @return the paths that were deleted by the move
+         */
+        public List<String> getDeletedPaths()
+        {
+            return Collections.unmodifiableList(deletedPaths);
+        }
+        
+        private void addDeletedPath(String path)
+        {
+            deletedPaths.add(path);
+        }
+    }
+    
+    public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)
+    {
+        this.configurationHealthChecker = configurationHealthChecker;
+    }
+
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
@@ -641,7 +699,7 @@ public class ConfigurationRefactoringManager
 
             seenNames.add(cloneKey);
 
-            return record instanceof TemplateRecord ? ((TemplateRecord) record).flatten() : record;
+            return record instanceof TemplateRecord ? ((TemplateRecord) record).flatten(false) : record;
         }
 
         private void checkParent(String scope, String originalKey, MutableRecord clone, Map<String, String> originalKeyToCloneKey)
@@ -1583,13 +1641,13 @@ public class ConfigurationRefactoringManager
     /**
      * Helper base class for "pull up" and "push down" actions.
      */
-    private class MoveActionSupport
+    private class PullPushActionSupport
     {
         protected String path;
         protected String templateOwnerPath;
         protected String remainderPath;
 
-        private MoveActionSupport(String path)
+        private PullPushActionSupport(String path)
         {
             this.path = path;
             templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
@@ -1676,7 +1734,7 @@ public class ConfigurationRefactoringManager
     /**
      * Helper base class for "pull up" actions.
      */
-    private class PullUpActionSupport extends MoveActionSupport
+    private class PullUpActionSupport extends PullPushActionSupport
     {
         protected final String ancestorKey;
 
@@ -1895,7 +1953,7 @@ public class ConfigurationRefactoringManager
     /**
      * Helper base class for "push down" actions.
      */
-    private class PushDownActionSupport extends MoveActionSupport
+    private class PushDownActionSupport extends PullPushActionSupport
     {
         private PushDownActionSupport(String path)
         {
@@ -2179,6 +2237,201 @@ public class ConfigurationRefactoringManager
             public void pop()
             {
                 recordStack.pop();
+            }
+        }
+    }
+
+    /**
+     * Action to move a templated collection item to a new location in the
+     * hierarchy.
+     */
+    private class MoveAction implements NullaryFunction<MoveResult>
+    {
+        private String path;
+        private String newTemplateParentPath;
+
+        private MoveAction(String path, String newTemplateParentPath)
+        {
+            this.path = path;
+            this.newTemplateParentPath = newTemplateParentPath;
+        }
+
+        public MoveResult process()
+        {
+            if (!StringUtils.stringSet(path))
+            {
+                throw new IllegalArgumentException("Path is required");
+            }
+            
+            if (!StringUtils.stringSet(newTemplateParentPath))
+            {
+                throw new IllegalArgumentException("New template parent path is required");
+            }
+            
+            if (!configurationTemplateManager.pathExists(path))
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
+            
+            String[] elements = PathUtils.getPathElements(path);
+            if (elements.length != 2 || !configurationTemplateManager.isTemplatedPath(path))
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not refer to a templated collection item");
+            }
+            
+            String[] newTemplateParentElements = PathUtils.getPathElements(newTemplateParentPath);
+            if (newTemplateParentElements.length != 2 || !newTemplateParentElements[0].equals(elements[0]))
+            {
+                throw new IllegalArgumentException("New template parent path '" + newTemplateParentPath + "' does not refer to an element of the same templated collection as path '" + path + "'");
+            }
+            
+            if (configurationTemplateManager.isConcrete(newTemplateParentPath))
+            {
+                throw new IllegalArgumentException("New template parent path '" + newTemplateParentPath + "' refers to a concrete instance");
+            }
+
+            long existingTemplateParentHandle = configurationTemplateManager.getTemplateParentHandle(path, configurationTemplateManager.getRecord(path));
+            if (existingTemplateParentHandle == 0)
+            {
+                throw new IllegalArgumentException("Cannot move the root of an inheritance hierarchy");
+            }
+
+            final MoveResult result = new MoveResult();
+            String existingTemplateParentPath = recordManager.getPathForHandle(existingTemplateParentHandle);
+            if (existingTemplateParentPath.equals(newTemplateParentPath))
+            {
+                // This is a no-op.  We could reject it, but that seems heavy
+                // handed.  Programmatic use of moving should be able to safely
+                // do a trivial move.
+                return result;
+            }
+
+            final Record newTemplateParentRecord = configurationTemplateManager.getRecord(newTemplateParentPath);
+            final Set<String> potentialAddedPaths = new HashSet<String>();
+
+            TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(elements[0]);
+            final TemplateNode subtreeRoot = hierarchy.getNodeById(elements[1]);
+            
+            subtreeRoot.forEachDescendant(new TemplateNode.NodeHandler()
+            {
+                public boolean handle(TemplateNode node)
+                {
+                    TemplateRecord existingRecord = (TemplateRecord) configurationTemplateManager.getRecord(node.getPath());
+                    if (node.isConcrete())
+                    {
+                        collectPotentialAdditions(node.getPath(), existingRecord, newTemplateParentRecord, potentialAddedPaths);
+                    }
+                    
+                    deleteIncompatible(node.getPath(), existingRecord, newTemplateParentRecord, result);
+                    return true;
+                }
+            }, false);
+            
+            configurationTemplateManager.suspendInstanceCache();
+            try
+            {
+                // Detach all items we are moving (push down values).
+                subtreeRoot.forEachDescendant(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode node)
+                    {
+                        detach(node.getPath());
+                        return true;
+                    }
+                }, false);
+                
+                // Switch parents.
+                MutableRecord record = recordManager.select(path).copy(false, true);
+                configurationTemplateManager.setParentTemplate(record, newTemplateParentRecord.getHandle());
+                recordManager.update(path, record);
+                
+                // Heal all moved items.
+                subtreeRoot.forEachDescendant(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode node)
+                    {
+                        ConfigurationHealthReport report = configurationHealthChecker.healPath(node.getPath());
+                        if (!report.isHealthy())
+                        {
+                            throw new IllegalStateException("Unable to heal path '" + node.getPath() + "' after refactoring. " + report);
+                        }
+
+                        return true;
+                    }
+                }, false);
+                
+            }
+            finally
+            {
+                configurationTemplateManager.resumeInstanceCache();
+            }
+            
+            configurationTemplateManager.raiseInsertEvents(new LinkedList<String>(potentialAddedPaths));
+            return result;
+        }
+
+        private void collectPotentialAdditions(String path, Record detachedRecord, Record newTemplateParentRecord, Set<String> potentialAddedPaths)
+        {
+            for (String nestedKey: newTemplateParentRecord.nestedKeySet())
+            {
+                Object detachedValue = detachedRecord.get(nestedKey);
+                String nestedPath = getPath(path, nestedKey);
+                if (detachedValue != null && detachedValue instanceof Record)
+                {
+                    collectPotentialAdditions(nestedPath, (Record) detachedValue, (Record) newTemplateParentRecord.get(nestedKey), potentialAddedPaths);
+                }
+                else
+                {
+                    potentialAddedPaths.add(nestedPath);
+                }
+            }
+        }
+
+        private void deleteIncompatible(String path, Record existingRecord, Record newTemplateParentRecord, MoveResult result)
+        {
+            for (String nestedKey: existingRecord.nestedKeySet())
+            {
+                String nestedPath = getPath(path, nestedKey);
+                Record nestedExistingRecord = (Record) existingRecord.get(nestedKey);
+
+                Object templateParentValue = newTemplateParentRecord.get(nestedKey);
+                if (templateParentValue != null && templateParentValue instanceof Record)
+                {
+                    Record templateParentNestedRecord = (Record) templateParentValue;
+                    if (StringUtils.equals(templateParentNestedRecord.getSymbolicName(), nestedExistingRecord.getSymbolicName()))
+                    {
+                        deleteIncompatible(nestedPath, nestedExistingRecord, templateParentNestedRecord, result);
+                    }
+                    else
+                    {
+                        configurationTemplateManager.delete(nestedPath);
+                        result.addDeletedPath(nestedPath);
+                    }
+                }
+            }
+        }
+
+        private void detach(String path)
+        {
+            TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            MutableRecord flattened = record.flatten(true);
+            detach(path, record.getMoi(), flattened);
+        }
+
+        private void detach(String path, Record existingRecord, MutableRecord detachedRecord)
+        {
+            // Recursively walks over the existing record, updating it where it
+            // differs from the detached version (effectively pushes down
+            // values that were previously scrubbed).
+            if (!detachedRecord.shallowEquals(existingRecord))
+            {
+                recordManager.update(path, detachedRecord);
+            }
+            
+            for (String nestedKey: detachedRecord.nestedKeySet())
+            {
+                MutableRecord nestedDetachedRecord = (MutableRecord) detachedRecord.get(nestedKey);
+                detach(getPath(path, nestedKey), (Record) existingRecord.get(nestedKey), nestedDetachedRecord);
             }
         }
     }
