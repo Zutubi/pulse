@@ -3,6 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -118,17 +119,17 @@ public class TemplateNodeImpl implements TemplateNode
         }
     }
 
-    public void forEachAncestor(NodeHandler callback, boolean strict)
+    public void forEachAncestor(UnaryFunction<TemplateNode, Boolean> callback, boolean strict)
     {
-        if((strict || callback.handle(this)) && parent != null)
+        if((strict || callback.process(this)) && parent != null)
         {
             parent.forEachAncestor(callback, false);
         }
     }
 
-    public void forEachDescendant(NodeHandler callback, boolean strict)
+    public void forEachDescendant(UnaryFunction<TemplateNode, Boolean>  callback, boolean strict)
     {
-        if(strict || callback.handle(this))
+        if(strict || callback.process(this))
         {
             for(TemplateNode node: children)
             {
@@ -136,5 +137,4 @@ public class TemplateNodeImpl implements TemplateNode
             }
         }
     }
-
 }

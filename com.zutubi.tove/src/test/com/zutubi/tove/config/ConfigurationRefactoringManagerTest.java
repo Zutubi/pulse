@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.mock;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
+    private static final Messages I18N = Messages.getInstance(ConfigurationRefactoringManager.class);
+
     private static final String SAMPLE_SCOPE = "sample";
     private static final String TEMPLATE_SCOPE = "template";
     private static final String NAME_ROOT = "root";
@@ -1392,7 +1395,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
         catch (IllegalArgumentException e)
         {
-            assertThat(e.getMessage(), containsString("Path does not exist"));
+            assertThat(e.getMessage(), containsString("Path 'invalid/path' does not exist"));
         }
     }
 
@@ -1738,62 +1741,78 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testMoveEmptyPath()
     {
-        failedMoveHelper("", rootPath, "Path is required");
+        failedMoveHelper("", rootPath, "path.required", "Path");
     }
 
     public void testMoveInvalidPath()
     {
-        failedMoveHelper("invalid", rootPath, "Path 'invalid' does not exist");
+        failedMoveHelper("invalid", rootPath, "path.nonexistant", "Path", "invalid");
     }
 
     public void testMoveScope()
     {
-        failedMoveHelper(TEMPLATE_SCOPE, rootPath, "Path '" + TEMPLATE_SCOPE + "' does not refer to a templated collection item");
+        failedMoveHelper(TEMPLATE_SCOPE, rootPath, "path.not.templated.collection.item", "Path", TEMPLATE_SCOPE);
     }
     
     public void testMoveNonTemplatedPath()
     {
         String path = configurationTemplateManager.insert(SAMPLE_SCOPE, new ConfigA("non templated"));
-        failedMoveHelper(path, rootPath, "Path '" + path + "' does not refer to a templated collection item");
+        failedMoveHelper(path, rootPath, "path.not.templated", "Path", path);
     }
 
     public void testMoveUnderTemplatedItem()
     {
         String itemPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
         String path = getPath(itemPath, "recipes");
-        failedMoveHelper(path, rootPath, "Path '" + path + "' does not refer to a templated collection item");
+        failedMoveHelper(path, rootPath, "path.not.templated.collection.item", "Path", path);
     }
 
     public void testMoveRoot()
     {
-        failedMoveHelper(rootPath, rootPath, "Cannot move the root of an inheritance hierarchy");
+        failedMoveHelper(rootPath, rootPath, "path.is.root", "Path", rootPath);
     }
     
     public void testMoveNewTemplateParentPathEmpty()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, "", "New template parent path is required");
+        failedMoveHelper(path, "", "path.required", "New template parent path");
     }
 
     public void testMoveNewTemplateParentPathInvalid()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, "invalid", "New template parent path 'invalid' does not refer to an element of the same templated collection as path 'template/templated'");
+        failedMoveHelper(path, "invalid", "path.nonexistant", "New template parent path", "invalid");
     }
 
     public void testMoveNewTemplateParentPathAScope()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, TEMPLATE_SCOPE, "New template parent path '" + TEMPLATE_SCOPE + "' does not refer to an element of the same templated collection as path 'template/templated'");
+        failedMoveHelper(path, TEMPLATE_SCOPE, "path.not.templated.collection.item", "New template parent path", TEMPLATE_SCOPE);
     }
 
     public void testMoveNewTemplateParentPathNotATemplate()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, path, "New template parent path '" + path + "' refers to a concrete instance");
+        failedMoveHelper(path, path, "path.is.concrete", "New template parent path", path);
     }
-    
-    private void failedMoveHelper(String path, String newTemplateParentPath, String expectedMessage)
+
+    public void testMoveNewTemplateParentInDifferentScope() throws TypeException
+    {
+        final String ANOTHER_SCOPE = "another";
+
+        CompositeType typeA = typeRegistry.getType(ConfigA.class);
+        MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
+        configurationPersistenceManager.register(ANOTHER_SCOPE, templatedMap);
+
+        MutableRecord root = unstantiate(new ConfigA("r2"));
+        configurationTemplateManager.markAsTemplate(root);
+        String anotherRootPath = configurationTemplateManager.insertRecord(ANOTHER_SCOPE, root);
+
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        failedMoveHelper(path, anotherRootPath, "move.new.template.parent.different.scope", anotherRootPath, path);
+    }
+
+    private void failedMoveHelper(String path, String newTemplateParentPath, String expectedMessageKey, Object... expectedMessageArgs)
     {
         try
         {
@@ -1802,7 +1821,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
         catch (IllegalArgumentException e)
         {
-            assertThat(e.getMessage(), containsString(expectedMessage));
+            assertThat(e.getMessage(), containsString(I18N.format(expectedMessageKey, expectedMessageArgs)));
         }
     }
 

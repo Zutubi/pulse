@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
@@ -23,6 +24,7 @@ import static com.zutubi.util.CollectionUtils.asPair;
 public class ConfigurationRefactoringManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRefactoringManager.class);
+    private static final Messages I18N = Messages.getInstance(ConfigurationRefactoringManager.class);
 
     public static final String ACTION_CLONE = "clone";
     public static final String ACTION_PULL_UP = "pullUp";
@@ -498,6 +500,112 @@ public class ConfigurationRefactoringManager
         {
             deletedPaths.add(path);
         }
+    }
+
+    /**
+     * Ensures the given path is set.
+     * 
+     * @param path     the path to test
+     * @param pathName capitalised, human-readable name for the path (e.g.
+     *                 "Clone path")
+     */
+    private void ensurePathSpecified(String path, String pathName)
+    {
+        if (!StringUtils.stringSet(path))
+        {
+            throw new IllegalArgumentException(I18N.format("path.required", pathName));
+        }
+    }
+    
+    /**
+     * Ensures the given path is set and refers to an existing configuration
+     * instance.
+     * 
+     * @param path     the path to test
+     * @param pathName capitalised, human-readable name for the path (e.g.
+     *                 "Clone path")
+     */
+    private void ensurePathExists(String path, String pathName)
+    {
+        ensurePathSpecified(path, pathName);
+        if (!configurationTemplateManager.pathExists(path))
+        {
+            throw new IllegalArgumentException(I18N.format("path.nonexistant", pathName, path));
+        }
+    }
+
+    /**
+     * Ensures the given path refers to an existing configuration instances in
+     * a templated scope.
+     * 
+     * @param path     the path to test
+     * @param pathName capitalised, human-readable name for the path (e.g.
+     *                 "Clone path")
+     */
+    private void ensurePathExistsInTemplatedScope(String path, String pathName)
+    {
+        ensurePathExists(path, pathName);
+        if (!configurationTemplateManager.isTemplatedPath(path))
+        {
+            throw new IllegalArgumentException(I18N.format("path.not.templated", pathName, path));
+        }
+    }
+
+    /**
+     * Ensures the given path refers to an existing templated collection item.
+     * 
+     * @param path     the path to test
+     * @param pathName capitalised, human-readable name for the path (e.g.
+     *                 "Clone path")
+     */
+    private Pair<String, String> ensurePathRefersToTemplatedCollectionItem(String path, String pathName)
+    {
+        ensurePathExistsInTemplatedScope(path, pathName);
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length != 2)
+        {
+            throw new IllegalArgumentException(I18N.format("path.not.templated.collection.item", pathName, path));
+        }
+        
+        return new Pair<String, String>(elements[0], elements[1]);
+    }
+
+    /**
+     * Ensures the given path refers to an existing templated collection item,
+     * but not the root of the templated scope.
+     * 
+     * @param path     the path to test
+     * @param pathName capitalised, human-readable name for the path (e.g.
+     *                 "Clone path")
+     */
+    private Pair<String, String> ensurePathRefersToNonRootTemplatedCollectionItem(String path, String pathName)
+    {
+        Pair<String, String> result = ensurePathRefersToTemplatedCollectionItem(path, pathName);
+        if (configurationTemplateManager.getTemplateParentHandle(path, configurationTemplateManager.getRecord(path)) == 0)
+        {
+            throw new IllegalArgumentException(I18N.format("path.is.root", pathName, path));
+        }
+        
+        return result;
+    }
+
+    /**
+     * Ensures the given path refers to an existing, non-concrete templated
+     * collection item.
+     * 
+     * @param path     the path to test
+     * @param pathName capitalised, human-readable name for the path (e.g.
+     *                 "Clone path")
+     */
+    private Pair<String, String> ensurePathRefersToNonConcreteTemplatedCollectionItem(String path, String pathName)
+    {
+        Pair<String, String> result = ensurePathRefersToTemplatedCollectionItem(path, pathName);
+        if (configurationTemplateManager.isConcrete(path))
+        {
+            throw new IllegalArgumentException(I18N.format("path.is.concrete", pathName, path));
+        }
+        
+        return result;
     }
     
     public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)
@@ -1657,15 +1765,7 @@ public class ConfigurationRefactoringManager
         public void ensureMovable()
         {
             // Path must be a composite in a templated scope.
-            if (!configurationTemplateManager.pathExists(path))
-            {
-                throw new IllegalArgumentException("Path does not exist");
-            }
-
-            if (templateOwnerPath == null)
-            {
-                throw new IllegalArgumentException("Path does not refer to a templated item");
-            }
+            ensurePathExistsInTemplatedScope(path, "Path");
 
             if (!StringUtils.stringSet(remainderPath))
             {
@@ -1758,9 +1858,9 @@ public class ConfigurationRefactoringManager
             // Specified ancestor must strictly be our ancestor.
             TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
             final boolean[] found = new boolean[]{false};
-            node.forEachAncestor(new TemplateNode.NodeHandler()
+            node.forEachAncestor(new UnaryFunction<TemplateNode, Boolean>()
             {
-                public boolean handle(TemplateNode node)
+                public Boolean process(TemplateNode node)
                 {
                     if (node.getId().equals(ancestorKey))
                     {
@@ -1790,10 +1890,7 @@ public class ConfigurationRefactoringManager
 
             String ancestorPath = PathUtils.getPath(scope, ancestorKey, remainderPath);
             String ancestorParentPath = PathUtils.getParentPath(ancestorPath);
-            if (!configurationTemplateManager.pathExists(ancestorParentPath))
-            {
-                throw new IllegalArgumentException("Ancestor parent path '" + ancestorParentPath + "' does not exist");
-            }
+            ensurePathExists(ancestorParentPath, "Ancestor parent path");
             
             List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(ancestorPath, true, false, false);
             List<String> existingDescendantPaths = configurationTemplateManager.getDescendantPaths(path, false, false, false);
@@ -1921,9 +2018,9 @@ public class ConfigurationRefactoringManager
                 // canonicalised.
                 node = node.getChild(PathUtils.getElement(path, 1));
                 final CompositeType templateOwnerType = (CompositeType) configurationTemplateManager.getType(node.getPath());
-                node.forEachDescendant(new TemplateNode.NodeHandler()
+                node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
                 {
-                    public boolean handle(TemplateNode node)
+                    public Boolean process(TemplateNode node)
                     {
                         String descendantPath = node.getPath();
                         MutableRecord deepCopy = recordManager.select(descendantPath).copy(true, true);
@@ -2258,45 +2355,16 @@ public class ConfigurationRefactoringManager
 
         public MoveResult process()
         {
-            if (!StringUtils.stringSet(path))
-            {
-                throw new IllegalArgumentException("Path is required");
-            }
-            
-            if (!StringUtils.stringSet(newTemplateParentPath))
-            {
-                throw new IllegalArgumentException("New template parent path is required");
-            }
-            
-            if (!configurationTemplateManager.pathExists(path))
-            {
-                throw new IllegalArgumentException("Path '" + path + "' does not exist");
-            }
-            
-            String[] elements = PathUtils.getPathElements(path);
-            if (elements.length != 2 || !configurationTemplateManager.isTemplatedPath(path))
-            {
-                throw new IllegalArgumentException("Path '" + path + "' does not refer to a templated collection item");
-            }
-            
-            String[] newTemplateParentElements = PathUtils.getPathElements(newTemplateParentPath);
-            if (newTemplateParentElements.length != 2 || !newTemplateParentElements[0].equals(elements[0]))
-            {
-                throw new IllegalArgumentException("New template parent path '" + newTemplateParentPath + "' does not refer to an element of the same templated collection as path '" + path + "'");
-            }
-            
-            if (configurationTemplateManager.isConcrete(newTemplateParentPath))
-            {
-                throw new IllegalArgumentException("New template parent path '" + newTemplateParentPath + "' refers to a concrete instance");
-            }
+            Pair<String, String> moveItem = ensurePathRefersToNonRootTemplatedCollectionItem(path, "Path");
+            Pair<String, String> newTemplateParentItem = ensurePathRefersToNonConcreteTemplatedCollectionItem(newTemplateParentPath, "New template parent path");
 
-            long existingTemplateParentHandle = configurationTemplateManager.getTemplateParentHandle(path, configurationTemplateManager.getRecord(path));
-            if (existingTemplateParentHandle == 0)
+            if (!moveItem.first.equals(newTemplateParentItem.first))
             {
-                throw new IllegalArgumentException("Cannot move the root of an inheritance hierarchy");
+                throw new IllegalArgumentException(I18N.format("move.new.template.parent.different.scope", newTemplateParentPath, path));
             }
-
+            
             final MoveResult result = new MoveResult();
+            long existingTemplateParentHandle = configurationTemplateManager.getTemplateParentHandle(path, configurationTemplateManager.getRecord(path));
             String existingTemplateParentPath = recordManager.getPathForHandle(existingTemplateParentHandle);
             if (existingTemplateParentPath.equals(newTemplateParentPath))
             {
@@ -2309,12 +2377,12 @@ public class ConfigurationRefactoringManager
             final Record newTemplateParentRecord = configurationTemplateManager.getRecord(newTemplateParentPath);
             final Set<String> potentialAddedPaths = new HashSet<String>();
 
-            TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(elements[0]);
-            final TemplateNode subtreeRoot = hierarchy.getNodeById(elements[1]);
+            TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(moveItem.first);
+            final TemplateNode subtreeRoot = hierarchy.getNodeById(moveItem.second);
             
-            subtreeRoot.forEachDescendant(new TemplateNode.NodeHandler()
+            subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
             {
-                public boolean handle(TemplateNode node)
+                public Boolean process(TemplateNode node)
                 {
                     TemplateRecord existingRecord = (TemplateRecord) configurationTemplateManager.getRecord(node.getPath());
                     if (node.isConcrete())
@@ -2331,9 +2399,9 @@ public class ConfigurationRefactoringManager
             try
             {
                 // Detach all items we are moving (push down values).
-                subtreeRoot.forEachDescendant(new TemplateNode.NodeHandler()
+                subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
                 {
-                    public boolean handle(TemplateNode node)
+                    public Boolean process(TemplateNode node)
                     {
                         detach(node.getPath());
                         return true;
@@ -2346,14 +2414,14 @@ public class ConfigurationRefactoringManager
                 recordManager.update(path, record);
                 
                 // Heal all moved items.
-                subtreeRoot.forEachDescendant(new TemplateNode.NodeHandler()
+                subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
                 {
-                    public boolean handle(TemplateNode node)
+                    public Boolean process(TemplateNode node)
                     {
                         ConfigurationHealthReport report = configurationHealthChecker.healPath(node.getPath());
                         if (!report.isHealthy())
                         {
-                            throw new IllegalStateException("Unable to heal path '" + node.getPath() + "' after refactoring. " + report);
+                            throw new IllegalStateException(I18N.format("move.heal.failed", node.getPath(), report.toString()));
                         }
 
                         return true;

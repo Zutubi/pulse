@@ -1,5 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.util.UnaryFunction;
+
 import java.util.List;
 
 /**
@@ -98,7 +100,7 @@ public interface TemplateNode
      * @param callback the callback to execute on each node
      * @param strict   if true, this node is not included in the walk
      */
-    void forEachAncestor(NodeHandler callback, boolean strict);
+    void forEachAncestor(UnaryFunction<TemplateNode, Boolean>  callback, boolean strict);
 
     /**
      * Walks down the hierarchy from this node, executing the given callback on
@@ -108,20 +110,5 @@ public interface TemplateNode
      * @param callback the callback to execute on each node
      * @param strict   if true, this node is not included in the walk
      */
-    void forEachDescendant(NodeHandler callback, boolean strict);
-
-    /**
-     * Callback interface used by tree-walking methods.
-     */
-    public interface NodeHandler
-    {
-        /**
-         * Called with a node to be processed.  May optionally abort
-         * processing of further nodes.
-         *
-         * @param node the node to process
-         * @return true to process further nodes
-         */
-        boolean handle(TemplateNode node);
-    }
+    void forEachDescendant(UnaryFunction<TemplateNode, Boolean> callback, boolean strict);
 }

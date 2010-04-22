@@ -610,9 +610,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         final Record skeleton = createSkeletonRecord(actualType, record);
 
-        node.forEachDescendant(new TemplateNode.NodeHandler()
+        node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
         {
-            public boolean handle(TemplateNode templateNode)
+            public Boolean process(TemplateNode templateNode)
             {
                 String descendantPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
                 if (recordManager.select(descendantPath) == null && recordManager.select(PathUtils.getParentPath(descendantPath)) != null)
@@ -1669,9 +1669,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
             TemplateNode node = hierarchy.getNodeById(elements[1]);
 
-            node.forEachDescendant(new TemplateNode.NodeHandler()
+            node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
             {
-                public boolean handle(TemplateNode templateNode)
+                public Boolean process(TemplateNode templateNode)
                 {
                     String oldDescendantPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
                     String newDescendantPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
@@ -1750,9 +1750,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
                 final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
 
-                node.forEachAncestor(new TemplateNode.NodeHandler()
+                node.forEachAncestor(new UnaryFunction<TemplateNode, Boolean>()
                 {
-                    public boolean handle(TemplateNode node)
+                    public Boolean process(TemplateNode node)
                     {
                         String ancestorPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
                         if (pathExists(ancestorPath))
@@ -1790,9 +1790,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
                 final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
 
-                node.forEachDescendant(new TemplateNode.NodeHandler()
+                node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
                 {
-                    public boolean handle(TemplateNode node)
+                    public Boolean process(TemplateNode node)
                     {
                         if (!concreteOnly || node.isConcrete())
                         {

@@ -348,7 +348,7 @@ public class TemplateRecord extends AbstractRecord
 
     public MutableRecord copy(boolean deep, boolean preserveHandles)
     {
-        return flatten(false);
+        return flatten(preserveHandles);
     }
 
     public Set<String> getHiddenKeys()

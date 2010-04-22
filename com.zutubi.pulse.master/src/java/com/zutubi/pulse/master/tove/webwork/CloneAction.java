@@ -14,6 +14,7 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.UnaryFunction;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -225,9 +226,9 @@ public class CloneAction extends ToveFormActionSupport
     {
         final Map parameters = ActionContext.getContext().getParameters();
         TemplateNode templateNode = configurationTemplateManager.getTemplateNode(path);
-        templateNode.forEachDescendant(new TemplateNode.NodeHandler()
+        templateNode.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
         {
-            public boolean handle(TemplateNode node)
+            public Boolean process(TemplateNode node)
             {
                 Record record = configurationTemplateManager.getRecord(node.getPath());
                 String key = getKey(record);
