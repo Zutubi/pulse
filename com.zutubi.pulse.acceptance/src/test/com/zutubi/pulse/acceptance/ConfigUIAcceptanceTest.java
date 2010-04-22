@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -932,7 +933,90 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         configPage.waitFor();
         configPage.clickBuildOptionsAndWait();
     }
+    
+    public void testMoveLinkPresence() throws Exception
+    {
+        String random = randomName();
+        String user = random + "-user";
+        String template = random + "-template";
+        String concrete = random + "-concrete";
+        
+        xmlRpcHelper.insertTrivialUser(user);
+        xmlRpcHelper.insertTrivialProject(template, true);
+        xmlRpcHelper.insertTrivialProject(concrete, false);
+        
+        loginAsAdmin();
+        
+        ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        assertFalse(globalPage.isMovePresent());
 
+        ProjectHierarchyPage templatePage = browser.openAndWaitFor(ProjectHierarchyPage.class, template, true);
+        assertTrue(templatePage.isMovePresent());
+
+        ProjectHierarchyPage concretePage = browser.openAndWaitFor(ProjectHierarchyPage.class, concrete, false);
+        assertTrue(concretePage.isMovePresent());
+        
+        logout();
+        login(user, "");
+
+        templatePage.openAndWaitFor();
+        assertFalse(templatePage.isMovePresent());
+        
+        concretePage.openAndWaitFor();
+        assertFalse(concretePage.isMovePresent());
+    }
+    
+    public void testMove() throws Exception
+    {
+        String random = randomName();
+        String newTemplateParent = random + "-newtp";
+        String toMove = random + "-tomove";
+
+        xmlRpcHelper.insertTrivialProject(newTemplateParent, true);
+        String toMovePath = xmlRpcHelper.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        loginAsAdmin();
+        
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, toMove, false);
+        hierarchyPage.clickMove();
+        
+        MoveForm moveForm = new MoveForm(browser);
+        moveForm.waitFor();
+        moveForm.moveFormElements(newTemplateParent);
+        
+        hierarchyPage.waitFor();
+        assertTrue(hierarchyPage.isTreeItemPresent(toMove));
+        assertEquals(newTemplateParent, xmlRpcHelper.getTemplateParent(toMovePath));
+    }
+
+    public void testMoveWithConfirmation() throws Exception
+    {
+        String random = randomName();
+        String newTemplateParent = random + "-newtp";
+        String toMove = random + "-tomove";
+
+        xmlRpcHelper.insertProject(newTemplateParent, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.createVersionedConfig("path"));
+        String toMovePath = xmlRpcHelper.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        loginAsAdmin();
+        
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, toMove, false);
+        hierarchyPage.clickMove();
+        
+        MoveForm moveForm = new MoveForm(browser);
+        moveForm.waitFor();
+        moveForm.moveFormElements(newTemplateParent);
+        
+        MoveConfirmPage confirmPage = new MoveConfirmPage(browser, urls, toMovePath);
+        confirmPage.waitFor();
+        assertEquals(asList(PathUtils.getPath(toMovePath, "type")), confirmPage.getDeletedPaths());
+        confirmPage.clickMove();        
+        
+        hierarchyPage.waitFor();
+        assertTrue(hierarchyPage.isTreeItemPresent(toMove));
+        assertEquals(newTemplateParent, xmlRpcHelper.getTemplateParent(toMovePath));
+    }
+    
     private void checkListedRecipes(String... expectedRecipes)
     {
         loginAsAdmin();

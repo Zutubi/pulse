@@ -816,7 +816,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String childProjectPath = xmlRpcHelper.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.createVersionedConfig("path"));
         String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
 
-        Hashtable<String, Object> result = xmlRpcHelper.previewMoveConfig(childProjectPath, newTemplateParentProjectPath);
+        Hashtable<String, Object> result = xmlRpcHelper.previewMoveConfig(childProjectPath, newTemplateParentProject);
         
         String scmPath = getPath(childProjectPath, "scm");
         String typePath = getPath(childProjectPath, "type");
@@ -838,7 +838,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
         xmlRpcHelper.insertProjectProperty(newTemplateParentProject, "prop", "val");
 
-        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
         
         String scmPath = getPath(childProjectPath, "scm");
         String typePath = getPath(childProjectPath, "type");
@@ -867,7 +867,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
         xmlRpcHelper.insertProjectProperty(newTemplateParentProject, "prop", "val");
 
-        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
         
         String grandhchild2TypePath = getPath(grandchild2ProjectPath, "type");
         checkExpectedDeletedPaths(result, grandhchild2TypePath);
@@ -907,7 +907,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         
         xmlRpcHelper.logout();
         xmlRpcHelper.login(user, "");
-        xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+        xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
     }
     
     public void testMoveConfigNoWritePermissionForPath() throws Exception
@@ -925,7 +925,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.login(user, "");
         try
         {
-            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
             fail("Should not be able to move a project that we cannot write to");
         }
         catch (Exception e)
@@ -960,7 +960,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.login(user, "");
         try
         {
-            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
             fail("Should not be able to move with descendant we cannot write to");
         }
         catch (Exception e)
@@ -986,7 +986,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.login(user, "");
         try
         {
-            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
             fail("Should not be able to move to new template parent that we cannot view");
         }
         catch (Exception e)

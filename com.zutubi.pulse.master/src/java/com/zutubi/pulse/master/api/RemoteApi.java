@@ -1123,20 +1123,21 @@ public class RemoteApi
      * @param token                 authentication token (see {@link #login})
      * @param path                  path of the item to move, must refer to a
      *                              non-root templated collection item
-     * @param newTemplateParentPath path of the new template parent to move to,
-     *                              must be a template item in the same
-     *                              collection as path
+     * @param newTemplateParentKey  key of the new template parent to move to,
+     *                              in the same collection as path, must refer
+     *                              to a template not under the path in the
+     *                              hierarchy
      * @return a result struct giving details of the move
      * @access requires write permission for the given path and all of its
      *         descendants and read permission for the new template parent
      * @see #moveConfig(String, String, String) 
      */
-    public Hashtable<String, Object> previewMoveConfig(String token, String path, String newTemplateParentPath)
+    public Hashtable<String, Object> previewMoveConfig(String token, String path, String newTemplateParentKey)
     {
         tokenManager.loginUser(token);
         try
         {
-            ConfigurationRefactoringManager.MoveResult moveResult = configurationRefactoringManager.previewMove(path, newTemplateParentPath);
+            ConfigurationRefactoringManager.MoveResult moveResult = configurationRefactoringManager.previewMove(path, newTemplateParentKey);
             return convert(moveResult);
         }
         finally
@@ -1161,20 +1162,21 @@ public class RemoteApi
      * @param token                 authentication token (see {@link #login})
      * @param path                  path of the item to move, must refer to a
      *                              non-root templated collection item
-     * @param newTemplateParentPath path of the new template parent to move to,
-     *                              must be a template item in the same
-     *                              collection as path
+     * @param newTemplateParentKey  key of the new template parent to move to,
+     *                              in the same collection as path, must refer
+     *                              to a template not under the path in the
+     *                              hierarchy
      * @return a result struct giving details of the move
      * @access requires write permission for the given path and all of its
      *         descendants and read permission for the new template parent
      * @see #previewMoveConfig(String, String, String) 
      */
-    public Hashtable<String, Object> moveConfig(String token, String path, String newTemplateParentPath)
+    public Hashtable<String, Object> moveConfig(String token, String path, String newTemplateParentKey)
     {
         tokenManager.loginUser(token);
         try
         {
-            ConfigurationRefactoringManager.MoveResult moveResult = configurationRefactoringManager.move(path, newTemplateParentPath);
+            ConfigurationRefactoringManager.MoveResult moveResult = configurationRefactoringManager.move(path, newTemplateParentKey);
             return convert(moveResult);
         }
         catch (RuntimeException e)

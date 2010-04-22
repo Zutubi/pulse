@@ -1738,10 +1738,33 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertNotNull(childA.getRef());
         assertSame(childA.getRef(), childA.getB().getRefToRef());
     }
+    
+    public void testGetMoveTemplatesEmptyPath()
+    {
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getMoveTemplates(""));
+    }
+
+    public void testGetMoveTemplatesInvalidPath()
+    {
+        assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getMoveTemplates(getPath(TEMPLATE_SCOPE, "invalid")));
+    }
+
+    public void testGetMoveTemplates()
+    {
+        String movePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("move"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("csibling"), rootPath, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("tsibling"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("cchild"), movePath, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("tchild"), movePath, true);
+
+        List<String> keys = configurationRefactoringManager.getMoveTemplates(movePath);
+        Collections.sort(keys);
+        assertEquals(asList(getBaseName(rootPath), "tsibling"), keys);
+    }
 
     public void testMoveEmptyPath()
     {
-        failedMoveHelper("", rootPath, "path.required", "Path");
+        failedMoveHelper("", rootPath, "string.required", "Path");
     }
 
     public void testMoveInvalidPath()
@@ -1772,46 +1795,38 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         failedMoveHelper(rootPath, rootPath, "path.is.root", "Path", rootPath);
     }
     
-    public void testMoveNewTemplateParentPathEmpty()
+    public void testMoveNewTemplateParentKeyEmpty()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, "", "path.required", "New template parent path");
+        failedMoveHelper(path, "", "string.required", "New template parent key");
     }
 
-    public void testMoveNewTemplateParentPathInvalid()
+    public void testMoveNewTemplateParentKeyInvalid()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, "invalid", "path.nonexistant", "New template parent path", "invalid");
+        failedMoveHelper(path, "invalid", "path.nonexistant", "New template parent path", getPath(TEMPLATE_SCOPE, "invalid"));
     }
 
-    public void testMoveNewTemplateParentPathAScope()
+    public void testMoveNewTemplateParentKeyNotATemplate()
     {
-        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, TEMPLATE_SCOPE, "path.not.templated.collection.item", "New template parent path", TEMPLATE_SCOPE);
+        String movePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("move"), rootPath, false);
+        String concretePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("concrete"), rootPath, false);
+        failedMoveHelper(movePath, "concrete", "path.is.concrete", "New template parent path", concretePath);
     }
 
-    public void testMoveNewTemplateParentPathNotATemplate()
+    public void testMoveNewTemplateParentKeySelf()
     {
-        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, path, "path.is.concrete", "New template parent path", path);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, true);
+        failedMoveHelper(path, "templated", "move.new.parent.is.self", path);
     }
 
-    public void testMoveNewTemplateParentInDifferentScope() throws TypeException
+    public void testMoveNewTemplateParentKeyDescendant()
     {
-        final String ANOTHER_SCOPE = "another";
-
-        CompositeType typeA = typeRegistry.getType(ConfigA.class);
-        MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
-        configurationPersistenceManager.register(ANOTHER_SCOPE, templatedMap);
-
-        MutableRecord root = unstantiate(new ConfigA("r2"));
-        configurationTemplateManager.markAsTemplate(root);
-        String anotherRootPath = configurationTemplateManager.insertRecord(ANOTHER_SCOPE, root);
-
-        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedMoveHelper(path, anotherRootPath, "move.new.template.parent.different.scope", anotherRootPath, path);
+        String movePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("move"), rootPath, true);
+        String descendantPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("descendant"), movePath, true);
+        failedMoveHelper(movePath, "descendant", "move.new.parent.is.descendant", descendantPath);
     }
-
+    
     private void failedMoveHelper(String path, String newTemplateParentPath, String expectedMessageKey, Object... expectedMessageArgs)
     {
         try
@@ -1830,7 +1845,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         MoveHierarchy hierarchy = setupSimpleMoveHierarchy();
 
         Listener listener = registerListener();
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(hierarchy.childPath, hierarchy.originalTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(hierarchy.childPath, hierarchy.originalTemplateParentKey);
         assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
         listener.assertEvents();
     }
@@ -1865,7 +1880,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         newTemplateParent.getBlist().add(new ConfigB("new b"));
         newTemplateParent.getBmap().put("map new b", new ConfigB("map new b"));
         newTemplateParent.getBmap().put("map both b", new ConfigB("map both b"));
-        String newTemplateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, newTemplateParent, rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, newTemplateParent, rootPath, true);
 
         String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("child"), originalTemplateParentPath, false);
         ConfigA child = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(childPath, ConfigA.class));
@@ -1876,7 +1891,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         Listener listener = registerListener();
 
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(childPath, newTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(childPath, newTemplateParent.getName());
         assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
         
         // expected child
@@ -1933,7 +1948,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         
         Listener listener = registerListener();
 
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
         assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
         
         child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
@@ -1984,7 +1999,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         Listener listener = registerListener();
 
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
         String deletedCommandPath = getPath(moveHierarchy.childPath, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
         assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
 
@@ -2030,7 +2045,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         Listener listener = registerListener();
 
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
         String deletedCommandPath = getPath(moveHierarchy.grandchild1Path, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
         assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
 
@@ -2054,6 +2069,36 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
                 new InsertEventSpec(grandchild2CommandPath, true),
                 new InsertEventSpec(grandchild2CommandPath, true)
         );
+    }
+
+    public void testMoveDeleteIncompatibleInheritedInSubtree()
+    {
+        final String RECIPE_NAME = "recipe";
+        final String COMMAND_NAME = "command";
+
+        // New template parent and child1 both have commands at the same
+        // path, one is an ant command, the other a maven command.
+        MoveHierarchy moveHierarchy = setupSubtreeMoveHierarchy();
+
+        ConfigA newTemplateParent = moveHierarchy.cloneNewTemplateParent();
+        ConfigRecipe newTemplateParentRecipe = new ConfigRecipe(RECIPE_NAME);
+        newTemplateParentRecipe.addCommand(new ConfigMavenCommand(COMMAND_NAME));
+        newTemplateParent.addRecipe(newTemplateParentRecipe);
+        configurationTemplateManager.save(newTemplateParent);
+
+        ConfigA child = moveHierarchy.cloneChild();
+        ConfigRecipe childRecipe = new ConfigRecipe(RECIPE_NAME);
+        childRecipe.addCommand(new ConfigAntCommand(COMMAND_NAME, new ConfigEnvironment()));
+        child.addRecipe(childRecipe);
+        configurationTemplateManager.save(child);
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
+        String deletedCommandPath = getPath(moveHierarchy.childPath, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
+        String deletedInheritedCommand1Path = getPath(moveHierarchy.grandchild1Path, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
+        String deletedInheritedCommand2Path = getPath(moveHierarchy.grandchild2Path, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
+        List<String> deleted = new LinkedList<String>(result.getDeletedPaths());
+        Collections.sort(deleted);
+        assertEquals(asList(deletedCommandPath, deletedInheritedCommand1Path, deletedInheritedCommand2Path), deleted);
     }
     
     public void testMoveInternalReference()
@@ -2288,7 +2333,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testPreviewMoveInvalidNewTemplateParentPath()
     {
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
-        failedPreviewMoveHelper(path, "invalid", "path.nonexistant", "New template parent path", "invalid");
+        failedPreviewMoveHelper(path, "invalid", "path.nonexistant", "New template parent path", getPath(TEMPLATE_SCOPE, "invalid"));
     }
     
     private void failedPreviewMoveHelper(String path, String newTemplateParentPath, String expectedMessageKey, Object... expectedMessageArgs)
@@ -2309,7 +2354,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         MoveHierarchy hierarchy = setupSimpleMoveHierarchy();
 
         Listener listener = registerListener();
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(hierarchy.childPath, hierarchy.originalTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(hierarchy.childPath, hierarchy.originalTemplateParentKey);
         assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
         listener.assertEvents();
     }
@@ -2324,7 +2369,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         newTemplateParent.addRecipe(new ConfigRecipe("a"));
 
         Listener listener = registerListener();
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(hierarchy.childPath, hierarchy.originalTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(hierarchy.childPath, hierarchy.originalTemplateParentKey);
         assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
         listener.assertEvents();
         
@@ -2354,7 +2399,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         Listener listener = registerListener();
 
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
         String deletedCommandPath = getPath(moveHierarchy.childPath, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
         assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
         
@@ -2479,7 +2524,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     private void doMoveWithNoExpectedEvents(MoveHierarchy moveHierarchy)
     {
         Listener listener = registerListener();
-        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
         assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
         listener.assertEvents();
     }
@@ -2494,7 +2539,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     private class MoveHierarchy
     {
+        String originalTemplateParentKey;
         String originalTemplateParentPath;
+        String newTemplateParentKey;
         String newTemplateParentPath;
         String childPath;
         String grandchild1Path;
@@ -2502,16 +2549,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         private MoveHierarchy(String originalTemplateParentPath, String newTemplateParentPath, String childPath)
         {
+            originalTemplateParentKey = getBaseName(originalTemplateParentPath);
             this.originalTemplateParentPath = originalTemplateParentPath;
+            newTemplateParentKey = getBaseName(newTemplateParentPath);
             this.newTemplateParentPath = newTemplateParentPath;
             this.childPath = childPath;
         }
 
         private MoveHierarchy(String originalTemplateParentPath, String newTemplateParentPath, String childPath, String grandchild1Path, String grandchild2Path)
         {
-            this.originalTemplateParentPath = originalTemplateParentPath;
-            this.newTemplateParentPath = newTemplateParentPath;
-            this.childPath = childPath;
+            this(originalTemplateParentPath, newTemplateParentPath, childPath);
             this.grandchild1Path = grandchild1Path;
             this.grandchild2Path = grandchild2Path;
         }

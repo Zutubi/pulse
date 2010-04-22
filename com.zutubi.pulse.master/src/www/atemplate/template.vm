@@ -23,6 +23,12 @@
         <td>smart clone this #i18n("key=label") by extracting a template parent and optionally clone its descendants</td>
     </tr>
 #end
+#auth("path=$path" "action=write")
+    <tr>
+        #actionHeader("move" "move" "move" "actionPath('#jss(${path})', 'move', false, false)")
+        <td>move this #i18n("key=label") and its descendants to a new location in the hierarchy</td>
+    </tr>
+#end
 #end
 #if(!$concrete)
 #auth("path=$path" "action=create")

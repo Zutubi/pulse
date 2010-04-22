@@ -46,7 +46,7 @@ width of its contents.  Floating it works, but hurts other things.
     var bc;
     <#if !form.readOnly>
         <#list form.submitFields as submitField>
-    bc = { text: '${submitField.value?js_string}' };
+    bc = { text: <#if submitField.label?exists> '${submitField.label?i18n?js_string}' <#else> '${submitField.value?js_string}' </#if> };
             <#if form.displayMode?default(false)>
     bc.disabled = true;
             </#if>

@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActio
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionResolver;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
@@ -23,6 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  */
@@ -46,6 +47,7 @@ public class PulseActionMapper implements ActionMapper
 
     // Pure config namespaces only, no hybrids here!
     private static final Set<String> configNamespaces = new HashSet<String>();
+    static
     {
         configNamespaces.add("/setupconfig");
         configNamespaces.add("/aconfig");
@@ -55,6 +57,7 @@ public class PulseActionMapper implements ActionMapper
 
     // Setup paths are only available during the setup.
     private static final Set<String> setupNamespaces = new HashSet<String>();
+    static
     {
         setupNamespaces.add("migrate");
         setupNamespaces.add("restore");
@@ -169,12 +172,20 @@ public class PulseActionMapper implements ActionMapper
         ActionMapping mapping = null;
         if (path != null)
         {
-            String[] actionSubmit = getActionSubmit(query, "display");
             if(params == null)
             {
                 params = new HashMap<String, String>();
             }
 
+            if (query != null)
+            {
+                // Strip parameter which is automatically added by Ext in some
+                // cases.
+                query = stripRandomParam(query);
+                query = collectExtraParameters(query, params);
+            }
+            
+            String[] actionSubmit = getActionSubmit(query, "display");
             String requestedAction = actionSubmit[0];
             params.put("submitField", actionSubmit[1]);
             params.put("actionName", requestedAction);
@@ -194,16 +205,33 @@ public class PulseActionMapper implements ActionMapper
         return mapping;
     }
 
+    private String stripRandomParam(String query)
+    {
+        return query.replaceAll("&?_dc=[0-9]+", "");
+    }
+
+    private String collectExtraParameters(String query, Map<String, String> params)
+    {
+        String[] queryElements = query.split("&");
+        if (queryElements.length > 1)
+        {
+            query = queryElements[0];
+            for (int i = 1; i < queryElements.length; i++)
+            {
+                String element = queryElements[i];
+                int index = element.indexOf('=');
+                if (index > 0)
+                {
+                    params.put(element.substring(0, index), element.substring(index + 1));
+                }
+            }
+        }
+        return query;
+    }
+
     private String[] getActionSubmit(String query, String defaultAction)
     {
         String[] actionSubmit = new String[]{defaultAction, ""};
-        if (query != null)
-        {
-            // Strip parameter which is automatically added by Ext in some
-            // cases.
-            query = stripRandomParam(query);
-        }
-        
         if (StringUtils.stringSet(query))
         {
             int index = query.indexOf('=');
@@ -224,11 +252,6 @@ public class PulseActionMapper implements ActionMapper
             }
         }
         return actionSubmit;
-    }
-
-    private String stripRandomParam(String query)
-    {
-        return query.replaceAll("&?_dc=[0-9]+", "");
     }
 
     private ActionMapping getDashboardMapping(String encodedPath, HttpServletRequest request)

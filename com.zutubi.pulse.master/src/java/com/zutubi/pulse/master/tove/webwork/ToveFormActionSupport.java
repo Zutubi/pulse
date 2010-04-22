@@ -33,6 +33,10 @@ import java.util.Map;
  *   <li>
  *     Add a new action mapping to the aconfig namespace in xwork.xml.
  *   </li>
+ *   <li>
+ *     (Optional) Override {@link #doPreview()} to insert a confirmation step
+ *     where required.
+ *   </li>
  * </ul>
  */
 public abstract class ToveFormActionSupport extends ToveActionSupport
@@ -42,6 +46,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
 
     private String actionName;
     private String submitName;
+    private String submitValue;
     protected String formSource;
     protected ConfigurationPanel newPanel;
 
@@ -56,11 +61,25 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
      */
     public ToveFormActionSupport(String actionName, String submitName)
     {
+        this(actionName, null, submitName);
+    }
+
+    /**
+     * Create a new action to render a form.
+     *
+     * @param actionName  the internal name of the action, used for xwork
+     *                    mapping and locating the template to render
+     * @param submitName  text on the default submit button for the form
+     * @param submitValue value for the default submit button for the form
+     */
+    public ToveFormActionSupport(String actionName, String submitName, String submitValue)
+    {
         this.actionName = actionName;
         newPanel = new ConfigurationPanel("aconfig/" + actionName + ".vm");
         this.submitName = submitName;
+        this.submitValue = submitValue;
     }
-
+    
     public String getFormSource()
     {
         return formSource;
@@ -74,7 +93,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
     public String execute() throws Exception
     {
         validatePath();
-        if(isInputSelected())
+        if (isInputSelected())
         {
             initialiseParameters();
             renderForm();
@@ -83,22 +102,29 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
 
         validateForm();
 
-        if(hasErrors())
+        if (hasErrors())
         {
             renderForm();
             return INPUT;
         }
 
-        doAction();
-        return SUCCESS;
+        if (!isConfirmSelected() || doPreview())
+        {
+            doAction();
+            return SUCCESS;
+        }
+        else
+        {
+            return INPUT;
+        }
     }
 
     private void renderForm() throws IOException, TemplateException
     {
         Form form = new Form(FORM_NAME, actionName, ToveUtils.getConfigURL(path, getFormAction(), null, "aconfig"), submitName);
         addFormFields(form);
-        addSubmit(form, submitName, true);
-        addSubmit(form, SUBMIT_CANCEL, false);
+        addSubmit(form, submitName, submitValue, true);
+        addSubmit(form, SUBMIT_CANCEL, SUBMIT_CANCEL, false);
 
         StringWriter writer = new StringWriter();
         ToveUtils.renderForm(form, getClass(), writer, freemarkerConfiguration);
@@ -127,10 +153,14 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
         return value;
     }
 
-    private void addSubmit(Form form, String name, boolean isDefault)
+    private void addSubmit(Form form, String name, String value, boolean isDefault)
     {
         Field field = new Field(FieldType.SUBMIT, name);
-        field.setValue(name);
+        if (name != null)
+        {
+            field.setLabel(name);
+        }
+        field.setValue(value);
         if(isDefault)
         {
             field.addParameter(SubmitFieldDescriptor.PARAM_DEFAULT, true);
@@ -184,10 +214,25 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
     protected abstract void validateForm();
 
     /**
+     * Called to preview the requested action.  This stage is reached when the
+     * form is submitted and validates.  For actions where the user may need to
+     * confirm, override this method.  To add a confirmation step, return false
+     * and set up an appropriate {@link ConfigurationPanel} in the newPanel
+     * field.  To continue immediately to the action, return true.
+     * 
+     * @return true to continue immediately to the action, false to show a
+     *         confirmation page via the newPanel
+     */
+    protected boolean doPreview()
+    {
+        return true;
+    }
+
+    /**
      * Called to execute the requested action.  This stage is reached when the
-     * form is submitted and validates.  The implementation should set up an
-     * appropriate {@link com.zutubi.pulse.master.tove.webwork.ConfigurationResponse}
-     * in the response field.
+     * form is submitted and validates, and either confirm is not selected or
+     * {@link #doPreview()} returns true.  The implementation should set up an
+     * appropriate {@link ConfigurationResponse} in the response field.
      */
     protected abstract void doAction();
 

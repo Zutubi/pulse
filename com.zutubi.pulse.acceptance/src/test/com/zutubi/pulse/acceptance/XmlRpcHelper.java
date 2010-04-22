@@ -254,14 +254,14 @@ public class XmlRpcHelper
         return call("pushDownConfig", path, childKeys);
     }
 
-    public Hashtable<String, Object> previewMoveConfig(String path, String newTemplateParentPath) throws Exception
+    public Hashtable<String, Object> previewMoveConfig(String path, String newTemplateParentKey) throws Exception
     {
-        return call("previewMoveConfig", path, newTemplateParentPath);
+        return call("previewMoveConfig", path, newTemplateParentKey);
     }
     
-    public Hashtable<String, Object> moveConfig(String path, String newTemplateParentPath) throws Exception
+    public Hashtable<String, Object> moveConfig(String path, String newTemplateParentKey) throws Exception
     {
-        return call("moveConfig", path, newTemplateParentPath);
+        return call("moveConfig", path, newTemplateParentKey);
     }
     
     public void setConfigOrder(String path, String... order) throws Exception

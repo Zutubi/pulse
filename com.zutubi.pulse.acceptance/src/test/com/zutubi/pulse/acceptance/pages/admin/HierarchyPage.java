@@ -15,6 +15,7 @@ public class HierarchyPage extends ConfigurationPanePage
     public static final String LINK_CONFIGURE = "configure";
     public static final String LINK_DELETE = "delete";
     public static final String LINK_SMART_CLONE = "smartclone";
+    public static final String LINK_MOVE = "move";
 
     protected String scope;
     protected String baseName;
@@ -97,6 +98,11 @@ public class HierarchyPage extends ConfigurationPanePage
         browser.doubleClick(getTreeItemLocator(baseName));
     }
 
+    public void selectTreeItem(String baseName)
+    {
+        browser.waitAndClick(getTreeItemLocator(baseName));
+    }
+
     public boolean isAddPresent()
     {
         return browser.isElementIdPresent(LINK_ADD);
@@ -122,6 +128,16 @@ public class HierarchyPage extends ConfigurationPanePage
         browser.waitAndClick(LINK_CLONE);
     }
 
+    public boolean isMovePresent()
+    {
+        return browser.isElementIdPresent(LINK_MOVE);
+    }
+
+    public void clickMove()
+    {
+        browser.waitAndClick(LINK_MOVE);
+    }
+    
     public void clickSmartClone()
     {
         browser.waitAndClick(LINK_SMART_CLONE);

@@ -29,6 +29,7 @@ public class ConfigurationRefactoringManager
     public static final String ACTION_CLONE = "clone";
     public static final String ACTION_PULL_UP = "pullUp";
     public static final String ACTION_PUSH_DOWN = "pushDown";
+    public static final String ACTION_MOVE = "move";
 
     private TypeRegistry typeRegistry;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -453,6 +454,58 @@ public class ConfigurationRefactoringManager
     }
 
     /**
+     * Returns the keys of all template instances that a given path can be
+     * moved under using {@link #move(String, String)}.  If the given path
+     * cannot be moved, the list returned is empty.
+     *
+     * @param path the path to get move templates for
+     * @return a list of keys for all templates that the path may be moved
+     *         under
+     * @see #move(String, String)
+     */
+    public List<String> getMoveTemplates(final String path)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<List<String>>()
+        {
+            public List<String> process()
+            {
+                try
+                {
+                    final List<String> result = new LinkedList<String>();
+                    Pair<String, String> scopeItemPair = ensurePathRefersToNonRootTemplatedCollectionItem(path, "Path");
+                    TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scopeItemPair.first);
+                    final TemplateNode moveNode = hierarchy.getNodeById(scopeItemPair.second);
+                    hierarchy.getRoot().forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                    {
+                        public Boolean process(TemplateNode node)
+                        {
+                            if (node == moveNode)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                if (!node.isConcrete() && configurationSecurityManager.hasPermission(node.getPath(), AccessManager.ACTION_VIEW))
+                                {
+                                    result.add(node.getId());
+                                }
+
+                                return true;
+                            }
+                        }
+                    }, false);
+
+                    return result;
+                }
+                catch (IllegalArgumentException e)
+                {
+                    return Collections.emptyList();
+                }
+            }
+        });
+    }
+
+    /**
      * Previews a move of an item in a templated collection to a new parent,
      * without making any actual changes.  This allows the caller to examine
      * the result of a move before going ahead.  An example use-case is warning
@@ -461,16 +514,17 @@ public class ConfigurationRefactoringManager
      *
      * @param path                  path of the item to move, must refer to a
      *                              non-root templated collection item
-     * @param newTemplateParentPath path of the new template parent to move to,
-     *                              must be a template item in the same
-     *                              collection as path
+     * @param newTemplateParentKey  key of the new template parent to move to,
+     *                              in the same collection as path, must refer
+     *                              to a template not under the path in the
+     *                              hierarchy
      * @return a result instance giving details of the move
      *
      * @see #move(String, String)
      */
-    public MoveResult previewMove(String path, String newTemplateParentPath)
+    public MoveResult previewMove(String path, String newTemplateParentKey)
     {
-        return configurationTemplateManager.executeInsideTransaction(new PreviewMoveAction(path, newTemplateParentPath));
+        return configurationTemplateManager.executeInsideTransaction(new PreviewMoveAction(path, newTemplateParentKey));
     }
 
     /**
@@ -488,16 +542,18 @@ public class ConfigurationRefactoringManager
      * 
      * @param path                  path of the item to move, must refer to a
      *                              non-root templated collection item
-     * @param newTemplateParentPath path of the new template parent to move to,
-     *                              must be a template item in the same
-     *                              collection as path
+     * @param newTemplateParentKey  key of the new template parent to move to,
+     *                              in the same collection as path, must refer
+     *                              to a template not under the path in the
+     *                              hierarchy
      * @return a result instance giving details of the move
      * 
-     * @see #previewMove(String, String) 
+     * @see #previewMove(String, String)
+     * @see #getMoveTemplates(String) 
      */
-    public MoveResult move(String path, String newTemplateParentPath)
+    public MoveResult move(String path, String newTemplateParentKey)
     {
-        return configurationTemplateManager.executeInsideTransaction(new MoveAction(path, newTemplateParentPath));
+        return configurationTemplateManager.executeInsideTransaction(new MoveAction(path, newTemplateParentKey));
     }
 
     /**
@@ -526,17 +582,17 @@ public class ConfigurationRefactoringManager
     }
 
     /**
-     * Ensures the given path is set.
+     * Ensures the given string is set.
      * 
-     * @param path     the path to test
-     * @param pathName capitalised, human-readable name for the path (e.g.
-     *                 "Clone path")
+     * @param s    the string to test
+     * @param name capitalised, human-readable name for the string (e.g.
+     *             "Clone path")
      */
-    private void ensurePathSpecified(String path, String pathName)
+    private void ensureSpecified(String s, String name)
     {
-        if (!StringUtils.stringSet(path))
+        if (!StringUtils.stringSet(s))
         {
-            throw new IllegalArgumentException(I18N.format("path.required", pathName));
+            throw new IllegalArgumentException(I18N.format("string.required", name));
         }
     }
     
@@ -550,7 +606,7 @@ public class ConfigurationRefactoringManager
      */
     private void ensurePathExists(String path, String pathName)
     {
-        ensurePathSpecified(path, pathName);
+        ensureSpecified(path, pathName);
         if (!configurationTemplateManager.pathExists(path))
         {
             throw new IllegalArgumentException(I18N.format("path.nonexistant", pathName, path));
@@ -2367,17 +2423,17 @@ public class ConfigurationRefactoringManager
     private abstract class MoveActionSupport implements NullaryFunction<MoveResult>
     {
         protected String path;
-        protected String newTemplateParentPath;
+        protected String newTemplateParentKey;
         
         protected MoveResult result = new MoveResult();
         protected TemplateNode subtreeRoot;
         protected Record newTemplateParentRecord;
         protected Set<String> potentialAddedPaths = new HashSet<String>();
 
-        public MoveActionSupport(String path, String newTemplateParentPath)
+        public MoveActionSupport(String path, String newTemplateParentKey)
         {
             this.path = path;
-            this.newTemplateParentPath = newTemplateParentPath;
+            this.newTemplateParentKey = newTemplateParentKey;
         }
 
         /**
@@ -2391,16 +2447,29 @@ public class ConfigurationRefactoringManager
         protected boolean previewMove()
         {
             Pair<String, String> moveItem = ensurePathRefersToNonRootTemplatedCollectionItem(path, "Path");
-            Pair<String, String> newTemplateParentItem = ensurePathRefersToNonConcreteTemplatedCollectionItem(newTemplateParentPath, "New template parent path");
+            ensureSpecified(newTemplateParentKey, "New template parent key");
+            final String newTemplateParentPath = getPath(moveItem.first, newTemplateParentKey);
+            ensurePathRefersToNonConcreteTemplatedCollectionItem(newTemplateParentPath, "New template parent path");
 
-            if (!moveItem.first.equals(newTemplateParentItem.first))
+            if (newTemplateParentPath.equals(path))
             {
-                throw new IllegalArgumentException(I18N.format("move.new.template.parent.different.scope", newTemplateParentPath, path));
+                throw new IllegalArgumentException(I18N.format("move.new.parent.is.self", newTemplateParentPath));
             }
             
             TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(moveItem.first);
             subtreeRoot = hierarchy.getNodeById(moveItem.second);
-
+            subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            {
+                public Boolean process(TemplateNode templateNode)
+                {
+                    if (templateNode.getId().equals(newTemplateParentKey))
+                    {
+                        throw new IllegalArgumentException(I18N.format("move.new.parent.is.descendant", newTemplateParentPath));
+                    }
+                    return true;
+                }
+            }, true);
+            
             configurationSecurityManager.ensurePermission(newTemplateParentPath, AccessManager.ACTION_VIEW);
             subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
             {
@@ -2505,9 +2574,9 @@ public class ConfigurationRefactoringManager
      */
     private class MoveAction extends MoveActionSupport
     {
-        private MoveAction(String path, String newTemplateParentPath)
+        private MoveAction(String path, String newTemplateParentKey)
         {
-            super(path, newTemplateParentPath);
+            super(path, newTemplateParentKey);
         }
 
         public MoveResult process()
@@ -2516,7 +2585,12 @@ public class ConfigurationRefactoringManager
             {
                 for (String path: result.getDeletedPaths())
                 {
-                    configurationTemplateManager.delete(path);
+                    // The path may no longer exist, as it may have been
+                    // deleted in an ancestor.
+                    if (configurationTemplateManager.pathExists(path))
+                    {
+                        configurationTemplateManager.delete(path);
+                    }
                 }
 
                 configurationTemplateManager.suspendInstanceCache();
