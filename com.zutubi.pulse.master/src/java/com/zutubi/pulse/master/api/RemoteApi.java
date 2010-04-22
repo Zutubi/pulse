@@ -27,7 +27,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -55,6 +54,8 @@ import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -1079,7 +1080,7 @@ public class RemoteApi
     }
 
     /**
-     * Pushes down an item from its current location in the template hiearchy
+     * Pushes down an item from its current location in the template hierarchy
      * to the given children.  Each specified child must satisfy
      * {@link #canPushDownConfig(String, String, String)}.  Children that hide the item
      * cannot be included, and will not have the item pushed down to them.  At
@@ -1110,6 +1111,88 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Previews a move of an item in a templated collection to a new parent,
+     * without making any actual changes.  This allows the caller to examine
+     * the result of a move before going ahead.  An example use-case is warning
+     * the user of incompatible paths that would need to be deleted to make the
+     * move.
+     * 
+     * @param token                 authentication token (see {@link #login})
+     * @param path                  path of the item to move, must refer to a
+     *                              non-root templated collection item
+     * @param newTemplateParentPath path of the new template parent to move to,
+     *                              must be a template item in the same
+     *                              collection as path
+     * @return a result struct giving details of the move
+     * @access requires write permission for the given path and all of its
+     *         descendants and read permission for the new template parent
+     * @see #moveConfig(String, String, String) 
+     */
+    public Hashtable<String, Object> previewMoveConfig(String token, String path, String newTemplateParentPath)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            ConfigurationRefactoringManager.MoveResult moveResult = configurationRefactoringManager.previewMove(path, newTemplateParentPath);
+            return convert(moveResult);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Moves an item of a templated collection to a new location in the
+     * template hierarchy.  If the moved item has descendants, they are moved
+     * too.
+     * <p/>
+     * When moving an item, some paths may need to be deleted.  Any path in the
+     * record to be moved that is type-incompatible with the corresponding path
+     * in the new template parent will be deleted.
+     * <p/>
+     * Note that moving can also create new concrete instances - if they are
+     * defined in the new template parent and did not previous exist in the
+     * concrete leaves of the moved subtree.
+     * 
+     * @param token                 authentication token (see {@link #login})
+     * @param path                  path of the item to move, must refer to a
+     *                              non-root templated collection item
+     * @param newTemplateParentPath path of the new template parent to move to,
+     *                              must be a template item in the same
+     *                              collection as path
+     * @return a result struct giving details of the move
+     * @access requires write permission for the given path and all of its
+     *         descendants and read permission for the new template parent
+     * @see #previewMoveConfig(String, String, String) 
+     */
+    public Hashtable<String, Object> moveConfig(String token, String path, String newTemplateParentPath)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            ConfigurationRefactoringManager.MoveResult moveResult = configurationRefactoringManager.move(path, newTemplateParentPath);
+            return convert(moveResult);
+        }
+        catch (RuntimeException e)
+        {
+            e.printStackTrace();
+            throw e;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+    
+    private Hashtable<String, Object> convert(ConfigurationRefactoringManager.MoveResult moveResult)
+    {
+        Hashtable<String, Object> struct = new Hashtable<String, Object>();
+        struct.put("deletedPaths", new Vector<String>(moveResult.getDeletedPaths()));
+        return struct;
     }
 
     /**

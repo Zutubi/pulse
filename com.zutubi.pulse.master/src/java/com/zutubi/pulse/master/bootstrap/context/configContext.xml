@@ -39,6 +39,7 @@
     <bean id="configurationTemplateManager" class="com.zutubi.tove.config.ConfigurationTemplateManager" autowire="byName">
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
+    <bean id="configurationHealthChecker" class="com.zutubi.tove.config.health.ConfigurationHealthChecker" autowire="byName"/>
     <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager" autowire="byName"/>
     <bean id="linkManager" class="com.zutubi.tove.links.LinkManager" autowire="byName"/>
     <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager" autowire="byName"/>

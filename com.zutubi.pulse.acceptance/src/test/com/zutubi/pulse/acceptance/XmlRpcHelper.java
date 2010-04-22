@@ -5,14 +5,12 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -26,7 +24,6 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Pair;
@@ -38,6 +35,10 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  */
@@ -253,6 +254,16 @@ public class XmlRpcHelper
         return call("pushDownConfig", path, childKeys);
     }
 
+    public Hashtable<String, Object> previewMoveConfig(String path, String newTemplateParentPath) throws Exception
+    {
+        return call("previewMoveConfig", path, newTemplateParentPath);
+    }
+    
+    public Hashtable<String, Object> moveConfig(String path, String newTemplateParentPath) throws Exception
+    {
+        return call("moveConfig", path, newTemplateParentPath);
+    }
+    
     public void setConfigOrder(String path, String... order) throws Exception
     {
         call("setConfigOrder", path, new Vector<String>(Arrays.asList(order)));

@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.xwork.actions.admin.debug;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.config.health.ConfigurationHealthReport;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -13,13 +12,12 @@ public class ConfigurationCheckAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationCheckAction.class);
 
-    private ObjectFactory objectFactory;
+    private ConfigurationHealthChecker configurationHealthChecker;
 
     @Override
     public String execute() throws Exception
     {
-        ConfigurationHealthChecker checker = objectFactory.buildBean(ConfigurationHealthChecker.class);
-        ConfigurationHealthReport report = checker.checkAll();
+        ConfigurationHealthReport report = configurationHealthChecker.checkAll();
         if (report.isHealthy())
         {
             LOG.info("Configuration check: All clear.");
@@ -33,8 +31,8 @@ public class ConfigurationCheckAction extends ActionSupport
         return SUCCESS;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)
     {
-        this.objectFactory = objectFactory;
+        this.configurationHealthChecker = configurationHealthChecker;
     }
 }

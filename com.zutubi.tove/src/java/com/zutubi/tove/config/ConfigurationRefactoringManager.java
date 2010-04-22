@@ -453,6 +453,27 @@ public class ConfigurationRefactoringManager
     }
 
     /**
+     * Previews a move of an item in a templated collection to a new parent,
+     * without making any actual changes.  This allows the caller to examine
+     * the result of a move before going ahead.  An example use-case is warning
+     * the user of incompatible paths that would need to be deleted to make the
+     * move.
+     *
+     * @param path                  path of the item to move, must refer to a
+     *                              non-root templated collection item
+     * @param newTemplateParentPath path of the new template parent to move to,
+     *                              must be a template item in the same
+     *                              collection as path
+     * @return a result instance giving details of the move
+     *
+     * @see #move(String, String)
+     */
+    public MoveResult previewMove(String path, String newTemplateParentPath)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new PreviewMoveAction(path, newTemplateParentPath));
+    }
+
+    /**
      * Moves an item of a templated collection to a new location in the
      * template hierarchy.  If the moved item has descendants, they are moved
      * too.
@@ -471,6 +492,8 @@ public class ConfigurationRefactoringManager
      *                              must be a template item in the same
      *                              collection as path
      * @return a result instance giving details of the move
+     * 
+     * @see #previewMove(String, String) 
      */
     public MoveResult move(String path, String newTemplateParentPath)
     {
@@ -2339,21 +2362,33 @@ public class ConfigurationRefactoringManager
     }
 
     /**
-     * Action to move a templated collection item to a new location in the
-     * hierarchy.
+     * Helper base class for move-related refactorings.
      */
-    private class MoveAction implements NullaryFunction<MoveResult>
+    private abstract class MoveActionSupport implements NullaryFunction<MoveResult>
     {
-        private String path;
-        private String newTemplateParentPath;
+        protected String path;
+        protected String newTemplateParentPath;
+        
+        protected MoveResult result = new MoveResult();
+        protected TemplateNode subtreeRoot;
+        protected Record newTemplateParentRecord;
+        protected Set<String> potentialAddedPaths = new HashSet<String>();
 
-        private MoveAction(String path, String newTemplateParentPath)
+        public MoveActionSupport(String path, String newTemplateParentPath)
         {
             this.path = path;
             this.newTemplateParentPath = newTemplateParentPath;
         }
 
-        public MoveResult process()
+        /**
+         * Validates input and collects information about a move, without
+         * making any permanent changes.  Initialises fields to use during the
+         * move.
+         * 
+         * @return true if the move is non-trivial, false if it is trivial
+         *         (allowing an immediate return).
+         */
+        protected boolean previewMove()
         {
             Pair<String, String> moveItem = ensurePathRefersToNonRootTemplatedCollectionItem(path, "Path");
             Pair<String, String> newTemplateParentItem = ensurePathRefersToNonConcreteTemplatedCollectionItem(newTemplateParentPath, "New template parent path");
@@ -2363,7 +2398,19 @@ public class ConfigurationRefactoringManager
                 throw new IllegalArgumentException(I18N.format("move.new.template.parent.different.scope", newTemplateParentPath, path));
             }
             
-            final MoveResult result = new MoveResult();
+            TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(moveItem.first);
+            subtreeRoot = hierarchy.getNodeById(moveItem.second);
+
+            configurationSecurityManager.ensurePermission(newTemplateParentPath, AccessManager.ACTION_VIEW);
+            subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            {
+                public Boolean process(TemplateNode templateNode)
+                {
+                    configurationSecurityManager.ensurePermission(templateNode.getPath(), AccessManager.ACTION_WRITE);
+                    return true;
+                }
+            }, false);
+            
             long existingTemplateParentHandle = configurationTemplateManager.getTemplateParentHandle(path, configurationTemplateManager.getRecord(path));
             String existingTemplateParentPath = recordManager.getPathForHandle(existingTemplateParentHandle);
             if (existingTemplateParentPath.equals(newTemplateParentPath))
@@ -2371,15 +2418,10 @@ public class ConfigurationRefactoringManager
                 // This is a no-op.  We could reject it, but that seems heavy
                 // handed.  Programmatic use of moving should be able to safely
                 // do a trivial move.
-                return result;
+                return false;
             }
 
-            final Record newTemplateParentRecord = configurationTemplateManager.getRecord(newTemplateParentPath);
-            final Set<String> potentialAddedPaths = new HashSet<String>();
-
-            TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(moveItem.first);
-            final TemplateNode subtreeRoot = hierarchy.getNodeById(moveItem.second);
-            
+            newTemplateParentRecord = configurationTemplateManager.getRecord(newTemplateParentPath);
             subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
             {
                 public Boolean process(TemplateNode node)
@@ -2390,54 +2432,14 @@ public class ConfigurationRefactoringManager
                         collectPotentialAdditions(node.getPath(), existingRecord, newTemplateParentRecord, potentialAddedPaths);
                     }
                     
-                    deleteIncompatible(node.getPath(), existingRecord, newTemplateParentRecord, result);
+                    findIncompatible(node.getPath(), existingRecord, newTemplateParentRecord, result);
                     return true;
                 }
             }, false);
             
-            configurationTemplateManager.suspendInstanceCache();
-            try
-            {
-                // Detach all items we are moving (push down values).
-                subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
-                {
-                    public Boolean process(TemplateNode node)
-                    {
-                        detach(node.getPath());
-                        return true;
-                    }
-                }, false);
-                
-                // Switch parents.
-                MutableRecord record = recordManager.select(path).copy(false, true);
-                configurationTemplateManager.setParentTemplate(record, newTemplateParentRecord.getHandle());
-                recordManager.update(path, record);
-                
-                // Heal all moved items.
-                subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
-                {
-                    public Boolean process(TemplateNode node)
-                    {
-                        ConfigurationHealthReport report = configurationHealthChecker.healPath(node.getPath());
-                        if (!report.isHealthy())
-                        {
-                            throw new IllegalStateException(I18N.format("move.heal.failed", node.getPath(), report.toString()));
-                        }
-
-                        return true;
-                    }
-                }, false);
-                
-            }
-            finally
-            {
-                configurationTemplateManager.resumeInstanceCache();
-            }
-            
-            configurationTemplateManager.raiseInsertEvents(new LinkedList<String>(potentialAddedPaths));
-            return result;
+            return true;
         }
-
+        
         private void collectPotentialAdditions(String path, Record detachedRecord, Record newTemplateParentRecord, Set<String> potentialAddedPaths)
         {
             for (String nestedKey: newTemplateParentRecord.nestedKeySet())
@@ -2455,7 +2457,7 @@ public class ConfigurationRefactoringManager
             }
         }
 
-        private void deleteIncompatible(String path, Record existingRecord, Record newTemplateParentRecord, MoveResult result)
+        private void findIncompatible(String path, Record existingRecord, Record newTemplateParentRecord, MoveResult result)
         {
             for (String nestedKey: existingRecord.nestedKeySet())
             {
@@ -2468,15 +2470,98 @@ public class ConfigurationRefactoringManager
                     Record templateParentNestedRecord = (Record) templateParentValue;
                     if (StringUtils.equals(templateParentNestedRecord.getSymbolicName(), nestedExistingRecord.getSymbolicName()))
                     {
-                        deleteIncompatible(nestedPath, nestedExistingRecord, templateParentNestedRecord, result);
+                        findIncompatible(nestedPath, nestedExistingRecord, templateParentNestedRecord, result);
                     }
                     else
                     {
-                        configurationTemplateManager.delete(nestedPath);
                         result.addDeletedPath(nestedPath);
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Action to preview a move - to determine what the result would look like
+     * without actually making changes.
+     */
+    private class PreviewMoveAction extends MoveActionSupport
+    {
+        public PreviewMoveAction(String path, String newTemplateParentPath)
+        {
+            super(path, newTemplateParentPath);
+        }
+
+        public MoveResult process()
+        {
+            previewMove();
+            return result;
+        }
+    }
+    
+    /**
+     * Action to move a templated collection item to a new location in the
+     * hierarchy.
+     */
+    private class MoveAction extends MoveActionSupport
+    {
+        private MoveAction(String path, String newTemplateParentPath)
+        {
+            super(path, newTemplateParentPath);
+        }
+
+        public MoveResult process()
+        {
+            if (previewMove())
+            {
+                for (String path: result.getDeletedPaths())
+                {
+                    configurationTemplateManager.delete(path);
+                }
+
+                configurationTemplateManager.suspendInstanceCache();
+                try
+                {
+                    // Detach all items we are moving (push down values).
+                    subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                    {
+                        public Boolean process(TemplateNode node)
+                        {
+                            detach(node.getPath());
+                            return true;
+                        }
+                    }, false);
+                    
+                    // Switch parents.
+                    MutableRecord record = recordManager.select(path).copy(false, true);
+                    configurationTemplateManager.setParentTemplate(record, newTemplateParentRecord.getHandle());
+                    recordManager.update(path, record);
+                    
+                    // Heal all moved items.
+                    subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                    {
+                        public Boolean process(TemplateNode node)
+                        {
+                            ConfigurationHealthReport report = configurationHealthChecker.healPath(node.getPath());
+                            if (!report.isHealthy())
+                            {
+                                throw new IllegalStateException(I18N.format("move.heal.failed", node.getPath(), report.toString()));
+                            }
+    
+                            return true;
+                        }
+                    }, false);
+                    
+                }
+                finally
+                {
+                    configurationTemplateManager.resumeInstanceCache();
+                }
+
+                configurationTemplateManager.raiseInsertEvents(new LinkedList<String>(potentialAddedPaths));
+            }
+            
+            return result;
         }
 
         private void detach(String path)

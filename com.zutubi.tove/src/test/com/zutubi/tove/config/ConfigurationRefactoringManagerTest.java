@@ -2280,6 +2280,90 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("1", list.get(1).getName());
     }
 
+    public void testPreviewMoveInvalidPath()
+    {
+        failedPreviewMoveHelper("invalid", rootPath, "path.nonexistant", "Path", "invalid");
+    }
+
+    public void testPreviewMoveInvalidNewTemplateParentPath()
+    {
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("templated"), rootPath, false);
+        failedPreviewMoveHelper(path, "invalid", "path.nonexistant", "New template parent path", "invalid");
+    }
+    
+    private void failedPreviewMoveHelper(String path, String newTemplateParentPath, String expectedMessageKey, Object... expectedMessageArgs)
+    {
+        try
+        {
+            configurationRefactoringManager.previewMove(path, newTemplateParentPath);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertThat(e.getMessage(), containsString(I18N.format(expectedMessageKey, expectedMessageArgs)));
+        }
+    }
+    
+    public void testPreviewMoveTrivial()
+    {
+        MoveHierarchy hierarchy = setupSimpleMoveHierarchy();
+
+        Listener listener = registerListener();
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(hierarchy.childPath, hierarchy.originalTemplateParentPath);
+        assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
+        listener.assertEvents();
+    }
+
+    public void testPreviewMoveMakesNoChanges()
+    {
+        MoveHierarchy hierarchy = setupSimpleMoveHierarchy();
+        
+        // Add a recipe in the new parent, and ensure that it does not get
+        // added to the child (it would if we actually made the move).
+        ConfigA newTemplateParent = hierarchy.cloneNewTemplateParent();
+        newTemplateParent.addRecipe(new ConfigRecipe("a"));
+
+        Listener listener = registerListener();
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(hierarchy.childPath, hierarchy.originalTemplateParentPath);
+        assertEquals(Collections.<String>emptyList(), result.getDeletedPaths());
+        listener.assertEvents();
+        
+        assertFalse(configurationTemplateManager.pathExists(getPath(hierarchy.childPath, "recipes", "a")));
+    }
+    
+    public void testPreviewMoveIncompatiblePaths()
+    {
+        final String RECIPE_NAME = "recipe";
+        final String COMMAND_NAME = "command";
+
+        // New template parent and child both have commands at the same path,
+        // one is an ant command, the other a maven command. 
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+
+        ConfigA newTemplateParent = moveHierarchy.cloneNewTemplateParent();
+        ConfigRecipe newTemplateParentRecipe = new ConfigRecipe(RECIPE_NAME);
+        newTemplateParentRecipe.addCommand(new ConfigMavenCommand(COMMAND_NAME));
+        newTemplateParent.addRecipe(newTemplateParentRecipe);
+        configurationTemplateManager.save(newTemplateParent);
+
+        ConfigA child = moveHierarchy.cloneChild();
+        ConfigRecipe childRecipe = new ConfigRecipe(RECIPE_NAME);
+        childRecipe.addCommand(new ConfigAntCommand(COMMAND_NAME, new ConfigEnvironment()));
+        child.addRecipe(childRecipe);
+        configurationTemplateManager.save(child);
+
+        Listener listener = registerListener();
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.previewMove(moveHierarchy.childPath, moveHierarchy.newTemplateParentPath);
+        String deletedCommandPath = getPath(moveHierarchy.childPath, "recipes", RECIPE_NAME, "commands", COMMAND_NAME);
+        assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
+        
+        // Check path was not actually deleted.
+        assertTrue(configurationTemplateManager.pathExists(deletedCommandPath));
+
+        listener.assertEvents();
+    }
+    
     private ConfigA createAInstance(String name)
     {
         ConfigA instance = new ConfigA(name);

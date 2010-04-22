@@ -23,6 +23,7 @@ import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
+import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.StringUtils;
@@ -443,6 +444,7 @@ public class DefaultSetupManager implements SetupManager
         MasterConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
         ConfigurationExtensionManager configurationExtensionManager = SpringComponentContext.getBean("configurationExtensionManager");
         ConfigurationStateManager configurationStateManager = SpringComponentContext.getBean("configurationStateManager");
+        ConfigurationHealthChecker configurationHealthChecker = SpringComponentContext.getBean("configurationHealthChecker");
 
         recordManager.init();
 
@@ -467,6 +469,8 @@ public class DefaultSetupManager implements SetupManager
             }
         });
         configurationTemplateManager.init();
+        
+        configurationHealthChecker.setRecordManager(recordManager);
 
         LogConfigurationManager logConfigurationManager = SpringComponentContext.getBean("logConfigurationManager");
         logConfigurationManager.applyConfig();

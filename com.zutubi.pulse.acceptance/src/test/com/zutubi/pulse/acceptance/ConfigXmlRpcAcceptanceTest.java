@@ -3,15 +3,21 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 
 import java.util.*;
 
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -799,6 +805,208 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(new Vector<String>(asList(pushedDownToPath)), xmlRpcHelper.pushDownConfig(propertyPath, new Vector<String>(asList(childProject))));
         assertFalse(xmlRpcHelper.configPathExists(propertyPath));
         assertTrue(xmlRpcHelper.configPathExists(pushedDownToPath));
+    }
+
+    public void testPreviewMoveConfig() throws Exception
+    {
+        String random = randomName();
+        String childProject = random + "-child";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = xmlRpcHelper.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.createVersionedConfig("path"));
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+
+        Hashtable<String, Object> result = xmlRpcHelper.previewMoveConfig(childProjectPath, newTemplateParentProjectPath);
+        
+        String scmPath = getPath(childProjectPath, "scm");
+        String typePath = getPath(childProjectPath, "type");
+        checkExpectedDeletedPaths(result, scmPath, typePath);
+        
+        // Make sure no changes were made.
+        assertEquals(ProjectManager.GLOBAL_PROJECT_NAME, xmlRpcHelper.getTemplateParent(childProjectPath));
+        assertTrue(xmlRpcHelper.configPathExists(scmPath));
+        assertTrue(xmlRpcHelper.configPathExists(typePath));
+    }
+
+    public void testMoveConfig() throws Exception
+    {
+        String random = randomName();
+        String childProject = random + "-child";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = xmlRpcHelper.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.createVersionedConfig("path"));
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        xmlRpcHelper.insertProjectProperty(newTemplateParentProject, "prop", "val");
+
+        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+        
+        String scmPath = getPath(childProjectPath, "scm");
+        String typePath = getPath(childProjectPath, "type");
+        checkExpectedDeletedPaths(result, scmPath, typePath);
+        
+        assertEquals(newTemplateParentProject, xmlRpcHelper.getTemplateParent(childProjectPath));
+        // These paths were incompatible, so should have changed to the new
+        // parent's type.
+        checkPathType(scmPath, "zutubi.subversionConfig");
+        checkPathType(typePath, "zutubi.multiRecipeTypeConfig");
+        // This path should have been newly-added from the new parent.
+        assertTrue(xmlRpcHelper.configPathExists(getPath(childProjectPath, "properties", "prop")));
+    }
+
+    public void testMoveConfigWithSubtree() throws Exception
+    {
+        String random = randomName();
+        String childProject = random + "-child";
+        String grandchild1Project = random + "-grandchild1";
+        String grandchild2Project = random + "-grandchild2";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = xmlRpcHelper.insertTrivialProject(childProject, true);
+        String grandchild1ProjectPath = xmlRpcHelper.insertSimpleProject(grandchild1Project, childProject, false);
+        String grandchild2ProjectPath = xmlRpcHelper.insertProject(grandchild2Project, childProject, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.createVersionedConfig("path"));
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        xmlRpcHelper.insertProjectProperty(newTemplateParentProject, "prop", "val");
+
+        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+        
+        String grandhchild2TypePath = getPath(grandchild2ProjectPath, "type");
+        checkExpectedDeletedPaths(result, grandhchild2TypePath);
+        
+        assertEquals(newTemplateParentProject, xmlRpcHelper.getTemplateParent(childProjectPath));
+        
+        // Override of Subversion URL should be maintained.
+        Hashtable<String, Object> grandchild2Scm = xmlRpcHelper.getConfig(getPath(grandchild2ProjectPath, "scm"));
+        assertEquals(Constants.FAIL_ANT_REPOSITORY, grandchild2Scm.get("url"));
+        
+        // Incompatible, deleted.
+        checkPathType(grandhchild2TypePath, "zutubi.multiRecipeTypeConfig");
+        
+        // This path should have been newly-added from the new parent.
+        assertTrue(xmlRpcHelper.configPathExists(getPath(childProjectPath, "properties", "prop")));
+        assertTrue(xmlRpcHelper.configPathExists(getPath(grandchild1ProjectPath, "properties", "prop")));
+        assertTrue(xmlRpcHelper.configPathExists(getPath(grandchild2ProjectPath, "properties", "prop")));
+    }
+    
+    public void testMoveConfigJustEnoughPermissions() throws Exception
+    {
+        String random = randomName();
+        String user = random + "-user";
+        String group = random + "-group";
+        String childProject = random + "-child";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, false);
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+
+        String userPath = xmlRpcHelper.insertTrivialUser(user);
+        String groupPath = xmlRpcHelper.insertGroup(group, asList(userPath));
+        Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
+        acl.put("group", groupPath);
+        acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_WRITE)));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(childProjectPath, "permissions"), acl);
+        
+        xmlRpcHelper.logout();
+        xmlRpcHelper.login(user, "");
+        xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+    }
+    
+    public void testMoveConfigNoWritePermissionForPath() throws Exception
+    {
+        String random = randomName();
+        String user = random + "-user";
+        String childProject = random + "-child";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, false);
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+
+        xmlRpcHelper.insertTrivialUser(user);
+        xmlRpcHelper.logout();
+        xmlRpcHelper.login(user, "");
+        try
+        {
+            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+            fail("Should not be able to move a project that we cannot write to");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Permission to write at path '" + childProjectPath + "' denied"));
+        }
+    }
+
+    public void testMoveConfigNoWritePermissionForSubtree() throws Exception
+    {
+        String random = randomName();
+        String user = random + "-user";
+        String group = random + "-group";
+        String childProject = random + "-child";
+        String grandChildProject = random + "-grandchild";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, true);
+        String grandChildProjectPath = xmlRpcHelper.insertTrivialProject(grandChildProject, childProject, false);
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+
+        String userPath = xmlRpcHelper.insertTrivialUser(user);
+        String groupPath = xmlRpcHelper.insertGroup(group, asList(userPath));
+        Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
+        acl.put("group", groupPath);
+        acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_WRITE)));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(childProjectPath, "permissions"), acl);
+
+        xmlRpcHelper.deleteAllConfigs(getPath(grandChildProjectPath, "permissions", WILDCARD_ANY_ELEMENT));
+        
+        xmlRpcHelper.logout();
+        xmlRpcHelper.login(user, "");
+        try
+        {
+            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+            fail("Should not be able to move with descendant we cannot write to");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Permission to write at path '" + grandChildProjectPath + "' denied"));            
+        }
+    }
+    
+    public void testMoveConfigNoReadPermissionForNewTemplateParent() throws Exception
+    {
+        String random = randomName();
+        String user = random + "-user";
+        String childProject = random + "-child";
+        String newTemplateParentProject = random + "-new-parent";
+        
+        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, false);
+        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+
+        xmlRpcHelper.deleteAllConfigs(getPath(newTemplateParentProjectPath, "permissions", WILDCARD_ANY_ELEMENT));
+        
+        xmlRpcHelper.insertTrivialUser(user);
+        xmlRpcHelper.logout();
+        xmlRpcHelper.login(user, "");
+        try
+        {
+            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProjectPath);
+            fail("Should not be able to move to new template parent that we cannot view");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Permission to view at path '" + newTemplateParentProjectPath + "' denied"));            
+        }
+    }
+
+    private void checkPathType(String path, String expectedType) throws Exception
+    {
+        Hashtable<String, Object> config = xmlRpcHelper.getConfig(path);
+        assertEquals(expectedType, config.get("meta.symbolicName"));
+    }
+
+    private void checkExpectedDeletedPaths(Hashtable<String, Object> result, String... expected)
+    {
+        @SuppressWarnings({"unchecked"})
+        List<String> deletedPaths = new LinkedList<String>((Collection<? extends String>) result.get("deletedPaths"));
+        Collections.sort(deletedPaths);
+        assertEquals(asList(expected), deletedPaths);
     }
 
     public void testRenameRecipe() throws Exception
