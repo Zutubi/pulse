@@ -5,7 +5,6 @@
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>
     <script type="text/javascript">
-    <!--
         var successfulShowing = {
             "suites": true,
             "cases": true
@@ -27,7 +26,6 @@
             toggleSuccessfulTestRows("child-" + name, successfulShowing[name]);
             setText(name + "-toggle", text);
         }
-	-->
     </script>
 </head>
 <body>

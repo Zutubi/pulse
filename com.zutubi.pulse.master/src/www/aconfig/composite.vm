@@ -116,7 +116,7 @@
             </div>
     #end
 
-    #if( $config.nestedProperties.size() > 0)
+    #if($config.nestedProperties.size() > 0)
             <div id="config-links" class="config-panel">
             <h3 class="config-header">navigate</h3>
             <div class="config-container">
@@ -146,13 +146,13 @@
             #else
     <p>
         This path has been configured in the following descendants (and thus cannot be configured at this level):
-        <ul>
-                #foreach($descendant in $config.configuredDescendants)
-            <li id='#id("cd-$descendant")'>#html($descendant)</li>
-                #end
-        </ul>
-            #end
     </p>
+    <ul>
+                #foreach($descendant in $config.configuredDescendants)
+        <li id='#id("cd-$descendant")'>#html($descendant)</li>
+                #end
+    </ul>
+            #end
         #else
     <p>
         No #i18n("key=label") configured.

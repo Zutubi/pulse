@@ -45,7 +45,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
     private static final String FORM_NAME = "form";
 
     private String actionName;
-    private String submitName;
+    private String submitLabel;
     private String submitValue;
     protected String formSource;
     protected ConfigurationPanel newPanel;
@@ -55,13 +55,13 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
     /**
      * Create a new action to render a form.
      *
-     * @param actionName the internal name of the action, used for xwork
-     *                   mapping and locating the template to render
-     * @param submitName text on the default submit button for the form
+     * @param actionName, the internal name of the action, used for xwork
+     *                    mapping and locating the template to render
+     * @param submitLabel text on the default submit button for the form
      */
-    public ToveFormActionSupport(String actionName, String submitName)
+    public ToveFormActionSupport(String actionName, String submitLabel)
     {
-        this(actionName, null, submitName);
+        this(actionName, null, submitLabel);
     }
 
     /**
@@ -69,14 +69,14 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
      *
      * @param actionName  the internal name of the action, used for xwork
      *                    mapping and locating the template to render
-     * @param submitName  text on the default submit button for the form
+     * @param submitLabel text on the default submit button for the form
      * @param submitValue value for the default submit button for the form
      */
-    public ToveFormActionSupport(String actionName, String submitName, String submitValue)
+    public ToveFormActionSupport(String actionName, String submitLabel, String submitValue)
     {
         this.actionName = actionName;
         newPanel = new ConfigurationPanel("aconfig/" + actionName + ".vm");
-        this.submitName = submitName;
+        this.submitLabel = submitLabel;
         this.submitValue = submitValue;
     }
     
@@ -121,9 +121,9 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
 
     private void renderForm() throws IOException, TemplateException
     {
-        Form form = new Form(FORM_NAME, actionName, ToveUtils.getConfigURL(path, getFormAction(), null, "aconfig"), submitName);
+        Form form = new Form(FORM_NAME, actionName, ToveUtils.getConfigURL(path, getFormAction(), null, "aconfig"), submitValue);
         addFormFields(form);
-        addSubmit(form, submitName, submitValue, true);
+        addSubmit(form, submitLabel, submitValue, true);
         addSubmit(form, SUBMIT_CANCEL, SUBMIT_CANCEL, false);
 
         StringWriter writer = new StringWriter();
@@ -153,15 +153,15 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
         return value;
     }
 
-    private void addSubmit(Form form, String name, String value, boolean isDefault)
+    private void addSubmit(Form form, String label, String value, boolean isDefault)
     {
-        Field field = new Field(FieldType.SUBMIT, name);
-        if (name != null)
+        Field field = new Field(FieldType.SUBMIT, value);
+        if (label != null)
         {
-            field.setLabel(name);
+            field.setLabel(label);
         }
         field.setValue(value);
-        if(isDefault)
+        if (isDefault)
         {
             field.addParameter(SubmitFieldDescriptor.PARAM_DEFAULT, true);
         }

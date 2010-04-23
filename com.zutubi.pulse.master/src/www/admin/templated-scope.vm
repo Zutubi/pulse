@@ -97,7 +97,7 @@
             configTree.render();
             root.expand();
             configPanel.doLayout();
-        }
+        };
 
         // ------------------------------------------------------------------
         // Template tree
@@ -118,18 +118,18 @@
                     }
                 });
             }
-        }
+        };
 
         var configureRecord = function(id)
         {
             tabPanel.activate('config-panel');
-        }
+        };
 
         var selectTemplate = function(path)
         {
             templateTree.getSelectionModel().clearSelections();
             templateTree.selectPath(templateTree.getRootNode().getPath('baseName') + '/' + path, 'baseName');
-        }
+        };
 
         // ------------------------------------------------------------------
         // Layout
@@ -277,7 +277,7 @@
                     Ext.getCmp('nested-east').show()
                     Ext.getCmp('nested-layout').doLayout();
                 }
-            }
+            };
         }();
 
         Ext.onReady(Layout.init, Layout, true);
