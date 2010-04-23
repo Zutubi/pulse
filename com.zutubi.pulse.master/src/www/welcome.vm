@@ -14,11 +14,11 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.1!  This page provides information on common next steps and important
-        new features in the 2.1 release.
+        Welcome to Pulse 2.2 beta!  This page provides information on common next steps and important
+        new features in the 2.2 release.
     </p>
     <p>
-        You can return to this page at any time by clicking on the "pulse 2.1" link in the top left
+        You can return to this page at any time by clicking on the "pulse 2.2" link in the top left
         corner.
     </p>
     <h1> :: getting started :: </h1>
@@ -82,128 +82,98 @@
     
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.1 has several new features.  Among the most important are:
+        Pulse 2.2 has several new features.  Among the most important are:
     </p>
     <p>
         <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
             <tr>
-                <th class="category" colspan="2">new in 2.1</th>
+                <th class="category" colspan="2">new in 2.2</th>
             </tr>
             <tr>
-                #actionHeader("project.dependecies" "project dependencies" "accept" false)
+                #actionHeader("artifacts.tab" "artifacts tab" "accept" false)
                 <td>
-                    Pulse now boasts project dependency management, allowing you to declare
-                    dependencies between your projects and deliver built artifacts between them.
-                    Smarter triggering has also been added for dependent projects.  Dependency
-                    support is built on Apache Ivy, making it interoperable with Maven and Ivy
-                    repositories, and with projects that already use Ivy.  Pulse can act as an Ivy
-                    repository both for internal projects and external ones.
+                    An all new "artifacts" tab for builds.  The clarity of this tab has been
+                    improved, and it now includes additional information such as a hash for the
+                    artifact files.  You can also filter artifacts to show only the ones you are
+                    interested in.  By marking some artifacts as "featured" you can have them appear
+                    more prominently.
                 </td>
             </tr>
             <tr>
-                #actionHeader("multi.command.projects" "multi-command projects" "accept" false)
+                #actionHeader("logs.tab" "logs tab" "accept" false)
                 <td>
-                    Pulse has always allowed a build to consist of multiple steps, but in previous
-                    versions to access this flexibility you had to write a Pulse file by hand.  Now
-                    there is full UI support for configuring multi-command projects, and the full
-                    flexibility of all the commands has also been exposed in the UI.  You can still
-                    write your Pulse files by hand, and in fact they have been simplified in some
-                    ways.
+                    The logs for a build and each build stage are now displayed in a dedicated tab
+                    rather than under the detailed view.  This tab makes it easy to switch logs.
+                    The log for the first stage is shown by default, rather than the (usually less
+                    interesting) build log.
                 </td>
             </tr>
             <tr>
-                #actionHeader("personal.build.improvements" "personal build improvements" "accept" false)
+                #actionHeader("changes.tab" "changes tab" "accept" false)
                 <td>
-                    Several improvements have been made to personal builds, including:
-                    <ul class="points">
-                        <li>The ability to choose the revision for the build.</li>
-                        <li>No more forced update when requesting a personal build.</li>
-                        <li>Pluggable patch formats: including support for standard unified diffs.</li>
-                        <li>The ability to submit an existing patch file (in any supported format).</li>
-                        <li>Smarter internal patch format and application.</li>
-                    </ul>
-                    These improvements make requesting personal builds more flexible and
-                    interoperable.  For example, you can create patches with other tools and submit
-                    them directly to Pulse.
+                    The changes tab for a build has been completely reworked.  The new layout for
+                    this tab shows more information in the same amount of vertical space.  It also
+                    presents the information with less clutter.
                 </td>
             </tr>
             <tr>
-                #actionHeader("multiple.agents.per.host" "multiple agents per host" "accept" false)
+                #actionHeader("build.navigation" "build navigation" "accept" false)
                 <td>
-                    Pulse now directly supports running multiple agents on the same host, including the
-                    ability to run multiple master agents.  This allows you to make full use of high
-                    end hardware with just a single Pulse service installed on a machine.  To make use
-                    of this ability, configure multiple agents with identical host and port details.
-                    Pulse will recognise agents that share a host and act accordingly.
+                    The navigation bar at the top of the Pulse web UI now allows you to step
+                    forwards and backwards through build results.  You can instantly see the status
+                    of adjacent builds, step forwards or backwards, or move to the next or previous
+                    build of a given status.
                 </td>
             </tr>
             <tr>
-                #actionHeader("further.net.support" "further .net tool support" "accept" false)
+                #actionHeader("working.copy.review" "working copy browsing" "accept" false)
                 <td>
-                    Support has been added for the popular .Net build tool NAnt and the NUnit testing
-                    library. NAnt support includes a new command and a post-processor to extract error
-                    and warning messages from both NAnt itself and commonly-used tools (e.g. the
-                    Visual Studio compilers). NUnit support includes a post-processor that can read
-                    NUnit XML reports to integrate test results into your Pulse builds.
-                </td>
-            <tr>
-                #actionHeader("agent.utilisation.stats" "agent utilisation statistics" "accept" false)
-                <td>
-                    A new "statistics" tab has been added for agents. This tab lists various figures
-                    such as the number of recipes the agent executes each day and how long the average
-                    recipe keeps the agent busy. Statistics are also shown for agent utilisation,
-                    including a pie chart that makes them easy to visualise. This allows you to see if
-                    you are getting the most out of your agent machines.
+                    The ability to browse a build's working copy has been reviewed.  The old option
+                    to capture working copy snapshots has been removed in favour of a simpler and
+                    faster alternative - the ability to browse the working copies on the agents
+                    themselves.  This can be used to debug build problems, and is especially useful
+                    for incremental builds.
                 </td>
             </tr>
             <tr>
-                #actionHeader("build.comments" "build result comments" "accept" false)
+                #actionHeader("agent.executing.stages" "agent executing stages" "accept" false)
                 <td>
-                    Users can now leave comments on build results. This allows teams to communicate;
-                    for example by leaving a note indicating why the build failed. Comments are displayed
-                    prominently on the build summary tab, where users viewing the build will be most
-                    likely to see them.
+                    The agents page now shows the executing build stage for each agent.  This allows
+                    you to see, at a glance, what all of your agents are doing.  You can also drill
+                    down to the project or build in question.
                 </td>
             </tr>
             <tr>
-                #actionHeader("finer.cleanup.rules" "fine-grained cleanup rules" "accept" false)
+                #actionHeader("move.refactoring" "move refactoring" "accept" false)
                 <td>
-                    Cleanup rules allow you to reduce disk space usage by having Pulse automatically
-                    delete old and unwanted build data. In 2.1, there are more options controlling exactly
-                    what is cleaned up. This allows you greater control: for example you can remove old
-                    build artifacts but maintain the key build result information.
+                    Both projects and agents may now be moved to a new location in the template
+                    hierarchy via a new "move" refactoring.  This allows you to reorganise your
+                    projects without reconfiguration and/or losing project history.
                 </td>
             </tr>
             <tr>
-                #actionHeader("built.in.docs" "built-in documentation" "accept" false)
+                #actionHeader("subscribe.by.label" "subscribe by label" "accept" false)
                 <td>
-                    The documentation for Pulse files is now built-in to the Pulse server, so that
-                    it matches the exact version and plugin set you have installed.  Clicking the
-                    book link in the top right-hand corner of the UI opens this reference
-                    documentation.
+                    Users can now subscribe to project notifications by label.  This allows a user
+                    to create a subscription once, and automatically have apply to projects with the
+                    given lables.  When a new project is added, users do not need to modify their
+                    subscriptions.
                 </td>
             </tr>
             <tr>
-                #actionHeader("pluggable.commands" "pluggable commands" "accept" false)
+                #actionHeader("svn.export" "subversion export" "accept" false)
                 <td>
-                    As part of the changes for multi-command projects, both command configuration
-                    and the command APIs were overhauled.  These changes make plugging in a command
-                    much easier than before.  As with other configurable elements, commands can now
-                    be fully documented and integrated into the UI when plugged-in.  Single command
-                    projects can use any plugged-in command with no extra effort for the plugin
-                    author.
+                    Projects using Subversion may now optionally choose to use exports rather than
+                    full working copies.  Exports are much smaller in size than full checkouts,
+                    allowing faster builds that use less disk space.
                 </td>
             </tr>
             <tr>
-                #actionHeader("admin.ui.improvements" "admin ui improvements" "accept" false)
+                #actionHeader("persistent.agent.messaging" "persistent agent messaging" "accept" false)
                 <td>
-                    Multiple improvements have been made to the administration user interface.  Most
-                    notable among these are:
-                    <ul class="points">
-                        <li>A reduction in nesting in the configuration tree (simplifying navigation).</li>
-                        <li>Performance improvements for large configuration sets.</li>
-                    </ul>
-                    These changes make the UI both simpler and snappier.
+                    A new persistent agent messaging system has been implemented to allow the Pulse
+                    master better control over agents.  For example, this system has been used to
+                    improve cleanup of persistent working directories on the agents.
                 </td>
             </tr>
         </table>
