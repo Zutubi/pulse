@@ -109,7 +109,7 @@ ZUTUBI.ConcreteProject.prototype = {
     },
 
     toggleMenu: function(menuType, menuArg, id) {
-        this.renderMenu(menuType, menuArg, id);
+        renderMenu(this, this.getMenuItems(menuType, menuArg, id), id);
         showHideFloat('actions', id, 'tl-bl?');
     },
 
@@ -230,54 +230,6 @@ ZUTUBI.ConcreteProject.prototype = {
         }
 
         return items;
-    },
-
-    renderMenu: function(menuType, menuArg, id) {
-        if (this.renderedMenus[id])
-        {
-            return;
-        }
-        
-        var menuEl = Ext.getBody().createChild({tag: 'div',  id: id, style: 'display: none'});
-        var listEl = menuEl.createChild({tag: 'ul', cls: 'actions'});
-        var items = this.getMenuItems(menuType, menuArg, id);
-        for (var i = 0; i < items.length; i++)
-        {
-            this.appendMenuItem(listEl, id, items[i]);
-        }
-
-        this.renderedMenus[id] = menuEl;
-    },
-    
-    appendMenuItem: function(el, menuId, item) {
-        if (!item.title)
-        {
-            item.title = item.id;
-        }
-
-        child = {
-            tag: 'a',
-            id: item.id + '-' + menuId,
-            cls: 'unadorned',
-            href: '#',
-            title: item.title,            
-            children: [{
-                tag: 'img',
-                alt: item.title,
-                src: window.baseUrl + '/images/' + item.image
-            }, ' ' + item.title]
-        };
-        
-        if (item.url !== undefined)
-        {
-            child.href = window.baseUrl + '/' + item.url;
-        }
-        if (item.onclick !== undefined)
-        {
-            child.onclick = item.onclick;
-        }
-        
-        el.createChild({tag: 'li', children: [child]});
     },
 
     destroy: function() {

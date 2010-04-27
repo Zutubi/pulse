@@ -31,34 +31,28 @@ pre {
 
 
 #header {
-    padding-bottom: 4px;
+    padding: 2px 2px 6px 2px;
     margin: 0;
     font-size: 14px;
-}
-
-#header table {
-    width: 100%;
-    margin: 0;
-    border-spacing: 0;
-}
-
-#header td {
+    font-weight:bold;
     color: #fff;
-    padding: 2px;
-}
-
-#header td.logo {
-    font-weight: bold;
-}
-
-#header td.user {
-    font-size: 12px;
-    vertical-align:bottom;
 }
 
 #header a {
     color: #fff;
     border-color: #fff;
+}
+
+#header .userToolbar {
+    font-size: 12px;
+    vertical-align:bottom;
+    font-weight:normal;
+    white-space:nowrap;
+}
+
+#header .xz-tblink
+{
+    margin:2px;
 }
 
     /*------------------------------
@@ -1913,4 +1907,43 @@ table.grid td.gunderstated
 td.glegend
 {
     padding: 0 10px 0 10px;
+}
+
+.x-build-nav-item
+{
+    margin: 0 1px;
+    width: 9px;
+    height: 9px;
+    cursor: pointer;
+    position:relative;
+    top:1px;
+}
+
+.x-build-nav-current
+{
+    margin: 0 4px;
+}
+
+.x-build-nav-item-SUCCESS
+{
+    background-color: #81b581;
+    padding:0;
+    border: #338833 solid 1px;
+}
+
+.x-build-nav-item-FAILURE, .x-build-nav-item-ERROR
+{
+    background-color: #f07878;
+    padding:0;
+    border: #C00000 solid 1px;
+}
+
+.x-build-nav-item-IN_PROGRESS, .x-build-nav-item-PENDING
+{
+    background-color:#88a0b8;
+}
+
+.x-build-nav-item-selected
+{
+    border: solid 1px black;
 }

@@ -528,6 +528,13 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestSuccessful();
     }
 
+    public BuildViewport getBuildViewport(long buildId)
+    {
+        BuildViewport viewport = new BuildViewport(buildId);
+        viewport.setBuildResultDao(buildResultDao);
+        return viewport;
+    }
+
     public void cleanup(BuildResult build, BuildCleanupOptions options)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);

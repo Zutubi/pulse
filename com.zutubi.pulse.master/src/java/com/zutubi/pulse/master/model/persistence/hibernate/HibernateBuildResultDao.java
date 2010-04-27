@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Expression;
@@ -546,6 +547,55 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 queryObject.setEntity("node", node);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();
+            }
+        });
+    }
+
+    public List<BuildResult> findByBeforeBuild(final long buildId, final int maxResults, final ResultState... states)
+    {
+        final BuildResult result = findById(buildId);
+        List<BuildResult> results = (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("SELECT result " +
+                        "FROM BuildResult result " +
+                        "WHERE result.id < :buildId " +
+                        "AND result.project.id = :projectId " +
+                        "AND result.stateName IN (:stateNames) " +
+                        "ORDER BY result DESC"
+                );
+                queryObject.setLong("buildId", buildId);
+                queryObject.setLong("projectId", result.getProject().getId());
+                queryObject.setParameterList("stateNames", getStateNames(states.length != 0 ? states : ResultState.values()));
+                queryObject.setMaxResults(maxResults);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+        return CollectionUtils.reverse(results);
+    }
+
+    public List<BuildResult> findByAfterBuild(final long buildId, final int maxResults, final ResultState... states)
+    {
+        final BuildResult result = findById(buildId);
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("SELECT result " +
+                        "FROM BuildResult result " +
+                        "WHERE result.id > :buildId " +
+                        "AND result.project.id = :projectId " +
+                        "AND result.stateName IN (:stateNames) " +
+                        "ORDER BY result ASC"
+                );
+                queryObject.setLong("buildId", buildId);
+                queryObject.setLong("projectId", result.getProject().getId());
+                queryObject.setParameterList("stateNames", getStateNames(states.length != 0 ? states : ResultState.values()));
+                queryObject.setMaxResults(maxResults);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
             }
         });
     }

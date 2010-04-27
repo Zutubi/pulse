@@ -80,7 +80,7 @@
 
             window.formSubmitting = false;
             window.baseUrl = '$base';
-            
+
             var viewport;
             var statusAreaEl;
             var statusMessageEl;
@@ -89,7 +89,7 @@
                 return {
                     init: function() {
                         Ext.QuickTips.init();
-                        
+
                         // If there is a tab bar, drop it in to the north div.
                         var tabbar = Ext.get('tabbar');
                         if(tabbar)
@@ -229,51 +229,38 @@
       >
       <noscript><ul class="error"><li class="error">The Pulse UI requires JavaScript.</li></ul></noscript>
       <div id="north">
-      <div id="header">
-        <table>
-            <tr>
-              <td class="logo">
-                  :: <a href="$base/default.action">pulse 2.2 [beta]</a> ::
-#if($personalBuild)
-                  <a href="$urls.dashboardMyBuilds()">my builds</a>
-    #if($buildNumber && $buildNumber != "0")
-                  :: <a href="$urls.dashboardMyBuild($buildNumber)">build $buildNumber</a>
-        #if($u_stageName)
-                  :: <a href="$urls.dashboardMyBuildStageDetails($buildNumber, $u_stageName)">stage $h_stageName</a>
-        #end
-    #end
-#elseif($u_projectName)
-                  <a href="$urls.projectHome($u_projectName)">$h_projectName</a>
-    #if($buildNumber && $buildNumber != "0")
-                  :: <a href="$urls.build($u_projectName, $buildNumber)">build $buildNumber</a>
-        #if($u_stageName)
-                  :: <a href="$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)">stage $h_stageName</a>
-        #end
-    #end
+          <div id="header"></div>
+          <script type="text/javascript">
+              var toolbarConfig = {};
+#if($u_projectName)
+              toolbarConfig.projectName = '$h_projectName';
+              toolbarConfig.projectUrl = '$urls.projectHome($u_projectName)';
+#if($buildNumber && $buildNumber != "0")
+              toolbarConfig.buildId = '$buildResult.id';
+#end
+#if($u_stageName)
+              toolbarConfig.stageName = 'stage $h_stageName';
+              toolbarConfig.stageUrl = '$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)';
+#end
 #end
 #if($u_agentName)
-                  <a href="$urls.agentStatus($u_agentName)">$h_agentName</a>
+              toolbarConfig.agentName = '$h_agentName';
+              toolbarConfig.agentUrl = '$urls.agentStatus($u_agentName)';
 #end
-              </td>
-              <td class="user" align="right">
 #if($loggedInUser)
-                  #html($loggedInUser.config.name) [ <a id="prefs" href="$base/dashboard/preferences/">preferences</a>#if($canLogout) | <a id="logout" href="$base/logout.action">logout</a>#end ]
-#else
-                  <a id="login" href="$base/login!input.action">login</a>
+              toolbarConfig.userName = '#html($loggedInUser.config.name)';
+#if($canLogout)
+              toolbarConfig.userCanLogout = true;
 #end
-                  &nbsp;
+#end
 #if($helpPage)
 
 #else
-    #set($helpPage = "Home")
+#set($helpPage = "Home")
 #end
-                  <a class="unadorned" href="$base/popups/reference.action" onclick="var popup = window.open('$base/popups/reference.action', '_pulsereference', 'status=yes,resizable=yes,top=100,left=100,width=900,height=600,scrollbars=yes'); popup.focus(); return false;">
-                      <img alt="help" src="$base/images/manual.gif"/>
-                  </a>
-              </td>
-            </tr>
-        </table>
-      </div>
+              var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
+              toolbar.render('header');
+          </script>
 
 #if($page.getProperty("page.selectedTab"))
     #set ($selectedTab = $page.getProperty("page.selectedTab"))
@@ -291,7 +278,7 @@
       </div>
 
       <div id="status-area" class="x-layout-inactive-content status-message" style="display: none">
-          <span style="float: right"><a class="unadorned" href="#" onclick="hideStatus(); return false"><img src="$base/images/close.gif" alt="close"/></a></span>
+          <span style="float: right"><a class="unadorned" href="#" onclick="hideStatus(); return false;"><img src="$base/images/close.gif" alt="close"/></a></span>
           <span id="status-message"></span>
       </div>
 

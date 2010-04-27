@@ -71,7 +71,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
         assertTextPresent("A. D. Ministrator");
-        assertLinkPresent("logout");
+        assertTrue(browser.isElementIdPresent("logout"));
     }
 
     private void checkSetPulseData()

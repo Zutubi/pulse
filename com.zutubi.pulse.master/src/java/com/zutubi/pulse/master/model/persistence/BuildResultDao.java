@@ -111,4 +111,30 @@ public interface BuildResultDao extends EntityDao<BuildResult>
      * @return the build result, or null if none could be located.
      */
     BuildResult findByProjectAndMetabuildId(Project project, long metaBuildId, ResultState... states);
+
+    /**
+     * Find the build results preceeding the specified build id.  All of the builds
+     * will belong to the same project.
+     *
+     * @param buildId       the build id
+     * @param maxResults    the maximum number of results to be returned.
+     * @param states        filter the build results to include builds with the specified states.
+     *                      Not specifying any states is equivalent to specifying all states.
+     * 
+     * @return a list of build results, in order of ascending ids.
+     */
+    List<BuildResult> findByBeforeBuild(final long buildId, final int maxResults, final ResultState... states);
+
+    /**
+     * Find the build results immediately after the specified build id.  All of the
+     * builds will belong to the same project.
+     *
+     * @param buildId       the build id
+     * @param maxResults    the maximum number of results to be returned.
+     * @param states        filter the build results to include builds with the specified states.
+     *                      Not specifying any states is equivalent to specifying all states.
+     *
+     * @return a list of build results, in order of ascending ids.
+     */
+    List<BuildResult> findByAfterBuild(final long buildId, final int maxResults, final ResultState... states);
 }

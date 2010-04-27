@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.model.persistence.UserDao;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 
 /**
@@ -1005,6 +1006,89 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(result, found);
 
         assertNull(buildResultDao.findByProjectAndMetabuildId(projectA, 11223344L));
+    }
+
+    public void testFindByAfterBuild()
+    {
+        Project project = new Project();
+        projectDao.save(project);
+
+        List<BuildResult> results = save(createCompletedBuild(project, 1),
+                createCompletedBuild(project, 2),
+                createFailedBuild(project, 3),
+                createCompletedBuild(project, 4),
+                createCompletedBuild(project, 5),
+                createFailedBuild(project, 6),
+                createCompletedBuild(project, 7),
+                createCompletedBuild(project, 8));
+
+        List<BuildResult> buildResults = buildResultDao.findByAfterBuild(results.get(0).getId(), 1, ResultState.SUCCESS);
+        assertEquals(results.get(1), buildResults.get(0));
+
+        buildResults = buildResultDao.findByAfterBuild(results.get(0).getId(), 2, ResultState.SUCCESS);
+        assertEquals(results.get(1), buildResults.get(0));
+        assertEquals(results.get(3), buildResults.get(1));
+
+        buildResults = buildResultDao.findByAfterBuild(results.get(0).getId(), 15, ResultState.SUCCESS);
+        assertEquals(5, buildResults.size());
+
+        buildResults = buildResultDao.findByAfterBuild(results.get(0).getId(), 2, ResultState.FAILURE);
+        assertEquals(results.get(2), buildResults.get(0));
+        assertEquals(results.get(5), buildResults.get(1));
+    }
+
+    public void testFindByAfterBoundToSingleProject()
+    {
+        Project projectA = new Project();
+        projectDao.save(projectA);
+        Project projectB = new Project();
+        projectDao.save(projectB);
+
+        List<BuildResult> results = save(createCompletedBuild(projectA, 1),
+                createCompletedBuild(projectB, 2),
+                createCompletedBuild(projectB, 3));
+
+        List<BuildResult> buildResults = buildResultDao.findByAfterBuild(results.get(0).getId(), 3, ResultState.SUCCESS);
+        assertEquals(0, buildResults.size());
+    }
+
+    public void testFindByBeforeBuild()
+    {
+        Project project = new Project();
+        projectDao.save(project);
+
+        List<BuildResult> results = save(createCompletedBuild(project, 1),
+                createCompletedBuild(project, 2),
+                createFailedBuild(project, 3),
+                createCompletedBuild(project, 4),
+                createCompletedBuild(project, 5),
+                createFailedBuild(project, 6),
+                createCompletedBuild(project, 7),
+                createCompletedBuild(project, 8));
+
+        List<BuildResult> buildResults = buildResultDao.findByBeforeBuild(results.get(7).getId(), 1, ResultState.SUCCESS);
+        assertEquals(results.get(6), buildResults.get(0));
+
+        buildResults = buildResultDao.findByBeforeBuild(results.get(7).getId(), 2, ResultState.SUCCESS);
+        assertEquals(results.get(4), buildResults.get(0));
+        assertEquals(results.get(6), buildResults.get(1));
+
+        buildResults = buildResultDao.findByBeforeBuild(results.get(7).getId(), 15, ResultState.SUCCESS);
+        assertEquals(5, buildResults.size());
+
+        buildResults = buildResultDao.findByBeforeBuild(results.get(7).getId(), 2, ResultState.FAILURE);
+        assertEquals(results.get(2), buildResults.get(0));
+        assertEquals(results.get(5), buildResults.get(1));
+    }
+
+    private List<BuildResult> save(BuildResult... results)
+    {
+        for (BuildResult result: results)
+        {
+            buildResultDao.save(result);
+        }
+        commitAndRefreshTransaction();
+        return Arrays.asList(results);
     }
 
     private BuildResult createResultWithRecipes()

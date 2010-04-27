@@ -279,4 +279,13 @@ public interface BuildManager
      * @param reason        the human readable reason for the termination request.
      */
     void terminateBuild(BuildResult buildResult, String reason);
+
+    /**
+     * Get a build viewport for the specified build.
+     *
+     * @param buildId   the id of the build the view port will be centered on.
+     *
+     * @return a new build viewport
+     */
+    BuildViewport getBuildViewport(long buildId);
 }
