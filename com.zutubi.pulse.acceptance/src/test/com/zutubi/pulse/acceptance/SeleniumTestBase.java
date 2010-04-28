@@ -101,7 +101,7 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void logout()
     {
-        browser.click("logout");
+        browser.click("//span[@id='logout']/a");
         browser.waitForPageToLoad();
     }
     
