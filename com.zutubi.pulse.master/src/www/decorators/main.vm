@@ -230,37 +230,6 @@
       <noscript><ul class="error"><li class="error">The Pulse UI requires JavaScript.</li></ul></noscript>
       <div id="north">
           <div id="header"></div>
-          <script type="text/javascript">
-              var toolbarConfig = {};
-#if($u_projectName)
-              toolbarConfig.projectName = '$h_projectName';
-              toolbarConfig.projectUrl = '$urls.projectHome($u_projectName)';
-#if($buildNumber && $buildNumber != "0")
-              toolbarConfig.buildId = '$buildResult.id';
-#end
-#if($u_stageName)
-              toolbarConfig.stageName = 'stage $h_stageName';
-              toolbarConfig.stageUrl = '$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)';
-#end
-#end
-#if($u_agentName)
-              toolbarConfig.agentName = '$h_agentName';
-              toolbarConfig.agentUrl = '$urls.agentStatus($u_agentName)';
-#end
-#if($loggedInUser)
-              toolbarConfig.userName = '#html($loggedInUser.config.name)';
-#if($canLogout)
-              toolbarConfig.userCanLogout = true;
-#end
-#end
-#if($helpPage)
-
-#else
-#set($helpPage = "Home")
-#end
-              var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
-              toolbar.render('header');
-          </script>
 
 #if($page.getProperty("page.selectedTab"))
     #set ($selectedTab = $page.getProperty("page.selectedTab"))
@@ -312,5 +281,38 @@
           #end
       #end
       </div>
+      
+      <script type="text/javascript">
+          var toolbarConfig = {};
+#if($u_projectName)
+          toolbarConfig.projectName = '$h_projectName';
+          toolbarConfig.projectUrl = '$urls.projectHome($u_projectName)';
+#if($buildNumber && $buildNumber != "0")
+          toolbarConfig.buildId = '$buildResult.id';
+#end
+#if($u_stageName)
+          toolbarConfig.stageName = 'stage $h_stageName';
+          toolbarConfig.stageUrl = '$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)';
+#end
+#end
+#if($u_agentName)
+          toolbarConfig.agentName = '$h_agentName';
+          toolbarConfig.agentUrl = '$urls.agentStatus($u_agentName)';
+#end
+#if($loggedInUser)
+          toolbarConfig.userName = '#html($loggedInUser.config.name)';
+#if($canLogout)
+          toolbarConfig.userCanLogout = true;
+#end
+#end
+#if($helpPage)
+
+#else
+#set($helpPage = "Home")
+#end
+          var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
+          toolbar.render('header');
+      </script>
+
     </body>
 </html>
