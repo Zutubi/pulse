@@ -884,6 +884,7 @@ ZUTUBI.FormPanel = function(config)
 
 Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
     displayMode: false,
+    buttonAlign: 'center',
 
     createForm: function()
     {
