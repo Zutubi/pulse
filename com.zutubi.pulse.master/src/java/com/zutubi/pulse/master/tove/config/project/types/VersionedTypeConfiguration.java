@@ -2,11 +2,10 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
-import com.zutubi.tove.annotations.FieldAction;
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmDirAction;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.validation.annotations.Required;
 
 /**
  * Pulse file project where the pulse file is stored in the project's SCM.
@@ -15,8 +14,7 @@ import com.zutubi.validation.annotations.Required;
 @Wire
 public class VersionedTypeConfiguration extends TypeConfiguration
 {
-    @Required
-    @FieldAction(template = "actions/browse-scm-file")
+    @BrowseScmDirAction
     private String pulseFileName;
 
     public String getPulseFileName()

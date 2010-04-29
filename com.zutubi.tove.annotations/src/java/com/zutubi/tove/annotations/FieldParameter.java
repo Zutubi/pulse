@@ -10,6 +10,7 @@ public interface FieldParameter
     static final String BASE_NAME       = "baseName";
     static final String CONSTRAINED     = "constrained";
     static final String PARENT_PATH     = "parentPath";
+    static final String PATH            = "path";
     static final String PROPERTY        = "property";
     static final String REQUIRED        = "required";
     static final String REQUIRED_ALWAYS = "requiredAlways";

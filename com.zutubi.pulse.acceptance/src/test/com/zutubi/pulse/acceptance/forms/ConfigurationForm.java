@@ -203,4 +203,9 @@ public class ConfigurationForm extends SeleniumForm
             this.type = type;
         }
     }
+
+    public final String getBrowseLinkId(String field)
+    {
+        return getFieldId(field) + ".browse";
+    }
 }

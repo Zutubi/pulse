@@ -9,6 +9,7 @@ import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -143,6 +144,7 @@ public class FormDescriptorFactory
                 fd.setForm(form);
                 fd.setParentPath(parentPath);
                 fd.setBaseName(baseName);
+                fd.setPath(PathUtils.getPath(parentPath, baseName));
                 fd.setProperty(property);
                 fd.setName(property.getName());
                 addFieldParameters(type, parentPath, property, fd, validators);
@@ -203,6 +205,7 @@ public class FormDescriptorFactory
 
         FieldDescriptor fd = createFieldOfType(fieldType);
         fd.setType(fieldType);
+        fd.setPath(PathUtils.getPath(parentPath, baseName));
         fd.setParentPath(parentPath);
         fd.setBaseName(baseName);
         fd.setProperty(property);

@@ -27,5 +27,5 @@ public @interface BrowseScmFileAction
      * @return the name of the field that contains the base directory
      *         to browse from, if any
      */
-    String baseDirField() default "work";
+    String baseDirField() default "";
 }

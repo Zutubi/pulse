@@ -1,11 +1,9 @@
 package com.zutubi.pulse.master.tove.model;
 
 import static com.zutubi.tove.annotations.FieldParameter.*;
-import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.ConventionSupport;
-import com.zutubi.pulse.master.tove.model.AbstractParameterised;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +26,10 @@ public class FieldDescriptor extends AbstractParameterised implements Descriptor
 
     public Field instantiate(String path, Record instance)
     {
+        // Implementation note:  The path parameter here is the same as the getParamters().get('path') value.
+        // However, because it is the FieldDescriptor that is used in the FieldActionPredicate, the path needs
+        // to be set before the field is instantiated.
+
         Field field = new Field(getType(), getName());
         field.setLabel(getName() + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
         field.addAll(getParameters());
@@ -93,6 +95,16 @@ public class FieldDescriptor extends AbstractParameterised implements Descriptor
     public void setParentPath(String parentPath)
     {
         addParameter(PARENT_PATH, parentPath);
+    }
+
+    public String getPath()
+    {
+        return (String) getParameter(PATH);
+    }
+
+    public void setPath(String path)
+    {
+        addParameter(PATH, path);
     }
 
     public String getBaseName()

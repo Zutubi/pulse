@@ -56,9 +56,4 @@ public class AntCommandForm extends ConfigurationForm
         browser.click(getBrowseLinkId(FIELD_BUILD_FILE));
         return new PulseFileSystemBrowserWindow(browser);
     }
-
-    private String getBrowseLinkId(String field)
-    {
-        return getFieldId(field) + ".browse";
-    }
 }

@@ -655,7 +655,7 @@ public class StringUtils
         int length = pieces.length;
         if(skipEmpty)
         {
-            while(length > 0 && pieces[length - 1].length() == 0)
+            while(length > 0 && (pieces[length - 1] == null || pieces[length - 1].length() == 0))
             {
                 length--;
             }

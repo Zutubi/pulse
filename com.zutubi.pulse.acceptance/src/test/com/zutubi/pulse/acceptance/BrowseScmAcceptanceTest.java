@@ -2,8 +2,10 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
+import com.zutubi.pulse.acceptance.forms.admin.ConvertToVersionedForm;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 /**
@@ -101,6 +103,25 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
+    }
+
+    // --( test rendering browse link for project to versioned transformation )---
+    public void testBrowseLinkAvailableForVersionedProjectConversion() throws Exception
+    {
+        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig());
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        projectPage.clickAction("convertToVersioned");
+
+        ConvertToVersionedForm form = browser.createForm(ConvertToVersionedForm.class);
+        form.waitFor();
+        
+        assertTrue(form.isBrowsePulseFileNameLinkAvailable());
+        PulseFileSystemBrowserWindow browse = form.clickBrowsePulseFileName();
+        browse.waitForNode("src");
+        browse.selectNode("src");
+        browse.clickOk();
+
+        assertEquals("src", form.getPulseFileNameFieldValue());
     }
 
     //---( test the browse window . )---

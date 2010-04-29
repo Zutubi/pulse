@@ -36,23 +36,23 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
 
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
-        String parentPath = field.getParentPath();
+        String path = field.getPath();
         String projectPath;
 
-        if (MasterConfigurationRegistry.PROJECTS_SCOPE.equals(PathUtils.getParentPath(parentPath)))
+        if (MasterConfigurationRegistry.PROJECTS_SCOPE.equals(PathUtils.getParentPath(path)))
         {
             if(StringUtils.stringSet(field.getBaseName()))
             {
-                projectPath = "c" + parentPath;
+                projectPath = "c" + path;
             }
             else
             {
-                projectPath = "wizards/" + parentPath;
+                projectPath = "wizards/" + path;
             }
         }
         else
         {
-            projectPath = PathUtils.getPath(0, 2, PathUtils.getPathElements(parentPath));
+            projectPath = PathUtils.getPath(0, 2, PathUtils.getPathElements(path));
         }
 
         try
