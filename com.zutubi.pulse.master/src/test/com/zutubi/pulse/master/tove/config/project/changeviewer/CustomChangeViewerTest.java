@@ -8,7 +8,6 @@ import static org.mockito.Mockito.stub;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.TimeZone;
 
 public class CustomChangeViewerTest extends PulseTestCase
@@ -99,8 +98,7 @@ public class CustomChangeViewerTest extends PulseTestCase
 
     private ChangeContext getContext()
     {
-        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
-        return new ChangeContextImpl(changelist, null, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, null, mockScmClient, null);
     }
 
     private FileChange getFileChange(String filePath)

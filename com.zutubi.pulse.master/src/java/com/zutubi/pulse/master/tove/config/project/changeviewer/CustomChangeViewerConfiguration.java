@@ -204,7 +204,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             references.add(new GenericVariable<String>(PROPERTY_PATH_RAW, fileChange.getPath()));
             references.add(new GenericVariable<String>(PROPERTY_PATH_FORM, WebUtils.formUrlEncode(fileChange.getPath())));
             references.add(new GenericVariable<String>(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
-            references.add(new GenericVariable<String>(PROPERTY_CHANGE_REVISION, context.getChangelist().getRevision().getRevisionString()));
+            references.add(new GenericVariable<String>(PROPERTY_CHANGE_REVISION, context.getRevision().getRevisionString()));
 
             // Quick check to see if there is a chance we need to calculate the
             // previous revision.  May have false positives, but that is OK, we

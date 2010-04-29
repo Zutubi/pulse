@@ -92,7 +92,7 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         }
         else
         {
-            return context.getChangelist().getRevision();
+            return context.getRevision();
         }
     }
 

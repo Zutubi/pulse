@@ -6,9 +6,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
-
-import java.util.Collections;
-
 import static org.mockito.Mockito.*;
 
 public class FisheyeChangeViewerTest extends PulseTestCase
@@ -94,8 +91,7 @@ public class FisheyeChangeViewerTest extends PulseTestCase
 
     private ChangeContext getContext()
     {
-        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
-        return new ChangeContextImpl(changelist, scmConfiguration, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, scmConfiguration, mockScmClient, null);
     }
 
     private FileChange getFileChange()

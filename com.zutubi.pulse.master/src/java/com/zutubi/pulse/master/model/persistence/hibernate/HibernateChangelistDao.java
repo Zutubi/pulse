@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
@@ -113,11 +112,10 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         });
 
         // Now eliminate false-positives from hash collisions.
-        Changelist rawChangelist = changelist.asChangelist();
         for (Iterator<PersistentChangelist> it = result.iterator(); it.hasNext(); )
         {
             PersistentChangelist current = it.next();
-            if (!current.asChangelist().equals(rawChangelist))
+            if (!current.isEquivalent(changelist))
             {
                 it.remove();
             }
@@ -187,19 +185,19 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
 
     private void addUnique(Collection<PersistentChangelist> lists, Collection<PersistentChangelist> toAdd)
     {
-        for(PersistentChangelist candidate: toAdd)
+        for (PersistentChangelist candidate: toAdd)
         {
             boolean found = false;
-            for(PersistentChangelist existing: lists)
+            for (PersistentChangelist existing: lists)
             {
-                if(existing.asChangelist().equals(candidate.asChangelist()))
+                if (existing.isEquivalent(candidate))
                 {
                     found = true;
                     break;
                 }
             }
 
-            if(!found)
+            if (!found)
             {
                 lists.add(candidate);
             }

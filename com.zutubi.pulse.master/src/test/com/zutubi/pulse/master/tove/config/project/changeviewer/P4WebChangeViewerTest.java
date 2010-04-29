@@ -7,8 +7,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-import java.util.Collections;
-
 public class P4WebChangeViewerTest extends PulseTestCase
 {
     private static final String BASE = "http://localhost:8080";
@@ -79,8 +77,7 @@ public class P4WebChangeViewerTest extends PulseTestCase
 
     private ChangeContext getContext()
     {
-        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
-        return new ChangeContextImpl(changelist, scmConfiguration, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, scmConfiguration, mockScmClient, null);
     }
 
     private FileChange getFileChange(String filePath)

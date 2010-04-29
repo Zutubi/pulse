@@ -264,7 +264,7 @@ public class ViewChangelistAction extends ActionSupport
         {
             ScmContext scmContext = scmManager.createContext(projectWithViewer);
             scmClient = scmManager.createClient(scmConfiguration);
-            final ChangeContext context = new ChangeContextImpl(changelist.asChangelist(), scmConfiguration, scmClient, scmContext);
+            final ChangeContext context = new ChangeContextImpl(changelist.getRevision(), scmConfiguration, scmClient, scmContext);
 
             changeViewerFound = true;
             changeUrl = getChangeUrl(changeViewer, changelist.getRevision());

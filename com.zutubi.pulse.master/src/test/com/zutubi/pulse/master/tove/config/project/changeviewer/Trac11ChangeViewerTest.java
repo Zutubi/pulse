@@ -6,8 +6,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-import java.util.Collections;
-
 public class Trac11ChangeViewerTest extends PulseTestCase
 {
     private static final String BASE = "http://trac.edgewall.org";
@@ -74,7 +72,6 @@ public class Trac11ChangeViewerTest extends PulseTestCase
 
     public ChangeContext getContext()
     {
-        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
-        return new ChangeContextImpl(changelist, null, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, null, mockScmClient, null);
     }
 }

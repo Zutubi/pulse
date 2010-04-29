@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-    <class name="com.zutubi.pulse.core.model.PersistentChangelist" table="BUILD_CHANGELIST" lazy="false">
+    <class name="com.zutubi.pulse.core.model.PersistentChangelist" table="BUILD_CHANGELIST" lazy="true">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -37,7 +37,7 @@
         </property>
     </class>
 
-    <class name="com.zutubi.pulse.core.model.PersistentFileChange" table="BUILD_FILE_CHANGE" lazy="false">
+    <class name="com.zutubi.pulse.core.model.PersistentFileChange" table="BUILD_FILE_CHANGE" lazy="true">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
