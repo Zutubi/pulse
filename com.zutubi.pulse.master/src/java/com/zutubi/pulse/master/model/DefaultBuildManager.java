@@ -391,9 +391,31 @@ public class DefaultBuildManager implements BuildManager
         return changelistDao.findLatestByProjects(projects, max);
     }
 
-    public List<PersistentChangelist> getChangesForBuild(BuildResult result)
+    public List<PersistentChangelist> getChangesForBuild(BuildResult result, boolean allowEmpty)
     {
-        return changelistDao.findByResult(result.getId());
+        List<PersistentChangelist> changelists = changelistDao.findByResult(result.getId());
+        if (!allowEmpty)
+        {
+            CollectionUtils.filterInPlace(changelists, new Predicate<PersistentChangelist>()
+            {
+                public boolean satisfied(PersistentChangelist persistentChangelist)
+                {
+                    return changelistDao.getSize(persistentChangelist) > 0;
+                }
+            });
+        }
+        
+        return changelists;
+    }
+
+    public int getChangelistSize(PersistentChangelist changelist)
+    {
+        return changelistDao.getSize(changelist);
+    }
+    
+    public List<PersistentFileChange> getChangelistFiles(PersistentChangelist changelist, int offset, int max)
+    {
+        return changelistDao.getFiles(changelist, offset, max);
     }
 
     public void deleteAllBuilds(Project project)

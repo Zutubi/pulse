@@ -223,9 +223,36 @@ public interface BuildManager
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max);
 
-    @SecureParameter(action = AccessManager.ACTION_VIEW)
-    List<PersistentChangelist> getChangesForBuild(BuildResult result);
+    /**
+     * Returns all changes associated with the given build result.
+     * 
+     * @param result     the result to retrieve changes for
+     * @param allowEmpty if true, the result may contain changelists with no
+     *                   files; if false, empty changelists are filtered out
+     * @return the changes associated with the given build
+     */
+    @SecureParameter(parameterIndex = 0, action = AccessManager.ACTION_VIEW)
+    List<PersistentChangelist> getChangesForBuild(BuildResult result, boolean allowEmpty);
 
+    /**
+     * Gets the number of files in the given changelist, without loading them
+     * all into memory.
+     * 
+     * @param changelist the changelist to get the size of
+     * @return the number of files changed in the given changelist
+     */
+    int getChangelistSize(PersistentChangelist changelist);
+    
+    /**
+     * Gets a page of the files changed in the given changelist.
+     * 
+     * @param changelist changelist to get files from
+     * @param offset     zero-base offset of the first file to retrieve
+     * @param max        maximum number of files to retrieve
+     * @return the given window from the list of files in the given changelist
+     */
+    List<PersistentFileChange> getChangelistFiles(PersistentChangelist changelist, int offset, int max);
+    
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void deleteAllBuilds(Project project);
 

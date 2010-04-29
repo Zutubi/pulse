@@ -192,7 +192,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         return user;
     }
 
-    public void testLookupEuqivalent()
+    public void testLookupEquivalent()
     {
         changelistDao.save(createChangelist(12, "jason"));
 
@@ -252,7 +252,44 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals(l2, found.get(0));
         assertEquals(l1, found.get(1));
     }
+    
+    public void testGetSize()
+    {
+        PersistentChangelist changelist = createChangelist(1, 1, "login1");
+        changelist.getChanges().add(new PersistentFileChange("f1", "rev", FileChange.Action.ADD, false));
+        changelist.getChanges().add(new PersistentFileChange("f2", "rev", FileChange.Action.ADD, false));
+        changelist.getChanges().add(new PersistentFileChange("f3", "rev", FileChange.Action.ADD, false));
+        changelistDao.save(changelist);
 
+        commitAndRefreshTransaction();
+        
+        assertEquals(3, changelistDao.getSize(changelist));
+    }
+
+    public void testGetFiles()
+    {
+        PersistentChangelist changelist = createChangelist(1, 1, "login1");
+        changelist.getChanges().add(new PersistentFileChange("f1", "rev", FileChange.Action.ADD, false));
+        changelist.getChanges().add(new PersistentFileChange("f2", "rev", FileChange.Action.ADD, false));
+        changelist.getChanges().add(new PersistentFileChange("f3", "rev", FileChange.Action.ADD, false));
+        changelist.getChanges().add(new PersistentFileChange("a1", "rev", FileChange.Action.ADD, false));
+        changelist.getChanges().add(new PersistentFileChange("a2", "rev", FileChange.Action.ADD, false));
+        changelistDao.save(changelist);
+
+        commitAndRefreshTransaction();
+        changelist = changelistDao.findById(changelist.getId());
+        
+        List<PersistentFileChange> files = changelistDao.getFiles(changelist, 1, 1);
+        assertEquals(1, files.size());
+        assertEquals("f2", files.get(0).getFilename());
+
+        files = changelistDao.getFiles(changelist, 2, 5);
+        assertEquals(3, files.size());
+        assertEquals("f3", files.get(0).getFilename());
+        assertEquals("a1", files.get(1).getFilename());
+        assertEquals("a2", files.get(2).getFilename());
+    }
+    
     private PersistentChangelist createChangelistForResult(Revision r1, long time, int resultId)
     {
         PersistentChangelist l1 = new PersistentChangelist(r1, time, "author", "comment", Arrays.asList(

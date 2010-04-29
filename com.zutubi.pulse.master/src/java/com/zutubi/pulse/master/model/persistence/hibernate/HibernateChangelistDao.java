@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
@@ -10,6 +11,7 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -122,6 +124,35 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         }
 
         return result;
+    }
+
+    public int getSize(final PersistentChangelist changelist)
+    {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Query queryObject = session.createQuery("select count(change) from PersistentChangelist model join model.changes as change where model = :changelist");
+                queryObject.setEntity("changelist", changelist);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
+    public List<PersistentFileChange> getFiles(final PersistentChangelist changelist, final int offset, final int max)
+    {
+        return (List<PersistentFileChange>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Query queryObject = session.createFilter(changelist.getChanges(), "order by ordinal");
+                queryObject.setFirstResult(offset);
+                queryObject.setMaxResults(max);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
     }
 
     public List<PersistentChangelist> findByResult(final long id)

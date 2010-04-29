@@ -50,7 +50,8 @@
     #end
     <table id="changelist.summaries" class="content">
         #headingRow($title 5)
-    #foreach($change in $changelists)
+    #foreach($model in $changelists)
+        #set($change = $model.changelist)
         #set($changeIndex = $velocityCount)
         <tr id="change.${changeIndex}">
             #contentHeading("change.revision" 1)
@@ -68,20 +69,20 @@
             #commitCommentCell($change "changes")
             #linkCell("view.$change.id" "view" "$urls.buildChangelist($buildResult, $change.id)")
         </tr>
-        #if($change.changes.size() > 0)
+        #if($model.changeCount > 0)
         <tr>
             <td class="content" colspan="5">
                 <b>#wwtext("name=changes.files")</b>
                 <ul>
-            #if($change.changes.size() < 5)
-                #set($limit = $change.changes.size() - 1)
+            #if($model.changeCount < 5)
+                #set($limit = $model.changeCount - 1)
                 #set($remaining = 0)
             #else
                 #set($limit = 4)
-                #set($remaining = $change.changes.size() - 5)
+                #set($remaining = $model.changeCount - 5)
             #end
             #foreach($i in [0..$limit])
-                #set($file = $change.changes.get($i))
+                #set($file = $model.changes.get($i))
                     <li id="change.${changeIndex}.file.${velocityCount}">$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.toString()</li>
             #end
             #if($remaining > 0)

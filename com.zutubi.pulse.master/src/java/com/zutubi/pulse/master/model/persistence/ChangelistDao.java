@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model.persistence;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 
@@ -38,4 +39,23 @@ public interface ChangelistDao extends EntityDao<PersistentChangelist>
     List<PersistentChangelist> findByResult(long id);
 
     List<PersistentChangelist> findAllEquivalent(PersistentChangelist changelist);
+
+    /**
+     * Gets the number of files in the given changelist, without loading them
+     * all into memory.
+     * 
+     * @param changelist the changelist to get the size of
+     * @return the number of files changed in the given changelist
+     */
+    int getSize(PersistentChangelist changelist);
+
+    /**
+     * Gets a page of the files changed in the given changelist.
+     * 
+     * @param changelist changelist to get files from
+     * @param offset     zero-base offset of the first file to retrieve
+     * @param max        maximum number of files to retrieve
+     * @return the given window from the list of files in the given changelist
+     */
+    List<PersistentFileChange> getFiles(PersistentChangelist changelist, int offset, int max);
 }

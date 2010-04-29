@@ -36,7 +36,7 @@ public class ChangedByMeSinceSuccessNotifyCondition implements NotifyCondition
             public Boolean process()
             {
                 // Check for direct changes on the build we have first.
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
+                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result, false);
                 ByMePredicate predicate = new ByMePredicate(user);
                 if (CollectionUtils.contains(changelists, predicate))
                 {
@@ -51,7 +51,7 @@ public class ChangedByMeSinceSuccessNotifyCondition implements NotifyCondition
                 List<BuildResult> resultRange = buildManager.queryBuilds(result.getProject(), ResultState.getCompletedStates(), lowestNumber, result.getNumber() - 1, 0, -1, false, false);
                 for (BuildResult r: resultRange)
                 {
-                    changelists  = buildManager.getChangesForBuild(r);
+                    changelists  = buildManager.getChangesForBuild(r, false);
                     if (CollectionUtils.contains(changelists, predicate))
                     {
                         return true;
