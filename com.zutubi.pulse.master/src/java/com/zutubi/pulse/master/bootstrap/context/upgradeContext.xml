@@ -128,6 +128,7 @@
                 <ref local="addDependencySyncField"/>
                 <ref local="addCommandCollectionSkeletons"/>
                 <ref local="gccLinkerPatterns"/>
+                <ref local="regexTestMultipleStatuses"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -621,5 +622,9 @@
 
     <bean id="gccLinkerPatterns" class="com.zutubi.pulse.master.upgrade.tasks.GccLinkerPatternsUpgradeTask">
         <property name="buildNumber" value="201023002"/>
+    </bean>
+
+    <bean id="regexTestMultipleStatuses" class="com.zutubi.pulse.master.upgrade.tasks.RegexTestPostProcessorMultipleStatusesUpgradeTask">
+        <property name="buildNumber" value="201025001"/>
     </bean>
 </beans>

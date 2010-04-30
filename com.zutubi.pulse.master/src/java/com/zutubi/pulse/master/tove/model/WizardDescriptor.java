@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.WizardState;
 import com.zutubi.pulse.master.tove.wizard.WizardTransition;
 import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardInterceptor;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
@@ -38,7 +39,7 @@ public class WizardDescriptor extends AbstractParameterised implements Descripto
 
         // create the form wizard for the wizard.
         WizardState currentState = wizardInstance.getCurrentState();
-        wizard.setTemplate(wizardInstance.isTemplate());
+        wizard.setTemplateCollectionItem(wizardInstance.isTemplate() && PathUtils.getPathElements(wizardInstance.getInsertPath()).length == 1);
 
         FormDescriptor formDescriptor = currentState.createFormDescriptor(formDescriptorFactory, path, "wizardForm");
         formDescriptor.setAction("wizard");

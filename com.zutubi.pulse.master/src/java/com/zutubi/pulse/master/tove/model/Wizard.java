@@ -15,7 +15,7 @@ public class Wizard
     private String currentStep;
 
     private boolean decorate;
-    private boolean template;
+    private boolean templateCollectionItem;
     private Form form;
 
     public int getStepCount()
@@ -43,14 +43,14 @@ public class Wizard
         this.decorate = decorate;
     }
 
-    public boolean isTemplate()
+    public boolean isTemplateCollectionItem()
     {
-        return template;
+        return templateCollectionItem;
     }
 
-    public void setTemplate(boolean template)
+    public void setTemplateCollectionItem(boolean templateCollectionItem)
     {
-        this.template = template;
+        this.templateCollectionItem = templateCollectionItem;
     }
 
     public Form getForm()

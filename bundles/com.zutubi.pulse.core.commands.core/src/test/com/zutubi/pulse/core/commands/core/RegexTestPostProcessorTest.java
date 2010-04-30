@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -57,6 +58,17 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         assertEquals("fail 2 details", tests.findCase(" <FAIL2>").getMessage());
     }
 
+    public void testMultipleStatuses() throws IOException
+    {
+        RegexTestPostProcessor pp = createProcessor(false, 3);
+        pp.getConfig().setPassStatus(asList("PASS", "GOOD"));
+        pp.getConfig().setFailureStatus(asList("FAIL", "POOR"));
+        
+        TestSuiteResult tests = runProcessorAndGetTests(pp, EXTENSION);
+        assertEquals(4, tests.getTotal());
+        assertEquals(2, tests.getTotalWithStatus(FAILURE));
+    }
+    
     public void testSkipped() throws IOException
     {
         TestSuiteResult tests = runProcessorAndGetTests(createProcessor(), EXTENSION);
@@ -74,7 +86,7 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         pp.setNameGroup(2);
         pp.setDetailsGroup(3);
         pp.setStatusGroup(4);
-        pp.setPassStatus("PASS");
+        pp.setPassStatus(asList("PASS"));
         pp.setSuite("baseSuite");
 
         RegexTestPostProcessor postProcessor = new RegexTestPostProcessor(pp);
@@ -107,7 +119,7 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         pp.setNameGroup(1);
         pp.setDurationGroup(2);
         pp.setStatusGroup(3);
-        pp.setPassStatus("PASS");
+        pp.setPassStatus(asList("PASS"));
 
         RegexTestPostProcessor postProcessor = new RegexTestPostProcessor(pp);
 
@@ -152,8 +164,8 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         pp.setStatusGroup(1);
         pp.setNameGroup(2);
         pp.setDetailsGroup(detailsGroup);
-        pp.setPassStatus("PASS");
-        pp.setFailureStatus("FAIL");
+        pp.setPassStatus(asList("PASS"));
+        pp.setFailureStatus(asList("FAIL"));
 
         pp.setAutoFail(autoFail);
         return new RegexTestPostProcessor(pp);

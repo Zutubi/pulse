@@ -1,5 +1,5 @@
 <h3 class="config-header">
-<#if wizard.template>
+<#if wizard.templateCollectionItem>
     ${"label.template"?i18n}
 <#else>
     ${"label"?i18n}
