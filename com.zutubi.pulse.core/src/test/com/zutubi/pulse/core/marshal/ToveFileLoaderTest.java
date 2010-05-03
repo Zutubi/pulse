@@ -1,12 +1,8 @@
 package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.pulse.core.engine.api.Content;
-import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
-import com.zutubi.pulse.core.engine.api.Referenceable;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.marshal.types.*;
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -17,12 +13,14 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class ToveFileLoaderTest extends PulseTestCase
 {
@@ -96,6 +94,15 @@ public class ToveFileLoaderTest extends PulseTestCase
         Textual textual = root.getTextual();
         assertNotNull(textual);
         assertEquals("text content v", textual.getX());
+    }
+
+    public void testContentPropertyNotSetWhenNestedElements() throws Exception
+    {
+        SimpleRoot root = load();
+        Textual textual = root.getTextual();
+        assertNotNull(textual);
+        assertNull(textual.getX());
+        assertEquals(1, textual.getList().size());
     }
 
     public void testMacroEmpty() throws Exception
@@ -221,6 +228,36 @@ public class ToveFileLoaderTest extends PulseTestCase
         assertEquals("val2", list.get(1));
     }
 
+    public void testAddableStringListViaAttribute() throws PulseException
+    {
+        SimpleRoot simpleRoot = load();
+        assertNotNull(simpleRoot.getStringList());
+        List<String> list = simpleRoot.getStringList().getAddableList();
+        assertEquals(2, list.size());
+        assertEquals("val1", list.get(0));
+        assertEquals("val2", list.get(1));
+    }
+
+    public void testNonSplitStringListViaAttribute() throws PulseException
+    {
+        SimpleRoot simpleRoot = load();
+        assertNotNull(simpleRoot.getStringList());
+        List<String> list = simpleRoot.getStringList().getNonSplitList();
+        assertEquals(1, list.size());
+        assertEquals("val1 val2", list.get(0));
+    }
+
+    public void testCopiedStringList() throws PulseException
+    {
+        // This test ensures the loader does not assume it can update
+        // collections in place - it needs to get, modify, set.
+        SimpleRoot simpleRoot = load();
+        assertNotNull(simpleRoot.getStringList());
+        List<String> list = simpleRoot.getStringList().getCopiedList();
+        assertEquals(1, list.size());
+        assertEquals("item", list.get(0));
+    }
+    
     public void testAddables() throws PulseException
     {
         SimpleRoot root = load();
@@ -596,6 +633,8 @@ public class ToveFileLoaderTest extends PulseTestCase
     {
         @Content
         private String x;
+        @Addable(value = "item", attribute = "")
+        private List<String> list = new LinkedList<String>();
 
         public String getX()
         {
@@ -605,6 +644,16 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setX(String x)
         {
             this.x = x;
+        }
+
+        public List<String> getList()
+        {
+            return list;
+        }
+
+        public void setList(List<String> list)
+        {
+            this.list = list;
         }
     }
 
@@ -671,6 +720,10 @@ public class ToveFileLoaderTest extends PulseTestCase
         @Addable(value = "add-item", attribute = "val")
         private List<String> addableList = new LinkedList<String>();
         private List<String> notAddableList = new LinkedList<String>();
+        @AttributeBinding(split = false)
+        private List<String> nonSplitList = new LinkedList<String>();
+        @Addable(value = "copied-item", attribute = "")
+        private List<String> copiedList = new LinkedList<String>();
 
         public List<String> getAddableList()
         {
@@ -690,6 +743,29 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setNotAddableList(List<String> notAddableList)
         {
             this.notAddableList = notAddableList;
+        }
+
+        public List<String> getNonSplitList()
+        {
+            return nonSplitList;
+        }
+
+        public void setNonSplitList(List<String> nonSplitList)
+        {
+            this.nonSplitList = nonSplitList;
+        }
+
+        public List<String> getCopiedList()
+        {
+            // Return a copy of the list: we're testing that the list is set
+            // back on the object (rather than the loader assuming it can
+            // modify it in-place).
+            return new LinkedList<String>(copiedList);
+        }
+
+        public void setCopiedList(List<String> copiedList)
+        {
+            this.copiedList = copiedList;
         }
     }
 

@@ -1,15 +1,20 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.engine.api.Addable;
+import com.zutubi.pulse.core.engine.api.AttributeBinding;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.postprocessors.api.TestReportPostProcessorConfigurationSupport;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -145,61 +150,70 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
         return getDurationGroup() != UNDEFINED_GROUP;
     }
 
-    @Required
-    public String getPassStatus()
+    @StringList @Addable(value = "pass-status", attribute = "") @AttributeBinding(split = false)
+    public List<String> getPassStatus()
     {
-        return findStatus(TestStatus.PASS);
+        return getStatuses(TestStatus.PASS);
     }
 
-    public void setPassStatus(String status)
+    public void setPassStatus(List<String> strings)
     {
-        this.statusMap.put(status, TestStatus.PASS);
+        setStatuses(strings, TestStatus.PASS);
     }
 
-    @Required
-    public String getFailureStatus()
+    @StringList @Addable(value = "failure-status", attribute = "") @AttributeBinding(split = false)
+    public List<String> getFailureStatus()
     {
-        return findStatus(TestStatus.FAILURE);
+        return getStatuses(TestStatus.FAILURE);
     }
 
-    public void setFailureStatus(String status)
+    public void setFailureStatus(List<String> strings)
     {
-        this.statusMap.put(status, TestStatus.FAILURE);
+        setStatuses(strings, TestStatus.FAILURE);
     }
 
-    @Required
-    public String getErrorStatus()
+    @StringList @Addable(value = "error-status", attribute = "") @AttributeBinding(split = false)
+    public List<String> getErrorStatus()
     {
-        return findStatus(TestStatus.ERROR);
+        return getStatuses(TestStatus.ERROR);
     }
 
-    public void setErrorStatus(String status)
+    public void setErrorStatus(List<String> strings)
     {
-        this.statusMap.put(status, TestStatus.ERROR);
+        setStatuses(strings, TestStatus.ERROR);
     }
 
-    @Required
-    public String getSkippedStatus()
+    @StringList @Addable(value = "skipped-status", attribute = "") @AttributeBinding(split = false)
+    public List<String> getSkippedStatus()
     {
-        return findStatus(TestStatus.SKIPPED);
+        return getStatuses(TestStatus.SKIPPED);
     }
 
-    public void setSkippedStatus(String status)
+    public void setSkippedStatus(List<String> strings)
     {
-        this.statusMap.put(status, TestStatus.SKIPPED);
+        setStatuses(strings, TestStatus.SKIPPED);
     }
 
-    private String findStatus(TestStatus status)
+    private List<String> getStatuses(TestStatus status)
     {
-        for(Map.Entry<String, TestStatus> entry: statusMap.entrySet())
+        List<String> strings = new LinkedList<String>();
+        for (Map.Entry<String, TestStatus> entry: statusMap.entrySet())
         {
-            if(entry.getValue().equals(status))
+            if (entry.getValue().equals(status))
             {
-                return entry.getKey();
+                strings.add(entry.getKey());
             }
         }
 
-        return null;
+        return strings;
+    }
+
+    private void setStatuses(List<String> strings, TestStatus status)
+    {
+        for (String s: strings)
+        {
+            this.statusMap.put(s, status);
+        }
     }
 
     public boolean isAutoFail()

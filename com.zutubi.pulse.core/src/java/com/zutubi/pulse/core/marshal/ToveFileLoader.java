@@ -2,10 +2,7 @@ package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.pulse.core.engine.api.Content;
-import com.zutubi.pulse.core.engine.api.Referenceable;
-import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
@@ -451,7 +448,7 @@ public class ToveFileLoader
      */
     private abstract class Adder implements Binder
     {
-        private TypeProperty property;
+        protected TypeProperty property;
 
         /**
          * Creates an adder.
@@ -471,10 +468,11 @@ public class ToveFileLoader
                 try
                 {
                     CollectionType type = (CollectionType) property.getType();
+                    Object value = property.getValue(parent);
                     if (type instanceof ListType)
                     {
                         @SuppressWarnings("unchecked")
-                        List<Object> list = (List) property.getValue(parent);
+                        List<Object> list = (List) value;
                         list.add(instance);
                     }
                     else
@@ -483,10 +481,15 @@ public class ToveFileLoader
                         CompositeType elementType = mapType.getTargetType();
     
                         @SuppressWarnings("unchecked")
-                        Map<String, Object> map = (Map) property.getValue(parent);
+                        Map<String, Object> map = (Map) value;
                         String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
                         map.put(key, instance);
                     }
+                    
+                    // We need to set it back on the instance as it is a bean
+                    // property - the collection is not necessarily stored in a
+                    // direct field.
+                    property.setValue(parent, value);
                 }
                 catch (Exception e)
                 {
@@ -623,7 +626,7 @@ public class ToveFileLoader
 
         public Object getInstance(Element element, Scope scope, VariableResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
-            return coerce(getAddableValue(element, attribute), type, resolutionStrategy, scope);
+            return coerce(getAddableValue(element, attribute), property, type, resolutionStrategy, scope);
         }
 
         public boolean initInstance()
@@ -678,13 +681,14 @@ public class ToveFileLoader
             throws Exception
     {
         String text = null;
-
+        boolean foundElement = false;
         for (int index = 0; index < e.getChildCount(); index++)
         {
             Node node = e.getChild(index);
 
             if (node instanceof Element)
             {
+                foundElement = true;
                 Element element = (Element) node;
                 loadType(element, instance, type, scope, depth + 1, fileResolver, interceptor);
             }
@@ -701,7 +705,7 @@ public class ToveFileLoader
             }
         }
 
-        if (text != null)
+        if (!foundElement && text != null)
         {
             TypeProperty contentProperty = findContentProperty(type);
             if (contentProperty != null)
@@ -946,7 +950,7 @@ public class ToveFileLoader
 
             try
             {
-                Object value = coerce(a.getValue(), property.getType(), getResolutionStrategy(interceptor, target, source), scope);
+                Object value = coerce(a.getValue(), property, property.getType(), getResolutionStrategy(interceptor, target, source), scope);
 
                 try
                 {
@@ -964,7 +968,7 @@ public class ToveFileLoader
         }
     }
 
-    private Object coerce(String value, Type type, VariableResolver.ResolutionStrategy resolutionStrategy, Scope scope) throws Exception
+    private Object coerce(String value, TypeProperty property, Type type, VariableResolver.ResolutionStrategy resolutionStrategy, Scope scope) throws Exception
     {
         if (type instanceof SimpleType)
         {
@@ -990,7 +994,7 @@ public class ToveFileLoader
             {
                 try
                 {
-                    Constructor c = clazz.getConstructor(new Class[]{String.class});
+                    Constructor c = clazz.getConstructor(String.class);
                     return c.newInstance(VariableResolver.resolveVariables(value, scope, resolutionStrategy));
                 }
                 catch (Exception e)
@@ -1008,11 +1012,19 @@ public class ToveFileLoader
                 if (squeezer != null)
                 {
                     List<Object> values = new LinkedList<Object>();
-                    for (String v: VariableResolver.splitAndResolveVariable(value, scope, resolutionStrategy))
+                    AttributeBinding binding = property.getAnnotation(AttributeBinding.class);
+                    if (binding == null || binding.split())
                     {
-                        values.add(squeezer.unsqueeze(v));
+                        for (String v: VariableResolver.splitAndResolveVariable(value, scope, resolutionStrategy))
+                        {
+                            values.add(squeezer.unsqueeze(v));
+                        }
                     }
-
+                    else
+                    {
+                        values.add(squeezer.unsqueeze(VariableResolver.resolveVariables(value, scope, resolutionStrategy)));
+                    }
+                    
                     return values;
                 }
             }

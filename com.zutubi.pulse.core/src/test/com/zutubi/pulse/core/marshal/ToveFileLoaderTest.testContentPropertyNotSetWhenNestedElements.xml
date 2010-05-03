@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+    <textual>
+        this text is ignored
+        <item>foo</item>
+    </textual>
+</project>
