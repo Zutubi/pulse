@@ -18,7 +18,7 @@ import java.util.Set;
  * A useful base class for JUnit test cases that nulls out fields in teardown
  * so that memory can be freed.
  */
-public class ZutubiTestCase extends TestCase
+public abstract class ZutubiTestCase extends TestCase
 {
     public ZutubiTestCase()
     {
