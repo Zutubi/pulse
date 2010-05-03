@@ -5,11 +5,12 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
- * <class comment/>
+ * Represents all artifacts across all builds of all projects, keyed by their
+ * database ids.
  */
-public class ArtifactsFileObject extends AbstractPulseFileObject
+public class GlobalArtifactsFileObject extends AbstractPulseFileObject
 {
-    public ArtifactsFileObject(final FileName name, final AbstractFileSystem fs)
+    public GlobalArtifactsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
@@ -25,13 +26,11 @@ public class ArtifactsFileObject extends AbstractPulseFileObject
 
     protected FileType doGetType() throws Exception
     {
-        // this object does allow traversal.
         return FileType.FOLDER;
     }
 
     protected String[] doListChildren() throws Exception
     {
-        // this object does not support listing.
         return NO_CHILDREN;
     }
 }

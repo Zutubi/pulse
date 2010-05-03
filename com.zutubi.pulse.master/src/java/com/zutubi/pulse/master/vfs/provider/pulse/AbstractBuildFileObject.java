@@ -9,6 +9,8 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
+ * Helper base the implements most of the functionality for files that
+ * represent a single build result.
  */
 public abstract class AbstractBuildFileObject extends AbstractPulseFileObject implements BuildResultProvider, AddressableFileObject, ProjectProvider
 {
@@ -20,27 +22,38 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
     public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
-        if (name.equals("wc"))
+        if (name.equals("artifacts"))
+        {
+            return objectFactory.buildBean(BuildArtifactsFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
+        }
+        else if (name.equals("details"))
+        {
+            return objectFactory.buildBean(BuildDetailsFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
+        }
+        else if (name.equals("stages"))
+        {
+            return objectFactory.buildBean(BuildStagesFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
+        }
+        else if (name.equals("wc"))
         {
             accessManager.ensurePermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, getBuildResult());
-            return objectFactory.buildBean(WorkingCopyContextFileObject.class,
+            return objectFactory.buildBean(BuildWorkingCopiesFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
             );
         }
-        else if (name.equals("artifacts"))
+        else 
         {
-            return objectFactory.buildBean(ArtifactsContextFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
-        }
-        else
-        {
-            return objectFactory.buildBean(NamedStageFileObject.class,
-                    new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                    new Object[]{fileName, name, pfs}
-            );
+            return null;
         }
     }
 
@@ -51,7 +64,7 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[]{"wc", "artifacts"};
+        return new String[]{"artifacts", "stages", "wc"};
     }
 
     public boolean isLocal()

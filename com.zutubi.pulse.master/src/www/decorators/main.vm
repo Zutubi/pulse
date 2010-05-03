@@ -285,8 +285,8 @@
       <script type="text/javascript">
           var toolbarConfig = {};
 #if($u_projectName)
-          toolbarConfig.projectName = '$h_projectName';
-          toolbarConfig.projectUrl = '$urls.projectHome($u_projectName)';
+          toolbarConfig.projectName = '#jss($h_projectName)';
+          toolbarConfig.projectUrl = '#jss($urls.projectHome($u_projectName))';
 #if($buildNumber && $buildNumber != "0")
           toolbarConfig.buildId = '$buildResult.id';
 #end
@@ -313,6 +313,5 @@
           var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
           toolbar.render('header');
       </script>
-
     </body>
 </html>

@@ -94,6 +94,16 @@ public class CommandResult extends Result
             return true;
         }
 
+        if (hasArtifactMessages(level))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean hasArtifactMessages(Feature.Level level)
+    {
         for (StoredArtifact artifact : artifacts)
         {
             if (artifact.hasMessages(level))
@@ -101,7 +111,6 @@ public class CommandResult extends Result
                 return true;
             }
         }
-
         return false;
     }
 

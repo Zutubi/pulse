@@ -61,6 +61,11 @@ public class Constants
      * Subversion URL for a small sample ant project that has an OCUnit output file results.txt.
      */
     public static final String OCUNIT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "ocunit";
+    /**
+     * Subversion URL for a small sample ant project that generates information for testing the
+     * details tab.
+     */
+    public static final String ALL_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "allant";
 
     /**
      * @return the url of the test git repository
@@ -91,6 +96,7 @@ public class Constants
         public static final String PERMISSIONS = "permissions";
         public static final String POST_PROCESSORS = "postProcessors";
         public static final String CONTACTS = "contacts";
+        public static final String DEPENDENCIES = "dependencies";
 
         /**
          * Property names in the multi recipe type class.
@@ -132,6 +138,7 @@ public class Constants
             {
                 public static final String NAME = "name";
                 public static final String POSTPROCESSORS = "postProcessors";
+                public static final String PUBLISH = "publish";
             }
 
             /**
@@ -221,30 +228,6 @@ public class Constants
             public static final String RETRIEVAL_PATTERN = "retrievalPattern";
             public static final String STATUS = "status";
             public static final String VERSION = "version";
-        }
-
-        public static class Artifact
-        {
-            public static final String NAME = "name";
-        }
-
-        /**
-         * Property names in the FileArtifactConfiguration class.
-         */
-        public static class FileArtifact extends Artifact
-        {
-            public static final String FILE = "file";
-        }
-
-        /**
-         * The constants for the property names in the DirectoryArtifactConfiguration class.
-         */
-        public static class DirectoryArtifact extends Artifact
-        {
-            public static final String BASE = "base";
-            public static final String INCLUDES = "includes";
-            public static final String EXCLUDES = "excludes";
-            public static final String MIME_TYPE = "type";
         }
     }   
 

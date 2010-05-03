@@ -9,7 +9,6 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.Constants;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,6 +59,11 @@ public class ProjectActionBase extends ActionSupport
         return Feature.Level.WARNING;
     }
 
+    public Feature.Level getInfoLevel()
+    {
+        return Feature.Level.INFO;
+    }
+    
     public List<Feature.Level> getFeatureLevels()
     {
         List<Feature.Level> list = Arrays.asList(Feature.Level.values());

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.core.model.EntityToIdMapping;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.core.model.EntityToIdMapping;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.CompositeMapping;
 import com.zutubi.util.ToStringMapping;
@@ -14,7 +14,8 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.util.List;
 
 /**
- * <class comment/>
+ * Represents a collection of build results.  Sometimes scoped within a single
+ * project, but not necessarily.
  */
 public class BuildsFileObject extends AbstractPulseFileObject
 {
@@ -78,7 +79,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
             List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project, MAX_BUILDS);
             List<String> buildIds = CollectionUtils.map(builds, 
-                    new CompositeMapping<BuildResult, Long, String>(new EntityToIdMapping(), new ToStringMapping())
+                    new CompositeMapping<BuildResult, Long, String>(new EntityToIdMapping<BuildResult>(), new ToStringMapping<Long>())
             );
             return buildIds.toArray(new String[buildIds.size()]);
         }

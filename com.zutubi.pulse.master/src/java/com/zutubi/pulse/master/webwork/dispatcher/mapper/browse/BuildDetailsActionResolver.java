@@ -12,7 +12,7 @@ public class BuildDetailsActionResolver extends ActionResolverSupport
 {
     public BuildDetailsActionResolver()
     {
-        super("viewCommandLog");
+        super("viewDetails");
     }
 
     public List<String> listChildren()

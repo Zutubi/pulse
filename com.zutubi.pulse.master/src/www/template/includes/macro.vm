@@ -2286,3 +2286,66 @@
         </table>
     </div>
 #end
+
+##
+## Renders a single row for a result basics table (summary of a result field).
+##
+#macro(resultBasicsRow $key $content)
+    <tr>
+        <th class="content fit-width right leftmost">#wwtext("name=build.$key")</th>
+        <td class="content rightmost">$content</td>
+    </tr>
+#end
+
+##
+## Renders a table of direct features of the given level on the given result.
+##
+#macro(resultFeatureTable $result $level)
+    #if($result.hasDirectMessages($level))
+<table id="features-${level.prettyString}" class="two-content spaced">
+    <tr><th class="two-heading">#wwtext("name=features.${level.prettyString}")</th></tr>
+    <tr>    
+        <td class="content leftmost rightmost">
+            <ul>
+    #foreach($feature in $result.getFeatures($level))
+                <li class="$level.prettyString">$action.plainToHtml($feature.summary)</li>
+    #end
+            </ul>
+        </td>
+    </tr>
+</table>
+    #end
+#end
+
+##
+## Renders tables for all direct features on the given result.
+##
+#macro(resultFeatureTables $result)
+    #resultFeatureTable($result $errorLevel)
+    #resultFeatureTable($result $warningLevel)
+    #resultFeatureTable($result $infoLevel)
+#end
+
+##
+## Renders a table of simple properties, e.g. custom fields, command properties.
+##
+#macro(resultPropertyTable $map $id $headingKey)
+    #if($map.size() > 0)
+        <table class="two-content spaced" id="$id">
+        <tr><th class="two-heading" colspan="2">#wwtext("name=$headingKey")</th></tr>
+        #foreach($entry in $map.entrySet())
+        <tr>
+            <th class="content fit-width right leftmost">#html($entry.key)</th>
+            <td class="content rightmost">#html($entry.value)</td>
+        </tr>
+        #end
+    </table>
+    #end
+#end
+
+##
+## Renders a table of custom fields on the given result.
+##
+#macro(resultCustomFields $result)
+    #resultPropertyTable($action.getCustomFields($result) "custom-fields" "build.custom.fields")
+#end

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
@@ -99,11 +99,10 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        BuildDetailedViewPage detailedViewPage = browser.openAndWaitFor(BuildDetailedViewPage.class, random, buildId);
-        detailedViewPage.clickStage(STAGE_DEFAULT);
-        browser.waitForElement(detailedViewPage.getCustomFieldsId(STAGE_DEFAULT));
-        assertEquals(Double.toString(value1), detailedViewPage.getCustomFieldValue(STAGE_DEFAULT, 1));
-        assertEquals(Double.toString(value2), detailedViewPage.getCustomFieldValue(STAGE_DEFAULT, 2));
+        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
+        detailsPage.clickStageAndWait(STAGE_DEFAULT);
+        assertEquals(Double.toString(value1), detailsPage.getCustomFieldValue(0));
+        assertEquals(Double.toString(value2), detailsPage.getCustomFieldValue(1));
     }
 
     public void testBuildScopedCustomFields() throws Exception
@@ -131,9 +130,8 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        BuildDetailedViewPage detailedViewPage = browser.openAndWaitFor(BuildDetailedViewPage.class, random, buildId);
-        browser.waitForElement(detailedViewPage.getCustomFieldsId(null));
-        assertEquals(FIELD_VALUE, detailedViewPage.getCustomFieldValue(null, 1));
+        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
+        assertEquals(FIELD_VALUE, detailsPage.getCustomFieldValue(0));
     }
 
     public void testReportsSanity() throws Exception

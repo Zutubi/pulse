@@ -18,6 +18,7 @@ import java.util.Set;
 public class ProjectFileObject extends AbstractPulseFileObject implements ProjectProvider, AddressableFileObject
 {
     private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
+    static
     {
         nodesDefinitions.put("builds", BuildsFileObject.class);
         nodesDefinitions.put("latest", LatestBuildFileObject.class);

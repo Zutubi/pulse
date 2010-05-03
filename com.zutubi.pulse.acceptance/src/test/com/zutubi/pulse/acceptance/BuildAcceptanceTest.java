@@ -8,13 +8,19 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
+import com.zutubi.pulse.core.commands.core.CustomFieldsPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.core.ExecutableCommand;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -23,6 +29,8 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -45,13 +53,13 @@ import static com.zutubi.pulse.acceptance.Constants.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
@@ -83,6 +91,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private static final String ANT_PROCESSOR = "ant output processor";
     private static final String JUNIT_PROCESSOR = "junit xml report processor";
+    private static final String CUSTOM_FIELD_PROCESSOR = "custom field processor";
 
     private static final String MESSAGE_BUILD_COMPLETED = "Build completed with status success";
     private static final String MESSAGE_CHECKING_REQUIREMENTS = "Checking recipe agent requirements...";
@@ -315,27 +324,115 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         triggerSuccessfulBuild(random, AGENT_NAME);
     }
 
-    public void testDetailedView() throws Exception
+    public void testDetailsView() throws Exception
     {
-        addProject(random, true);
+        final String UPSTREAM_ARTIFACT = "file";
+        final String BUILD_FIELD_PROCESSOR = "build field processor";
+        final String FEATURES_PROCESSOR = "features processor";
+
+        String upstreamProjectName = random + "-upstream";
+        Hashtable<String, Object> upstreamAntConfig = xmlRpcHelper.getAntConfig();
+        upstreamAntConfig.put(Project.AntCommand.ARGUMENTS, "-Dcreate.list=file.txt");
+        upstreamAntConfig.put(Project.AntCommand.TARGETS, "create");
+        String upstreamProjectPath = xmlRpcHelper.insertSingleCommandProject(upstreamProjectName, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(DEP_ANT_REPOSITORY), upstreamAntConfig);
+        insertFileArtifact(upstreamProjectPath, UPSTREAM_ARTIFACT, "file.txt", null, true);
+        xmlRpcHelper.runBuild(upstreamProjectName, BUILD_TIMEOUT);
+        
+        String mainProjectName = random + "-main";
+        String mainProjectPath = xmlRpcHelper.insertSingleCommandProject(mainProjectName, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(ALL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        insertTestCapture(mainProjectPath, JUNIT_PROCESSOR);
+
+        String mainProcessorsPath = getPath(mainProjectPath, POSTPROCESSORS);
+        Hashtable<String, Object> buildFieldsProcessorConfig = xmlRpcHelper.createDefaultConfig(CustomFieldsPostProcessorConfiguration.class);
+        buildFieldsProcessorConfig.put(NAME, BUILD_FIELD_PROCESSOR);
+        buildFieldsProcessorConfig.put("scope", FieldScope.BUILD.toString());
+        xmlRpcHelper.insertConfig(mainProcessorsPath, buildFieldsProcessorConfig);
+
+        Hashtable<String, Object> featuresProcessorConfig = xmlRpcHelper.createDefaultConfig(RegexPostProcessorConfiguration.class);
+        featuresProcessorConfig.put(NAME, FEATURES_PROCESSOR);
+        featuresProcessorConfig.put("leadingContext", 2);
+        featuresProcessorConfig.put("trailingContext", 2);
+        Vector<Hashtable<String, Object>> patterns = new Vector<Hashtable<String, Object>>(3);
+        patterns.add(createRegexPattern(Feature.Level.ERROR, "^error:"));
+        patterns.add(createRegexPattern(Feature.Level.WARNING, "^warning:"));
+        patterns.add(createRegexPattern(Feature.Level.INFO, "^info:"));
+        featuresProcessorConfig.put("patterns", patterns);
+        xmlRpcHelper.insertConfig(mainProcessorsPath, featuresProcessorConfig);
+        
+        insertFileArtifact(mainProjectPath, "custom fields", "build.properties", BUILD_FIELD_PROCESSOR, false);
+        insertFileArtifact(mainProjectPath, "stage fields", "stage.properties", CUSTOM_FIELD_PROCESSOR, false);
+        insertFileArtifact(mainProjectPath, "features", "features.txt", FEATURES_PROCESSOR, false);
+
+        String mainDependenciesPath = getPath(mainProjectPath, DEPENDENCIES);
+        Hashtable<String, Object> dependenciesConfig = xmlRpcHelper.getConfig(mainDependenciesPath);
+        dependenciesConfig.put("syncDestination", false);
+        xmlRpcHelper.saveConfig(mainDependenciesPath, dependenciesConfig, false);
+        
+        Hashtable<String, Object> dependencyConfig = xmlRpcHelper.createDefaultConfig(DependencyConfiguration.class);
+        dependencyConfig.put("project", upstreamProjectPath);
+        xmlRpcHelper.insertConfig(getPath(mainDependenciesPath, DEPENDENCIES), dependencyConfig);
+        
+        xmlRpcHelper.runBuild(mainProjectName, BUILD_TIMEOUT);
 
         loginAsAdmin();
-        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
+        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, mainProjectName, 1L);
+        assertTrue(detailsPage.isBuildBasicsPresent());
+        assertEquals(asPair("status", "failure"), detailsPage.getBuildBasicsRow(0));
+        assertTrue(detailsPage.isBuildBasicsPresent());
+        assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
+        assertFalse(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
+        assertFalse(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
+        assertTrue(detailsPage.isCustomFieldsTablePresent());
+        assertEquals(asPair("property1", "value1"), detailsPage.getCustomField(0));
+        assertTrue(detailsPage.isDependenciesTablePresent());
+        
+        detailsPage.clickStageAndWait(ProjectConfigurationWizard.DEFAULT_STAGE);
+        assertFalse(detailsPage.isBuildBasicsPresent());
+        assertTrue(detailsPage.isStageBasicsPresent());
+        assertEquals(asPair("status", "failure"), detailsPage.getStageBasicsRow(0));
+        assertEquals(asPair("recipe", "[default]"), detailsPage.getStageBasicsRow(1));
+        assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
+        assertFalse(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
+        assertFalse(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
+        assertTrue(detailsPage.isCustomFieldsTablePresent());
+        assertEquals(asPair("stageproperty1", "value1"), detailsPage.getCustomField(0));
 
-        BuildDetailedViewPage detailedViewPage = browser.openAndWaitFor(BuildDetailedViewPage.class, random, 1L);
-        browser.waitForLocator(LOCATOR_ENV_ARTIFACT);
-        assertFalse(browser.isVisible(LOCATOR_ENV_ARTIFACT));
-        detailedViewPage.clickCommand("default", "build");
-        assertTrue(browser.isVisible(LOCATOR_ENV_ARTIFACT));
-        browser.click(LOCATOR_ENV_ARTIFACT);
-        browser.waitForPageToLoad(10 * SECOND);
-        assertTextPresent("Process Environment");
+        detailsPage.clickCommandAndWait(ProjectConfigurationWizard.DEFAULT_STAGE, ProjectConfigurationWizard.DEFAULT_COMMAND);
+        assertFalse(detailsPage.isBuildBasicsPresent());
+        assertFalse(detailsPage.isStageBasicsPresent());
+        assertTrue(detailsPage.isCommandBasicsPresent());
+        assertEquals(asPair("status", "failure"), detailsPage.getCommandBasicsRow(0));
+        assertTrue(detailsPage.isCommandPropertiesPresent());
+        assertEquals(asPair("build file", "build.xml"), detailsPage.getCommandPropertiesRow(0));
+        assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
+        assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
+        assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
+        assertTextPresent("error feature");
+        assertTextPresent("warning feature");
+        assertTextPresent("info feature");
+        assertTextPresent("context line 1");
+        assertTextPresent("info context line 2");
+    }
 
-        detailedViewPage.openAndWaitFor();
-        detailedViewPage.clickCommand("default", "build");
-        browser.click("link=decorated");
-        browser.waitForPageToLoad(10 * SECOND);
-        assertElementPresent("decorated");
+    private Hashtable<String, Object> createRegexPattern(Feature.Level category, String expression)  throws Exception
+    {
+        Hashtable<String, Object> pattern = xmlRpcHelper.createDefaultConfig(RegexPatternConfiguration.class);
+        pattern.put("category", category.toString());
+        pattern.put("expression", expression);
+        return pattern;
+    }
+
+    private void insertFileArtifact(String projectPath, String name, String file, String processorName, boolean publish) throws Exception
+    {
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        artifactConfig.put(NAME, name);
+        artifactConfig.put(FILE, file);
+        if (processorName != null)
+        {
+            artifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
+        }
+        artifactConfig.put(PUBLISH, publish);
+        xmlRpcHelper.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
     }
 
     public void testPulseEnvironmentVariables() throws Exception
@@ -456,7 +553,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.runBuild(random);
 
         loginAsAdmin();
-        goToArtifact(random, 1, "mess", LOCATOR_OUTPUT_ARTIFACT);
+        goToArtifact(random, 1, "mess", OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
         assertTextPresent(TRIVIAL_ANT_REPOSITORY);
     }
 
@@ -573,7 +670,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put(NAME, ARTIFACT_NAME);
-        artifactConfig.put(FILE, ARTIFACT_FILENAME);
+        artifactConfig.put(Project.Command.FileArtifact.FILE, ARTIFACT_FILENAME);
         artifactConfig.put(TYPE, CONTENT_TYPE);
         xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
@@ -1107,14 +1204,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void goToEnv(String projectName, long buildId)
     {
-        goToArtifact(projectName, buildId, "build", LOCATOR_ENV_ARTIFACT);
+        goToArtifact(projectName, buildId, "build", ExecutableCommand.ENV_ARTIFACT_NAME, ExecutableCommand.ENV_FILENAME);
     }
 
-    private void goToArtifact(String projectName, long buildId, String command, String artifact)
+    private void goToArtifact(String projectName, long buildId, String command, String artifact, String file)
     {
-        BuildDetailedViewPage detailedViewPage = browser.openAndWaitFor(BuildDetailedViewPage.class, projectName, buildId);
-        detailedViewPage.clickCommand("default", command);
-        browser.click(artifact);
+        BuildArtifactsPage artifactsPage = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildId);
+        artifactsPage.setFilterAndWait("");
+        artifactsPage.clickArtifactFileDownload(artifact, file);
         browser.waitForPageToLoad(10 * SECOND);
     }
 

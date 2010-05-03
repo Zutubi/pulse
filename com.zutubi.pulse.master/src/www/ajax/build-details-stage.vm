@@ -1,0 +1,20 @@
+#set($result = $recipeResultNode.result)
+<table id="stage-basics" class="two-content">
+    <tr><th class="two-heading" colspan="2">#wwtext("name=stage") #html($recipeResultNode.stageName)</th></tr>
+    #resultBasicsRow("status" "#statusImage($result true) $result.state.prettyString")
+    #resultBasicsRow("recipe" "#html($result.recipeNameSafe)")
+    #resultBasicsRow("agent" "#html($recipeResultNode.hostSafe)")
+    #resultBasicsRow("tests" "$result.testSummary")
+    #resultBasicsRow("when" "$result.stamps.getPrettyStartDate($locale) ($result.stamps.prettyStartTime)")
+#if($result.completed())
+    #resultBasicsRow("completed" "$result.stamps.getPrettyEndDate($locale) ($result.stamps.prettyEndTime)")
+#end
+    #resultBasicsRow("elapsed" "$result.stamps.prettyElapsed")
+#if($result.completed())
+    #resultBasicsRow("errors" "$result.errorFeatureCount")
+    #resultBasicsRow("warnings" "$result.warningFeatureCount")
+#end
+</table>
+
+#resultFeatureTables($result)
+#resultCustomFields($result)

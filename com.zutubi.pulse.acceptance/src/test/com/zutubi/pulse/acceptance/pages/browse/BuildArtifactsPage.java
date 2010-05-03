@@ -176,4 +176,21 @@ public class BuildArtifactsPage extends SeleniumPage
         String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]/td[contains(@class, 'artifact-hash')]/div";
         return browser.getText(locator).trim();
     }
+
+    /**
+     * Clicks on the download action link for the given artifact file.
+     * 
+     * @param artifactName name of the artifact the file is captured within
+     * @param fileName     name of the file to click the download link of
+     */
+    public void clickArtifactFileDownload(String artifactName, String fileName)
+    {
+        clickArtifactFileAction(artifactName, fileName, "download");
+    }
+
+    private void clickArtifactFileAction(String artifactName, String fileName, String type)
+    {
+        String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]//img[@alt='" + type + "']";
+        browser.click(locator);
+    }
 }

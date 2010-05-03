@@ -540,9 +540,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("Recipe '[default]' completed with status failure");
         
         browser.click(IDs.buildDetailsTab());
-        PersonalBuildDetailedViewPage detailedViewPage = browser.createPage(PersonalBuildDetailedViewPage.class, buildNumber);
-        detailedViewPage.waitFor();
-        detailedViewPage.clickCommand("default", "build");
+        PersonalBuildDetailsPage detailsPage = browser.createPage(PersonalBuildDetailsPage.class, buildNumber);
+        detailsPage.waitFor();
+        detailsPage.clickCommandAndWait("default", "build");
         assertTextPresent("nosuchcommand");
 
         browser.click(IDs.buildChangesTab());

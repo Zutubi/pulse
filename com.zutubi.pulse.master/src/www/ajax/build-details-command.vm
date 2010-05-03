@@ -1,0 +1,30 @@
+<table id="command-basics" class="two-content">
+    <tr><th class="two-heading" colspan="2">#wwtext("name=command") #html($commandResult.commandName)</th></tr>
+    #resultBasicsRow("status" "#statusImage($commandResult true) $commandResult.state.prettyString")
+    #resultBasicsRow("when" "$commandResult.stamps.getPrettyStartDate($locale) ($commandResult.stamps.prettyStartTime)")
+#if($commandResult.completed())
+    #resultBasicsRow("completed" "$commandResult.stamps.getPrettyEndDate($locale) ($commandResult.stamps.prettyEndTime)")
+#end
+    #resultBasicsRow("elapsed" "$commandResult.stamps.prettyElapsed")
+#if($commandResult.completed())
+    #resultBasicsRow("errors" "$commandResult.errorFeatureCount")
+    #resultBasicsRow("warnings" "$commandResult.warningFeatureCount")
+#end
+</table>
+
+#resultPropertyTable($commandResult.properties "command-properties" "command.properties")
+
+#foreach($level in $featureLevels)
+    #if($commandResult.hasMessages($level))
+<table id="features-${level.prettyString}" class="two-content spaced">
+    <tr><th class="two-heading">#wwtext("name=features.${level.prettyString}")</th></tr>
+    <tr>
+        <td class="content leftmost rightmost">
+            <ul>
+                #commandMessageSummary($buildResult $recipeResultNode.result $commandResult $level)
+            </ul>
+        </td>
+    </tr>
+</table>
+    #end
+#end

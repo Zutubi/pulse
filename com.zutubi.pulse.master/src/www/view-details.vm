@@ -1,0 +1,111 @@
+#helpTag("Build+Details+Tab")
+#authorisationTags($principle)
+#buildTags($project $result)
+#if($commandResult)
+    #set($resultId = $commandResult.id)
+#elseif($recipeResultNode)
+    #set($resultId = $recipeResultNode.result.id)
+#else
+    #set($resultId = $buildResult.id)
+#end
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+    <script type="text/javascript">
+        var detailPanel;
+        var resultTree;
+        var paneLoading = false;
+    
+        function onSelect(selectionModel, node)
+        {
+            //var ui = node.getUI();
+            //console.log(ui.getIconEl().className.replace(/\bstatus-.+\b/, ''));
+            paneLoading = true;
+            detailPanel.body.load({
+                url: '${base}/ajax/buildDetailsPanel.action',
+                params: node.attributes.extraAttributes,
+                scripts: true,
+                callback: function(element, success, response) {
+                    paneLoading = false;
+                    if (!success)
+                    {
+                        onSelectFailure(element, response);
+                    }
+                }
+            });
+        }
+        
+        Ext.onReady(function()
+        {
+            detailPanel = new Ext.Panel({
+                layout: 'fit',
+                id: 'detail-panel',
+                contentEl: 'center',
+                border: false,
+                autoScroll: true,
+                bodyStyle: 'padding: 16px'
+            });
+            
+            var center = Ext.getCmp('nested-center');
+            center.add(detailPanel);
+
+            var loader = new ZUTUBI.FSTreeLoader({
+                    baseUrl: '$base',
+                    basePath: 'builds/$result.id',
+                    preloadDepth: 2,
+                    showFiles: true
+            });
+            
+            resultTree = new ZUTUBI.ConfigTree({
+                el: 'result-tree',
+                layout: 'fit',
+                border: false,
+                animate: false,
+                loader: loader,
+                autoScroll: true,
+                bodyStyle: 'padding: 10px'
+            });
+
+            var root = new Ext.tree.AsyncTreeNode({
+                baseName: 'details',
+                text: 'build $result.number',
+                iconCls: 'status-$result.state.string',
+                extraAttributes: {
+                    projectName: '#jss($projectName)',
+                    buildVID: '$result.number',
+                    personal: '$result.personal',
+                    resultId: '$result.id'
+                }
+            });
+            
+            resultTree.setRootNode(root);
+            resultTree.getSelectionModel().on('selectionchange', onSelect);
+
+            var nestedWest = Ext.getCmp('nested-west');
+            nestedWest.add(resultTree);
+
+            resultTree.render();
+            resultTree.on('load', function(node) {
+                if (node.attributes.extraAttributes.resultId == '$resultId')
+                {
+                    node.select();
+                }
+            });
+                
+            nestedWest.show();
+            nestedWest.setWidth(300);
+            viewport.doLayout();
+            root.expand(true);
+        });
+    </script>
+</head>
+<body>
+    #buildTabs($result "details")
+    
+    <div id="result-tree">
+    </div>
+    <div id="detail-panel" style="min-height: 100%">
+        #parse("/template/includes/actionerrors.vm")
+    </div>
+</body>
+</html>

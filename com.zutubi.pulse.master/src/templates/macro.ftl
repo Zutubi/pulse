@@ -30,7 +30,7 @@ Returns a link to the tests page for a build result.
 [/#function]
 
 [#---------------------------------------------------------------------------
-Returns a link to the detailed view page for a build stage.
+Returns a link to the details page for a build stage.
 ----------------------------------------------------------------------------]
 [#function stageDetailsLink result node]
     [#return externalUrls.stageDetails(result, node)/]

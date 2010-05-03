@@ -35,8 +35,8 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     /**
      * The name of the execution environment artifact.
      */
-    static final String ENV_ARTIFACT_NAME = "environment";
-    static final String ENV_FILENAME = "env.txt";
+    public static final String ENV_ARTIFACT_NAME = "environment";
+    public static final String ENV_FILENAME = "env.txt";
 
     private volatile Process child;
     private volatile int pid;

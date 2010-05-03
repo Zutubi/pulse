@@ -521,6 +521,10 @@ Browse view
     border-collapse: collapse;
 }
 
+table.spaced {
+    margin-top: 20px;
+}
+
 .two-content .content, .two-content .content-right, .two-content td {
     border: dotted 1px #bbb;
 }
@@ -802,6 +806,37 @@ Build tabs
     font-weight: normal;
     font-style: italic;
     float: right    
+}
+
+.x-tree-node-collapsed .status-pending, .x-tree-node-expanded .status-pending, .x-tree-node-leaf .status-pending
+{
+	background-image: url(../images/hourglass.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .status-inprogress, .x-tree-node-expanded .status-inprogress, .x-tree-node-leaf .status-inprogress
+{
+	background-image: url(../images/inprogress.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .status-terminating, .x-tree-node-expanded .status-terminating, .x-tree-node-leaf .status-terminating
+{
+	background-image: url(../images/stop.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .status-success, .x-tree-node-expanded .status-success, .x-tree-node-leaf .status-success
+{
+	background-image: url(../images/accept.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .status-failure, .x-tree-node-expanded .status-failure, .x-tree-node-leaf .status-failure,
+.x-tree-node-collapsed .status-error, .x-tree-node-expanded .status-error, .x-tree-node-leaf .status-error
+{
+	background-image: url(../images/exclamation.gif);
+    width: 20px;
 }
 
 .x-tree-node-collapsed .artifact-broken, .x-tree-node-expanded .artifact-broken, .x-tree-node-leaf .artifact-broken

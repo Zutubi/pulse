@@ -12,11 +12,11 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.util.List;
 
 /**
- * <class comment/>
+ * Represents the working copies for a build, keyed by stage.
  */
-public class WorkingCopyContextFileObject extends AbstractPulseFileObject
+public class BuildWorkingCopiesFileObject extends AbstractPulseFileObject
 {
-    public WorkingCopyContextFileObject(final FileName name, final AbstractFileSystem fs)
+    public BuildWorkingCopiesFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }

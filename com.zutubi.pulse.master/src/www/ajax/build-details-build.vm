@@ -1,0 +1,62 @@
+<table id="build-basics" class="two-content">
+    <tr><th class="two-heading" colspan="2">#wwtext("name=build") $buildResult.number</th></tr>
+    #resultBasicsRow("status" "#statusImage($buildResult true) $buildResult.state.prettyString")
+    #resultBasicsRow("reason" "#html($buildResult.reason.summary)")
+#if($buildResult.revision)
+    #resultBasicsRow("rev" "$buildResult.revision")
+#else
+    #resultBasicsRow("rev" $action.getText("revision.none"))
+#end
+    #resultBasicsRow("tests" "$buildResult.testSummary")
+    #resultBasicsRow("when" "$buildResult.stamps.getPrettyStartDate($locale) ($buildResult.stamps.prettyStartTime)")
+#if($buildResult.completed())
+    #resultBasicsRow("completed" "$buildResult.stamps.getPrettyEndDate($locale) ($buildResult.stamps.prettyEndTime)")
+#end
+    #resultBasicsRow("elapsed" "$buildResult.stamps.prettyElapsed")
+#if($buildResult.completed())
+    #resultBasicsRow("errors" "$buildResult.errorFeatureCount")
+    #resultBasicsRow("warnings" "$buildResult.warningFeatureCount")
+#end
+</table>
+
+#resultFeatureTables($result)
+#resultCustomFields($result)
+
+#if($dependencyDetailsPresent)
+    <table id="build-dependencies" class="two-content spaced">
+        <tr><th colspan="4" class="two-heading">#wwtext("name=dependencies.header")</th></tr>
+        <tr>
+            <th class="content leftmost">#wwtext("name=dependencies.column.project")</th>
+            <th class="content">#wwtext("name=dependencies.column.build")</th>
+            <th class="content">#wwtext("name=dependencies.column.stage")</th>
+            <th class="content rightmost">#wwtext("name=dependencies.column.artifact")</th>
+        </tr>
+    #foreach($detail in $dependencyDetails)
+        #if ($detail.reportAvailable)
+            #foreach($dependency in $detail.dependencies)
+            <tr>
+                #if ($dependency.projectUrl)
+                    <td class="content leftmost"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
+                #else
+                    <td class="content leftmost">#html($dependency.projectName)</td>
+                #end
+                #if($dependency.buildUrl)
+                    <td class="content"><a href="$dependency.buildUrl">#html($dependency.buildName)</a></td>
+                #else
+                    <td class="content">#html($dependency.buildName)</td>
+                #end
+                <td class="content">#html($dependency.stageName)</td>
+                #if ($dependency.artifactUrl)
+                    <td class="content rightmost"><a id='#id("${dependency.projectName}-${dependency.stageName}-${dependency.artifactName}")' href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
+                #else
+                    <td class="content rightmost">#html($dependency.artifactName)</td>
+                #end
+            </tr>
+            #end
+        #else
+            <td colspan="4" class="content leftmost rightmost"><b>#html($detail.stageName)</b> stage dependency details are not available.  They have most likely been cleaned up.</td>
+        #end
+    #end
+    </table>
+</div>
+#end

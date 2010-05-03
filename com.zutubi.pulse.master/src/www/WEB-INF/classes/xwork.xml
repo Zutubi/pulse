@@ -122,9 +122,9 @@
             <result name="success" type="velocity">/view-test-suite.vm</result>
         </action>
 
-        <action name="viewCommandLog" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+        <action name="viewDetails" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/view-command-log.vm</result>
+            <result name="success" type="velocity">/view-details.vm</result>
         </action>
 
         <action name="viewBuildArtifacts" class="com.zutubi.pulse.master.xwork.actions.project.ViewArtifactsAction">
@@ -422,6 +422,10 @@
             <result name="success" type="velocity">view-build-panel.vm</result>
         </action>
 
+        <action name="buildDetailsPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+            <result name="success" type="velocity">build-details-panel.vm</result>
+        </action>
+        
         <action name="tailBuildLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>

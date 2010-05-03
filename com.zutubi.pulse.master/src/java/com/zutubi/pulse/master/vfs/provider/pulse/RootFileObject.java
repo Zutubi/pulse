@@ -20,9 +20,10 @@ public class RootFileObject extends StaticMappingFileObject
     public static final String NODE_TEMPLATES       = "templates";
     public static final String NODE_WIZARDS         = "wizards";
 
+    static
     {
         // setup the default root node definitions.
-        nodesDefinitions.put(NODE_ARTIFACTS, ArtifactsFileObject.class);
+        nodesDefinitions.put(NODE_ARTIFACTS, GlobalArtifactsFileObject.class);
         nodesDefinitions.put(NODE_BUILDS, BuildsFileObject.class);
         nodesDefinitions.put(NODE_CONFIG, ConfigFileObject.class);
         nodesDefinitions.put(NODE_PLUGINS, PluginsFileObject.class);

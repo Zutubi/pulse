@@ -15,11 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class comment/>
+ * Represents the artifacts in a single build result, keyed by stage.
  */
-public class ArtifactsContextFileObject extends AbstractPulseFileObject implements AddressableFileObject, ComparatorProvider
+public class BuildArtifactsFileObject extends AbstractPulseFileObject implements AddressableFileObject, ComparatorProvider
 {
-    public ArtifactsContextFileObject(final FileName name, final AbstractFileSystem fs)
+    public BuildArtifactsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
@@ -95,23 +95,6 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
             return provider.getBuildResult();
         }
         return null;
-    }
-
-    protected long getBuildResultId()
-    {
-        try
-        {
-            BuildResultProvider provider = getAncestor(BuildResultProvider.class);
-            if (provider != null)
-            {
-                return provider.getBuildResultId();
-            }
-            return -1;
-        }
-        catch (FileSystemException e)
-        {
-            return -1;
-        }
     }
 
     public boolean isLocal()

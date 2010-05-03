@@ -1,8 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
-import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
@@ -10,6 +8,7 @@ import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -143,9 +142,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildRunner.triggerSuccessfulBuild(projectA);
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
-        BuildDetailedViewPage page = browser.openAndWaitFor(BuildDetailedViewPage.class, projectB.getName(), 1L);
-        assertTrue(page.isBuildLogLinkPresent());
-        StageLogPage log = page.clickStageLogLink("default");
+        StageLogPage log = browser.openAndWaitFor(StageLogPage.class, projectB.getName(), 1L, "default");
         assertTrue(log.isLogAvailable());
 
         if (browser.isFirefox())

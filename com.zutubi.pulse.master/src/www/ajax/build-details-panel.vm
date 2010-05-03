@@ -1,0 +1,9 @@
+<div id='#id("${result.ownerName}-build-${result.number}-details")'>
+#if($commandResult)
+   #parse("ajax/build-details-command.vm")
+#elseif($recipeResultNode)
+   #parse("ajax/build-details-stage.vm")
+#else
+    #parse("ajax/build-details-build.vm")
+#end
+</div>

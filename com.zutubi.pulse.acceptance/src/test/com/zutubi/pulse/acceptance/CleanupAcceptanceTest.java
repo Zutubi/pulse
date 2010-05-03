@@ -6,11 +6,12 @@ import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -327,30 +328,22 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     private BuildLogPage openBuildLogsUI(String projectName, long buildNumber)
     {
-        BuildDetailedViewPage page = browser.createPage(BuildDetailedViewPage.class, projectName, buildNumber);
+        BuildLogPage page = browser.createPage(BuildLogPage.class, projectName, buildNumber);
         if (!canOpenPage(page))
         {
-            fail("Failed to open detailed build page.");
+            fail("Failed to open build log page.");
         }
-        if (!page.isBuildLogLinkPresent())
-        {
-            fail("Failed to locate build log link.");
-        }
-        return page.clickBuildLogLink();
+        return page;
     }
 
     private StageLogPage openStageLogsUI(String projectName, long buildNumber, String stageName)
     {
-        BuildDetailedViewPage page = browser.createPage(BuildDetailedViewPage.class, projectName, buildNumber);
+        StageLogPage page = browser.createPage(StageLogPage.class, projectName, buildNumber, stageName);
         if (!canOpenPage(page))
         {
-            fail("Failed to open detailed build page.");
+            fail("Failed to open stage log page.");
         }
-        if (!page.isStageLogLinkPresent(stageName))
-        {
-            fail("Failed to locate stage log link.");
-        }
-        return page.clickStageLogLink(stageName);
+        return page;
     }
 
     public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
