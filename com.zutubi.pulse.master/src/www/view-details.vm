@@ -15,18 +15,26 @@
         var detailPanel;
         var resultTree;
         var paneLoading = false;
-    
+        var selectedResultId = '$resultId';
+
         function onSelect(selectionModel, node)
         {
-            //var ui = node.getUI();
-            //console.log(ui.getIconEl().className.replace(/\bstatus-.+\b/, ''));
+            if (!node) return;
+
             paneLoading = true;
+            var scrollPosition = detailPanel.body.getScroll();
             detailPanel.body.load({
                 url: '${base}/ajax/buildDetailsPanel.action',
                 params: node.attributes.extraAttributes,
                 scripts: true,
                 callback: function(element, success, response) {
                     paneLoading = false;
+                    if (scrollPosition)
+                    {
+                        element.scrollTo('left', scrollPosition.left);
+                        element.scrollTo('top', scrollPosition.top);
+                    }
+
                     if (!success)
                     {
                         onSelectFailure(element, response);
@@ -50,10 +58,11 @@
             center.add(detailPanel);
 
             var loader = new ZUTUBI.FSTreeLoader({
-                    baseUrl: '$base',
-                    basePath: 'builds/$result.id',
-                    preloadDepth: 2,
-                    showFiles: true
+                baseUrl: '$base',
+                basePath: 'builds/$result.id',
+                preloadDepth: 2,
+                showFiles: true,
+                clearOnLoad: true
             });
             
             resultTree = new ZUTUBI.ConfigTree({
@@ -86,16 +95,61 @@
 
             resultTree.render();
             resultTree.on('load', function(node) {
-                if (node.attributes.extraAttributes.resultId == '$resultId')
+                if (node.attributes.extraAttributes.resultId == selectedResultId)
                 {
                     node.select();
                 }
             });
-                
+
             nestedWest.show();
             nestedWest.setWidth(300);
             viewport.doLayout();
+
+#if($refreshInterval || $principle.preferences.refreshingEnabled)
+            function refreshDetails()
+            {
+                var rootNode = resultTree.getRootNode();
+
+                Ext.Ajax.request({
+                    url: '$base/ajax/getBuildStatus.action',
+                    params: {
+                        buildId: '$result.id'
+                    },
+                    success: function(rspObj) {
+                        var status = Ext.util.JSON.decode(rspObj.responseText);
+                        var iconEl = rootNode.getUI().getIconEl();
+                        iconEl.className = iconEl.className.replace(/\bstatus-.+\b/, 'status-' + status);
+                    }
+                });
+
+                var selectedNode = resultTree.getSelectionModel().getSelectedNode();
+                if (!selectedNode)
+                {
+                    selectedNode = rootNode;
+                }
+
+                selectedResultId = selectedNode.attributes.extraAttributes.resultId;
+                resultTree.getLoader().load(resultTree.getRootNode(), function()
+                {
+                    rootNode.expand(true);
+                });
+            }
+
+    #if($refreshInterval)
+            var refreshInterval = $refreshInterval;
+    #else
+            var refreshInterval = $principle.preferences.refreshInterval;
+    #end
+
+            var runner = new Ext.util.TaskRunner();
+            runner.start({
+                run: refreshDetails,
+                scope: this,
+                interval: 1000 * refreshInterval
+            });
+#else
             root.expand(true);
+#end
         });
     </script>
 </head>
