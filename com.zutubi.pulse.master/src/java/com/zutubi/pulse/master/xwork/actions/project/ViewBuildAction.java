@@ -301,7 +301,7 @@ public class ViewBuildAction extends CommandActionBase
     {
         if(changelists == null)
         {
-            changelists = buildManager.getChangesForBuild(getResult());
+            changelists = buildManager.getChangesForBuild(getResult(), true);
         }
         return changelists;
     }

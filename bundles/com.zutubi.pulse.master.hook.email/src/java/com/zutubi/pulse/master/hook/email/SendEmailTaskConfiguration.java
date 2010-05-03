@@ -234,7 +234,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
         {
-            for (PersistentChangelist change : buildManager.getChangesForBuild(build))
+            for (PersistentChangelist change : buildManager.getChangesForBuild(build, true))
             {
                 String scmLogin = change.getAuthor();
                 // Only bother to map and add if we haven't already done so.

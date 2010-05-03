@@ -270,13 +270,17 @@ public class PulseActionMapper implements ActionMapper
         else if(encodedPath.startsWith(PATH_MY_CHANGES))
         {
             String[] elements = encodedPath.split("/");
-            if(elements.length != 2)
+            if(elements.length < 2)
             {
                 return null;
             }
 
-            Map<String, String> parameters = new HashMap<String, String>(1);
+            Map<String, String> parameters = new HashMap<String, String>(2);
             parameters.put("id", WebUtils.uriComponentDecode(elements[1]));
+            if (elements.length > 2)
+            {
+                parameters.put("startPage", elements[2]);
+            }
             return new ActionMapping("viewChangelist", "default", null, parameters);
         }
         else if(encodedPath.startsWith(PATH_MY_BUILDS))

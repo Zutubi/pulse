@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerUtils.*;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
@@ -14,6 +13,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+
+import static com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerUtils.*;
 
 /**
  * A ChangeViewer for linking to a Fisheye instance.
@@ -92,7 +93,7 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         }
         else
         {
-            return context.getChangelist().getRevision();
+            return context.getRevision();
         }
     }
 

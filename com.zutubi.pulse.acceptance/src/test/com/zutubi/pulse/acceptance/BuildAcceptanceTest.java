@@ -86,9 +86,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String CHANGE_COMMENT = "Edit build file.";
     private static final String CHANGE_FILENAME = "build.xml";
 
-    private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
-    private static final String LOCATOR_OUTPUT_ARTIFACT = "link=output.txt";
-
     private static final String ANT_PROCESSOR = "ant output processor";
     private static final String JUNIT_PROCESSOR = "junit xml report processor";
     private static final String CUSTOM_FIELD_PROCESSOR = "custom field processor";
@@ -553,7 +550,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.runBuild(random);
 
         loginAsAdmin();
-        goToArtifact(random, 1, "mess", OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
+        goToArtifact(random, 1, OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
         assertTextPresent(TRIVIAL_ANT_REPOSITORY);
     }
 
@@ -1204,10 +1201,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void goToEnv(String projectName, long buildId)
     {
-        goToArtifact(projectName, buildId, "build", ExecutableCommand.ENV_ARTIFACT_NAME, ExecutableCommand.ENV_FILENAME);
+        goToArtifact(projectName, buildId, ExecutableCommand.ENV_ARTIFACT_NAME, ExecutableCommand.ENV_FILENAME);
     }
 
-    private void goToArtifact(String projectName, long buildId, String command, String artifact, String file)
+    private void goToArtifact(String projectName, long buildId, String artifact, String file)
     {
         BuildArtifactsPage artifactsPage = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildId);
         artifactsPage.setFilterAndWait("");

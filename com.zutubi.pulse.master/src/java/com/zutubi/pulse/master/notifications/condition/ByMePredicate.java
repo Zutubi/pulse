@@ -18,20 +18,15 @@ public class ByMePredicate implements Predicate<PersistentChangelist>
 
     public boolean satisfied(PersistentChangelist changelist)
     {
-        if (changelist.getChanges() == null || changelist.getChanges().isEmpty())
-        {
-            return false;
-        }
-
         String author = changelist.getAuthor();
-        if(author.equals(user.getLogin()))
+        if (author.equals(user.getLogin()))
         {
             return true;
         }
 
-        for(String alias: user.getPreferences().getAliases())
+        for (String alias: user.getPreferences().getAliases())
         {
-            if(author.equals(alias))
+            if (author.equals(alias))
             {
                 return true;
             }

@@ -3,7 +3,10 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -13,12 +16,14 @@ import java.util.List;
  */
 public class ViewChangesAction extends BuildActionBase
 {
+    private static final int FILE_LIMIT = 5;
+
     private long sinceBuild = 0;
     private BuildResult previous;
     private BuildResult previousSuccessful;
     private BuildResult previousUnsuccessful;
     private BuildResult sinceResult;
-    private List<PersistentChangelist> changelists;
+    private List<ChangelistModel> changelists;
 
     public long getSinceBuild()
     {
@@ -50,7 +55,7 @@ public class ViewChangesAction extends BuildActionBase
         return previousUnsuccessful;
     }
 
-    public List<PersistentChangelist> getChangelists()
+    public List<ChangelistModel> getChangelists()
     {
         return changelists;
     }
@@ -88,7 +93,7 @@ public class ViewChangesAction extends BuildActionBase
             }
         }
 
-        changelists = new LinkedList<PersistentChangelist>();
+        List<PersistentChangelist> rawChangelists = new LinkedList<PersistentChangelist>();
 
         // Get changes for all results after since, up to and including to.
         if (sinceBuild != 0)
@@ -96,15 +101,51 @@ public class ViewChangesAction extends BuildActionBase
             List<BuildResult> resultRange = buildManager.queryBuilds(result.getProject(), ResultState.getCompletedStates(), sinceBuild + 1, result.getNumber() - 1, 0, -1, true, false);
             for(BuildResult r: resultRange)
             {
-                changelists.addAll(buildManager.getChangesForBuild(r));
+                rawChangelists.addAll(buildManager.getChangesForBuild(r, true));
             }
         }
-        changelists.addAll(buildManager.getChangesForBuild(result));
-        Collections.sort(changelists, new ChangelistComparator());
+        rawChangelists.addAll(buildManager.getChangesForBuild(result, true));
+        Collections.sort(rawChangelists, new ChangelistComparator());
+        changelists = CollectionUtils.map(rawChangelists, new Mapping<PersistentChangelist, ChangelistModel>()
+        {
+            public ChangelistModel map(PersistentChangelist persistentChangelist)
+            {
+                return new ChangelistModel(persistentChangelist, buildManager.getChangelistSize(persistentChangelist), buildManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT));
+            }
+        });
         
         previousSuccessful = buildManager.getPreviousBuildResultWithRevision(result, new ResultState[] { ResultState.SUCCESS });
         previousUnsuccessful = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getBrokenStates());
 
         return SUCCESS;
+    }
+    
+    public static class ChangelistModel
+    {
+        private PersistentChangelist changelist;
+        private int changeCount;
+        private List<PersistentFileChange> changes;
+
+        public ChangelistModel(PersistentChangelist changelist, int changeCount, List<PersistentFileChange> changes)
+        {
+            this.changelist = changelist;
+            this.changeCount = changeCount;
+            this.changes = changes;
+        }
+
+        public PersistentChangelist getChangelist()
+        {
+            return changelist;
+        }
+
+        public int getChangeCount()
+        {
+            return changeCount;
+        }
+
+        public List<PersistentFileChange> getChanges()
+        {
+            return changes;
+        }
     }
 }

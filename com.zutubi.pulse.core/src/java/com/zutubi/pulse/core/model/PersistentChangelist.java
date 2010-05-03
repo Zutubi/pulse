@@ -34,12 +34,6 @@ public class PersistentChangelist extends Entity
     private long projectId;
     private long resultId;
 
-    /**
-     * Cached version of an equivalent changelist.  Cacheable as changelists
-     * are immutable.  Created on demand (null until then).
-     */
-    private Changelist changelist = null;
-
     // For hibernate
     PersistentChangelist()
     {
@@ -72,24 +66,6 @@ public class PersistentChangelist extends Entity
                 return new PersistentFileChange(change);
             }
         });
-
-        changelist = data;
-    }
-
-    public Changelist asChangelist()
-    {
-        if (changelist == null)
-        {
-            changelist = new Changelist(revision, time, author, comment, CollectionUtils.map(changes, new Mapping<PersistentFileChange, FileChange>()
-            {
-                public FileChange map(PersistentFileChange persistentFileChange)
-                {
-                    return persistentFileChange.asChange();
-                }
-            }));
-        }
-
-        return changelist;
     }
 
     public Date getDate()
@@ -212,6 +188,45 @@ public class PersistentChangelist extends Entity
     public void setResultId(long resultId)
     {
         this.resultId = resultId;
+    }
+
+    /**
+     * Compares changelists by equivalence.  The comparison uses all properties
+     * of the change except for the file changes.  Thus if two changelists
+     * occur at the same time, by the same author, with the same comment and
+     * creating the same revision they are deemed equivalent.  This is
+     * important for identifying the same changelist when found by different
+     * {@link com.zutubi.pulse.core.scm.api.ScmClient}s.
+     *
+     * @param other changelist to compare to
+     * @return true iff the other changelist is deemed to represent the same
+     *         changelist as this one
+     */
+    public boolean isEquivalent(PersistentChangelist other)
+    {
+        if (this == other)
+        {
+            return true;
+        }
+
+        if (time != other.time)
+        {
+            return false;
+        }
+        if (author != null ? !author.equals(other.author) : other.author != null)
+        {
+            return false;
+        }
+        if (comment != null ? !comment.equals(other.comment) : other.comment != null)
+        {
+            return false;
+        }
+        if (revision != null ? !revision.equals(other.revision) : other.revision != null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public String toString()

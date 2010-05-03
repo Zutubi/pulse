@@ -29,7 +29,7 @@ public class DefaultRenderService implements RenderService
         dataMap.put("status", result.succeeded() ? "healthy" : "broken");
         dataMap.put("result", result);
         dataMap.put("model", result);
-        dataMap.put("changelists", buildManager.getChangesForBuild(result));
+        dataMap.put("changelists", buildManager.getChangesForBuild(result, true));
         dataMap.put("errorLevel", Feature.Level.ERROR);
         dataMap.put("infoLevel", Feature.Level.INFO);
         dataMap.put("warningLevel", Feature.Level.WARNING);

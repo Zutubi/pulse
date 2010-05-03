@@ -2636,7 +2636,7 @@ public class RemoteApi
                 public Vector<Hashtable<String, Object>> process()
                 {
                     Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-                    List<PersistentChangelist> changelists = buildManager.getChangesForBuild(build);
+                    List<PersistentChangelist> changelists = buildManager.getChangesForBuild(build, true);
                     for (PersistentChangelist change : changelists)
                     {
                         result.add(convertChangelist(change));

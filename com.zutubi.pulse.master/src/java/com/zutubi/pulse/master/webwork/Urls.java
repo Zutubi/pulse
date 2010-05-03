@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
@@ -115,6 +116,11 @@ public class Urls
     public String dashboardPreferences()
     {
         return dashboard() + "preferences/";
+    }
+
+    public String dashboardChangelist(long id)
+    {
+        return dashboard() + "changes/" + id + "/";
     }
 
     public String browse()

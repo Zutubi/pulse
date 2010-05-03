@@ -2,11 +2,10 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
-
-import java.util.Collections;
 
 public class ViewVCChangeViewerTest extends PulseTestCase
 {
@@ -71,8 +70,7 @@ public class ViewVCChangeViewerTest extends PulseTestCase
 
     private ChangeContext getContext()
     {
-        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
-        return new ChangeContextImpl(changelist, null, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, null, mockScmClient, null);
     }
 
     private FileChange getFileChange(String filePath)

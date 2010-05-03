@@ -45,7 +45,8 @@
     ##-------------------------------------------------------------------------
     ## Changes list (one table per change)
     ##-------------------------------------------------------------------------
-    #foreach($change in $changelists)
+    #foreach($model in $changelists)
+        #set($change = $model.changelist)
         #set($changeIndex = $velocityCount)
         $action.updateChangeUrl($change)
         #set($url = $action.getChangeUrl())
@@ -91,19 +92,19 @@
         #end
             </td>
         </tr>
-        #if($change.changes.size() > 0)
+        #if($model.changeCount > 0)
         <tr>
             <td class="change-files">
                 <ul>
-            #if($change.changes.size() < 5)
-                #set($limit = $change.changes.size() - 1)
+            #if($model.changeCount < 5)
+                #set($limit = $model.changeCount - 1)
                 #set($remaining = 0)
             #else
                 #set($limit = 4)
-                #set($remaining = $change.changes.size() - 5)
+                #set($remaining = $model.changeCount - 5)
             #end
             #foreach($i in [0..$limit])
-                #set($file = $change.changes.get($i))
+                #set($file = $model.changes.get($i))
                     <li id="change.${changeIndex}.file.${velocityCount}">$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.toString()</li>
             #end
             #if($remaining > 0)

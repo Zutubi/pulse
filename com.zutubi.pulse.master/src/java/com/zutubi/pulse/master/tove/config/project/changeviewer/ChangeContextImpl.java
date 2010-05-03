@@ -8,22 +8,22 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
  */
 public class ChangeContextImpl implements ChangeContext
 {
-    private Changelist changelist;
+    private Revision revision;
     private ScmConfiguration scmConfiguration;
     private ScmClient scmClient;
     private ScmContext scmContext;
 
-    public ChangeContextImpl(Changelist changelist, ScmConfiguration scmConfiguration, ScmClient scmClient, ScmContext scmContext)
+    public ChangeContextImpl(Revision revision, ScmConfiguration scmConfiguration, ScmClient scmClient, ScmContext scmContext)
     {
-        this.changelist = changelist;
+        this.revision = revision;
         this.scmConfiguration = scmConfiguration;
         this.scmClient = scmClient;
         this.scmContext = scmContext;
     }
 
-    public Changelist getChangelist()
+    public Revision getRevision()
     {
-        return changelist;
+        return revision;
     }
 
     public ScmConfiguration getScmConfiguration()
@@ -43,7 +43,7 @@ public class ChangeContextImpl implements ChangeContext
 
     public Revision getPreviousChangelistRevision() throws ScmException
     {
-        return scmClient.getPreviousRevision(scmContext, changelist.getRevision(), false);
+        return scmClient.getPreviousRevision(scmContext, revision, false);
     }
 
     public Revision getPreviousFileRevision(FileChange fileChange) throws ScmException

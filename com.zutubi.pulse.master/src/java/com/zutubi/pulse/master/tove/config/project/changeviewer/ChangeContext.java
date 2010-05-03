@@ -10,9 +10,9 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 public interface ChangeContext
 {
     /**
-     * @return the changelist that this operation relates to
+     * @return the revision of the changelist that this operation relates to
      */
-    Changelist getChangelist();
+    Revision getRevision();
 
     /**
      * @return the configuration of the SCM implementation that created the

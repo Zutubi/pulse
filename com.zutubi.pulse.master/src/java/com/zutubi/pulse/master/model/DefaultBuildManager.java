@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -38,6 +36,9 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -377,9 +378,19 @@ public class DefaultBuildManager implements BuildManager
         return changelistDao.findLatestByProjects(projects, max);
     }
 
-    public List<PersistentChangelist> getChangesForBuild(BuildResult result)
+    public List<PersistentChangelist> getChangesForBuild(BuildResult result, boolean allowEmpty)
     {
-        return changelistDao.findByResult(result.getId());
+        return changelistDao.findByResult(result.getId(), allowEmpty);
+    }
+
+    public int getChangelistSize(PersistentChangelist changelist)
+    {
+        return changelistDao.getSize(changelist);
+    }
+    
+    public List<PersistentFileChange> getChangelistFiles(PersistentChangelist changelist, int offset, int max)
+    {
+        return changelistDao.getFiles(changelist, offset, max);
     }
 
     public void deleteAllBuilds(Project project)
@@ -588,7 +599,7 @@ public class DefaultBuildManager implements BuildManager
                 Revision revision = build.getRevision();
                 if (revision != null)
                 {
-                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
+                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId(), true);
                     for (PersistentChangelist change : changelists)
                     {
                         changelistDao.delete(change);

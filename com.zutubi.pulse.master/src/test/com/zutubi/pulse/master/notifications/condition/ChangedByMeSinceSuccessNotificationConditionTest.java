@@ -14,15 +14,16 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class ChangedByMeSinceSuccessNotificationConditionTest extends PulseTestCase
 {
@@ -79,7 +80,7 @@ public class ChangedByMeSinceSuccessNotificationConditionTest extends PulseTestC
 
     private void setChanges(BuildResult build, UserConfiguration... authors)
     {
-        stub(buildManager.getChangesForBuild(build)).toReturn(CollectionUtils.map(authors, new Mapping<UserConfiguration, PersistentChangelist>()
+        stub(buildManager.getChangesForBuild(build, false)).toReturn(CollectionUtils.map(authors, new Mapping<UserConfiguration, PersistentChangelist>()
         {
             public PersistentChangelist map(UserConfiguration author)
             {

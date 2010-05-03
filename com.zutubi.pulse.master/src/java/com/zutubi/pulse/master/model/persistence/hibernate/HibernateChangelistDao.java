@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -113,11 +114,10 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         });
 
         // Now eliminate false-positives from hash collisions.
-        Changelist rawChangelist = changelist.asChangelist();
         for (Iterator<PersistentChangelist> it = result.iterator(); it.hasNext(); )
         {
             PersistentChangelist current = it.next();
-            if (!current.asChangelist().equals(rawChangelist))
+            if (!current.isEquivalent(changelist))
             {
                 it.remove();
             }
@@ -126,17 +126,54 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         return result;
     }
 
-    public List<PersistentChangelist> findByResult(final long id)
+    public int getSize(final PersistentChangelist changelist)
     {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Query queryObject = session.createQuery("select count(change) from PersistentChangelist model join model.changes as change where model = :changelist");
+                queryObject.setEntity("changelist", changelist);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
+    public List<PersistentFileChange> getFiles(final PersistentChangelist changelist, final int offset, final int max)
+    {
+        return (List<PersistentFileChange>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Query queryObject = session.createFilter(changelist.getChanges(), "order by ordinal");
+                queryObject.setFirstResult(offset);
+                queryObject.setMaxResults(max);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+    }
+
+    public List<PersistentChangelist> findByResult(final long id, final boolean allowEmpty)
+    {
+        final String queryString;
+        if (allowEmpty)
+        {
+            queryString = "from PersistentChangelist model where model.resultId = :resultId order by model.time desc, model.id desc";
+        }
+        else
+        {
+            queryString = "from PersistentChangelist model where model.resultId = :resultId and size(model.changes) > 0 order by model.time desc, model.id desc";
+        }
+        
         return  (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.resultId = :resultId order by model.time desc, model.id desc");
+                Query queryObject = session.createQuery(queryString);
                 queryObject.setParameter("resultId", id);
-
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -187,19 +224,19 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
 
     private void addUnique(Collection<PersistentChangelist> lists, Collection<PersistentChangelist> toAdd)
     {
-        for(PersistentChangelist candidate: toAdd)
+        for (PersistentChangelist candidate: toAdd)
         {
             boolean found = false;
-            for(PersistentChangelist existing: lists)
+            for (PersistentChangelist existing: lists)
             {
-                if(existing.asChangelist().equals(candidate.asChangelist()))
+                if (existing.isEquivalent(candidate))
                 {
                     found = true;
                     break;
                 }
             }
 
-            if(!found)
+            if (!found)
             {
                 lists.add(candidate);
             }

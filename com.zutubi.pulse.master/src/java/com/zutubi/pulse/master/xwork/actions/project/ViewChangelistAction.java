@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeContext;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeContextImpl;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.PagingSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
@@ -32,8 +33,15 @@ public class ViewChangelistAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ViewChangelistAction.class);
 
+    /**
+     * The maximum number of files to list per page.
+     */
+    private static final int FILES_PER_PAGE = 100;
+
     private long id;
+    private PagingSupport pagingSupport = new PagingSupport(FILES_PER_PAGE);
     private PersistentChangelist changelist;
+    private List<PersistentFileChange> files;
     private BuildManager buildManager;
 
     /**
@@ -139,6 +147,16 @@ public class ViewChangelistAction extends ActionSupport
         return fileModels;
     }
 
+    public PagingSupport getPagingSupport()
+    {
+        return pagingSupport;
+    }
+
+    public void setStartPage(int startPage)
+    {
+        pagingSupport.setStartPage(startPage);
+    }
+
     public String execute()
     {
         changelist = changelistDao.findById(id);
@@ -148,6 +166,9 @@ public class ViewChangelistAction extends ActionSupport
             return ERROR;
         }
 
+        pagingSupport.setTotalItems(changelistDao.getSize(changelist));
+        files = changelistDao.getFiles(changelist, pagingSupport.getStartOffset(), FILES_PER_PAGE);
+        
         if (StringUtils.stringSet(projectName))
         {
             project = projectManager.getProject(projectName, false);
@@ -246,7 +267,7 @@ public class ViewChangelistAction extends ActionSupport
 
     private void createSimpleFileModels()
     {
-        CollectionUtils.map(changelist.getChanges(), new Mapping<PersistentFileChange, FileModel>()
+        CollectionUtils.map(files, new Mapping<PersistentFileChange, FileModel>()
         {
             public FileModel map(PersistentFileChange persistentFileChange)
             {
@@ -264,12 +285,12 @@ public class ViewChangelistAction extends ActionSupport
         {
             ScmContext scmContext = scmManager.createContext(projectWithViewer);
             scmClient = scmManager.createClient(scmConfiguration);
-            final ChangeContext context = new ChangeContextImpl(changelist.asChangelist(), scmConfiguration, scmClient, scmContext);
+            final ChangeContext context = new ChangeContextImpl(changelist.getRevision(), scmConfiguration, scmClient, scmContext);
 
             changeViewerFound = true;
             changeUrl = getChangeUrl(changeViewer, changelist.getRevision());
 
-            CollectionUtils.map(changelist.getChanges(), new Mapping<PersistentFileChange, FileModel>()
+            CollectionUtils.map(files, new Mapping<PersistentFileChange, FileModel>()
             {
                 public FileModel map(PersistentFileChange persistentFileChange)
                 {

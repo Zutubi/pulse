@@ -37,7 +37,7 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
         {
             public Boolean process()
             {
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
+                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result, false);
                 return CollectionUtils.contains(changelists, new ByMePredicate(user));
             }
         });

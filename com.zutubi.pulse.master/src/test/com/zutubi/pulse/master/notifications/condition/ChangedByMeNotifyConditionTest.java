@@ -10,10 +10,11 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.RandomUtils;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.Arrays;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class ChangedByMeNotifyConditionTest extends PulseTestCase
 {
@@ -61,14 +62,7 @@ public class ChangedByMeNotifyConditionTest extends PulseTestCase
     {
         BuildResult result = new BuildResult();
         result.setId(RandomUtils.randomInt());
-/*
-        for(PersistentChangelist list: changes)
-        {
-            list.setResultId(result.getId());
-            buildManager.save(list);
-        }
-*/
-        stub(buildManager.getChangesForBuild(result)).toReturn(Arrays.asList(changes));
+        stub(buildManager.getChangesForBuild(result, false)).toReturn(Arrays.asList(changes));
         result.setRevision(new Revision("1"));
         return result;
     }

@@ -1,13 +1,10 @@
 package com.zutubi.pulse.master.notifications.condition;
 
-import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.NullaryFunction;
-
-import java.util.List;
 
 /**
  * 
@@ -37,16 +34,7 @@ public class ChangedNotifyCondition implements NotifyCondition
         {
             public Boolean process()
             {
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
-                for (PersistentChangelist changelist : changelists)
-                {
-                    if (changelist.getChanges() != null && changelist.getChanges().size() > 0)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
+                return buildManager.getChangesForBuild(result, false).size() > 0;
             }
         });
     }
