@@ -36,7 +36,15 @@ public interface ChangelistDao extends EntityDao<PersistentChangelist>
 
     List<PersistentChangelist> findLatestByProjects(Project[] projects, int max);
 
-    List<PersistentChangelist> findByResult(long id);
+    /**
+     * Finds all changes associated with a given build.
+     * 
+     * @param id         id of the build to get the changelists for
+     * @param allowEmpty if true, changelists with no file changes may be
+     *                   included in the result; if false they are filtered out
+     * @return the changes associated with the given build
+     */
+    List<PersistentChangelist> findByResult(long id, boolean allowEmpty);
 
     List<PersistentChangelist> findAllEquivalent(PersistentChangelist changelist);
 

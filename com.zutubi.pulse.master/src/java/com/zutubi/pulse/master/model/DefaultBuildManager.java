@@ -393,19 +393,7 @@ public class DefaultBuildManager implements BuildManager
 
     public List<PersistentChangelist> getChangesForBuild(BuildResult result, boolean allowEmpty)
     {
-        List<PersistentChangelist> changelists = changelistDao.findByResult(result.getId());
-        if (!allowEmpty)
-        {
-            CollectionUtils.filterInPlace(changelists, new Predicate<PersistentChangelist>()
-            {
-                public boolean satisfied(PersistentChangelist persistentChangelist)
-                {
-                    return changelistDao.getSize(persistentChangelist) > 0;
-                }
-            });
-        }
-        
-        return changelists;
+        return changelistDao.findByResult(result.getId(), allowEmpty);
     }
 
     public int getChangelistSize(PersistentChangelist changelist)
@@ -625,7 +613,7 @@ public class DefaultBuildManager implements BuildManager
                 Revision revision = build.getRevision();
                 if (revision != null)
                 {
-                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
+                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId(), true);
                     for (PersistentChangelist change : changelists)
                     {
                         changelistDao.delete(change);

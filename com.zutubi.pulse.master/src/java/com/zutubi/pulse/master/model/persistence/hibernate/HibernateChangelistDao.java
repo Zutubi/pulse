@@ -155,17 +155,25 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         });
     }
 
-    public List<PersistentChangelist> findByResult(final long id)
+    public List<PersistentChangelist> findByResult(final long id, final boolean allowEmpty)
     {
+        final String queryString;
+        if (allowEmpty)
+        {
+            queryString = "from PersistentChangelist model where model.resultId = :resultId order by model.time desc, model.id desc";
+        }
+        else
+        {
+            queryString = "from PersistentChangelist model where model.resultId = :resultId and size(model.changes) > 0 order by model.time desc, model.id desc";
+        }
+        
         return  (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.resultId = :resultId order by model.time desc, model.id desc");
+                Query queryObject = session.createQuery(queryString);
                 queryObject.setParameter("resultId", id);
-
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });

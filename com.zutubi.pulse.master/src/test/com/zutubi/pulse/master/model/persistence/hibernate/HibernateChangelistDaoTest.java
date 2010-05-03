@@ -225,9 +225,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         changelistDao.save(list);
         commitAndRefreshTransaction();
 
-        List<PersistentChangelist> found = changelistDao.findByResult(1);
+        List<PersistentChangelist> found = changelistDao.findByResult(1, true);
         assertEquals(0, found.size());
-        found = changelistDao.findByResult(12);
+        found = changelistDao.findByResult(12, true);
         assertEquals(1, found.size());
         assertEquals(list, found.get(0));
     }
@@ -247,10 +247,32 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         createChangelistForResult(r2, time2, 15);
         commitAndRefreshTransaction();
 
-        List<PersistentChangelist> found = changelistDao.findByResult(13);
+        List<PersistentChangelist> found = changelistDao.findByResult(13, true);
         assertEquals(2, found.size());
         assertEquals(l2, found.get(0));
         assertEquals(l1, found.get(1));
+    }
+    
+    public void testFindByResultFilterEmpty()
+    {
+        final int RESULT_ID = 12;
+        
+        PersistentChangelist empty = new PersistentChangelist(createRevision(1), 1, "a1", "comment", Collections.<PersistentFileChange>emptyList());
+        empty.setResultId(RESULT_ID);
+        changelistDao.save(empty);
+
+        PersistentChangelist nonEmpty = new PersistentChangelist(createRevision(2), 10, "a2", "comment", Arrays.asList(new PersistentFileChange("file", "rev", FileChange.Action.ADD, false)));
+        nonEmpty.setResultId(RESULT_ID);
+        changelistDao.save(nonEmpty);
+
+        commitAndRefreshTransaction();
+
+        List<PersistentChangelist> found = changelistDao.findByResult(RESULT_ID, true);
+        assertEquals(2, found.size());
+
+        found = changelistDao.findByResult(RESULT_ID, false);
+        assertEquals(1, found.size());
+        assertEquals(1, found.get(0).getChanges().size());
     }
     
     public void testGetSize()
