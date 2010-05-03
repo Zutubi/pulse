@@ -1,17 +1,16 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import org.tmatesoft.svn.core.wc.*;
+import com.zutubi.util.FileSystemUtils;
+import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.wc.*;
 
-import java.io.File;
 import java.io.Closeable;
-
-import com.zutubi.util.FileSystemUtils;
+import java.io.File;
 
 /**
  * Utility class that provides assistance when working with an svn workspace.
@@ -77,6 +76,21 @@ public class SubversionWorkspace implements Closeable
         SVNCommitClient commitClient = clientManager.getCommitClient();
         SVNCommitInfo info = commitClient.doCommit(files, true, comment, null, null, false, false, SVNDepth.EMPTY);
         return String.valueOf(info.getNewRevision());
+    }
+
+    /**
+     * Copies one subversion URL to another, server side.
+     * 
+     * @param comment the commit comment for the copy change
+     * @param fromUrl source URL
+     * @param toUrl   destination URL
+     * @throws SVNException on error
+     */
+    public void doCopy(String comment, String fromUrl, String toUrl) throws SVNException
+    {
+        SVNCopyClient copyClient = clientManager.getCopyClient();
+        SVNCopySource[] copySources = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(fromUrl))};
+        copyClient.doCopy(copySources, SVNURL.parseURIDecoded(toUrl), false, true, true, comment, null);
     }
 
     /**

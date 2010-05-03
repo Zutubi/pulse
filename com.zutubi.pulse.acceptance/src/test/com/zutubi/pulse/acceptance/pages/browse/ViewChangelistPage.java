@@ -17,8 +17,10 @@ import java.util.List;
 public class ViewChangelistPage extends SeleniumPage
 {
     private static final String ID_DETAILS_TABLE = "changelist.details";
-    private static final String ID_BUILDS_TABLE   = "changelist.builds";
+    private static final String ID_BUILDS_TABLE  = "changelist.builds";
     private static final String ID_FILES_TABLE   = "changelist.files";
+    private static final String ID_NEXT_PAGE     = "page.next";
+    private static final String ID_PREVIOUS_PAGE = "page.previous";
 
     private static final String FORMAT_ID_CHANGELIST_BUILDS = "changelist.build.%d";
     private static final String FORMAT_ID_CHANGELIST_FILES = "changelist.file.%d";
@@ -118,4 +120,18 @@ public class ViewChangelistPage extends SeleniumPage
         return new Changelist(new Revision(getRevision()), 0, getAuthor(), getComment(), fileChanges);
     }
 
+    public boolean isNextLinkPresent()
+    {
+        return browser.isElementPresent(ID_NEXT_PAGE);
+    }
+
+    public void clickNext()
+    {
+        browser.click(ID_NEXT_PAGE);
+    }
+
+    public boolean isPreviousLinkPresent()
+    {
+        return browser.isElementPresent(ID_PREVIOUS_PAGE);
+    }
 }

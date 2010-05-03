@@ -11,7 +11,7 @@ public class Constants
     /**
      * Subversion base URL for several test projects (see below).
      */
-    private static final String SUBVERSION_ACCEPT_REPO = "svn://localhost:3088/accept/trunk/";
+    public static final String SUBVERSION_ACCEPT_REPO = "svn://localhost:3088/accept/trunk/";
     /**
      * Subversion URL for a trivial ant project (just a build.xml file).
      */

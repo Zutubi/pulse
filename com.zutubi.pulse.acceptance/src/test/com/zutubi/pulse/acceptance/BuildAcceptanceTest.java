@@ -176,6 +176,63 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
     }
 
+    public void testChangelistWithManyFiles() throws Exception
+    {
+        final int CHANGE_COUNT = 102;
+
+        // Create a new repo area so we don't conflict with other tests.
+        String subversionUrl = Constants.SUBVERSION_ACCEPT_REPO + random;
+        File wcDir = createTempDirectory();
+        SubversionWorkspace workspace = new SubversionWorkspace(wcDir, CHANGE_AUTHOR, CHANGE_AUTHOR);
+        workspace.doCopy("copy triviant", Constants.TRIVIAL_ANT_REPOSITORY, subversionUrl);
+        
+        // Run an initial build
+        xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(subversionUrl), xmlRpcHelper.getAntConfig());
+        xmlRpcHelper.runBuild(random);
+
+        // Commit a large change to the repository.
+        String revisionString;
+        try
+        {
+            workspace.doCheckout(subversionUrl);
+
+            File[] files = new File[CHANGE_COUNT];
+            for (int i = 0; i < CHANGE_COUNT; i++)
+            {
+                files[i] = new File(wcDir, String.format("file-%03d.txt", i));
+                FileSystemUtils.createFile(files[i], "content");
+            }
+            
+            workspace.doAdd(files);
+            revisionString = workspace.doCommit(CHANGE_COMMENT, files);
+        }
+        finally
+        {
+            IOUtils.close(workspace);
+        }
+        
+        long buildNumber = xmlRpcHelper.runBuild(random);
+
+        loginAsAdmin();
+        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, buildNumber);
+        assertTextPresent(String.format("%d more files", CHANGE_COUNT - 5));
+
+        List<Long> changeIds = changesPage.getChangeIds();
+        assertEquals(1, changeIds.size());
+        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changeIds.get(0), revisionString);
+        Changelist changelist = changelistPage.getChangelist();
+        assertEquals(100, changelist.getChanges().size());
+        assertTrue(changelistPage.isNextLinkPresent());
+        assertFalse(changelistPage.isPreviousLinkPresent());
+
+        changelistPage.clickNext();
+        browser.waitForPageToLoad();
+        changelist = changelistPage.getChangelist();
+        assertEquals(CHANGE_COUNT - 100, changelist.getChanges().size());
+        assertFalse(changelistPage.isNextLinkPresent());
+        assertTrue(changelistPage.isPreviousLinkPresent());
+    }
+    
     public void testChangeAffectsViewableAndUnviewableProjects() throws Exception
     {
         String viewableProject = random + "-viewable";
