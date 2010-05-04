@@ -2901,29 +2901,6 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
 });
 Ext.reg('xztblink', ZUTUBI.Toolbar.LinkItem);
 
-ZUTUBI.Toolbar.TextItem = Ext.extend(Ext.Toolbar.Item, {
-    /**
-     * @cfg {String} text  The text to be shown.
-     */
-
-    initComponent: function()
-    {
-        ZUTUBI.Toolbar.TextItem.superclass.initComponent.call(this);
-    },
-
-    // private
-    onRender: function(ct, position)
-    {
-        this.autoEl = {
-            tag: 'span',
-            cls: 'xz-tbtext',
-            html: this.text
-        };
-        ZUTUBI.Toolbar.TextItem.superclass.onRender.call(this, ct, position);
-    }
-});
-Ext.reg('xztbtext', ZUTUBI.Toolbar.TextItem);
-
 /**
  * Displays all plugins in a tree, handling selection and actions performed on
  * them.
@@ -3059,49 +3036,28 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
     
     initComponent: function()
     {
-        this.builds = new Ext.util.MixedCollection();
-
         ZUTUBI.PulseHeader.superclass.initComponent.apply(this, arguments);
-        this.refresh();
 
-        this.on('afterrender', this.onAfterRender.createDelegate(this));
-        
-        if (this.buildId)
+        this.builds = new Ext.util.MixedCollection();
+        if (this.data)
         {
-            this.loadBuildViewport();
+            this.builds.addAll(this.data.builds);
         }
     },
 
-    loadBuildViewport: function()
+    afterRender: function()
     {
-        Ext.Ajax.request({
-            url: window.baseUrl + '/ajax/getBuildViewport.action',
-            params: {
-                buildId: this.buildId
-            },
-            success: this.onLoad.createDelegate(this)
-        });
-    },
+        ZUTUBI.PulseHeader.superclass.afterRender.apply(this, arguments);
 
-    onLoad: function(response)
-    {
-        this.data = Ext.util.JSON.decode(response.responseText);
-
-        this.builds = new Ext.util.MixedCollection();
-        this.builds.addAll(this.data.builds);
-
-        this.refresh();
-    },
-
-    onAfterRender: function()
-    {
         // Remove the x-toolbar class to avoid clashing with the default
         // toolbar styling.
         this.getEl().removeClass('x-toolbar');
     },
 
-    refresh: function()
+    onRender: function()
     {
+        ZUTUBI.PulseHeader.superclass.onRender.apply(this, arguments);
+
         // clear the existing items.
         var currentItems = (this.items) ? this.items.clone() : new Ext.util.MixedCollection();
         currentItems.each(function(item) {
@@ -3109,19 +3065,19 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
             item.destroy();
         }, this);
 
-        this.addItem({xtype: 'xztbtext', text: '&nbsp;::&nbsp;'});
-        this.addItem({xtype: 'xztblink', text:"pulse 2.2 [beta]", url:window.baseUrl + '/default.action'});
-        this.addItem({xtype: 'xztbtext', text: '&nbsp;::&nbsp;'});
+        this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
+        this.addItem({xtype: 'xztblink', text:"pulse 2.2 [beta]", url: window.baseUrl + '/default.action'});
+        this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
 
         if (this.projectName)
         {
             this.addItem({id: 'pulse-toolbar-project-link', xtype: 'xztblink', text: this.projectName, url: this.projectUrl});
-            this.addItem({xtype: 'xztbtext', text: '&nbsp;::&nbsp;'});
+            this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
         }
         else if (this.agentName)
         {
             this.addItem({id: 'pulse-toolbar-agent-link', xtype: 'xztblink', text: this.agentName, url: this.agentUrl});
-            this.addItem({xtype: 'xztbtext', text: '&nbsp;::&nbsp;'});
+            this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
         }
 
         if (this.buildId)
@@ -3130,18 +3086,39 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                 var selected = build.id == this.buildId;
                 if (selected)
                 {
+                    var url = null;
+                    if (this.personalBuild)
+                    {
+                        url = window.baseUrl + '/dashboard/my/' + build.number;
+                    }
+                    else
+                    {
+                        url = window.baseUrl + '/browse/projects/' + encodeURIComponent(build.name) + '/builds/' + build.number;
+                    }
                     this.addItem({
                         id: 'pulse-toolbar-build-link',
                         xtype: 'xztblink',
                         text: 'build ' + build.number,
-                        url: window.baseUrl + "/browse/projects/"+ encodeURIComponent(build.name) +"/builds/" + build.number
+                        url: url
                     });
                 }
                 else
                 {
+                    var tooltip;
+                    if (build.id < this.buildId)
+                    {
+                        tooltip = 'step&nbsp;back&nbsp;to&nbsp;build&nbsp;' + build.number;
+                    }
+                    else
+                    {
+                        tooltip = 'step&nbsp;forward&nbsp;to&nbsp;build&nbsp;' + build.number;
+                    }
                     this.addItem(new ZUTUBI.BuildNavToolbarItem({
                         id: 'pulse-toolbar-build-item-' + build.number,
-                        build: build
+                        build: build,
+                        tooltip: tooltip,
+                        selectedTab: this.selectedTab,
+                        personalBuild: this.personalBuild
                     }));
                 }
             }, this);
@@ -3150,34 +3127,39 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
             {
                 var menuConfig = {};
                 Ext.apply(menuConfig, this.data);
-                Ext.apply(menuConfig, {id: this.id});
+                Ext.apply(menuConfig, {
+                    id: this.id,
+                    personalBuild : this.personalBuild,
+                    selectedTab: this.selectedTab
+                });
 
                 this.addItem(new ZUTUBI.BuildNavToolbarMenu(menuConfig));
             }
+            this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
         }
 
         if (this.stageName)
         {
-            this.addItem({id: 'pulse-toolbar-stage-link', xtype: 'xztblink', text: this.stageName, url: this.stageUrl});
-            this.addItem({xtype: 'xztbtext', text: '&nbsp;::&nbsp;'});
+            this.addItem({id: 'pulse-toolbar-stage-link', xtype: 'xztblink', text: 'stage ' + this.stageName, url: this.stageUrl});
+            this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
         }
 
         this.addFill();
 
         if (this.userName)
         {
-            this.addItem({xtype: 'xztbtext', text:this.userName + " [", cls: 'userToolbar'});
-            this.addItem({xtype: 'xztblink', id: 'prefs', text:"preferences", url: window.baseUrl + '/dashboard/preferences/', cls: 'userToolbar'});
+            this.addItem({xtype: 'tbtext', html: this.userName + ' [', tag: 'span', cls: 'userToolbar'});
+            this.addItem({xtype: 'xztblink', id: 'prefs', text: 'preferences', url: window.baseUrl + '/dashboard/preferences/', cls: 'userToolbar'});
             if (this.userCanLogout)
             {
-                this.addItem({xtype: 'xztbtext', text: '|', cls: 'userToolbar'});
-                this.addItem({xtype: 'xztblink', id: 'logout', text:"logout", url: window.baseUrl + '/logout.action', cls: 'userToolbar'});
+                this.addItem({xtype: 'tbtext', html: '|', tag: 'span', cls: 'userToolbar'});
+                this.addItem({xtype: 'xztblink', id: 'logout', text: "logout", url: window.baseUrl + '/logout.action', cls: 'userToolbar'});
             }
-            this.addItem({xtype: 'xztbtext', text: ']', cls: 'userToolbar'});
+            this.addItem({xtype: 'tbtext', html: ']', tag: 'span', cls: 'userToolbar'});
         }
         else
         {
-            this.addItem({xtype: 'xztblink', id: 'login', text:"login", url:window.baseUrl + '/login!input.action', cls: 'user'});
+            this.addItem({xtype: 'xztblink', id: 'login', text: 'login', url:window.baseUrl + '/login!input.action', cls: 'user'});
         }
 
         this.addItem({xtype: 'xztblink',
@@ -3191,8 +3173,6 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                 }
             }
         });
-
-        this.doLayout();
     },
 
     hasMenuItems: function()
@@ -3200,6 +3180,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
         return this.data && (this.data.nextSuccessful || this.data.nextBroken || this.data.previousSuccessful || this.data.previousBroken);
     }
 });
+Ext.reg('xztbtoolbar', ZUTUBI.PulseHeader);
 
 
 ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
@@ -3223,7 +3204,7 @@ ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
 
         Ext.QuickTips.register({
             target: this.getEl(),
-            text: 'build&nbsp;' + this.build.number
+            text: this.tooltip
         });
 
         this.mon(this.getEl(), {
@@ -3233,10 +3214,16 @@ ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
 
     onClick: function()
     {
-        window.location.href = window.baseUrl + "/browse/projects/"+ encodeURIComponent(this.build.name) +"/builds/" + this.build.number;
+        if (this.personalBuild)
+        {
+            window.location.href = window.baseUrl + '/dashboard/my/' + this.build.number + '/' + this.selectedTab;
+        }
+        else
+        {
+            window.location.href = window.baseUrl + '/browse/projects/' + encodeURIComponent(this.build.name) + '/builds/' + this.build.number + '/' + this.selectedTab;
+        }
     }
 });
-
 
 ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
@@ -3257,7 +3244,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
                 tag: 'img',
                 cls: 'popdown floating-widget',
                 id: this.id + '_actions_button',
-                src: window.baseUrl + "/images/default/s.gif"
+                src: window.baseUrl + '/images/default/s.gif'
             }]
         };
     },
@@ -3282,13 +3269,14 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     {
         var items = [];
 
+        var config = null;
         if (this.nextSuccessful)
         {
             items.push({
                 id: 'next-successful',
                 image: 'health/ok.gif',
-                title: 'Next successful (build '+this.nextSuccessful.number+')',
-                url: 'browse/projects/' + encodeURIComponent(this.nextSuccessful.name) + '/builds/' + this.nextSuccessful.number
+                title: 'Next successful (build ' + this.nextSuccessful.number + ')',
+                url: this.getUrl(this.personalBuild, this.nextSuccessful)
             });
         }
         if (this.nextBroken)
@@ -3296,8 +3284,8 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'next-broken',
                 image: 'health/broken.gif',
-                title: 'Next broken (build '+this.nextBroken.number+')',
-                url: 'browse/projects/' + encodeURIComponent(this.nextBroken.name) + '/builds/' + this.nextBroken.number
+                title: 'Next broken (build ' + this.nextBroken.number + ')',
+                url: this.getUrl(this.personalBuild, this.nextBroken)
             });
         }
         if (this.previousSuccessful)
@@ -3305,8 +3293,8 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'previous-successful',
                 image: 'health/ok.gif',
-                title: 'Previous successful (build '+this.previousSuccessful.number+')',
-                url: 'browse/projects/' + encodeURIComponent(this.previousSuccessful.name) + '/builds/' + this.previousSuccessful.number
+                title: 'Previous successful (build ' + this.previousSuccessful.number + ')',
+                url: this.getUrl(this.personalBuild, this.previousSuccessful)
             });
         }
         if (this.previousBroken)
@@ -3315,9 +3303,21 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
                 id: 'previous-broken',
                 image: 'health/broken.gif',
                 title: 'Previous broken (build ' + this.previousBroken.number + ')',
-                url: 'browse/projects/' + encodeURIComponent(this.previousBroken.name) + '/builds/' + this.previousBroken.number
+                url: this.getUrl(this.personalBuild, this.previousBroken)
             });
         }
         return items;
+    },
+
+    getUrl: function(isPersonalBuild, build)
+    {
+        if (isPersonalBuild)
+        {
+            return 'dashboard/my/' + build.number + '/' + this.selectedTab;
+        }
+        else
+        {
+            return 'browse/projects/' + encodeURIComponent(build.name) + '/builds/' + build.number + '/' + this.selectedTab;
+        }
     }
 });

@@ -1,6 +1,6 @@
 #helpTag("Build+Log+View")
 #authorisationTags($principle)
-#stageTags($buildResult)
+#stageTags($buildResult "logs")
 <html>
 <head>
     <title>

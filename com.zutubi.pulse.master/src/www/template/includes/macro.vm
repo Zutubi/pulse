@@ -33,20 +33,21 @@
 ##
 ## Outputs sitemesh content tags for build links on the header bar
 ##
-#macro(buildTags $project $buildResult)
+#macro(buildTags $project $buildResult $selectedTab)
 #if($buildResult.user)
     #userTags($buildResult.user)
 #else
     #projectTags($project)
 #end
     <content tag="buildNumber">$buildResult.number</content>
+    <content tag="selectedBuildTab">$selectedTab</content>
 #end
 
 ##
 ## Outputs sitemesh content tags for stage links on the header bar
 ##
-#macro(stageTags $buildResult)
-    #buildTags($buildResult.project $buildResult)
+#macro(stageTags $buildResult $selectedTab)
+    #buildTags($buildResult.project $buildResult $selectedTab)
     <content tag="h_stageName">$h_stageName</content>
     <content tag="u_stageName">$u_stageName</content>
 #end

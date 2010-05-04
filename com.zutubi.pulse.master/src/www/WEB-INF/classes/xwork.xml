@@ -523,11 +523,6 @@
             <result name="success" type="flexjson">data</result>
         </action>
 
-        <action name="getBuildViewport" class="com.zutubi.pulse.master.xwork.actions.ajax.GetBuildViewportAction">
-            <interceptor-ref name="ajaxStack"/>
-            <result name="success" type="flexjson">data</result>
-        </action>
-
         <action name="getBuildStatus" class="com.zutubi.pulse.master.xwork.actions.ajax.GetBuildStatusAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">status</result>

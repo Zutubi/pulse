@@ -90,6 +90,53 @@
                     init: function() {
                         Ext.QuickTips.init();
 
+                          var toolbarConfig = {};
+                          toolbarConfig.selectedTab = '$page.getProperty("page.selectedBuildTab")';
+#if ($action.viewport)
+                          toolbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
+#end
+
+#if($personalBuild)
+                          toolbarConfig.personalBuild = true;
+                          toolbarConfig.projectName = 'my builds';
+                          toolbarConfig.projectUrl = '#jss($urls.dashboardMyBuilds())';
+#if($buildNumber && $buildNumber != "0")
+                          toolbarConfig.buildId = '$buildResult.id';
+#end
+#if($u_stageName)
+                          toolbarConfig.stageName = '#jss($h_stageName)';
+                          toolbarConfig.stageUrl = '#jss($urls.dashboardMyBuildStageDetails($buildNumber, $u_stageName))';
+#end
+#elseif($u_projectName)
+                          toolbarConfig.personalBuild = false;
+                          toolbarConfig.projectName = '#jss($h_projectName)';
+                          toolbarConfig.projectUrl = '#jss($urls.projectHome($u_projectName))';
+#if($buildNumber && $buildNumber != "0")
+                          toolbarConfig.buildId = '$buildResult.id';
+#end
+#if($u_stageName)
+                          toolbarConfig.stageName = '#jss($h_stageName)';
+                          toolbarConfig.stageUrl = '#jss($urls.stageDetails($u_projectName, $buildNumber, $u_stageName))';
+#end
+#end
+#if($u_agentName)
+                          toolbarConfig.agentName = '#jss($h_agentName)';
+                          toolbarConfig.agentUrl = '#jss($urls.agentStatus($u_agentName))';
+#end
+#if($loggedInUser)
+                          toolbarConfig.userName = '#html($loggedInUser.config.name)';
+#if($canLogout)
+                          toolbarConfig.userCanLogout = true;
+#end
+#end
+#if($helpPage)
+
+#else
+#set($helpPage = "Home")
+#end
+                        var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
+                        toolbar.render('header');
+
                         // If there is a tab bar, drop it in to the north div.
                         var tabbar = Ext.get('tabbar');
                         if(tabbar)
@@ -281,37 +328,5 @@
           #end
       #end
       </div>
-      
-      <script type="text/javascript">
-          var toolbarConfig = {};
-#if($u_projectName)
-          toolbarConfig.projectName = '#jss($h_projectName)';
-          toolbarConfig.projectUrl = '#jss($urls.projectHome($u_projectName))';
-#if($buildNumber && $buildNumber != "0")
-          toolbarConfig.buildId = '$buildResult.id';
-#end
-#if($u_stageName)
-          toolbarConfig.stageName = 'stage $h_stageName';
-          toolbarConfig.stageUrl = '$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)';
-#end
-#end
-#if($u_agentName)
-          toolbarConfig.agentName = '$h_agentName';
-          toolbarConfig.agentUrl = '$urls.agentStatus($u_agentName)';
-#end
-#if($loggedInUser)
-          toolbarConfig.userName = '#html($loggedInUser.config.name)';
-#if($canLogout)
-          toolbarConfig.userCanLogout = true;
-#end
-#end
-#if($helpPage)
-
-#else
-#set($helpPage = "Home")
-#end
-          var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
-          toolbar.render('header');
-      </script>
     </body>
 </html>

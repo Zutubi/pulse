@@ -1,6 +1,6 @@
 #helpTag("Build+Tests+Tab")
 #authorisationTags($principle)
-#buildTags($project $buildResult)
+#buildTags($project $buildResult "tests")
 <html>
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>

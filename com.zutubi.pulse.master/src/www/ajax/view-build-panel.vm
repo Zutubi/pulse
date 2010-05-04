@@ -21,13 +21,13 @@
                         href="$base/cancelBuild.action?buildId=$result.id&fromBuild=true"
             #elseif($actionLink.action == "delete")
                         #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
-                        href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?${ownerArg}&amp;buildVID=$buildResult.number')"
+                        href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?#jss(${ownerArg})&amp;buildVID=$buildResult.number')"
             #elseif($actionLink.action == "takeResponsibility")
-                        href="#" onclick="takeResponsibility('$result.project.id'); return false"
+                        href="#" onclick="takeResponsibility('$result.project.id'); return false;"
             #elseif($actionLink.action == "clearResponsibility")
-                        href="#" onclick="clearResponsibility('$result.project.id'); return false"
+                        href="#" onclick="clearResponsibility('$result.project.id'); return false;"
             #elseif($actionLink.action == "addComment")
-                        href="#" onclick="addComment('$result.id'); return false"                       
+                        href="#" onclick="addComment('$result.id'); return false;"                       
             #end
                     >$actionLink.label</a>
                 </td>

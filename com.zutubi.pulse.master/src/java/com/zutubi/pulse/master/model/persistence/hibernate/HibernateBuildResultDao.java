@@ -561,12 +561,19 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("SELECT result " +
                         "FROM BuildResult result " +
                         "WHERE result.id < :buildId " +
-                        "AND result.project.id = :projectId " +
+                        (result.isPersonal() ? "AND result.user = :user " : "AND result.project = :project ") +
                         "AND result.stateName IN (:stateNames) " +
                         "ORDER BY result DESC"
                 );
                 queryObject.setLong("buildId", buildId);
-                queryObject.setLong("projectId", result.getProject().getId());
+                if (result.isPersonal())
+                {
+                    queryObject.setEntity("user", result.getUser());
+                }
+                else
+                {
+                    queryObject.setEntity("project", result.getProject());
+                }
                 queryObject.setParameterList("stateNames", getStateNames(states.length != 0 ? states : ResultState.values()));
                 queryObject.setMaxResults(maxResults);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -586,12 +593,19 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("SELECT result " +
                         "FROM BuildResult result " +
                         "WHERE result.id > :buildId " +
-                        "AND result.project.id = :projectId " +
+                        (result.isPersonal() ? "AND result.user = :user " : "AND result.project = :project ") +
                         "AND result.stateName IN (:stateNames) " +
                         "ORDER BY result ASC"
                 );
                 queryObject.setLong("buildId", buildId);
-                queryObject.setLong("projectId", result.getProject().getId());
+                if (result.isPersonal())
+                {
+                    queryObject.setEntity("user", result.getUser());
+                }
+                else
+                {
+                    queryObject.setEntity("project", result.getProject());
+                }
                 queryObject.setParameterList("stateNames", getStateNames(states.length != 0 ? states : ResultState.values()));
                 queryObject.setMaxResults(maxResults);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

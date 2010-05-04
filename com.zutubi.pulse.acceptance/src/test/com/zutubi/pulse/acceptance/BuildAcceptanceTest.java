@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;

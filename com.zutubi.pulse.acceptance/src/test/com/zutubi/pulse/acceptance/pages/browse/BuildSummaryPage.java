@@ -3,7 +3,8 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.toValidHtmlName;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The summary tab for a build result.
@@ -18,14 +19,14 @@ public class BuildSummaryPage extends ResponsibilityPage
 
     public BuildSummaryPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
 
     public String getUrl()
     {
-        return urls.buildSummary(projectName, Long.toString(buildId));
+        return urls.buildSummary(uriComponentEncode(projectName), Long.toString(buildId));
     }
 
     private String getHookId(String hookName)
@@ -55,7 +56,7 @@ public class BuildSummaryPage extends ResponsibilityPage
 
     private String getDependenciesId()
     {
-        return WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-dependencies";
+        return toValidHtmlName(projectName) + "-build-" + Long.toString(buildId) + "-dependencies";
     }
 
     public boolean hasDependencies()

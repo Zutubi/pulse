@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -16,8 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -40,7 +39,7 @@ public class SeleniumBrowser
     private String browser;
     private boolean started = false;
     private String baseUrl;
-    private Urls urls = Urls.getBaselessInstance();
+    private Urls urls;
 
     private static String getBrowserProperty()
     {
@@ -83,6 +82,7 @@ public class SeleniumBrowser
         this.browser = browser;
         baseUrl = "http://localhost:" + port + "/";
         selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
+        urls = new Urls(baseUrl);
     }
 
     public String getBaseUrl()
@@ -297,14 +297,16 @@ public class SeleniumBrowser
     /**
      * Open the selenium browser to the requested location.
      *
-     * @param location  the location at which to open the browser, relative to the
-     * base url.
-     *
-     * @see #getBaseUrl() 
+     * @param location  the location at which to open the browser.
      */
     public void open(String location)
     {
-        selenium.open(StringUtils.join("/", true, baseUrl, location));
+        if (!location.startsWith(baseUrl))
+        {
+            location = StringUtils.join("/", true, baseUrl, location);
+        }
+        
+        selenium.open(location);
     }
 
     public void click(String locator)
@@ -379,7 +381,7 @@ public class SeleniumBrowser
      */
     public boolean isLinkToPresent(String href)
     {
-        return selenium.isElementPresent("//a[@href='" + href + "']");
+        return selenium.isElementPresent("//a[@href=\"" + href + "\"]");
     }
 
     /**

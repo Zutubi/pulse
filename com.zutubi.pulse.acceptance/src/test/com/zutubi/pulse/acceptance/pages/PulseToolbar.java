@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The Pulse toolbar is the toolbar at the very top of the Pulse page,
@@ -9,16 +10,16 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class PulseToolbar
 {
-    private static final String TOOLBAR_ID = "pulse-toolbar";
-    private static final String PROJECT_LINK_ID = "pulse-toolbar-project-link";
-    private static final String BUILD_LINK_ID = "pulse-toolbar-build-link";
-    private static final String BUILD_ITEM_ID_PREFIX = "pulse-toolbar-build-item-";
-    private static final String AGENT_LINK_ID = "pulse-toolbar-agent-link";
-    private static final String BUILD_MENU_ID = "pulse-toolbar_actions_button";
-    private static final String NEXT_SUCCESSFUL_LINK_ID = "next-successful-pulse-toolbar_actions";
-    private static final String PREVIOUS_SUCCESSFUL_LINK_ID = "previous-successful-pulse-toolbar_actions";
-    private static final String NEXT_BROKEN_LINK_ID = "next-broken-pulse-toolbar_actions";
-    private static final String PREVIOUS_BROKEN_LINK_ID = "previous-broken-pulse-toolbar_actions";
+    private static final String ID_TOOLBAR = "pulse-toolbar";
+    private static final String ID_PROJECT_LINK = "pulse-toolbar-project-link";
+    private static final String ID_BUILD_LINK = "pulse-toolbar-build-link";
+    private static final String PREFIX_ID_BUILD_ITEM = "pulse-toolbar-build-item-";
+    private static final String ID_AGENT_LINK = "pulse-toolbar-agent-link";
+    private static final String ID_BUILD_MENU = "pulse-toolbar_actions_button";
+    private static final String ID_NEXT_SUCCESSFUL_LINK = "next-successful-pulse-toolbar_actions";
+    private static final String ID_PREVIOUS_SUCCESSFUL_LINK = "previous-successful-pulse-toolbar_actions";
+    private static final String ID_NEXT_BROKEN_LINK = "next-broken-pulse-toolbar_actions";
+    private static final String ID_PREVIOUS_BROKEN_LINK = "previous-broken-pulse-toolbar_actions";
 
     private SeleniumBrowser browser;
     private Urls urls;
@@ -31,71 +32,96 @@ public class PulseToolbar
 
     public boolean isPresent()
     {
-        return this.browser.isElementIdPresent(TOOLBAR_ID);
+        return this.browser.isElementIdPresent(ID_TOOLBAR);
     }
 
     public boolean isBuildNavMenuPresent()
     {
-        return this.browser.isElementIdPresent(BUILD_MENU_ID);
+        return this.browser.isElementIdPresent(ID_BUILD_MENU);
     }
 
     public boolean isNextSuccessfulBuildLinkPresent()
     {
-        return this.browser.isElementIdPresent(NEXT_SUCCESSFUL_LINK_ID);
+        return this.browser.isElementIdPresent(ID_NEXT_SUCCESSFUL_LINK);
+    }
+
+    public void clickNextSuccessfulBuildLink()
+    {
+        browser.click(ID_NEXT_SUCCESSFUL_LINK);
     }
 
     public boolean isPreviousSuccessfulBuildLinkPresent()
     {
-        return this.browser.isElementIdPresent(PREVIOUS_SUCCESSFUL_LINK_ID);
+        return this.browser.isElementIdPresent(ID_PREVIOUS_SUCCESSFUL_LINK);
+    }
+
+    public void clickPreviousSuccessfulBuildLink()
+    {
+        browser.click(ID_PREVIOUS_SUCCESSFUL_LINK);
     }
 
     public boolean isNextBrokenBuildLinkPresent()
     {
-        return this.browser.isElementIdPresent(NEXT_BROKEN_LINK_ID);
+        return this.browser.isElementIdPresent(ID_NEXT_BROKEN_LINK);
+    }
+
+    public void clickNextBrokenBuildLink()
+    {
+        browser.click(ID_NEXT_BROKEN_LINK);
     }
 
     public boolean isPreviousBrokenBuildLinkPresent()
     {
-        return this.browser.isElementIdPresent(PREVIOUS_BROKEN_LINK_ID);
+        return this.browser.isElementIdPresent(ID_PREVIOUS_BROKEN_LINK);
+    }
+
+    public void clickPreviousBrokenBuildLink()
+    {
+        browser.click(ID_PREVIOUS_BROKEN_LINK);
     }
 
     public void clickOnNavMenu()
     {
-        this.browser.click(BUILD_MENU_ID);
+        this.browser.click(ID_BUILD_MENU);
     }
 
     public boolean isBuildNavItemPresent(int buildNumber)
     {
-        return browser.isElementIdPresent(BUILD_ITEM_ID_PREFIX + buildNumber);
+        return browser.isElementIdPresent(PREFIX_ID_BUILD_ITEM + buildNumber);
+    }
+
+    public void clickBuildNavItem(int buildNumber)
+    {
+        browser.click(PREFIX_ID_BUILD_ITEM + buildNumber);
     }
 
     public boolean isBuildNavLinkPresent(String projectName, int buildNumber)
     {
-        return browser.isElementIdPresent(BUILD_LINK_ID) && browser.isLinkToPresent(getBaseUrl() + urls.build(projectName, String.valueOf(buildNumber)));
+        return browser.isElementIdPresent(ID_BUILD_LINK) && browser.isLinkToPresent(urls.build(uriComponentEncode(projectName), String.valueOf(buildNumber)));
+    }
+
+    public boolean isPersonalBuildNavLinkPresent(int buildNumber)
+    {
+        return browser.isElementIdPresent(ID_BUILD_LINK) && browser.isLinkToPresent(urls.dashboardMyBuild(String.valueOf(buildNumber)));
     }
 
     public boolean isProjectLinkPresent(String projectName)
     {
-        return browser.isElementIdPresent(PROJECT_LINK_ID) && browser.isLinkToPresent(getBaseUrl() + urls.projectHome(projectName));
+        return browser.isElementIdPresent(ID_PROJECT_LINK) && browser.isLinkToPresent(urls.projectHome(uriComponentEncode(projectName)));
+    }
+
+    public boolean isMyBuildsLinkPresent()
+    {
+        return browser.isElementIdPresent(ID_PROJECT_LINK) && browser.isLinkToPresent(urls.dashboardMyBuilds());
     }
 
     public void waitForBuildNav()
     {
-        browser.waitForElement(BUILD_LINK_ID);
+        browser.waitForElement(ID_BUILD_LINK);
     }
 
     public boolean isBuildNavPresent()
     {
-        return browser.isElementIdPresent(BUILD_LINK_ID);
-    }
-
-    private String getBaseUrl()
-    {
-        String baseUrl = browser.getBaseUrl();
-        if (baseUrl.endsWith("/"))
-        {
-            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-        }
-        return baseUrl;
+        return browser.isElementIdPresent(ID_BUILD_LINK);
     }
 }

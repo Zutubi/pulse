@@ -1,4 +1,4 @@
-package com.zutubi.pulse.acceptance.utils;
+package com.zutubi.pulse.acceptance.utils.workspace;
 
 import com.zutubi.util.FileSystemUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
@@ -6,17 +6,25 @@ import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
-import java.io.Closeable;
 import java.io.File;
+import java.io.Closeable;
 
 /**
  * Utility class that provides assistance when working with an svn workspace.
  */
 public class SubversionWorkspace implements Closeable
 {
+    static
+    {
+        // Initialise SVN library
+        DAVRepositoryFactory.setup();
+        SVNRepositoryFactoryImpl.setup();
+    }
+
     private SVNClientManager clientManager;
     private File workingDir;
 
@@ -80,7 +88,7 @@ public class SubversionWorkspace implements Closeable
 
     /**
      * Copies one subversion URL to another, server side.
-     * 
+     *
      * @param comment the commit comment for the copy change
      * @param fromUrl source URL
      * @param toUrl   destination URL
@@ -92,7 +100,7 @@ public class SubversionWorkspace implements Closeable
         SVNCopySource[] copySources = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(fromUrl))};
         copyClient.doCopy(copySources, SVNURL.parseURIDecoded(toUrl), false, true, true, comment, null);
     }
-
+    
     /**
      * Cleanup resources held by this instance.  This includes cleaning up the working
      * directory.

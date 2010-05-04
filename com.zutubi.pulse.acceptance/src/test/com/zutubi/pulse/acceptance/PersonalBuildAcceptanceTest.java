@@ -5,24 +5,18 @@ import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
+import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
+import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.patchformats.unified.UnifiedPatchFormat;
-import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
-import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
-import com.zutubi.pulse.core.scm.git.GitPatchFormat;
-import com.zutubi.pulse.core.scm.git.GitWorkingCopy;
-import com.zutubi.pulse.core.scm.p4.PerforceClient;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
-import com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy;
-import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
-import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
-import com.zutubi.pulse.dev.personal.PersonalBuildClient;
-import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -31,26 +25,16 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.util.io.IOUtils;
-import org.tmatesoft.svn.core.SVNDepth;
+import static com.zutubi.util.CollectionUtils.asPair;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
-
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Simple sanity checks for personal builds.
@@ -61,20 +45,18 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     private static final int BUILD_TIMEOUT = 90000;
 
     private File workingCopyDir;
+    private PersonalBuildRunner buildRunner;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        WorkingCopyFactory.registerType("svn", SubversionWorkingCopy.class);
-        WorkingCopyFactory.registerType("git", GitWorkingCopy.class);
-        WorkingCopyFactory.registerType("p4", PerforceWorkingCopy.class);
         workingCopyDir = FileSystemUtils.createTempDir("PersonalBuildAcceptanceTest", "");
 
-        DAVRepositoryFactory.setup();
-        SVNRepositoryFactoryImpl.setup();
-
         xmlRpcHelper.loginAsAdmin();
+
+        buildRunner = new PersonalBuildRunner(xmlRpcHelper);
+        buildRunner.setBase(workingCopyDir);
     }
 
     protected void tearDown() throws Exception
@@ -426,8 +408,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void checkout(String url) throws SVNException
     {
-        SVNUpdateClient client = new SVNUpdateClient(SVNWCUtil.createDefaultAuthenticationManager(), null);
-        client.doCheckout(SVNURL.parseURIDecoded(url), workingCopyDir, SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
+        SubversionWorkspace workspace = new SubversionWorkspace(workingCopyDir, "pulse", "pulse");
+        workspace.doCheckout(url);
     }
 
     private void makeChangeToBuildFile() throws IOException
@@ -458,15 +440,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(stagePath, stage, false);
     }
 
-    private long runPersonalBuild(ResultState expectedStatus)
+    private long runPersonalBuild(ResultState expectedStatus) throws IOException
     {
         // Request the build and wait for it to complete
         AcceptancePersonalBuildUI ui = requestPersonalBuild();
-
-        List<String> warnings = ui.getWarningMessages();
-        assertTrue("Got warnings: " + StringUtils.join("\n", warnings), warnings.isEmpty());
-        List<String> errors = ui.getErrorMessages();
-        assertTrue("Got errors: " + StringUtils.join("\n", errors), errors.isEmpty());
 
         List<String> statuses = ui.getStatusMessages();
         assertTrue(statuses.size() > 0);
@@ -482,49 +459,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void createConfigFile(String projectName, Pair<String, ?>... extraProperties) throws IOException
     {
-        File configFile = new File(workingCopyDir, PersonalBuildConfig.PROPERTIES_FILENAME);
-        Properties config = new Properties();
-        config.put(PersonalBuildConfig.PROPERTY_PULSE_URL, browser.getBaseUrl());
-        config.put(PersonalBuildConfig.PROPERTY_PULSE_USER, "admin");
-        config.put(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "admin");
-        config.put(PersonalBuildConfig.PROPERTY_PROJECT, projectName);
-
-        for (Pair<String, ?> extra: extraProperties)
-        {
-            config.put(extra.first, extra.second.toString());
-        }
-
-        FileOutputStream os = null;
-        try
-        {
-            os = new FileOutputStream(configFile);
-            config.store(os, null);
-        }
-        finally
-        {
-            IOUtils.close(os);
-        }
+        buildRunner.createConfigFile(browser.getBaseUrl(), "admin", "admin", projectName, extraProperties);
     }
 
-    private AcceptancePersonalBuildUI requestPersonalBuild()
+    private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException
     {
-        AcceptancePersonalBuildUI ui = new AcceptancePersonalBuildUI();
-        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir, ui);
-
-        DefaultPatchFormatFactory patchFormatFactory = new DefaultPatchFormatFactory();
-        patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
-        patchFormatFactory.registerFormatType("git", GitPatchFormat.class);
-        patchFormatFactory.registerScm("git", "git");
-        patchFormatFactory.registerFormatType("unified", UnifiedPatchFormat.class);
-        patchFormatFactory.registerScm(PerforceClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
-        patchFormatFactory.setObjectFactory(new DefaultObjectFactory());
-
-        PersonalBuildClient client = new PersonalBuildClient(config, ui);
-        client.setPatchFormatFactory(patchFormatFactory);
-
-        PersonalBuildCommand command = new PersonalBuildCommand();
-        command.execute(client);
-        return ui;
+        return buildRunner.triggerBuild();
     }
 
     private void verifyPersonalBuildTabs(String projectName, long buildNumber, String agent)
@@ -568,43 +508,5 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         PersonalBuildArtifactsPage artifactsPage = browser.openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
         artifactsPage.setFilterAndWait("");
         browser.waitForLocator(artifactsPage.getCommandLocator("build"));
-    }
-
-    private static class AcceptancePersonalBuildUI extends TestPersonalBuildUI
-    {
-        private long buildNumber = -1;
-
-        public boolean isPatchAccepted()
-        {
-            return buildNumber > 0;
-        }
-
-        public long getBuildNumber()
-        {
-            return buildNumber;
-        }
-
-        public void status(String message)
-        {
-            super.status(message);
-
-            if (message.startsWith("Patch accepted"))
-            {
-                String[] pieces = message.split(" ");
-                String number = pieces[pieces.length - 1];
-                number = number.substring(0, number.length() - 1);
-                buildNumber = Long.parseLong(number);
-            }
-        }
-
-        public String inputPrompt(String question)
-        {
-            return "";
-        }
-
-        public String passwordPrompt(String question)
-        {
-            return "";
-        }
     }
 }

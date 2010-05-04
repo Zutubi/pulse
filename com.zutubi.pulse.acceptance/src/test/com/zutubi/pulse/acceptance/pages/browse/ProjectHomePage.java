@@ -2,11 +2,9 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_REBUILD;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_TRIGGER;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_VIEW_SOURCE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -18,7 +16,7 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public ProjectHomePage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-home-" + WebUtils.uriComponentEncode(projectName), WebUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-home-" + projectName, uriComponentEncode(projectName));
         this.projectName = projectName;
     }
 
@@ -50,6 +48,6 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public String getUrl()
     {
-        return urls.project(projectName);
+        return urls.project(uriComponentEncode(projectName));
     }
 }

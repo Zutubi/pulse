@@ -830,6 +830,44 @@ public class XmlRpcHelper
         return (Boolean) call("cancelBuild", projectName, number);
     }
 
+    public Hashtable<String, Object> getPersonalBuild(int number) throws Exception
+    {
+        Vector<Hashtable<String, Object>> build = call("getPersonalBuild", number);
+        if(build.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return build.get(0);
+        }
+    }
+
+    /**
+     * Wait for a personal build to complete.  The build is identified by the
+     * user that is currently logged in and the specified build number.
+     *
+     * @param buildNumber   the build number of the personal build being waited for.
+     */
+    public void waitForBuildToComplete(final int buildNumber)
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    Hashtable<String, Object> build = getPersonalBuild(buildNumber);
+                    return build != null && Boolean.TRUE.equals(build.get("completed"));
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, BUILD_TIMEOUT, "build " + buildNumber + " for current user to complete");
+    }
+
     public Hashtable<String, Object> getBuild(String projectName, int number) throws Exception
     {
         Vector<Hashtable<String, Object>> build = call("getBuild", projectName, number);
@@ -869,6 +907,16 @@ public class XmlRpcHelper
         if (build != null)
         {
             return (String)build.get("reason");
+        }
+        return null;
+    }
+
+    public ResultState getPersonalBuildStatus(int buildNumber) throws Exception
+    {
+        Hashtable<String, Object> build = getPersonalBuild(buildNumber);
+        if (build != null)
+        {
+            return ResultState.fromPrettyString((String) build.get("status"));
         }
         return null;
     }

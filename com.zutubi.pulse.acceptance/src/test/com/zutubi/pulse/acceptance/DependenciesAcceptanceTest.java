@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;

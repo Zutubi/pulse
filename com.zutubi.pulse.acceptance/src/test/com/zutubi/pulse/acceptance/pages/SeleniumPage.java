@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.toValidHtmlName;
 
 /**
  * Base for all pages, with basic functions for identifying page presence and
@@ -73,12 +73,12 @@ public abstract class SeleniumPage
      */
     public void waitFor()
     {
-        browser.waitForElement(id);
+        browser.waitForElement(toValidHtmlName(id));
     }
 
     public boolean isPresent()
     {
-        return browser.isElementPresent("id=" + WebUtils.toValidHtmlName(id));
+        return browser.isElementPresent("id=" + toValidHtmlName(id));
     }
 
     public String getTitle()

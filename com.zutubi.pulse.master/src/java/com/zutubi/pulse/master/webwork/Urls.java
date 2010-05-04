@@ -35,7 +35,7 @@ public class Urls
 
     public Urls(String baseUrl)
     {
-        this.baseUrl = baseUrl;
+        this.baseUrl = (baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl);
     }
 
     public String base()

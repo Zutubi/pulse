@@ -9,16 +9,16 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class PersonalBuildSummaryPage extends BuildSummaryPage
 {
-    private long buildId;
+    private long buildNumber;
 
-    public PersonalBuildSummaryPage(SeleniumBrowser browser, Urls urls, long buildId)
+    public PersonalBuildSummaryPage(SeleniumBrowser browser, Urls urls, long buildNumber)
     {
-        super(browser, urls, "personal", buildId);
-        this.buildId = buildId;
+        super(browser, urls, "personal", buildNumber);
+        this.buildNumber = buildNumber;
     }
 
     public String getUrl()
     {
-        return urls.dashboardMyBuild(Long.toString(buildId));
+        return urls.dashboardMyBuild(Long.toString(buildNumber));
     }
 }

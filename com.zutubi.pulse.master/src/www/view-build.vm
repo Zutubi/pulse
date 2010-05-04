@@ -1,6 +1,6 @@
 #helpTag("Build+Summary+Tab")
 #authorisationTags($principle)
-#buildTags($project $buildResult)
+#buildTags($project $buildResult "summary")
 
 #if($personal)
     #set($ownerArg = "personal=true")
@@ -24,7 +24,7 @@
 #if($personal)
                     personal: 'true',
 #else
-                    projectName: '$h_projectName',
+                    projectName: '#jss($h_projectName)',
 #end
                     buildVID: '$buildResult.number',
                     hook: hookHandle

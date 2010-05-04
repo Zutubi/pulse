@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +24,7 @@ public class ProjectActionBase extends ActionSupport
     private long projectId;
     protected BuildManager buildManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
+    protected ObjectFactory objectFactory;
 
     public String getProjectName()
     {
@@ -114,6 +116,11 @@ public class ProjectActionBase extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

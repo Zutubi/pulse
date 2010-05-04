@@ -21,6 +21,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 public class GitClient implements ScmClient
 {
+    public static final String TYPE = "git";
+    
     private static final Logger LOG = Logger.getLogger(GitClient.class);
 
     static final Messages I18N = Messages.getInstance(GitClient.class);

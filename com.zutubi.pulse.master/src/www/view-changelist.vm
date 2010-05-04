@@ -1,7 +1,7 @@
 #helpTag("Changelist+View")
 #authorisationTags($principle)
 #if($buildResult)
-    #buildTags($buildResult.project $buildResult)
+    #buildTags($buildResult.project $buildResult "changes")
 #elseif($project)
     #projectTags($project)
 #end

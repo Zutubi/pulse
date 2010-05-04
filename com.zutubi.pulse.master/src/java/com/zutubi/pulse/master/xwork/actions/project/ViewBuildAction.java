@@ -166,7 +166,7 @@ public class ViewBuildAction extends CommandActionBase
             }
         });
     }
-    
+
     public String execute()
     {
         final BuildResult result = getRequiredBuildResult();

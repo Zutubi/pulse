@@ -20,6 +20,11 @@ public class MyBuildsAction extends ActionSupport
     private BuildManager buildManager;
     private BuildColumns columns;
 
+    public boolean isPersonalBuild()
+    {
+        return true;
+    }
+
     public User getUser()
     {
         return user;
