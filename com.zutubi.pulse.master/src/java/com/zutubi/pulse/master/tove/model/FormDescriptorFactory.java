@@ -140,19 +140,24 @@ public class FormDescriptorFactory
                 {
                     ((OptionFieldDescriptor) fd).setMultiple(true);
                 }
-
-                fd.setForm(form);
-                fd.setParentPath(parentPath);
-                fd.setBaseName(baseName);
-                fd.setPath(PathUtils.getPath(parentPath, baseName));
-                fd.setProperty(property);
-                fd.setName(property.getName());
+                initialiseDescriptor(fd, fieldType, parentPath, baseName, form, property);
                 addFieldParameters(type, parentPath, property, fd, validators);
                 fieldDescriptors.add(fd);
             }
         }
 
         return fieldDescriptors;
+    }
+
+    private void initialiseDescriptor(FieldDescriptor fd, String fieldType, String parentPath, String baseName, FormDescriptor form, TypeProperty property)
+    {
+        fd.setForm(form);
+        fd.setParentPath(parentPath);
+        fd.setBaseName(baseName);
+        fd.setPath(PathUtils.getPath(parentPath, baseName));
+        fd.setProperty(property);
+        fd.setName(property.getName());
+        fd.setType(fieldType);
     }
 
     private List<Validator> getValidators(String parentPath, String baseName, boolean concrete, CompositeType type)
@@ -204,13 +209,8 @@ public class FormDescriptorFactory
         }
 
         FieldDescriptor fd = createFieldOfType(fieldType);
-        fd.setType(fieldType);
-        fd.setPath(PathUtils.getPath(parentPath, baseName));
-        fd.setParentPath(parentPath);
-        fd.setBaseName(baseName);
-        fd.setProperty(property);
-        fd.setName(property.getName());
-        fd.setForm(form);
+        initialiseDescriptor(fd, fieldType, parentPath, baseName, form, property);
+
         return fd;
     }
 
