@@ -1,6 +1,6 @@
 #helpTag("Build+Details+Tab")
 #authorisationTags($principle)
-#buildTags($project $result)
+#buildTags($project $result "details")
 #if($commandResult)
     #set($resultId = $commandResult.id)
 #elseif($recipeResultNode)
