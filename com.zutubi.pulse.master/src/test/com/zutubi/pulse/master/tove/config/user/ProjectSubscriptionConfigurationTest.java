@@ -8,9 +8,9 @@ import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import static org.mockito.Mockito.mock;
 
 import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
 
 public class ProjectSubscriptionConfigurationTest extends PulseTestCase
 {
@@ -99,6 +99,15 @@ public class ProjectSubscriptionConfigurationTest extends PulseTestCase
         suscription.setProjects(asList(project2.getConfig()));
         suscription.setLabels(asList(LABEL_ODD));
 
+        assertTrue(suscription.conditionSatisfied(createBuild(project1)));
+        assertTrue(suscription.conditionSatisfied(createBuild(project2)));
+        assertTrue(suscription.conditionSatisfied(createBuild(project3)));
+    }
+    
+    public void testNoCondition()
+    {
+        suscription.setCondition(null);
+        
         assertTrue(suscription.conditionSatisfied(createBuild(project1)));
         assertTrue(suscription.conditionSatisfied(createBuild(project2)));
         assertTrue(suscription.conditionSatisfied(createBuild(project3)));

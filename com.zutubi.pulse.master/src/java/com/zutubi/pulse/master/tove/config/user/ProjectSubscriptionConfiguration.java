@@ -141,32 +141,39 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
 
     public NotifyCondition getNotifyCondition()
     {
-        if(notifyCondition == null)
+        if (notifyCondition == null)
         {
-            // Need to parse our condition.
-            try
+            if (condition == null)
             {
-                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition.getExpression()));
-
-                NotifyConditionParser parser = new NotifyConditionParser(lexer);
-                parser.condition();
-                AST t = parser.getAST();
-                if(t == null)
-                {
-                    // Empty expression evals to true
-                    notifyCondition = new TrueNotifyCondition();
-                }
-                else
-                {
-                    NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
-                    tree.setNotifyConditionFactory(notifyFactory);
-                    notifyCondition = tree.cond(t);
-                }
+                notifyCondition = new TrueNotifyCondition();
             }
-            catch (Exception e)
+            else
             {
-                LOG.severe("Unable to parse subscription condition '" + condition.getExpression() + "'");
-                notifyCondition = new FalseNotifyCondition();
+                // Need to parse our condition.
+                try
+                {
+                    NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition.getExpression()));
+    
+                    NotifyConditionParser parser = new NotifyConditionParser(lexer);
+                    parser.condition();
+                    AST t = parser.getAST();
+                    if(t == null)
+                    {
+                        // Empty expression evals to true
+                        notifyCondition = new TrueNotifyCondition();
+                    }
+                    else
+                    {
+                        NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
+                        tree.setNotifyConditionFactory(notifyFactory);
+                        notifyCondition = tree.cond(t);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LOG.severe("Unable to parse subscription condition '" + condition.getExpression() + "'");
+                    notifyCondition = new FalseNotifyCondition();
+                }
             }
         }
 
