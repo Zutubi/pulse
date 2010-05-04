@@ -653,9 +653,9 @@ public class StringUtils
         // If skipping empty, move length backwards to ignore empty pieces at
         // the end (helps us know when we are on the last actual piece).
         int length = pieces.length;
-        if(skipEmpty)
+        if (skipEmpty)
         {
-            while(length > 0 && (pieces[length - 1] == null || pieces[length - 1].length() == 0))
+            while (length > 0 && !stringSet(pieces[length - 1]))
             {
                 length--;
             }
@@ -665,7 +665,7 @@ public class StringUtils
         for (int i = 0; i < length; i++)
         {
             String piece = pieces[i];
-            if(skipEmpty && piece.length() == 0)
+            if (skipEmpty && !stringSet(piece))
             {
                 continue;
             }
