@@ -4,7 +4,7 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NotEqualsPredicate;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,14 +26,14 @@ public class HostStatus
      * building.  The agent handle may map to either nothing, or 0 if it is not
      * currently executing a build.
      */
-    private Map<Long, Long> agentHandleToRecipeId = Collections.emptyMap();
+    private Map<Long, Long> agentHandleToRecipeId = new HashMap<Long, Long>();
     /**
      * If true, this is the first status request the agent has answered since
      * it booted.  Used to detect agent bounces between pings (CIB-1141).
      */
     private boolean first = false;
     /**
-     * If an error occured, a detail message.
+     * If an error occurred, a detail message.
      */
     private String message = null;
 
