@@ -17,6 +17,35 @@
         var paneLoading = false;
         var selectedResultId = '$resultId';
 
+        function refreshDetails()
+        {
+            var rootNode = resultTree.getRootNode();
+
+            Ext.Ajax.request({
+                url: '$base/ajax/getBuildStatus.action',
+                params: {
+                    buildId: '$result.id'
+                },
+                success: function(rspObj) {
+                    var status = Ext.util.JSON.decode(rspObj.responseText);
+                    var iconEl = rootNode.getUI().getIconEl();
+                    iconEl.className = iconEl.className.replace(/\bstatus-.+\b/, 'status-' + status);
+                }
+            });
+
+            var selectedNode = resultTree.getSelectionModel().getSelectedNode();
+            if (!selectedNode)
+            {
+                selectedNode = rootNode;
+            }
+
+            selectedResultId = selectedNode.attributes.extraAttributes.resultId;
+            resultTree.getLoader().load(resultTree.getRootNode(), function()
+            {
+                rootNode.expand(true);
+            });
+        }
+
         function onSelect(selectionModel, node)
         {
             if (!node) return;
@@ -106,35 +135,6 @@
             viewport.doLayout();
 
 #if($refreshInterval || $principle.preferences.refreshingEnabled)
-            function refreshDetails()
-            {
-                var rootNode = resultTree.getRootNode();
-
-                Ext.Ajax.request({
-                    url: '$base/ajax/getBuildStatus.action',
-                    params: {
-                        buildId: '$result.id'
-                    },
-                    success: function(rspObj) {
-                        var status = Ext.util.JSON.decode(rspObj.responseText);
-                        var iconEl = rootNode.getUI().getIconEl();
-                        iconEl.className = iconEl.className.replace(/\bstatus-.+\b/, 'status-' + status);
-                    }
-                });
-
-                var selectedNode = resultTree.getSelectionModel().getSelectedNode();
-                if (!selectedNode)
-                {
-                    selectedNode = rootNode;
-                }
-
-                selectedResultId = selectedNode.attributes.extraAttributes.resultId;
-                resultTree.getLoader().load(resultTree.getRootNode(), function()
-                {
-                    rootNode.expand(true);
-                });
-            }
-
     #if($refreshInterval)
             var refreshInterval = $refreshInterval;
     #else
