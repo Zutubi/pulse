@@ -9,8 +9,8 @@ import com.zutubi.util.WebUtils;
  */
 public class BuildTestsPage extends AbstractTestsPage
 {
-    private static final String ID_BUILD_INCOMPLETE = "build.incomplete";
-    private static final String ID_NO_TESTS = "no.tests";
+    private static final String ID_BUILD_INCOMPLETE = "build-incomplete";
+    private static final String ID_NO_TESTS = "no-tests";
 
     private String projectName;
     private long buildId;

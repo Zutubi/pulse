@@ -1303,9 +1303,9 @@
     <h2 id="failed.tests" class="section">#wwtext("name=failed.tests")</h2>
         #foreach($recipeNode in $buildResult.root.children)
             #if($recipeNode.hasBrokenTests())
-    <table class="fill-content">
+    <table class="fill two-content">
         <tr>
-            <th class="heading" colspan="5">
+            <th class="two-heading" colspan="5">
                 #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stageName) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
             </th>
         </tr>
@@ -1318,10 +1318,10 @@
                 #noteRow($action.getText("test.excess.failures", [$excess]) 5)
             #end
             <tr>
-                #contentHeading("test.name" 1)
+                #contentClassHeading("test.name" 1 "leftmost")
                 #contentHeading("test.status" 2)
                 #contentHeading("test.details" 1)
-                #contentHeading("test.duration" 1)
+                #contentClassHeading("test.duration" 1 "rightmost")
             </tr>
             #showRecipeTestFailures($buildResult $recipeNode)
         #end
@@ -1513,8 +1513,8 @@
 ##
 ## Shows a test status cell for a broken case.
 ##
-#macro(brokenTestStatusCell $test $key)
-    <td class="test-failure">
+#macro(brokenTestStatusCell $test $key $extraClass)
+    <td class="test-failure fit-width $extraClass">
     #if($test.wasBrokenPreviously())
         <img alt="broken test" src="$base/images/exclamation-bw.gif"/>
     #else
@@ -1532,29 +1532,29 @@
 ##
 ## Outputs a status cell for a test result
 ##
-#macro(testStatusCell $test)
+#macro(testStatusCell $test $extraClass)
     #if($test.errors > 0)
-        #brokenTestStatusCell($test "test.error")
+        #brokenTestStatusCell($test "test.error" $extraClass)
     #elseif($test.failures > 0)
-        #brokenTestStatusCell($test "test.failure")
+        #brokenTestStatusCell($test "test.failure" $extraClass)
     #elseif($test.expectedFailures > 0)
-        #brokenTestStatusCell($test "test.expected.failure")
+        #brokenTestStatusCell($test "test.expected.failure" $extraClass)
     #elseif($test.total == 0)
-    <td class="content">
+    <td class="content fit-width $extraClass">
         <img alt="none" src="$base/images/none_blue.gif"/>
     </td>
     <td class="content">
         #wwtext("name=test.none")
     </td>
     #elseif($test.allTestsSkipped())
-    <td class="content">
+    <td class="content fit-width $extraClass">
         <img alt="skipped" src="$base/images/none_blue.gif"/>
     </td>
     <td class="test-skipped">
         #wwtext("name=test.skipped")
     </td>
     #else
-    <td class="success">
+    <td class="success fit-width $extraClass">
         <img alt="success" src="$base/images/accept.gif"/>
     </td>
     <td class="success">
@@ -1566,65 +1566,12 @@
     #end
 #end
 
-##
-## Shows a single test with any nested tests (if it is a suite).
-##
-#macro(showTest $recipe $test $indent $showPassed $parent)
-    #if($showPassed || $test.hasBrokenTests())
-        #if($test.hasBrokenTests())
-            #set($cssClass = "test-failure")
-        #elseif($test.allTestsSkipped())
-            #set($cssClass = "content")
-        #else
-            #set($cssClass = "success")
-        #end
-        #set($rowId = "test${parent}_${test.id}")
-        <tr id="$rowId"
-        #if($test.isSuite() && $showPassed)
-            class="suite" onmouseover="getElement('$rowId').className = 'suite-hover';" onmouseout="getElement('$rowId').className = 'suite';" onclick="toggleTests('$rowId', successfulShowing['$recipe.id']);"
-        #end
-        >
-            <td
-        #if($test.isSuite() && $showPassed)
-                class="$cssClass content-nowrap collapse"
-        #else
-                class="$cssClass content-nowrap"
-        #end
-            >
-                 ${indent}$!webwork.htmlEncode($test.name)
-             </td>
-            #testStatusCell($test)
-        #if($test.isSuite())
-            #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures", "$test.expectedFailures", "$test.skipped"]))
-        #else
-            #if($test.message)
-            <td class="content-wrap">
-                $action.plainToHtml($test.message)
-            </td>
-            #else
-                #contentCell("empty.cell")
-            #end
-        #end
-            <td class="content" width="10%">
-                $!webwork.htmlEncode($test.prettyDuration)
-            </td>
-        </tr>
-
-        #if($test.isSuite())
-            #set($newparent = "${parent}_${test.id}")
-            #foreach($child in $test.children)
-                #showTest($recipe $child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "$newparent")
-            #end
-        #end
-    #end
-#end
-
 #macro(showTestCaseFailure $recipe $test $indent)
     <tr>
-        <td class="test-failure content-nowrap">
+        <td class="test-failure content-nowrap leftmost">
              ${indent}$!webwork.htmlEncode($test.name)
         </td>
-        #testStatusCell($test) 
+        #testStatusCell($test "")
     #if($test.message)
         <td class="content-wrap">
             $action.plainToHtml($test.message)
@@ -1632,7 +1579,7 @@
     #else
         #contentCell("empty.cell")
     #end
-        <td class="content" width="10%">
+        <td class="content rightmost" width="10%">
             $!webwork.htmlEncode($test.prettyDuration)
         </td>
     </tr>
@@ -1647,13 +1594,13 @@
     #set($path = $action.pushSuite($test))
 
     <tr>
-        <td class="test-failure content-nowrap">
+        <td class="test-failure content-nowrap leftmost">
              ${indent}<a href='$urls.stageTests($build, $recipe)${path}/'>$!webwork.htmlEncode($test.name)</a>
          </td>
         #contentCell("empty.cell")
         #contentCell("empty.cell")
         #contentCell("empty.cell")
-        <td class="content" width="10%">
+        <td class="content rightmost" width="10%">
             $!webwork.htmlEncode($test.prettyDuration)
         </td>
     </tr>
@@ -1752,25 +1699,29 @@
 ## Shows a test summary table for a result
 ##
 #macro(testSummaryTable $summary)
-    <table id="test.summary" class="fill-content">
-        #headingRow("test.summary" 8)
+    <table id="test.summary" class="fill two-content">
         <tr>
-            #contentHeading("test.status" 2)
+            <th class="two-heading" colspan="8">
+                #wwtext("name=test.summary")
+            </th>
+        </tr>
+        <tr>
+            #contentClassHeading("test.status" 2 "leftmost")
             #contentHeading("test.total" 1)
             #contentHeading("test.failures" 1)
             #contentHeading("test.errors" 1)
             #contentHeading("test.expected.failures" 1)
             #contentHeading("test.skipped" 1)
-            #contentHeading("test.success.rate" 1)
+            #contentClassHeading("test.success.rate" 1 "rightmost")
         </tr>
         <tr>
-            #testStatusCell($summary)
+            #testStatusCell($summary "leftmost")
             #rightCell($summary.total)
             #rightCell($summary.failures)
             #rightCell($summary.errors)
             #rightCell($summary.expectedFailures)
             #rightCell($summary.skipped)
-            #rightCell("${summary.successRate}%")
+            <td class="content-right rightmost">${summary.successRate}%</td>
         </tr>
     </table>
 #end

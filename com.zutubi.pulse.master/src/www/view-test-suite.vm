@@ -4,7 +4,48 @@
 <html>
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>
+
     <script type="text/javascript">
+        Ext.onReady(function() {
+            new ZUTUBI.Toolbar({
+                id: 'build-toolbar',
+                renderTo: 'build-toolbar-holder',
+                enableOverflow: true,
+                items: [{
+                    xtype: 'xztblink',
+                    id: 'allcrumb',
+                    text: '#wwtext("name=tests.all")',
+                    url: '#jss($urls.buildTests($buildResult))'
+                }, '::', {
+                    xtype: 'xztblink',
+                    id: 'stagecrumb',
+                    text: Ext.util.Format.htmlEncode('#wwtext("name=build.stage") #jss($stageName)'),
+                    url: '#jss($urls.stageTests($buildResult, $recipeResultNode))'
+                }
+#set($suitePath="")
+#set($rawSuitePath="")
+#foreach($element in $paths)
+    #if($element.length() > 0)
+        #if($suitePath.length() > 0)
+            #set($suitePath = "$suitePath/$action.uriComponentEncode($element)")
+            #set($rawSuitePath = "$rawSuitePath/$element")
+        #else
+            #set($suitePath = "$action.uriComponentEncode($element)")
+            #set($rawSuitePath = "$element")
+        #end
+                , '::', {
+                xtype: 'xztblink',
+                id: '#id("suitecrumb-${rawSuitePath}")',
+                text: Ext.util.Format.htmlEncode('#wwtext("name=test.suite") #jss($element)'),
+                url: '#jss("$urls.stageTests($buildResult, $recipeResultNode)${suitePath}/")'
+
+                }
+    #end
+#end
+                ]
+            });
+        });
+
         var successfulShowing = {
             "suites": true,
             "cases": true
@@ -30,36 +71,22 @@
 </head>
 <body>
     #buildTabs($buildResult "tests")
+
 #if($path)
     #set($pathComponent = "-$path")
 #else
     #set($pathComponent = "")
 #end
-    <p id='#id("${buildResult.ownerName}-build-${buildResult.number}-tests-${stageName}${pathComponent}")'>
-        <a id="allcrumb" href="$urls.buildTests($buildResult)">#wwtext("name=tests.all")</a>
-        :: <a id="stagecrumb" href="$urls.stageTests($buildResult, $recipeResultNode)">#wwtext("name=build.stage") $h_stageName</a>
-#set($suitePath="")
-#set($rawSuitePath="")
-#foreach($element in $paths)
-    #if($element.length() > 0)
-        #if($suitePath.length() > 0)
-            #set($suitePath = "$suitePath/$action.uriComponentEncode($element)")
-            #set($rawSuitePath = "$rawSuitePath/$element")
-        #else
-            #set($suitePath = "$action.uriComponentEncode($element)")
-            #set($rawSuitePath = "$element")
-        #end
-        :: <a id='#id("suitecrumb-${rawSuitePath}")' href="$urls.stageTests($buildResult, $recipeResultNode)${suitePath}/">#wwtext("name=test.suite") #html($element)</a>
-    #end
-#end
-    </p>
+
+    <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-tests-${stageName}${pathComponent}")'>
+        <div id="build-toolbar-holder"></div>
 
 #if($suiteExists)
     #testSummaryTable($suite.summary)
 
     #if($suite.suites.size() > 0)
-        <table id="child-suites" class="fill-content">
-            <th class="heading" colspan="9">
+        <table id="child-suites" class="fill two-content spaced">
+            <th class="two-heading" colspan="9">
                <span class="action">
                    <a href="#" id="suites-toggle" onclick="toggleSuccessful('suites'); return false;">
                         #wwtext("name=tests.hide.successful")
@@ -68,14 +95,14 @@
                 #wwtext("name=test.suites")
             </th>
             <tr>
-                #contentHeading("test.name" 1)
+                #contentClassHeading("test.name" 1 "leftmost")
                 #contentHeading("test.status" 2)
                 #contentHeading("test.total" 1)
                 #contentHeading("test.failures" 1)
                 #contentHeading("test.errors" 1)
                 #contentHeading("test.expected.failures" 1)
                 #contentHeading("test.skipped" 1)
-                #contentHeading("test.duration" 1)
+                #contentClassHeading("test.duration" 1 "rightmost")
             </tr>
         #foreach($childSuite in $suite.suites)
             #if($childSuite.hasBrokenTests())
@@ -84,22 +111,22 @@
                 #set($cssClass = "successful")
             #end
             <tr class="$cssClass">
-                <td class="content"><a id='#id("suite-${childSuite.name}")' href="$urls.stageTests($buildResult, $recipeResultNode)$action.getChildUriPath($childSuite.name)/">#html($childSuite.name)</a></td>
-                #testStatusCell($childSuite)
+                <td class="content leftmost"><a id='#id("suite-${childSuite.name}")' href="$urls.stageTests($buildResult, $recipeResultNode)$action.getChildUriPath($childSuite.name)/">#html($childSuite.name)</a></td>
+                #testStatusCell($childSuite "")
                 #rightCell($childSuite.total)
                 #rightCell($childSuite.failures)
                 #rightCell($childSuite.errors)
                 #rightCell($childSuite.expectedFailures)
                 #rightCell($childSuite.skipped)
-                #rightCell($childSuite.prettyDuration)
+                <td class="content-right rightmost">$childSuite.prettyDuration</td>
             </tr>
         #end
         </table>
     #end
 
     #if($suite.cases.size() > 0)
-        <table id="child-cases" class="fill-content">
-            <th class="heading" colspan="5">
+        <table id="child-cases" class="fill two-content spaced">
+            <th class="two-heading" colspan="5">
                <span class="action">
                    <a href="#" id="cases-toggle" onclick="toggleSuccessful('cases'); return false;">
                         #wwtext("name=tests.hide.successful")
@@ -108,10 +135,10 @@
                 #wwtext("name=test.cases")
             </th>
             <tr>
-                #contentHeading("test.name" 1)
+                #contentClassHeading("test.name" 1 "leftmost")
                 #contentHeading("test.status" 2)
                 #contentHeading("test.details" 1)
-                #contentHeading("test.duration" 1)
+                #contentClassHeading("test.duration" 1 "rightmost")
             </tr>
         #foreach($childCase in $suite.cases)
             #if($childCase.hasBrokenTests())
@@ -120,8 +147,8 @@
                 #set($cssClass = "successful")
             #end
             <tr class="$cssClass">
-                #dynamicCell($childCase.name)
-                #testStatusCell($childCase)
+                <td class="content leftmost">$!webwork.htmlEncode($childCase.name)</td>
+                #testStatusCell($childCase "")
                 #if($childCase.message)
                 <td class="content-wrap">
                     $action.plainToHtml($childCase.message)
@@ -129,13 +156,13 @@
                 #else
                     #contentCell("empty.cell")
                 #end
-                #rightCell($childCase.prettyDuration)
+                <td class="content-right rightmost">$childCase.prettyDuration</td>
             </tr>
         #end
         </table>
     #end
 #else
-    <span id="test.load.failure">#wwtext("name=test.load.failure")</span>
+        <span id="test-load-failure">#wwtext("name=test.load.failure")</span>
 #end
-
+    </div>
 </html>

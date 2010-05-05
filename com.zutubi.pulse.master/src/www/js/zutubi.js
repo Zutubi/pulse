@@ -2832,7 +2832,35 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
     }
 }); }
 
-ZUTUBI.Toolbar = {};
+ZUTUBI.Toolbar = Ext.extend(Ext.Toolbar, {
+    initComponent: function()
+    {
+        var config = {
+            layout: 'xztoolbar'
+        };
+        Ext.apply(this, config);
+        Ext.apply(this.initialConfig, config);
+
+        ZUTUBI.Toolbar.superclass.initComponent.call(this);
+    }
+});
+Ext.reg('xztoolbar', ZUTUBI.Toolbar);
+
+ZUTUBI.Toolbar.ToolbarLayout = Ext.extend(Ext.layout.ToolbarLayout, {
+    addComponentToMenu : function(m, c)
+    {
+        if (c instanceof ZUTUBI.Toolbar.LinkItem)
+        {
+            m.add(this.createMenuConfig(c, true));
+        }
+        else
+        {
+            ZUTUBI.Toolbar.ToolbarLayout.superclass.addComponentToMenu.call(this, m, c);
+        }
+    }
+});
+Ext.Container.LAYOUTS.xztoolbar = ZUTUBI.Toolbar.ToolbarLayout;
+
 ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
     /**
      * @cfg {String} icon  URL of the image to show beside the link.
@@ -2887,6 +2915,14 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
         }
         ZUTUBI.Toolbar.LinkItem.superclass.onRender.call(this, ct, position);
         this.mon(this.el, {scope: this, click: this.onClick});
+    },
+
+    handler: function(e)
+    {
+        if (this.url)
+        {
+            window.location.href = this.url;
+        }
     },
 
     onClick: function(e)
@@ -3269,7 +3305,6 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     {
         var items = [];
 
-        var config = null;
         if (this.nextSuccessful)
         {
             items.push({

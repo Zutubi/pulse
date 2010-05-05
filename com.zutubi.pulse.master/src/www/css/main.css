@@ -2256,3 +2256,9 @@ td.glegend
 {
     border: solid 1px black;
 }
+
+a.x-menu-item
+{
+    border-bottom: none;
+    color: #000;
+}

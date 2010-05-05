@@ -65,7 +65,6 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
         listener.setMinThreads(Integer.getInteger(PROPERTY_MIN_THREADS, listener.getMinThreads()));
         listener.setMaxThreads(Integer.getInteger(PROPERTY_MAX_THREADS, listener.getMaxThreads()));
         server.addListener(listener);
-
     }
 
     private int getIdleTimeout()
