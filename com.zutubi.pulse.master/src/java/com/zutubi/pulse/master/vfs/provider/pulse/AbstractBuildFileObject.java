@@ -64,7 +64,7 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[]{"artifacts", "stages", "wc"};
+        return new String[]{"artifacts", "details", "stages", "wc"};
     }
 
     public boolean isLocal()
