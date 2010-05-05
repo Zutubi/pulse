@@ -4,7 +4,6 @@
 <html>
 <head>
     <title>#wwtext("name=server.activity")</title>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         #updater("$base/ajax/viewServerQueuesPanel.action" "panel" $principle "Ext.emptyFn")
     </script>

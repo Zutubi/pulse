@@ -15,7 +15,6 @@
 <html>
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
 </head>
 <body>
     #buildTabs($buildResult "changes")
