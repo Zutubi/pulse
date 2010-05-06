@@ -965,7 +965,7 @@
         #dateClassCell($recipe)
         #elapsedCell($recipe)
         <td class="content">
-            <a id="log-#uce($build.project.name)-${build.number}-${resultNode.stageName}" href="$urls.stageLog($build, $resultNode)" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
+            <a id='#id("log-${build.project.name}-${build.number}-${resultNode.stageName}")' href="$urls.stageLog($build, $resultNode)" class="unadorned" title="view log"><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")</a>
         </td>
     </tr>
 #end

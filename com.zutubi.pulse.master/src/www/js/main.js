@@ -288,14 +288,17 @@ function hideChildren(id)
 function toggleSuccessfulTestRows(tableId, successfulShowing)
 {
     var table = getElement(tableId);
-    var rows = table.getElementsByTagName('tr');
-
-    for(var i = 0; i < rows.length; i++)
+    if (table)
     {
-        var successfulRow = rows[i].className.indexOf('successful') == 0;
-        if(successfulRow)
+        var rows = table.getElementsByTagName('tr');
+
+        for(var i = 0; i < rows.length; i++)
         {
-            rows[i].style.display = successfulShowing ? '' : 'none';
+            var successfulRow = rows[i].className.indexOf('successful') == 0;
+            if(successfulRow)
+            {
+                rows[i].style.display = successfulShowing ? '' : 'none';
+            }
         }
     }
 }

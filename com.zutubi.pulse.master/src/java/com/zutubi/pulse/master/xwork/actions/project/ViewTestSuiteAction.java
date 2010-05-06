@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.xwork.actions.ajax.SetTestFilterAction;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -25,6 +26,7 @@ public class ViewTestSuiteAction extends StageActionBase
     private String path;
     private PersistentTestSuiteResult suite;
     private List<String> paths;
+    private boolean filterTests;
     private MasterConfigurationManager configurationManager;
 
     /**
@@ -69,6 +71,11 @@ public class ViewTestSuiteAction extends StageActionBase
     public List<String> getPaths()
     {
         return paths;
+    }
+
+    public boolean isFilterTests()
+    {
+        return filterTests;
     }
 
     /**
@@ -152,6 +159,8 @@ public class ViewTestSuiteAction extends StageActionBase
                 return ERROR;
             }
         }
+
+        filterTests = SetTestFilterAction.filterTestsForBuild(getBuildResult().getId());
 
         return SUCCESS;
     }

@@ -185,7 +185,7 @@ public class WebUtilsTest extends ZutubiTestCase
 
     public void testURIComponentEncodeNoChange()
     {
-        assertEquals("agzALZ0369_-!~.'()*", WebUtils.uriComponentEncode("agzALZ0369_-!~.'()*"));
+        assertEquals("agzALZ0369_-!~.()*", WebUtils.uriComponentEncode("agzALZ0369_-!~.()*"));
     }
 
     public void testURIComponentEncodeNonASCII() throws UnsupportedEncodingException

@@ -357,4 +357,32 @@ public class AcceptanceTestUtils
         String text = browser.getText(IDs.STATUS_MESSAGE);
         assertThat(text, containsString(message));
     }
+
+    /**
+     * Sets the value of an Ext combo box with a given component id.
+     *
+     * @param browser selenium instance
+     * @param comboId component id of the combo
+     * @param value   value to set the combo to
+     */
+    public static void setComboByValue(SeleniumBrowser browser, String comboId, String value)
+    {
+        String indexExpression;
+        // Annoyingly ext stores can't find the empty string value...
+        if (StringUtils.stringSet(value))
+        {
+            indexExpression = "store.find('filter', '" + value + "')";
+        }
+        else
+        {
+            indexExpression = "0";
+        }
+
+        browser.evalExpression(
+                "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "');" +
+                "combo.setValue('" + value + "');" +
+                "var store = combo.getStore();" +
+                "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
+        );
+    }
 }

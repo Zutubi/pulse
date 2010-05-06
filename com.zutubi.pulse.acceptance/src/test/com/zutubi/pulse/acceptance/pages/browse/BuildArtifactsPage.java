@@ -5,14 +5,14 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.vfs.provider.pulse.ArtifactFileObject;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
 
 /**
  * The artifacts tab for a build result.
  */
 public class BuildArtifactsPage extends SeleniumPage
 {
-    private static final String EXPRESSION_COMBO = "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('filter-combo');";
+    private static final String ID_COMBO = "filter-combo";
+    private static final String EXPRESSION_COMBO = "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + ID_COMBO + "');";
 
     private String projectName;
     private long buildId;
@@ -67,23 +67,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public void setFilterAndWait(String filter)
     {
-        String indexExpression;
-        // Annoyingly ext stores can't find the empty string value...
-        if (StringUtils.stringSet(filter))
-        {
-            indexExpression = "store.find('filter', '" + filter + "')";
-        }
-        else
-        {
-            indexExpression = "0";
-        }
-
-        browser.evalExpression(EXPRESSION_COMBO +
-                "combo.setValue('" + filter + "');" +
-                "var store = combo.getStore();" +
-                "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
-        );
-
+        AcceptanceTestUtils.setComboByValue(browser, ID_COMBO, filter);
         waitForLoad();
     }
 

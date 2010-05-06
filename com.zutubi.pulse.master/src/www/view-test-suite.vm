@@ -6,12 +6,64 @@
     <title>#wwtext("name=build") $buildResult.number</title>
 
     <script type="text/javascript">
+        var filtering = false;
+
+        function applyFilter(filter)
+        {
+            filtering = true;
+            toggleSuccessfulTestRows('child-suites', filter == '');
+            toggleSuccessfulTestRows('child-cases', filter == '');
+
+            Ext.Ajax.request({
+                url: '$base/ajax/setTestFilter.action',
+                params: {
+                    buildId: '$buildResult.id',
+                    filter: filter
+                },
+                callback: function() {
+                    filtering = false;
+                }
+            });
+        }
+
         Ext.onReady(function() {
             new ZUTUBI.Toolbar({
                 id: 'build-toolbar',
                 renderTo: 'build-toolbar-holder',
                 enableOverflow: true,
                 items: [{
+                        xtype: 'label',
+                        text: 'filter:'
+                    }, ' ', {
+                    xtype: 'combo',
+                    id: 'filter-combo',
+                    width: 200,
+                    mode: 'local',
+                    triggerAction: 'all',
+                    editable: false,
+                    store: new Ext.data.ArrayStore({
+                        idIndex: 0,
+                        fields: [
+                            'filter',
+                            'text'
+                        ],
+                        data: [
+                            ['', 'all tests'],
+                            ['broken', 'broken tests only']
+                        ]
+                    }),
+                    valueField: 'filter',
+                    displayField: 'text',
+                    value: #if($filterTests) 'broken' #else '' #end,
+                    listeners: {
+                        select: function(combo, record) {
+                            applyFilter(record.get('filter'));
+                        }
+                    }
+                }, '  ', {
+                    xtype: 'tbtext',
+                    text: '<span class="understated">//</span>'
+                }, {
                     xtype: 'xztblink',
                     id: 'allcrumb',
                     text: '#wwtext("name=tests.all")',
@@ -45,28 +97,6 @@
                 ]
             });
         });
-
-        var successfulShowing = {
-            "suites": true,
-            "cases": true
-        };
-
-        function toggleSuccessful(name)
-        {
-            if(successfulShowing[name])
-            {
-                text = "#wwtext("name=tests.show.successful")";
-                successfulShowing[name] = false;
-            }
-            else
-            {
-                text = "#wwtext("name=tests.hide.successful")";
-                successfulShowing[name] = true;
-            }
-
-            toggleSuccessfulTestRows("child-" + name, successfulShowing[name]);
-            setText(name + "-toggle", text);
-        }
     </script>
 </head>
 <body>
@@ -87,11 +117,6 @@
     #if($suite.suites.size() > 0)
         <table id="child-suites" class="fill two-content spaced">
             <th class="two-heading" colspan="9">
-               <span class="action">
-                   <a href="#" id="suites-toggle" onclick="toggleSuccessful('suites'); return false;">
-                        #wwtext("name=tests.hide.successful")
-                    </a>
-                </span>
                 #wwtext("name=test.suites")
             </th>
             <tr>
@@ -110,7 +135,7 @@
             #else
                 #set($cssClass = "successful")
             #end
-            <tr class="$cssClass">
+            <tr class="$cssClass" #if($filterTests && !$childSuite.hasBrokenTests()) style="display: none" #end>
                 <td class="content leftmost"><a id='#id("suite-${childSuite.name}")' href="$urls.stageTests($buildResult, $recipeResultNode)$action.getChildUriPath($childSuite.name)/">#html($childSuite.name)</a></td>
                 #testStatusCell($childSuite "")
                 #rightCell($childSuite.total)
@@ -127,11 +152,6 @@
     #if($suite.cases.size() > 0)
         <table id="child-cases" class="fill two-content spaced">
             <th class="two-heading" colspan="5">
-               <span class="action">
-                   <a href="#" id="cases-toggle" onclick="toggleSuccessful('cases'); return false;">
-                        #wwtext("name=tests.hide.successful")
-                    </a>
-                </span>
                 #wwtext("name=test.cases")
             </th>
             <tr>
@@ -146,7 +166,7 @@
             #else
                 #set($cssClass = "successful")
             #end
-            <tr class="$cssClass">
+            <tr class="$cssClass" #if($filterTests && !$childCase.hasBrokenTests()) style="display: none" #end>
                 <td class="content leftmost">$!webwork.htmlEncode($childCase.name)</td>
                 #testStatusCell($childCase "")
                 #if($childCase.message)

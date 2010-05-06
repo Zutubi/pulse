@@ -34,7 +34,7 @@ public class StageTestsPage extends AbstractTestsPage
 
     public boolean isLoadFailureMessageShown()
     {
-        return browser.isElementIdPresent("test.load.failure");
+        return browser.isElementIdPresent("test-load-failure");
     }
 
     public boolean isBreadcrumbsVisible()

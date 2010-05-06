@@ -457,7 +457,7 @@ public class WebUtils
         if(c < '\u0080')
         {
             // In the ASCII range we only accept alphanumerics and:
-            //   -_.!~*'()
+            //   -_.!~*().  We omit ' as it messes with HTML links.
             if(Character.isLetterOrDigit(c))
             {
                 return true;
@@ -472,7 +472,6 @@ public class WebUtils
                     case '!':
                     case '~':
                     case '*':
-                    case '\'':
                     case '(':
                     case ')':
                         return true;
