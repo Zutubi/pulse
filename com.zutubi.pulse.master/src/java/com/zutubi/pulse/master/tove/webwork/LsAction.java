@@ -10,7 +10,6 @@ import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
 
@@ -20,6 +19,8 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The ls action provides access to 'ls' style functionality for the web ui.
@@ -134,7 +135,7 @@ public class LsAction extends VFSActionSupport
             String className = e.getStackTrace()[0].getClassName();
             Class cls = ClassLoaderUtils.loadClass(className, LsAction.class);
             Messages i18n = Messages.getInstance(cls);
-            addActionError(i18n.format(e.getCode(), e.getInfo()));
+            addActionError(i18n.format(e.getCode(), (Object[])e.getInfo()));
             return ERROR;
         }
     }
