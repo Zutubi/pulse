@@ -234,10 +234,10 @@ public class ViewBuildAction extends CommandActionBase
 
         File dataDir = configurationManager.getDataDirectory();
         result.loadFeatures(dataDir);
+        result.loadFailedTestResults(dataDir, getFailureLimit());
 
         if(result.completed())
         {
-            result.loadFailedTestResults(dataDir, getFailureLimit());
             loadDependencyDetails(result);
         }
 

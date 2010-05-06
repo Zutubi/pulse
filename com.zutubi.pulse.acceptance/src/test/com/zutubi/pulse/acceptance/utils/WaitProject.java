@@ -2,15 +2,17 @@ package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
+import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * A project configuration setup for working with the wait ant projects.
@@ -44,7 +46,7 @@ public class WaitProject extends ProjectConfigurationHelper
 
     public List<String> getPostProcessorNames()
     {
-        return new LinkedList<String>();
+        return asList("junit xml report processor");
     }
 
     public void releaseBuild() throws IOException
@@ -54,6 +56,6 @@ public class WaitProject extends ProjectConfigurationHelper
 
     public List<Class> getPostProcessorTypes()
     {
-        return new LinkedList<Class>();
+        return Arrays.<Class>asList(JUnitReportPostProcessorConfiguration.class);
     }
 }

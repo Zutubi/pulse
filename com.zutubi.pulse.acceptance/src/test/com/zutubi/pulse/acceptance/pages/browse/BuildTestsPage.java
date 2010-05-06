@@ -9,9 +9,6 @@ import com.zutubi.util.WebUtils;
  */
 public class BuildTestsPage extends AbstractTestsPage
 {
-    private static final String ID_BUILD_INCOMPLETE = "build-incomplete";
-    private static final String ID_NO_TESTS = "no-tests";
-
     private String projectName;
     private long buildId;
 
@@ -27,11 +24,6 @@ public class BuildTestsPage extends AbstractTestsPage
         return urls.buildTests(projectName, Long.toString(buildId));
     }
 
-    public boolean isBuildComplete()
-    {
-        return !browser.isElementIdPresent(ID_BUILD_INCOMPLETE);
-    }
-
     public boolean isFailureUnavailableMessageShown()
     {
         return  browser.isElementIdPresent("test.broken.unavailable");
@@ -39,17 +31,27 @@ public class BuildTestsPage extends AbstractTestsPage
 
     public boolean hasFailedTests()
     {
-        return browser.isElementIdPresent("failed.tests");
+        return browser.isElementIdPresent("failed-tests");
     }
 
-    public boolean hasTests()
+    public boolean hasFailedTestsForStage(String stage)
     {
-        return isBuildComplete() && !browser.isElementIdPresent(ID_NO_TESTS) && browser.isElementIdPresent(ID_TEST_SUMMARY);
+        return browser.isElementIdPresent("stage-" + stage + "-failed");
     }
-
+    
     public StageTestsPage clickStageAndWait(String stage)
     {
         browser.click("stage-" + stage);
         return browser.waitFor(StageTestsPage.class, projectName, buildId, stage);
+    }
+
+    public boolean isStagePresent(String stage)
+    {
+        return browser.isElementIdPresent("stage-" + stage);
+    }
+
+    public boolean isStageComplete(String stage)
+    {
+        return !browser.isElementIdPresent("stage-" + stage + "-inprogress");
     }
 }

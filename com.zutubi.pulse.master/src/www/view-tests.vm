@@ -4,54 +4,19 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
+    <script type="text/javascript">
+#if($personal)
+    #set($ownerArg = "personal=true")
+#else
+    #set($ownerArg = "projectName=$u_projectName")
+#end
+        #updater("$base/ajax/viewTestsPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle "Ext.emptyFn")
+    </script>
 </head>
 <body>
     #buildTabs($result "tests")
 
-    <div id='#id("${result.ownerName}-build-${result.number}-tests")'>
-#if($result.completed())
-    #if($result.hasTests())
-    #testSummaryTable($result.testSummary)
-
-    <table class="fill spaced two-content">
-        <th class="two-heading" colspan="9">
-            #wwtext("name=build.stages")
-        </th>
-        <tr>
-            #contentClassHeading("build.stage" 1 "leftmost")
-            #contentHeading("test.status" 2)
-            #contentHeading("test.total" 1)
-            #contentHeading("test.failures" 1)
-            #contentHeading("test.errors" 1)
-            #contentHeading("test.expected.failures" 1)
-            #contentHeading("test.skipped" 1)
-            #contentClassHeading("test.success.rate" 1 "rightmost")
-        </tr>
-        #foreach($node in $result.root.children)
-            #set($summary = $node.result.testSummary)
-        <tr>
-            <td class="content leftmost"><a id='#id("stage-${node.stageName}")' href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>
-            #testStatusCell($summary "")
-            #rightCell($summary.total)
-            #rightCell($summary.failures)
-            #rightCell($summary.errors)
-            #rightCell($summary.expectedFailures)
-            #rightCell($summary.skipped)
-            <td class="content-right rightmost">${summary.successRate}%</td>
-        </tr>
-        #end
-    </table>
-
-    #buildTestFailures($result)
-    #else
-    <p id="no-tests">
-        #wwtext("name=build.no.tests")
-    </p>
-    #end
-#else
-    <p id="build-incomplete">
-        #wwtext("name=tests.build.incomplete")
-    </p>
-#end
+    <div id="panel">
+        #parse("ajax/view-tests-panel.vm")
     </div>
 </html>

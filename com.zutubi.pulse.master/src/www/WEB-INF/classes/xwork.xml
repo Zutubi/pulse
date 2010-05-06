@@ -430,6 +430,10 @@
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
+        <action name="viewTestsPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+            <result name="success" type="velocity">view-tests-panel.vm</result>
+        </action>
+
         <action name="tailProjectLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailProjectLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>

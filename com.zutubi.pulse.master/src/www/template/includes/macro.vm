@@ -1299,11 +1299,11 @@
 #end
 
 #macro(buildTestFailures $buildResult)
-    #if($buildResult.completed() && $buildResult.hasBrokenTests())
-    <h2 id="failed.tests" class="section">#wwtext("name=failed.tests")</h2>
+    #if($buildResult.hasBrokenTests())
+    <h2 id="failed-tests" class="section">#wwtext("name=failed.tests")</h2>
         #foreach($recipeNode in $buildResult.root.children)
             #if($recipeNode.hasBrokenTests())
-    <table class="fill two-content">
+    <table id='#id("stage-${recipeNode.stageName}-failed")' class="fill two-content #if($velocityCount > 1) spaced #end">
         <tr>
             <th class="two-heading" colspan="5">
                 #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stageName) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")

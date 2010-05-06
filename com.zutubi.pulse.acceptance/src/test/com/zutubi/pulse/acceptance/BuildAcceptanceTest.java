@@ -14,16 +14,15 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
-import com.zutubi.pulse.core.commands.core.CustomFieldsPostProcessorConfiguration;
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
-import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.core.*;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -36,6 +35,7 @@ import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfigurat
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
@@ -957,7 +957,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
 
-        assertTrue(testsPage.hasTests());
         assertEquals(expectedSummary, testsPage.getTestSummary());
 
         StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
@@ -1013,7 +1012,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // Test we can drill all the way down then back up again.
         BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
 
-        assertTrue(testsPage.hasTests());
+        assertTrue(testsPage.getTestSummary().getTotal() > 0);
         StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
         TestSuitePage topSuitePage = stageTestsPage.clickSuiteAndWait(PROCESSOR_SUITE);
         TestSuitePage nestedSuitePath = topSuitePage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
@@ -1043,7 +1042,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
         TestResultSummary expectedSummary = new TestResultSummary(0, 0, 3, 0, 583);
 
-        assertTrue(testsPage.hasTests());
         assertEquals(expectedSummary, testsPage.getTestSummary());
 
         StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
@@ -1059,6 +1057,96 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         stageTestsPage.waitFor();
         stageTestsPage.clickAllCrumb();
         testsPage.waitFor();
+    }
+
+    public void testTestResultsShownForCompletedStagesBeforeBuildCompletes() throws Exception
+    {
+        final String SECOND_STAGE = "second";
+
+        File tempDir = createTempDirectory();
+        try
+        {
+            // Set up a project with two recipes and stages:
+            //   - default: runs a recipe that completes quickly, with tests
+            //   - second:  runs the default waiting recipe, which we can
+            //              release when we choose (also with tests)
+            WaitProject project = projects.createWaitAntProject(tempDir, random);
+
+            DirectoryArtifactConfiguration reportsArtifact = new DirectoryArtifactConfiguration("test reports", "reports/xml");
+            PostProcessorConfiguration junitProcessor = project.getConfig().getPostProcessors().get(JUNIT_PROCESSOR);
+            reportsArtifact.addPostProcessor(junitProcessor);
+            
+            SleepCommandConfiguration command = new SleepCommandConfiguration("noop");
+            command.addArtifact(reportsArtifact);
+
+            RecipeConfiguration completeRecipe = new RecipeConfiguration("complete");
+            completeRecipe.addCommand(command);
+
+            MultiRecipeTypeConfiguration type = (MultiRecipeTypeConfiguration) project.getConfig().getType();
+            type.addRecipe(completeRecipe);
+            
+            project.getDefaultStage().setRecipe(completeRecipe.getName());
+
+            project.addStage(SECOND_STAGE);
+            reportsArtifact = project.addDirArtifact("test reports", "reports/xml");
+            reportsArtifact.addPostProcessor(junitProcessor);
+            
+            configurationHelper.insertProject(project.getConfig());
+            
+            xmlRpcHelper.waitForProjectToInitialise(project.getName());
+            xmlRpcHelper.triggerBuild(project.getName());
+            xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+            
+            Hashtable<String, Object> build;
+            final String defaultStageName = project.getDefaultStage().getName();
+            do
+            {
+                build = xmlRpcHelper.getBuild(project.getName(), 1);
+                Thread.sleep(500);
+            }
+            while (!stageIsComplete(build, defaultStageName));
+            
+            loginAsAdmin();
+            BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, project.getName(), 1L);
+            assertTrue(testsPage.isStagePresent(defaultStageName));
+            assertTrue(testsPage.isStageComplete(defaultStageName));
+            assertTrue(testsPage.hasFailedTestsForStage(defaultStageName));
+
+            assertTrue(testsPage.isStagePresent(SECOND_STAGE));
+            assertFalse(testsPage.isStageComplete(SECOND_STAGE));
+            assertFalse(testsPage.hasFailedTestsForStage(SECOND_STAGE));
+                
+            project.releaseBuild();
+            xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+            
+            testsPage.openAndWaitFor();
+            assertTrue(testsPage.isStagePresent(defaultStageName));
+            assertTrue(testsPage.isStageComplete(defaultStageName));
+            assertTrue(testsPage.hasFailedTestsForStage(defaultStageName));
+
+            assertTrue(testsPage.isStagePresent(SECOND_STAGE));
+            assertTrue(testsPage.isStageComplete(SECOND_STAGE));
+            assertTrue(testsPage.hasFailedTestsForStage(SECOND_STAGE));
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private boolean stageIsComplete(Hashtable<String, Object> build, String stageName)
+    {
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        for (Hashtable<String, Object> stage: stages)
+        {
+            if (stageName.equals(stage.get("name")))
+            {
+                return (Boolean) stage.get("completed");
+            }
+        }
+        
+        return false;
     }
 
     public void testIdLeader() throws Exception

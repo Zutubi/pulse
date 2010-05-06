@@ -29,6 +29,16 @@ public class DirectoryArtifactConfiguration extends FileSystemArtifactConfigurat
     @Wizard.Ignore
     private boolean followSymlinks;
 
+    public DirectoryArtifactConfiguration()
+    {
+    }
+
+    public DirectoryArtifactConfiguration(String name, String base)
+    {
+        super(name);
+        this.base = base;
+    }
+
     public String getBase()
     {
         return base;

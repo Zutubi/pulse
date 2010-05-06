@@ -5,7 +5,6 @@ import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -14,7 +13,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
@@ -25,16 +23,19 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -496,8 +497,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.click(IDs.buildTestsTab());
         PersonalBuildTestsPage testsPage = browser.createPage(PersonalBuildTestsPage.class, buildNumber);
         testsPage.waitFor();
-        assertTrue(testsPage.isBuildComplete());
-        assertFalse(testsPage.hasTests());
+        assertEquals(0, testsPage.getTestSummary().getTotal());
 
         browser.click(IDs.buildFileTab());
         PersonalBuildFilePage filePage = browser.createPage(PersonalBuildFilePage.class, buildNumber);

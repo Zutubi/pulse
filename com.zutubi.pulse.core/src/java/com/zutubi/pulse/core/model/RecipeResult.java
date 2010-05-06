@@ -266,20 +266,23 @@ public class RecipeResult extends Result
 
     public void loadFailedTestResults(File dataRoot, int limit)
     {
-        File output = getAbsoluteOutputDir(dataRoot);
-        File testDir = new File(output, TEST_DIR);
-        if(testDir.exists())
+        if (completed())
         {
-            try
+            File output = getAbsoluteOutputDir(dataRoot);
+            File testDir = new File(output, TEST_DIR);
+            if(testDir.exists())
             {
-                TestSuitePersister persister = new TestSuitePersister();
-                failedTestResults = persister.read(null, testDir, true, true, limit);
-            }
-            catch (Exception e)
-            {
-                // There is other info to show, don't totally explode
-                // because we can't load the tests
-                LOG.severe("Unable to load test results: " + e.getMessage(), e);
+                try
+                {
+                    TestSuitePersister persister = new TestSuitePersister();
+                    failedTestResults = persister.read(null, testDir, true, true, limit);
+                }
+                catch (Exception e)
+                {
+                    // There is other info to show, don't totally explode
+                    // because we can't load the tests
+                    LOG.severe("Unable to load test results: " + e.getMessage(), e);
+                }
             }
         }
     }

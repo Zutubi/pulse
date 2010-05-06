@@ -4,15 +4,13 @@ import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
+import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
@@ -30,7 +28,6 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -39,6 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
+import static org.mockito.Mockito.*;
 
 /**
  * The configuration helper is a support class that bridges the gap between local
@@ -115,7 +118,9 @@ public class ConfigurationHelper
         // tests.
         configurationRegistry.registerConfigurationType(AntCommandConfiguration.class);
         configurationRegistry.registerConfigurationType(ExecutableCommandConfiguration.class);
+        configurationRegistry.registerConfigurationType(SleepCommandConfiguration.class);
         configurationRegistry.registerConfigurationType(AntPostProcessorConfiguration.class);
+        configurationRegistry.registerConfigurationType(JUnitReportPostProcessorConfiguration.class);
         configurationRegistry.registerConfigurationType(SubversionConfiguration.class);
         configurationRegistry.registerConfigurationType(GitConfiguration.class);
         configurationRegistry.registerConfigurationType(DependentBuildTriggerConfiguration.class);
