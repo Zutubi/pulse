@@ -4,37 +4,33 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.model.EntityWithIdPredicate;
-import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.*;
+import static com.zutubi.pulse.master.committransformers.CommitMessageBuilder.processSubstitution;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Comment;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectResponsibility;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.context.Context;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.master.committransformers.CommitMessageBuilder.processSubstitution;
 
 /**
  * Action to provide data for the build summary tab.
@@ -49,6 +45,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
     private boolean canClearResponsible = false;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
     private List<RelatedLink> relatedLinks = new LinkedList<RelatedLink>();
+    private Map<String, List<FeaturedArtifact>> featuredArtifacts = new LinkedHashMap<String, List<FeaturedArtifact>>();
     private List<BuildHookConfiguration> hooks;
 
     private SummaryData data;
@@ -83,12 +80,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
     public boolean canDeleteComment(final long id)
     {
         Comment comment = CollectionUtils.find(getBuildResult().getComments(), new EntityWithIdPredicate<Comment>(id));
-        if (comment == null)
-        {
-            return false;
-        }
-
-        return accessManager.hasPermission(AccessManager.ACTION_DELETE, comment);
+        return comment != null && accessManager.hasPermission(AccessManager.ACTION_DELETE, comment);
     }
 
     public List<ActionLink> getActions()
@@ -99,6 +91,11 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
     public List<RelatedLink> getRelatedLinks()
     {
         return relatedLinks;
+    }
+
+    public Map<String, List<FeaturedArtifact>> getFeaturedArtifacts()
+    {
+        return featuredArtifacts;
     }
 
     public List<BuildHookConfiguration> getHooks()
@@ -171,6 +168,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         }
         
         gatherRelatedLinks(result);
+        gatherFeaturedArtifacts(result);
 
         try
         {
@@ -193,7 +191,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
     private void gatherRelatedLinks(BuildResult buildResult)
     {
         changelists = buildManager.getChangesForBuild(buildResult, true);
-        
+
         List<LinkSubstitution> substitutions = gatherLinkSubstitutions(buildResult.getProject().getConfig());
         relatedLinks = new LinkedList<RelatedLink>();
         for (LinkSubstitution substitution: substitutions)
@@ -235,8 +233,78 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
                 }
             }
         }
-        
+
         return result;
+    }
+
+    private void gatherFeaturedArtifacts(final BuildResult result)
+    {
+        for (final RecipeResultNode node: result.getRoot().getChildren())
+        {
+            if (node.getResult().completed())
+            {
+                List<FeaturedArtifact> stageFeaturedArtifacts = new LinkedList<FeaturedArtifact>();
+                for (final CommandResult commandResult: node.getResult().getCommandResults())
+                {
+                    List<StoredArtifact> commandFeaturedArtifacts = CollectionUtils.filter(commandResult.getArtifacts(), new Predicate<StoredArtifact>()
+                    {
+                        public boolean satisfied(StoredArtifact storedArtifact)
+                        {
+                            return storedArtifact.isFeatured();
+                        }
+                    });
+
+                    final String baseUrl = configurationManager.getSystemConfig().getContextPathNormalised();
+                    final Urls urls = new Urls(baseUrl);
+                    CollectionUtils.map(commandFeaturedArtifacts, new Mapping<StoredArtifact, FeaturedArtifact>()
+                    {
+                        public FeaturedArtifact map(StoredArtifact artifact)
+                        {
+                            String icon;
+                            String url;
+
+                            if (artifact.isLink())
+                            {
+                                icon = "link";
+                                url = artifact.getUrl();
+                            }
+                            else if (artifact.isSingleFile())
+                            {
+                                StoredFileArtifact file = artifact.getFile();
+                                if (file.canDecorate())
+                                {
+                                    icon = "decorate";
+                                    url = urls.commandArtifacts(result, commandResult) + file.getPathUrl();
+                                }
+                                else
+                                {
+                                    icon = "download";
+                                    url = urls.commandDownload(result, commandResult, file.getPath());
+                                }
+                            }
+                            else if (artifact.hasIndexFile())
+                            {
+                                icon = "view";
+                                url = urls.fileFileArtifact(artifact, artifact.findFileBase(artifact.findIndexFile()));
+                            }
+                            else
+                            {
+                                icon = "archive";
+                                url = baseUrl + "/zip.action?path=pulse:///projects/" + result.getProject().getId() + "/builds/" + result.getId() + "/artifacts/" + node.getResult().getId() + "/" + commandResult.getId() + "/" + artifact.getId() + "/";
+                            }
+
+                            return new FeaturedArtifact(icon, url, artifact.getName());
+                        }
+                    }, stageFeaturedArtifacts);
+                }
+
+                if (stageFeaturedArtifacts.size() > 0)
+                {
+                    Collections.sort(stageFeaturedArtifacts);
+                    featuredArtifacts.put(node.getStageName(), stageFeaturedArtifacts);
+                }
+            }
+        }
     }
 
     private String renderTemplate(String template, Context context, VelocityManager velocityManager) throws Exception
@@ -272,7 +340,44 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
             return rightPanel;
         }
     }
-    
+
+    public static class FeaturedArtifact implements Comparable
+    {
+        private static final Sort.StringComparator COMPARATOR = new Sort.StringComparator();
+
+        private String icon;
+        private String url;
+        private String name;
+
+        public FeaturedArtifact(String icon, String url, String name)
+        {
+            this.icon = icon;
+            this.url = url;
+            this.name = name;
+        }
+
+        public String getIcon()
+        {
+            return icon;
+        }
+
+        public String getUrl()
+        {
+            return url;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public int compareTo(Object o)
+        {
+            FeaturedArtifact other = (FeaturedArtifact) o;
+            return COMPARATOR.compare(name, other.name);
+        }
+    }
+
     public static class RelatedLink
     {
         private String url;

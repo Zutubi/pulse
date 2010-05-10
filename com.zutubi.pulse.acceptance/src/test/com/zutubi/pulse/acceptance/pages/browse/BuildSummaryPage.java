@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.master.webwork.Urls;
-
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
@@ -14,6 +13,7 @@ public class BuildSummaryPage extends AbstractBuildStatusPage
     private static final String ID_COMMENTS_LIST = "build-comments";
     private static final String ID_TEST_FAILURES = "failed-tests";
     private static final String ID_RELATED_LINKS = "related-links";
+    private static final String ID_FEATURED_ARTIFACTS = "featured-artifacts";
 
     public BuildSummaryPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
@@ -79,5 +79,15 @@ public class BuildSummaryPage extends AbstractBuildStatusPage
     public String getRelatedLinkText(int index)
     {
         return browser.getCellContents(ID_RELATED_LINKS, index + 1, 0);
+    }
+
+    public boolean isFeaturedArtifactsTablePresent()
+    {
+        return browser.isElementPresent(ID_FEATURED_ARTIFACTS);
+    }
+
+    public String getFeaturedArtifactsRow(int index)
+    {
+        return browser.getCellContents(ID_FEATURED_ARTIFACTS, index + 1, 0);
     }
 }

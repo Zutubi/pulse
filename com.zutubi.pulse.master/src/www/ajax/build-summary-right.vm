@@ -49,6 +49,30 @@
     </table>
 #end
 
+#if($featuredArtifacts.size() > 0)
+    <table id="featured-artifacts" class="two-content spaced">
+        <tr>
+            <th class="two-heading">#wwtext("name=featured.artifacts")</th>
+        </tr>
+    #foreach($entry in $featuredArtifacts.entrySet())
+        <tr>
+            <th class="content leftmost rightmost">
+                #wwtext("name=stage") :: #html($entry.key)
+            </th>
+        </tr>
+        #foreach($artifact in $entry.value)
+        <tr>
+            <td class="content leftmost rightmost">
+                &nbsp;&nbsp;
+                <a class="unadorned" title="$artifact.icon" href="$artifact.url"><img alt="$artifact.icon" src="$base/images/artifacts/${artifact.icon}.gif"/></a>
+                <a href="$artifact.url">#html($artifact.name)</a>
+            </td>
+        #end
+        </tr>
+    #end
+    </table>
+#end
+
 #if($hooks.size() > 0)
     <table class="two-content spaced">
         <tr>
