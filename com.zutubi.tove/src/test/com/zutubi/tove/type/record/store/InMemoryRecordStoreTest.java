@@ -6,10 +6,6 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 
-/**
- *
- *
- */
 public class InMemoryRecordStoreTest extends RecordStoreTestCase
 {
     private InMemoryRecordStore recordStore;
@@ -27,17 +23,8 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
 
         MutableRecordImpl base = new MutableRecordImpl();
         recordStore = new InMemoryRecordStore(base);
-
         recordStore.setTransactionManager(transactionManager);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        transaction = null;
-        transactionManager = null;
-        recordStore = null;
-
-        super.tearDown();
+        recordStore.init();
     }
 
     public void testSelect()

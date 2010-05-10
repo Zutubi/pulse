@@ -92,16 +92,15 @@
 
                           var toolbarConfig = {};
                           toolbarConfig.selectedTab = '$page.getProperty("page.selectedBuildTab")';
-#if ($action.viewport)
-                          toolbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
-#end
-
 #if($personalBuild)
                           toolbarConfig.personalBuild = true;
                           toolbarConfig.projectName = 'my builds';
                           toolbarConfig.projectUrl = '#jss($urls.dashboardMyBuilds())';
 #if($buildNumber && $buildNumber != "0")
                           toolbarConfig.buildId = '$buildResult.id';
+#if ($action.viewport)
+                          toolbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
+#end
 #end
 #if($u_stageName)
                           toolbarConfig.stageName = '#jss($h_stageName)';

@@ -1,8 +1,8 @@
 package com.zutubi.tove.transaction;
 
 /**
- * The UserTransaction interface defines the methods to explicitly manage transaction boundaries.
- *
+ * The UserTransaction interface defines the methods to explicitly manage transaction
+ * boundaries.
  */
 public class UserTransaction
 {

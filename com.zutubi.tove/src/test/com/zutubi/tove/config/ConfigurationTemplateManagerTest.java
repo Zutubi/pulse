@@ -41,7 +41,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     private static final String GRANDPARENT_NAME = "gp";
     private static final String CHILD_NAME = "c";
     private static final String GRANDCHILD_NAME = "gc";
-    
+
     private CompositeType typeA;
     private CompositeType typeB;
 
@@ -138,12 +138,12 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             assertEquals("Permission to create at path 'sample' denied", e.getMessage());
         }
     }
-    
+
     public void testInsertTemplatedRoot()
     {
         String path = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
         assertEquals(PathUtils.getPath(SCOPE_TEMPLATED, "root"), path);
-        
+
         Record record = configurationTemplateManager.getRecord(path);
         assertNotNull(record);
         assertTrue(configurationTemplateManager.isTemplate(record));
@@ -157,9 +157,9 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         root.setB("b");
         root.setC("c");
         root.getCs().put("c1", new ConfigC("c1"));
-        
+
         String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
-        
+
         ConfigA child = new ConfigA("child");
         child.setB("b");
         child.setC("override");
@@ -167,7 +167,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child, rootPath, false);
 
         assertEquals(PathUtils.getPath(SCOPE_TEMPLATED, "child"), childPath);
-        
+
         Record record = configurationTemplateManager.getRecord(childPath);
         assertNotNull(record);
         assertFalse(configurationTemplateManager.isTemplate(record));
@@ -180,7 +180,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertNotNull(itemRecord);
         assertEquals("c1", itemRecord.get("name"));
     }
-    
+
     public void testInsertTemplatedInvalidScope()
     {
         try
@@ -193,7 +193,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             assertThat(e.getMessage(), containsString("Scope 'invalid' is invalid"));
         }
     }
-    
+
     public void testInsertTemplatedNonTemplatedScope()
     {
         try
@@ -261,7 +261,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             assertThat(e.getMessage(), containsString("refers to a concrete record"));
         }
     }
-    
+
     public void testInsertTemplatedNoParentNotTemplate()
     {
         try
@@ -288,13 +288,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             assertThat(e.getMessage(), containsString("already has a root item"));
         }
     }
-    
+
     public void testSave()
     {
         ConfigA a = new ConfigA("a");
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
+        assertNotNull(a);
         a = configurationTemplateManager.deepClone(a);
         a.setB("somevalue");
         configurationTemplateManager.save(a);
@@ -1801,7 +1802,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         er = configurationTemplateManager.getInstance(refererPath, Referer.class);
 
         configurationTemplateManager.delete(refereePath);
-        
+
         assertNotSame(er, configurationTemplateManager.getInstance(refererPath, Referer.class));
         assertNotSame(erCollection, configurationTemplateManager.getInstance(SCOPE_REFERER));
     }
@@ -1815,7 +1816,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         parent = configurationTemplateManager.deepClone(parent);
         parent.setB("i haz change it");
         configurationTemplateManager.save(parent);
-        
+
         assertNotSame(child, configurationTemplateManager.getInstance(paths.second, ConfigA.class));
     }
 
@@ -1828,7 +1829,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         child = configurationTemplateManager.deepClone(child);
         child.setB("i haz change it");
         configurationTemplateManager.save(child);
-        
+
         assertSame(parent, configurationTemplateManager.getInstance(paths.first, ConfigA.class));
     }
 
@@ -1876,7 +1877,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
                 return mockA.getName().equals(GRANDCHILD_NAME);
             }
         }, ConfigA.class);
-        
+
         assertEquals(1, results.size());
         assertEquals(GRANDCHILD_NAME, results.get(0).getName());
     }

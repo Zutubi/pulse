@@ -1,8 +1,7 @@
 package com.zutubi.tove.transaction;
 
 /**
- *
- *
+ * The possible status's of a transaction. 
  */
 public enum TransactionStatus
 {

@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.containsString;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+
 /**
  * Tests configuration of projects via the remote API.
  */
@@ -26,7 +28,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetGlobal() throws Exception
     {
         Hashtable<String, Object> globalProject = call("getConfig", "projects/global project template");
-        assertProject(globalProject, "global project template");
+        assertProject(globalProject, GLOBAL_PROJECT_NAME);
         assertDefaultOptions(globalProject);
     }
 
@@ -109,7 +111,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testListProjects() throws Exception
     {
         Vector<String> projects = call("getConfigListing", "projects");
-        assertTrue(projects.contains("global project template"));
+        assertTrue(projects.contains(GLOBAL_PROJECT_NAME));
         int sizeBefore = projects.size();
 
         String name = randomName();

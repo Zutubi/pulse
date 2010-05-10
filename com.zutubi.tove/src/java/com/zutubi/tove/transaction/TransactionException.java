@@ -1,5 +1,8 @@
 package com.zutubi.tove.transaction;
 
+/**
+ * Base exception for the transaction package.
+ */
 public class TransactionException extends RuntimeException
 {
     public TransactionException()

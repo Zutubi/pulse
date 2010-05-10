@@ -2,12 +2,13 @@ package com.zutubi.tove.type.record;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.tove.transaction.TransactionalWrapper;
+import com.zutubi.tove.transaction.inmemory.InMemoryMapStateWrapper;
+import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
 import com.zutubi.tove.type.record.events.RecordDeletedEvent;
 import com.zutubi.tove.type.record.events.RecordInsertedEvent;
 import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.tove.type.record.store.RecordStore;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -31,7 +32,11 @@ public class RecordManager implements HandleAllocator
 
     public static final long UNDEFINED = 0;
 
-    private TransactionalWrapper<RecordManagerState> stateWrapper;
+    /**
+     * Record handle to path map.  Handles uniquely identify paths, so there should
+     * never be any duplication.  This object aggressively enforces this.
+     */
+    private InMemoryTransactionResource<Map<Long, String>> state;
 
     /**
      * The current highest handle allocated.
@@ -69,8 +74,8 @@ public class RecordManager implements HandleAllocator
             }
         });
 
-        stateWrapper = new RecordManagerStateTransactionalWrapper(new RecordManagerState(handleToPathMapping));
-        stateWrapper.setTransactionManager(transactionManager);
+        state = new InMemoryTransactionResource<Map<Long, String>>(new InMemoryMapStateWrapper<Long, String>(handleToPathMapping));
+        state.setTransactionManager(transactionManager);
 
         nextHandle.set(highest[0]);
     }
@@ -87,7 +92,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized String getPathForHandle(long handle)
     {
-        return getState().getPathForHandle(handle);
+        return state.get(false).get(handle);
     }
 
     /**
@@ -173,15 +178,7 @@ public class RecordManager implements HandleAllocator
                 throw new IllegalArgumentException("Failed to update '" + path + "'. New handle differs from existing handle.");
             }
         }
-
-        stateWrapper.execute(new UnaryFunction<RecordManagerState, Object>()
-        {
-            public Object process(RecordManagerState state)
-            {
-                recordStore.update(path, values);
-                return null;
-            }
-        });
+        recordStore.update(path, values);
 
         eventManager.publish(new RecordUpdatedEvent(this, path, originalRecord, new ImmutableRecord(values)));
     }
@@ -203,14 +200,15 @@ public class RecordManager implements HandleAllocator
         }
 
         // we copy first because we do not want to modify the argument.
-        final Record copy = record.copy(true, true);
+        final MutableRecord copy = record.copy(true, true);
+        allocateHandles(copy);
 
-        stateWrapper.execute(new UnaryFunction<RecordManagerState, Object>()
+        transactionManager.runInTransaction(new NullaryFunction<Object>()
         {
-            public Object process(RecordManagerState state)
+            public Object process()
             {
-                allocateHandles((MutableRecord) copy);
-                state.addToHandleMap(path, copy);
+                Map<Long, String> handleToPathMap = state.get(true);
+                addToHandleMap(handleToPathMap, path, copy);
                 recordStore.insert(path, copy);
                 return null;
             }
@@ -230,14 +228,15 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path, true);
 
-        Record record = stateWrapper.execute(new UnaryFunction<RecordManagerState, Record>()
+        Record record = transactionManager.runInTransaction(new NullaryFunction<Record>()
         {
-            public Record process(RecordManagerState state)
+            public Record process()
             {
                 Record deletedRecord = recordStore.delete(path);
                 if (deletedRecord != null)
                 {
-                    state.removeFromHandleMap(deletedRecord);
+                    Map<Long, String> handleToPathMap = state.get(true);
+                    removeFromHandleMap(handleToPathMap, deletedRecord);
                 }
                 return deletedRecord;
             }
@@ -259,28 +258,31 @@ public class RecordManager implements HandleAllocator
      * @return the moved record, or null if the source path does not refer to
      *         an existing record
      */
-    public synchronized Record move(String sourcePath, final String destinationPath)
+    public synchronized Record move(final String sourcePath, final String destinationPath)
     {
         checkPath(destinationPath, true);
         checkDoesNotExist(destinationPath, "Failed to move to destination path: '" + destinationPath + "'. An entry already exists at this path.");
 
-        final Record record = delete(sourcePath);
+        Record record = transactionManager.runInTransaction(new NullaryFunction<Record>()
+        {
+            public Record process()
+            {
+                Record record = delete(sourcePath);
+                if (record != null)
+                {
+                    Map<Long, String> handleToPathMap = state.get(true);
+                    addToHandleMap(handleToPathMap, destinationPath, record);
+                    recordStore.insert(destinationPath, record);
+                }
+                return record;
+            }
+        });
+
         if (record != null)
         {
-            stateWrapper.execute(new UnaryFunction<RecordManagerState, Object>()
-            {
-                public Object process(RecordManagerState state)
-                {
-                    state.addToHandleMap(destinationPath, record);
-                    recordStore.insert(destinationPath, record);
-                    return null;
-                }
-            });
-
             eventManager.publish(new RecordInsertedEvent(this, destinationPath));
-            return record;
         }
-        return null;
+        return record;
     }
 
     public void setRecordStore(RecordStore recordStore)
@@ -291,11 +293,6 @@ public class RecordManager implements HandleAllocator
     public void setTransactionManager(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
-    }
-
-    private RecordManagerState getState()
-    {
-        return stateWrapper.get();
     }
 
     private void allocateHandles(MutableRecord record)
@@ -345,6 +342,36 @@ public class RecordManager implements HandleAllocator
         handler.handle(path, record);
     }
 
+    private void addToHandleMap(Map<Long, String> handleToPathMap, String path, Record record)
+    {
+        // aggressively ensure that we reject duplicates handles.
+        if (handleToPathMap.containsKey(record.getHandle()))
+        {
+            // only time we will allow this is when the path is the same.
+            String mappedPath = handleToPathMap.get(record.getHandle());
+            if (!path.equals(mappedPath))
+            {
+                throw new RuntimeException("Attempting to add a duplicate record handle.  " +
+                        "Existing path is: '" + mappedPath + "', duplicate path is: '" + path + "'");
+            }
+        }
+
+        handleToPathMap.put(record.getHandle(), path);
+        for (String key : record.nestedKeySet())
+        {
+            addToHandleMap(handleToPathMap, PathUtils.getPath(path, key), (MutableRecord) record.get(key));
+        }
+    }
+
+    protected void removeFromHandleMap(Map<Long, String> handleToPathMap, Record record)
+    {
+        handleToPathMap.remove(record.getHandle());
+        for (String key : record.nestedKeySet())
+        {
+            removeFromHandleMap(handleToPathMap, (Record) record.get(key));
+        }
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
@@ -353,80 +380,5 @@ public class RecordManager implements HandleAllocator
     private interface RecordHandler
     {
         void handle(String path, Record record);
-    }
-
-    /**
-     *
-     */
-    private class RecordManagerState
-    {
-        /**
-         * Record handle to path map.  Handles uniquely identify paths, so there should
-         * never be any duplication.  This object aggressively enforces this.
-         */
-        Map<Long, String> handleToPathMap;
-
-        public RecordManagerState()
-        {
-            this(new HashMap<Long, String>());
-        }
-
-        public RecordManagerState(Map<Long, String> handleToPathMap)
-        {
-            this.handleToPathMap = new HashMap<Long, String>(handleToPathMap);
-        }
-
-        public RecordManagerState(RecordManagerState otherState)
-        {
-            this.handleToPathMap = new HashMap<Long, String>(otherState.handleToPathMap);
-        }
-
-        public String getPathForHandle(long handle)
-        {
-            return handleToPathMap.get(handle);
-        }
-
-        private void addToHandleMap(String path, Record record)
-        {
-            // aggressively ensure that we reject duplicates handles.
-            if (handleToPathMap.containsKey(record.getHandle()))
-            {
-                // only time we will allow this is when the path is the same.
-                String mappedPath = handleToPathMap.get(record.getHandle());
-                if (!path.equals(mappedPath))
-                {
-                    throw new RuntimeException("Attempting to add a duplicate record handle.  " +
-                            "Existing path is: '" + mappedPath + "', duplicate path is: '" + path + "'");
-                }
-            }
-
-            handleToPathMap.put(record.getHandle(), path);
-            for (String key : record.nestedKeySet())
-            {
-                addToHandleMap(PathUtils.getPath(path, key), (MutableRecord) record.get(key));
-            }
-        }
-
-        protected void removeFromHandleMap(Record record)
-        {
-            handleToPathMap.remove(record.getHandle());
-            for (String key : record.nestedKeySet())
-            {
-                removeFromHandleMap((Record) record.get(key));
-            }
-        }
-    }
-
-    private class RecordManagerStateTransactionalWrapper extends TransactionalWrapper<RecordManagerState>
-    {
-        public RecordManagerStateTransactionalWrapper(RecordManagerState global)
-        {
-            super(global);
-        }
-
-        public RecordManagerState copy(RecordManagerState o)
-        {
-            return new RecordManagerState(o);
-        }
     }
 }

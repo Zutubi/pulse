@@ -7,10 +7,10 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.transaction.Transaction;
-import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.tove.transaction.TransactionResource;
-import com.zutubi.tove.transaction.TransactionalWrapper;
+import com.zutubi.tove.transaction.*;
+import com.zutubi.tove.transaction.inmemory.InMemoryStateWrapper;
+import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
+import com.zutubi.tove.transaction.inmemory.InMemoryMapStateWrapper;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.type.record.events.RecordDeletedEvent;
@@ -35,7 +35,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
-    private StateTransactionalWrapper stateWrapper;
+//    private InMemoryTransactionResource<State> stateHolder;
+    private InMemoryTransactionResource<Map<String, TemplateHierarchy>> templateHierarchiesState;
+
+    private ThreadLocal<List<Event>> pendingEvents = new ThreadLocal<List<Event>>();
+    private final DefaultInstanceCache instances = new DefaultInstanceCache();
+    private boolean instancesEnabled = true;
 
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
@@ -54,12 +59,22 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     private int refreshCount = 0;
     private boolean validationEnabled = false;
 
+    private SendEventsOnTransactionCompletionSynchronization sendEventSync = new SendEventsOnTransactionCompletionSynchronization();
+
     public void init()
     {
         eventManager.register(this);
 
-        stateWrapper = new StateTransactionalWrapper();
-        stateWrapper.setTransactionManager(transactionManager);
+/*
+        stateHolder = new InMemoryTransactionResource<State>(new ConfigurationTemplateInMemoryStateWrapper(new State()));
+        stateHolder.setTransactionManager(transactionManager);
+
+*/
+        instances.setTransactionManager(transactionManager);
+        instances.init();
+
+        templateHierarchiesState = new InMemoryTransactionResource<Map<String, TemplateHierarchy>>(new InMemoryMapStateWrapper<String, TemplateHierarchy>(new HashMap<String, TemplateHierarchy>()));
+        templateHierarchiesState.setTransactionManager(transactionManager);
     }
 
     public void initSecondPhase()
@@ -73,6 +88,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         if (!configurationPersistenceManager.isPersistent(path))
         {
             throw new IllegalArgumentException("Attempt to manage records for non-persistent path '" + path + "'");
+        }
+    }
+
+    private void checkTransactionActive()
+    {
+        if (!transactionManager.isTransactionActive())
+        {
+            throw new IllegalStateException("Active transaction required.");
         }
     }
 
@@ -270,47 +293,40 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return record;
     }
 
-    <T> T executeInsideTransaction(final NullaryFunction<T> a)
+    <T> T executeInsideTransaction(final NullaryFunction<T> function)
     {
-        return stateWrapper.execute(new UnaryFunction<State, T>()
+        return transactionManager.runInTransaction(new NullaryFunction<T>()
         {
-            public T process(final State state)
+            public T process()
             {
-                Transaction txn = transactionManager.getTransaction();
-                txn.enlistResource(new TransactionResource()
+                if (pendingEvents.get() == null)
                 {
-                    public boolean prepare()
-                    {
-                        return true;
-                    }
+                    pendingEvents.set(new LinkedList<Event>());
 
-                    public void commit()
-                    {
-                        for(ConfigurationEvent e: state.pendingEvents)
-                        {
-                            eventManager.publish(e);
-                        }
+                    Transaction txn = transactionManager.getTransaction();
+                    txn.registerSynchronization(sendEventSync);
+                }
 
-                        state.pendingEvents.clear();
-                    }
-
-                    public void rollback()
-                    {
-                        // Just don't raise the events.
-                    }
-                });
-
-                return a.process();
+                return function.process();
             }
         });
     }
 
-    private void publishEvent(ConfigurationEvent event)
+    private void publishEvent(ConfigurationEvent event) throws ConfigurationException
     {
-        eventManager.publish(event);
-        if (event.hasExceptions())
+        // post configuration events are delayed until after the transaction is complete
+        if (event.isPost())
         {
-            throw new ConfigurationException(event.getExceptions().get(0));
+            List<Event> events = pendingEvents.get();
+            events.add(event);
+        }
+        else
+        {
+            eventManager.publish(event);
+            if (event.hasExceptions())
+            {
+                throw new ConfigurationException(event.getExceptions().get(0));
+            }
         }
     }
 
@@ -337,7 +353,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     /**
      * Inserts an instance into a templated collection, setting its parent and
      * marking it as a template if necessary.
-     * 
+     *
      * @param scope              scope to insert the instance into (must be
      *                           templated)
      * @param instance           the instance to insert
@@ -354,14 +370,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
         if (scopeInfo == null)
         {
-            throw new IllegalArgumentException("Scope '" + scope + "' is invalid");            
+            throw new IllegalArgumentException("Scope '" + scope + "' is invalid");
         }
-        
+
         if (!scopeInfo.isTemplated())
         {
             throw new IllegalArgumentException("Scope '" + scope + "' is not templated");
         }
-        
+
         CompositeType instanceType = getInstanceType(instance);
         CompositeType scopeItemType = (CompositeType) scopeInfo.getTargetType();
         if (!instanceType.equals(scopeItemType))
@@ -376,7 +392,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             {
                 throw new IllegalArgumentException("Inserted item must have a parent or be a template itself");
             }
-            
+
             Record templatedCollectionRecord = recordManager.select(scope);
             if (templatedCollectionRecord.nestedKeySet().size() != 0)
             {
@@ -390,19 +406,19 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             {
                 throw new IllegalArgumentException("Template parent path '" + templateParentPath + "' does not refer to an element of the same templated collection");
             }
-            
+
             templateParentRecord = recordManager.select(templateParentPath);
             if (templateParentRecord == null)
             {
                 throw new IllegalArgumentException("Template parent path '" + templateParentPath + "' is invalid");
             }
-            
+
             if (!isTemplate(templateParentRecord))
             {
                 throw new IllegalArgumentException("Template parent path '" + templateParentPath + "' refers to a concrete record");
             }
         }
-        
+
         try
         {
             final MutableRecord record = instanceType.unstantiate(instance, null);
@@ -410,12 +426,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             {
                 setParentTemplate(record, templateParentRecord.getHandle());
             }
-            
+
             if (template)
             {
                 markAsTemplate(record);
             }
-            
+
             return executeInsideTransaction(new NullaryFunction<String>()
             {
                 public String process()
@@ -645,21 +661,18 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     void raiseInsertEvents(List<String> concretePaths)
     {
-        State state = getState();
-
         // For every new concrete path that has appeared (possibly inherited)
         for (String concretePath : concretePaths)
         {
             // Raise an event for all the config instances under this path.
-            for (Object instance : state.instances.getAllDescendants(concretePath, false))
+            for (Object instance : instances.getAllDescendants(concretePath, false))
             {
                 if (isComposite(instance))
                 {
                     Configuration configuration = (Configuration) instance;
                     boolean cascaded = !concretePath.equals(configuration.getConfigurationPath());
-                    InsertEvent insertEvent = new InsertEvent(this, configuration, cascaded);
-                    publishEvent(insertEvent);
-                    state.pendingEvents.add(new PostInsertEvent(this, configuration, cascaded));
+                    publishEvent(new InsertEvent(this, configuration, cascaded));
+                    publishEvent(new PostInsertEvent(this, configuration, cascaded));
                     configurationStateManager.createAndAssignState(configuration);
                 }
             }
@@ -724,9 +737,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     void suspendInstanceCache()
     {
-        ConfigurationTemplateManager.State state = getState();
-        state.instancesEnabled = false;
-        state.instances = new DefaultInstanceCache();
+        checkTransactionActive();
+
+        instancesEnabled = false;
+        instances.reset();
     }
 
     /**
@@ -735,19 +749,27 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     void resumeInstanceCache()
     {
-        getState().instancesEnabled = true;
+        checkTransactionActive();
+
+        instancesEnabled = true;
         refreshCaches();
     }
 
     void refreshCaches()
     {
-        ConfigurationTemplateManager.State state = getState();
-        refreshTemplateHierarchies(state);
-        if (state.instancesEnabled)
+        executeInsideTransaction(new NullaryFunction<Object>()
         {
-            refreshInstances(state);
-        }
-        refreshCount++;
+            public Object process()
+            {
+                refreshTemplateHierarchies();
+                if (instancesEnabled)
+                {
+                    refreshInstances();
+                }
+                refreshCount++;
+                return null;
+            }
+        });
     }
 
     public void wireIfRequired(Configuration instance)
@@ -759,9 +781,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private void refreshInstances(State state)
+    private void refreshInstances()
     {
-        DefaultInstanceCache instances = state.instances;
         instances.clearDirty();
 
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
@@ -840,7 +861,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     }
                 }
             }
-        }, true);
+        }, true, true);
     }
 
     /**
@@ -851,7 +872,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      *
      * If the path does not exist or is not in a templated scope, it is
      * deemed to not be inherited.
-     * 
+     *
      * @param path the path to test
      * @return true if the path is inherited
      */
@@ -1004,9 +1025,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return !Boolean.valueOf(record.getMeta(TemplateRecord.TEMPLATE_KEY));
     }
 
-    private void refreshTemplateHierarchies(State state)
+    private void refreshTemplateHierarchies()
     {
-        state.templateHierarchies.clear();
+        Map<String, TemplateHierarchy> templateHierarchies = templateHierarchiesState.get(true);
+        templateHierarchies.clear();
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
             if (scope.isTemplated())
@@ -1042,7 +1064,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     root = createTemplateNode(record, scope.getScopeName(), idProperty, recordsByParent);
                 }
 
-                state.templateHierarchies.put(scope.getScopeName(), new TemplateHierarchy(scope.getScopeName(), root));
+                templateHierarchies.put(scope.getScopeName(), new TemplateHierarchy(scope.getScopeName(), root));
             }
         }
     }
@@ -1080,7 +1102,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             throw new NullPointerException("Path is required");
         }
-        return getState().instances.isValid(path, true);
+        return instances.isValid(path, true);
     }
 
     /**
@@ -1103,7 +1125,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             return false;
         }
-
 
         final List<Pair<Configuration, CompositeType>> composites = new LinkedList<Pair<Configuration, CompositeType>>();
         try
@@ -1187,7 +1208,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * @param deep          if true, child records will also be validated
      *                      recursively (otherwise they are ignored)
      * @param ignoredFields fields for which validation errors should be
-     *                      ignored 
+     *                      ignored
      * @return the instance, which will be marked up with any validation errors
      * @throws com.zutubi.tove.type.TypeException
      *          if an error prevents creation of the instance: this is more
@@ -1562,22 +1583,20 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     private void raiseSaveEvents(String path)
     {
-        State state = getState();
-
         // Pile up the events before raising any, as the handlers may make
         // their own changes!
-        List<SaveEvent> saveEvents = new LinkedList<SaveEvent>();
+        List<ConfigurationEvent> saveEvents = new LinkedList<ConfigurationEvent>();
         for (String concretePath : getDescendantPaths(path, false, true, false))
         {
-            Configuration instance = state.instances.get(concretePath, false);
+            Configuration instance = instances.get(concretePath, false);
             if (isComposite(instance))
             {
                 saveEvents.add(new SaveEvent(this, instance));
-                state.pendingEvents.add(new PostSaveEvent(this, instance));
+                saveEvents.add(new PostSaveEvent(this, instance));
             }
         }
 
-        for (SaveEvent e: saveEvents)
+        for (ConfigurationEvent e: saveEvents)
         {
             publishEvent(e);
         }
@@ -1950,12 +1969,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                         return false;
                     }
                 }
-
                 return true;
             }
         });
     }
-
 
     public RecordCleanupTask getCleanupTasks(final String path)
     {
@@ -2019,7 +2036,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                             }
                         }
                     }
-
                     addAdditionalTasks(path, result);
 
                     // All descendants must be deleted.
@@ -2028,13 +2044,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     {
                         result.addCascaded(getDescendantCleanupTask(descendantPath));
                     }
-
                     return result;
                 }
                 else
                 {
-                    // Much simpler, just delete the record and run custom
-                    // and reference cleanup tasks.
+                    // Much simpler, just delete the record and run custom and reference cleanup tasks.
                     DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, false);
                     addAdditionalTasks(path, result);
                     return result;
@@ -2073,7 +2087,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
 
         configurationCleanupManager.addCustomCleanupTasks(task);
-        configurationReferenceManager.addReferenceCleanupTasks(path, getState().instances, task);
+        configurationReferenceManager.addReferenceCleanupTasks(path, instances, task);
     }
 
     public void delete(final String path)
@@ -2099,17 +2113,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 configurationCleanupManager.runCleanupTasks(getCleanupTasks(path), recordManager);
                 refreshCaches();
 
-                State state = getState();
                 for(ConfigurationEvent e: events)
                 {
-                    if (e.isPost())
-                    {
-                        state.pendingEvents.add(e);
-                    }
-                    else
-                    {
-                        publishEvent(e);
-                    }
+                    publishEvent(e);
                 }
 
                 return null;
@@ -2120,10 +2126,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     private List<ConfigurationEvent> prepareDeleteEvents(String path)
     {
         List<ConfigurationEvent> result = new LinkedList<ConfigurationEvent>();
-        State state = getState();
         for (String concretePath : getDescendantPaths(path, false, true, false))
         {
-            for (Object instance : state.instances.getAllDescendants(concretePath, false))
+            for (Object instance : instances.getAllDescendants(concretePath, false))
             {
                 if (isComposite(instance))
                 {
@@ -2134,7 +2139,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 }
             }
         }
-
         return result;
     }
 
@@ -2175,7 +2179,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * collection item that is currently hidden.  Restoring the item causes
      * it to reappear at the restored and all descendant levels, which will
      * lead to insert events for concrete descendants.
-     * 
+     *
      * @param path the path to restore: must be currently hidden
      * @throws IllegalArgumentException if path does not refer to a
      *         currently-hidden path
@@ -2300,38 +2304,47 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T extends Configuration> T deepClone(T instance)
+    public <T extends Configuration> T deepClone(final T instance)
     {
-        final String path = instance.getConfigurationPath();
-        Record record = getRecord(path);
-        ComplexType type = getType(path);
-        final DefaultInstanceCache cloneSetCache = new DefaultInstanceCache();
-        PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cloneSetCache, new ReferenceResolver()
+        return transactionManager.runInTransaction(new NullaryFunction<T>()
         {
-            public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
+            public T process()
             {
-                InstanceCache cache = getState().instances;
-                String targetPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, toHandle);
-                if(targetPath.startsWith(path))
+                final String path = instance.getConfigurationPath();
+                Record record = getRecord(path);
+                ComplexType type = getType(path);
+                final DefaultInstanceCache cloneSetCache = new DefaultInstanceCache();
+                cloneSetCache.setTransactionManager(transactionManager);
+                cloneSetCache.init();
+
+                PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cloneSetCache, new ReferenceResolver()
                 {
-                    // This reference points within the object tree we are cloning.
-                    // We must update it to point to a new clone.
-                    cache = cloneSetCache;
+                    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
+                    {
+                        InstanceCache cache = instances;
+                        String targetPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, toHandle);
+                        if(targetPath.startsWith(path))
+                        {
+                            // This reference points within the object tree we are cloning.
+                            // We must update it to point to a new clone.
+                            cache = cloneSetCache;
+                        }
+
+                        return configurationReferenceManager.resolveReference(templateOwnerPath, toHandle, instantiator, cache, null);
+                    }
+                }, ConfigurationTemplateManager.this);
+
+                try
+                {
+                    return (T) instantiator.instantiate(path, false, type, record);
                 }
-
-                return configurationReferenceManager.resolveReference(templateOwnerPath, toHandle, instantiator, cache, null);
+                catch (TypeException e)
+                {
+                    LOG.severe(e);
+                    return null;
+                }
             }
-        }, this);
-
-        try
-        {
-            return (T) instantiator.instantiate(path, false, type, record);
-        }
-        catch (TypeException e)
-        {
-            LOG.severe(e);
-            return null;
-        }
+        });
     }
 
     public <T extends Configuration> T getInstance(long handle, Class<T> clazz)
@@ -2348,22 +2361,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public Configuration getInstance(String path)
     {
-        State state = getState();
-        if (state == null)
+        if (instances == null)
         {
-            return null;    
+            return null;
         }
-
-        return state.instances.get(path, true);
-    }
-
-    ConfigurationTemplateManager.State getState()
-    {
-        if (stateWrapper != null)
-        {
-            return stateWrapper.get();
-        }
-        return null;
+        return instances.get(path, true);
     }
 
     /**
@@ -2399,7 +2401,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         return deepClone(instance);
     }
-    
+
     public Set<String> getAllPaths(String path)
     {
         return CollectionUtils.map(getAllInstances(path, Configuration.class, true), new ConfigurationToPathMapping(), new HashSet<String>());
@@ -2414,8 +2416,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     <T extends Configuration> void getAllInstances(String path, Class<T> clazz, Collection<T> result, boolean allowIncomplete)
     {
-        State state = getState();
-        state.instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
+        instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
     }
 
     public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz, boolean allowIncomplete)
@@ -2430,10 +2431,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
         if (paths != null)
         {
-            State state = getState();
             for (String path : paths)
             {
-                state.instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
+                instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
             }
         }
 
@@ -2486,7 +2486,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             return null;
         }
-        
+
         String rootId = templateHierarchy.getRoot().getId();
         return getInstance(PathUtils.getPath(scope, rootId), clazz);
     }
@@ -2537,7 +2537,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * Indicates if the given record is directly marked as a template.  Note
      * that records nested under a template instance are not marked in this way
      * (only owner records are marked).
-     * 
+     *
      * @param record the record to test
      * @return true if the record is directly marked as a template
      */
@@ -2558,7 +2558,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     public Set<String> getTemplateScopes()
     {
-        return getState().templateHierarchies.keySet();
+        return templateHierarchiesState.get(false).keySet();
     }
 
     public TemplateHierarchy getTemplateHierarchy(String scope)
@@ -2574,7 +2574,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             throw new IllegalArgumentException("Request for template hierarchy for non-templated scope '" + scope + "'");
         }
 
-        return getState().templateHierarchies.get(scope);
+        return templateHierarchiesState.get(false).get(scope);
     }
 
     /**
@@ -2614,7 +2614,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(elements[0]);
             if (scope != null && scope.isTemplated())
             {
-                TemplateHierarchy hierarchy = getState().templateHierarchies.get(scope.getScopeName());
+                TemplateHierarchy hierarchy = templateHierarchiesState.get(false).get(scope.getScopeName());
                 return hierarchy.getNodeById(elements[1]);
             }
         }
@@ -2800,10 +2800,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     private void markDirty(String path)
     {
-        DefaultInstanceCache cache = getState().instances;
-        if (cache.markDirty(path))
+        if (instances.markDirty(path))
         {
-            for (String referencingPath: cache.getInstancePathsReferencing(path))
+            for (String referencingPath: instances.getInstancePathsReferencing(path))
             {
                 markDirty(referencingPath);
             }
@@ -2837,10 +2836,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
         else
         {
-            DefaultInstanceCache cache = getState().instances;
-            if (cache != null)
+            if (instances != null)
             {
-                Collection<Configuration> descendants = cache.getAllDescendants(((RecordDeletedEvent) event).getPath(), true);
+                Collection<Configuration> descendants = instances.getAllDescendants(((RecordDeletedEvent) event).getPath(), true);
                 for (Configuration c: descendants)
                 {
                     markDirty(c.getConfigurationPath());
@@ -2922,10 +2920,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return localNode != null;
     }
 
+    public InstanceCache getInstances()
+    {
+        return instances;
+    }
+
     /**
      * The state class encapsulates the state of the configuration template manager that is subject to
      * transactional control / isolation etc.
-     *
      */
     class State
     {
@@ -2934,36 +2936,56 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
          * updated during refreshes).
          */
         boolean instancesEnabled = true;
-        /**
-         * Cache of complete instances.
-         */
-        DefaultInstanceCache instances = new DefaultInstanceCache();
-        Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
 
-        /**
-         * A list of events to be published if the current transaction commits.
-         */
-        List<ConfigurationEvent> pendingEvents = new LinkedList<ConfigurationEvent>();
+        Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
     }
 
-    private class StateTransactionalWrapper extends TransactionalWrapper<State>
+/*
+    private class ConfigurationTemplateInMemoryStateWrapper extends InMemoryStateWrapper<State>
     {
-        public StateTransactionalWrapper()
+        private ConfigurationTemplateInMemoryStateWrapper(State state)
         {
-            super(new State());
+            super(state);
         }
 
-        public State copy(State v)
+        protected ConfigurationTemplateInMemoryStateWrapper copy()
         {
             State copy = new State();
-            copy.instancesEnabled = v.instancesEnabled;
+            State original = get();
+
+            copy.instancesEnabled = original.instancesEnabled;
+
             // Instances are immutable (we copy on write) so we can reuse the
             // same instances, wrapped with a new cache.
-            copy.instances = v.instances.copyStructure();
+//            copy.instances = original.instances.copyStructure();
+
             // Template hierarchies are also immutable, so just copy the map,
             // reusing the same hierarchies.
-            copy.templateHierarchies = new HashMap<String, TemplateHierarchy>(v.templateHierarchies);
-            return copy;
+//            copy.templateHierarchies = new HashMap<String, TemplateHierarchy>(original.templateHierarchies);
+
+            return new ConfigurationTemplateInMemoryStateWrapper(copy);
+        }
+    }
+
+*/
+    /**
+     * A transaction synchronization that will collect and publish any events
+     * that have been collected in the current transaction threads pendingEvents
+     * thread local.
+     */
+    private class SendEventsOnTransactionCompletionSynchronization implements Synchronization
+    {
+        public void postCompletion(TransactionStatus status)
+        {
+            List<Event> events = pendingEvents.get();
+            if (status == TransactionStatus.COMMITTED)
+            {
+                for (Event event : events)
+                {
+                    eventManager.publish(event);
+                }
+            }
+            pendingEvents.set(null);
         }
     }
 }

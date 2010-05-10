@@ -3,6 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.transaction.TransactionManager;
 import static com.zutubi.util.CollectionUtils.asSet;
 import com.zutubi.util.Sort;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -19,34 +20,13 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        TransactionManager transactionManager = new TransactionManager();
+
         cache = new DefaultInstanceCache();
+        cache.setTransactionManager(transactionManager);
+        cache.init();
     }
-
-    public void testCopyStructureEmpty()
-    {
-        DefaultInstanceCache copy = cache.copyStructure();
-        assertEmpty(copy);
-    }
-
-    public void testCopyStructure()
-    {
-        TestConfiguration c1 = new TestConfiguration(1);
-        TestConfiguration c2 = new TestConfiguration(2);
-        TestConfiguration c3 = new TestConfiguration(3);
-
-        cache.put("foo", c1, true);
-        cache.put("foo/bar", c2, true);
-        cache.put("baz", c3, true);
-
-        DefaultInstanceCache copy = cache.copyStructure();
-        assertEquals(3, copy.getAllDescendants("", true).size());
-
-        // The copy should hold the same instances.
-        assertSame(c1, copy.get("foo", true));
-        assertSame(c2, copy.get("foo/bar", true));
-        assertSame(c3, copy.get("baz", true));
-    }
-
 
     public void testHasInstancesUnderEmptyEmptyPath()
     {
@@ -113,7 +93,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
     {
         markInvalidHelper("a/b", false, false, true, true);
     }
-    
+
     public void testMarkInvalidABC()
     {
         markInvalidHelper("a/b/c", false, false, false, true);
@@ -217,7 +197,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         cache.put("foo/bar", new TestConfiguration(3), true);
         cache.put("foo/baz", o, true);
         cache.put("foo/quux", new TestConfiguration(4), true);
-        
+
         List<Configuration> all = new LinkedList<Configuration>();
         cache.getAllMatchingPathPattern("foo/baz", all, true);
         assertEquals(1, all.size());
@@ -301,7 +281,6 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     public void testClearDirtyRetainsUnmarked()
     {
-        cache = new DefaultInstanceCache();
         cache.put("foo", new TestConfiguration(1), true);
         cache.clearDirty();
         assertSize(1, cache);
@@ -331,7 +310,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
         cache.markDirty("foo");
         cache.clearDirty();
-        
+
         cache.put("foo", new TestConfiguration(1), true);
         assertSize(2, cache);
         assertNotNull(cache.get("foo", true));
@@ -350,13 +329,13 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
         cache.markDirty("foo");
         cache.clearDirty();
-        
+
         cache.put("foo", new TestConfiguration(1), true);
         assertSize(2, cache);
         assertNotNull(cache.get("foo", false));
         assertNotNull(cache.get("foo", true));
     }
-    
+
     public void testIndexReference()
     {
         addInstance("foo");
@@ -386,7 +365,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
         cache.markDirty("foo");
         cache.clearDirty();
-        
+
         assertTrue(cache.getInstancePathsReferencing("bar").isEmpty());
         assertTrue(cache.getPropertyPathsReferencing("bar").isEmpty());
     }
@@ -402,7 +381,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
         cache.markDirty("bar");
         cache.clearDirty();
-        
+
         assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
         assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
     }
@@ -427,7 +406,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
     private List<CollectingHandler.Entry> forAllHelper(CollectingHandler.Entry... expected)
     {
         CollectingHandler handler = new CollectingHandler();
-        cache.forAllInstances(handler, true);
+        cache.forAllInstances(handler, true, false);
         assertEquals(expected.length, handler.entries.size());
         final Sort.StringComparator stringComp = new Sort.StringComparator();
         Collections.sort(handler.entries, new Comparator<CollectingHandler.Entry>()

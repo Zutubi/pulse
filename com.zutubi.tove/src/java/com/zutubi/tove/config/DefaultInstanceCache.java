@@ -2,7 +2,13 @@ package com.zutubi.tove.config;
 
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
+import com.zutubi.tove.transaction.inmemory.InMemoryMapStateWrapper;
+import com.zutubi.tove.transaction.inmemory.InMemoryStateWrapper;
+import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.NullaryProcedure;
 
 import java.util.*;
 
@@ -12,61 +18,76 @@ import java.util.*;
  */
 class DefaultInstanceCache implements InstanceCache
 {
-    private Entry root = new Entry(true);
-    private Map<String, Set<String>> referenceIndex = new HashMap<String, Set<String>>();
+    private InMemoryTransactionResource<Map<String, Set<String>>> referenceIndexState;
+    private InMemoryTransactionResource<Entry> entryState;
 
-    public DefaultInstanceCache copyStructure()
+    private TransactionManager transactionManager;
+
+    public void init()
     {
-        DefaultInstanceCache copy = new DefaultInstanceCache();
-        copy.root = root.copyStructure();
+        referenceIndexState = new InMemoryTransactionResource<Map<String, Set<String>>>(new InMemoryMapStateWrapper<String, Set<String>>(new HashMap<String, Set<String>>()));
+        referenceIndexState.setTransactionManager(transactionManager);
 
-        copy.referenceIndex = new HashMap<String, Set<String>>();
-        for (Map.Entry<String, Set<String>> entry: referenceIndex.entrySet())
+        entryState = new InMemoryTransactionResource<Entry>(new InMemoryEntryStateWrapper(new Entry(true)));
+        entryState.setTransactionManager(transactionManager);
+    }
+
+    public void reset()
+    {
+        transactionManager.runInTransaction(new NullaryProcedure()
         {
-            copy.referenceIndex.put(entry.getKey(), new HashSet<String>(entry.getValue()));
-        }
-
-        return copy;
+            public void run()
+            {
+                entryState.get(true).reset();
+                referenceIndexState.get(true).clear();
+            }
+        });
     }
 
     public boolean hasInstancesUnder(String path)
     {
         if(path.length() == 0)
         {
-            return root.size() > 0;
+            return entryState.get(false).size() > 0;
         }
         else
         {
-            return getEntry(path, true, null) != null;
+            return getEntry(path, true, null, false) != null;
         }
     }
 
-    public void markInvalid(String path)
+    public void markInvalid(final String path)
     {
-        getEntry(path, true, new UnaryProcedure<Entry>()
+        transactionManager.runInTransaction(new NullaryProcedure()
         {
-            public void run(Entry entry)
+            public void run()
             {
-                entry.markInvalid();
+                getEntry(path, true, new UnaryProcedure<Entry>()
+                {
+                    public void run(Entry entry)
+                    {
+                        entry.markInvalid();
+                    }
+                }, true);
             }
         });
     }
 
     public boolean isValid(String path, boolean allowIncomplete)
     {
-        DefaultInstanceCache.Entry entry = getEntry(path, allowIncomplete, null);
+        DefaultInstanceCache.Entry entry = getEntry(path, allowIncomplete, null, false);
         return entry != null && entry.isValid();
     }
 
     public Configuration get(String path, boolean allowIncomplete)
     {
-        Entry entry = getEntry(path, allowIncomplete, null);
+        Entry entry = getEntry(path, allowIncomplete, null, false);
         return entry == null ? null : entry.getInstance();
     }
 
-    private Entry getEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f)
+    private Entry getEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f, boolean writeable)
     {
-        return getEntry(root, PathUtils.getPathElements(path), 0, allowIncomplete, f);
+        return getEntry(entryState.get(writeable), PathUtils.getPathElements(path), 0, allowIncomplete, f);
     }
 
     private Entry getEntry(Entry entry, String[] elements, int index, boolean allowIncomplete, UnaryProcedure<Entry> f)
@@ -93,7 +114,7 @@ class DefaultInstanceCache implements InstanceCache
     public Collection<Configuration> getAllDescendants(String path, boolean allowIncomplete)
     {
         Collection<Configuration> result = new LinkedList<Configuration>();
-        Entry entry = getEntry(path, allowIncomplete, null);
+        Entry entry = getEntry(path, allowIncomplete, null, false);
         if (entry != null)
         {
             entry.getAllDescendants(result, allowIncomplete);
@@ -108,7 +129,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public <T extends Configuration> void getAllMatchingPathPattern(String path, Class<T> clazz, Collection<T> result, boolean allowIncomplete)
     {
-        getAll(root, PathUtils.getPathElements(path), 0, clazz, result, allowIncomplete);
+        getAll(entryState.get(false), PathUtils.getPathElements(path), 0, clazz, result, allowIncomplete);
     }
 
     private <T extends Configuration> void getAll(Entry entry, String[] elements, int index, Class<T> clazz, Collection<T> result, boolean allowIncomplete)
@@ -138,14 +159,26 @@ class DefaultInstanceCache implements InstanceCache
         }
     }
 
-    public void put(String path, Configuration instance, boolean complete)
+    public void put(final String path, final Configuration instance, final boolean complete)
     {
-        put(instance, complete, root, PathUtils.getPathElements(path), 0);
+        transactionManager.runInTransaction(new NullaryProcedure()
+        {
+            public void run()
+            {
+                put(instance, complete, entryState.get(true), PathUtils.getPathElements(path), 0);
+            }
+        });
     }
 
-    public void forAllInstances(InstanceHandler handler, boolean allowIncomplete)
+    public void forAllInstances(final InstanceHandler handler, final boolean allowIncomplete, final boolean writeable)
     {
-        root.forAllInstances(null, allowIncomplete, "", handler);
+        transactionManager.runInTransaction(new NullaryProcedure()
+        {
+            public void run()
+            {
+                entryState.get(writeable).forAllInstances(null, allowIncomplete, "", handler);
+            }
+        });
     }
 
     private void put(Configuration instance, boolean complete, Entry entry, String[] elements, int index)
@@ -161,12 +194,18 @@ class DefaultInstanceCache implements InstanceCache
 
     public void clearDirty()
     {
-        root.prune(referenceIndex);
+        transactionManager.runInTransaction(new NullaryProcedure()
+        {
+            public void run()
+            {
+                entryState.get(true).prune(referenceIndexState.get(true));
+            }
+        });
     }
 
     public Set<String> getInstancePathsReferencing(String path)
     {
-        Set<String> instancesReferencing = referenceIndex.get(path);
+        Set<String> instancesReferencing = referenceIndexState.get(false).get(path);
         if (instancesReferencing == null)
         {
             return Collections.emptySet();
@@ -179,7 +218,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public Set<String> getPropertyPathsReferencing(String path)
     {
-        Set<String> instancesReferencing = referenceIndex.get(path);
+        Set<String> instancesReferencing = referenceIndexState.get(false).get(path);
         if (instancesReferencing == null)
         {
             return Collections.emptySet();
@@ -189,7 +228,7 @@ class DefaultInstanceCache implements InstanceCache
             Set<String> result = new HashSet<String>();
             for (String instancePath: instancesReferencing)
             {
-                Entry entry = getEntry(instancePath, true, null);
+                Entry entry = getEntry(instancePath, true, null, false);
                 for (Map.Entry<String, String> propertyReference: entry.getReferences().entrySet())
                 {
                     if (propertyReference.getValue().equals(path))
@@ -203,24 +242,31 @@ class DefaultInstanceCache implements InstanceCache
         }
     }
 
-    public void indexReference(String fromPropertyPath, String toPath)
+    public void indexReference(final String fromPropertyPath, final String toPath)
     {
-        String propertyPath = PathUtils.getBaseName(fromPropertyPath);
-        String instancePath = PathUtils.getParentPath(fromPropertyPath);
-        Entry entry = getEntry(instancePath, true, null);
-        if (entry == null)
+        transactionManager.runInTransaction(new NullaryProcedure()
         {
-            propertyPath = PathUtils.getPath(PathUtils.getBaseName(instancePath), propertyPath);
-            instancePath = PathUtils.getParentPath(instancePath);
-            entry = getEntry(instancePath, true, null);
-        }
+            public void run()
+            {
+                String propertyPath = PathUtils.getBaseName(fromPropertyPath);
+                String instancePath = PathUtils.getParentPath(fromPropertyPath);
+                Entry entry = getEntry(instancePath, true, null, true);
+                if (entry == null)
+                {
+                    propertyPath = PathUtils.getPath(PathUtils.getBaseName(instancePath), propertyPath);
+                    instancePath = PathUtils.getParentPath(instancePath);
+                    entry = getEntry(instancePath, true, null, true);
+                }
 
-        addToReferenceIndex(instancePath, toPath);
-        entry.addReference(propertyPath, toPath);
+                addToReferenceIndex(instancePath, toPath);
+                entry.addReference(propertyPath, toPath);
+            }
+        });
     }
 
     private void addToReferenceIndex(String fromPath, String toPath)
     {
+        Map<String, Set<String>> referenceIndex = referenceIndexState.get(true);
         Set<String> index = referenceIndex.get(toPath);
         if (index == null)
         {
@@ -231,16 +277,26 @@ class DefaultInstanceCache implements InstanceCache
         index.add(fromPath);
     }
 
-    public boolean markDirty(String path)
+    public boolean markDirty(final String path)
     {
-        Entry entry = getEntry(path, true, null);
-        if (entry != null && !entry.isDirty())
+        return transactionManager.runInTransaction(new NullaryFunction<Boolean>()
         {
-            entry.markDirty();
-            return true;
-        }
+            public Boolean process()
+            {
+                Entry entry = getEntry(path, true, null, true);
+                if (entry != null && !entry.isDirty())
+                {
+                    entry.markDirty();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
 
-        return false;
+    public void setTransactionManager(TransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
     }
 
     private static class Entry
@@ -378,7 +434,7 @@ class DefaultInstanceCache implements InstanceCache
         {
             return references;
         }
-        
+
         private void addReference(String relativePropertyPath, String configurationPath)
         {
             if (references == null)
@@ -387,6 +443,16 @@ class DefaultInstanceCache implements InstanceCache
             }
 
             references.put(relativePropertyPath, configurationPath);
+        }
+
+        public void reset()
+        {
+            this.instance = null;
+            this.children = null;
+            this.dirty = false;
+            this.complete = true;
+            this.valid = true;
+            this.references = null;
         }
 
         public Entry copyStructure()
@@ -456,6 +522,19 @@ class DefaultInstanceCache implements InstanceCache
             }
 
             return children == null && instance == null;
+        }
+    }
+
+    private class InMemoryEntryStateWrapper extends InMemoryStateWrapper<Entry>
+    {
+        private InMemoryEntryStateWrapper(Entry state)
+        {
+            super(state);
+        }
+
+        protected InMemoryStateWrapper<Entry> copy()
+        {
+            return new InMemoryEntryStateWrapper(get().copyStructure());
         }
     }
 }

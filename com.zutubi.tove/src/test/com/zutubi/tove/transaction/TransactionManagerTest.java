@@ -1,27 +1,23 @@
 package com.zutubi.tove.transaction;
 
+import com.zutubi.util.NullaryFunction;
+
 public class TransactionManagerTest extends AbstractTransactionTestCase
 {
     private TransactionManager transactionManager;
+    private UserTransaction userTransaction;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         transactionManager = new TransactionManager();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        transactionManager = null;
-
-        super.tearDown();
+        userTransaction = new UserTransaction(transactionManager);
     }
 
     // check that the transaction ids are unique and sequentially increasing(?)
     public void testUniqueTransactionIdsAllocatedToTransactions()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         long id = transactionManager.getTransaction().getId();
@@ -42,7 +38,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testSimpleCommitTransactionFlow()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         Transaction transaction = transactionManager.getTransaction();
@@ -62,7 +57,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testSimpleRollbackTransactionFlow()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         Transaction transaction = transactionManager.getTransaction();
@@ -82,7 +76,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testRollbackDueToPrepareFailure()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         Transaction transaction = transactionManager.getTransaction();
@@ -92,7 +85,15 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
         resource.interactWithMe();
         resource.setPreparationResponse(false);
 
-        userTransaction.commit();
+        try
+        {
+            userTransaction.commit();
+            fail();
+        }
+        catch (RollbackException e)
+        {
+            // expected.
+        }
 
         assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
         assertTrue(resource.isRolledback());
@@ -100,7 +101,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testRollbackDueToRollbackOnly()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         Transaction transaction = transactionManager.getTransaction();
@@ -131,7 +131,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testSyncTriggeredOnCommit()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         final TransactionStatus[] transactionStatus = new TransactionStatus[1];
@@ -151,7 +150,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testSyncTriggeredOnRollback()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         final TransactionStatus[] transactionStatus = new TransactionStatus[1];
@@ -171,7 +169,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testCommittedTransactionStatusWhenNoResourcesRegistered()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         Transaction transaction = transactionManager.getTransaction();
@@ -183,7 +180,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testRolledbackTransactionStatusWhenNoResourcesRegistered()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         Transaction transaction = transactionManager.getTransaction();
@@ -195,7 +191,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testSerialisationOfTransactions()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         final TransactionalResource e = new TransactionalResource(transactionManager);
@@ -219,7 +214,7 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
         // Pause this thread whilst the separate thread is doing what it needs to.
         // A semaphore is awkward here since the userTransaction.begin is a blocking call.
-        while (internalTransaction[0] == null || internalTransaction[0].getStatus() != TransactionStatus.ACTIVE)
+        while (internalTransaction[0] == null)
         {
             Thread.yield();
         }
@@ -239,7 +234,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testNestedTransaction()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         assertEquals(TransactionStatus.ACTIVE, userTransaction.getStatus());
@@ -261,7 +255,6 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
     public void testNestedTransactionRollback()
     {
-        UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
 
         assertEquals(TransactionStatus.ACTIVE, userTransaction.getStatus());
@@ -281,17 +274,58 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
         assertTrue(e.isRolledback());
     }
 
-    private void pause()
+    public void testExceptionDuringTransactionTriggersRollback()
     {
+        final TransactionalResource resource = new TransactionalResource(transactionManager);
+
         try
         {
-            Thread.sleep(500);
+            transactionManager.runInTransaction(new NullaryFunction()
+            {
+                public Object process()
+                {
+                    resource.interactWithMe();
+
+                    throw new RuntimeException("badness");
+                }
+            });
+            fail();
         }
-        catch (InterruptedException e1)
+        catch (Exception e)
         {
-            // noop.
+            // noop, expected.
         }
+        assertTrue(resource.isRolledback());
     }
+
+    public void testExceptionDuringNestedTransactionMarksRollbackOnly()
+    {
+        userTransaction.begin();
+
+        final TransactionalResource resource = new TransactionalResource(transactionManager);
+
+        try
+        {
+            transactionManager.runInTransaction(new NullaryFunction()
+            {
+                public Object process()
+                {
+                    resource.interactWithMe();
+
+                    throw new RuntimeException("badness");
+                }
+            });
+            fail();
+        }
+        catch (Exception e)
+        {
+            // noop, expected.
+        }
+        assertEquals(TransactionStatus.ROLLBACKONLY, userTransaction.getStatus());
+        userTransaction.commit();
+        assertTrue(resource.isRolledback());
+    }
+
 
     private class TransactionalResource implements TransactionResource
     {

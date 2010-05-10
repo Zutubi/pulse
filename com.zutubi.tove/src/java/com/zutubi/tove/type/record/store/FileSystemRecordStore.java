@@ -83,7 +83,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     /**
      * The interval (in seconds) between automatic compaction runs.
-     *  
+     *
      * @param interval interval in seconds.
      */
     public void setCompactionInterval(long interval)
@@ -205,6 +205,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
         inMemoryDelegate = new InMemoryRecordStore(latestSnapshot);
         inMemoryDelegate.setTransactionManager(transactionManager);
+        inMemoryDelegate.init();
 
         // load the journal.
 

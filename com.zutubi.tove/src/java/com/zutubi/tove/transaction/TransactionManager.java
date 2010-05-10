@@ -1,10 +1,15 @@
 package com.zutubi.tove.transaction;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * The transaction manager is responsible for managing the systems transactions.  It begins, rolls back,
@@ -15,12 +20,19 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class TransactionManager
 {
+    private static final Messages I18N = Messages.getInstance(TransactionManager.class);
     private static final Logger LOG = Logger.getLogger(TransactionManager.class);
 
-    private static long nextTransactionId = 1;
+    private static final AtomicLong nextTransactionId = new AtomicLong(1);
 
+    /**
+     * The active transaction bound to the current thread. 
+     */
     private ThreadLocal<Transaction> transactionHolder = new ThreadLocal<Transaction>();
 
+    /**
+     * Lock used to serialise transactions.
+     */
     private Lock activeTransaction = new ReentrantLock();
 
     public TransactionManager()
@@ -52,29 +64,37 @@ public class TransactionManager
         Transaction txn = transactionHolder.get();
         if (txn == null)
         {
-            // No transaction in progress, so start one.
-            txn = new Transaction(nextTransactionId++, this);
-            txn.setStatus(TransactionStatus.ACTIVE);
-            transactionHolder.set(txn);
-
             activeTransaction.lock();
 
+            // No transaction in progress, so start one.
+            txn = new Transaction(nextTransactionId.getAndIncrement(), this);
+            txn.setStatus(TransactionStatus.ACTIVE);
+            transactionHolder.set(txn);
         }
         else
         {
             // track the transaction depth...
             txn.setDepth(txn.getDepth() + 1);
         }
-
         return txn;
     }
 
+    /**
+     * Commit the corrently active transaction.  This requires that a transaction
+     * be active or an error is thrown.
+     *
+     * If the current transaction is marked as rollbackOnly or a problem occurs
+     * during the commit, a rollback will be triggered.
+     *
+     * @throws TransactionException if no transaction is active or if there is a
+     * problem committing the transaction.
+     */
     public void commit() throws TransactionException
     {
         Transaction currentTransaction = transactionHolder.get();
         if (currentTransaction == null)
         {
-            throw new TransactionException("No active transaction available.");
+            throw new TransactionException(I18N.format("no.active.transaction"));
         }
 
         // check the txn depth.
@@ -94,12 +114,11 @@ public class TransactionManager
         TransactionStatus currentStatus = currentTransaction.getStatus();
         if (currentStatus != TransactionStatus.ACTIVE)
         {
-            throw new TransactionException("Attempting to commit a non-active transaction. Current transaction status is " + currentStatus.toString().toLowerCase());
+            throw new TransactionException(I18N.format("commit.non-active", currentStatus));
         }
 
         currentTransaction.setStatus(TransactionStatus.COMMITTING);
 
-        // look through the enlisted resources, and
         boolean canCommit = true;
         for (TransactionResource resource : currentTransaction.getResources())
         {
@@ -109,7 +128,7 @@ public class TransactionManager
             }
             catch (Throwable e)
             {
-                LOG.warning("Failed to prepare transaction resource, marking transaction for rollback.", e);
+                LOG.warning(I18N.format("prepare.failed"), e);
                 canCommit = false;
             }
 
@@ -121,7 +140,8 @@ public class TransactionManager
 
         if (canCommit)
         {
-            for (TransactionResource resource : currentTransaction.getResources())
+            List<TransactionResource> resources = new LinkedList<TransactionResource>(currentTransaction.getResources());
+            for (TransactionResource resource : resources)
             {
                 resource.commit();
             }
@@ -130,17 +150,18 @@ public class TransactionManager
 
             transactionHolder.set(null);
             activeTransaction.unlock();
+
+            List<Synchronization> synchronizations = new LinkedList<Synchronization>(currentTransaction.getSynchronizations());
+            for (Synchronization synchronization : synchronizations)
+            {
+                synchronization.postCompletion(currentTransaction.getStatus());
+            }
         }
         else
         {
             rollback();
 
-            //Question: indicate the failure to commit by throwing an exception?
-        }
-
-        for (Synchronization synchronization : currentTransaction.getSynchronizations())
-        {
-            synchronization.postCompletion(currentTransaction.getStatus());
+            throw new RollbackException(I18N.format("prepare.failed"));
         }
     }
 
@@ -155,9 +176,9 @@ public class TransactionManager
         Transaction currentTransaction = transactionHolder.get();
         if (currentTransaction == null)
         {
-            throw new TransactionException("No active transaction available.");
+            throw new TransactionException(I18N.format("no.active.transaction"));
         }
-        
+
         // check the txn depth.
         if (currentTransaction.getDepth() > 0)
         {
@@ -168,7 +189,8 @@ public class TransactionManager
 
         currentTransaction.setStatus(TransactionStatus.ROLLINGBACK);
 
-        for (TransactionResource resource : currentTransaction.getResources())
+        List<TransactionResource> resources = new LinkedList<TransactionResource>(currentTransaction.getResources());
+        for (TransactionResource resource : resources)
         {
             resource.rollback();
         }
@@ -178,7 +200,8 @@ public class TransactionManager
         transactionHolder.set(null);
         activeTransaction.unlock();
 
-        for (Synchronization synchronization : currentTransaction.getSynchronizations())
+        List<Synchronization> synchronizations = new LinkedList<Synchronization>(currentTransaction.getSynchronizations());
+        for (Synchronization synchronization : synchronizations)
         {
             synchronization.postCompletion(currentTransaction.getStatus());
         }
@@ -195,7 +218,7 @@ public class TransactionManager
         Transaction activeTransaction = transactionHolder.get();
         if (activeTransaction == null)
         {
-            throw new TransactionException("No active transaction available.");
+            throw new TransactionException(I18N.format("no.active.transaction"));
         }
         activeTransaction.setStatus(TransactionStatus.ROLLBACKONLY);
     }
@@ -216,10 +239,20 @@ public class TransactionManager
     }
 
     /**
+     * Returns true if a transaction is active on the current thread.
+     *
+     * @return true if a transaction is active, false otherwise.
+     */
+    public boolean isTransactionActive()
+    {
+        return transactionHolder.get() != null;
+    }
+
+    /**
      * Get the status of the transaction associated with the current thread.
-     * 
+     *
      * @return the transaction status
-     * 
+     *
      * @throws TransactionException if no transaction is associated with the current thread.
      */
     public TransactionStatus getStatus() throws TransactionException
@@ -227,12 +260,50 @@ public class TransactionManager
         Transaction activeTransaction = transactionHolder.get();
         if (activeTransaction == null)
         {
-            throw new TransactionException("No active transaction available.");
+            throw new TransactionException(I18N.format("no.active.transaction"));
         }
         return activeTransaction.getStatus();
     }
 
-    public <T> T runInTransaction(NullaryFunction<T> action, TransactionResource... resources)
+    /**
+     * Run the provided function within the context of a transaction.  If a transaction is
+     * active, then this function participates in that existing transaction.  If not, a new
+     * transaction is started.
+     *
+     * @param function      the function to be run within the context of a transaction.
+     * @param resources     resources to be bound to the transaction.
+     * @param <T>           the return type of the function.
+     * @return the result of the function.
+     */
+    public <T> T runInTransaction(final NullaryFunction<T> function, TransactionResource... resources)
+    {
+        final Object[] result = new Object[1];
+        inTransaction(new NullaryProcedure()
+        {
+            public void run()
+            {
+                result[0] = function.process();
+            }
+        }, resources);
+
+        //noinspection unchecked
+        return (T) result[0];
+    }
+
+    /**
+     * Run the provided procedure within the context of a transaction.  If a transaction is
+     * active, then this procedure participates in that existing transaction.  If not, a new
+     * transaction is started.
+     *
+     * @param procedure     the procedure to be run within the context of a transaction.
+     * @param resources     resources to be bound to the transaction.
+     */
+    public void runInTransaction(NullaryProcedure procedure, TransactionResource... resources)
+    {
+        inTransaction(procedure, resources);
+    }
+
+    private void inTransaction(NullaryProcedure procedure, TransactionResource... resources)
     {
         // ensure that we are part of the transaction.
         boolean activeTransaction = getTransaction() != null;
@@ -251,12 +322,10 @@ public class TransactionManager
         {
             try
             {
-                T result = action.process();
+                procedure.run();
 
                 // execute a manual transaction.
                 commit();
-
-                return result;
             }
             catch (RuntimeException e)
             {
@@ -273,7 +342,7 @@ public class TransactionManager
         {
             try
             {
-                return action.process();
+                procedure.run();
             }
             catch (RuntimeException e)
             {

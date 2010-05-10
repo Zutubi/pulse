@@ -1,9 +1,6 @@
 package com.zutubi.tove.type.record.store;
 
-import com.zutubi.tove.transaction.Transaction;
-import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.tove.transaction.TransactionStatus;
-import com.zutubi.tove.transaction.UserTransaction;
+import com.zutubi.tove.transaction.*;
 import com.zutubi.tove.type.record.DefaultRecordSerialiser;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
@@ -502,7 +499,16 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         Transaction transaction = transactionManager.getTransaction();
 
         recordStore.insert("sample", sample);
-        txn.commit();
+
+        try
+        {
+            txn.commit();
+            fail("Expected exception.");
+        }
+        catch (RollbackException e)
+        {
+            // expected.
+        }
 
         assertNull(recordStore.select().get("sample"));
         assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
@@ -533,7 +539,16 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         Transaction transaction = transactionManager.getTransaction();
 
         recordStore.insert("sample", sample);
-        txn.commit();
+
+        try
+        {
+            txn.commit();
+            fail("Expected exception.");
+        }
+        catch (RollbackException e)
+        {
+            // expected.
+        }
 
         assertNull(recordStore.select().get("sample"));
         assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
@@ -592,7 +607,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
     {
         MutableRecord sample = createRandomSampleRecord();
         recordStore.insert("a", sample);
-        
+
         assertNotNull(recordStore.select().get("a"));
 
         MutableRecord sampleImport = createRandomSampleRecord();

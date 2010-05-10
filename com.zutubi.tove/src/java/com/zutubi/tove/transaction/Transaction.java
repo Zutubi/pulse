@@ -21,6 +21,9 @@ public class Transaction
      */
     private List<TransactionResource> resources;
 
+    /**
+     * List of synchronizations that are participating in this transaction.
+     */
     private List<Synchronization> synchronizations;
 
     /**

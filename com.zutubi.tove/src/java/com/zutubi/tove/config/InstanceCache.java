@@ -11,15 +11,6 @@ import java.util.Set;
  */
 public interface InstanceCache
 {
-    /**
-     * Returns a copy of this cache which points to the same instances.  That
-     * is, the cache structure itself is copied, but the same instances are
-     * held in the new cache.
-     *
-     * @return a copy of this cache holding the same instances
-     */
-    DefaultInstanceCache copyStructure();
-
     void markInvalid(String path);
 
     boolean isValid(String path, boolean allowIncomplete);
@@ -43,7 +34,7 @@ public interface InstanceCache
 
     void put(String path, Configuration instance, boolean complete);
 
-    void forAllInstances(InstanceHandler handler, boolean allowIncomplete);
+    void forAllInstances(InstanceHandler handler, boolean allowIncomplete, boolean writeable);
 
     /**
      * Marks an instance as dirty: i.e. the instance or something it reaches

@@ -38,12 +38,18 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
     {
         super.setUp();
 
+        TransactionManager transactionManager = new TransactionManager();
+
+        InMemoryRecordStore recordStore = new InMemoryRecordStore();
+        recordStore.setTransactionManager(transactionManager);
+        recordStore.init();
+
         recordManager = new RecordManager();
-        recordManager.setRecordStore(new InMemoryRecordStore());
-        recordManager.setTransactionManager(new TransactionManager());
+        recordManager.setRecordStore(recordStore);
+        recordManager.setTransactionManager(transactionManager);
         recordManager.setEventManager(new DefaultEventManager());
         recordManager.init();
-        
+
         // Create an empty scope: just one record
         recordManager.insert(SCOPE_EMPTY, new MutableRecordImpl());
 
@@ -57,12 +63,6 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
         addProject(PROJECT_ROOT, PROJECT_TEMPLATE);
         addProject(PROJECT_TEMPLATE, PROJECT_TEMPLATE_CHILD1);
         addProject(PROJECT_TEMPLATE, PROJECT_TEMPLATE_CHILD2);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        recordManager = null;
-        super.tearDown();
     }
 
     public void testEmptyScope()

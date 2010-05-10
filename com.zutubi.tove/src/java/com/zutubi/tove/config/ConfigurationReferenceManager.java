@@ -107,7 +107,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
 
     public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
     {
-        return resolveReference(templateOwnerPath, toHandle, instantiator, configurationTemplateManager.getState().instances, indexPath);
+        return resolveReference(templateOwnerPath, toHandle, instantiator, configurationTemplateManager.getInstances(), indexPath);
     }
 
     public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, InstanceCache cache, String indexPath) throws TypeException

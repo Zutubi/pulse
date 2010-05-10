@@ -48,7 +48,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
     protected DefaultConfigurationProvider configurationProvider = null;
     protected ConfigurationHealthChecker configurationHealthChecker;
     protected boolean checkHealthOnTeardown = true;
-    
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -68,6 +68,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
 
         InMemoryRecordStore inMemory = new InMemoryRecordStore();
         inMemory.setTransactionManager(transactionManager);
+        inMemory.init();
 
         recordManager = new RecordManager();
         recordManager.setTransactionManager(transactionManager);
@@ -125,7 +126,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         configurationTemplateManager.setConfigurationPersistenceManager(configurationPersistenceManager);
         configurationTemplateManager.setValidationManager(validationManager);
         configurationTemplateManager.setTransactionManager(transactionManager);
-        
+
         configurationReferenceManager = new ConfigurationReferenceManager();
         configurationReferenceManager.setRecordManager(recordManager);
         configurationReferenceManager.setTypeRegistry(typeRegistry);
@@ -172,7 +173,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         typeRegistry.setHandleAllocator(recordManager);
 
         objectFactory.initProperties(this);
-        
+
         configurationHealthChecker = objectFactory.buildBean(ConfigurationHealthChecker.class);
     }
 
@@ -195,7 +196,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
     {
         checkHealthOnTeardown = false;
     }
-    
+
     public MutableRecord unstantiate(Configuration c) throws TypeException
     {
         CompositeType type = typeRegistry.getType(c.getClass());

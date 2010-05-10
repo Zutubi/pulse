@@ -18,7 +18,7 @@ public class ConfigurationPersistenceManagerTest extends ZutubiTestCase
     private ConfigurationPersistenceManager manager = null;
     private TypeRegistry typeRegistry = null;
     private RecordManager recordManager = null;
-    
+
     private TransactionManager transactionManager;
 
     protected void setUp() throws Exception
@@ -28,11 +28,12 @@ public class ConfigurationPersistenceManagerTest extends ZutubiTestCase
         typeRegistry = new TypeRegistry();
         recordManager = new RecordManager();
         typeRegistry.setHandleAllocator(recordManager);
-        
+
         transactionManager = new TransactionManager();
 
         InMemoryRecordStore inMemory = new InMemoryRecordStore();
         inMemory.setTransactionManager(transactionManager);
+        inMemory.init();
 
         recordManager = new RecordManager();
         recordManager.setTransactionManager(transactionManager);

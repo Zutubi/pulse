@@ -14,11 +14,12 @@ public abstract class AbstractHealthProblemTestCase extends ZutubiTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         TransactionManager transactionManager = new TransactionManager();
 
         InMemoryRecordStore recordStore = new InMemoryRecordStore();
         recordStore.setTransactionManager(transactionManager);
+        recordStore.init();
 
         recordManager = new RecordManager();
         recordManager.setEventManager(new DefaultEventManager());
