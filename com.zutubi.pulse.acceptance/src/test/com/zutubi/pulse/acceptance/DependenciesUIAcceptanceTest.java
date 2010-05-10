@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
+import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
@@ -57,7 +58,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         configurationHelper.insertProject(project.getConfig());
     }
 
-    public void testBuildSummaryReport() throws Exception
+    public void testBuildDetailsReport() throws Exception
     {
         browser.loginAsAdmin();
 
@@ -67,8 +68,8 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(projectA);
         long projectABuildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, projectA.getName(), projectABuildNumber);
-        assertFalse(summaryPage.hasDependencies());
+        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, projectA.getName(), projectABuildNumber);
+        assertFalse(detailsPage.isDependenciesTablePresent());
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
         projectB.addArtifacts("build/artifactB.jar");
@@ -82,11 +83,11 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(dependentProject);
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
-        summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
-        assertTrue(summaryPage.hasDependencies());
+        detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
+        assertTrue(detailsPage.isDependenciesTablePresent());
         
-        BuildSummaryPage.DependencyRow row1 = summaryPage.getDependencyRow(1);
-        BuildSummaryPage.DependencyRow row2 = summaryPage.getDependencyRow(2);
+        BuildDetailsPage.DependencyRow row1 = detailsPage.getDependencyRow(1);
+        BuildDetailsPage.DependencyRow row2 = detailsPage.getDependencyRow(2);
 
         assertEquals("default", row1.getStage());
         assertEquals("default", row2.getStage());

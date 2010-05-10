@@ -1,16 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -27,8 +16,6 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -40,16 +27,11 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -57,14 +39,9 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -73,6 +50,31 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -377,6 +379,29 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         triggerSuccessfulBuild(random, AGENT_NAME);
     }
+    
+    public void testSummaryView() throws Exception
+    {
+        final String FEATURES_PROCESSOR = "features processor";
+
+        String mainProjectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(ALL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        insertTestCapture(mainProjectPath, JUNIT_PROCESSOR);
+
+        insertFeaturesProcessor(random, FEATURES_PROCESSOR);
+        insertFileArtifact(mainProjectPath, "features", "features.txt", FEATURES_PROCESSOR, false);
+
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, 1L);
+        assertTrue(summaryPage.isBuildBasicsPresent());
+        assertEquals(asPair("status", "failure"), summaryPage.getBuildBasicsRow(0));
+        assertTrue(summaryPage.isBuildBasicsPresent());
+        assertTrue(summaryPage.isFeaturesTablePresent(Feature.Level.ERROR));
+        assertTrue(summaryPage.isFeaturesTablePresent(Feature.Level.WARNING));
+        assertFalse(summaryPage.isFeaturesTablePresent(Feature.Level.INFO));
+        assertTrue(summaryPage.isTestFailuresTablePresent());
+    }
 
     public void testDetailsView() throws Exception
     {
@@ -402,16 +427,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         buildFieldsProcessorConfig.put("scope", FieldScope.BUILD.toString());
         xmlRpcHelper.insertConfig(mainProcessorsPath, buildFieldsProcessorConfig);
 
-        Hashtable<String, Object> featuresProcessorConfig = xmlRpcHelper.createDefaultConfig(RegexPostProcessorConfiguration.class);
-        featuresProcessorConfig.put(NAME, FEATURES_PROCESSOR);
-        featuresProcessorConfig.put("leadingContext", 2);
-        featuresProcessorConfig.put("trailingContext", 2);
-        Vector<Hashtable<String, Object>> patterns = new Vector<Hashtable<String, Object>>(3);
-        patterns.add(createRegexPattern(Feature.Level.ERROR, "^error:"));
-        patterns.add(createRegexPattern(Feature.Level.WARNING, "^warning:"));
-        patterns.add(createRegexPattern(Feature.Level.INFO, "^info:"));
-        featuresProcessorConfig.put("patterns", patterns);
-        xmlRpcHelper.insertConfig(mainProcessorsPath, featuresProcessorConfig);
+        insertFeaturesProcessor(mainProjectName, FEATURES_PROCESSOR);
         
         insertFileArtifact(mainProjectPath, "custom fields", "build.properties", BUILD_FIELD_PROCESSOR, false);
         insertFileArtifact(mainProjectPath, "stage fields", "stage.properties", CUSTOM_FIELD_PROCESSOR, false);
@@ -466,6 +482,20 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("info feature");
         assertTextPresent("context line 1");
         assertTextPresent("info context line 2");
+    }
+
+    private void insertFeaturesProcessor(String projectName, String processorName) throws Exception
+    {
+        Hashtable<String, Object> featuresProcessorConfig = xmlRpcHelper.createDefaultConfig(RegexPostProcessorConfiguration.class);
+        featuresProcessorConfig.put(NAME, processorName);
+        featuresProcessorConfig.put("leadingContext", 2);
+        featuresProcessorConfig.put("trailingContext", 2);
+        Vector<Hashtable<String, Object>> patterns = new Vector<Hashtable<String, Object>>(3);
+        patterns.add(createRegexPattern(Feature.Level.ERROR, "^error:"));
+        patterns.add(createRegexPattern(Feature.Level.WARNING, "^warning:"));
+        patterns.add(createRegexPattern(Feature.Level.INFO, "^info:"));
+        featuresProcessorConfig.put("patterns", patterns);
+        xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, POSTPROCESSORS), featuresProcessorConfig);
     }
 
     private Hashtable<String, Object> createRegexPattern(Feature.Level category, String expression)  throws Exception
@@ -635,10 +665,19 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(logPage.isLogAvailable());
         assertTextPresent(MESSAGE_BUILD_COMPLETED);
 
-        // Use the combo to switch to a stage log.
-        logPage.selectStage(DEFAULT_STAGE);
         StageLogPage stageLogPage = browser.createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
-        stageLogPage.waitFor();
+        if (browser.isFirefox())
+        {
+            // Unfortunately JS security prevents us using the combo in proxy
+            // mode.
+            stageLogPage.openAndWaitFor();
+        }
+        else
+        {
+            // Use the combo to switch to a stage log.
+            logPage.selectStage(DEFAULT_STAGE);
+            stageLogPage.waitFor();
+        }
         assertTrue(stageLogPage.isLogAvailable());
         assertTextPresent(MESSAGE_RECIPE_COMPLETED);
 

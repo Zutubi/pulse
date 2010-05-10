@@ -8,6 +8,6 @@ public class BuildSummaryActionResolver extends ParameterisedActionResolver
 {
     public BuildSummaryActionResolver()
     {
-        super("viewBuild");
+        super("viewBuildSummary");
     }
 }

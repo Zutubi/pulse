@@ -1,8 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Pair;
 import com.zutubi.util.WebUtils;
@@ -10,23 +8,17 @@ import com.zutubi.util.WebUtils;
 /**
  * The details tab for a build result.
  */
-public class BuildDetailsPage extends SeleniumPage
+public class BuildDetailsPage extends AbstractBuildStatusPage
 {
-    public static final String ID_BUILD_BASICS = "build-basics";
     public static final String ID_CUSTOM_FIELDS = "custom-fields";
     public static final String ID_RETRIEVED_DEPENDENCIES = "build-dependencies";
     public static final String ID_STAGE_BASICS = "stage-basics";
     public static final String ID_COMMAND_BASICS = "command-basics";
     public static final String ID_COMMAND_PROPERTIES = "command-properties";
 
-    private String projectName;
-    private long buildId;
-    
     public BuildDetailsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-details", WebUtils.uriComponentEncode(projectName));
-        this.projectName = projectName;
-        this.buildId = buildId;
+        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-details", WebUtils.uriComponentEncode(projectName), projectName, buildId);
     }
 
     public String getUrl()
@@ -58,21 +50,6 @@ public class BuildDetailsPage extends SeleniumPage
         browser.waitForCondition("selenium.browserbot.getCurrentWindow().paneLoading === false");
     }
 
-    public boolean isBuildBasicsPresent()
-    {
-        return browser.isElementPresent(ID_BUILD_BASICS);
-    }
-    
-    public Pair<String, String> getBuildBasicsRow(int index)
-    {
-        return getRow(ID_BUILD_BASICS, index);
-    }
-
-    public boolean isFeaturesTablePresent(Feature.Level level)
-    {
-        return browser.isElementPresent("features-" + level.getPrettyString());
-    }
-
     public boolean isCustomFieldsTablePresent()
     {
         return browser.isElementPresent(ID_CUSTOM_FIELDS);
@@ -91,6 +68,17 @@ public class BuildDetailsPage extends SeleniumPage
     public boolean isDependenciesTablePresent()
     {
         return browser.isElementPresent(ID_RETRIEVED_DEPENDENCIES);
+    }
+
+    public DependencyRow getDependencyRow(int row)
+    {
+        row = row + 1; // skip the table header row.
+        return new DependencyRow(
+                browser.getCellContents(ID_RETRIEVED_DEPENDENCIES, row, 0),
+                browser.getCellContents(ID_RETRIEVED_DEPENDENCIES, row, 1),
+                browser.getCellContents(ID_RETRIEVED_DEPENDENCIES, row, 2),
+                browser.getCellContents(ID_RETRIEVED_DEPENDENCIES, row, 3)
+        );
     }
 
     public boolean isStageBasicsPresent()
@@ -122,9 +110,40 @@ public class BuildDetailsPage extends SeleniumPage
     {
         return getRow(ID_COMMAND_PROPERTIES, index);
     }
-    
-    private Pair<String, String> getRow(String tableId, int index)
+
+    public class DependencyRow
     {
-        return new Pair<String, String>(browser.getCellContents(tableId, index + 1, 0), browser.getCellContents(tableId, index + 1, 1));
+        private String project;
+        private String build;
+        private String stage;
+        private String artifact;
+
+        public DependencyRow(String project, String build, String stage, String artifact)
+        {
+            this.project = project;
+            this.build = build;
+            this.stage = stage;
+            this.artifact = artifact;
+        }
+
+        public String getProject()
+        {
+            return project;
+        }
+
+        public String getBuild()
+        {
+            return build;
+        }
+
+        public String getStage()
+        {
+            return stage;
+        }
+
+        public String getArtifact()
+        {
+            return artifact;
+        }
     }
 }

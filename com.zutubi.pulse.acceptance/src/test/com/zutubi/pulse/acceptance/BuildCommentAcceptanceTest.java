@@ -147,6 +147,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         dialog.clickOk();
 
         browser.waitForPageToLoad();
+        page.waitFor();
         assertTrue(page.isCommentsPresent());
         assertTextPresent(TEST_COMMENT);
         assertTextPresent("by " + TEST_USER);

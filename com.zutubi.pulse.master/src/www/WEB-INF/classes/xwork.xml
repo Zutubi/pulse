@@ -96,7 +96,7 @@
             <result name="success" type="redirect">${redirect}</result>
         </action>
 
-        <action name="viewBuild" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+        <action name="viewBuildSummary" class="com.zutubi.pulse.master.xwork.actions.project.BuildStatusActionBase">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-build.vm</result>
         </action>
@@ -112,7 +112,7 @@
             <result name="success" type="velocity">/view-personal-changes.vm</result>
         </action>
 
-        <action name="viewTests" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+        <action name="viewTests" class="com.zutubi.pulse.master.xwork.actions.project.BuildStatusActionBase">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-tests.vm</result>
         </action>
@@ -122,7 +122,7 @@
             <result name="success" type="velocity">/view-test-suite.vm</result>
         </action>
 
-        <action name="viewDetails" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+        <action name="viewDetails" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildDetailsAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-details.vm</result>
         </action>
@@ -418,11 +418,12 @@
             <result name="success" type="velocity">project-dependencies-panel.vm</result>
         </action>
 
-        <action name="viewBuildPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
-            <result name="success" type="velocity">view-build-panel.vm</result>
+        <action name="viewBuildSummaryPanel" class="com.zutubi.pulse.master.xwork.actions.project.BuildSummaryDataAction">
+            <result name="success" type="flexjson">data</result>
+            <result name="error" type="httpheader">500</result>
         </action>
 
-        <action name="buildDetailsPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+        <action name="buildDetailsPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildDetailsAction">
             <result name="success" type="velocity">build-details-panel.vm</result>
         </action>
         
@@ -430,7 +431,7 @@
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
-        <action name="viewTestsPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
+        <action name="viewTestsPanel" class="com.zutubi.pulse.master.xwork.actions.project.BuildStatusActionBase">
             <result name="success" type="velocity">view-tests-panel.vm</result>
         </action>
 

@@ -5,12 +5,12 @@
 
         <td class="columns" width="100%">
 
-            #responsibilityPanel($currentBuild "0px")
+            #responsibilityPanel($currentBuild)
 
             <h2 class="section top">#wwtext("name=current.build")</h2>
 
         #if($currentBuild)
-            #showBuild($currentBuild true false)
+            #showBuild($currentBuild)
             #buildTableColumns($summaryColumns "project.summary")            
         #else
             <p>

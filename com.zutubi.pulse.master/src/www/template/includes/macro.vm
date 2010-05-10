@@ -1143,13 +1143,19 @@
 ##
 #macro(buildMessageSummary $buildResult $level)
     #if($buildResult.hasMessages($level))
-        <h3>#wwtext("name=${level.toString().toLowerCase()}.messages")</h3>
-        <ul class="$level.toString().toLowerCase()">
-        #resultMessageItems($buildResult $level)
+<table id="features-${level.prettyString}" class="two-content spaced">
+    <tr><th class="two-heading">#wwtext("name=features.${level.prettyString}")</th></tr>
+    <tr>    
+        <td class="content leftmost rightmost">
+            <ul>
+                #resultMessageItems($buildResult $level)
         #foreach($node in $buildResult.root.children)
-            #nodeMessageSummary($buildResult $node $level)
+                #nodeMessageSummary($buildResult $node $level)
         #end
-        </ul>
+            </ul>
+        </td>
+    </tr>
+</table>
     #end
 #end
 
@@ -1300,46 +1306,52 @@
 
 #macro(buildTestFailures $buildResult)
     #if($buildResult.hasBrokenTests())
-    <h2 id="failed-tests" class="section">#wwtext("name=failed.tests")</h2>
+    <table id="failed-tests" class="two-content spaced">
+        <tr>
+            <th class="two-heading" colspan="5">#wwtext("name=failed.tests")</th>
+        </tr>
+        <tr>
+            #contentClassHeading("test.name" 1 "leftmost")
+            #contentHeading("test.status" 2)
+            #contentHeading("test.details" 1)
+            #contentClassHeading("test.duration" 1 "rightmost")
+        </tr>
         #foreach($recipeNode in $buildResult.root.children)
             #if($recipeNode.hasBrokenTests())
-    <table id='#id("stage-${recipeNode.stageName}-failed")' class="fill two-content #if($velocityCount > 1) spaced #end">
-        <tr>
-            <th class="two-heading" colspan="5">
-                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stageName) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
-            </th>
+        <tr id='#id("stage-${recipeNode.stageName}-failed")'>
+            <td class="content leftmost">
+                <a href="$urls.stageTests($buildResult, $recipeNode)">#wwtext("name=build.stage") $!webwork.htmlEncode($recipeNode.stageName)</a>
+            </td>
+            <td class="content"><img src="$base/images/exclamation.gif"/></td>
+            <td class="content">$recipeNode.result.testSummary</td>
+            #dynamicCell("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
+            <td class="content rightmost">&nbsp;</td>
         </tr>
         #set($broken = $recipeNode.result.loadedTestFailures)
-        #if($broken == 0)
-            #noteRow("test.broken.unavailable" 5)
-        #else
-            #set($excess = $recipeNode.result.excessFailureCount)
-            #if($excess > 0)
-                #noteRow($action.getText("test.excess.failures", [$excess]) 5)
+                #if($broken == 0)
+        #noteRow("test.broken.unavailable" 5)
+                #else
+                    #set($excess = $recipeNode.result.excessFailureCount)
+                    #if($excess > 0)
+        #noteRow($action.getText("test.excess.failures", [$excess]) 5)
+                    #end
+        #showRecipeTestFailures($buildResult $recipeNode)
+                #end
             #end
-            <tr>
-                #contentClassHeading("test.name" 1 "leftmost")
-                #contentHeading("test.status" 2)
-                #contentHeading("test.details" 1)
-                #contentClassHeading("test.duration" 1 "rightmost")
-            </tr>
-            #showRecipeTestFailures($buildResult $recipeNode)
         #end
     </table>
-            #end
-        #end
     #end
 #end
 
 
 ##
-## Shows the main build result view (shared with project current build)
+## Shows a build result summary for the project home page.
 ##
-#macro(showBuild $buildResult $projectHome $detailedView)
+#macro(showBuild $buildResult)
     <table id="build.summary" class="content">
         <tr>
             <th class="heading" colspan="$summaryColumns.getTotalSpan($project)">
-#if($loggedInUser && $projectHome)
+#if($loggedInUser)
                 <span class="action">
                     <a class="unadorned" href="#" id="columns-popup-link-project.summary" onclick="summaryPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
                 </span>
@@ -1362,74 +1374,6 @@
         #recipeSummary($recipeNode $buildResult $detailedView true)
         #end
     </table>
-    #end
-
-    #if(!$detailedView && !$projectHome)
-        #if($buildResult.comments.size() > 0)
-    <h2 class="section">#wwtext("name=build.comments")</h2>
-    <ul id="build.comments" class="comments">
-            #foreach($comment in $buildResult.comments)
-        <li>
-            <div class="comment-body">
-                $action.plainToHtml($comment.message)
-            </div>
-            <div class="comment-author">
-                by #html($comment.author), $comment.prettyTime ($comment.getPrettyDate($action.locale))
-                #if($action.canDeleteComment($comment.id))
-                [<a id="delete.comment.$velocityCount" href="#" onclick="deleteComment($buildResult.id, $comment.id); return false;">delete</a>]
-                #end
-            </div>
-        </li>
-            #end
-    </ul>
-        #end
-
-        #if($dependencyDetailsPresent)
-    <div id='#id("${result.ownerName}-build-${result.number}-dependencies")'>
-        <table id="table.dependencies" width="150" class="content">
-             <th colspan="4" class="heading">#wwtext("name=dependencies.header")</th>
-            <tr>
-                <th class="content">#wwtext("name=dependencies.column.project")</th>
-                <th class="content">#wwtext("name=dependencies.column.build")</th>
-                <th class="content">#wwtext("name=dependencies.column.stage")</th>
-                <th class="content">#wwtext("name=dependencies.column.artifact")</th>
-            </tr>
-                #foreach($detail in $dependencyDetails)
-                    #if ($detail.reportAvailable)
-                        #foreach($dependency in $detail.dependencies)
-                <tr>
-                            #if ($dependency.projectUrl)
-                        <td class="content"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
-                            #else
-                        <td class="content">#html($dependency.projectName)</td>
-                            #end
-                            #if($dependency.buildUrl)
-                        <td class="content"><a href="$dependency.buildUrl">#html($dependency.buildName)</a></td>
-                            #else
-                        <td class="content">#html($dependency.buildName)</td>
-                            #end
-                    <td class="content">#html($dependency.stageName)</td>
-                            #if ($dependency.artifactUrl)
-                        <td class="content"><a id='#id("${dependency.projectName}-${dependency.stageName}-${dependency.artifactName}")' href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
-                            #else
-                        <td class="content">#html($dependency.artifactName)</td>
-                            #end
-                </tr>
-                        #end
-                    #else
-                <td colspan="4" class="content"><b>#html($detail.stageName)</b> stage dependency details are not available.  They have most likely been cleaned up.</td>
-                    #end
-                #end
-        </table>
-    </div>
-        #end
-        
-        #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
-    <h2 class="section">#wwtext("name=build.features")</h2>
-    #buildMessageSummary($buildResult $errorLevel)
-    #buildMessageSummary($buildResult $warningLevel)
-        #end
-        #buildTestFailures($buildResult)
     #end
 #end
 
@@ -1621,10 +1565,10 @@
 #macro(showRecipeTestFailures $build $recipe)
     #if($recipe.result.failedTestResults)
         #foreach($child in $recipe.result.failedTestResults.suites)
-            #showTestSuiteFailures($build $recipe $child "")
+            #showTestSuiteFailures($build $recipe $child "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         #end
         #foreach($child in $recipe.result.failedTestResults.cases)
-            #showTestCaseFailure($recipe $child "")
+            #showTestCaseFailure($recipe $child "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         #end
     #end
 #end
@@ -2160,9 +2104,9 @@
 
 #end
 
-#macro(responsibilityPanel $result $margin)
+#macro(responsibilityPanel $result)
     #if($responsibleOwner)
-    <p class="note" style="margin-top: $margin; margin-bottom: 16px" id="responsible-panel">
+    <p class="note" style="margin-top: 0; margin-bottom: 16px" id="responsible-panel">
             <img alt="fixing" src="$base/images/config/actions/takeResponsibility.gif" style="padding: 0 6px 0 6px"/> <span id="responsible-message">#html($responsibleOwner)</span>
         #if($canClearResponsible)
             [<a href="#" id="responsible-clear" onclick="clearResponsibility('$result.project.id'); return false">clear</a>]
@@ -2237,6 +2181,32 @@
             #end
         </table>
     </div>
+#end
+
+##
+## Renders a table of basic information about a build.
+##
+#macro(buildBasicsTable $buildResult)
+    <table id="build-basics" class="two-content">
+        <tr><th class="two-heading" colspan="2">#wwtext("name=build") $buildResult.number</th></tr>
+        #resultBasicsRow("status" "#statusImage($buildResult true) $buildResult.state.prettyString")
+        #resultBasicsRow("reason" "#html($buildResult.reason.summary)")
+    #if($buildResult.revision)
+        #resultBasicsRow("rev" "$buildResult.revision")
+    #else
+        #resultBasicsRow("rev" $action.getText("revision.none"))
+    #end
+        #resultBasicsRow("tests" "$buildResult.testSummary")
+        #resultBasicsRow("when" "$buildResult.stamps.getPrettyStartDate($locale) ($buildResult.stamps.prettyStartTime)")
+    #if($buildResult.completed())
+        #resultBasicsRow("completed" "$buildResult.stamps.getPrettyEndDate($locale) ($buildResult.stamps.prettyEndTime)")
+    #end
+        #resultBasicsRow("elapsed" "$buildResult.stamps.prettyElapsed")
+    #if($buildResult.completed())
+        #resultBasicsRow("errors" "$buildResult.errorFeatureCount")
+        #resultBasicsRow("warnings" "$buildResult.warningFeatureCount")
+    #end
+    </table>
 #end
 
 ##

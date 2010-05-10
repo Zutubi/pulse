@@ -12,8 +12,37 @@
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript">
-        #updater("$base/ajax/viewBuildPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle "Ext.emptyFn")
+        var buildPanel;
+        var initialised = false;
+        var runner = null;
+        
+        function updateContent()
+        {
+            Ext.Ajax.request({
+                url: '#jss("$base/ajax/viewBuildSummaryPanel.action?${ownerArg}&buildVID=$buildResult.number")',
+                success: function(transport, options)
+                {
+                    var response = eval("(" + transport.responseText + ")");
+                    buildPanel.layout.center.panel.update(response.mainPanel);
+                    buildPanel.layout.east.panel.update(response.rightPanel);
+                    initialised = true;
+                },
+                
+                failure: function(transport, options)
+                {
+                    if (runner)
+                    {
+                        runner.stopAll();
+                    }
 
+                    if (!initialised)
+                    {
+                        Ext.get('build-loading').update('#wwtext("name=loading.failed")');
+                    }
+                }
+            });
+        }
+                
         function triggerHook(hookHandle)
         {
             hideStatus(false);
@@ -49,12 +78,55 @@
                 }
             });
         };
+
+        Ext.onReady(function() {
+            buildPanel = new Ext.Panel({
+                layout: 'border',
+                border: false,
+                defaults: {
+                    layout: 'fit',
+                    border: false,
+                    autoScroll: true,
+                    bodyStyle: "padding: 15px"
+                },
+                items: [{
+                    region: 'center',
+                    id: 'build-center',
+                    split: false,
+                    contentEl: 'center'
+                }, {
+                    region: 'east',
+                    id: 'build-east',
+                    split: true,
+                    collapsible: true,
+                    collapseMode: 'mini',
+                    hideCollapseTool: true,
+                    width: 300
+                }]
+            });
+        
+            var nestedCenter = Ext.getCmp('nested-center');
+            nestedCenter.add(buildPanel);
+            viewport.doLayout();
+
+    #if($refreshInterval || $principle.preferences.refreshingEnabled)
+            var task = {
+                run: updateContent,
+                interval: 1000 * #if($refreshInterval) $refreshInterval #else $principle.preferences.refreshInterval #end
+            }
+            
+            runner = new Ext.util.TaskRunner();
+            runner.start(task);
+    #else
+            updateContent();
+    #end
+        });
     </script>
 </head>
 <body>
     #buildTabs($buildResult "summary")
-
-    <div id="panel">
-        #parse("ajax/view-build-panel.vm")
+    
+    <div id="build-loading">
+        <img alt="loading" src="$base/images/inprogress.gif"/> #wwtext("name=loading.data")
     </div>
 </html>

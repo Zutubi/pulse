@@ -9,7 +9,7 @@ public class BuildActionResolver extends StaticMapActionResolver
 {
     public BuildActionResolver(String id)
     {
-        super("viewBuild");
+        super("viewBuildSummary");
 
         addMapping("summary", new BuildSummaryActionResolver());
         addMapping("details", new BuildDetailsActionResolver());

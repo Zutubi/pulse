@@ -1,24 +1,4 @@
-<table id="build-basics" class="two-content">
-    <tr><th class="two-heading" colspan="2">#wwtext("name=build") $buildResult.number</th></tr>
-    #resultBasicsRow("status" "#statusImage($buildResult true) $buildResult.state.prettyString")
-    #resultBasicsRow("reason" "#html($buildResult.reason.summary)")
-#if($buildResult.revision)
-    #resultBasicsRow("rev" "$buildResult.revision")
-#else
-    #resultBasicsRow("rev" $action.getText("revision.none"))
-#end
-    #resultBasicsRow("tests" "$buildResult.testSummary")
-    #resultBasicsRow("when" "$buildResult.stamps.getPrettyStartDate($locale) ($buildResult.stamps.prettyStartTime)")
-#if($buildResult.completed())
-    #resultBasicsRow("completed" "$buildResult.stamps.getPrettyEndDate($locale) ($buildResult.stamps.prettyEndTime)")
-#end
-    #resultBasicsRow("elapsed" "$buildResult.stamps.prettyElapsed")
-#if($buildResult.completed())
-    #resultBasicsRow("errors" "$buildResult.errorFeatureCount")
-    #resultBasicsRow("warnings" "$buildResult.warningFeatureCount")
-#end
-</table>
-
+#buildBasicsTable($buildResult)
 #resultFeatureTables($result)
 #resultCustomFields($result)
 

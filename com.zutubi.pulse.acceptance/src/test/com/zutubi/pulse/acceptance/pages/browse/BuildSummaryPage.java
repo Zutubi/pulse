@@ -3,25 +3,20 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.WebUtils.toValidHtmlName;
+
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The summary tab for a build result.
  */
-public class BuildSummaryPage extends ResponsibilityPage
+public class BuildSummaryPage extends AbstractBuildStatusPage
 {
-    private static final String DEPENDENTY_TABLE_ID = "table.dependencies";
-    private static final String COMMENTS_LIST_ID = "build.comments";
-
-    private String projectName;
-    private long buildId;
+    private static final String ID_COMMENTS_LIST = "build-comments";
+    private static final String ID_TEST_FAILURES = "failed-tests";
 
     public BuildSummaryPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
-        this.projectName = projectName;
-        this.buildId = buildId;
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId, projectName, buildId);
     }
 
     public String getUrl()
@@ -44,45 +39,14 @@ public class BuildSummaryPage extends ResponsibilityPage
         browser.click(getHookId(hookName));
     }
 
-    public boolean hasTests()
-    {
-        return !getSummaryTestsColumnText().contains("none");
-    }
-
     public String getSummaryTestsColumnText()
     {
-        return browser.getText("id="+projectName+".build."+buildId+".test");
-    }
-
-    private String getDependenciesId()
-    {
-        return toValidHtmlName(projectName) + "-build-" + Long.toString(buildId) + "-dependencies";
-    }
-
-    public boolean hasDependencies()
-    {
-        return browser.isElementIdPresent(getDependenciesId());
-    }
-
-    public DependencyRow getDependencyRow(int row)
-    {
-        row = row + 1; // skip the table header row.
-        return new DependencyRow(
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 1),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 2),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 3)
-        );
-    }
-
-    public int getDependencyCount()
-    {
-        return 0;
+        return browser.getCellContents(ID_BUILD_BASICS, 4, 1);
     }
 
     public boolean isCommentsPresent()
     {
-        return browser.isElementPresent(COMMENTS_LIST_ID);
+        return browser.isElementPresent(ID_COMMENTS_LIST);
     }
 
     public boolean isDeleteCommentLinkPresent(int commentNumber)
@@ -96,44 +60,13 @@ public class BuildSummaryPage extends ResponsibilityPage
         return new ConfirmDialog(browser);
     }
 
+    public boolean isTestFailuresTablePresent()
+    {
+        return browser.isElementPresent(ID_TEST_FAILURES);
+    }
+
     private String getDeleteCommentLinkId(int commentNumber)
     {
         return "delete.comment." + commentNumber;
-    }
-
-    public class DependencyRow
-    {
-        private String project;
-        private String build;
-        private String stage;
-        private String artifact;
-
-        public DependencyRow(String project, String build, String stage, String artifact)
-        {
-            this.project = project;
-            this.build = build;
-            this.stage = stage;
-            this.artifact = artifact;
-        }
-
-        public String getProject()
-        {
-            return project;
-        }
-
-        public String getBuild()
-        {
-            return build;
-        }
-
-        public String getStage()
-        {
-            return stage;
-        }
-
-        public String getArtifact()
-        {
-            return artifact;
-        }
     }
 }

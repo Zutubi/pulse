@@ -617,7 +617,7 @@ Browse view
     border-collapse: collapse;
 }
 
-table.spaced
+table.spaced, ul.spaced
 {
     margin-top: 20px;
 }
@@ -1183,6 +1183,7 @@ ul.comments
     padding: 4px 0 0 6px;
     background: #f8f8ff;
     border: 1px solid #dde;
+    width: 97%;
 }
 
 ul.comments li

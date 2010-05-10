@@ -473,7 +473,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         // Verify each tab in turn
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("nosuchcommand");
-        assertEquals(agent, browser.getText(IDs.stageAgentCell(projectName, buildNumber, "default")));
 
         browser.click(IDs.buildLogsTab());
         BuildLogsPage logsPage = browser.createPage(BuildLogsPage.class, projectName, buildNumber, "default");

@@ -1,0 +1,49 @@
+#if($personal)
+    #set($ownerArg = "personal=true")
+#else
+    #set($ownerArg = "projectName=$u_projectName")
+#end
+
+#if($actions.size() > 0)
+    <table class="two-content">
+        <tr>
+            <th class="two-heading">actions</th>
+        </tr>
+    #foreach($actionLink in $actions)
+        <tr>
+            <td class="content leftmost rightmost">
+                <img alt="$actionLink.label" src="$base/images/config/actions/${actionLink.icon}.gif"/>
+                <a id="action.${actionLink.action}"
+        #if($actionLink.action == "cancel")
+                    href="$base/cancelBuild.action?buildId=$result.id&fromBuild=true"
+        #elseif($actionLink.action == "delete")
+                    #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
+                    href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?#jss(${ownerArg})&amp;buildVID=$buildResult.number')"
+        #elseif($actionLink.action == "takeResponsibility")
+                    href="#" onclick="takeResponsibility('$result.project.id'); return false;"
+        #elseif($actionLink.action == "clearResponsibility")
+                    href="#" onclick="clearResponsibility('$result.project.id'); return false;"
+        #elseif($actionLink.action == "addComment")
+                    href="#" onclick="addComment('$result.id'); return false;"                       
+        #end
+                >$actionLink.label</a>
+            </td>
+        </tr>
+    #end
+    </table>
+#end
+#if($hooks.size() > 0)
+    <table class="two-content spaced">
+        <tr>
+            <th class="two-heading">hooks</th>
+        </tr>
+    #foreach($hook in $hooks)
+        <tr>
+            <td class="content leftmost rightmost">
+                <img alt="trigger" src="$base/images/lightning.gif"/>
+                <a id='#id("hook.${hook.name}")' href="#" onclick="triggerHook('$hook.handle'); return false">#html($hook.name)</a>
+            </td>
+        </tr>
+    #end
+    </table>
+#end

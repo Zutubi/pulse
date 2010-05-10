@@ -34,12 +34,11 @@
             });
 
             var selectedNode = resultTree.getSelectionModel().getSelectedNode();
-            if (!selectedNode)
+            if (selectedNode)
             {
-                selectedNode = rootNode;
+                selectedResultId = selectedNode.attributes.extraAttributes.resultId;
             }
 
-            selectedResultId = selectedNode.attributes.extraAttributes.resultId;
             resultTree.getLoader().load(resultTree.getRootNode(), function()
             {
                 rootNode.expand(true);
