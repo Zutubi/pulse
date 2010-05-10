@@ -97,6 +97,7 @@ public class Constants
         public static final String POST_PROCESSORS = "postProcessors";
         public static final String CONTACTS = "contacts";
         public static final String DEPENDENCIES = "dependencies";
+        public static final String COMMIT_MESSAGE_TRANSFORMERS = "commitMessageTransformers";
 
         /**
          * Property names in the multi recipe type class.

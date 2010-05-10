@@ -32,6 +32,23 @@
     #end
     </table>
 #end
+
+#if($relatedLinks.size() > 0)
+    <table id="related-links" class="two-content spaced">
+        <tr>
+            <th class="two-heading">#wwtext("name=related.links")</th>
+        </tr>
+    #foreach($link in $relatedLinks)
+        <tr>
+            <td class="content leftmost rightmost">
+                <img alt="link" src="$base/images/link_go.gif"/>
+                <a href="$link.url">#html($link.text)</a>
+            </td>
+        </tr>
+    #end
+    </table>
+#end
+
 #if($hooks.size() > 0)
     <table class="two-content spaced">
         <tr>

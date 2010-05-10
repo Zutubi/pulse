@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.commit;
 
+import com.zutubi.pulse.master.committransformers.SimpleSubstitution;
+import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
 
@@ -55,6 +56,6 @@ public class CustomTransformerConfiguration extends CommitMessageTransformerConf
 
     public List<Substitution> substitutions()
     {
-        return Arrays.asList(new Substitution(expression, replacement,isExclusive()));
+        return Arrays.<Substitution>asList(new SimpleSubstitution(expression, replacement));
     }
 }

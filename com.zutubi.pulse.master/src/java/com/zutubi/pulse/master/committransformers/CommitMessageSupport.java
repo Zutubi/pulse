@@ -29,16 +29,16 @@ public class CommitMessageSupport
         List<Substitution> substitutions = new LinkedList<Substitution>();
         for (CommitMessageTransformerConfiguration transformer : transformers)
         {
-            for(Substitution substitution: transformer.substitutions())
+            for (Substitution substitution: transformer.substitutions())
             {
-                if(!substitutions.contains(substitution))
+                if (!substitutions.contains(substitution))
                 {
                     substitutions.add(substitution);
                 }
             }
         }
 
-        for(Substitution substitution: substitutions)
+        for (Substitution substitution: substitutions)
         {
             builder.replace(substitution);
         }

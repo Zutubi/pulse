@@ -6,12 +6,15 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.EntityWithIdPredicate;
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.master.committransformers.LinkSubstitution;
+import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -28,6 +31,10 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.master.committransformers.CommitMessageBuilder.processSubstitution;
 
 /**
  * Action to provide data for the build summary tab.
@@ -41,6 +48,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
     private String responsibleComment;
     private boolean canClearResponsible = false;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
+    private List<RelatedLink> relatedLinks = new LinkedList<RelatedLink>();
     private List<BuildHookConfiguration> hooks;
 
     private SummaryData data;
@@ -69,10 +77,6 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
 
     public List<PersistentChangelist> getChangelists()
     {
-        if (changelists == null)
-        {
-            changelists = buildManager.getChangesForBuild(getResult(), true);
-        }
         return changelists;
     }
 
@@ -90,6 +94,11 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
     public List<ActionLink> getActions()
     {
         return actions;
+    }
+
+    public List<RelatedLink> getRelatedLinks()
+    {
+        return relatedLinks;
     }
 
     public List<BuildHookConfiguration> getHooks()
@@ -160,6 +169,8 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         {
             actions.add(ToveUtils.getActionLink(BuildResult.ACTION_ADD_COMMENT, messages, contentRoot));
         }
+        
+        gatherRelatedLinks(result);
 
         try
         {
@@ -177,6 +188,55 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         }
 
         return SUCCESS;
+    }
+
+    private void gatherRelatedLinks(BuildResult buildResult)
+    {
+        changelists = buildManager.getChangesForBuild(buildResult, true);
+        
+        List<LinkSubstitution> substitutions = gatherLinkSubstitutions(buildResult.getProject().getConfig());
+        relatedLinks = new LinkedList<RelatedLink>();
+        for (LinkSubstitution substitution: substitutions)
+        {
+            try
+            {
+                Pattern pattern = Pattern.compile(substitution.getExpression());
+                for (PersistentChangelist changelist: changelists)
+                {
+                    Matcher matcher = pattern.matcher(changelist.getComment());
+                    while (matcher.find())
+                    {
+                        relatedLinks.add(new RelatedLink(processSubstitution(substitution.getLinkUrl(), matcher), processSubstitution(substitution.getLinkText(), matcher)));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Soldier on.
+            }
+        }
+    }
+
+    private List<LinkSubstitution> gatherLinkSubstitutions(ProjectConfiguration projectConfig)
+    {
+        List<LinkSubstitution> result = new LinkedList<LinkSubstitution>();
+        for (CommitMessageTransformerConfiguration transformerConfig: projectConfig.getCommitMessageTransformers().values())
+        {
+            List<Substitution> substitutions = transformerConfig.substitutions();
+            for (Substitution substitution: substitutions)
+            {
+                if (substitution instanceof LinkSubstitution)
+                {
+                    LinkSubstitution linkSubstitution = (LinkSubstitution) substitution;
+                    if( !result.contains(linkSubstitution))
+                    {
+                        result.add(linkSubstitution);
+                    }
+                }
+            }
+        }
+        
+        return result;
     }
 
     private String renderTemplate(String template, Context context, VelocityManager velocityManager) throws Exception
@@ -210,6 +270,28 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         public String getRightPanel()
         {
             return rightPanel;
+        }
+    }
+    
+    public static class RelatedLink
+    {
+        private String url;
+        private String text;
+
+        public RelatedLink(String url, String text)
+        {
+            this.url = url;
+            this.text = text;
+        }
+
+        public String getUrl()
+        {
+            return url;
+        }
+
+        public String getText()
+        {
+            return text;
         }
     }
 }

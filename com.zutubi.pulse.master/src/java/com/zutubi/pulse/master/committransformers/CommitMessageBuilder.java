@@ -322,7 +322,7 @@ public class CommitMessageBuilder
      * @return
      * @see java.util.regex.Matcher#appendReplacement(StringBuffer,String)
      */
-    private String processSubstitution(String replacement, Matcher matcher)
+    public static String processSubstitution(String replacement, Matcher matcher)
     {
         // Process substitution string to replace group references with groups
         int cursor = 0;

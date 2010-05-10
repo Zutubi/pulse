@@ -6,8 +6,6 @@ import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransform
 
 import java.util.Arrays;
 
-/**
- */
 public class JiraTransformerConfigurationTest extends PulseTestCase
 {
     public void testAnyKey()

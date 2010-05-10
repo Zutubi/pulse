@@ -34,6 +34,7 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
@@ -52,12 +53,12 @@ import java.util.List;
 import java.util.Vector;
 
 import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
@@ -318,23 +319,28 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private String editAndCommitBuildFile() throws IOException, SVNException
     {
+        return editAndCommitFile(TRIVIAL_ANT_REPOSITORY, CHANGE_FILENAME, CHANGE_COMMENT,
+                "<?xml version=\"1.0\"?>\n" +
+                "<project default=\"default\">\n" +
+                "    <target name=\"default\">\n" +
+                "        <echo message=\"" + random + "\"/>\n" +
+                "    </target>\n" +
+                "</project>");
+    }
+
+    private String editAndCommitFile(String repository, String filename, String comment, String newContent) throws IOException, SVNException
+    {
         File wcDir = createTempDirectory();
         SubversionWorkspace workspace = new SubversionWorkspace(wcDir, CHANGE_AUTHOR, CHANGE_AUTHOR);
-        
         try
         {
-            workspace.doCheckout(TRIVIAL_ANT_REPOSITORY);
+            workspace.doCheckout(repository);
 
-            File buildFile = new File(wcDir, CHANGE_FILENAME);
+            File buildFile = new File(wcDir, filename);
             assertTrue(buildFile.exists());
-            FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
-                    "<project default=\"default\">\n" +
-                    "    <target name=\"default\">\n" +
-                    "        <echo message=\"" + random + "\"/>\n" +
-                    "    </target>\n" +
-                    "</project>");
+            FileSystemUtils.createFile(buildFile, newContent);
 
-            return workspace.doCommit(CHANGE_COMMENT, buildFile);
+            return workspace.doCommit(comment, buildFile);
         }
         finally
         {
@@ -384,23 +390,35 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         final String FEATURES_PROCESSOR = "features processor";
 
-        String mainProjectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(ALL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
-        insertTestCapture(mainProjectPath, JUNIT_PROCESSOR);
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(ALL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        insertTestCapture(projectPath, JUNIT_PROCESSOR);
 
         insertFeaturesProcessor(random, FEATURES_PROCESSOR);
-        insertFileArtifact(mainProjectPath, "features", "features.txt", FEATURES_PROCESSOR, false);
+        insertFileArtifact(projectPath, "features", "features.txt", FEATURES_PROCESSOR, false);
+        
+        Hashtable<String, Object> transformer = xmlRpcHelper.createDefaultConfig(LinkTransformerConfiguration.class);
+        transformer.put("name", "issues");
+        transformer.put("expression", "CIB-[0-9]+");
+        transformer.put("url", "http://jira.zutubi.com/$0");
+        xmlRpcHelper.insertConfig(getPath(projectPath, COMMIT_MESSAGE_TRANSFORMERS), transformer);
 
+        // Run two builds, to generate a change between them.
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
-
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", random);
+        long buildNumber = xmlRpcHelper.runBuild(random);
+        
         loginAsAdmin();
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, 1L);
+        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
         assertTrue(summaryPage.isBuildBasicsPresent());
         assertEquals(asPair("status", "failure"), summaryPage.getBuildBasicsRow(0));
-        assertTrue(summaryPage.isBuildBasicsPresent());
+
         assertTrue(summaryPage.isFeaturesTablePresent(Feature.Level.ERROR));
         assertTrue(summaryPage.isFeaturesTablePresent(Feature.Level.WARNING));
         assertFalse(summaryPage.isFeaturesTablePresent(Feature.Level.INFO));
         assertTrue(summaryPage.isTestFailuresTablePresent());
+        
+        assertTrue(summaryPage.isRelatedLinksTablePresent());
+        assertEquals("CIB-123", summaryPage.getRelatedLinkText(0));
     }
 
     public void testDetailsView() throws Exception
@@ -448,7 +466,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, mainProjectName, 1L);
         assertTrue(detailsPage.isBuildBasicsPresent());
         assertEquals(asPair("status", "failure"), detailsPage.getBuildBasicsRow(0));
-        assertTrue(detailsPage.isBuildBasicsPresent());
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
         assertFalse(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
         assertFalse(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));

@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.commit;
 
+import com.zutubi.pulse.master.committransformers.LinkSubstitution;
+import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
 
@@ -56,6 +57,6 @@ public class LinkTransformerConfiguration extends CommitMessageTransformerConfig
 
     public List<Substitution> substitutions()
     {
-        return Arrays.asList(new Substitution(expression, "<a href='" + url + "'>$0</a>", isExclusive()));
+        return Arrays.<Substitution>asList(new LinkSubstitution(expression, url, "$0"));
     }
 }

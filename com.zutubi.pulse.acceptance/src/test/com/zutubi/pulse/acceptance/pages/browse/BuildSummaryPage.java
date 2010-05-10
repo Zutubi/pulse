@@ -13,6 +13,7 @@ public class BuildSummaryPage extends AbstractBuildStatusPage
 {
     private static final String ID_COMMENTS_LIST = "build-comments";
     private static final String ID_TEST_FAILURES = "failed-tests";
+    private static final String ID_RELATED_LINKS = "related-links";
 
     public BuildSummaryPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
@@ -68,5 +69,15 @@ public class BuildSummaryPage extends AbstractBuildStatusPage
     private String getDeleteCommentLinkId(int commentNumber)
     {
         return "delete.comment." + commentNumber;
+    }
+
+    public boolean isRelatedLinksTablePresent()
+    {
+        return browser.isElementPresent(ID_RELATED_LINKS);
+    }
+    
+    public String getRelatedLinkText(int index)
+    {
+        return browser.getCellContents(ID_RELATED_LINKS, index + 1, 0);
     }
 }

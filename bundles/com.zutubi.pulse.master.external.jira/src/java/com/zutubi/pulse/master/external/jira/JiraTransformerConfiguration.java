@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master.external.jira;
 
+import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;
 
@@ -75,32 +77,20 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
 
     public List<Substitution> substitutions()
     {
-        final String replacement = getReplacement();
+        final String linkUrl = StringUtils.join("/", true, this.url, "browse/$0");
         return CollectionUtils.map(getKeyPatterns(), new Mapping<String, Substitution>()
         {
             public Substitution map(String keyPattern)
             {
-                return new Substitution("(" + keyPattern + "-[0-9]+)", replacement, isExclusive());
+                return new LinkSubstitution(keyPattern + "-[0-9]+", linkUrl, "$0");
             }
         });
     }
 
     @Transient
-    private String getReplacement()
-    {
-        String url = getUrl();
-        if (url.endsWith("/"))
-        {
-            url = url.substring(0, url.length() - 1);
-        }
-
-        return String.format("<a href='%s/browse/$1'>$1</a>", url);
-    }
-
-    @Transient
     private List<String> getKeyPatterns()
     {
-        if(matchAnyKey)
+        if (matchAnyKey)
         {
             return Arrays.asList("[a-zA-Z]+");
         }
