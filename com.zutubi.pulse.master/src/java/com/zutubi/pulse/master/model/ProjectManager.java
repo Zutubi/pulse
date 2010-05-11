@@ -150,8 +150,6 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureResult
     List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects);
 
-    void removeReferencesToAgent(long agentStateId);
-
     /**
      * Removes all references from projects to a given user (used when the user
      * is deleted).
@@ -159,9 +157,6 @@ public interface ProjectManager extends EntityManager<Project>
      * @param user the user to remove all references to
      */
     void removeReferencesToUser(User user);
-
-    @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER)
-    void markForCleanBuild(Project project);
 
     /**
      * Sets the last poll time for the project to the given timestamp.

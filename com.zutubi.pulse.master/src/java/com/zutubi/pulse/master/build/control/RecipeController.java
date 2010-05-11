@@ -198,7 +198,6 @@ public class RecipeController
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HOST_ID, agent.getHost().getId());
-        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
 
         addScmProperties(agentContext);
 

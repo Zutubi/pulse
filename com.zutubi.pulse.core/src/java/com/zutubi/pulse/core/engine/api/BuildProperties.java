@@ -83,13 +83,6 @@ public class BuildProperties
      * where as the build version is a human readable identifier.
      */
     public static final String PROPERTY_BUILD_VERSION           = "build.version";
-
-    /**
-     * Set to "true" if the build has been explicitly marked as a clean
-     * build, "false" otherwise. Any incremental build artifacts will be
-     * deleted before such a build is commenced.
-     */
-    public static final String PROPERTY_CLEAN_BUILD             = "clean.build";
     /**
      * An internal property used by the master to instruct agents to compress
      * captured artifacts for download.

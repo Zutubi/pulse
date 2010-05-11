@@ -10,11 +10,6 @@
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
-        <bag name="forceCleanAgents" table="FORCE_CLEAN_AGENTS" lazy="false" cascade="none">
- 	        <key column="PROJECT_ID"/>
-            <many-to-many class="com.zutubi.pulse.master.model.AgentState" column="AGENT_ID"/>
- 	    </bag>
-
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
 
         <property name="buildCount" type="int">

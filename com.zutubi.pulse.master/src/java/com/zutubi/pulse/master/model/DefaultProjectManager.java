@@ -5,7 +5,6 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -14,10 +13,12 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
-import com.zutubi.pulse.master.events.build.*;
+import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
-import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.project.ProjectInitialisationService;
@@ -75,7 +76,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ChangelistIsolator changelistIsolator;
     private ScmManager scmManager;
     private LicenseManager licenseManager;
-    private AgentStateDao agentStateDao;
 
     private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
@@ -1231,39 +1231,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return result;
     }
 
-    public void removeReferencesToAgent(long agentStateId)
-    {
-        for(Project p: getProjects(true))
-        {
-            if(p.clearForceCleanForAgent(agentStateId))
-            {
-                projectDao.save(p);
-            }
-        }
-    }
-
     public void removeReferencesToUser(User user)
     {
         for (Project project: projectDao.findByResponsible(user))
         {
             clearResponsibility(project);
-        }
-    }
-
-    public void markForCleanBuild(Project project)
-    {
-        boolean changed = false;
-        for(AgentState agentState: agentStateDao.findAll())
-        {
-            if(project.setForceCleanForAgent(agentState))
-            {
-                changed = true;
-            }
-        }
-
-        if(changed)
-        {
-            projectDao.save(project);
         }
     }
 
@@ -1361,23 +1333,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void handleRecipeAssigned(RecipeAssignedEvent rde)
-    {
-        RecipeRequest request = rde.getRequest();
-        ProjectConfiguration projectConfig = getProjectConfig(request.getProject(), true);
-        if(projectConfig != null)
-        {
-            Project project = projectDao.findById(projectConfig.getProjectId());
-            if(ProjectPredicates.exists(project))
-            {
-                if(project.clearForceCleanForAgent(rde.getAgent().getId()))
-                {
-                    projectDao.save(project);
-                }
-            }
-        }
-    }
-
     private void handleInitialisationCompleted(ProjectInitialisationCompletedEvent event)
     {
         Project.Transition transition = event.isSuccessful() ? Project.Transition.INITIALISE_SUCCESS : Project.Transition.INITIALISE_FAILURE;
@@ -1394,10 +1349,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         if (evt instanceof BuildCompletedEvent)
         {
             handleBuildCompleted((BuildCompletedEvent) evt);
-        }
-        else if (evt instanceof RecipeAssignedEvent)
-        {
-            handleRecipeAssigned((RecipeAssignedEvent) evt);
         }
         else if (evt instanceof ProjectInitialisationCompletedEvent)
         {
@@ -1425,7 +1376,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public Class[] getHandledEvents()
     {
         return new Class[] { BuildCompletedEvent.class,
-                             RecipeAssignedEvent.class,
                              ProjectInitialisationCompletedEvent.class,
                              ProjectDestructionCompletedEvent.class,
                              ConfigurationEventSystemStartedEvent.class,
@@ -1490,11 +1440,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
-    }
-
-    public void setAgentStateDao(AgentStateDao agentStateDao)
-    {
-        this.agentStateDao = agentStateDao;
     }
 
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)

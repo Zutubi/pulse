@@ -6,16 +6,18 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.*;
 import com.zutubi.util.WebUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.util.FileSystemUtils.copy;
+import static com.zutubi.util.FileSystemUtils.getNormalisedAbsolutePath;
 
 /**
  * The Project Repo Bootstrapper checks out a project into the:
@@ -48,8 +50,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         checkForOldWorkDir(context, persistentWorkDir);
 
         // run the scm bootstrapper on the local directory,
-        boolean cleanBuild = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, false);
-        childBootstrapper = selectBootstrapper(cleanBuild, persistentWorkDir);
+        childBootstrapper = selectBootstrapper(persistentWorkDir);
 
         RecipePaths mungedPaths = new RecipePaths()
         {
@@ -149,16 +150,8 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         }
     }
 
-    private ScmBootstrapper selectBootstrapper(boolean cleanBuild, final File localDir)
+    private ScmBootstrapper selectBootstrapper(final File localDir)
     {
-        if(cleanBuild && localDir.exists())
-        {
-            if(!rmdir(localDir))
-            {
-                throw new BuildException("Unable to remove local scm directory: " + localDir.getAbsolutePath());
-            }
-        }
-
         if (!localDir.exists() && !localDir.mkdirs())
         {
             throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());

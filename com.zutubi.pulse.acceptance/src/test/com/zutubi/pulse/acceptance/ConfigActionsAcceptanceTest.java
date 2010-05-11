@@ -44,7 +44,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
-        waitForStatus("the next build on each agent will be clean");
+        waitForStatus("removing all persistent build directories for this project");
     }
 
     public void testCustomActionWithArgument() throws Exception

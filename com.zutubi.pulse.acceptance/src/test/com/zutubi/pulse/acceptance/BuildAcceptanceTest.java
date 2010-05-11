@@ -1,25 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.BootstrapCommand;
+import com.zutubi.pulse.core.BootstrapCommandConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
@@ -27,8 +19,6 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -40,17 +30,13 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -59,14 +45,9 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -75,6 +56,31 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -612,10 +618,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
         ensureProject(projectName);
-        String stagePath = getPath(PROJECTS_SCOPE, projectName, "stages", "default");
-        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(AGENTS_SCOPE, MASTER_AGENT_NAME));
-        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+        assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
         xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
         loginAsAdmin();
@@ -642,10 +645,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
         ensureProject(projectName);
-        String stagePath = getPath(PROJECTS_SCOPE, projectName, "stages", "default");
-        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(AGENTS_SCOPE, MASTER_AGENT_NAME));
-        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+        assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
         xmlRpcHelper.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
@@ -1284,11 +1284,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         options.put(Constants.Project.Options.PERSISTENT_WORK_DIR, "${data.dir}/customwork/${project}");
         xmlRpcHelper.saveConfig(optionsPath, options, false);
 
-        String svnPath = PathUtils.getPath(projectPath, Constants.Project.SCM);
-        Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
-        svn.put(Constants.Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
-        xmlRpcHelper.saveConfig(svnPath, svn, false);
-        xmlRpcHelper.waitForProjectToInitialise(random);
+        setSchemeToIncrementalUpdate(random);
 
         String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
         Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
@@ -1306,7 +1302,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailure() throws Exception
     {
-        String projectPath = createProjectWithTwoAntStages("nosuchbuildfile.xml");
+        String projectPath = createProjectWithTwoAntStages(random, "nosuchbuildfile.xml", "another-stage");
         setTerminateStageOnFailure(projectPath);
 
         long buildId = xmlRpcHelper.runBuild(random, ResultState.ERROR.getPrettyString(), BUILD_TIMEOUT);
@@ -1318,7 +1314,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailureStageSucceeds() throws Exception
     {
-        String projectPath = createProjectWithTwoAntStages("build.xml");
+        String projectPath = createProjectWithTwoAntStages(random, "build.xml", "another-stage");
         setTerminateStageOnFailure(projectPath);
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
@@ -1330,7 +1326,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTerminateOnStageFailureLimit() throws Exception
     {
-        String projectPath = createProjectWithTwoAntStages("nosuchbuildfile.xml");
+        String projectPath = createProjectWithTwoAntStages(random, "nosuchbuildfile.xml", "another-stage");
         String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
         Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
         options.put("stageFailureLimit", 1);
@@ -1373,7 +1369,105 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(buildFilePage.isHighlightedFilePresent());
         assertTextPresent("default-recipe=\"default\"");
     }
+    
+    public void testCleanBuild() throws Exception
+    {
+        String projectName = random + "-project";
+        String agentName = random + "-agent";
 
+        Hashtable<String, Object> agent = xmlRpcHelper.createEmptyConfig("zutubi.agentConfig");
+        agent.put("name", agentName);
+        agent.put("remote", false);
+
+        String agentPath = xmlRpcHelper.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
+
+        try
+        {
+            String projectPath = xmlRpcHelper.insertSimpleProject(projectName);
+            assignStageToAgent(projectName, DEFAULT_STAGE, agentName);
+            setSchemeToIncrementalUpdate(projectName);
+
+            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+            xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
+            long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            loginAsAdmin();
+
+            browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
+            assertTextPresent("build.xml");
+
+            AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
+            AgentStatusPage.SynchronisationMessage synchronisationMessage = statusPage.getSynchronisationMessage(0);
+            assertEquals("clean up stage '" + DEFAULT_STAGE + "' of project '" + projectName + "'", synchronisationMessage.description);
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(agentPath);
+        }
+    }
+    
+
+    public void testCleanBuildTwoStagesOneAgent() throws Exception
+    {
+        final String SECOND_STAGE_NAME = "stage-left";
+
+        String projectName = random + "-project";
+        String agentName = random + "-agent";
+
+        Hashtable<String, Object> agent = xmlRpcHelper.createEmptyConfig("zutubi.agentConfig");
+        agent.put("name", agentName);
+        agent.put("remote", false);
+
+        String agentPath = xmlRpcHelper.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
+
+        try
+        {
+            String projectPath = createProjectWithTwoAntStages(projectName, "build.xml", SECOND_STAGE_NAME);
+            setSchemeToIncrementalUpdate(projectName);
+
+            // First build establishes directories for both stages on master agent.
+            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            // For the next build, clean, but send the second stage to a
+            // different agent.
+            assignStageToAgent(projectName, SECOND_STAGE_NAME, agentName);
+            xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
+            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            // Finally, set the second stage back to the original agent.  Check
+            // that it does not end up with the directory from the first build.
+            // This is verified by ensuring the build.xml file is checked out.
+            assignStageToAgent(projectName, SECOND_STAGE_NAME, AgentManager.MASTER_AGENT_NAME);
+            long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+            loginAsAdmin();
+
+            browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, SECOND_STAGE_NAME, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
+            assertTextPresent("build.xml");
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(agentPath);
+        }
+    }
+    
+    private void setSchemeToIncrementalUpdate(String projectName) throws Exception
+    {
+        String svnPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Project.SCM);
+        Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
+        svn.put(Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
+        xmlRpcHelper.saveConfig(svnPath, svn, false);
+        xmlRpcHelper.waitForProjectToInitialise(projectName);
+    }
+
+    private void assignStageToAgent(String projectName, String stageName, String agentName) throws Exception
+    {
+        String stagePath = getPath(PROJECTS_SCOPE, projectName, "stages", stageName);
+        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
+        defaultStage.put("agent", getPath(AGENTS_SCOPE, agentName));
+        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+    }
+    
     public void testPulseFilePropertiesAddedToEnvironment() throws Exception
     {
         String projectPath = xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
@@ -1396,11 +1490,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPropertyPresentWithValue("p2", "value"));
     }
     
-    private String createProjectWithTwoAntStages(String buildFile) throws Exception
+    private String createProjectWithTwoAntStages(String projectName, String buildFile, String secondStageName) throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
         Hashtable<String, String> keys = new Hashtable<String, String>();
-        keys.put(DEFAULT_STAGE, "another-stage");
+        keys.put(DEFAULT_STAGE, secondStageName);
         xmlRpcHelper.cloneConfig(PathUtils.getPath(projectPath, Project.STAGES), keys);
         return projectPath;
     }

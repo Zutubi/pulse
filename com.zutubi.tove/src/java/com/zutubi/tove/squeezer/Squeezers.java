@@ -15,7 +15,6 @@ public class Squeezers
 
     static
     {
-        // initialise.
         register(String.class, new StringSqueezer());
         register(Boolean.class, new BooleanSqueezer());
         register(Boolean.TYPE, new BooleanSqueezer());
@@ -34,6 +33,7 @@ public class Squeezers
         register(Float.class, new FloatSqueezer());
         register(Float.TYPE, new FloatSqueezer());
         register(File.class, new FileSqueezer());
+        register(Map.class, new MapSqueezer());
     }
 
     public static TypeSqueezer findSqueezer(Class<?> type)

@@ -142,6 +142,7 @@
                 <ref local="featuredArtifacts"/>
                 <ref local="artifactHash"/>
                 <ref local="fileArtifactHash"/>
+                <ref local="dropForceCleanAgents"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -714,6 +715,15 @@
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-04.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dropForceCleanAgents" class="com.zutubi.pulse.master.upgrade.tasks.DropForceCleanAgentsUpgradeTask">
+        <property name="buildNumber" value="201999014"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-05.hbm.xml</value>
             </list>
         </property>
     </bean>

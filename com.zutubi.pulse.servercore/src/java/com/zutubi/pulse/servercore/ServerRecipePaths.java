@@ -2,7 +2,6 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.tove.variables.GenericVariable;
-import com.zutubi.tove.variables.HashVariableMap;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
@@ -12,19 +11,21 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 
 import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
-import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
 
 /**
  * The server recipe paths, which by default live at:
  * <ul>
- *   <li>${data.dir}/agents/${agent}/recipes/${recipe.id} - for transient recipes, and</li>
- *   <li>${data.dir}/agents/${agent}/work/${project} - for persistent recipes.</li>
+ *   <li>$(data.dir)/agents/$(agent.handle)/recipes/$(recipe.id) - for transient recipes, and</li>
+ *   <li>$(data.dir)/agents/$(agent.handle)/work/$(project.handle)/$(stage.handle) - for persistent recipes.</li>
  * </ul>
  */
 public class ServerRecipePaths implements RecipePaths
 {
     private static final Logger LOG = Logger.getLogger(ServerRecipePaths.class);
 
+    public static final String PROPERTY_DATA_DIR = "data.dir";
+    public static final String PROPERTY_AGENT_DATA_DIR = "agent.data.dir";
+    
     private AgentRecipeDetails recipeDetails;
     private File dataDir;
 
@@ -36,10 +37,8 @@ public class ServerRecipePaths implements RecipePaths
 
     private File getAgentDataDir()
     {
-        VariableMap references = new HashVariableMap();
-        references.add(new GenericVariable<String>("data.dir", dataDir.getAbsolutePath()));
-        references.add(new GenericVariable<String>("agent", encodeFilenameComponent(recipeDetails.getAgent())));
-        references.add(new GenericVariable<String>("agent.handle", Long.toString(recipeDetails.getAgentHandle())));
+        VariableMap references = recipeDetails.createPathVariableMap();
+        references.add(new GenericVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
 
         try
         {
@@ -49,7 +48,7 @@ public class ServerRecipePaths implements RecipePaths
         catch (ResolutionException e)
         {
             LOG.warning("Invalid agent data directory '" + recipeDetails.getAgentDataPattern() + "': " + e.getMessage(), e);
-            return new File(dataDir, FileSystemUtils.composeFilename("agents", encodeFilenameComponent(recipeDetails.getAgent())));
+            return new File(dataDir, FileSystemUtils.composeFilename("agents", Long.toString(recipeDetails.getAgentHandle())));
         }
     }
 
@@ -65,13 +64,9 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
-        VariableMap references = new HashVariableMap();
-        references.add(new GenericVariable<String>("agent.data.dir", getAgentDataDir().getAbsolutePath()));
-        references.add(new GenericVariable<String>("data.dir", dataDir.getAbsolutePath()));
-        references.add(new GenericVariable<String>("project", encodeFilenameComponent(recipeDetails.getProject())));
-        references.add(new GenericVariable<String>("project.handle", Long.toString(recipeDetails.getProjectHandle())));
-        references.add(new GenericVariable<String>("stage", encodeFilenameComponent(recipeDetails.getStage())));
-        references.add(new GenericVariable<String>("stage.handle", Long.toString(recipeDetails.getStageHandle())));
+        VariableMap references = recipeDetails.createPathVariableMap();
+        references.add(new GenericVariable<String>(PROPERTY_AGENT_DATA_DIR, getAgentDataDir().getAbsolutePath()));
+        references.add(new GenericVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
 
         try
         {
@@ -81,7 +76,7 @@ public class ServerRecipePaths implements RecipePaths
         catch (ResolutionException e)
         {
             LOG.warning("Invalid persistent work directory '" + recipeDetails.getProjectPersistentPattern() + "': " + e.getMessage(), e);
-            return new File(dataDir, FileSystemUtils.composeFilename("work", encodeFilenameComponent(recipeDetails.getProject())));
+            return new File(getAgentDataDir(), FileSystemUtils.composeFilename("work", Long.toString(recipeDetails.getProjectHandle()), Long.toString(recipeDetails.getStageHandle())));
         }
     }
 

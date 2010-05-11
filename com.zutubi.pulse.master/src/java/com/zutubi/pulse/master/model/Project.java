@@ -4,13 +4,10 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.EnumUtils;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -547,7 +544,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private int successCount = 0;
     private Long lastPollTime;
     private ProjectConfiguration config;
-    private List<AgentState> forceCleanAgents = new LinkedList<AgentState>();
     /**
      * If not null, holds details about the user responsible for this project.
      */
@@ -703,54 +699,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public String getDescription()
     {
         return config == null ? null : config.getDescription();
-    }
-
-    public List<AgentState> getForceCleanAgents()
-    {
-        return forceCleanAgents;
-    }
-
-    public boolean isForceCleanForAgent(final long agentStateId)
-    {
-        return CollectionUtils.find(forceCleanAgents, new Predicate<AgentState>()
-        {
-            public boolean satisfied(AgentState agentState)
-            {
-                return agentState.getId() == agentStateId;
-            }
-        }) != null;
-    }
-
-    public void setForceCleanAgents(List<AgentState> forceCleanAgents)
-    {
-        this.forceCleanAgents = forceCleanAgents;
-    }
-
-    public boolean setForceCleanForAgent(AgentState agentState)
-    {
-        if(!isForceCleanForAgent(agentState.getId()))
-        {
-            forceCleanAgents.add(agentState);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public boolean clearForceCleanForAgent(final long agentStateId)
-    {
-        int sizeBefore = forceCleanAgents.size();
-        forceCleanAgents = CollectionUtils.filter(forceCleanAgents, new Predicate<AgentState>()
-        {
-            public boolean satisfied(AgentState agentState)
-            {
-                return agentState.getId() != agentStateId;
-            }
-        });
-
-        return forceCleanAgents.size() != sizeBefore;
     }
 
     public ProjectResponsibility getResponsibility()

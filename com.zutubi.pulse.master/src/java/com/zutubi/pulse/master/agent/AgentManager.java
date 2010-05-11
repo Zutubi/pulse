@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.Pair;
 import com.zutubi.util.UnaryProcedure;
 
 import java.util.List;
@@ -65,16 +66,16 @@ public interface AgentManager extends AgentPersistentStatusManager
     void updateStatistics();
 
     /**
-     * Queues a new synchronisation message for the given agent.  The message
+     * Queues new synchronisation messages for the given agent.  The messages
      * will be sent on the next synchronisation cycle for the agent (and
      * retried until it succeeds or fails permanently).
      *
-     * @param agent       agent to queue the message for
-     * @param message     the message to queue
-     * @param description human-readable description of the purpose of this
-     *                    message
+     * @param agent                   agent to queue the message for
+     * @param messageDescriptionPairs a list of messages to queue, paired with
+     *                                human-readable description of their
+     *                                purpose
      */
-    void enqueueSynchronisationMessage(Agent agent, SynchronisationMessage message, String description);
+    void enqueueSynchronisationMessages(Agent agent, List<Pair<SynchronisationMessage, String>> messageDescriptionPairs);
 
     /**
      * Dequeues (deletes) the given agent synchronisation messages.

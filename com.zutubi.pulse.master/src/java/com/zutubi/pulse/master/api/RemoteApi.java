@@ -27,7 +27,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -55,6 +54,10 @@ import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -1498,7 +1501,7 @@ public class RemoteApi
         try
         {
             SynchronisationMessage message = synchronisationTaskFactory.toMessage(new TestSynchronisationTask(succeed));
-            agentManager.enqueueSynchronisationMessage(internalGetAgent(agent), message, description);
+            agentManager.enqueueSynchronisationMessages(internalGetAgent(agent), asList(asPair(message, description)));
             return true;
         }
         finally

@@ -9,6 +9,8 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
+import java.util.Collections;
+
 import static java.util.Arrays.asList;
 
 public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersistenceTestCase
@@ -31,7 +33,7 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
         AgentState agentState = new AgentState();
         agentStateDao.save(agentState);
 
-        AgentSynchronisationMessage message = new AgentSynchronisationMessage(agentState, synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("foo")), "description");
+        AgentSynchronisationMessage message = new AgentSynchronisationMessage(agentState, synchronisationTaskFactory.toMessage(newTask()), "description");
         message.setStatus(AgentSynchronisationMessage.Status.PROCESSING);
         message.setStatusMessage("nothing to report");
 
@@ -51,7 +53,7 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
         agentStateDao.save(agentState1);
         agentStateDao.save(agentState2);
 
-        SynchronisationMessage dummyMessage = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("foo"));
+        SynchronisationMessage dummyMessage = synchronisationTaskFactory.toMessage(newTask());
 
         AgentSynchronisationMessage message11 = new AgentSynchronisationMessage(agentState1, dummyMessage, "desc");
         AgentSynchronisationMessage message12 = new AgentSynchronisationMessage(agentState1, dummyMessage, "desc");
@@ -76,7 +78,7 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
         agentStateDao.save(agentState1);
         agentStateDao.save(agentState2);
 
-        SynchronisationMessage dummyMessage = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("foo"));
+        SynchronisationMessage dummyMessage = synchronisationTaskFactory.toMessage(newTask());
 
         AgentSynchronisationMessage message11 = new AgentSynchronisationMessage(agentState1, dummyMessage, "desc");
         AgentSynchronisationMessage message12 = new AgentSynchronisationMessage(agentState1, dummyMessage, "desc");
@@ -93,5 +95,10 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
         assertEquals(2, agentSynchronisationMessageDao.deleteByAgentState(agentState1));
         assertEquals(0, agentSynchronisationMessageDao.findByAgentState(agentState1).size());
         assertEquals(2, agentSynchronisationMessageDao.findByAgentState(agentState2).size());
+    }
+
+    private DeleteDirectoryTask newTask()
+    {
+        return new DeleteDirectoryTask("foo", "bar", Collections.<String, String>emptyMap());
     }
 }
