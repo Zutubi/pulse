@@ -364,7 +364,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         assertNotNull(artifact);
         String permalink = (String) artifact.get("permalink");
-        String text = downloadAsAdmin(baseUrl + permalink.substring(1) + "env.txt");
+        String text = downloadAsAdmin(baseUrl + permalink.substring(1) + "/env.txt");
 
         assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
         assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
