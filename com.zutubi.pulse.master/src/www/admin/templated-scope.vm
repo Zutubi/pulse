@@ -84,7 +84,7 @@
 
             var root = new Ext.tree.AsyncTreeNode({
                 baseName: project,
-                text: project,
+                text: Ext.util.Format.htmlEncode(project),
                 cls: cls,
                 iconCls: iconCls,
                 allowDrag: false,

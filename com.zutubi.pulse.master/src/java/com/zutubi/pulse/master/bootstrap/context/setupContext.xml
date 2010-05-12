@@ -5,7 +5,6 @@
     <bean id="setupManager" class="com.zutubi.pulse.master.bootstrap.DefaultSetupManager" autowire="byName">
         <property name="configContexts">
             <list>
-                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/serviceContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/configContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/transactionContext.xml</value>
             </list>
@@ -17,6 +16,7 @@
         </property>
         <property name="dataContexts">
             <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/serviceContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/databaseContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/recordContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/cacheContext.xml</value>

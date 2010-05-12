@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -258,7 +259,7 @@ public class ConfigurationResponse
 
         public String getDisplayName()
         {
-            return displayName;
+            return TextUtils.htmlEncode(displayName);
         }
 
         public String getCollapsedCollection()
@@ -309,7 +310,7 @@ public class ConfigurationResponse
 
         public String getNewDisplayName()
         {
-            return newDisplayName;
+            return TextUtils.htmlEncode(newDisplayName);
         }
 
         public String getCollapsedCollection()
