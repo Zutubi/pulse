@@ -55,6 +55,50 @@
                 visibleTree.collapseAll();
             }
         }
+        
+        function navigateTo(owner, path)
+        {
+            var container = Ext.get('nested-layout');
+            container.mask('Loading...');
+            Ext.Ajax.request({
+                url: '$base/ajax/xls.action',
+                params: {
+                    basePath: 'config',
+                    path: '$scope'
+                },
+                success: function(result, request)
+                {
+                    var listing = eval(result.responseText);
+                    var nodeInfo = null;
+                    for (var i = 0; i < listing.length; i++)
+                    {
+                        var current = listing[i];
+                        if (current.baseName == owner)
+                        {
+                            nodeInfo = current;
+                            break;
+                         }
+                     }
+                     
+                     if (nodeInfo)
+                     {
+                         createConfigTree(owner, nodeInfo.cls, nodeInfo.iconCls);
+                         configTree.selectConfigPath(path, function() {
+                             container.unmask();
+                         });
+                     }
+                     else
+                     {
+                         container.unmask();
+                         showStatus(owner + ' not found', 'failure');
+                     }
+                },
+                failure: function(result, request){
+                    container.unmask();
+                    showStatus('unable to load $scope information to navigate', 'failure');
+                }
+            });
+        }
 
         // ------------------------------------------------------------------
         // Config tree

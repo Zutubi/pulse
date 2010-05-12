@@ -28,6 +28,8 @@ import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
 
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -69,7 +71,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         {
             public Set<String> getAllowedAuthorities(String action, ConfigA resource)
             {
-                return new HashSet<String>(Arrays.asList(action));
+                return new HashSet<String>(asList(action));
             }
         });
     }
@@ -142,7 +144,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testInsertTemplatedRoot()
     {
         String path = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
-        assertEquals(PathUtils.getPath(SCOPE_TEMPLATED, "root"), path);
+        assertEquals(getPath(SCOPE_TEMPLATED, "root"), path);
 
         Record record = configurationTemplateManager.getRecord(path);
         assertNotNull(record);
@@ -166,7 +168,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child, rootPath, false);
 
-        assertEquals(PathUtils.getPath(SCOPE_TEMPLATED, "child"), childPath);
+        assertEquals(getPath(SCOPE_TEMPLATED, "child"), childPath);
 
         Record record = configurationTemplateManager.getRecord(childPath);
         assertNotNull(record);
@@ -224,7 +226,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), PathUtils.getPath(SCOPE_TEMPLATED, "invalid"), true);
+            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), getPath(SCOPE_TEMPLATED, "invalid"), true);
             fail("Should not be able to insert an item with an invalid parent");
         }
         catch (Exception e)
@@ -922,7 +924,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testCanDeleteInheritedComposite() throws TypeException
     {
-        assertFalse(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "composite")));
+        assertFalse(configurationTemplateManager.canDelete(getPath(insertInherited(), "composite")));
     }
 
     public void testCanDeleteSimple()
@@ -937,7 +939,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = new ConfigA("test");
         a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "composite")));
+        assertTrue(configurationTemplateManager.canDelete(getPath(path, "composite")));
     }
 
     public void testCanDeleteMapItem()
@@ -945,7 +947,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = new ConfigA("test");
         a.getCs().put("cee", new ConfigC("cee"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "cs/cee")));
+        assertTrue(configurationTemplateManager.canDelete(getPath(path, "cs/cee")));
     }
 
     public void testCanDeleteOwnedComposite() throws TypeException
@@ -956,7 +958,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testCanDeleteInheritedMapItem() throws TypeException
     {
-        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "cs/cee")));
+        assertTrue(configurationTemplateManager.canDelete(getPath(insertInherited(), "cs/cee")));
     }
 
     private String insertInherited() throws TypeException
@@ -1010,7 +1012,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteInheritedComposite() throws TypeException
     {
-        String path = PathUtils.getPath(insertInherited(), "composite");
+        String path = getPath(insertInherited(), "composite");
         failedDeleteHelper(path, "Invalid path 'template/child/composite': cannot delete an inherited composite property");
     }
 
@@ -1101,7 +1103,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteAllInheritedComposite() throws TypeException
     {
-        String path = PathUtils.getPath(insertInherited(), "composite");
+        String path = getPath(insertInherited(), "composite");
         assertEquals(0, configurationTemplateManager.deleteAll(path));
         assertTrue(configurationTemplateManager.pathExists(path));
     }
@@ -1356,7 +1358,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "composite")));
+        assertFalse(configurationTemplateManager.existsInTemplateParent(getPath(path, "composite")));
     }
 
     public void testInTemplateParentTemplateRecord()
@@ -1369,7 +1371,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = configurationTemplateManager.getInstance(aPath, ConfigA.class);
         a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.save(a);
-        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "composite")));
+        assertFalse(configurationTemplateManager.existsInTemplateParent(getPath(path, "composite")));
     }
 
     public void testInTemplateParentInheritedComposite() throws TypeException
@@ -1378,7 +1380,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         parent.setComposite(new ConfigB("inheritme"));
         ConfigA child = new ConfigA("child");
         String childPath = insertParentAndChildA(parent, child).second;
-        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "composite")));
+        assertTrue(configurationTemplateManager.existsInTemplateParent(getPath(childPath, "composite")));
     }
 
     public void testInTemplateParentOwnedComposite() throws TypeException
@@ -1387,7 +1389,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA child = new ConfigA("child");
         child.setComposite(new ConfigB("ownme"));
         String childPath = insertParentAndChildA(parent, child).second;
-        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "composite")));
+        assertFalse(configurationTemplateManager.existsInTemplateParent(getPath(childPath, "composite")));
     }
 
     public void testInTemplateParentOverriddenComposite() throws TypeException
@@ -1399,7 +1401,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         b.setB("hehe");
         child.setComposite(b);
         String childPath = insertParentAndChildA(parent, child).second;
-        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "composite")));
+        assertTrue(configurationTemplateManager.existsInTemplateParent(getPath(childPath, "composite")));
     }
 
     public void testInTemplateParentInheritedValue() throws TypeException
@@ -1408,7 +1410,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         parent.setB("pb");
         ConfigA child = new ConfigA("child");
         String childPath = insertParentAndChildA(parent, child).second;
-        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "b")));
+        assertTrue(configurationTemplateManager.existsInTemplateParent(getPath(childPath, "b")));
     }
 
     public void testInTemplateParentOwnedValue() throws TypeException
@@ -1418,7 +1420,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA child = new ConfigA("child");
         child.setB("cb");
         String childPath = insertParentAndChildA(parent, child).second;
-        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "b")));
+        assertTrue(configurationTemplateManager.existsInTemplateParent(getPath(childPath, "b")));
     }
 
     public void testIsOverriddenInvalidPath()
@@ -1446,7 +1448,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(path, "composite")));
     }
 
     public void testIsOverriddenTemplateRecord()
@@ -1459,7 +1461,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = configurationTemplateManager.getInstance(aPath, ConfigA.class);
         a.setComposite(new ConfigB("b"));
         String path = configurationTemplateManager.save(a);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(path, "composite")));
     }
 
     public void testIsOverriddenInheritedComposite() throws TypeException
@@ -1468,8 +1470,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         parent.setComposite(new ConfigB("inheritme"));
         ConfigA child = new ConfigA("child");
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "composite")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.first, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.second, "composite")));
     }
 
     public void testIsOverriddenOwnedComposite() throws TypeException
@@ -1478,8 +1480,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA child = new ConfigA("child");
         child.setComposite(new ConfigB("ownme"));
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "composite")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "composite")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths.first, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.second, "composite")));
     }
 
     public void testIsOverriddenOverriddenComposite() throws TypeException
@@ -1491,8 +1493,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         b.setB("hehe");
         child.setComposite(b);
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "composite")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "composite")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths.first, "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.second, "composite")));
     }
 
     public void testIsOverriddenInheritedValue() throws TypeException
@@ -1501,8 +1503,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         parent.setB("pb");
         ConfigA child = new ConfigA("child");
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "b")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "b")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.first, "b")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.second, "b")));
     }
 
     public void testIsOverriddenOverriddenValue() throws TypeException
@@ -1512,8 +1514,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA child = new ConfigA("child");
         child.setB("cb");
         Pair<String, String> paths = insertParentAndChildA(parent, child);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "b")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "b")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths.first, "b")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths.second, "b")));
     }
 
     public void testIsOverriddenOverriddenInGrandchild() throws TypeException
@@ -1524,9 +1526,9 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA grandchild = new ConfigA("grandchild");
         grandchild.setB("cb");
         String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "b")));
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "b")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "b")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths[0], "b")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths[1], "b")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths[2], "b")));
     }
 
     public void testIsOverriddenCompositeOverriddenInGrandchild() throws TypeException
@@ -1539,9 +1541,9 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         b.setB("hehe");
         grandchild.setComposite(b);
         String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "composite")));
-        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "composite")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "composite")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths[0], "composite")));
+        assertTrue(configurationTemplateManager.isOverridden(getPath(paths[1], "composite")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths[2], "composite")));
     }
 
     public void testIsOverriddenCompositeHiddenInChild() throws TypeException
@@ -1552,11 +1554,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA grandchild = new ConfigA("grandchild");
         String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
 
-        configurationTemplateManager.delete(PathUtils.getPath(paths[1], "cs", "hideme"));
+        configurationTemplateManager.delete(getPath(paths[1], "cs", "hideme"));
 
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "cs", "hideme")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "cs", "hideme")));
-        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "cs", "hideme")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths[0], "cs", "hideme")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths[1], "cs", "hideme")));
+        assertFalse(configurationTemplateManager.isOverridden(getPath(paths[2], "cs", "hideme")));
     }
 
     public void testAttemptToChangeReadOnlyFieldRejected() throws TypeException
@@ -1912,6 +1914,91 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals(CHILD_NAME, results.get(0).getName());
     }
 
+    public void testGetAncestorPathsInvalidPath()
+    {
+        try
+        {
+            configurationTemplateManager.getAncestorPaths("invalid/path", true);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertThat(e.getMessage(), containsString("Invalid path 'invalid/path': references unknown scope 'invalid'"));
+        }
+    }
+    
+    public void testGetAncestorPathsRoot() throws TypeException
+    {
+        Pair<String, String> paths = insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        assertEquals(Arrays.<String>asList(), configurationTemplateManager.getAncestorPaths(paths.first, true));
+    }
+
+    public void testGetAncestorPathsRootNonStrict() throws TypeException
+    {
+        Pair<String, String> paths = insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        assertEquals(asList(paths.first), configurationTemplateManager.getAncestorPaths(paths.first, false));
+    }
+
+    public void testGetAncestorPathsChild() throws TypeException
+    {
+        Pair<String, String> paths = insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        assertEquals(asList(paths.first), configurationTemplateManager.getAncestorPaths(paths.second, true));
+    }
+
+    public void testGetAncestorPathsChildNonStrict() throws TypeException
+    {
+        Pair<String, String> paths = insertParentAndChildA(new ConfigA("parent"), new ConfigA("child"));
+        assertEquals(asList(paths.second, paths.first), configurationTemplateManager.getAncestorPaths(paths.second, false));
+    }
+
+    public void testGetAncestorPathsNestedInRoot() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("x"));
+        Pair<String, String> paths = insertParentAndChildA(parent, new ConfigA("child"));
+        assertEquals(Arrays.<String>asList(), configurationTemplateManager.getAncestorPaths(getPath(paths.first, "composite"), true));
+    }
+
+    public void testGetAncestorPathsNestedInRootNonStrict() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("x"));
+        Pair<String, String> paths = insertParentAndChildA(parent, new ConfigA("child"));
+        String parentBPath = getPath(paths.first, "composite");
+        assertEquals(asList(parentBPath), configurationTemplateManager.getAncestorPaths(parentBPath, false));
+    }
+
+    public void testGetAncestorPathsNestedInChild() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("x"));
+        Pair<String, String> paths = insertParentAndChildA(parent, new ConfigA("child"));
+        assertEquals(asList(getPath(paths.first, "composite")), configurationTemplateManager.getAncestorPaths(getPath(paths.second, "composite"), true));
+    }
+
+    public void testGetAncestorPathsNestedInChildNonStrict() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("x"));
+        Pair<String, String> paths = insertParentAndChildA(parent, new ConfigA("child"));
+        String childBPath = getPath(paths.second, "composite");
+        assertEquals(asList(childBPath, getPath(paths.first, "composite")), configurationTemplateManager.getAncestorPaths(childBPath, false));
+    }
+
+    public void testGetAncestorPathsMultipleAncestors() throws TypeException
+    {
+        String[] paths = insertParentChildAndGrandchildA(new ConfigA("parent"), new ConfigA("child"), new ConfigA("grandchild"));
+        assertEquals(asList(paths[1], paths[0]), configurationTemplateManager.getAncestorPaths(paths[2], true));
+    }
+
+    public void testGetAncestorPathsNestedMultipleAncestors() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        parent.setComposite(new ConfigB("x"));
+        String[] paths = insertParentChildAndGrandchildA(parent, new ConfigA("child"), new ConfigA("grandchild"));
+        assertEquals(asList(getPath(paths[1], "composite"), getPath(paths[0], "composite")), configurationTemplateManager.getAncestorPaths(getPath(paths[2], "composite"), true));
+    }
+    
     private Pair<String, String> insertParentAndChildA(ConfigA parent, ConfigA child) throws TypeException
     {
         MutableRecord record = unstantiate(parent);
@@ -1941,7 +2028,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.setParentTemplate(record, childHandle);
         String grandChildPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         return new String[]{parentPath, childPath, grandChildPath};
-    }
+    }    
 
     private void assertNoSuchPath(String path)
     {

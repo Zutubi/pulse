@@ -27,6 +27,37 @@
     #end
 #end
 
+#macro(navcombo $name $options)
+    #if($options.size() > 0)
+            <div id="${name}-combo" class="template-nav"></div>
+            <script type="text/javascript">
+                var ${name}Combo = new Ext.form.ComboBox({
+                    renderTo: '${name}-combo',
+                    emptyText: 'to same path in ${name}',
+                    width: 260,
+                    mode: 'local',
+                    triggerAction: 'all',
+                    editable: false,
+                    store: [
+        #foreach($option in $options)
+            #if($velocityCount > 1),#end ['#jss($option)', Ext.util.Format.htmlEncode('#jss($option)')]
+        #end
+                    ],
+                    listeners: {
+                        select: function(combo, record) {
+                            var pieces = '#jss($path)'.split('/');
+                            pieces[1] = record.get(record.fields.first().name);
+                            navigateTo(pieces[1], pieces.join('/'));
+                        }
+                    }
+                });
+                
+                ${name}Combo.render();
+            </script>
+    
+    #end
+#end
+
 <h2 id='#id($path)'>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
@@ -116,16 +147,21 @@
             </div>
     #end
 
-    #if($config.nestedProperties.size() > 0)
+    #if($config.configuredAncestors.size() > 0 || $config.configuredDescendants.size() > 0 || $config.nestedProperties.size() > 0)
             <div id="config-links" class="config-panel">
             <h3 class="config-header">navigate</h3>
             <div class="config-container">
-            <ul class="config-links">
-        #foreach($prop in $config.nestedProperties)
-            #set($onclick = "selectPath('#jss(${path})/${prop}'); return false;")
-                <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="#html($onclick)">#displayname("path=${path}/${prop}")</a></li>
+                #navcombo("ancestor" $config.configuredAncestors)
+                #navcombo("descendant" $config.configuredDescendants)
+        #if($config.nestedProperties.size() > 0)
+                <div class="template-nav">to nested configuration:</div>
+                <ul class="config-links">
+            #foreach($prop in $config.nestedProperties)
+                #set($onclick = "selectPath('#jss(${path})/${prop}'); return false;")
+                    <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="#html($onclick)">#displayname("path=${path}/${prop}")</a></li>
+            #end
+                </ul>
         #end
-            </ul>
             </div>
             </div>
     #end

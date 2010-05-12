@@ -7,10 +7,12 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.transaction.*;
-import com.zutubi.tove.transaction.inmemory.InMemoryStateWrapper;
-import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
+import com.zutubi.tove.transaction.Synchronization;
+import com.zutubi.tove.transaction.Transaction;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.tove.transaction.TransactionStatus;
 import com.zutubi.tove.transaction.inmemory.InMemoryMapStateWrapper;
+import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.type.record.events.RecordDeletedEvent;
@@ -1790,7 +1792,90 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return null;
     }
 
+    /**
+     * Returns a list of all existing ancestor paths for the given path.  If
+     * the path is not in a templated scope, then the result will be an empty
+     * or single-element list with just the original path (depending on the
+     * value of strict).  Otherwise, the result will contain an entry for every
+     * template ancestor of the input path which defines the same remainder
+     * path.
+     * 
+     * @param path   path to find the ancestors of
+     * @param strict if false, include the path itself in the result
+     * @return a list of all existing template ancestor paths of the given path
+     */
+    public List<String> getAncestorPaths(String path, boolean strict)
+    {
+        Pair<TemplateNode, String> nodeAndRemainder = getNodeAndRemainderPath(path);
+        if (nodeAndRemainder != null)
+        {
+            final List<String> result = new LinkedList<String>();
+            final String remainderPath = nodeAndRemainder.second;
+            nodeAndRemainder.first.forEachAncestor(new UnaryFunction<TemplateNode, Boolean>()
+            {
+                public Boolean process(TemplateNode node)
+                {
+                    String ancestorPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
+                    if (pathExists(ancestorPath))
+                    {
+                        result.add(ancestorPath);
+                    }
+                    return true;
+                }
+            }, strict);
+            
+            return result;
+        }
+
+        // We get here for non-templated scopes.
+        if (strict)
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return Arrays.asList(path);
+        }
+    }
+
     public List<String> getDescendantPaths(String path, boolean strict, final boolean concreteOnly, final boolean includeHidden)
+    {
+        Pair<TemplateNode, String> nodeAndRemainder = getNodeAndRemainderPath(path);
+        if (nodeAndRemainder != null)
+        {
+            final List<String> result = new LinkedList<String>();
+            final String remainderPath = nodeAndRemainder.second;
+            nodeAndRemainder.first.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            {
+                public Boolean process(TemplateNode node)
+                {
+                    if (!concreteOnly || node.isConcrete())
+                    {
+                        String descendantPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
+                        if(includeHidden || pathExists(descendantPath))
+                        {
+                            result.add(descendantPath);
+                        }
+                    }
+                    return true;
+                }
+            }, strict);
+            
+            return result;
+        }
+
+        // We get here for non-templated scopes.
+        if (strict)
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return Arrays.asList(path);
+        }
+    }
+    
+    private Pair<TemplateNode, String> getNodeAndRemainderPath(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
         if (elements.length > 1)
@@ -1804,40 +1889,17 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
             if (scopeInfo.isTemplated())
             {
-                final List<String> result = new LinkedList<String>();
                 TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
-                final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
-
-                node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                if (node != null)
                 {
-                    public Boolean process(TemplateNode node)
-                    {
-                        if (!concreteOnly || node.isConcrete())
-                        {
-                            String descendantPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
-                            if(includeHidden || pathExists(descendantPath))
-                            {
-                                result.add(descendantPath);
-                            }
-                        }
-                        return true;
-                    }
-                }, strict);
-
-                return result;
+                    String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
+                    return new Pair<TemplateNode, String>(node, remainderPath);
+                }
             }
         }
-
-        // We get here for non-templated scopes.
-        if (strict)
-        {
-            return Collections.emptyList();
-        }
-        else
-        {
-            return Arrays.asList(path);
-        }
+        
+        return null;
     }
 
     /**

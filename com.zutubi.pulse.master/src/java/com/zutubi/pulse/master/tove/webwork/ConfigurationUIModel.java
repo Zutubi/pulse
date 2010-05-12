@@ -71,6 +71,7 @@ public class ConfigurationUIModel
 
     private List<String> displayFields = new LinkedList<String>();
 
+    private List<String> configuredAncestors = new LinkedList<String>();
     private List<String> configuredDescendants = new LinkedList<String>();
 
     private boolean writable;
@@ -175,8 +176,20 @@ public class ConfigurationUIModel
         }
         else
         {
+            Mapping<String, String> pathToOwnerMapping = new Mapping<String, String>()
+            {
+                public String map(String s)
+                {
+                    return PathUtils.getPathElements(s)[1];
+                }
+            };
+            
+            List<String> ancestorPaths = configurationTemplateManager.getAncestorPaths(path, true);
+            configuredAncestors = CollectionUtils.map(ancestorPaths, pathToOwnerMapping);
+            
             // Is this path configured in any descendants?
             List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(path, true, false, false);
+            configuredDescendants = CollectionUtils.map(descendantPaths, pathToOwnerMapping);
 
             determineActions(parentType);
             determineDescendantActions(descendantPaths);
@@ -185,14 +198,6 @@ public class ConfigurationUIModel
             
             if(instance == null)
             {
-                configuredDescendants = CollectionUtils.map(descendantPaths, new Mapping<String, String>()
-                {
-                    public String map(String s)
-                    {
-                        return PathUtils.getPathElements(s)[1];
-                    }
-                });
-
                 if (configuredDescendants.size() == 0 && !((CompositeType) type).isExtendable())
                 {
                     resolveNested();
@@ -447,6 +452,11 @@ public class ConfigurationUIModel
     public List<String> getDisplayFields()
     {
         return displayFields;
+    }
+
+    public List<String> getConfiguredAncestors()
+    {
+        return configuredAncestors;
     }
 
     public List<String> getConfiguredDescendants()

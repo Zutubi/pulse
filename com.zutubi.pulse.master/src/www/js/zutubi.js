@@ -506,13 +506,18 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         return configPath;
     },
 
-    selectConfigPath: function(configPath)
+    selectConfigPath: function(configPath, callback)
     {
         this.getSelectionModel().clearSelections();
         this.expandToPath(configPath, function(found, node) {
             if (found)
             {
                 node.select();
+            }
+            
+            if (callback)
+            {
+                callback();
             }
         });
     },

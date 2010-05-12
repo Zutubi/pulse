@@ -1922,6 +1922,11 @@ ul.config-links li.invalid-property a:hover
     -moz-opacity: 0.4;
 }
 
+.template-nav
+{
+    padding: 3px 3px 3px 10px;
+}
+
 /*
  * Configuration help panel
  */
