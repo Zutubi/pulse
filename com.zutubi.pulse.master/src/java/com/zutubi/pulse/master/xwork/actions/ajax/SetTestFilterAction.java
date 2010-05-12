@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.util.StringUtils;
+import com.zutubi.pulse.master.xwork.actions.project.TestFilterContext;
 
 /**
  * Simple ajax action to store a user's test filter preference for a build in
@@ -10,20 +9,8 @@ import com.zutubi.util.StringUtils;
  */
 public class SetTestFilterAction extends ActionSupport
 {
-    public static final String FILTER_TESTS_KEY_PREFIX = "pulse.filterTests.";
-
     private long buildId;
     private String filter;
-
-    private static String getSessionKey(long buildId)
-    {
-        return FILTER_TESTS_KEY_PREFIX + buildId;
-    }
-
-    public static boolean filterTestsForBuild(long buildId)
-    {
-        return StringUtils.stringSet((String) ActionContext.getContext().getSession().get(getSessionKey(buildId)));
-    }
 
     public void setBuildId(long buildId)
     {
@@ -37,7 +24,7 @@ public class SetTestFilterAction extends ActionSupport
 
     public String execute()
     {
-        ActionContext.getContext().getSession().put(getSessionKey(buildId), filter);
+        TestFilterContext.setFilterForBuild(buildId, filter);
         return SUCCESS;
     }
 }

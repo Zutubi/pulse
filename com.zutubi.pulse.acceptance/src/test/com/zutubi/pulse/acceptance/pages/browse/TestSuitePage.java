@@ -51,4 +51,9 @@ public class TestSuitePage extends AbstractTestsPage
         AcceptanceTestUtils.setComboByValue(browser, ID_COMBO, filter);
         browser.waitForCondition("selenium.browserbot.getCurrentWindow().filtering === false");
     }
+
+    public boolean isTestCaseVisible(String caseName)
+    {
+        return browser.isVisible("//td[text()='" + caseName + "']");
+    }
 }

@@ -982,7 +982,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testTestResults() throws Exception
     {
-        final String LOCATOR_SUCCESSFUL_TEST = "//td[text()='testAdd']";
+        final String SUCCESSFUL_TEST = "testAdd";
 
         Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
@@ -994,14 +994,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // Test filtering out of successful tests (including stickiness).
         suitePage.openAndWaitFor();
         assertEquals(TestSuitePage.FILTER_NONE, suitePage.getCurrentFilter());
-        assertTrue(browser.isVisible(LOCATOR_SUCCESSFUL_TEST));
+        assertTrue(suitePage.isTestCaseVisible(SUCCESSFUL_TEST));
         suitePage.setFilterAndWait(TestSuitePage.FILTER_BROKEN);
         assertEquals(TestSuitePage.FILTER_BROKEN, suitePage.getCurrentFilter());
-        assertFalse(browser.isVisible(LOCATOR_SUCCESSFUL_TEST));
+        assertFalse(suitePage.isTestCaseVisible(SUCCESSFUL_TEST));
         
         suitePage.openAndWaitFor();
         assertEquals(TestSuitePage.FILTER_BROKEN, suitePage.getCurrentFilter());
-        assertFalse(browser.isVisible(LOCATOR_SUCCESSFUL_TEST));
+        assertFalse(suitePage.isTestCaseVisible(SUCCESSFUL_TEST));
     }
 
     public void testTestResultsExpectedFailure() throws Exception
