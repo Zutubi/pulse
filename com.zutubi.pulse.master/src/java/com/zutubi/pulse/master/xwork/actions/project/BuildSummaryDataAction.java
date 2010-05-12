@@ -5,7 +5,6 @@ import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.*;
-import static com.zutubi.pulse.master.committransformers.CommitMessageBuilder.processSubstitution;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.master.model.*;
@@ -31,6 +30,8 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 
 /**
  * Action to provide data for the build summary tab.
