@@ -27,11 +27,9 @@ import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.io.DirectoryFileFilter;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -60,47 +58,6 @@ public class DefaultBuildManager implements BuildManager
 
     private MasterLocationProvider masterLocationProvider;
     private RepositoryAttributes repositoryAttributes;
-
-    public void init()
-    {
-        // CIB-1147: detect and remove old .dead dirs on restart.
-        cleanupDeadDirectories();
-    }
-
-    private void cleanupDeadDirectories()
-    {
-        File projectRoot = configurationManager.getUserPaths().getProjectRoot();
-        if (projectRoot.isDirectory())
-        {
-            File[] projectDirs = projectRoot.listFiles(new DirectoryFileFilter());
-
-            for (File projectDir : projectDirs)
-            {
-                File[] deadDirs = projectDir.listFiles(new FileFilter()
-                {
-                    public boolean accept(File f)
-                    {
-                        return fileDeletionService.wasScheduledForDeletion(f);
-                    }
-                });
-
-                for (File dead : deadDirs)
-                {
-                    scheduleCleanup(dead);
-                }
-            }
-        }
-    }
-
-    public void setBuildResultDao(BuildResultDao dao)
-    {
-        buildResultDao = dao;
-    }
-
-    public void setArtifactDao(ArtifactDao dao)
-    {
-        artifactDao = dao;
-    }
 
     public void save(BuildResult buildResult)
     {
@@ -769,6 +726,16 @@ public class DefaultBuildManager implements BuildManager
         {
             fileDeletionService.delete(file);
         }
+    }
+
+    public void setBuildResultDao(BuildResultDao dao)
+    {
+        buildResultDao = dao;
+    }
+
+    public void setArtifactDao(ArtifactDao dao)
+    {
+        artifactDao = dao;
     }
 
     public void setChangelistDao(ChangelistDao changelistDao)

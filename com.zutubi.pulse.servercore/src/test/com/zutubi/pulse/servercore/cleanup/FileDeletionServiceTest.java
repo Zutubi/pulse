@@ -1,17 +1,25 @@
 package com.zutubi.pulse.servercore.cleanup;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.UserPaths;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 public class FileDeletionServiceTest extends PulseTestCase
 {
-    private FileDeletionService deletionService;
     private File tmp;
+    private ConfigurationManager configurationManager;
+    private FileDeletionService deletionService;
+    private static final int DELETE_TIMEOUT = 10000;
 
     protected void setUp() throws Exception
     {
@@ -19,9 +27,32 @@ public class FileDeletionServiceTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir(getName(), "test");
 
+
+        UserPaths paths = new UserPaths()
+        {
+            public File getData()
+            {
+                return tmp;
+            }
+
+            public File getUserConfigRoot()
+            {
+                return null;
+            }
+        };
+
+        configurationManager = mock(ConfigurationManager.class);
+        doReturn(paths).when(configurationManager).getUserPaths();
+
+        initService();
+    }
+
+    private void initService()
+    {
         deletionService = new FileDeletionService();
-        deletionService.init();
         deletionService.setThreadFactory(Executors.defaultThreadFactory());
+        deletionService.setConfigurationManager(configurationManager);
+        deletionService.init();
     }
 
     protected void tearDown() throws Exception
@@ -86,6 +117,88 @@ public class FileDeletionServiceTest extends PulseTestCase
         catch (IllegalArgumentException e)
         {
             // expected
+        }
+    }
+    
+    public void testContinuesDeletionAfterRestart() throws IOException
+    {
+        deletionService.stop(true);
+        
+        File f1 = createNewFile("1");
+        File f2 = createNewFile("2");
+        
+        deletionService.delete(f1);
+        deletionService.delete(f2);
+        
+        assertFalse(f1.exists());
+        assertFalse(f2.exists());
+
+        File dead1 = new File(f1.getAbsolutePath() + FileDeletionService.SUFFIX);
+        File dead2 = new File(f2.getAbsolutePath() + FileDeletionService.SUFFIX);
+        assertTrue(dead1.exists());
+        assertTrue(dead2.exists());
+        
+        initService();
+        
+        waitForFileToBeDeleted(dead1);
+        waitForFileToBeDeleted(dead2);
+    }
+
+    public void testIndexEntriesRemoved() throws IOException, ExecutionException, InterruptedException
+    {
+        // When a file is fully deleted, it should be removed from the index.
+        // We can test this by replacing it with a .dead file and ensuring it
+        // is not nuked on restart.
+        File f1 = createNewFile("1");
+
+        Future<Boolean> future = deletionService.delete(f1);
+        assertTrue(future.get());
+        deletionService.stop(true);
+        
+        assertFalse(f1.exists());
+
+        File dead1 = new File(f1.getAbsolutePath() + FileDeletionService.SUFFIX);
+        assertFalse(dead1.exists());
+        assertTrue(dead1.createNewFile());
+        
+        initService();
+
+        Thread.sleep(100);
+        assertTrue(dead1.exists());
+    }
+
+    public void testIgnoresInvalidIndexEntries() throws IOException, InterruptedException
+    {
+        deletionService.stop(true);
+        
+        File notDead = createNewFile("alive.txt");
+        File index = new File(tmp, FileDeletionService.INDEX_FILE_NAME);
+        FileSystemUtils.createFile(index, "invalid\n" + notDead.getAbsolutePath() + "\n");
+        
+        initService();
+        
+        Thread.sleep(100);
+        assertTrue(notDead.exists());
+    }
+    
+    private void waitForFileToBeDeleted(File file)
+    {
+        long start = System.currentTimeMillis();
+        while (file.exists())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                // Keep going.
+            }
+            
+            if (System.currentTimeMillis() - start > DELETE_TIMEOUT)
+            {
+                fail("Timed out waiting for file '" + file.getAbsolutePath() + "' to be deleted");
+            }
         }
     }
 

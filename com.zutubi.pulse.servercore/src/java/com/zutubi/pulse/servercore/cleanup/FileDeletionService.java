@@ -1,11 +1,16 @@
 package com.zutubi.pulse.servercore.cleanup;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
-import java.io.File;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -24,12 +29,28 @@ import java.util.concurrent.FutureTask;
 public class FileDeletionService extends BackgroundServiceSupport
 {
     private static final Messages I18N = Messages.getInstance(FileDeletionService.class);
+    private static final Logger LOG = Logger.getLogger(FileDeletionService.class);
 
+    public static final String INDEX_FILE_NAME = "dead-index.txt";
     public static final String SUFFIX = ".dead";
+
+    public Set<File> index = new HashSet<File>();
+    public File indexFile;
+    
+    private ConfigurationManager configurationManager;
 
     public FileDeletionService()
     {
         super(I18N.format("service.name"));
+    }
+
+    @Override
+    public synchronized void init()
+    {
+        super.init();
+        
+        indexFile = new File(configurationManager.getUserPaths().getData(), INDEX_FILE_NAME);
+        loadIndex();
     }
 
     /**
@@ -75,21 +96,6 @@ public class FileDeletionService extends BackgroundServiceSupport
     }
 
     /**
-     * This method indicates whether or not the specified file was previously scheduled for
-     * deletion.  Note that this method does not identify all previously scheduled files
-     * with 100% accuracy.  A result of true indicates that this file was previously scheduled,
-     * whilst a result of false indicates that it is unlikely that this file was previously
-     * scheduled for deletion.
-     *
-     * @param f the file in question
-     * @return  true if the file was previously scheduled for deletion, false otherwise.
-     */
-    public boolean wasScheduledForDeletion(File f)
-    {
-        return f.getName().endsWith(SUFFIX);
-    }
-
-    /**
      * Determine a suitable name to rename this file to prior to deletion.  The
      * criteria are that a) the file does not exist, b) the file name has the
      * suffix '.dead' so that it can later be identified as a file/directory that
@@ -111,7 +117,89 @@ public class FileDeletionService extends BackgroundServiceSupport
 
     private Future<Boolean> scheduleDeletion(File file)
     {
+        addToIndex(file);
         return getExecutorService().submit(new Delete(file));
+    }
+    
+    private synchronized void addToIndex(File file)
+    {
+        if (index.add(file))
+        {
+            saveIndex();
+        }
+    }
+    
+    private synchronized void removeFromIndex(File file)
+    {
+        if (index.remove(file))
+        {
+            saveIndex();
+        }
+    }
+
+    private synchronized void loadIndex()
+    {
+        if (indexFile.exists())
+        {
+            BufferedReader reader = null;
+            try
+            {
+                reader = new BufferedReader(new FileReader(indexFile));
+                String line;
+                while ((line = reader.readLine()) != null)
+                {
+                    // There is some paranoia here, as this index file is
+                    // telling us to delete arbitrary directories.  To avoid
+                    // painful mistakes, only believe entries with the expected
+                    // suffix.  If the rename to the suffix version failed, we
+                    // won't restart that delete (seemingly a lesser evil than
+                    // deleting something we shouldn't have).
+                    line = line.trim();
+                    if (line.endsWith(SUFFIX))
+                    {
+                        File file = new File(line);
+                        if (file.isAbsolute())
+                        {
+                            scheduleDeletion(file);
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                LOG.severe("Unable to load from dead index '" + indexFile.getAbsolutePath() + "': " + e.getMessage(), e);
+            }
+            finally
+            {
+                IOUtils.close(reader);
+            }
+        }
+    }
+    
+    private synchronized void saveIndex()
+    {
+        PrintWriter writer = null;
+        try
+        {
+            writer = new PrintWriter(indexFile);
+            for (File f: index)
+            {
+                writer.println(f.getAbsolutePath());
+            }
+        }
+        catch (IOException e)
+        {
+            LOG.severe("Unable to save to dead index '" + indexFile.getAbsolutePath() + "': " + e.getMessage(), e);
+        }
+        finally
+        {
+            IOUtils.close(writer);
+        }
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     private class Delete implements Callable<Boolean>
@@ -127,13 +215,20 @@ public class FileDeletionService extends BackgroundServiceSupport
         {
             if (target.exists())
             {
-                if (target.isFile())
+                try
                 {
-                    return target.delete();
+                    if (target.isFile())
+                    {
+                        return target.delete();
+                    }
+                    else // target.isDirectory()
+                    {
+                        return FileSystemUtils.rmdir(target);
+                    }
                 }
-                else // target.isDirectory()
+                finally
                 {
-                    return FileSystemUtils.rmdir(target);
+                    removeFromIndex(target);
                 }
             }
             return true;
