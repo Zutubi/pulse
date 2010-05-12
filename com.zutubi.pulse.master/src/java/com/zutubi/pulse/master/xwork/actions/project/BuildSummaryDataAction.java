@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransform
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.config.NamedConfigurationComparator;
@@ -266,7 +267,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
 
                             if (artifact.isLink())
                             {
-                                icon = "link";
+                                icon = FileAction.TYPE_LINK;
                                 url = artifact.getUrl();
                             }
                             else if (artifact.isSingleFile())
@@ -274,23 +275,23 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
                                 StoredFileArtifact file = artifact.getFile();
                                 if (file.canDecorate())
                                 {
-                                    icon = "decorate";
+                                    icon = FileAction.TYPE_DECORATE;
                                     url = urls.commandArtifacts(result, commandResult) + file.getPathUrl();
                                 }
                                 else
                                 {
-                                    icon = "download";
+                                    icon = FileAction.TYPE_DOWNLOAD;
                                     url = urls.commandDownload(result, commandResult, file.getPath());
                                 }
                             }
                             else if (artifact.hasIndexFile())
                             {
-                                icon = "view";
+                                icon = FileAction.TYPE_VIEW;
                                 url = urls.fileFileArtifact(artifact, artifact.findFileBase(artifact.findIndexFile()));
                             }
                             else
                             {
-                                icon = "archive";
+                                icon = FileAction.TYPE_ARCHIVE;
                                 url = baseUrl + "/zip.action?path=pulse:///projects/" + result.getProject().getId() + "/builds/" + result.getId() + "/artifacts/" + node.getResult().getId() + "/" + commandResult.getId() + "/" + artifact.getId() + "/";
                             }
 
