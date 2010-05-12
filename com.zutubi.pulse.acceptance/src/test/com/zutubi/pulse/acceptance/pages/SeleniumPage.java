@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+
 import static com.zutubi.util.WebUtils.toValidHtmlName;
 
 /**
@@ -76,6 +77,15 @@ public abstract class SeleniumPage
         browser.waitForElement(toValidHtmlName(id));
     }
 
+    /**
+     * Wait for the browser to reload, and for this page to be avaialble. 
+     */
+    public void waitForReload()
+    {
+        browser.waitForPageToLoad();
+        waitFor();
+    }
+    
     public boolean isPresent()
     {
         return browser.isElementPresent("id=" + toValidHtmlName(id));

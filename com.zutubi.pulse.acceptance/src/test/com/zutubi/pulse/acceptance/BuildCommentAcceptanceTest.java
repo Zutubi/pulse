@@ -104,7 +104,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         ConfirmDialog confirmDialog = page.clickDeleteComment(1);
         confirmDialog.waitFor();
         confirmDialog.clickOk();
-        browser.waitForPageToLoad();
+        page.waitForReload();
         assertTextNotPresent(TEST_COMMENT);
     }
 
@@ -146,8 +146,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
 
-        browser.waitForPageToLoad();
-        page.waitFor();
+        page.waitForReload();
         assertTrue(page.isCommentsPresent());
         assertTextPresent(TEST_COMMENT);
         assertTextPresent("by " + TEST_USER);
