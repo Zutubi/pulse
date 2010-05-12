@@ -29,6 +29,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     private ProjectConfigurations projects;
     private UserConfigurations users;
     private String projectName;
+    private PulseToolbar toolbar;
 
     @Override
     protected void setUp() throws Exception
@@ -44,6 +45,8 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         users = new UserConfigurations();
 
         xmlRpcHelper.loginAsAdmin();
+
+        toolbar = new PulseToolbar(browser);
     }
 
     @Override
@@ -89,8 +92,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         // go to project home page - ensure that the standard stuff is there.
         browser.openAndWaitFor(ProjectHomePage.class, projectName);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
-        assertTrue(toolbar.isProjectLinkPresent(projectName));
+        assertTrue(toolbar.isProjectLinkPresent());
         assertFalse(toolbar.isBuildNavPresent());
         assertFalse(toolbar.isBuildNavMenuPresent());
     }
@@ -99,24 +101,22 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     {
         browser.openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         toolbar.waitForBuildNav();
 
         assertFalse(toolbar.isBuildNavMenuPresent());
-        assertTrue(toolbar.isBuildNavLinkPresent(projectName, 1));
+        assertTrue(toolbar.isBuildNavLinkPresent(1));
     }
 
     private void doTestMultipleBuilds()
     {
         browser.openAndWaitFor(BuildSummaryPage.class, projectName, 3L);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         toolbar.waitForBuildNav();
 
         assertTrue(toolbar.isBuildNavMenuPresent());
         assertTrue(toolbar.isBuildNavItemPresent(1));
         assertTrue(toolbar.isBuildNavItemPresent(2));
-        assertTrue(toolbar.isBuildNavLinkPresent(projectName, 3));
+        assertTrue(toolbar.isBuildNavLinkPresent(3));
         assertTrue(toolbar.isBuildNavItemPresent(4));
         assertTrue(toolbar.isBuildNavItemPresent(5));
         assertFalse(toolbar.isBuildNavItemPresent(6));
@@ -129,7 +129,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         // wait for reload?
         toolbar.waitForBuildNav();
 
-        assertTrue(toolbar.isBuildNavLinkPresent(projectName, 5));
+        assertTrue(toolbar.isBuildNavLinkPresent(5));
         assertFalse(toolbar.isBuildNavItemPresent(1));
         assertTrue(toolbar.isBuildNavItemPresent(6));
     }
@@ -138,7 +138,6 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     {
         browser.openAndWaitFor(BuildSummaryPage.class, projectName, 3L);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         toolbar.waitForBuildNav();
 
         assertFalse(toolbar.isNextSuccessfulBuildLinkPresent());
@@ -163,7 +162,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         page.waitFor();
 
         toolbar.waitForBuildNav();
-        assertTrue(toolbar.isBuildNavLinkPresent(projectName, 2));
+        assertTrue(toolbar.isBuildNavLinkPresent(2));
 
         toolbar.clickOnNavMenu();
         assertTrue(toolbar.isNextSuccessfulBuildLinkPresent());
@@ -224,7 +223,6 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     {
         browser.openAndWaitFor(MyBuildsPage.class);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         assertTrue(toolbar.isMyBuildsLinkPresent());
         assertFalse(toolbar.isBuildNavPresent());
         assertFalse(toolbar.isBuildNavMenuPresent());
@@ -234,24 +232,22 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     {
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, 1L);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         toolbar.waitForBuildNav();
 
         assertFalse(toolbar.isBuildNavMenuPresent());
-        assertTrue(toolbar.isPersonalBuildNavLinkPresent(1));
+        assertTrue(toolbar.isBuildNavLinkPresent(1));
     }
 
     private void doTestMultiplePersonalBuilds()
     {
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, 3L);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         toolbar.waitForBuildNav();
 
         assertTrue(toolbar.isBuildNavMenuPresent());
         assertTrue(toolbar.isBuildNavItemPresent(1));
         assertTrue(toolbar.isBuildNavItemPresent(2));
-        assertTrue(toolbar.isPersonalBuildNavLinkPresent(3));
+        assertTrue(toolbar.isBuildNavLinkPresent(3));
         assertTrue(toolbar.isBuildNavItemPresent(4));
         assertTrue(toolbar.isBuildNavItemPresent(5));
 
@@ -262,7 +258,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         toolbar.waitForBuildNav();
 
-        assertTrue(toolbar.isPersonalBuildNavLinkPresent(5));
+        assertTrue(toolbar.isBuildNavLinkPresent(5));
         assertTrue(toolbar.isBuildNavItemPresent(3));
     }
 
@@ -270,7 +266,6 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     {
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, 3L);
 
-        PulseToolbar toolbar = new PulseToolbar(browser, urls);
         toolbar.waitForBuildNav();
 
         assertFalse(toolbar.isNextSuccessfulBuildLinkPresent());
@@ -295,7 +290,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         page.waitFor();
 
         toolbar.waitForBuildNav();
-        assertTrue(toolbar.isPersonalBuildNavLinkPresent(2));
+        assertTrue(toolbar.isBuildNavLinkPresent(2));
 
         toolbar.clickOnNavMenu();
         assertTrue(toolbar.isNextSuccessfulBuildLinkPresent());

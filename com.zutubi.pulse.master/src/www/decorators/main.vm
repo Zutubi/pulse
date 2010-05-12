@@ -96,12 +96,6 @@
                           toolbarConfig.personalBuild = true;
                           toolbarConfig.projectName = 'my builds';
                           toolbarConfig.projectUrl = '#jss($urls.dashboardMyBuilds())';
-#if($buildNumber && $buildNumber != "0")
-                          toolbarConfig.buildId = '$buildResult.id';
-#if ($action.viewport)
-                          toolbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
-#end
-#end
 #if($u_stageName)
                           toolbarConfig.stageName = '#jss($h_stageName)';
                           toolbarConfig.stageUrl = '#jss($urls.dashboardMyBuildStageDetails($buildNumber, $u_stageName))';
@@ -110,12 +104,15 @@
                           toolbarConfig.personalBuild = false;
                           toolbarConfig.projectName = '#jss($h_projectName)';
                           toolbarConfig.projectUrl = '#jss($urls.projectHome($u_projectName))';
-#if($buildNumber && $buildNumber != "0")
-                          toolbarConfig.buildId = '$buildResult.id';
-#end
 #if($u_stageName)
                           toolbarConfig.stageName = '#jss($h_stageName)';
                           toolbarConfig.stageUrl = '#jss($urls.stageDetails($u_projectName, $buildNumber, $u_stageName))';
+#end
+#end
+#if($buildNumber && $buildNumber != "0")
+                          toolbarConfig.buildId = '$buildResult.id';
+#if ($action.viewport)
+                          toolbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
 #end
 #end
 #if($u_agentName)

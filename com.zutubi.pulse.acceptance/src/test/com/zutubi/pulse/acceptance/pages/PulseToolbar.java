@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The Pulse toolbar is the toolbar at the very top of the Pulse page,
@@ -22,12 +21,10 @@ public class PulseToolbar
     private static final String ID_PREVIOUS_BROKEN_LINK = "previous-broken-pulse-toolbar_actions";
 
     private SeleniumBrowser browser;
-    private Urls urls;
 
-    public PulseToolbar(SeleniumBrowser browser, Urls urls)
+    public PulseToolbar(SeleniumBrowser browser)
     {
         this.browser = browser;
-        this.urls = urls;
     }
 
     public boolean isPresent()
@@ -95,24 +92,19 @@ public class PulseToolbar
         browser.click(PREFIX_ID_BUILD_ITEM + buildNumber);
     }
 
-    public boolean isBuildNavLinkPresent(String projectName, int buildNumber)
+    public boolean isBuildNavLinkPresent(int buildNumber)
     {
-        return browser.isElementIdPresent(ID_BUILD_LINK) && browser.isLinkToPresent(urls.build(uriComponentEncode(projectName), String.valueOf(buildNumber)));
+        return browser.isElementPresent("//span[@id='"+ID_BUILD_LINK+"']/a[text()='build " + buildNumber + "']");
     }
 
-    public boolean isPersonalBuildNavLinkPresent(int buildNumber)
+    public boolean isProjectLinkPresent()
     {
-        return browser.isElementIdPresent(ID_BUILD_LINK) && browser.isLinkToPresent(urls.dashboardMyBuild(String.valueOf(buildNumber)));
-    }
-
-    public boolean isProjectLinkPresent(String projectName)
-    {
-        return browser.isElementIdPresent(ID_PROJECT_LINK) && browser.isLinkToPresent(urls.projectHome(uriComponentEncode(projectName)));
+        return browser.isElementIdPresent(ID_PROJECT_LINK);
     }
 
     public boolean isMyBuildsLinkPresent()
     {
-        return browser.isElementIdPresent(ID_PROJECT_LINK) && browser.isLinkToPresent(urls.dashboardMyBuilds());
+        return browser.isElementIdPresent(ID_PROJECT_LINK);
     }
 
     public void waitForBuildNav()
