@@ -1,9 +1,15 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
+
+import java.util.List;
+
 import static com.zutubi.util.WebUtils.uriPathEncode;
+import static java.util.Arrays.asList;
 
 /**
  * A page in the admin UI that displays a single composite.  This page
@@ -13,6 +19,10 @@ import static com.zutubi.util.WebUtils.uriPathEncode;
 public class CompositePage extends ConfigPage
 {
     private static final String CONFIGURE_LINK = "configure";
+    private static final String ID_ANCESTOR_NAV = "ancestor-nav";
+    private static final String ID_ANCESTOR_COMBO = "ancestor-combo";
+    private static final String ID_DESCENDANT_NAV = "descendant-nav";
+    private static final String ID_DESCENDANT_COMBO = "descendant-combo";
 
     private String path;
 
@@ -128,5 +138,45 @@ public class CompositePage extends ConfigPage
     private String getLinkId(String name)
     {
         return "link." + name;
+    }
+
+    public boolean isAncestorNavigationPresent()
+    {
+        return browser.isElementPresent(ID_ANCESTOR_NAV);
+    }
+
+    public List<String> getAncestorNavigationOptions()
+    {
+        return asList(AcceptanceTestUtils.getComboOptions(browser, ID_ANCESTOR_COMBO));
+    }
+    
+    public CompositePage navigateToAncestorAndWait(String ancestor)
+    {
+        return navigateAndWait(ID_ANCESTOR_COMBO, ancestor);
+    }
+
+    public boolean isDescendantNavigationPresent()
+    {
+        return browser.isElementPresent(ID_DESCENDANT_NAV);
+    }
+
+    public List<String> getDescendantNavigationOptions()
+    {
+        return asList(AcceptanceTestUtils.getComboOptions(browser, ID_DESCENDANT_COMBO));
+    }
+
+    public CompositePage navigateToDescendantAndWait(String ancestor)
+    {
+        return navigateAndWait(ID_DESCENDANT_COMBO, ancestor);
+    }
+    
+    private CompositePage navigateAndWait(String comboId, String ancestor)
+    {
+        AcceptanceTestUtils.setComboByValue(browser, comboId, ancestor);
+        String[] pathElements = PathUtils.getPathElements(path);
+        pathElements[1] = ancestor;
+        CompositePage page = new CompositePage(browser, urls, PathUtils.getPath(pathElements));
+        page.waitFor();
+        return page;
     }
 }

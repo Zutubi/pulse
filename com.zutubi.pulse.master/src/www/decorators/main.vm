@@ -120,7 +120,7 @@
                           toolbarConfig.agentUrl = '#jss($urls.agentStatus($u_agentName))';
 #end
 #if($loggedInUser)
-                          toolbarConfig.userName = '#html($loggedInUser.config.name)';
+                          toolbarConfig.userName = Ext.util.Format.htmlEncode('#jss($loggedInUser.config.name)');
 #if($canLogout)
                           toolbarConfig.userCanLogout = true;
 #end

@@ -29,10 +29,11 @@
 
 #macro(navcombo $name $options)
     #if($options.size() > 0)
-            <div id="${name}-combo" class="template-nav"></div>
+            <div id="${name}-nav" class="template-nav"></div>
             <script type="text/javascript">
                 var ${name}Combo = new Ext.form.ComboBox({
-                    renderTo: '${name}-combo',
+                    renderTo: '${name}-nav',
+                    id: '${name}-combo',
                     emptyText: 'to same path in ${name}',
                     width: 260,
                     mode: 'local',
@@ -171,7 +172,7 @@
     ## by a wizard.
     #if($config.extensions.size() > 0)
         #if($config.writable)
-            #if($config.configuredDescendants.size() == 0)
+            #if($config.configuredDescendantCount == 0)
                 #set($onclick = "addToPath('#jss(${path})'); return false;")
     <table class="template-actions" cellspacing="5px">
         <tr>
@@ -181,13 +182,18 @@
     </table>
             #else
     <p>
-        This path has been configured in the following descendants (and thus cannot be configured at this level):
+        This path has been configured in $config.configuredDescendantCount descendant(s) (and thus cannot be configured at this level).
     </p>
-    <ul>
-                #foreach($descendant in $config.configuredDescendants)
-        <li id='#id("cd-$descendant")'>#html($descendant)</li>
-                #end
+                #if($config.configuredDescendants.size() > 0)
+    <p>
+        These descendants include:
+    </p>
+    <ul class="points">
+                    #foreach($descendant in $config.configuredDescendants)
+        <li id='#id("cd-$descendant")'><a href="#" onclick="var pieces = '#jss($action.htmlEncode($path))'.split('/'); pieces[1] = '#jss($action.htmlEncode($descendant))'; navigateTo(pieces[1], pieces.join('/'));">#html($descendant)</a></li>
+                    #end
     </ul>
+                #end
             #end
         #else
     <p>

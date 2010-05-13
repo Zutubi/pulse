@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -110,14 +111,7 @@ public abstract class SeleniumForm
 
     public String[] getComboBoxOptions(String name)
     {
-        String js = "var result = function() { " +
-                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "'); " +
-                        "var values = []; " +
-                        "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
-                        "return values; " +
-                    "}(); " +
-                    "result";
-        return browser.evalExpression(js).split(",");
+        return AcceptanceTestUtils.getComboOptions(browser, getFieldId(name));
     }
 
     public void submitNamedFormElements(String submitValue, Pair<String, String>... fieldValues)

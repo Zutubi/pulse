@@ -38,7 +38,7 @@ public class BuildArtifactsPage extends SeleniumPage
 
     private void waitForLoad()
     {
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.getCmp('artifacts-tree').loading === false");
+        browser.waitForCondition("var win = selenium.browserbot.getCurrentWindow(); win.Ext && win.Ext.getCmp('artifacts-tree') && win.Ext.getCmp('artifacts-tree').loading === false");
     }
 
     /**

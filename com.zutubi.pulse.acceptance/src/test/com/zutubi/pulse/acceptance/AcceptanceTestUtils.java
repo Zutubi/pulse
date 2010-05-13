@@ -10,15 +10,17 @@ import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
+import freemarker.template.utility.StringUtil;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class AcceptanceTestUtils
 {
@@ -371,7 +373,7 @@ public class AcceptanceTestUtils
         // Annoyingly ext stores can't find the empty string value...
         if (StringUtils.stringSet(value))
         {
-            indexExpression = "store.find('filter', '" + value + "')";
+            indexExpression = "store.find(store.fields.first().name, '" + StringUtil.javaScriptStringEnc(value) + "')";
         }
         else
         {
@@ -380,9 +382,29 @@ public class AcceptanceTestUtils
 
         browser.evalExpression(
                 "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "');" +
-                "combo.setValue('" + value + "');" +
+                "combo.setValue('" + StringUtil.javaScriptStringEnc(value) + "');" +
                 "var store = combo.getStore();" +
                 "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
         );
+    }
+
+    /**
+     * Retrieves the available options in the Ext combo box with the given
+     * component id.
+     * 
+     * @param browser selenium instance
+     * @param comboId component id of the combo
+     * @return available options in the combo
+     */
+    public static String[] getComboOptions(SeleniumBrowser browser, String comboId)
+    {
+        String js = "var result = function() { " +
+                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
+                        "var values = []; " +
+                        "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
+                        "return values; " +
+                    "}(); " +
+                    "result";
+        return browser.evalExpression(js).split(",");
     }
 }

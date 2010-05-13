@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
@@ -21,6 +20,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
 
@@ -69,7 +70,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childName = random + "-child";
         xmlRpcHelper.insertTrivialProject(parentName, true);
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
-        String labelsPath = PathUtils.getPath(childPath, "labels");
+        String labelsPath = getPath(childPath, "labels");
 
         loginAsAdmin();
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, labelsPath);
@@ -94,7 +95,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
         loginAsAdmin();
-        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(projectPath, "labels"));
+        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, getPath(projectPath, "labels"));
         labelsPage.clickAdd();
 
         LabelForm labelForm = browser.createForm(LabelForm.class);
@@ -111,7 +112,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String labelBaseName = insertLabel(projectPath);
 
         loginAsAdmin();
-        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(projectPath, "labels"));
+        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, getPath(projectPath, "labels"));
         labelsPage.clickView(labelBaseName);
 
         LabelForm labelForm = browser.createForm(LabelForm.class);
@@ -126,7 +127,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
         label.put("label", "test");
-        return PathUtils.getBaseName(xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), label));
+        return PathUtils.getBaseName(xmlRpcHelper.insertConfig(getPath(projectPath, "labels"), label));
     }
 
     public void testCheckForm() throws Exception
@@ -337,7 +338,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(parentPath);
 
         String childPropertiesPath = getPropertiesPath(childPath);
-        xmlRpcHelper.deleteConfig(PathUtils.getPath(childPropertiesPath, "p1"));
+        xmlRpcHelper.deleteConfig(getPath(childPropertiesPath, "p1"));
 
         loginAsAdmin();
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, childPropertiesPath);
@@ -360,10 +361,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         // At this point we should be allowed to configure in the parent
         loginAsAdmin();
-        CompositePage compositePage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(parentPath, "changeViewer"));
+        CompositePage compositePage = browser.openAndWaitFor(CompositePage.class, getPath(parentPath, "changeViewer"));
         assertTrue(compositePage.isConfigureLinkPresent());
 
-        String childChangeViewerPath = PathUtils.getPath(childPath, "changeViewer");
+        String childChangeViewerPath = getPath(childPath, "changeViewer");
         Hashtable<String, Object> changeViewer = xmlRpcHelper.createEmptyConfig(CustomChangeViewerConfiguration.class);
         changeViewer.put("changesetURL", "dummy");
         xmlRpcHelper.insertConfig(childChangeViewerPath, changeViewer);
@@ -430,7 +431,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String path = xmlRpcHelper.insertTrivialProject(random, false);
         Hashtable<String, Object> trigger = xmlRpcHelper.createDefaultConfig(ScmBuildTriggerConfiguration.class);
         trigger.put("name", "t1");
-        String triggersPath = PathUtils.getPath(path, "triggers");
+        String triggersPath = getPath(path, "triggers");
         xmlRpcHelper.insertConfig(triggersPath, trigger);
         trigger.put("name", "t2");
         xmlRpcHelper.insertConfig(triggersPath, trigger);
@@ -534,7 +535,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
-        String recipePath = PathUtils.getPath(parentPath, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES, Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME);
+        String recipePath = getPath(parentPath, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES, Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME);
         Hashtable<String, Object> recipe = xmlRpcHelper.getConfig(recipePath);
         recipe.put("name", NEW_RECIPE_NAME);
         @SuppressWarnings({"unchecked"})
@@ -545,13 +546,13 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addInheritingProject(parentName, childName);
 
-        String childRecipesPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES);
+        String childRecipesPath = getPath(PROJECTS_SCOPE, childName, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES);
         assertEquals(asList(NEW_RECIPE_NAME), new LinkedList<String>(xmlRpcHelper.getConfigListing(childRecipesPath)));
 
-        String childCommandsPath = PathUtils.getPath(childRecipesPath, NEW_RECIPE_NAME, Constants.Project.MultiRecipeType.Recipe.COMMANDS);
+        String childCommandsPath = getPath(childRecipesPath, NEW_RECIPE_NAME, Constants.Project.MultiRecipeType.Recipe.COMMANDS);
         assertEquals(asList(NEW_COMMAND_NAME), new LinkedList<String>(xmlRpcHelper.getConfigListing(childCommandsPath)));
         
-        browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(childCommandsPath, NEW_COMMAND_NAME));
+        browser.openAndWaitFor(CompositePage.class, getPath(childCommandsPath, NEW_COMMAND_NAME));
         AntCommandForm form = browser.createForm(AntCommandForm.class);
         assertTrue(form.isFormPresent());
     }
@@ -587,7 +588,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
 
-        String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
+        String projectTypePath = getPath(PROJECTS_SCOPE, random, Constants.Project.TYPE);
         Hashtable<String, Object> type = xmlRpcHelper.getConfig(projectTypePath);
         assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
@@ -615,7 +616,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage childHierarchyPage = browser.createPage(ProjectHierarchyPage.class, child, false);
         childHierarchyPage.waitFor();
 
-        String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
+        String childTypePath = getPath(PROJECTS_SCOPE, child, Constants.Project.TYPE);
         Hashtable<String, Object> type = xmlRpcHelper.getConfig(childTypePath);
         assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
@@ -644,7 +645,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
 
-        String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
+        String projectTypePath = getPath(PROJECTS_SCOPE, random, Constants.Project.TYPE);
         Hashtable<String, Object> type = xmlRpcHelper.getConfig(projectTypePath);
         assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
@@ -677,7 +678,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage childHierarchyPage = browser.createPage(ProjectHierarchyPage.class, child, false);
         childHierarchyPage.waitFor();
 
-        String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
+        String childTypePath = getPath(PROJECTS_SCOPE, child, Constants.Project.TYPE);
         Hashtable<String, Object> type = xmlRpcHelper.getConfig(childTypePath);
         assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
@@ -706,10 +707,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addProject(random, false);
 
-        ListPage listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "stages"));
         assertItemPresent(listPage, "default", null, "view", "delete");
 
-        listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
+        listPage = browser.openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "triggers"));
         assertItemPresent(listPage, "scm trigger", null, "view", "delete", "pause");
     }
 
@@ -722,10 +723,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         addProject(parentName, true, GLOBAL_PROJECT_NAME, false);
         addInheritingProject(parentName, childName);
 
-        ListPage listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, childName, "stages"));
         assertItemPresent(listPage, "default", ListPage.ANNOTATION_INHERITED, "view", "delete");
 
-        listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
+        listPage = browser.openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, childName, "triggers"));
         assertItemPresent(listPage, "scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
     }
 
@@ -1009,12 +1010,40 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         
         MoveConfirmPage confirmPage = new MoveConfirmPage(browser, urls, toMovePath);
         confirmPage.waitFor();
-        assertEquals(asList(PathUtils.getPath(toMovePath, "type")), confirmPage.getDeletedPaths());
+        assertEquals(asList(getPath(toMovePath, "type")), confirmPage.getDeletedPaths());
         confirmPage.clickMove();        
         
         hierarchyPage.waitFor();
         assertTrue(hierarchyPage.isTreeItemPresent(toMove));
         assertEquals(newTemplateParent, xmlRpcHelper.getTemplateParent(toMovePath));
+    }
+    
+    public void testTemplateNavigation() throws Exception
+    {
+        final String PROCESSOR_NAME = "ant output processor";
+
+        String templateName = random + "-template";
+        String concreteName = random + "-concrete";
+
+        xmlRpcHelper.insertTrivialProject(templateName, true);
+        xmlRpcHelper.insertSimpleProject(concreteName, templateName, false);
+
+        loginAsAdmin();
+
+        CompositePage rootPage = browser.openAndWaitFor(CompositePage.class, getPath(PROJECTS_SCOPE, GLOBAL_PROJECT_NAME, Constants.Project.POST_PROCESSORS, PROCESSOR_NAME));
+        assertFalse(rootPage.isAncestorNavigationPresent());
+        assertTrue(rootPage.isDescendantNavigationPresent());
+        
+        CompositePage concretePage = rootPage.navigateToDescendantAndWait(concreteName);
+        assertTrue(concretePage.isAncestorNavigationPresent());
+        assertEquals(asList(templateName, GLOBAL_PROJECT_NAME), concretePage.getAncestorNavigationOptions());
+        assertFalse(concretePage.isDescendantNavigationPresent());
+        
+        CompositePage templatePage = concretePage.navigateToAncestorAndWait(templateName);
+        assertTrue(templatePage.isAncestorNavigationPresent());
+        assertEquals(asList(GLOBAL_PROJECT_NAME), templatePage.getAncestorNavigationOptions());
+        assertTrue(templatePage.isDescendantNavigationPresent());
+        assertEquals(asList(concreteName), templatePage.getDescendantNavigationOptions());
     }
     
     private void checkListedRecipes(String... expectedRecipes)
@@ -1042,6 +1071,6 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     private String getPropertiesPath(String projectPath)
     {
-        return PathUtils.getPath(projectPath, "properties");
+        return getPath(projectPath, "properties");
     }
 }

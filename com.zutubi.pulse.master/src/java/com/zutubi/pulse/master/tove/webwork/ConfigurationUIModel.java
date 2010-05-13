@@ -16,10 +16,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 
 import java.io.File;
 import java.util.*;
@@ -72,6 +69,11 @@ public class ConfigurationUIModel
     private List<String> displayFields = new LinkedList<String>();
 
     private List<String> configuredAncestors = new LinkedList<String>();
+    /**
+     * Note that this counts even descendants that the user has no permission
+     * to view, which will be filtered out of the configuredDescendants list.
+     */
+    private int configuredDescendantCount = 0;
     private List<String> configuredDescendants = new LinkedList<String>();
 
     private boolean writable;
@@ -189,7 +191,14 @@ public class ConfigurationUIModel
             
             // Is this path configured in any descendants?
             List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(path, true, false, false);
-            configuredDescendants = CollectionUtils.map(descendantPaths, pathToOwnerMapping);
+            configuredDescendantCount = descendantPaths.size();
+            configuredDescendants = CollectionUtils.map(CollectionUtils.filter(descendantPaths, new Predicate<String>()
+            {
+                public boolean satisfied(String path)
+                {
+                    return configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW);
+                }
+            }), pathToOwnerMapping);
 
             determineActions(parentType);
             determineDescendantActions(descendantPaths);
@@ -198,7 +207,7 @@ public class ConfigurationUIModel
             
             if(instance == null)
             {
-                if (configuredDescendants.size() == 0 && !((CompositeType) type).isExtendable())
+                if (configuredDescendantCount == 0 && !((CompositeType) type).isExtendable())
                 {
                     resolveNested();
                 }
@@ -457,6 +466,11 @@ public class ConfigurationUIModel
     public List<String> getConfiguredAncestors()
     {
         return configuredAncestors;
+    }
+
+    public int getConfiguredDescendantCount()
+    {
+        return configuredDescendantCount;
     }
 
     public List<String> getConfiguredDescendants()
