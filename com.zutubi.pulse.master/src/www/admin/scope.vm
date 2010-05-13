@@ -29,11 +29,11 @@
                     var center = Ext.getCmp('nested-center');
                     center.add(detailPanel);
 
-                    var loader = new ZUTUBI.ConfigTreeLoader(#jss('$base/aconfig');
+                    var loader = new ZUTUBI.ConfigTreeLoader('#jss($base/aconfig)');
 
                     configTree = new ZUTUBI.ConfigTree({
 #if($prefixPath)
-                        pathPrefix: #jss('$prefixPath'),
+                        pathPrefix: '#jss($prefixPath)',
 #end
                         el: 'config-tree',
                         layout: 'fit',
