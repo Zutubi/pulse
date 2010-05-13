@@ -16,7 +16,7 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public ProjectHomePage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-home-" + projectName, uriComponentEncode(projectName));
+        super(browser, urls, "project-home-" + projectName, projectName);
         this.projectName = projectName;
     }
 

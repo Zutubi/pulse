@@ -301,11 +301,6 @@ public class SeleniumBrowser
      */
     public void open(String location)
     {
-        if (!location.startsWith(baseUrl))
-        {
-            location = StringUtils.join("/", true, baseUrl, location);
-        }
-        
         selenium.open(location);
     }
 

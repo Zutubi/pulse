@@ -92,7 +92,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         assertFalse(loginPage.isSignupPresent());
 
         // go directly to the action and verify that it is disabled.
-        browser.open(SIGNUP_INPUT_ACTION);
+        browser.open(urls.base() + SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "", "");
@@ -103,7 +103,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     {
         setAnonymousAccess(false);
         setAnonymousSignup(true);
-        browser.open(SIGNUP_INPUT_ACTION);
+        browser.open(urls.base() + SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         form.waitFor();
         form.saveFormElements(random, random, "p1", "p2");
@@ -115,7 +115,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     {
         setAnonymousAccess(false);
         setAnonymousSignup(true);
-        browser.open(SIGNUP_INPUT_ACTION);
+        browser.open(urls.base() + SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         form.waitFor();
         form.saveFormElements("admin", "name", "p", "p");

@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
 
@@ -441,7 +442,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(stagePath, stage, false);
     }
 
-    private long runPersonalBuild(ResultState expectedStatus) throws IOException
+    private long runPersonalBuild(ResultState expectedStatus) throws IOException, PersonalBuildException
     {
         // Request the build and wait for it to complete
         AcceptancePersonalBuildUI ui = requestPersonalBuild();
@@ -463,7 +464,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         buildRunner.createConfigFile(browser.getBaseUrl(), "admin", "admin", projectName, extraProperties);
     }
 
-    private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException
+    private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException, PersonalBuildException
     {
         return buildRunner.triggerBuild();
     }

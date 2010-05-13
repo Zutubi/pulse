@@ -3148,11 +3148,11 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                     var tooltip;
                     if (build.id < this.buildId)
                     {
-                        tooltip = 'step&nbsp;back&nbsp;to&nbsp;build&nbsp;' + build.number;
+                        tooltip = 'step back to build ' + build.number;
                     }
                     else
                     {
-                        tooltip = 'step&nbsp;forward&nbsp;to&nbsp;build&nbsp;' + build.number;
+                        tooltip = 'step forward to build ' + build.number;
                     }
                     this.addItem(new ZUTUBI.BuildNavToolbarItem({
                         id: 'pulse-toolbar-build-item-' + build.number,

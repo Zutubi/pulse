@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.WebUtils;
 
 /**
  * The page shown when looking at an agent in the configuration view.
@@ -18,9 +19,9 @@ public class AgentConfigPage extends CompositePage
         this.template = template;
     }
 
-    private static String getPath(String project)
+    private static String getPath(String agent)
     {
-        return "agents/" + project;
+        return "agents/" + agent;
     }
 
     public String getPath()
@@ -30,7 +31,7 @@ public class AgentConfigPage extends CompositePage
 
     public String getUrl()
     {
-        return urls.adminAgent(agent);
+        return urls.adminAgent(WebUtils.uriComponentEncode(agent));
     }
 
     public AgentHierarchyPage clickHierarchy()

@@ -18,14 +18,14 @@ public class BuildFilePage extends SeleniumPage
 
     public BuildFilePage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-file", "build " + buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-file", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
 
     public String getUrl()
     {
-        return urls.buildFile(projectName, Long.toString(buildId));
+        return urls.buildFile(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
     }
 
     public boolean isHighlightedFilePresent()

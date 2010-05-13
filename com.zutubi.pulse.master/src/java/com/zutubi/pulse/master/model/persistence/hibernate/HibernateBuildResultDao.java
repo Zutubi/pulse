@@ -558,26 +558,16 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("SELECT result " +
-                        "FROM BuildResult result " +
-                        "WHERE result.id < :buildId " +
-                        (result.isPersonal() ? "AND result.user = :user " : "AND result.project = :project ") +
-                        "AND result.stateName IN (:stateNames) " +
-                        "ORDER BY result DESC"
-                );
-                queryObject.setLong("buildId", buildId);
+                Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, result.isPersonal());
+                criteria.add(Expression.lt("id", buildId));
                 if (result.isPersonal())
                 {
-                    queryObject.setEntity("user", result.getUser());
+                    criteria.add(Expression.eq("user", result.getUser()));
                 }
-                else
-                {
-                    queryObject.setEntity("project", result.getProject());
-                }
-                queryObject.setParameterList("stateNames", getStateNames(states.length != 0 ? states : ResultState.values()));
-                queryObject.setMaxResults(maxResults);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
+                criteria.addOrder(Order.desc("id"));
+                criteria.setMaxResults(maxResults);
+                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+                return criteria.list();
             }
         });
         return CollectionUtils.reverse(results);
@@ -590,26 +580,16 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("SELECT result " +
-                        "FROM BuildResult result " +
-                        "WHERE result.id > :buildId " +
-                        (result.isPersonal() ? "AND result.user = :user " : "AND result.project = :project ") +
-                        "AND result.stateName IN (:stateNames) " +
-                        "ORDER BY result ASC"
-                );
-                queryObject.setLong("buildId", buildId);
+                Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, result.isPersonal());
+                criteria.add(Expression.gt("id", buildId));
                 if (result.isPersonal())
                 {
-                    queryObject.setEntity("user", result.getUser());
+                    criteria.add(Expression.eq("user", result.getUser()));
                 }
-                else
-                {
-                    queryObject.setEntity("project", result.getProject());
-                }
-                queryObject.setParameterList("stateNames", getStateNames(states.length != 0 ? states : ResultState.values()));
-                queryObject.setMaxResults(maxResults);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
+                criteria.addOrder(Order.asc("id"));
+                criteria.setMaxResults(maxResults);
+                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+                return criteria.list();
             }
         });
     }

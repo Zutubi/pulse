@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.vfs.provider.pulse.ArtifactFileObject;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.WebUtils;
 
 /**
  * The artifacts tab for a build result.
@@ -26,7 +27,7 @@ public class BuildArtifactsPage extends SeleniumPage
 
     public String getUrl()
     {
-        return urls.buildArtifacts(projectName, Long.toString(buildId));
+        return urls.buildArtifacts(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
     }
 
     @Override

@@ -18,12 +18,12 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     public BuildDetailsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-details", WebUtils.uriComponentEncode(projectName), projectName, buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-details", projectName, projectName, buildId);
     }
 
     public String getUrl()
     {
-        return urls.buildDetails(projectName, Long.toString(buildId));
+        return urls.buildDetails(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
     }
 
     @Override

@@ -14,14 +14,14 @@ public class BuildTestsPage extends AbstractTestsPage
 
     public BuildTestsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests", "build " + buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-tests", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
 
     public String getUrl()
     {
-        return urls.buildTests(projectName, Long.toString(buildId));
+        return urls.buildTests(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
     }
 
     public boolean isFailureUnavailableMessageShown()

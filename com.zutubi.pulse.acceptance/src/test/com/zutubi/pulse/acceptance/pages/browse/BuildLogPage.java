@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.WebUtils;
 
 /**
  * A page that represents the build log page.
@@ -20,7 +21,7 @@ public class BuildLogPage extends AbstractLogPage
 
     public String getUrl()
     {
-        return urls.buildLog(project, buildNumber);
+        return urls.buildLog(WebUtils.uriComponentEncode(project), buildNumber);
     }
 
     public void selectStage(String stageName)

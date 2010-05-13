@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.BuiltinGroupForm;
 import com.zutubi.pulse.acceptance.forms.admin.GroupForm;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
@@ -13,7 +14,7 @@ public class GroupsPage extends ListPage
 {
     public GroupsPage(SeleniumBrowser browser, Urls urls)
     {
-        super(browser, urls, MasterConfigurationRegistry.GROUPS_SCOPE);
+        super(browser, urls, GROUPS_SCOPE);
     }
 
     public GroupForm clickAddGroupAndWait()

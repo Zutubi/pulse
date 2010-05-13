@@ -13,12 +13,12 @@ public class ProjectLogPage extends AbstractLogPage
 
     public ProjectLogPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-log-" + WebUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-log-" + projectName);
         this.projectName = projectName;
     }
 
     public String getUrl()
     {
-        return urls.projectLog(projectName);
+        return urls.projectLog(WebUtils.uriComponentEncode(projectName));
     }
 }

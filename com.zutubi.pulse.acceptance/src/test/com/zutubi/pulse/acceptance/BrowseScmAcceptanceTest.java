@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.util.WebUtils;
 
 /**
  * A high level acceptance test that checks the ability to browse and select
@@ -194,7 +195,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig() throws Exception
     {
         configurationHelper.insertProject(projects.createTestAntProject(random).getConfig());
-        browser.open(urls.adminProject(random) + "/" +
+        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +
                 Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME + "/" +

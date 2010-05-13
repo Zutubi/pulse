@@ -266,7 +266,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         Thread.sleep(30000);
 
-        browser.open("/");
+        browser.open(urls.base());
 
         browser.waitForElement("upgrade.preview", 120 * SECOND);
 

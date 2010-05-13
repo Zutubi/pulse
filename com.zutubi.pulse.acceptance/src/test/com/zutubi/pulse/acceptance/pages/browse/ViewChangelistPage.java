@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Pair;
+import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ViewChangelistPage extends SeleniumPage
 
     public String getUrl()
     {
-        return urls.buildChangelist(projectName, Long.toString(buildId), changeId);
+        return urls.buildChangelist(WebUtils.uriComponentEncode(projectName), Long.toString(buildId), changeId);
     }
 
     public String getRevision()

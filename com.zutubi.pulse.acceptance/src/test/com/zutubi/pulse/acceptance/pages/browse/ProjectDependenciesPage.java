@@ -2,11 +2,11 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
+import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectDependencyGraphRenderer;
-import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
-import com.zutubi.util.WebUtils;
 import com.zutubi.util.EnumUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The browse project dependencies page.
@@ -20,13 +20,13 @@ public class ProjectDependenciesPage extends AbstractLogPage
 
     public ProjectDependenciesPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-dependencies-" + WebUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-dependencies-" + projectName);
         this.projectName = projectName;
     }
 
     public String getUrl()
     {
-        return urls.projectDependencies(projectName);
+        return urls.projectDependencies(WebUtils.uriComponentEncode(projectName));
     }
 
     public boolean isUpstreamPresent(String project, int x, int y)

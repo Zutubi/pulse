@@ -80,7 +80,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, twoDaysAgo()));
 
-        browser.open("/");
+        browser.open(urls.base());
         browser.waitForElement("license-expired");
         assertTextPresent("Your license has expired.");
         assertElementNotPresent("support-expired");
@@ -95,7 +95,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, twoDaysAgo()));
 
-        browser.open("/");
+        browser.open(urls.base());
         browser.waitForElement("support-expired");
         assertTextPresent("support/upgrades have expired");
         assertElementNotPresent("license-expired");
@@ -110,7 +110,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, new Date(System.currentTimeMillis() - 999999 * Constants.DAY)));
 
-        browser.open("/");
+        browser.open(urls.base());
         browser.waitForElement("license-cannot-run");
         assertTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date.");
         assertElementNotPresent("license-expired");
@@ -235,7 +235,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private void assertExceeded() throws Exception
     {
-        browser.open("/");
+        browser.open(urls.base());
         browser.refreshUntilElement("license-exceeded");
         assertTextPresent("Your license limits have been exceeded.");
 

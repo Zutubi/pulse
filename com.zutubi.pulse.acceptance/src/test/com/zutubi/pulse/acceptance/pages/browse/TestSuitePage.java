@@ -23,7 +23,7 @@ public class TestSuitePage extends AbstractTestsPage
 
     public TestSuitePage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName, String suitePath)
     {
-        super(browser, urls, WebUtils.toValidHtmlName(projectName + "-build-" + Long.toString(buildId) + "-tests-" + stageName + "-" + suitePath), "build " + buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-tests-" + stageName + "-" + suitePath, "build " + buildId);
         this.projectName = projectName;
         this.stageName = stageName;
         this.suitePath = suitePath;
@@ -32,7 +32,7 @@ public class TestSuitePage extends AbstractTestsPage
 
     public String getUrl()
     {
-        return urls.stageTests(projectName, Long.toString(buildId), stageName) + suitePath;
+        return urls.stageTests(WebUtils.uriComponentEncode(projectName), Long.toString(buildId), stageName) + suitePath;
     }
 
     public TestSuitePage clickSuiteAndWait(String suiteName)

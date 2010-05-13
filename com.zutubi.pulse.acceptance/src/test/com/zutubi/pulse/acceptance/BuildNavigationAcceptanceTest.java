@@ -1,14 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.PulseToolbar;
+import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.PersonalBuildSummaryPage;
+import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -54,13 +56,13 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     {
         logout();
         xmlRpcHelper.logout();
-        
+
         super.tearDown();
     }
 
     public void testBuildNavigation() throws Exception
     {
-        projectName = randomName() + "\"' ;?&";
+        projectName = randomName() + "\"' ;?&<html>";
 
         // create project.
         ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
@@ -177,13 +179,12 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
         configurationHelper.insertProject(project.getConfig());
 
-        // ensure the 'all users group' can run 'personal builds'
-        ensureAllUsersCanRunPersonalBuilds();
-
-        // user needs 'run personal build' permissions.
         String userName = randomName();
         UserConfiguration user = users.createSimpleUser(userName);
         configurationHelper.insertUser(user);
+
+        // user needs 'run personal build' permissions.
+        ensureUserCanRunPersonalBuild(userName);
 
         login(userName, "");
         xmlRpcHelper.login(userName, "");
@@ -297,20 +298,18 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         assertTrue(toolbar.isPreviousSuccessfulBuildLinkPresent());
     }
 
-    private void ensureAllUsersCanRunPersonalBuilds() throws Exception
+    private void ensureUserCanRunPersonalBuild(String userName) throws Exception
     {
-        ensureGroupHasPermission("groups/all users", ServerPermission.PERSONAL_BUILD.toString());
-    }
-
-    private void ensureGroupHasPermission(String groupPath, String permission) throws Exception
-    {
+        String groupPath = GROUPS_SCOPE + "/" + DEVELOPERS_GROUP_NAME;
         Hashtable group = xmlRpcHelper.getConfig(groupPath);
-        Vector perms = (Vector) group.get("serverPermissions");
+        Vector members = (Vector) group.get("members");
 
-        if (!perms.contains(permission))
+        String userReference = USERS_SCOPE + "/" + userName;
+        if (!members.contains(userReference))
         {
-            perms.add(permission);
+            members.add(userReference);
             xmlRpcHelper.saveConfig(groupPath, group, false);
         }
     }
+
 }

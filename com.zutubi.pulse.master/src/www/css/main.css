@@ -2232,6 +2232,7 @@ td.glegend
     cursor: pointer;
     position: relative;
     top: 1px;
+    white-space: nowrap;
 }
 
 .x-build-nav-current

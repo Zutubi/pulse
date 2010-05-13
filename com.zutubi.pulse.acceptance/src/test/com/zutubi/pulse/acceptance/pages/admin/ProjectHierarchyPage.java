@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
@@ -11,7 +12,7 @@ public class ProjectHierarchyPage extends HierarchyPage
 {
     public ProjectHierarchyPage(SeleniumBrowser browser, Urls urls, String project, boolean template)
     {
-        super(browser, urls, MasterConfigurationRegistry.PROJECTS_SCOPE, project, template);
+        super(browser, urls, PROJECTS_SCOPE, project, template);
     }
 
     public ProjectConfigPage clickConfigure()

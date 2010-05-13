@@ -18,7 +18,7 @@
         var Layout = function()
         {
 #if($path)
-            var path = '$path';
+            var path = '#jss($path)';
 #else
             var path = '';
 #end
@@ -29,11 +29,11 @@
                     var center = Ext.getCmp('nested-center');
                     center.add(detailPanel);
 
-                    var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
+                    var loader = new ZUTUBI.ConfigTreeLoader(#jss('$base/aconfig');
 
                     configTree = new ZUTUBI.ConfigTree({
 #if($prefixPath)
-                        pathPrefix: '$prefixPath',
+                        pathPrefix: #jss('$prefixPath'),
 #end
                         el: 'config-tree',
                         layout: 'fit',

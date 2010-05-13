@@ -14,6 +14,7 @@ import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import com.zutubi.util.WebUtils;
 
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
@@ -335,7 +336,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         doSmartClone();
 
-        browser.open(urls.adminProject(random) + Constants.Project.HOOKS + "/stagey");
+        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) + Constants.Project.HOOKS + "/stagey");
         ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, PostStageHookConfiguration.class);
         hookForm.waitFor();
 

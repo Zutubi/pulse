@@ -15,7 +15,7 @@ public class StageTestsPage extends AbstractTestsPage
 
     public StageTestsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests-" + WebUtils.uriComponentEncode(stageName), "build " + buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-tests-" + stageName, "build " + buildId);
         this.projectName = projectName;
         this.stageName = stageName;
         this.buildId = buildId;
@@ -23,7 +23,7 @@ public class StageTestsPage extends AbstractTestsPage
 
     public String getUrl()
     {
-        return urls.stageTests(projectName, Long.toString(buildId), stageName);
+        return urls.stageTests(WebUtils.uriComponentEncode(projectName), Long.toString(buildId), stageName);
     }
 
     public TestSuitePage clickSuiteAndWait(String suite)

@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.WebUtils;
 
 /**
  * The decorated artifact page: contains the artifact content with features
@@ -28,7 +29,7 @@ public class CommandArtifactPage extends SeleniumPage
 
     public String getUrl()
     {
-        return urls.commandArtifacts(projectName, Long.toString(buildId), stageName, commandName) + artifactPath;
+        return urls.commandArtifacts(WebUtils.uriComponentEncode(projectName), Long.toString(buildId), stageName, commandName) + artifactPath;
     }
 
     public String getProjectName()

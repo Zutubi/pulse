@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfi
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.io.IOUtils;
 
 import java.util.Hashtable;
@@ -57,7 +58,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // single select should have an empty option added.
         loginAsAdmin();
         addProject(random, true, GLOBAL_PROJECT_NAME, false);
-        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) + "scm/");
+        browser.open(urls.adminProject(uriComponentEncode(random)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         String[] options = form.getComboBoxOptions("checkoutScheme");
@@ -162,7 +163,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        browser.open(urls.adminProject(WebUtils.uriComponentEncode(CHECK_PROJECT)) + "scm/");
+        browser.open(urls.adminProject(uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "");

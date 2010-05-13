@@ -38,14 +38,14 @@ public class BuildChangesPage extends SeleniumPage
 
     public BuildChangesPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
 
     public String getUrl()
     {
-        return urls.buildChanges(projectName, Long.toString(buildId));
+        return urls.buildChanges(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
     }
 
     public static String formatChangesSince(long buildNumber)

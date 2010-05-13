@@ -43,7 +43,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
     public void testNoTrailingSlash() throws Exception
     {
         // See CIB-1715.
-        browser.open("dashboard");
+        browser.open(urls.base() + "/dashboard");
         browser.waitForPageToLoad(3 * SECOND);
         DashboardPage page = browser.createPage(DashboardPage.class);
         assertTrue(page.isPresent());

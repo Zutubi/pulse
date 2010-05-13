@@ -8,7 +8,7 @@ public class DevAcceptanceTestSuite
     {
         TestSuite suite = new TestSuite();
         // need to run this one first as it runs through the installation setup.
-        suite.addTestSuite(SetupAcceptanceTest.class);
+//        suite.addTestSuite(SetupAcceptanceTest.class);
 
         // now we can run the rest of the tests.
 
