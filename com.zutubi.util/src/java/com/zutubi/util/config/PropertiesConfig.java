@@ -40,7 +40,7 @@ public class PropertiesConfig implements Config
         props.remove(key);
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         return true;
     }

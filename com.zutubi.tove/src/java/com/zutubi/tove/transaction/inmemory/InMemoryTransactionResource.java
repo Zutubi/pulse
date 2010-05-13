@@ -50,21 +50,21 @@ public class InMemoryTransactionResource<T> implements TransactionResource
      * This method provides access to the state being managed by this transaction
      * resource.
      *
-     * You can only request a writeable state within the context of an active
+     * You can only request a writable state within the context of an active
      * transaction.
      *
-     * @param writeableState    true if the state may be modified, false otherwise.
+     * @param writableState    true if the state may be modified, false otherwise.
      *  
      * @return the state instance.
      */
-    public synchronized T get(boolean writeableState)
+    public synchronized T get(boolean writableState)
     {
         Transaction transaction = transactionManager.getTransaction();
         if (transaction == null)
         {
-            if (writeableState)
+            if (writableState)
             {
-                throw new IllegalStateException(I18N.format("writeable.requires.transaction"));
+                throw new IllegalStateException(I18N.format("writable.requires.transaction"));
             }
             return globalState.get();
         }
@@ -72,7 +72,7 @@ public class InMemoryTransactionResource<T> implements TransactionResource
         // ensure that we are enlisted with the transaction.
         transaction.enlistResource(this);
 
-        if (writeableState)
+        if (writableState)
         {
             if (localState.get() == null)
             {

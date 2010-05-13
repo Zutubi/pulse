@@ -34,7 +34,16 @@ public interface InstanceCache
 
     void put(String path, Configuration instance, boolean complete);
 
-    void forAllInstances(InstanceHandler handler, boolean allowIncomplete, boolean writeable);
+    /**
+     * This method traverses the instance cache, passing each instance to specified instance
+     * handler.
+     *
+     * @param handler               the callback
+     * @param allowIncomplete   allow incomplete instances to be passed to the handler
+     * @param writable              if the handler intends to make any changes to the instance, then writable
+     * must be true so that the change is persisted.
+     */
+    void forAllInstances(InstanceHandler handler, boolean allowIncomplete, boolean writable);
 
     /**
      * Marks an instance as dirty: i.e. the instance or something it reaches

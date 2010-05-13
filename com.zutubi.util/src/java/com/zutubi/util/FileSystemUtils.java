@@ -240,7 +240,7 @@ public class FileSystemUtils
                 File destParent = dest.getParentFile();
                 if (destParent != null && !destParent.canWrite())
                 {
-                    message += ": destination's parent directory is not writeable";
+                    message += ": destination's parent directory is not writable";
                 }
             }
             

@@ -1166,7 +1166,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
             catch (IOException e)
             {
-                assertTrue(e.getMessage().contains("destination's parent directory is not writeable"));
+                assertTrue(e.getMessage().contains("destination's parent directory is not writable"));
             }
             finally
             {

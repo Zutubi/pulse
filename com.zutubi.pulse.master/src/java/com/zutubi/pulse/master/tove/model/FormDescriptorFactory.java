@@ -239,7 +239,7 @@ public class FormDescriptorFactory
     {
         handleAnnotations(type, fd, property.getAnnotations());
 
-        if (!property.isWriteable())
+        if (!property.isWritable())
         {
             fd.addParameter("readOnly", true);
         }

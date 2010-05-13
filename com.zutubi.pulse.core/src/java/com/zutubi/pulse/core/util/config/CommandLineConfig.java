@@ -93,7 +93,7 @@ public class CommandLineConfig implements Config
         throw new UnsupportedOperationException("Command line is read only");
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         return false;
     }

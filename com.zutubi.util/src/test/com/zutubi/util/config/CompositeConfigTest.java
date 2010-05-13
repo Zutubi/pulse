@@ -20,7 +20,7 @@ public class CompositeConfigTest extends ZutubiTestCase
         CompositeConfig config = new CompositeConfig();
         Assert.assertFalse(config.hasProperty("some.property"));
         Assert.assertNull(config.getProperty("some.property"));
-        Assert.assertFalse(config.isWriteable());
+        Assert.assertFalse(config.isWritable());
 
         // unable to store content.
         config.setProperty("some.property", "value");
@@ -35,7 +35,7 @@ public class CompositeConfigTest extends ZutubiTestCase
         CompositeConfig config = new CompositeConfig(delegate);
         Assert.assertEquals(delegate.hasProperty("some.property"), config.hasProperty("some.property"));
         Assert.assertEquals(delegate.getProperty("some.property"), config.getProperty("some.property"));
-        Assert.assertEquals(delegate.isWriteable(), config.isWriteable());
+        Assert.assertEquals(delegate.isWritable(), config.isWritable());
 
         // unable to store content.
         config.setProperty("some.property", "value");

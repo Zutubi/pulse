@@ -41,7 +41,7 @@ public @interface File
     boolean verifyReadable() default false;
 
     /**
-     * @return true if the field value must be writeable
+     * @return true if the field value must be writable
      * @see java.io.File#canWrite()
      */
     boolean verifyWritable() default false;

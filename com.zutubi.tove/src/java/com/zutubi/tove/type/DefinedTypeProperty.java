@@ -12,7 +12,7 @@ import java.lang.reflect.Modifier;
  * <p/>
  * A property is named 'x', with accessors getX and setX.
  * <p/>
- * A property is considered writeable if it has a public setter and is not marked with
+ * A property is considered writable if it has a public setter and is not marked with
  * the readOnly annotation.  A property is considered readable if it has a public getter.
  */
 public class DefinedTypeProperty extends TypeProperty
@@ -84,7 +84,7 @@ public class DefinedTypeProperty extends TypeProperty
         return getter != null && Modifier.isPublic(getter.getModifiers());
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         // annotation overrides all.
         if (getAnnotation(ReadOnly.class) != null)

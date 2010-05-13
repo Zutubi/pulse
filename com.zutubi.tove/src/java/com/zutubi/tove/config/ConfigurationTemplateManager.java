@@ -7,7 +7,7 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.transaction.Synchronization;
+import com.zutubi.tove.transaction.Synchronisation;
 import com.zutubi.tove.transaction.Transaction;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionStatus;
@@ -37,7 +37,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
-//    private InMemoryTransactionResource<State> stateHolder;
     private InMemoryTransactionResource<Map<String, TemplateHierarchy>> templateHierarchiesState;
 
     private ThreadLocal<List<Event>> pendingEvents = new ThreadLocal<List<Event>>();
@@ -61,17 +60,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     private int refreshCount = 0;
     private boolean validationEnabled = false;
 
-    private SendEventsOnTransactionCompletionSynchronization sendEventSync = new SendEventsOnTransactionCompletionSynchronization();
+    private SendEventsOnTransactionCompletionSynchronisation sendEventSync = new SendEventsOnTransactionCompletionSynchronisation();
 
     public void init()
     {
         eventManager.register(this);
 
-/*
-        stateHolder = new InMemoryTransactionResource<State>(new ConfigurationTemplateInMemoryStateWrapper(new State()));
-        stateHolder.setTransactionManager(transactionManager);
-
-*/
         instances.setTransactionManager(transactionManager);
         instances.init();
 
@@ -1556,7 +1550,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         for (TypeProperty property : type.getProperties())
         {
-            if (!property.isWriteable())
+            if (!property.isWritable())
             {
                 // ensure that the old and new values are the same.
                 String propertyName = property.getName();
@@ -2982,7 +2976,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return localNode != null;
     }
 
-    public InstanceCache getInstances()
+    InstanceCache getInstances()
     {
         return instances;
     }
@@ -3002,40 +2996,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
     }
 
-/*
-    private class ConfigurationTemplateInMemoryStateWrapper extends InMemoryStateWrapper<State>
-    {
-        private ConfigurationTemplateInMemoryStateWrapper(State state)
-        {
-            super(state);
-        }
-
-        protected ConfigurationTemplateInMemoryStateWrapper copy()
-        {
-            State copy = new State();
-            State original = get();
-
-            copy.instancesEnabled = original.instancesEnabled;
-
-            // Instances are immutable (we copy on write) so we can reuse the
-            // same instances, wrapped with a new cache.
-//            copy.instances = original.instances.copyStructure();
-
-            // Template hierarchies are also immutable, so just copy the map,
-            // reusing the same hierarchies.
-//            copy.templateHierarchies = new HashMap<String, TemplateHierarchy>(original.templateHierarchies);
-
-            return new ConfigurationTemplateInMemoryStateWrapper(copy);
-        }
-    }
-
-*/
     /**
-     * A transaction synchronization that will collect and publish any events
-     * that have been collected in the current transaction threads pendingEvents
+     * A transaction synchronization that will publish any events that have been
+     * collected in the current transaction threads pendingEvents
      * thread local.
      */
-    private class SendEventsOnTransactionCompletionSynchronization implements Synchronization
+    private class SendEventsOnTransactionCompletionSynchronisation implements Synchronisation
     {
         public void postCompletion(TransactionStatus status)
         {

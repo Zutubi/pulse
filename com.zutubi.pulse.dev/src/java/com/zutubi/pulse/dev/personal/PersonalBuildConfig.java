@@ -324,9 +324,9 @@ public class PersonalBuildConfig implements Config
         return config.getProperty(key);
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
-        return config.isWriteable();
+        return config.isWritable();
     }
 
     public File getUserConfigFile()

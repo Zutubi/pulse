@@ -24,7 +24,7 @@ public class Transaction
     /**
      * List of synchronizations that are participating in this transaction.
      */
-    private List<Synchronization> synchronizations;
+    private List<Synchronisation> synchronisations;
 
     /**
      * The transactions current status.
@@ -120,7 +120,7 @@ public class Transaction
         getResources().remove(resource);
     }
 
-    public void registerSynchronization(Synchronization sync)
+    public void registerSynchronization(Synchronisation sync)
     {
         // can only register a synchronisation if this transaction is considered active.
         assertActiveTransaction();
@@ -131,13 +131,13 @@ public class Transaction
         }
     }
 
-    List<Synchronization> getSynchronizations()
+    List<Synchronisation> getSynchronizations()
     {
-        if (synchronizations == null)
+        if (synchronisations == null)
         {
-            synchronizations = new LinkedList<Synchronization>();
+            synchronisations = new LinkedList<Synchronisation>();
         }
-        return synchronizations;
+        return synchronisations;
     }
 
     List<TransactionResource> getResources()

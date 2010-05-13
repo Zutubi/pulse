@@ -85,9 +85,9 @@ class DefaultInstanceCache implements InstanceCache
         return entry == null ? null : entry.getInstance();
     }
 
-    private Entry getEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f, boolean writeable)
+    private Entry getEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f, boolean writable)
     {
-        return getEntry(entryState.get(writeable), PathUtils.getPathElements(path), 0, allowIncomplete, f);
+        return getEntry(entryState.get(writable), PathUtils.getPathElements(path), 0, allowIncomplete, f);
     }
 
     private Entry getEntry(Entry entry, String[] elements, int index, boolean allowIncomplete, UnaryProcedure<Entry> f)
@@ -170,13 +170,13 @@ class DefaultInstanceCache implements InstanceCache
         });
     }
 
-    public void forAllInstances(final InstanceHandler handler, final boolean allowIncomplete, final boolean writeable)
+    public void forAllInstances(final InstanceHandler handler, final boolean allowIncomplete, final boolean writable)
     {
         transactionManager.runInTransaction(new NullaryProcedure()
         {
             public void run()
             {
-                entryState.get(writeable).forAllInstances(null, allowIncomplete, "", handler);
+                entryState.get(writable).forAllInstances(null, allowIncomplete, "", handler);
             }
         });
     }

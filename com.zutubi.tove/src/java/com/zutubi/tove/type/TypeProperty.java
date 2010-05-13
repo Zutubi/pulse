@@ -103,5 +103,5 @@ public abstract class TypeProperty
 
     public abstract boolean isReadable();
     
-    public abstract boolean isWriteable();
+    public abstract boolean isWritable();
 }

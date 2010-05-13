@@ -48,9 +48,9 @@ public class ConfigSupport implements Config
         }
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
-        return delegate.isWriteable();
+        return delegate.isWritable();
     }
 
     public Integer getInteger(String key)

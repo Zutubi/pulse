@@ -34,7 +34,7 @@ public class ExtensionTypeProperty extends TypeProperty
         return true;
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         return true;
     }

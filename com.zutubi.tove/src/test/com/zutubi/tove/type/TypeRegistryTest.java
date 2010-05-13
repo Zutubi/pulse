@@ -98,7 +98,7 @@ public class TypeRegistryTest extends ZutubiTestCase
         CompositeType c = typeRegistry.register(ReadOnlyFieldA.class);
         TypeProperty a = c.getProperty("a");
         assertTrue(a.isReadable());
-        assertFalse(a.isWriteable());
+        assertFalse(a.isWritable());
     }
 
     public void testReadOnlyFieldViaAnnotation() throws TypeException
@@ -106,7 +106,7 @@ public class TypeRegistryTest extends ZutubiTestCase
         CompositeType c = typeRegistry.register(ReadOnlyFieldB.class);
         TypeProperty b = c.getProperty("b");
         assertTrue(b.isReadable());
-        assertFalse(b.isWriteable());
+        assertFalse(b.isWritable());
     }
 
     public void testCanSetNameFieldOnNamedConfigurationToReadOnly() throws TypeException
@@ -114,7 +114,7 @@ public class TypeRegistryTest extends ZutubiTestCase
         CompositeType c = typeRegistry.register(ReadOnlyFieldName.class);
         TypeProperty name = c.getProperty("name");
         assertTrue(name.isReadable());
-        assertFalse(name.isWriteable());
+        assertFalse(name.isWritable());
     }
 
     public void testTransientFieldsNotIncluded() throws TypeException

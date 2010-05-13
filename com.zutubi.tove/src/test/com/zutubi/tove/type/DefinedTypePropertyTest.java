@@ -98,10 +98,10 @@ public class DefinedTypePropertyTest extends TestCase
         DefinedTypeProperty property = new DefinedTypeProperty();
         Method setter = Sample.class.getDeclaredMethod("setO", Object.class);
         property.setSetter(setter);
-        assertTrue(property.isWriteable());
+        assertTrue(property.isWritable());
         
         property.addAnnotation(setter.getAnnotation(ReadOnly.class));
-        assertFalse(property.isWriteable());
+        assertFalse(property.isWritable());
     }
 
     public static class Sample

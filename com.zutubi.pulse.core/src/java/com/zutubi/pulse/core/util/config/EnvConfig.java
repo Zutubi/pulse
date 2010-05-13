@@ -24,7 +24,7 @@ public class EnvConfig extends ConfigSupport
         super(props);
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         return false;
     }

@@ -135,7 +135,7 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
         final TransactionStatus[] transactionStatus = new TransactionStatus[1];
         Transaction transaction = transactionManager.getTransaction();
-        transaction.registerSynchronization(new Synchronization()
+        transaction.registerSynchronization(new Synchronisation()
         {
             public void postCompletion(TransactionStatus status)
             {
@@ -154,7 +154,7 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
         final TransactionStatus[] transactionStatus = new TransactionStatus[1];
         Transaction transaction = transactionManager.getTransaction();
-        transaction.registerSynchronization(new Synchronization()
+        transaction.registerSynchronization(new Synchronisation()
         {
             public void postCompletion(TransactionStatus status)
             {

@@ -23,7 +23,7 @@ public interface Config
      *
      * @param value to be associated with the specified key.
      *
-     * @see #isWriteable()
+     * @see #isWritable()
      */
     void setProperty(String key, String value);
 
@@ -41,7 +41,7 @@ public interface Config
      *
      * @param key uniquely identifies the property.
      *
-     * @see #isWriteable()
+     * @see #isWritable()
      */
     void removeProperty(String key);
 
@@ -50,5 +50,5 @@ public interface Config
      *
      * @return true if setProperty and removeProperty can be called, false otherwise.
      */
-    boolean isWriteable();
+    boolean isWritable();
 }

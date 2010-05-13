@@ -10,7 +10,7 @@ public class FileValidator extends StringFieldValidatorSupport
     private boolean verifyFile;
     private boolean verifyDirectory;
     private boolean verifyReadable;
-    private boolean verifyWriteable;
+    private boolean verifyWritable;
 
     public FileValidator()
     {
@@ -43,7 +43,7 @@ public class FileValidator extends StringFieldValidatorSupport
             addError("not.readable");
         }
 
-        if(verifyWriteable && !f.canWrite())
+        if(verifyWritable && !f.canWrite())
         {
             addError("not.writable");
         }
@@ -79,13 +79,13 @@ public class FileValidator extends StringFieldValidatorSupport
         this.verifyReadable = verifyReadable;
     }
 
-    public boolean isVerifyWriteable()
+    public boolean isVerifyWritable()
     {
-        return verifyWriteable;
+        return verifyWritable;
     }
 
-    public void setVerifyWriteable(boolean verifyWriteable)
+    public void setVerifyWritable(boolean verifyWritable)
     {
-        this.verifyWriteable = verifyWriteable;
+        this.verifyWritable = verifyWritable;
     }
 }

@@ -189,8 +189,8 @@ public class ConfigurationValidationContext implements ValidationContext
         config.removeProperty(key);
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
-        return config.isWriteable();
+        return config.isWritable();
     }
 }

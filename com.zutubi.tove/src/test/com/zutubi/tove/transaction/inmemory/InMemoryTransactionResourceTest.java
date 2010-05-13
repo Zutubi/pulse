@@ -38,7 +38,7 @@ public class InMemoryTransactionResourceTest extends AbstractTransactionTestCase
 
         txn.commit();
 
-        assertNotNull(resource.get(false).get("key"));
+        assertEquals("value", resource.get(false).get("key"));
     }
 
     public void testRollback()
@@ -76,7 +76,7 @@ public class InMemoryTransactionResourceTest extends AbstractTransactionTestCase
         {
             public void run()
             {
-                assertNotNull(resource.get(false).get("key"));
+                assertEquals("value", resource.get(false).get("key"));
             }
         });
     }

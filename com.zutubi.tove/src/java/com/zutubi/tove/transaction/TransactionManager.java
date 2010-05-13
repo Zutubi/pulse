@@ -80,7 +80,7 @@ public class TransactionManager
     }
 
     /**
-     * Commit the corrently active transaction.  This requires that a transaction
+     * Commit the currently active transaction.  This requires that a transaction
      * be active or an error is thrown.
      *
      * If the current transaction is marked as rollbackOnly or a problem occurs
@@ -151,10 +151,10 @@ public class TransactionManager
             transactionHolder.set(null);
             activeTransaction.unlock();
 
-            List<Synchronization> synchronizations = new LinkedList<Synchronization>(currentTransaction.getSynchronizations());
-            for (Synchronization synchronization : synchronizations)
+            List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronizations());
+            for (Synchronisation synchronisation : synchronisations)
             {
-                synchronization.postCompletion(currentTransaction.getStatus());
+                synchronisation.postCompletion(currentTransaction.getStatus());
             }
         }
         else
@@ -200,10 +200,10 @@ public class TransactionManager
         transactionHolder.set(null);
         activeTransaction.unlock();
 
-        List<Synchronization> synchronizations = new LinkedList<Synchronization>(currentTransaction.getSynchronizations());
-        for (Synchronization synchronization : synchronizations)
+        List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronizations());
+        for (Synchronisation synchronisation : synchronisations)
         {
-            synchronization.postCompletion(currentTransaction.getStatus());
+            synchronisation.postCompletion(currentTransaction.getStatus());
         }
     }
 
@@ -277,17 +277,21 @@ public class TransactionManager
      */
     public <T> T runInTransaction(final NullaryFunction<T> function, TransactionResource... resources)
     {
-        final Object[] result = new Object[1];
+        final ResultHolder<T> holder = new ResultHolder<T>();
         inTransaction(new NullaryProcedure()
         {
             public void run()
             {
-                result[0] = function.process();
+                holder.result = function.process();
             }
         }, resources);
 
-        //noinspection unchecked
-        return (T) result[0];
+        return holder.result;
+    }
+
+    private class ResultHolder<T>
+    {
+        T result;
     }
 
     /**

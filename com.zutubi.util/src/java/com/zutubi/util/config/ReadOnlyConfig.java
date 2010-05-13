@@ -29,7 +29,7 @@ public class ReadOnlyConfig implements Config
         throw new UnsupportedOperationException();
     }
 
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         return false;
     }

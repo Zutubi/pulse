@@ -13,7 +13,8 @@ package com.zutubi.tove.transaction.inmemory;
 public abstract class InMemoryStateWrapper<U>
 {
     /**
-     * Indicates whether or not the wrapped state is considered writeable.
+     * Indicates whether or not a modifiable copy of the wrapped state has
+     * been requested.
      */
     private boolean dirty;
 

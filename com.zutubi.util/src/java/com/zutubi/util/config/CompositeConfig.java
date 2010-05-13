@@ -44,7 +44,7 @@ public class CompositeConfig implements Config
     {
         for (Config config: delegates)
         {
-            if (!config.isWriteable())
+            if (!config.isWritable())
             {
                 return;
             }
@@ -68,7 +68,7 @@ public class CompositeConfig implements Config
     {
         for (Config config: delegates)
         {
-            if (!config.isWriteable())
+            if (!config.isWritable())
             {
                 return;
             }
@@ -84,11 +84,11 @@ public class CompositeConfig implements Config
      *
      * @return true if this composite is writable.
      */
-    public boolean isWriteable()
+    public boolean isWritable()
     {
         if (delegates.size() > 0)
         {
-            return delegates.get(0).isWriteable();
+            return delegates.get(0).isWritable();
         }
         return false;
     }
