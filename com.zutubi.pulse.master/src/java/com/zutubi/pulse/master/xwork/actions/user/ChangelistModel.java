@@ -149,6 +149,11 @@ public class ChangelistModel
     {
         return aggregateStatusIcon;
     }
+    
+    public int getBuildCount()
+    {
+        return builds.size();
+    }
 
     @JSON
     public List<ChangelistBuildModel> getBuilds()

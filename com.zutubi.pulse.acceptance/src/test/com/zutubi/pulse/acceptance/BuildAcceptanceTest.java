@@ -182,6 +182,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEquals(1, changeIds.size());
         ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changeIds.get(0), revisionString);
         assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
+        
+        // Check appearance of change on user's dashboard.
+        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage.ProjectChange change = dashboardPage.getProjectChange(0);
+        assertEquals(ResultState.SUCCESS, change.status);
+        assertEquals(random + " :: build " + buildNumber, change.builds);
     }
 
     public void testChangelistWithManyFiles() throws Exception
@@ -277,6 +283,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
         assertThat(builds, hasItem(new Pair<String, Long>(unviewableProject, unviewableBuildNumber)));
         
+        // Dashboard project changes table should show popup for multiple
+        // builds.
+        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage.ProjectChange change = dashboardPage.getProjectChange(0);
+        assertEquals(ResultState.SUCCESS, change.status);
+        assertEquals("2 builds", change.builds);
+        
         logout();
         login(regularUser, "");
         
@@ -288,7 +301,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         
         // Check other pages that we can view where the changelist appears.
         browser.openAndWaitFor(ProjectHomePage.class, viewableProject);
-        browser.openAndWaitFor(DashboardPage.class);
+
+        dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        change = dashboardPage.getProjectChange(0);
+        assertEquals(ResultState.SUCCESS, change.status);
+        assertEquals(viewableProject + " :: build " + viewableBuildNumber, change.builds);
     }
     
     public void testChangeViewerLinks() throws Exception

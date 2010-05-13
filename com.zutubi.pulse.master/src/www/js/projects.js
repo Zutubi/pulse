@@ -731,14 +731,15 @@ ZUTUBI.ChangesTable = function(containerEl, idSuffix, title, showWho) {
 };
 
 ZUTUBI.ChangesTable.prototype = {
-    tableTemplate: new Ext.XTemplate('<table class="two-content"><tbody>' +
-                                         '<tr><th class="two-heading" colspan="6">{title}</th></tr>' +
+    tableTemplate: new Ext.XTemplate('<table id="{idSuffix}-changes-table" class="two-content"><tbody>' +
+                                         '<tr><th class="two-heading" colspan="7">{title}</th></tr>' +
                                          '<tr>' +
                                              '<th class="content leftmost">revision</th>' +
                                              '<tpl if="showWho"><th class="content">who</th></tpl>' +
                                              '<th class="content">when</th>' +
                                              '<th class="content">comment</th>' +
-                                             '<th class="content">build results</th>' +
+                                             '<th class="content">status</th>' +
+                                             '<th class="content">affected builds</th>' +
                                              '<th class="content rightmost">actions</th>' +
                                          '</tr>' +
                                      '</tbody></table>').compile(),
@@ -772,11 +773,23 @@ ZUTUBI.ChangesTable.prototype = {
                                               '</tpl>' +
                                               '<tpl if="!shortComment">{comment}</tpl>' +
                                           '</td>' +
-                                          '<td class="{aggregateStatusClass}">' +
-                                              '<img alt="{aggregateStatus}" src="{base}/images/{aggregateStatusIcon}"/> {aggregateStatus} ' +
-                                              '<span id="{id}_{idSuffix}_builds_link">' +
-                                                  '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}_{idSuffix}_builds_button" alt="show all builds"/>' +
-                                              '</span>' +
+                                          '<td class="content">' +
+                                              '<img alt="{aggregateStatus}" src="{base}/images/{aggregateStatusIcon}"/> {aggregateStatus}' +
+                                          '</td>' +
+                                          '<td class="content">' +
+                                              '<tpl if="buildCount == 0">' +
+                                                  'no builds' +
+                                              '</tpl>' +
+                                              '<tpl if="buildCount == 1">' +
+                                                  '<a href="{base}/browse/projects/{[values.builds[0].encodedProject]}/home/">{[Ext.util.Format.htmlEncode(values.builds[0].project)]}</a> :: ' +
+                                                  '<a href="{base}/browse/projects/{[values.builds[0].encodedProject]}/builds/{[values.builds[0].number]}/">build {[values.builds[0].number]}</a>' +
+                                              '</tpl>' +
+                                              '<tpl if="buildCount &gt; 1">' +
+                                                  '{buildCount} builds ' +
+                                                  '<span id="{id}_{idSuffix}_builds_link">' +
+                                                      '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}_{idSuffix}_builds_button" alt="show all builds"/>' +
+                                                  '</span>' +
+                                              '</tpl>' +
                                           '</td>' +
                                           '<td class="content rightmost"><a href="{base}/dashboard/changes/{id}/">view</a></td>' +
                                       '</tr>').compile(),
@@ -848,7 +861,10 @@ ZUTUBI.ChangesTable.prototype = {
                 }
 
                 var buildsButton = Ext.get(change.id + '_' + this.idSuffix + '_builds_link');
-                buildsButton.on('click', this.toggleBuilds.createDelegate(this, [change]));
+                if (buildsButton)
+                {
+                    buildsButton.on('click', this.toggleBuilds.createDelegate(this, [change]));
+                }
             }
         }
         else

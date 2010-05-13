@@ -431,7 +431,7 @@ td.content-centre, th.centre, th.content-centre
     text-align: center;
 }
 
-td.content-right, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right
+table.content td.content-right, td.content-right, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right
 {
     text-align: right;
     vertical-align: top;
