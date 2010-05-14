@@ -2589,7 +2589,7 @@ public class ConfigurationRefactoringManager
                     // deleted in an ancestor.
                     if (configurationTemplateManager.pathExists(path))
                     {
-                        configurationTemplateManager.delete(path);
+                        configurationTemplateManager.delete(path, false);
                     }
                 }
 
@@ -2655,7 +2655,7 @@ public class ConfigurationRefactoringManager
                 recordManager.update(path, detachedRecord);
             }
             
-            for (String nestedKey: detachedRecord.nestedKeySet())
+            for (String nestedKey: existingRecord.nestedKeySet())
             {
                 MutableRecord nestedDetachedRecord = (MutableRecord) detachedRecord.get(nestedKey);
                 detach(getPath(path, nestedKey), (Record) existingRecord.get(nestedKey), nestedDetachedRecord);

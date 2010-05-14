@@ -2032,6 +2032,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     public RecordCleanupTask getCleanupTasks(final String path)
     {
+        return getCleanupTasks(path, true);
+    }
+
+    RecordCleanupTask getCleanupTasks(final String path, final boolean checkTemplateParent)
+    {
         return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>()
         {
             public RecordCleanupTask process()
@@ -2056,12 +2061,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 if(isTemplatedPath(path))
                 {
                     RecordCleanupTaskSupport result;
-                    if(pathElements.length == 2)
+                    if (pathElements.length == 2)
                     {
                         // Deleting an entire templated instance
                         result = new DeleteRecordCleanupTask(path, false);
                     }
-                    else
+                    else if (checkTemplateParent)
                     {
                         // We are not deleting an entire templated instance.
                         // We need to determine if this is a hide or actual
@@ -2092,6 +2097,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                             }
                         }
                     }
+                    else
+                    {
+                        result = new DeleteRecordCleanupTask(path, false);
+                    }
+                    
                     addAdditionalTasks(path, result);
 
                     // All descendants must be deleted.
@@ -2146,7 +2156,36 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         configurationReferenceManager.addReferenceCleanupTasks(path, instances, task);
     }
 
+    /**
+     * Deletes or hides the configuration at the given path.  If the
+     * configuration is an inherited collection item, it is hidden.  Otherwise,
+     * it is deleted.  In either case, if the path is nested within a templated
+     * collection item (i.e. in a templated scope, but not a top-level item),
+     * all descendant paths are also deleted.
+     * <p/>
+     * Note that paths marked as permanent, and inherited composites cannot be
+     * deleted this way.
+     * 
+     * @param path the path to delete
+     */
     public void delete(final String path)
+    {
+        delete(path, true);
+    }
+
+    /**
+     * Identical to {@link #delete(String, boolean)}, but allows the choice to
+     * specify that inherited composites may be deleted.  This only makes sense
+     * as part of a larger operation that will restore the invariant that all
+     * paths in a template parent are either present or hidden in all of its
+     * children.
+     * 
+     * @param path                the path tro delete
+     * @param checkTemplateParent if true, verify invariants against the
+     *                            template parent (in particular, do not allow
+     *                            inherited composited to be deleted)
+     */
+    void delete(final String path, final boolean checkTemplateParent)
     {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
@@ -2166,7 +2205,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 }
 
                 List<ConfigurationEvent> events = prepareDeleteEvents(path);
-                configurationCleanupManager.runCleanupTasks(getCleanupTasks(path), recordManager);
+                configurationCleanupManager.runCleanupTasks(getCleanupTasks(path, checkTemplateParent), recordManager);
                 refreshCaches();
 
                 for(ConfigurationEvent e: events)

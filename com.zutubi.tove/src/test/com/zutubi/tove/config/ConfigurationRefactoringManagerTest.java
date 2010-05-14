@@ -67,6 +67,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         
         typeRegistry.register(ConfigAntCommand.class);
         typeRegistry.register(ConfigMavenCommand.class);
+        typeRegistry.register(ConfigGitScm.class);
+        typeRegistry.register(ConfigSubversionScm.class);
     }
 
     public void testCanCloneEmptyPath()
@@ -2071,6 +2073,34 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         );
     }
 
+    public void testMoveDeleteIncompatibleInheritedComposite()
+    {
+        // Original and new parent template have incompatible scms.
+        MoveHierarchy moveHierarchy = setupSimpleMoveHierarchy();
+
+        ConfigA newTemplateParent = moveHierarchy.cloneNewTemplateParent();
+        newTemplateParent.setScm(new ConfigGitScm());
+        configurationTemplateManager.save(newTemplateParent);
+
+        ConfigA originalTemplateParent = moveHierarchy.cloneOriginalTemplateParent();
+        originalTemplateParent.setScm(new ConfigSubversionScm());
+        configurationTemplateManager.save(originalTemplateParent);
+
+        Listener listener = registerListener();
+
+        ConfigurationRefactoringManager.MoveResult result = configurationRefactoringManager.move(moveHierarchy.childPath, moveHierarchy.newTemplateParentKey);
+        String deletedScmPath = getPath(moveHierarchy.childPath, "scm");
+        assertEquals(asList(deletedScmPath), result.getDeletedPaths());
+
+        ConfigA child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
+        assertTrue(child.getScm() instanceof ConfigGitScm);
+
+        listener.assertEvents(
+                new DeleteEventSpec(deletedScmPath, false),
+                new PostDeleteEventSpec(deletedScmPath, false)
+        );
+    }
+
     public void testMoveDeleteIncompatibleInheritedInSubtree()
     {
         final String RECIPE_NAME = "recipe";
@@ -2599,7 +2629,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         private Referee refToRef;
         @Reference
         private List<Referee> listOfRefs = new LinkedList<Referee>();
-        
+        private ConfigScm scm;
         private Map<String, ConfigRecipe> recipes = new LinkedHashMap<String, ConfigRecipe>();
 
         public ConfigA()
@@ -2699,6 +2729,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setListOfRefs(List<Referee> listOfRefs)
         {
             this.listOfRefs = listOfRefs;
+        }
+
+        public ConfigScm getScm()
+        {
+            return scm;
+        }
+
+        public void setScm(ConfigScm scm)
+        {
+            this.scm = scm;
         }
 
         public Map<String, ConfigRecipe> getRecipes()
@@ -2858,6 +2898,22 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
     }
 
+    @SymbolicName("scm")
+    public abstract static class ConfigScm extends AbstractConfiguration
+    {
+
+    }
+
+    @SymbolicName("scm.git")
+    public static class ConfigGitScm extends ConfigScm
+    {
+    }
+    
+    @SymbolicName("scm.subversion")
+    public static class ConfigSubversionScm extends ConfigScm
+    {
+    }
+    
     @SymbolicName("command")
     public static interface ConfigCommand extends NamedConfiguration
     {
