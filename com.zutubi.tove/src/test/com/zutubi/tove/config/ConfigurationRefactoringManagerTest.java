@@ -247,7 +247,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testSimpleCloneInTemplateScope() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
         String clonePath = configurationRefactoringManager.clone(path, "clone of a");
         assertEquals("template/clone of a", clonePath);
         ConfigA clone = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
@@ -258,7 +258,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneOfTemplate() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a"), true);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, true);
         String clonePath = configurationRefactoringManager.clone(path, "clone of a");
         assertEquals("template/clone of a", clonePath);
         ConfigA clone = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
@@ -282,9 +282,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneCreatesSkeletons() throws TypeException
     {
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String child1Path = insertTemplateAInstance(parentPath, createAInstance("child1"), false);
-        String child2Path = insertTemplateAInstance(parentPath, createAInstance("child2"), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String child1Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child1"), parentPath, false);
+        String child2Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child2"), parentPath, false);
 
         assertNotNull(recordManager.select(getPath(child1Path, "bmap")));
         Listener listener = registerListener();
@@ -318,7 +318,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneWithInternalReferenceInTemplatedScope() throws TypeException
     {
-        cloneWithInternalReferenceHelper(insertTemplateAInstance(rootPath, createAInstance("a"), false));
+        cloneWithInternalReferenceHelper(configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false));
     }
 
     private void cloneWithInternalReferenceHelper(String path)
@@ -377,10 +377,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testMultipleCloneWithReferenceBetweenInInheritedMapItem() throws TypeException
     {
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
         configurationTemplateManager.getInstance(parentPath, ConfigA.class);
-        String child1Path = insertTemplateAInstance(parentPath, createAInstance("child1"), false);
-        String child2Path = insertTemplateAInstance(parentPath, createAInstance("child2"), false);
+        String child1Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child1"), parentPath, false);
+        String child2Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child2"), parentPath, false);
 
         ConfigA child1Instance = configurationTemplateManager.getInstance(child1Path, ConfigA.class);
         ConfigA child2Instance = configurationTemplateManager.getInstance(child2Path, ConfigA.class);
@@ -404,8 +404,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneWithInheritedItem() throws TypeException
     {
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(parentPath, new ConfigA("child"), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("child"), parentPath, false);
 
         String clonePath = configurationRefactoringManager.clone("template/child/bmap/colby", "clone of colby");
         ConfigB clone = configurationTemplateManager.getInstance(clonePath, ConfigB.class);
@@ -414,10 +414,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneWithOveriddenItem() throws TypeException
     {
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
         ConfigA childInstance = createAInstance("child");
         childInstance.getBmap().get("colby").setY(111222333);
-        insertTemplateAInstance(parentPath, childInstance, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, childInstance, parentPath, false);
 
         String clonePath = configurationRefactoringManager.clone("template/child/bmap/colby", "clone of colby");
         ConfigB clone = configurationTemplateManager.getInstance(clonePath, ConfigB.class);
@@ -463,8 +463,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     private void templateHierarchyHelper(Map<String, String> originalKeyToCloneKey) throws TypeException
     {
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(parentPath, createAInstance("child"), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), parentPath, false);
 
         configurationRefactoringManager.clone(TEMPLATE_SCOPE, originalKeyToCloneKey);
 
@@ -507,7 +507,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCanExtractParentTemplate() throws TypeException
     {
-        String aPath = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
         assertTrue(configurationRefactoringManager.canExtractParentTemplate(aPath));
     }
 
@@ -570,7 +570,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testExtractParentTemplateSimple() throws TypeException
     {
-        String aPath = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
         String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("a"), "extracted");
 
         // Ensure the instances both look as expected
@@ -597,8 +597,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testExtractParentTemplateIdenticalSiblings() throws TypeException
     {
-        String path1 = insertTemplateAInstance(rootPath, createAInstance("1"), false);
-        String path2 = insertTemplateAInstance(rootPath, createAInstance("2"), false);
+        String path1 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("1"), rootPath, false);
+        String path2 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("2"), rootPath, false);
         String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("1", "2"), "extracted");
 
         // Ensure parent has all fields pulled up
@@ -649,12 +649,12 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     private void externalReferenceHelper(String extractKey) throws TypeException
     {
-        String refereePath = insertTemplateAInstance(rootPath, createAInstance("referee"), false);
+        String refereePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("referee"), rootPath, false);
         ConfigA referee = configurationTemplateManager.getInstance(refereePath, ConfigA.class);
         ConfigA referer = new ConfigA("referer");
         referer.setRefToRef(referee.getRef());
         referer.getListOfRefs().add(referee.getRef());
-        String refererPath = insertTemplateAInstance(rootPath, referer, false);
+        String refererPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, referer, rootPath, false);
 
         configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList(extractKey), "extracted");
 
@@ -686,9 +686,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testExtractParentTemplateCommonExternalReferences() throws TypeException
     {
-        String refereePath = insertTemplateAInstance(rootPath, createAInstance("referee"), false);
-        String path1 = insertTemplateAInstance(rootPath, createAInstance("one"), false);
-        String path2 = insertTemplateAInstance(rootPath, createAInstance("two"), false);
+        String refereePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("referee"), rootPath, false);
+        String path1 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("one"), rootPath, false);
+        String path2 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("two"), rootPath, false);
 
         ConfigA referee = configurationTemplateManager.getInstance(refereePath, ConfigA.class);
         ConfigA a1 = configurationTemplateManager.getInstance(path1, ConfigA.class);
@@ -736,7 +736,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     private String insertAInstanceWithInternalReference(String name) throws TypeException
     {
         ConfigA configA = createAInstance(name);
-        String aPath = insertTemplateAInstance(rootPath, configA, false);
+        String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, configA, rootPath, false);
 
         configA = configurationTemplateManager.getInstance(aPath, ConfigA.class);
         configA.setRefToRef(configA.getRef());
@@ -755,7 +755,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     private String insertAInstanceWithInternalReferenceList(String name) throws TypeException
     {
         ConfigA configA = createAInstance(name);
-        String aPath = insertTemplateAInstance(rootPath, configA, false);
+        String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, configA, rootPath, false);
 
         configA = configurationTemplateManager.getInstance(aPath, ConfigA.class);
         configA.getListOfRefs().add(configA.getRef());
@@ -775,7 +775,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         ConfigA a = createAInstance("a");
         a.getBmap().put("b", new ConfigB("b"));
-        insertTemplateAInstance(rootPath, a, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, a, rootPath, false);
         String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted");
 
         ConfigA extracted = configurationTemplateManager.getInstance(extractedPath, ConfigA.class);
@@ -828,14 +828,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testGetPullUpAncestorsNoValidAncestor() throws TypeException
     {
-        String templateParentPath = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
-        String path = insertTemplateAInstance(templateParentPath, createAInstance("a2"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, true);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), templateParentPath, false);
         assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors(getPath(path, "b")));
     }
 
     public void testGetPullUpAncestors() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
         assertEquals(asList(NAME_ROOT), configurationRefactoringManager.getPullUpAncestors(getPath(path, "b")));
     }
 
@@ -863,8 +863,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCanPullUpAnyNoValidAncestor() throws TypeException
     {
-        String templateParentPath = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
-        String path = insertTemplateAInstance(templateParentPath, createAInstance("a2"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, true);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), templateParentPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b")));
     }
 
@@ -872,13 +872,13 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         ConfigA configA = createAInstance("a1");
         configA.getB().setPermanent(true);
-        String path = insertTemplateAInstance(rootPath, configA, false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, configA, rootPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b")));
     }
 
     public void testCanPullUpAny() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
         assertTrue(configurationRefactoringManager.canPullUp(getPath(path, "b")));
     }
     
@@ -906,15 +906,15 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCanPullUpBadAncestor() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
-        insertTemplateAInstance(rootPath, createAInstance("a2"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), rootPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b"), "a2"));
     }
 
     public void testCanPullUpAncestorDefinesPath() throws TypeException
     {
-        String templateParentPath = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
-        String path = insertTemplateAInstance(templateParentPath, createAInstance("a2"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, true);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), templateParentPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b"), NAME_ROOT));
     }
 
@@ -922,20 +922,20 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         ConfigA configA = createAInstance("child");
         configA.getBmap().get("colby").getCmap().put("colcy", new ConfigC("colcy"));
-        String path = insertTemplateAInstance(rootPath, configA, false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, configA, rootPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "bmap", "colby", "cmap", "colcy"), NAME_ROOT));
     }
 
     public void testCanPullUpSiblingDefinesPath() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
-        insertTemplateAInstance(rootPath, createAInstance("a2"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), rootPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b"), NAME_ROOT));
     }
 
     public void testCanPullUpSimple() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
         assertFalse(configurationRefactoringManager.canPullUp(getPath(path, "b", "y"), NAME_ROOT));
     }
 
@@ -943,8 +943,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_PARENT = "parent";
 
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
-        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), templateParentPath, false);
 
         ConfigA child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         child.getB().setRefToRef(child.getRef());
@@ -956,13 +956,13 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCanPullUpComposite() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
         assertTrue(configurationRefactoringManager.canPullUp(getPath(path, "b"), NAME_ROOT));
     }
 
     public void testCanPullUpCollectionItem() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
         assertTrue(configurationRefactoringManager.canPullUp(getPath(path, "bmap", "colby"), NAME_ROOT));
     }
 
@@ -972,14 +972,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         ConfigA parent = new ConfigA(NAME_PARENT);
         parent.setRef(new Referee("ee"));
-        String templateParentPath = insertTemplateAInstance(rootPath, parent, true);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parent, rootPath, true);
 
         parent = configurationTemplateManager.getInstance(templateParentPath, ConfigA.class);
         ConfigA child = new ConfigA("child");
         ConfigB childB = new ConfigB("b");
         childB.setRefToRef(parent.getRef());
         child.setB(childB);
-        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, templateParentPath, false);
 
         String pullPath = getPath(childPath, "b");
         assertTrue(configurationRefactoringManager.canPullUp(pullPath, NAME_PARENT));
@@ -993,7 +993,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         doThrow(new AccessDeniedException(ERROR_MESSAGE)).when(securityManager).ensurePermission(startsWith(rootPath), anyString());
         configurationRefactoringManager.setConfigurationSecurityManager(securityManager);
 
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
         try
         {
             configurationRefactoringManager.pullUp(getPath(path, "b"), NAME_ROOT);
@@ -1011,8 +1011,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   b <-- pulled up
         // a2
         //   b
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), false);
-        insertTemplateAInstance(rootPath, createAInstance("a2"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, false);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), rootPath, false);
         try
         {
             configurationRefactoringManager.pullUp(getPath(path, "b"), NAME_ROOT);
@@ -1032,8 +1032,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   ref: defines ee
         //   b <-- pulled up
         //     refToRef: refers to ee
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
-        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), templateParentPath, false);
 
         ConfigA child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         child.getB().setRefToRef(child.getRef());
@@ -1057,8 +1057,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         // child
         //   b <-- pulled up
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
-        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), templateParentPath, false);
         String pullPath = getPath(childPath, "b");
 
         String path = configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
@@ -1080,8 +1080,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         // child
         //   bmap
         //     colby <-- pulled up
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
-        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), templateParentPath, false);
         String pullPath = getPath(childPath, "bmap", "colby");
 
         String path = configurationRefactoringManager.pullUp(pullPath, NAME_PARENT);
@@ -1100,9 +1100,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_PARENT = "parent";
 
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
-        String childPath = insertTemplateAInstance(templateParentPath, createAInstance("child"), false);
-        String siblingPath = insertTemplateAInstance(templateParentPath, new ConfigA("sibling"), false);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), templateParentPath, false);
+        String siblingPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("sibling"), templateParentPath, false);
         String pullPath = getPath(childPath, "b");
 
         Listener listener = registerListener();
@@ -1125,14 +1125,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //     refToRef: refers to ee
         ConfigA parent = new ConfigA(NAME_PARENT);
         parent.setRef(new Referee("ee"));
-        String templateParentPath = insertTemplateAInstance(rootPath, parent, true);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parent, rootPath, true);
 
         parent = configurationTemplateManager.getInstance(templateParentPath, ConfigA.class);
         ConfigA child = new ConfigA("child");
         ConfigB childB = new ConfigB("b");
         childB.setRefToRef(parent.getRef());
         child.setB(childB);
-        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, templateParentPath, false);
 
 
         String pullPath = getPath(childPath, "b");
@@ -1166,13 +1166,13 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   b <-- pulled up
         //     ref: defines ee
         //     refToRef: refers to ee
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
 
         ConfigA child = new ConfigA("child");
         ConfigB childB = new ConfigB("b");
         childB.setRef(new Referee("ee"));
         child.setB(childB);
-        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, templateParentPath, false);
 
         child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         child.getB().setRefToRef(child.getB().getRef());
@@ -1199,13 +1199,13 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   refToRef: refers to ee
         //   b <-- pulled up
         //     ref: defines ee
-        String templateParentPath = insertTemplateAInstance(rootPath, new ConfigA(NAME_PARENT), true);
+        String templateParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_PARENT), rootPath, true);
 
         ConfigA child = new ConfigA("child");
         ConfigB childB = new ConfigB("b");
         childB.setRef(new Referee("ee"));
         child.setB(childB);
-        String childPath = insertTemplateAInstance(templateParentPath, child, false);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, templateParentPath, false);
 
         child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         child.setRefToRef(child.getB().getRef());
@@ -1249,8 +1249,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testGetPushDownChildrenHiddenInChild() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
-        String childPath = insertTemplateAInstance(path, createAInstance("a2"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), path, false);
         // Hide the path in the child
         configurationTemplateManager.delete(getPath(childPath, "bmap", "colby"));
         assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPushDownChildren(getPath(path, "bmap", "colby")));
@@ -1260,8 +1260,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_CHILD = "child";
 
-        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(path, createAInstance(NAME_CHILD), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance(NAME_CHILD), path, false);
         assertEquals(asList(NAME_CHILD), configurationRefactoringManager.getPushDownChildren(getPath(path, "b")));
     }
 
@@ -1289,8 +1289,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCanPushDownAnyNoValidChild() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a1"), true);
-        String childPath = insertTemplateAInstance(path, createAInstance("a2"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a1"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a2"), path, false);
         // Hide the path in the child
         configurationTemplateManager.delete(getPath(childPath, "bmap", "colby"));
         assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "bmap", "colby")));
@@ -1300,23 +1300,23 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         ConfigA configA = createAInstance("parent");
         configA.getB().setPermanent(true);
-        String path = insertTemplateAInstance(rootPath, configA, true);
-        insertTemplateAInstance(path, createAInstance("child"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, configA, rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), path, false);
         assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "b")));
     }
 
     public void testCanPushDownInherited() throws TypeException
     {
-        String grandParentPath = insertTemplateAInstance(rootPath, createAInstance("gp"), true);
-        String parentPath = insertTemplateAInstance(grandParentPath, createAInstance("p"), true);
-        insertTemplateAInstance(parentPath, createAInstance("c"), false);
+        String grandParentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("gp"), rootPath, true);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("p"), grandParentPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("c"), parentPath, false);
         assertFalse(configurationRefactoringManager.canPushDown(getPath(parentPath, "b")));
     }
 
     public void testCanPushDownAny() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(path, createAInstance("child"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("child"), path, false);
         assertTrue(configurationRefactoringManager.canPushDown(getPath(path, "b")));
     }
 
@@ -1344,7 +1344,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCanPushDownBadChild() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
         assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "b"), NAME_ROOT));
     }
 
@@ -1352,8 +1352,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_CHILD = "child";
 
-        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String childPath = insertTemplateAInstance(path, createAInstance(NAME_CHILD), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance(NAME_CHILD), path, false);
         // Hide the path in the child
         configurationTemplateManager.delete(getPath(childPath, "bmap", "colby"));
         assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "bmap", "colby"), NAME_CHILD));
@@ -1363,8 +1363,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_CHILD = "child";
 
-        String path = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(path, createAInstance(NAME_CHILD), false);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance(NAME_CHILD), path, false);
         assertFalse(configurationRefactoringManager.canPushDown(getPath(path, "b", "y"), NAME_CHILD));
     }
 
@@ -1372,8 +1372,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_CHILD = "child";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         assertTrue(configurationRefactoringManager.canPushDown(getPath(parentPath, "b"), NAME_CHILD));
     }
 
@@ -1381,8 +1381,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         final String NAME_CHILD = "child";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         assertTrue(configurationRefactoringManager.canPushDown(getPath(parentPath, "bmap", "colby"), NAME_CHILD));
     }
 
@@ -1415,7 +1415,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testPushDownInvalidChild() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance("a"), true);
+        String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, true);
         try
         {
             configurationRefactoringManager.pushDown(getPath(path, "b"), asSet("invalid"));
@@ -1437,8 +1437,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   [colby] (hidden)
         final String NAME_CHILD = "child";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         configurationTemplateManager.delete(getPath(childPath, "bmap", "colby"));
         try
         {
@@ -1465,9 +1465,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         final String NAME_CHILD = "child";
         final String NAME_CHILD_HIDDEN = "child-hidden";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
-        String childHiddenPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD_HIDDEN), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
+        String childHiddenPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD_HIDDEN), parentPath, false);
         configurationTemplateManager.delete(getPath(childHiddenPath, "bmap", "colby"));
         String pushPath = getPath(parentPath, "bmap", "colby");
         configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
@@ -1487,8 +1487,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   b
         final String NAME_CHILD = "child";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
         Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
@@ -1511,8 +1511,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //     colby
         final String NAME_CHILD = "child";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
 
         String pushPath = getPath(parentPath, "bmap", "colby");
         Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
@@ -1533,10 +1533,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         //   b
         final String NAME_CHILD = "child";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
         ConfigA child = createAInstance(NAME_CHILD);
         child.getB().setY(88);
-        String childPath = insertTemplateAInstance(parentPath, child, false);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
         configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
@@ -1556,9 +1556,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         final String NAME_CHILD1 = "child1";
         final String NAME_CHILD2 = "child2";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String child1Path = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD1), false);
-        String child2Path = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD2), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String child1Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD1), parentPath, false);
+        String child2Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD2), parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
         Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD1, NAME_CHILD2));
@@ -1586,9 +1586,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         final String NAME_CHILD1 = "child1";
         final String NAME_CHILD2 = "child2";
 
-        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
-        String child1Path = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD1), false);
-        String child2Path = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD2), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("parent"), rootPath, true);
+        String child1Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD1), parentPath, false);
+        String child2Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD2), parentPath, false);
         Listener listener = registerListener();
 
         String pushPath = getPath(parentPath, "b");
@@ -1621,8 +1621,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         ConfigA parentA = createAInstance("parent");
         parentA.getB().getCmap().put(NAME_C, new ConfigC(NAME_C));
-        String parentPath = insertTemplateAInstance(rootPath, parentA, true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parentA, rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
         configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
@@ -1646,8 +1646,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         ConfigA parentA = createAInstance("parent");
         parentA.getB().getCmap().put(NAME_C, new ConfigC(NAME_C));
-        String parentPath = insertTemplateAInstance(rootPath, parentA, true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parentA, rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         String hiddenPath = getPath(childPath, "b", "cmap", "colc");
         configurationTemplateManager.delete(hiddenPath);
 
@@ -1671,8 +1671,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         ConfigA parentA = createAInstance("parent");
         parentA.getB().setRef(new Referee("ee"));
-        String parentPath = insertTemplateAInstance(rootPath, parentA, true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parentA, rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         parentA = configurationTemplateManager.getInstance(parentPath, ConfigA.class);
         parentA.getB().setRefToRef(parentA.getB().getRef());
         configurationTemplateManager.save(parentA);
@@ -1697,8 +1697,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         ConfigA parentA = createAInstance("parent");
         parentA.getB().setRef(new Referee("ee"));
-        String parentPath = insertTemplateAInstance(rootPath, parentA, true);
-        insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parentA, rootPath, true);
+        configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         parentA = configurationTemplateManager.getInstance(parentPath, ConfigA.class);
         parentA.setRefToRef(parentA.getB().getRef());
         configurationTemplateManager.save(parentA);
@@ -1726,8 +1726,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         ConfigA parentA = createAInstance("parent");
         parentA.setRef(new Referee("ee"));
-        String parentPath = insertTemplateAInstance(rootPath, parentA, true);
-        String childPath = insertTemplateAInstance(parentPath, new ConfigA(NAME_CHILD), false);
+        String parentPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, parentA, rootPath, true);
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
         parentA = configurationTemplateManager.getInstance(parentPath, ConfigA.class);
         parentA.getB().setRefToRef(parentA.getRef());
         configurationTemplateManager.save(parentA);
@@ -2468,18 +2468,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     private String insertTemplateA(String templateParentPath, String name, boolean template) throws TypeException
     {
-        return insertTemplateAInstance(templateParentPath, new ConfigA(name), template);
-    }
-
-    private String insertTemplateAInstance(String templateParentPath, ConfigA instance, boolean template) throws TypeException
-    {
-        MutableRecord record = unstantiate(instance);
-        if(template)
-        {
-            configurationTemplateManager.markAsTemplate(record);
-        }
-        configurationTemplateManager.setParentTemplate(record, configurationTemplateManager.getRecord(templateParentPath).getHandle());
-        return configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, record);
+        return configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(name), templateParentPath, template);
     }
 
     private String addB(String aPath, String name)
