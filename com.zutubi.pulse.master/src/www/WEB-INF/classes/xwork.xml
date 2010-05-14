@@ -473,7 +473,7 @@
 
         <action name="setDependenciesTransitiveMode" class="com.zutubi.pulse.master.xwork.actions.user.SetDependenciesTransitiveModeAction">
             <interceptor-ref name="ajaxStack"/>
-            <result name="success" type="httpheader">200</result>
+            <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="setTestFilter" class="com.zutubi.pulse.master.xwork.actions.ajax.SetTestFilterAction">

@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.ajax.SimpleResult;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction;
 import com.zutubi.tove.config.ConfigurationProvider;
 
@@ -14,6 +15,7 @@ import com.zutubi.tove.config.ConfigurationProvider;
 public class SetDependenciesTransitiveModeAction extends ActionSupport
 {
     private String mode;
+    private SimpleResult result;
     private ConfigurationProvider configurationProvider;
 
     public String getMode()
@@ -24,6 +26,11 @@ public class SetDependenciesTransitiveModeAction extends ActionSupport
     public void setMode(String mode)
     {
         this.mode = mode;
+    }
+
+    public SimpleResult getResult()
+    {
+        return result;
     }
 
     @Override @SuppressWarnings({"unchecked"})
@@ -44,6 +51,7 @@ public class SetDependenciesTransitiveModeAction extends ActionSupport
             configurationProvider.save(preferences);
         }
 
+        result = new SimpleResult(true, null);
         return SUCCESS;
     }
 
