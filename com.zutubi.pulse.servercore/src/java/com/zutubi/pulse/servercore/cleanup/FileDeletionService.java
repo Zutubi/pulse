@@ -92,7 +92,7 @@ public class FileDeletionService extends BackgroundServiceSupport
             } // else rename fails, but should not prevent us from scheduling the deletion.
         }
 
-        return scheduleDeletion(file);
+        return indexAndScheduleDeletion(file);
     }
 
     /**
@@ -115,12 +115,17 @@ public class FileDeletionService extends BackgroundServiceSupport
         return dest;
     }
 
-    private Future<Boolean> scheduleDeletion(File file)
+    private Future<Boolean> indexAndScheduleDeletion(File file)
     {
         addToIndex(file);
+        return scheduleDeletion(file);
+    }
+
+    private Future<Boolean> scheduleDeletion(File file)
+    {
         return getExecutorService().submit(new Delete(file));
     }
-    
+
     private synchronized void addToIndex(File file)
     {
         if (index.add(file))
@@ -160,7 +165,7 @@ public class FileDeletionService extends BackgroundServiceSupport
                         File file = new File(line);
                         if (file.isAbsolute())
                         {
-                            scheduleDeletion(file);
+                            index.add(file);
                         }
                     }
                 }
@@ -172,6 +177,13 @@ public class FileDeletionService extends BackgroundServiceSupport
             finally
             {
                 IOUtils.close(reader);
+            }
+            
+            // This save filters out the rejected index entries.
+            saveIndex();
+            for (File file: index)
+            {
+                scheduleDeletion(file);
             }
         }
     }
