@@ -583,6 +583,7 @@ public class ToveUtils
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
         context.put("actionErrors", stack.findValue("actionErrors"));
         context.put("fieldErrors", stack.findValue("fieldErrors"));
+        context.put("isWindows", ""+SystemUtils.IS_WINDOWS);
 
         // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
         DelegateBuiltin.conditionalRegistration("i18n", "i18nText");

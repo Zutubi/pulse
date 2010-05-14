@@ -772,7 +772,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         page.clickSaveFilterAndWait();
 
         browser.refresh();
-        page.waitFor();
+        page.waitForReload();
         
         assertEquals("featured", page.getCurrentFilter());
         assertFalse(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));

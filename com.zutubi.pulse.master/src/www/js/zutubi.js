@@ -2107,23 +2107,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             this.submitButton = new Ext.Button({
                 text: 'ok',
                 disabled: true,
-                handler: function()
-                {
-                    var node = this.tree.getSelectionModel().getSelectedNode();
-                    var p = node.getPath('baseName');
-                    if (!this.tree.rootVisible)
-                    {
-                        p = p.substring(this.tree.root.attributes.baseName.length + 1);
-                    }
-
-                    if(p.length > 0 && p.substring(0, 1) == '/')
-                    {
-                        p = p.substring(1);
-                    }
-
-                    this.target.setValue(p);
-                    this.close();
-                }.createDelegate(this)
+                handler: this.onSubmit.createDelegate(this)
             });
             this.addButton(this.submitButton);
 
@@ -2138,6 +2122,24 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             }.createDelegate(this)
         });
         this.addButton(this.closeButton);
+    },
+
+    onSubmit: function()
+    {
+        var node = this.tree.getSelectionModel().getSelectedNode();
+        var p = node.getPath('baseName');
+        if (!this.tree.rootVisible)
+        {
+            p = p.substring(this.tree.root.attributes.baseName.length + 1);
+        }
+
+        if(p.length > 0 && p.substring(0, 1) == '/')
+        {
+            p = p.substring(1);
+        }
+
+        this.target.setValue(p);
+        this.close();
     },
 
     showMask: function()
@@ -2180,6 +2182,8 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
  * A PulseFileSystemBrowser with a toolbar and some buttons.
  */
 ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
+
+    isWindows: false,
 
     initComponent: function() {
 
@@ -2244,6 +2248,27 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
                 });
             }
         });
+    },
+
+    onSubmit: function()
+    {
+        var node = this.tree.getSelectionModel().getSelectedNode();
+        var p = node.getPath('baseName');
+        if (!this.tree.rootVisible)
+        {
+            p = p.substring(this.tree.root.attributes.baseName.length + 1);
+        }
+
+        if (this.isWindows)
+        {
+            if(p.length > 0 && p.substring(0, 1) == '/')
+            {
+                p = p.substring(1);
+            }
+        }
+
+        this.target.setValue(p);
+        this.close();
     }
 });
 
