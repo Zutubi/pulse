@@ -2,6 +2,8 @@ package com.zutubi.tove.transaction;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * The transaction objects allows for operations to be performed against a specific transaction.
@@ -42,6 +44,11 @@ public class Transaction
      * Transaction id, unique to all transactions within a particular transaction manager.
      */
     private long id;
+
+    /**
+     * A map of data bound to this transaction. 
+     */
+    private Map<String, Object> transactionalData;    
 
     Transaction(long id, TransactionManager transactionManager)
     {
@@ -129,6 +136,43 @@ public class Transaction
         {
             getSynchronizations().add(sync);
         }
+    }
+
+    /**
+     * Bind the data to this transaction with the specified key.  This data
+     * will be available during the scope of this transaction. 
+     *
+     * @param key   the key used to identify the data
+     * @param data  the data being bound to this transaction.
+     */
+    public void put(String key, Object data)
+    {
+        assertActiveTransaction();
+
+        getTransactionalData().put(key, data);
+    }
+
+    /**
+     * Get specific data that has been bound to this transaction.
+     * 
+     * @param key   the key identifying the data to be retrieved.
+     * @param <V>   the type of the data being retrieved.
+     * @return  the requested data.
+     */
+    public <V> V get(String key)
+    {
+        // Assume that the client knows the type of the data they are requesting. 
+        //noinspection unchecked
+        return (V) getTransactionalData().get(key);
+    }
+
+    Map<String, Object> getTransactionalData()
+    {
+        if (transactionalData == null)
+        {
+            transactionalData = new HashMap<String, Object>();
+        }
+        return transactionalData;
     }
 
     List<Synchronisation> getSynchronizations()

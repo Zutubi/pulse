@@ -154,7 +154,7 @@ public class TransactionManager
             List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronizations());
             for (Synchronisation synchronisation : synchronisations)
             {
-                synchronisation.postCompletion(currentTransaction.getStatus());
+                synchronisation.postCompletion(currentTransaction);
             }
         }
         else
@@ -203,7 +203,7 @@ public class TransactionManager
         List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronizations());
         for (Synchronisation synchronisation : synchronisations)
         {
-            synchronisation.postCompletion(currentTransaction.getStatus());
+            synchronisation.postCompletion(currentTransaction);
         }
     }
 

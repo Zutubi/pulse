@@ -36,10 +36,10 @@ import java.util.*;
 public class ConfigurationTemplateManager implements com.zutubi.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
-
+    private static final String TXN_KEY_PENDING_EVENTS = "pending.events";
+    
     private InMemoryTransactionResource<Map<String, TemplateHierarchy>> templateHierarchiesState;
 
-    private ThreadLocal<List<Event>> pendingEvents = new ThreadLocal<List<Event>>();
     private final DefaultInstanceCache instances = new DefaultInstanceCache();
     private boolean instancesEnabled = true;
 
@@ -295,11 +295,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             public T process()
             {
-                if (pendingEvents.get() == null)
-                {
-                    pendingEvents.set(new LinkedList<Event>());
+                Transaction txn = transactionManager.getTransaction();
 
-                    Transaction txn = transactionManager.getTransaction();
+                if (txn.get(TXN_KEY_PENDING_EVENTS) == null)
+                {
+                    txn.put(TXN_KEY_PENDING_EVENTS, new LinkedList<Event>());
                     txn.registerSynchronization(sendEventSync);
                 }
 
@@ -313,7 +313,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         // post configuration events are delayed until after the transaction is complete
         if (event.isPost())
         {
-            List<Event> events = pendingEvents.get();
+            List<Event> events = transactionManager.getTransaction().get(TXN_KEY_PENDING_EVENTS);
             events.add(event);
         }
         else
@@ -359,7 +359,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * @param template           if true, mark the inserted record as a
      *                           template, must be true if templateParentPath
      *                           is null
-     * @return
+     * @return the new path at which the instance was inserted.
      */
     public String insertTemplated(final String scope, Object instance, String templateParentPath, boolean template)
     {
@@ -3003,17 +3003,16 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     private class SendEventsOnTransactionCompletionSynchronisation implements Synchronisation
     {
-        public void postCompletion(TransactionStatus status)
+        public void postCompletion(Transaction txn)
         {
-            List<Event> events = pendingEvents.get();
-            if (status == TransactionStatus.COMMITTED)
+            if (txn.getStatus() == TransactionStatus.COMMITTED)
             {
+                List<Event> events = txn.get(TXN_KEY_PENDING_EVENTS);
                 for (Event event : events)
                 {
                     eventManager.publish(event);
                 }
             }
-            pendingEvents.set(null);
         }
     }
 }

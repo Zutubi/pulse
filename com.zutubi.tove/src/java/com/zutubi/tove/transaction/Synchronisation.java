@@ -9,7 +9,7 @@ public interface Synchronisation
      * Callback that is triggered when the transaction this synchronisation
      * is registered with completed.
      *
-     * @param status    the status of the transaction.
+     * @param txn    the transaction that has been completed.
      */
-    void postCompletion(TransactionStatus status);
+    void postCompletion(Transaction txn);
 }

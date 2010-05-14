@@ -137,9 +137,9 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
         Transaction transaction = transactionManager.getTransaction();
         transaction.registerSynchronization(new Synchronisation()
         {
-            public void postCompletion(TransactionStatus status)
+            public void postCompletion(Transaction txn)
             {
-                transactionStatus[0] = status;
+                transactionStatus[0] = txn.getStatus();
             }
         });
 
@@ -156,9 +156,9 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
         Transaction transaction = transactionManager.getTransaction();
         transaction.registerSynchronization(new Synchronisation()
         {
-            public void postCompletion(TransactionStatus status)
+            public void postCompletion(Transaction txn)
             {
-                transactionStatus[0] = status;
+                transactionStatus[0] = txn.getStatus();
             }
         });
 
@@ -326,6 +326,14 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
         assertTrue(resource.isRolledback());
     }
 
+    public void testTransactionalData()
+    {
+        transactionManager.begin();
+        Transaction txn = transactionManager.getTransaction();
+        txn.put("key", "value");
+        assertEquals("value", txn.get("key"));
+        transactionManager.commit();
+    }
 
     private class TransactionalResource implements TransactionResource
     {
