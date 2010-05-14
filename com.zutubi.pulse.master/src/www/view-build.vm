@@ -83,6 +83,7 @@
             buildPanel = new Ext.Panel({
                 layout: 'border',
                 border: false,
+                contentEl: 'center',
                 defaults: {
                     layout: 'fit',
                     border: false,
@@ -93,7 +94,7 @@
                     region: 'center',
                     id: 'build-center',
                     split: false,
-                    contentEl: 'center'
+                    contentEl: 'nested-content'
                 }, {
                     region: 'east',
                     id: 'build-east',
@@ -113,7 +114,7 @@
             var task = {
                 run: updateContent,
                 interval: 1000 * #if($refreshInterval) $refreshInterval #else $principle.preferences.refreshInterval #end
-            }
+            };
             
             runner = new Ext.util.TaskRunner();
             runner.start(task);
@@ -125,8 +126,10 @@
 </head>
 <body>
     #buildTabs($buildResult "summary")
-    
-    <div id="build-loading">
-        <img alt="loading" src="$base/images/inprogress.gif"/> #wwtext("name=loading.data")
+
+    <div id="nested-content">
+        <div id="build-loading">
+            <img alt="loading" src="$base/images/inprogress.gif"/> #wwtext("name=loading.data")
+        </div>
     </div>
 </html>

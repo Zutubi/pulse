@@ -11,6 +11,7 @@
             var panel = new Ext.Panel({
                 id: 'build-panel',
                 layout: 'fit',
+                contentEl: 'center',
                 border: false,
                 
                 tbar: {
@@ -26,7 +27,7 @@
                 
                 items: [{
                     xtype: 'xzcontentpanel',
-                    contentEl: 'center',
+                    contentEl: 'nested-content',
                     title: '#wwtext("name=pulse.file")'
                 }]
             });
@@ -42,13 +43,15 @@
 <body>
     #buildTabs($buildResult "file")
 
-    <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-file")'>
+    <div id="nested-content">
+        <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-file")'>
 #if($highlightedFile)
-    <div id="highlighted-file" class="build-panel-content">
-        $highlightedFile
-    </div>
+        <div id="highlighted-file" class="build-panel-content">
+            $highlightedFile
+        </div>
 #else
-    <div id="no-file" class="build-panel-content">No pulse file available.</div>
+        <div id="no-file" class="build-panel-content">No pulse file available.</div>
 #end
+        </div>
     </div>
 </html>
