@@ -552,8 +552,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     /**
      * Allow easy / safe access to a snapshot of the list of recipe dispatch requests.  Changes
-     * to the list itself are synchronized so that the snapshot is not taken in the middle of a
-     * change.  However, and importantly, the snapshot is not bound to the synchronization
+     * to the list itself are synchronised so that the snapshot is not taken in the middle of a
+     * change.  However, and importantly, the snapshot is not bound to the synchronisation
      * taking place within the ThreadedRecipeQueue.
      *
      * See CIB-1401.

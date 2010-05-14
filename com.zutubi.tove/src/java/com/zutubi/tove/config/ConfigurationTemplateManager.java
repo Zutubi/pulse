@@ -300,7 +300,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 if (txn.get(TXN_KEY_PENDING_EVENTS) == null)
                 {
                     txn.put(TXN_KEY_PENDING_EVENTS, new LinkedList<Event>());
-                    txn.registerSynchronization(sendEventSync);
+                    txn.registerSynchronisation(sendEventSync);
                 }
 
                 return function.process();
@@ -2997,7 +2997,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     }
 
     /**
-     * A transaction synchronization that will publish any events that have been
+     * A transaction synchronisation that will publish any events that have been
      * collected in the current transaction threads pendingEvents
      * thread local.
      */

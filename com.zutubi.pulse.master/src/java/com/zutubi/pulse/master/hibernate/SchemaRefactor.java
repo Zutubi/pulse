@@ -198,7 +198,7 @@ public class SchemaRefactor
 
     /**
      * When a schema change is made to a column, hibernates alter will not update the column. This method handles
-     * what hibernate avoids, by synchronizing the definition of the column in the database with the definition
+     * what hibernate avoids, by synchronising the definition of the column in the database with the definition
      * in the hibernate mapping. Tricky. 
      *
      * NOTE: The mapping definition should represent what you want to column to look like AFTER the refresh.  This is
@@ -334,7 +334,7 @@ public class SchemaRefactor
         String fromColumnName = fromColumn.getName();
         fromColumn.setName(toColumnName);
 
-        // add the new column to the table - synchronize the database with the updated schema.
+        // add the new column to the table - synchronise the database with the updated schema.
         updateTableSchema(table, connection);
 
         // copy column data.
@@ -365,7 +365,7 @@ public class SchemaRefactor
     }
 
     /**
-     * Executes a set of alter table statements to synchronize the underlying database table with the hibernate schema.
+     * Executes a set of alter table statements to synchronise the underlying database table with the hibernate schema.
      * NOTE: This will only add columns that do not already exist.
      * 
      * @param table         the table to be altered

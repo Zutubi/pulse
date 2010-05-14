@@ -151,7 +151,7 @@ public class TransactionManager
             transactionHolder.set(null);
             activeTransaction.unlock();
 
-            List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronizations());
+            List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronisations());
             for (Synchronisation synchronisation : synchronisations)
             {
                 synchronisation.postCompletion(currentTransaction);
@@ -200,7 +200,7 @@ public class TransactionManager
         transactionHolder.set(null);
         activeTransaction.unlock();
 
-        List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronizations());
+        List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronisations());
         for (Synchronisation synchronisation : synchronisations)
         {
             synchronisation.postCompletion(currentTransaction);
