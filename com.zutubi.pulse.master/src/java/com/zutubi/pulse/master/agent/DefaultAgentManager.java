@@ -324,7 +324,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                         agentSynchronisationMessageDao.save(agentMessage);
                     }
                     
-                    eventManager.publish(new AgentSynchronisationMessageEnqueuedEvent(this, agent));
+                    eventManager.publish(new AgentSynchronisationMessagesEnqueuedEvent(this, agent));
                     return null;
                 }
             });

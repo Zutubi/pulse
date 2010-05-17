@@ -565,7 +565,7 @@ public class AgentStatusManager implements EventListener
         return recipeId;
     }
 
-    private void handleAgentSynchronisationMessageEnqueued(Agent agent)
+    private void handleAgentSynchronisationMessagesEnqueued(Agent agent)
     {
         Agent existingAgent = agentsById.get(agent.getId());
         if (existingAgent != null)
@@ -640,9 +640,9 @@ public class AgentStatusManager implements EventListener
             {
                 handleAgentRemoved(((AgentRemovedEvent) event).getAgent());
             }
-            else if (event instanceof AgentSynchronisationMessageEnqueuedEvent)
+            else if (event instanceof AgentSynchronisationMessagesEnqueuedEvent)
             {
-                handleAgentSynchronisationMessageEnqueued(((AgentSynchronisationMessageEnqueuedEvent) event).getAgent());
+                handleAgentSynchronisationMessagesEnqueued(((AgentSynchronisationMessagesEnqueuedEvent) event).getAgent());
             }
         }
         finally
@@ -668,7 +668,7 @@ public class AgentStatusManager implements EventListener
                 AgentEnableRequestedEvent.class,
                 AgentPingEvent.class,
                 AgentRemovedEvent.class,
-                AgentSynchronisationMessageEnqueuedEvent.class,
+                AgentSynchronisationMessagesEnqueuedEvent.class,
                 AgentSynchronisationCompleteEvent.class,
                 RecipeAbortedEvent.class,
                 RecipeCollectedEvent.class,

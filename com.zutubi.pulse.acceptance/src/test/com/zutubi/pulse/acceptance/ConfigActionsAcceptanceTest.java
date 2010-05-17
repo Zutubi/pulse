@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.acceptance.forms.admin.CustomTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.MultiRecipeTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.SetPasswordForm;
@@ -11,6 +12,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
@@ -44,7 +46,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
-        waitForStatus("removing all persistent build directories for this project");
+        waitForStatus(Messages.getInstance(ProjectConfiguration.class).format("clean.feedback"));
     }
 
     public void testCustomActionWithArgument() throws Exception

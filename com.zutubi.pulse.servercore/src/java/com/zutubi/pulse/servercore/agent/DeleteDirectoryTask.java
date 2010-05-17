@@ -17,8 +17,8 @@ import java.util.Map;
  * A synchronisation task that deletes a directory.  If the directory does not
  * exist, the request is ignored (this should also handle retries).
  * <p/>
- * As deleting can take time, the directory is just marked as dead and cleaned
- * asynchronously.
+ * As deleting can take time, the directory is submitted to the file deletion
+ * service to be cleaned asynchronously.
  */
 public class DeleteDirectoryTask implements SynchronisationTask
 {
