@@ -22,7 +22,6 @@ import static com.zutubi.util.CollectionUtils.asPair;
  * Test for managing the server license and ensuring the licenses are
  * enforced.
  */
-// the xmlrpc tests create the project/user/agent data we need for these tests to work, so lets depend on them.
 public class LicenseAcceptanceTest extends SeleniumTestBase
 {
     private static final String LICENSE_PATH = "settings/license";

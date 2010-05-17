@@ -81,7 +81,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
 
-        browser.waitForPageToLoad(LOAD_TIMEOUT);
+        page.waitForReload();
         assertSelfResponsible(page);
     }
 
@@ -95,7 +95,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
         assertSelfResponsible(homePage);
         homePage.clickClearResponsible();
-        browser.waitForPageToLoad(LOAD_TIMEOUT);
+        homePage.waitForReload();
         assertNobodyResponsible(homePage);
 
         // Clear on the build summary tab
@@ -105,7 +105,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertTrue(summaryPage.hasResponsibleUser());
 
         summaryPage.clickAction(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY);
-        browser.waitForPageToLoad(LOAD_TIMEOUT);
+        summaryPage.waitForReload();
         assertNobodyResponsible(summaryPage);
 
         takeResponsibility(TEST_PROJECT);
@@ -114,7 +114,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
         assertTrue(dashboardPage.hasResponsibilities());
         dashboardPage.clearResponsibility(TEST_PROJECT);
-        browser.waitForPageToLoad(LOAD_TIMEOUT);
+        dashboardPage.waitForReload();
         assertFalse(dashboardPage.hasResponsibilities());
     }
 
@@ -158,7 +158,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         assertTrue(page.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
         page.clickClearResponsible();
-        browser.waitForPageToLoad(LOAD_TIMEOUT);
+        page.waitForReload();
         assertNobodyResponsible(page);
     }
 
