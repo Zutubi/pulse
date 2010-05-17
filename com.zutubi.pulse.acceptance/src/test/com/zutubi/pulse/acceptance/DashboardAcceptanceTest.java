@@ -4,13 +4,14 @@ import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.asVector;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.asVector;
+import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Acceptance tests for the users dashboard view.
@@ -43,7 +44,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
     public void testNoTrailingSlash() throws Exception
     {
         // See CIB-1715.
-        browser.open(urls.base() + "/dashboard");
+        browser.open(urls.base() + "dashboard");
         browser.waitForPageToLoad(3 * SECOND);
         DashboardPage page = browser.createPage(DashboardPage.class);
         assertTrue(page.isPresent());
