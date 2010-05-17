@@ -20,7 +20,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     private static final String ID_BUILD_QUEUE_TABLE = "server.activity.build.queue";
     private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
     private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.recipe.queue";
-    private static final String REVISION_WAIT_ANT = "23";
+    private static final String REVISION_WAIT_ANT = "28";
 
     private static final int TIMEOUT = 90000;
 
