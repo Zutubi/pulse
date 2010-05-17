@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
-import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.acceptance.utils.*;
@@ -116,13 +115,13 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(dependentProject);
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
-        browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
+        browser.openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
         assertTrue(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
 
         // delete the artifact from the file system
         repository.clean();
 
-        browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
+        browser.openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
         assertFalse(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
     }
 
