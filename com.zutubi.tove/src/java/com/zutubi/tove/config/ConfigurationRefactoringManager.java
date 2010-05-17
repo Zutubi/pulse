@@ -493,7 +493,7 @@ public class ConfigurationRefactoringManager
                                 return true;
                             }
                         }
-                    }, false);
+                    }, false, null);
 
                     return result;
                 }
@@ -2107,7 +2107,7 @@ public class ConfigurationRefactoringManager
                         deepCopy.forEach(new DeepUpdateFunction(descendantPath));
                         return true;
                     }
-                }, false);
+                }, false, null);
             }
             catch (Exception e)
             {
@@ -2468,7 +2468,7 @@ public class ConfigurationRefactoringManager
                     }
                     return true;
                 }
-            }, true);
+            }, true, null);
             
             configurationSecurityManager.ensurePermission(newTemplateParentPath, AccessManager.ACTION_VIEW);
             subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
@@ -2478,7 +2478,7 @@ public class ConfigurationRefactoringManager
                     configurationSecurityManager.ensurePermission(templateNode.getPath(), AccessManager.ACTION_WRITE);
                     return true;
                 }
-            }, false);
+            }, false, null);
             
             long existingTemplateParentHandle = configurationTemplateManager.getTemplateParentHandle(path, configurationTemplateManager.getRecord(path));
             String existingTemplateParentPath = recordManager.getPathForHandle(existingTemplateParentHandle);
@@ -2504,7 +2504,7 @@ public class ConfigurationRefactoringManager
                     findIncompatible(node.getPath(), existingRecord, newTemplateParentRecord, result);
                     return true;
                 }
-            }, false);
+            }, false, null);
             
             return true;
         }
@@ -2604,7 +2604,7 @@ public class ConfigurationRefactoringManager
                             detach(node.getPath());
                             return true;
                         }
-                    }, false);
+                    }, false, null);
                     
                     // Switch parents.
                     MutableRecord record = recordManager.select(path).copy(false, true);
@@ -2624,7 +2624,7 @@ public class ConfigurationRefactoringManager
     
                             return true;
                         }
-                    }, false);
+                    }, false, null);
                     
                 }
                 finally

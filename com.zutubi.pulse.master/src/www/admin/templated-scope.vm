@@ -56,8 +56,12 @@
             }
         }
         
-        function navigateTo(owner, path)
+        function navigateToOwner(owner, originalPath)
         {
+            var pieces = originalPath.split('/');
+            pieces[1] = owner;
+            var path = pieces.join('/');
+            
             var container = Ext.get('nested-layout');
             container.mask('Loading...');
             Ext.Ajax.request({

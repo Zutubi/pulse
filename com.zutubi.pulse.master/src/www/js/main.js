@@ -762,7 +762,8 @@ function toggleStateList(e)
     Ext.get(target).findParent('ul.top-level', document.body, true).toggleClass('expanded');
 }
 
-function viewWorkingCopy(project) {
+function viewWorkingCopy(project)
+{
 
     var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
         baseUrl : window.baseUrl,
@@ -770,4 +771,16 @@ function viewWorkingCopy(project) {
         title : 'browse working copy'
     });
     browser.show(this);
+}
+
+function indentImage(size)
+{
+    if (size == 0)
+    {
+        return '';
+    }
+    else
+    {
+        return '<img src="' + Ext.BLANK_IMAGE_URL + '" width="' + (size * 10) +  '"/>';
+    }
 }

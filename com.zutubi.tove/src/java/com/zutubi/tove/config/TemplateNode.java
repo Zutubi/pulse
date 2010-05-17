@@ -2,6 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.util.UnaryFunction;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -107,8 +108,10 @@ public interface TemplateNode
      * each node as it goes.  If the callback returns false, the walk is
      * stopped at this node.
      * 
-     * @param callback the callback to execute on each node
-     * @param strict   if true, this node is not included in the walk
+     * @param callback   the callback to execute on each node
+     * @param strict     if true, this node is not included in the walk
+     * @param comparator if not null, a comparator that will be used to order
+     *                   children before walking them
      */
-    void forEachDescendant(UnaryFunction<TemplateNode, Boolean> callback, boolean strict);
+    void forEachDescendant(UnaryFunction<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator);
 }

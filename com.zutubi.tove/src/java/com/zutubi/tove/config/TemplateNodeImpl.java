@@ -6,6 +6,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -127,13 +128,24 @@ public class TemplateNodeImpl implements TemplateNode
         }
     }
 
-    public void forEachDescendant(UnaryFunction<TemplateNode, Boolean>  callback, boolean strict)
+    public void forEachDescendant(UnaryFunction<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator)
     {
-        if(strict || callback.process(this))
+        if (strict || callback.process(this))
         {
-            for(TemplateNode node: children)
+            List<TemplateNode> children;
+            if (comparator == null)
             {
-                node.forEachDescendant(callback, false);
+                children = this.children;
+            }
+            else
+            {
+                children = new LinkedList<TemplateNode>(this.children);
+                Collections.sort(children, comparator);
+            }
+            
+            for (TemplateNode node: children)
+            {
+                node.forEachDescendant(callback, false, null);
             }
         }
     }

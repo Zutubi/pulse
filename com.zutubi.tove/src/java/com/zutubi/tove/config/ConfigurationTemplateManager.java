@@ -639,7 +639,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     return false;
                 }
             }
-        }, strict);
+        }, strict, null);
     }
 
     Record createSkeletonRecord(ComplexType type, Record record)
@@ -1693,7 +1693,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     recordManager.move(oldDescendantPath, newDescendantPath);
                     return true;
                 }
-            }, true);
+            }, true, null);
         }
     }
 
@@ -1853,7 +1853,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     }
                     return true;
                 }
-            }, strict);
+            }, strict, null);
             
             return result;
         }

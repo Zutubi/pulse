@@ -250,7 +250,7 @@ public class CloneAction extends ToveFormActionSupport
 
                 return true;
             }
-        }, true);
+        }, true, null);
     }
 
     private String[] getDependentFields(String textField, TemplateNode node)

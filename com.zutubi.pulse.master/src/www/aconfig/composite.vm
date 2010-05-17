@@ -31,7 +31,7 @@
     #if($options.size() > 0)
             <div id="${name}-nav" class="template-nav"></div>
             <script type="text/javascript">
-                var ${name}Combo = new Ext.form.ComboBox({
+                new Ext.form.ComboBox({
                     renderTo: '${name}-nav',
                     id: '${name}-combo',
                     emptyText: 'to same path in ${name}',
@@ -41,19 +41,18 @@
                     editable: false,
                     store: [
         #foreach($option in $options)
-            #if($velocityCount > 1),#end ['#jss($option)', Ext.util.Format.htmlEncode('#jss($option)')]
+            #if($velocityCount > 1),#end ['#jss($option.second)', indentImage($option.first) + Ext.util.Format.htmlEncode('#jss($option.second)')]
         #end
                     ],
                     listeners: {
                         select: function(combo, record) {
-                            var pieces = '#jss($path)'.split('/');
-                            pieces[1] = record.get(record.fields.first().name);
-                            navigateTo(pieces[1], pieces.join('/'));
+                            // This should not be necessary, but it stops the ugliness of Ext
+                            // showing HTML in the input field (e.g. indent image, escaped chars).
+                            combo.setValue('');
+                            navigateToOwner(record.get(record.fields.first().name), '#jss($path)');
                         }
                     }
                 });
-                
-                ${name}Combo.render();
             </script>
     
     #end
@@ -189,8 +188,25 @@
         These descendants include:
     </p>
     <ul class="points">
+                    #set($lastDepth = 0)
                     #foreach($descendant in $config.configuredDescendants)
-        <li id='#id("cd-$descendant")'><a href="#" onclick="var pieces = '#jss($action.htmlEncode($path))'.split('/'); pieces[1] = '#jss($action.htmlEncode($descendant))'; navigateTo(pieces[1], pieces.join('/'));">#html($descendant)</a></li>
+                        #if($descendant.first > $lastDepth)
+                            #set($upper = $descendant.first - 1)
+                            #foreach($item in [$lastDepth..$upper])
+    <ul>
+                            #end
+                        #end
+                        #if($descendant.first < $lastDepth)
+                            #set($upper = $lastDepth - 1)
+                            #foreach($item in [$descendant.first..$upper])
+    </ul>
+                            #end
+                        #end
+                        #set($lastDepth = $descendant.first)
+                        #if($velocityCount > 1)
+        </li>
+                        #end
+        <li id='#id("cd-$descendant.second")'><a href="#" onclick="navigateToOwner('#jss($action.htmlEncode($descendant.second))', '#jss($action.htmlEncode($path))'); return false;">#html($descendant.second)</a>
                     #end
     </ul>
                 #end

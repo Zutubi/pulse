@@ -68,13 +68,21 @@ public class ConfigurationUIModel
 
     private List<String> displayFields = new LinkedList<String>();
 
-    private List<String> configuredAncestors = new LinkedList<String>();
+    /**
+     * A list of (-relative hierarchy depth, owner) pairs, sorted from closest
+     * ancestor to most distant.
+     */
+    private List<Pair<Integer, String>> configuredAncestors = new LinkedList<Pair<Integer, String>>();
     /**
      * Note that this counts even descendants that the user has no permission
-     * to view, which will be filtered out of the configuredDescendants list.
+     * to view, which will be filtered out of the configuredDescendants tree.
      */
     private int configuredDescendantCount = 0;
-    private List<String> configuredDescendants = new LinkedList<String>();
+    /**
+     * A list of (relative hierarchy depth, owner) pairs, sorted in depth first
+     * traversal order, with siblings sorted alphabetically.
+     */
+    private List<Pair<Integer, String>> configuredDescendants = new LinkedList<Pair<Integer, String>>();
 
     private boolean writable;
     private boolean embedded = false;
@@ -178,27 +186,19 @@ public class ConfigurationUIModel
         }
         else
         {
-            Mapping<String, String> pathToOwnerMapping = new Mapping<String, String>()
-            {
-                public String map(String s)
-                {
-                    return PathUtils.getPathElements(s)[1];
-                }
-            };
-            
             List<String> ancestorPaths = configurationTemplateManager.getAncestorPaths(path, true);
-            configuredAncestors = CollectionUtils.map(ancestorPaths, pathToOwnerMapping);
+            configuredAncestors = new LinkedList<Pair<Integer, String>>();
+            int i = ancestorPaths.size() - 1;
+            for (String ancestorPath: ancestorPaths)
+            {
+                configuredAncestors.add(new Pair<Integer, String>(i, PathUtils.getPathElements(ancestorPath)[1]));
+                i--;
+            }
             
             // Is this path configured in any descendants?
             List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(path, true, false, false);
             configuredDescendantCount = descendantPaths.size();
-            configuredDescendants = CollectionUtils.map(CollectionUtils.filter(descendantPaths, new Predicate<String>()
-            {
-                public boolean satisfied(String path)
-                {
-                    return configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW);
-                }
-            }), pathToOwnerMapping);
+            determineConfiguredDescendants();
 
             determineActions(parentType);
             determineDescendantActions(descendantPaths);
@@ -252,6 +252,34 @@ public class ConfigurationUIModel
         if (collapsedCollection == null)
         {
             nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+        }
+    }
+    
+    private void determineConfiguredDescendants()
+    {
+        String elements[] = PathUtils.getPathElements(path);
+        if (elements.length >= 2)
+        {
+            String ownerPath = PathUtils.getPath(0, 2, pathElements);
+            TemplateNode node = configurationTemplateManager.getTemplateNode(ownerPath);
+            if (node != null)
+            {
+                final String remainderPath = PathUtils.getPath(2, pathElements);
+                final int topDepth = node.getDepth() + 1;
+                node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                {
+                    public Boolean process(TemplateNode currentNode)
+                    {
+                        String descendantPath = remainderPath == null ? currentNode.getPath() : PathUtils.getPath(currentNode.getPath(), remainderPath);
+                        if (configurationTemplateManager.pathExists(descendantPath) && configurationSecurityManager.hasPermission(descendantPath, AccessManager.ACTION_VIEW))
+                        {
+                            configuredDescendants.add(new Pair<Integer, String>(currentNode.getDepth() - topDepth, currentNode.getId()));
+                        }
+                        
+                        return true;
+                    }
+                }, true, new NodeIdComparator());
+            }
         }
     }
 
@@ -463,7 +491,7 @@ public class ConfigurationUIModel
         return displayFields;
     }
 
-    public List<String> getConfiguredAncestors()
+    public List<Pair<Integer, String>> getConfiguredAncestors()
     {
         return configuredAncestors;
     }
@@ -473,7 +501,7 @@ public class ConfigurationUIModel
         return configuredDescendantCount;
     }
 
-    public List<String> getConfiguredDescendants()
+    public List<Pair<Integer, String>> getConfiguredDescendants()
     {
         return configuredDescendants;
     }
@@ -546,5 +574,15 @@ public class ConfigurationUIModel
     public void setStateDisplayRenderer(StateDisplayRenderer stateDisplayRenderer)
     {
         this.stateDisplayRenderer = stateDisplayRenderer;
+    }
+
+    private static class NodeIdComparator implements Comparator<TemplateNode>
+    {
+        private static final Sort.StringComparator DELEGATE = new Sort.StringComparator();
+        
+        public int compare(TemplateNode n1, TemplateNode n2)
+        {
+            return DELEGATE.compare(n1.getId(), n2.getId());
+        }
     }
 }
