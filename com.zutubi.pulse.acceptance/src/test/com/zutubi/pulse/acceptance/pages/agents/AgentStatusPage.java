@@ -1,10 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.agents;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
+import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
 
 /**
@@ -17,7 +19,9 @@ public class AgentStatusPage extends SeleniumPage
     public static final String ID_SYNCH_TABLE = "synchronisation.messages";
     public static final String ID_PATTERN_SYNCH_MESSAGE = "synchronisation.message.%d";
     public static final String ID_PATTERN_STATUS_MESSAGE = "status.message.%d";
-    public static final String ID_PATTERN_STATUS_MESSAGE_BUTTON = "status.message.%d_link";
+    public static final String ID_PATTERN_STATUS_POPUP_BUTTON = "status.popup.%d_link";
+    
+    private static final long TIMEOUT = 30000;
 
     private String agent;
 
@@ -116,10 +120,16 @@ public class AgentStatusPage extends SeleniumPage
      */
     public String clickAndWaitForSynchronisationMessageStatus(int index)
     {
-        String linkId = String.format(ID_PATTERN_STATUS_MESSAGE_BUTTON, index + 1);
+        String linkId = String.format(ID_PATTERN_STATUS_POPUP_BUTTON, index + 1);
         browser.click(linkId);
-        String popupId = String.format(ID_PATTERN_STATUS_MESSAGE, index + 1);
-        browser.waitForElement(popupId);
+        final String popupId = String.format(ID_PATTERN_STATUS_MESSAGE, index + 1);
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return browser.isElementPresent(popupId) && browser.getText(popupId).length() > 0;
+            }
+        }, TIMEOUT, "sync message status popup to appear");
         return browser.getText(popupId);
     }
 

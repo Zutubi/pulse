@@ -77,19 +77,19 @@
                             <img alt="$message.status" src="$base/images/synch/${message.status}.gif"/>
                             $message.status.prettyString
             #if($message.statusMessage)
-                            #showHideButton("synch" "status.message.${velocityCount}" "tr-br?")
-                            <div id="status.message.${velocityCount}" style="display: none">
+                            #showHideButton("synch" "status.popup.${velocityCount}" "tr-br?")
+                            <div id="status.popup.${velocityCount}" style="display: none">
                                 <table class="content" style="margin: 0">
                                     <tr>
                                         <th class="heading">
                                             <span class="action">
-                                                <a href="#" onclick="showHideFloat('synch', 'status.message.${velocityCount}'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                                                <a href="#" onclick="showHideFloat('synch', 'status.popup.${velocityCount}'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                                             </span>
                                             #wwtext("name=message.status.message")
                                         </th>
                                     </tr>
                                     <tr>
-                                        <td><pre>$action.htmlEncode($message.statusMessage)</pre></td>
+                                        <td><pre id="status.message.${velocityCount}">$action.htmlEncode($message.statusMessage)</pre></td>
                                     </tr>
                                 </table>
                             </div>
