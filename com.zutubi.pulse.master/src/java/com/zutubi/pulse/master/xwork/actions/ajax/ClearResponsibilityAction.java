@@ -9,6 +9,6 @@ public class ClearResponsibilityAction extends ResponsibilityActionBase
     public SimpleResult doExecute()
     {
         projectManager.clearResponsibility(getProject());
-        return new SimpleResult(true, null);
+        return new TrivialSuccessfulResult();
     }
 }

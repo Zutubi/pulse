@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.ajax.SimpleResult;
+import com.zutubi.pulse.master.xwork.actions.ajax.TrivialSuccessfulResult;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction;
 import com.zutubi.tove.config.ConfigurationProvider;
 
@@ -51,7 +52,7 @@ public class SetDependenciesTransitiveModeAction extends ActionSupport
             configurationProvider.save(preferences);
         }
 
-        result = new SimpleResult(true, null);
+        result = new TrivialSuccessfulResult();
         return SUCCESS;
     }
 

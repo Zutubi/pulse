@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
 /**
+ * A simple result object for generating a JSON tuple with a success flag and
+ * optional detail message.
  */
 public class SimpleResult
 {
