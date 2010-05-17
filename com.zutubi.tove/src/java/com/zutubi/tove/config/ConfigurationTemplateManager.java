@@ -2061,12 +2061,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 if(isTemplatedPath(path))
                 {
                     RecordCleanupTaskSupport result;
-                    if (pathElements.length == 2)
+                    if (pathElements.length == 2 || !checkTemplateParent)
                     {
-                        // Deleting an entire templated instance
+                        // Deleting an entire templated instance, or sure that
+                        // we should delete the record regardless of
+                        // inheritance.
                         result = new DeleteRecordCleanupTask(path, false);
                     }
-                    else if (checkTemplateParent)
+                    else
                     {
                         // We are not deleting an entire templated instance.
                         // We need to determine if this is a hide or actual
@@ -2096,10 +2098,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                                 throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete an inherited composite property");
                             }
                         }
-                    }
-                    else
-                    {
-                        result = new DeleteRecordCleanupTask(path, false);
                     }
                     
                     addAdditionalTasks(path, result);
@@ -2174,11 +2172,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     }
 
     /**
-     * Identical to {@link #delete(String, boolean)}, but allows the choice to
-     * specify that inherited composites may be deleted.  This only makes sense
-     * as part of a larger operation that will restore the invariant that all
-     * paths in a template parent are either present or hidden in all of its
-     * children.
+     * Identical to {@link #delete(String)}, but allows the choice to specify
+     * that inherited composites may be deleted.  This only makes sense as part
+     * of a larger operation that will restore the invariant that all paths in
+     * a template parent are either present or hidden in all of its children.
      * 
      * @param path                the path tro delete
      * @param checkTemplateParent if true, verify invariants against the
