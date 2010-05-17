@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract base for forms that are based off a configuration class, where
+ * Base for forms that are based off a configuration class, where
  * the class is available (i.e. not a plugin).  The form and field names are
  * automatically determined from the class.
  */
-public abstract class ConfigurationForm extends SeleniumForm
+public class ConfigurationForm extends SeleniumForm
 {
     public static final String ANNOTATION_INHERITED = "inherited";
 
