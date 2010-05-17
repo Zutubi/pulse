@@ -352,11 +352,6 @@
             <result name="success" type="redirect">/server/activity/</result>
         </action>
 
-        <action name="disableUser" class="com.zutubi.pulse.master.xwork.actions.admin.user.DisableUserAction">
-            <result name="input" type="velocity">undefined.vm</result>
-            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
-        </action>
-
         <action name="addSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doAdd">
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
