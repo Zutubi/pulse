@@ -292,8 +292,17 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public boolean isBuildPresentViaUI(String projectName, long buildNumber)
     {
-        BuildSummaryPage page = browser.createPage(BuildSummaryPage.class, projectName, buildNumber);
-        return canOpenPage(page);
+        BuildSummaryPage page = browser.open(BuildSummaryPage.class, projectName, buildNumber);
+        browser.waitForPageToLoad();
+        if (browser.isTextPresent("Unknown build"))
+        {
+            return false;
+        }
+        else
+        {
+            page.waitFor();
+            return true;
+        }
     }
 
     public boolean isBuildPulseFilePresentViaUI(String projectName, long buildNumber)
