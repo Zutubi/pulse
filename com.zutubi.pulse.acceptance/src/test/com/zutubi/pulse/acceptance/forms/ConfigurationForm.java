@@ -27,7 +27,7 @@ import java.util.Map;
  * the class is available (i.e. not a plugin).  The form and field names are
  * automatically determined from the class.
  */
-public class ConfigurationForm extends SeleniumForm
+public abstract class ConfigurationForm extends SeleniumForm
 {
     public static final String ANNOTATION_INHERITED = "inherited";
 
@@ -202,10 +202,5 @@ public class ConfigurationForm extends SeleniumForm
             this.name = name;
             this.type = type;
         }
-    }
-
-    public final String getBrowseLinkId(String field)
-    {
-        return getFieldId(field) + ".browse";
     }
 }

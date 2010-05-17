@@ -114,7 +114,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
             // leave the revision blank
             form.triggerFormElements(asPair("version", "OH_HAI"));
 
-            browser.click("logout");
+            browser.click("//span[@id='logout']/a");
             browser.waitForPageToLoad();
         }
         finally
@@ -125,11 +125,6 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectName, 1);
 
         assertBuildVersion(projectName, 1, "OH_HAI");
-    }
-
-    public void testSpecifyVersionViaConfiguration()
-    {
-
     }
 
     /**

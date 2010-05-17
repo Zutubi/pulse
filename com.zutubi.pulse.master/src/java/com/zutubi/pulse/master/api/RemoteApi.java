@@ -2920,7 +2920,7 @@ public class RemoteApi
         result.put("stage", stage);
         result.put("command", command.getCommandName());
         result.put("name", artifact.getName());
-        result.put("permalink", Urls.getBaselessInstance().commandDownload(build, command, artifact.getName()));
+        result.put("permalink", Urls.getBaselessInstance().commandDownload(build, command, artifact.getName()) + "/");
         return result;
     }
 

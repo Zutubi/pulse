@@ -73,6 +73,11 @@ public abstract class SeleniumForm
         return "zfid." + name;
     }
 
+    public String getBrowseLinkId(String field)
+    {
+        return getFieldId(field) + ".browse";
+    }
+
     public boolean isAnnotationPresent(String fieldName, String annotation)
     {
         return browser.isElementIdPresent(getFieldId(fieldName) + "." + annotation);
