@@ -1,13 +1,45 @@
-.x-splitbar-h{background-image:url(../images/pagan/sizer/e-handle.gif);background-position:left;}
+.x-splitbar-h {
+    background-image:url(../images/pagan/sizer/e-handle.gif);
+}
 
-.x-tab-panel-header, .x-tab-panel-footer{background-color: #fff}
-.x-tab-strip span.x-tab-strip-text{color: #666;font-weight:bold}
-.x-tab-strip-over span.x-tab-strip-text{color:#15428b;}
-.x-tab-strip-active span.x-tab-strip-text{cursor:default;color:#15428b;}
-ul.x-tab-strip-bottom{padding-bottom:1px;background:url(../images/pagan/tabs/tab-strip-btm-bg.gif) #cedff5 repeat-x top;border-top:1px solid #8db2e3;border-bottom:0 none;}
-.x-tab-strip-bottom .x-tab-right{background:url(../images/pagan/tabs/tab-btm-inactive-right-bg.gif) no-repeat bottom right;}
-.x-tab-strip-bottom .x-tab-left{background:url(../images/pagan/tabs/tab-btm-inactive-left-bg.gif) no-repeat bottom left;}
-.x-tab-strip-bottom .x-tab-strip-active .x-tab-right{background:url(../images/pagan/tabs/tab-btm-right-bg.gif) no-repeat bottom left;}
-.x-tab-strip-bottom .x-tab-strip-active .x-tab-left{background:url(../images/pagan/tabs/tab-btm-left-bg.gif) no-repeat bottom right;}
+.x-tab-panel-header, .x-tab-panel-footer {
+    background-color: #fff;
+}
 
-.x-tree-node .x-tree-selected{background-color:#ddf;}
+.x-tab-strip span.x-tab-strip-text {
+    color: #666;
+}
+
+.x-tab-strip-over span.x-tab-strip-text {
+    color: #15428b;
+}
+
+.x-tab-strip-active span.x-tab-strip-text {
+    color: #15428b;
+}
+
+ul.x-tab-strip-bottom{
+    background-color: #cedff5;
+	background-image: url(../images/pagan/tabs/tab-strip-btm-bg.gif);
+	border-top-color: #8db2e3;
+}
+
+.x-tab-strip-bottom .x-tab-right {
+	background-image: url(../images/pagan/tabs/tab-btm-inactive-right-bg.gif);
+}
+
+.x-tab-strip-bottom .x-tab-left {
+	background-image: url(../images/pagan/tabs/tab-btm-inactive-left-bg.gif);
+}
+
+.x-tab-strip-bottom .x-tab-strip-active .x-tab-right {
+	background-image: url(../images/pagan/tabs/tab-btm-right-bg.gif);
+}
+
+.x-tab-strip-bottom .x-tab-strip-active .x-tab-left {
+	background-image: url(../images/pagan/tabs/tab-btm-left-bg.gif);
+}
+
+.x-tree-node .x-tree-selected {
+    background-color: #ddf;
+}
