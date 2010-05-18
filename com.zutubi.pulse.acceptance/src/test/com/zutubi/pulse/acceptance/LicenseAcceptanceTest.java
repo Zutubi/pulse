@@ -109,6 +109,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
         while (!condition.satisfied() && tried < 3)
         {
+            browser.open(urls.base());
             browser.waitForPageToLoad();
             tried++;
         }

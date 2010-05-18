@@ -376,7 +376,8 @@ public class SystemUtils
             n = root.enumerate(threads, true);
         } while (n == nAlloc);
 
-        return Arrays.asList(Arrays.copyOf(threads, n));
+        Thread[] t = Arrays.copyOf(threads, n);
+        return Arrays.asList(t);
     }
 
     private static ThreadGroup getRootThreadGroup() {
