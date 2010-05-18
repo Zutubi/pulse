@@ -25,159 +25,200 @@
     <p>
         New to Pulse?  Here are a few ways to get started:
     </p>
-    <p>
-        <table class="template-actions" cellspacing="5px">
-            <tr>
-                <th class="category" colspan="2">configure</th>
-            </tr>
+    <table class="template-actions" cellspacing="5px">
+        <tr>
+            <th class="category" colspan="2">configure</th>
+        </tr>
 #auth("path=projects" "action=create")
-            <tr>
-                #actionHeader("add.projects" "add new projects" "add" "$urls.adminProjects()")
-                <td>using the add project wizard (administration &gt; projects tab)</td>
-            </tr>
+        <tr>
+            #actionHeader("add.projects" "add new projects" "add" "$urls.adminProjects()")
+            <td>using the add project wizard (administration &gt; projects tab)</td>
+        </tr>
 #end
 #auth("path=users" "action=create")
-            <tr>
-                #actionHeader("add.users" "add new users" "add" "$urls.adminUsers()")
-                <td>at the users view (administration &gt; users tab)</td>
-            </tr>
+        <tr>
+            #actionHeader("add.users" "add new users" "add" "$urls.adminUsers()")
+            <td>at the users view (administration &gt; users tab)</td>
+        </tr>
 #end
 #auth("path=agents" "action=create")
-            <tr>
-                #actionHeader("add.agents" "add new agents" "add" "$urls.adminAgents()")
-                <td>using the add agent wizard (administration &gt; agents tab)</td>
-            </tr>
+        <tr>
+            #actionHeader("add.agents" "add new agents" "add" "$urls.adminAgents()")
+            <td>using the add agent wizard (administration &gt; agents tab)</td>
+        </tr>
 #end
 #auth("path=settings" "action=write")
-            <tr>
-                #actionHeader("configure.settings" "configure server settings" "pencil" "$urls.adminSettings()")
-                <td>at the server settings view (administration &gt; settings tab)</td>
-            </tr>
+        <tr>
+            #actionHeader("configure.settings" "configure server settings" "pencil" "$urls.adminSettings()")
+            <td>at the server settings view (administration &gt; settings tab)</td>
+        </tr>
 #end
-            <tr>
-                #actionHeader("configure.preferences" "configure your preferences" "pencil" "$urls.dashboardPreferences()")
-                <td>at the preferences view (dashboard &gt; preferences tab)</td>
-            </tr>
-            <tr>
-                <th class="category" colspan="2">explore</th>
-            </tr>
-            <tr>
-                #actionHeader("view.dashboard" "go to your home page" "zoom" "$urls.dashboard()")
-                <td>at the dashboard view (dashboard &gt; home)</td>
-            </tr>
-            <tr>
-                #actionHeader("browse.projects" "browse build reports" "zoom" "$urls.browse()")
-                <td>at the browse view (browse)</td>
-            </tr>
-            <tr>
-                #actionHeader("view.activity" "view server activity" "zoom" "$urls.server()")
-                <td>at the server view (server)</td>
-            </tr>
-            <tr>
-                #actionHeader("view.agents" "view all agents" "zoom" "$urls.agents()")
-                <td>at the agents view (agents)</td>
-            </tr>
-        </table>
-    </p>
-    
+        <tr>
+            #actionHeader("configure.preferences" "configure your preferences" "pencil" "$urls.dashboardPreferences()")
+            <td>at the preferences view (dashboard &gt; preferences tab)</td>
+        </tr>
+        <tr>
+            <th class="category" colspan="2">explore</th>
+        </tr>
+        <tr>
+            #actionHeader("view.dashboard" "go to your home page" "zoom" "$urls.dashboard()")
+            <td>at the dashboard view (dashboard &gt; home)</td>
+        </tr>
+        <tr>
+            #actionHeader("browse.projects" "browse build reports" "zoom" "$urls.browse()")
+            <td>at the browse view (browse)</td>
+        </tr>
+        <tr>
+            #actionHeader("view.activity" "view server activity" "zoom" "$urls.server()")
+            <td>at the server view (server)</td>
+        </tr>
+        <tr>
+            #actionHeader("view.agents" "view all agents" "zoom" "$urls.agents()")
+            <td>at the agents view (agents)</td>
+        </tr>
+    </table>
+
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.2 has several new features.  Among the most important are:
+        Pulse 2.2 is packed with new features, with a major focus on the user interface and usability
+        in general.  Among the most important updates are:
     </p>
-    <p>
-        <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
-            <tr>
-                <th class="category" colspan="2">new in 2.2</th>
-            </tr>
-            <tr>
-                #actionHeader("artifacts.tab" "artifacts tab" "accept" false)
-                <td>
-                    An all new "artifacts" tab for builds.  The clarity of this tab has been
-                    improved, and it now includes additional information such as a hash for the
-                    artifact files.  You can also filter artifacts to show only the ones you are
-                    interested in.  By marking some artifacts as "featured" you can have them appear
-                    more prominently.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("logs.tab" "logs tab" "accept" false)
-                <td>
-                    The logs for a build and each build stage are now displayed in a dedicated tab
-                    rather than under the detailed view.  This tab makes it easy to switch logs.
-                    The log for the first stage is shown by default, rather than the (usually less
-                    interesting) build log.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("changes.tab" "changes tab" "accept" false)
-                <td>
-                    The changes tab for a build has been completely reworked.  The new layout for
-                    this tab shows more information in the same amount of vertical space.  It also
-                    presents the information with less clutter.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("build.navigation" "build navigation" "accept" false)
-                <td>
-                    The navigation bar at the top of the Pulse web UI now allows you to step
-                    forwards and backwards through build results.  You can instantly see the status
-                    of adjacent builds, step forwards or backwards, or move to the next or previous
-                    build of a given status.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("working.copy.review" "working copy browsing" "accept" false)
-                <td>
-                    The ability to browse a build's working copy has been reviewed.  The old option
-                    to capture working copy snapshots has been removed in favour of a simpler and
-                    faster alternative - the ability to browse the working copies on the agents
-                    themselves.  This can be used to debug build problems, and is especially useful
-                    for incremental builds.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("agent.executing.stages" "agent executing stages" "accept" false)
-                <td>
-                    The agents page now shows the executing build stage for each agent.  This allows
-                    you to see, at a glance, what all of your agents are doing.  You can also drill
-                    down to the project or build in question.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("move.refactoring" "move refactoring" "accept" false)
-                <td>
-                    Both projects and agents may now be moved to a new location in the template
-                    hierarchy via a new "move" refactoring.  This allows you to reorganise your
-                    projects without reconfiguration and/or losing project history.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("subscribe.by.label" "subscribe by label" "accept" false)
-                <td>
-                    Users can now subscribe to project notifications by label.  This allows a user
-                    to create a subscription once, and automatically have apply to projects with the
-                    given lables.  When a new project is added, users do not need to modify their
-                    subscriptions.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("svn.export" "subversion export" "accept" false)
-                <td>
-                    Projects using Subversion may now optionally choose to use exports rather than
-                    full working copies.  Exports are much smaller in size than full checkouts,
-                    allowing faster builds that use less disk space.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("persistent.agent.messaging" "persistent agent messaging" "accept" false)
-                <td>
-                    A new persistent agent messaging system has been implemented to allow the Pulse
-                    master better control over agents.  For example, this system has been used to
-                    improve cleanup of persistent working directories on the agents.
-                </td>
-            </tr>
-        </table>
-    </p>
+    <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
+        <tr>
+            <th class="category" colspan="2">new in 2.2</th>
+        </tr>
+        <tr>
+            #actionHeader("summary.tab" "build summary tab" "accept" false)
+            <td>
+                The build summary tab has been reviewed and improved to fit more important
+                information in a better layout.  Related links (mined from commit messages)
+                and featured artifacts have been added to this tab for convenient access.
+                These and similar links are displayed in an independent right column.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("artifacts.tab" "artifacts tab" "accept" false)
+            <td>
+                An all new artifacts tab for builds.  The clarity of this tab has been
+                improved, and it now includes additional information such as the size and hash of
+                the artifact files.  You can also filter artifacts to show only the ones you are
+                interested in.  By marking some artifacts as "featured" you can have them appear
+                more prominently (both on this tab, and on the build summary tab).
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("logs.tab" "logs tab" "accept" false)
+            <td>
+                The logs for a build and each build stage are now displayed in a dedicated tab
+                rather than under the detailed view.  This tab makes it easy to switch logs.
+                The log for the first stage is shown by default, rather than the (usually less
+                interesting) build log.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("tests.tab" "tests tab" "accept" false)
+            <td>
+                The tests tab has been updated to show test results from completed stages while
+                a build is still in progress.  Like all other active views, the test tab now
+                updates while the build is in progress.  Finally, filtering out successful tests
+                has been made easier, as your choice is remember as you drill through test suites.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("details.tab" "details tab" "accept" false)
+            <td>
+                The detailed view for the build has been overhauled with a new layout.  The details
+                of the build, each stage and each command are now presented with greater clarity.
+                The new layout also allows the page to be updated efficiently while the build is
+                in progress.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("changes.tab" "changes tab" "accept" false)
+            <td>
+                The changes tab for a build has been completely reworked.  The new layout for
+                this tab shows more information in the same amount of vertical space.  It also
+                presents the information with less clutter.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("build.navigation" "build navigation" "accept" false)
+            <td>
+                The navigation bar at the top of the Pulse web UI now allows you to step
+                forwards and backwards through build results.  You can instantly see the status
+                of adjacent builds, step forwards or backwards, or move to the next or previous
+                build of a given status.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("working.copy.review" "working copy browsing" "accept" false)
+            <td>
+                The ability to browse a build's working copy has been reviewed.  The old option
+                to capture working copy snapshots has been removed in favour of a simpler and
+                faster alternative - the ability to browse the working copies on the agents
+                themselves.  This can be used to debug build problems, and is especially useful
+                for incremental builds.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("agent.executing.stages" "agent executing stages" "accept" false)
+            <td>
+                The agents page now shows the executing build stage for each agent.  This allows
+                you to see, at a glance, what all of your agents are doing.  You can also drill
+                down to the project or build in question.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("move.refactoring" "move refactoring" "accept" false)
+            <td>
+                Both projects and agents may now be moved to a new location in the template
+                hierarchy via a new "move" refactoring.  This allows you to reorganise your
+                projects without reconfiguration and/or losing project history.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("template.navigation" "template hierarchy navigation" "accept" false)
+            <td>
+                When editing projects and agents, it is now much simpler to navigate up and
+                down the template hierarchy.  You can navigate to the same configuration
+                in any ancestor or descendant in one action, rather than switching back and forth
+                between the configuration and hierarchy views.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("subscribe.by.label" "subscribe by label" "accept" false)
+            <td>
+                Users can now subscribe to project notifications by label.  This allows a user
+                to create a subscription once, and automatically have apply to projects with the
+                given lables.  When a new project is added, users do not need to modify their
+                subscriptions.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("svn.export" "subversion export" "accept" false)
+            <td>
+                Projects using Subversion may now optionally choose to use exports rather than
+                full working copies.  Exports are much smaller in size than full checkouts,
+                allowing faster builds that use less disk space.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("persistent.agent.messaging" "persistent agent messaging" "accept" false)
+            <td>
+                A new persistent agent messaging system has been implemented to allow the Pulse
+                master better control over agents.  For example, this system has been used to
+                improve cleanup of persistent working directories on the agents.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("configuration.performance" "configuration system performance" "accept" false)
+            <td>
+                More improvements have been made to the performance of the configuration subsystem.
+                For installations with large numbers of projects and/or agents, this should improve
+                performance of several pages (not limited to editing configuration).
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
 
