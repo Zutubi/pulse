@@ -72,12 +72,14 @@ Ext.ux.tree.TreeGridNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
     animExpand : function(cb){
         this.ctNode.style.display = "";
         Ext.ux.tree.TreeGridNodeUI.superclass.animExpand.call(this, cb);
-    }
+    },
+
+   onClick: Ext.emptyFn
 });
 
 Ext.ux.tree.TreeGridRootNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
     isTreeGridNodeUI: true,
-
+    
     // private
     render : function(){
         if(!this.rendered){
