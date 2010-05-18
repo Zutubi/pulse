@@ -376,8 +376,15 @@ public class SystemUtils
             n = root.enumerate(threads, true);
         } while (n == nAlloc);
 
-        Thread[] t = Arrays.copyOf(threads, n);
-        return Arrays.asList(t);
+        List<Thread> result = new LinkedList<Thread>();
+        CollectionUtils.filter(threads, new Predicate<Thread>()
+        {
+            public boolean satisfied(Thread thread)
+            {
+                return thread != null;
+            }
+        }, result);
+        return result;
     }
 
     private static ThreadGroup getRootThreadGroup() {
