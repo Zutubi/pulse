@@ -721,7 +721,8 @@ th.fit-width, td.fit-width
 td.health-unknown, td.health-ok, td.health-broken, td.health-warnings
 {
     width: 10px;
-    background: no-repeat 1px 4px;
+    background-repeat: no-repeat;
+    background-position: 1px 4px;
 }
 
 td.group-header
