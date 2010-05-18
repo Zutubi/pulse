@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Constants;
+import com.zutubi.util.Condition;
 
 import java.util.Date;
 import java.util.Hashtable;
@@ -95,7 +96,24 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, twoDaysAgo()));
 
         browser.open(urls.base());
-        browser.waitForElement("support-expired");
+        browser.waitForPageToLoad();
+        
+        int tried = 0;
+        Condition condition = new Condition()
+        {
+            public boolean satisfied()
+            {
+                return browser.isElementIdPresent("support-expired");
+            }
+        };
+
+        while (!condition.satisfied() && tried < 3)
+        {
+            browser.waitForPageToLoad();
+            tried++;
+        }
+
+        assertTrue(condition.satisfied());
         assertTextPresent("support/upgrades have expired");
         assertElementNotPresent("license-expired");
 
