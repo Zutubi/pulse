@@ -1106,7 +1106,7 @@ public class XmlRpcHelper
                     message += ", started " + (System.currentTimeMillis() - startTimeMillis) + "ms ago";
                 }
             }
-
+            System.err.println(threadDump());
             throw new TimeoutException(message, e);
         }
     }
@@ -1159,6 +1159,11 @@ public class XmlRpcHelper
     public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception
     {
         return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);
+    }
+
+    public String threadDump() throws Exception
+    {
+        return (String) call("threadDump");
     }
 
     private static class BuildHolder

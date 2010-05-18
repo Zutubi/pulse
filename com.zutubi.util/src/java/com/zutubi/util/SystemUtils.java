@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 
 /**
  */
@@ -335,5 +337,56 @@ public class SystemUtils
         {
             return Boolean.valueOf(value);
         }
+    }
+
+    /**
+     * Trigger a dump of all the threads currently active in the system.
+     *
+     * @param out   the print stream to which the thread dump is written.
+     */
+    public static void threadDump(PrintStream out)
+    {
+        for (Thread t : getAllThreads())
+        {
+            out.println(t);
+            StackTraceElement[] traceElements = t.getStackTrace();
+            for (StackTraceElement element : traceElements) 
+            {
+                out.println("\tat " + element);
+            }
+            out.println();
+        }
+    }
+
+    /**
+     * Get a list of all the threads currently active within the system.
+     *
+     * @return a list of threads.
+     */
+    public static List<Thread> getAllThreads()
+    {
+        final ThreadGroup root = getRootThreadGroup();
+        final ThreadMXBean thbean = ManagementFactory.getThreadMXBean();
+        int nAlloc = thbean.getThreadCount();
+        int n = 0;
+        Thread[] threads;
+        do {
+            nAlloc *= 2;
+            threads = new Thread[nAlloc];
+            n = root.enumerate(threads, true);
+        } while (n == nAlloc);
+
+        return Arrays.asList(Arrays.copyOf(threads, n));
+    }
+
+    private static ThreadGroup getRootThreadGroup() {
+
+        ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup parentThreadGroup;
+        while ((parentThreadGroup = threadGroup.getParent()) != null)
+        {
+            threadGroup = parentThreadGroup;
+        }
+        return threadGroup;
     }
 }

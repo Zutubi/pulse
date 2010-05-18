@@ -58,6 +58,8 @@ import java.util.*;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3953,6 +3955,23 @@ public class RemoteApi
         tokenManager.verifyAdmin(token);
         shutdownManager.delayedStop();
         return true;
+    }
+
+    /**
+     * @internal Trigger and return a jvm thread dump.  Note that this only works when
+     * there are threads free to do this work.
+     *
+     * @param token authentication token (see {@link #login})
+     * @return the thread dump.
+     */
+    public String threadDump(String token)
+    {
+        tokenManager.verifyAdmin(token);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SystemUtils.threadDump(new PrintStream(baos));
+
+        return new String(baos.toByteArray());
     }
 
     private Project internalGetProject(String projectName, boolean allowInvalid)

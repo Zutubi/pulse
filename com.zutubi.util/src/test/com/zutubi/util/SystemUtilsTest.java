@@ -3,6 +3,8 @@ package com.zutubi.util;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 /**
  * NOTE: cygwin is requried on the path for windows machines.
@@ -61,6 +63,21 @@ public class SystemUtilsTest extends ZutubiTestCase
                 assertEquals("mvn", mvn.getName());
             }
         }
+    }
+
+    public void testThreadDump()
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SystemUtils.threadDump(new PrintStream(baos));
+
+        String[] dump = new String(baos.toByteArray()).split("\n");
+        assertTrue(CollectionUtils.find(dump, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                return s.contains("at com.zutubi.util.SystemUtils.threadDump");
+            }
+        }) != null);
     }
 
 /*
