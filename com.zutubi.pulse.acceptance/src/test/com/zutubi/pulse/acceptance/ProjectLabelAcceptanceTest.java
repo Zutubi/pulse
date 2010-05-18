@@ -40,7 +40,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         insertLabel(p1, label2);
         insertLabel(p2, label1);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, g1, p1, p2);
         assertGroupPresent(browsePage, g2, p1);
@@ -63,7 +63,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         insertLabel(projectName, label);
 
         String userPath = xmlRpcHelper.insertTrivialUser(userLogin);
-        login(userLogin, "");
+        browser.login(userLogin, "");
 
         // Default is group by label
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
@@ -93,7 +93,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> label1 = createLabel(group);
         insertLabel(p1, label1);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
         assertFalse(browsePage.isProjectPresent(group, p2));
@@ -117,7 +117,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         insertLabel(p1, label1);
         String path = insertLabel(p2, label1);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1, p2);
 
@@ -138,7 +138,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> label1 = createLabel(group);
         String path = insertLabel(p1, label1);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
 

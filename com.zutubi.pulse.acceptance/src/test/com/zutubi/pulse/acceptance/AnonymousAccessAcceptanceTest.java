@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -75,7 +76,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         assertFalse(welcomePage.isElementIdPresent(IDs.ID_LOGIN));
 
         // logout and log back in again.
-        logout();
+        browser.logout();
 
         loginPage = browser.open(LoginPage.class);
         loginPage.login(login, password);
@@ -118,7 +119,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         browser.open(urls.base() + SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         form.waitFor();
-        form.saveFormElements("admin", "name", "p", "p");
+        form.saveFormElements(ADMIN_CREDENTIALS.getUserName(), "name", "p", "p");
         assertTrue(form.isFormPresent());
         assertTextPresent("login 'admin' is already in use");
     }

@@ -73,7 +73,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
     {
         int buildId = buildRunner.triggerAndWaitForBuild(testProject);
 
-        login(TEST_USER, "");
+        browser.login(TEST_USER, "");
         BuildSummaryPage page = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, (long) buildId);
         page.clickAction(BuildResult.ACTION_ADD_COMMENT);
 
@@ -90,14 +90,14 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
 
         BuildSummaryPage page = addCommentHelper();
 
-        logout();
-        login(random, "");
+        browser.logout();
+        browser.login(random, "");
 
         page.openAndWaitFor();
         assertFalse(page.isDeleteCommentLinkPresent(1));
 
-        logout();
-        login(TEST_USER, "");
+        browser.logout();
+        browser.login(TEST_USER, "");
         
         page.openAndWaitFor();
         assertTrue(page.isDeleteCommentLinkPresent(1));
@@ -135,7 +135,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
 
     private BuildSummaryPage addCommentToBuild(String project, int buildId)
     {
-        login(TEST_USER, "");
+        browser.login(TEST_USER, "");
         BuildSummaryPage page = browser.openAndWaitFor(BuildSummaryPage.class, project, (long) buildId);
         assertFalse(page.isCommentsPresent());
 

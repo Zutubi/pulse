@@ -20,7 +20,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
     public void testDefaultGroupsTable()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
@@ -33,7 +33,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
     public void testCreateEmptyGroup()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
@@ -61,12 +61,12 @@ public class GroupAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        login(login, "");
+        browser.login(login, "");
         ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
-        logout();
+        browser.logout();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
@@ -75,12 +75,12 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.applyFormElements(null, userHandle, null);
         form.waitFor();
-        logout();
+        browser.logout();
 
-        login(login, "");
+        browser.login(login, "");
         globalPage.openAndWaitFor();
         browser.waitForElement(HierarchyPage.LINK_ADD);
-        logout();
+        browser.logout();
     }
 
     public void testAddPermissionToGroup() throws Exception
@@ -99,35 +99,35 @@ public class GroupAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, userHandle, null);
         browser.waitForElement(getGroupPath(random));
-        logout();
+        browser.logout();
 
-        login(login, "");
+        browser.login(login, "");
         ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
-        logout();
+        browser.logout();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminGroup(random));
         form.waitFor();
         form.applyFormElements(null, null, ServerPermission.CREATE_PROJECT.toString());
         form.waitFor();
-        logout();
+        browser.logout();
 
-        login(login, "");
+        browser.login(login, "");
         globalPage.openAndWaitFor();
         assertTrue(globalPage.isAddPresent());
-        logout();
+        browser.logout();
     }
 
     public void testEditBuiltInGroup()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
@@ -150,7 +150,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
     private void assertBuiltinGroupNameIsReadOnly(String groupName, String groupId)
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
@@ -164,7 +164,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         assertTrue(form.isFormPresent());
         assertFalse(form.isEditable("name"));
 
-        logout();
+        browser.logout();
     }
 
     private String getGroupPath(String group)

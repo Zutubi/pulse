@@ -56,7 +56,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         // When configuring a template and a single select is shown, that
         // single select should have an empty option added.
-        loginAsAdmin();
+        browser.loginAsAdmin();
         addProject(random, true, GLOBAL_PROJECT_NAME, false);
         browser.open(urls.adminProject(uriComponentEncode(random)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
@@ -73,7 +73,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
         String labelsPath = getPath(childPath, "labels");
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, labelsPath);
         labelsPage.clickAdd();
 
@@ -95,7 +95,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, getPath(projectPath, "labels"));
         labelsPage.clickAdd();
 
@@ -112,7 +112,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
         String labelBaseName = insertLabel(projectPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, getPath(projectPath, "labels"));
         labelsPage.clickView(labelBaseName);
 
@@ -133,7 +133,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCheckForm() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureProject(CHECK_PROJECT);
         browser.open(urls.adminProject(WebUtils.uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
@@ -147,7 +147,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCheckFormFailure() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureProject(CHECK_PROJECT);
         browser.open(urls.adminProject(WebUtils.uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
@@ -161,7 +161,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCheckFormValidationFailure() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureProject(CHECK_PROJECT);
         browser.open(urls.adminProject(uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
@@ -176,7 +176,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCheckFormCheckFieldValidationFailure() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.admin() + "settings/email/");
         EmailSettingsForm form = browser.createForm(EmailSettingsForm.class);
         form.waitFor();
@@ -189,7 +189,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCheckFormInWizard() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, false);
         hierarchyPage.clickAdd();
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
@@ -216,7 +216,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         ensureProject(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage configPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         ListPage listPage = configPage.clickCollection("permissions", "permissions");
         listPage.waitFor();
@@ -238,7 +238,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testClearMultiSelect() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         browser.open(urls.adminGroup(UserManager.ANONYMOUS_USERS_GROUP_NAME));
         BuiltinGroupForm groupForm = browser.createForm(BuiltinGroupForm.class);
@@ -258,7 +258,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String propertiesPath = getPropertiesPath(projectPath);
         insertProperty(projectPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, propertiesPath);
         propertiesPage.clickAdd();
 
@@ -276,7 +276,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(parentPath);
         String childPath = xmlRpcHelper.insertTrivialProject(random + "-child", parentName, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         propertiesPage.clickAdd();
 
@@ -295,7 +295,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
         insertProperty(childPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(parentPath));
         assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
@@ -318,7 +318,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(child1Path);
         insertProperty(child2Path);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(parentPath));
         assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
@@ -341,7 +341,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childPropertiesPath = getPropertiesPath(childPath);
         xmlRpcHelper.deleteConfig(getPath(childPropertiesPath, "p1"));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, childPropertiesPath);
         assertItemPresent(propertiesPage, "p1", ListPage.ANNOTATION_HIDDEN);
         propertiesPage.clickAdd();
@@ -361,7 +361,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
 
         // At this point we should be allowed to configure in the parent
-        loginAsAdmin();
+        browser.loginAsAdmin();
         CompositePage compositePage = browser.openAndWaitFor(CompositePage.class, getPath(parentPath, "changeViewer"));
         assertTrue(compositePage.isConfigureLinkPresent());
 
@@ -381,7 +381,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         String path = orderPrelude();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertItemPresent(listPage, "p1", null, ACTION_DOWN);
         assertFalse(listPage.isActionLinkPresent("p1", ACTION_UP));
@@ -394,7 +394,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         String path = orderPrelude();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertEquals("p2", listPage.getCellContent(1, 0));
         assertEquals("p3", listPage.getCellContent(2, 0));
@@ -408,7 +408,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         String path = orderPrelude();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertEquals("p2", listPage.getCellContent(1, 0));
         assertEquals("p3", listPage.getCellContent(2, 0));
@@ -437,7 +437,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         trigger.put("name", "t2");
         xmlRpcHelper.insertConfig(triggersPath, trigger);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage listPage = browser.openAndWaitFor(ListPage.class, triggersPath);
         assertFalse(listPage.isOrderColumnPresent(2));
         assertItemPresent(listPage, "t1", null);
@@ -453,7 +453,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String path = orderPrelude();
 
         xmlRpcHelper.insertTrivialUser(random);
-        login(random, "");
+        browser.login(random, "");
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertFalse(listPage.isOrderColumnPresent(2));
         assertItemPresent(listPage, "p1", null);
@@ -476,8 +476,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         insertProperty(parentPath, "p1");
         insertProperty(parentPath, "p2");
-        
-        loginAsAdmin();
+
+        browser.loginAsAdmin();
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         assertFalse(listPage.isOrderInheritedPresent());
         assertFalse(listPage.isOrderOverriddenPresent());
@@ -500,8 +500,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
         xmlRpcHelper.setConfigOrder(getPropertiesPath(childPath), "p1", "p2");
-        
-        loginAsAdmin();
+
+        browser.loginAsAdmin();
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         assertFalse(listPage.isOrderInheritedPresent());
         assertTrue(listPage.isOrderOverriddenPresent());
@@ -513,7 +513,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childName = random + "-child";
         xmlRpcHelper.insertSimpleProject(parentName, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         addInheritingProject(parentName, childName);
 
         ProjectHierarchyPage childHierarchyPage = browser.createPage(ProjectHierarchyPage.class, childName, false);
@@ -544,7 +544,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         command.put("name", NEW_COMMAND_NAME);
         xmlRpcHelper.saveConfig(recipePath, recipe, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         addInheritingProject(parentName, childName);
 
         String childRecipesPath = getPath(PROJECTS_SCOPE, childName, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES);
@@ -575,7 +575,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testWizardMultiRecipeProject() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         runAddProjectWizard(new DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
         {
@@ -601,7 +601,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         
         xmlRpcHelper.insertProject(parent, GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.getMultiRecipeTypeConfig());
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectHierarchyPage parentHierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parent, true);
         parentHierarchyPage.clickAdd();
@@ -624,7 +624,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCustomProject() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         final String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
 
@@ -659,7 +659,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
         xmlRpcHelper.insertProject(parent, GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.getCustomTypeConfig(pulseFileString));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectHierarchyPage parentHierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parent, true);
         parentHierarchyPage.clickAdd();
@@ -690,7 +690,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childName = random + "-child";
         xmlRpcHelper.insertSimpleProject(parentName, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
         hierarchyPage.clickAdd();
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
@@ -705,7 +705,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testDefaultProjectConfigCreated()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         addProject(random, false);
 
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "stages"));
@@ -720,7 +720,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         addProject(parentName, true, GLOBAL_PROJECT_NAME, false);
         addInheritingProject(parentName, childName);
 
@@ -733,7 +733,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testValidationInWizard()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage projectsPage = browser.openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
         projectsPage.clickAdd();
 
@@ -760,7 +760,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testTemplateValidationInWizard()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage projectsPage = browser.openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
         projectsPage.clickAddTemplate();
 
@@ -801,7 +801,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
 
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
@@ -820,7 +820,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, true);
 
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
@@ -839,35 +839,35 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testInvalidPathNonExistantScope() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.admin() + "scopish/");
         assertGenericError("Invalid path 'scopish': references non-existant root scope 'scopish'");
     }
 
     public void testInvalidPathNonExistantCollectionItem() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminUser("nosuchuser"));
         assertGenericError("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection");
     }
 
     public void testInvalidPathNonExistantTemplateItem() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminProject("nosuchproject"));
         assertGenericError("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection");
     }
 
     public void testInvalidPathNonExistantProperty() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");
         assertGenericError("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'");
     }
 
     public void testInvalidPathSimpleProperty() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminProject(GLOBAL_PROJECT_NAME) + "name/");
         assertGenericError("Invalid path 'projects/global project template/name': references non-complex type");
     }
@@ -875,14 +875,14 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testInstanceErrorsDisplayed() throws Exception
     {
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.openAndWaitFor(CompositePage.class, projectPath);
         assertTextPresent("An SCM must be configured to complete this project.");
     }
 
     public void testSaveNoParentPath() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminSettings());
         ServerSettingsForm form = browser.createForm(ServerSettingsForm.class);
         form.waitFor();
@@ -895,7 +895,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testCancelNoParentPath() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminSettings());
         ServerSettingsForm form = browser.createForm(ServerSettingsForm.class);
         form.waitFor();
@@ -923,7 +923,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testPunctuatedProjectName()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         String punctuatedName = ".;.,." + random;
         addProject(punctuatedName, false);
@@ -946,9 +946,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialUser(user);
         xmlRpcHelper.insertTrivialProject(template, true);
         xmlRpcHelper.insertTrivialProject(concrete, false);
-        
-        loginAsAdmin();
-        
+
+        browser.loginAsAdmin();
+
         ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isMovePresent());
 
@@ -957,9 +957,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ProjectHierarchyPage concretePage = browser.openAndWaitFor(ProjectHierarchyPage.class, concrete, false);
         assertTrue(concretePage.isMovePresent());
-        
-        logout();
-        login(user, "");
+
+        browser.logout();
+        browser.login(user, "");
 
         templatePage.openAndWaitFor();
         assertFalse(templatePage.isMovePresent());
@@ -977,8 +977,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(newTemplateParent, true);
         String toMovePath = xmlRpcHelper.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
-        loginAsAdmin();
-        
+        browser.loginAsAdmin();
+
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, toMove, false);
         hierarchyPage.clickMove();
         
@@ -1000,8 +1000,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProject(newTemplateParent, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.createVersionedConfig("path"));
         String toMovePath = xmlRpcHelper.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
-        loginAsAdmin();
-        
+        browser.loginAsAdmin();
+
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, toMove, false);
         hierarchyPage.clickMove();
         
@@ -1029,7 +1029,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(templateName, true);
         xmlRpcHelper.insertSimpleProject(concreteName, templateName, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         CompositePage rootPage = browser.openAndWaitFor(CompositePage.class, getPath(PROJECTS_SCOPE, GLOBAL_PROJECT_NAME, Constants.Project.POST_PROCESSORS, PROCESSOR_NAME));
         assertFalse(rootPage.isAncestorNavigationPresent());
@@ -1049,7 +1049,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     
     private void checkListedRecipes(String... expectedRecipes)
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
 
         BuildStageForm stageForm = browser.createForm(BuildStageForm.class, false);

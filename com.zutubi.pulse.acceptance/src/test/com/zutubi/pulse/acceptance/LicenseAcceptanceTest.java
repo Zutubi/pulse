@@ -31,7 +31,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
-        loginAsAdmin();
+        browser.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception

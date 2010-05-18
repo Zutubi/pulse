@@ -38,7 +38,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         String labelPath = insertLabel(parent, createLabel("foo"));
         String childLabelPath = labelPath.replace(parent, child);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         assertPushDownAvailability(childLabelPath, false);
     }
 
@@ -50,7 +50,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
 
         String labelPath = insertLabel(parent, createLabel("foo"));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         assertPushDownAvailability(labelPath, true);
     }
 
@@ -107,7 +107,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         setupHierarchy(parent, child);
         String propertyPath = xmlRpcHelper.insertProjectProperty(parent, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertyList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(propertyList.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(propertyList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_PUSH_DOWN));

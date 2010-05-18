@@ -64,7 +64,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
         String projectHandle = xmlRpcHelper.getConfigHandle(path);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         // go to add dependency page.
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectName, false);
@@ -89,7 +89,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         addStages(projectA, "a1", "a2", "a3", "a4");
         addStages(projectB, "b1", "b2");
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectC, false);
 
@@ -143,7 +143,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         projectC.addDependency(projectB);
         insertProject(projectC);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectA.getName(), false);
 
@@ -165,7 +165,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         addProject(projectB, true);
         xmlRpcHelper.enableBuildPrompting(projectB);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         assertFalse(isRebuildOptionAvailableOnPrompt(projectB, false));
 
@@ -211,7 +211,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         addDependency(downstreamBothProject, upstreamProject1);
         addDependency(downstreamBothProject, upstreamProject2, IvyStatus.STATUS_MILESTONE);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         assertFalse(isRebuildActionAvailableOnProjectHomePage(upstreamProject1));
         assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamIntegrationProject));

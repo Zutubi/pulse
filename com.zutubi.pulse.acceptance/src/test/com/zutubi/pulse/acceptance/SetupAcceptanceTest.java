@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.setup.*;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import org.xml.sax.SAXException;
@@ -147,7 +148,13 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         // create admin.
         createAdminForm.waitFor();
-        createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin@example.com", "admin", "admin");
+        createAdminForm.nextFormElements(
+                ADMIN_CREDENTIALS.getUserName(),
+                "A. D. Ministrator",
+                "admin@example.com",
+                ADMIN_CREDENTIALS.getPassword(),
+                ADMIN_CREDENTIALS.getPassword()
+        );
     }
 
     private void checkServerSettings()

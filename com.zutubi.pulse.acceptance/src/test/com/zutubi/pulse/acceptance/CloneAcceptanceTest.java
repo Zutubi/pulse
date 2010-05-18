@@ -51,8 +51,8 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         label.put("label", "foo");
         String labelsPath = PathUtils.getPath(projectPath, "labels");
         String labelPath = xmlRpcHelper.insertConfig(labelsPath, label);
-        
-        loginAsAdmin();
+
+        browser.loginAsAdmin();
         assertCloneAvailability(labelPath, false);
     }
 
@@ -64,20 +64,20 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String propertyPath = xmlRpcHelper.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
         String userPath = xmlRpcHelper.insertTrivialUser(user);
 
-        login(user, "");
+        browser.login(user, "");
         assertCloneAvailability(propertyPath, false);
 
         String groupPath = xmlRpcHelper.insertGroup(random + "-group", asList(userPath));
         xmlRpcHelper.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
 
-        logout();
-        login(user, "");
+        browser.logout();
+        browser.login(user, "");
         assertCloneAvailability(propertyPath, true);
     }
 
     public void testProjectCloneLinkNotPresentForTemplateRoot() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(hierarchyPage.isClonePresent());
     }
@@ -89,14 +89,14 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(project, false);
         String userPath = xmlRpcHelper.insertTrivialUser(user);
 
-        login(user, "");
+        browser.login(user, "");
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, project, false);
         assertFalse(hierarchyPage.isClonePresent());
 
         xmlRpcHelper.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
 
-        logout();
-        login(user, "");
+        browser.logout();
+        browser.login(user, "");
         hierarchyPage.openAndWaitFor();
         assertTrue(hierarchyPage.isClonePresent());
     }
@@ -156,7 +156,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(random, false);
         String propertyPath = xmlRpcHelper.insertProjectProperty(random, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage labelList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(labelList.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(labelList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_CLONE));
@@ -167,7 +167,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
@@ -182,7 +182,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
@@ -278,7 +278,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickSmartClone();
 
@@ -345,7 +345,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
     private ProjectHierarchyPage doSmartClone()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickSmartClone();
 
@@ -364,7 +364,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(childName, parentName, false);
         assertEquals(asList(childName), new ArrayList<String>(xmlRpcHelper.getTemplateChildren(parentPath)));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         return browser.openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
     }
 }

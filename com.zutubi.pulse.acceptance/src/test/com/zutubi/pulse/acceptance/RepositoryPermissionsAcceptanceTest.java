@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
-import com.zutubi.pulse.acceptance.Constants;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
@@ -58,11 +57,9 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
 
     public void testProject_AdminAccess() throws IOException
     {
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
-
         ensurePathExists(projectName);
-        assertEquals(__200_OK, httpGet(projectName, credentials));
-        assertEquals(__201_Created, httpPut(projectName + "/file.txt", credentials));
+        assertEquals(__200_OK, httpGet(projectName, ADMIN_CREDENTIALS));
+        assertEquals(__201_Created, httpPut(projectName + "/file.txt", ADMIN_CREDENTIALS));
     }
 
     public void testProject_UserAccess() throws Exception
@@ -83,12 +80,10 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
 
     public void testDefault_AdminAccess() throws IOException
     {
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
-
         String path = "some/" + randomName() + "/path";
         ensurePathExists(path);
-        assertEquals(__200_OK, httpGet(path, credentials));
-        assertEquals(__201_Created, httpPut(path + "/file.txt", credentials));
+        assertEquals(__200_OK, httpGet(path, ADMIN_CREDENTIALS));
+        assertEquals(__201_Created, httpPut(path + "/file.txt", ADMIN_CREDENTIALS));
     }
 
     public void testDefault_UserAccess() throws Exception

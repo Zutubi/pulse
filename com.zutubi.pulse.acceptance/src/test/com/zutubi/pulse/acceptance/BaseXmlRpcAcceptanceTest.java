@@ -106,8 +106,7 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
     protected String downloadAsAdmin(String url) throws IOException
     {
         HttpClient client = new HttpClient();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
-        client.getState().setCredentials(new AuthScope(null, -1), credentials);
+        client.getState().setCredentials(new AuthScope(null, -1), AcceptanceTestUtils.ADMIN_CREDENTIALS);
         client.getParams().setAuthenticationPreemptive(true);
 
         GetMethod get = new GetMethod(url);

@@ -27,7 +27,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         xmlRpcHelper.loginAsAdmin();
 
@@ -44,7 +44,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.logout();
 
-        logout();
+        browser.logout();
 
         super.tearDown();
     }

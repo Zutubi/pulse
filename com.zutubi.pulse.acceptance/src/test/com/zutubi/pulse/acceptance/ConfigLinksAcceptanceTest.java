@@ -23,7 +23,7 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         assertTrue(projectConfigPage.isLinksBoxPresent());
         assertTrue(projectConfigPage.isLinkPresent("home"));
@@ -38,7 +38,7 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
 
     public void testLinksNotShownForTemplate() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, GLOBAL_PROJECT_NAME, true);
         assertFalse(projectConfigPage.isLinksBoxPresent());
         assertFalse(projectConfigPage.isLinkPresent("home"));
@@ -46,7 +46,7 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
 
     public void testLinksNotShownForTypeWithNoLinks() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         CompositePage compositePage = browser.openAndWaitFor(CompositePage.class, GlobalConfiguration.SCOPE_NAME);
         assertFalse(compositePage.isLinksBoxPresent());
     }

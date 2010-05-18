@@ -43,7 +43,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     public void testActionFeedbackSimple() throws Exception
     {
         xmlRpcHelper.insertSimpleProject(random, false);
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
         waitForStatus(Messages.getInstance(ProjectConfiguration.class).format("clean.feedback"));
@@ -58,10 +58,10 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.saveFormElements("testpw", "testpw");
 
         usersPage.waitFor();
-        logout();
+        browser.logout();
 
         // Login with the new password
-        login(random, "testpw");
+        browser.login(random, "testpw");
     }
 
     public void testCustomActionWithArgumentValidation() throws Exception
@@ -84,17 +84,17 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         UserForm userForm = browser.createForm(UserForm.class, random);
         userForm.waitFor();
-        logout();
+        browser.logout();
 
         // Check the password is unchanged
-        login(random, "");
+        browser.login(random, "");
     }
 
     private ListPage customActionWithArgumentPrelude() throws Exception
     {
         xmlRpcHelper.insertTrivialUser(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage usersPage = browser.openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
         usersPage.clickAction(random, "setPassword");
         return usersPage;
@@ -155,7 +155,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM);
         return projectPage;
@@ -168,7 +168,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(parentProject, true);
         xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, childProject, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
@@ -181,7 +181,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(parentProject, true);
         String childPath = xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentProject, false);
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
@@ -198,14 +198,14 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
     public void testActionsListedForAgent() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentConfigPage agentPage = browser.openAndWaitFor(AgentConfigPage.class, AgentManager.MASTER_AGENT_NAME, false);
         assertTrue(agentPage.isActionPresent(AgentConfigurationActions.ACTION_PING));
     }
 
     public void testActionsNotListedForTemplateAgent() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentConfigPage agentPage = browser.openAndWaitFor(AgentConfigPage.class, AgentManager.GLOBAL_AGENT_NAME, false);
         assertFalse(agentPage.isActionPresent(AgentConfigurationActions.ACTION_PING));
     }
@@ -214,7 +214,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
@@ -224,7 +224,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
@@ -239,7 +239,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertSimpleProject(parentName, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentName, true);
         assertFalse(projectPage.isDescendantActionsPresent());
 

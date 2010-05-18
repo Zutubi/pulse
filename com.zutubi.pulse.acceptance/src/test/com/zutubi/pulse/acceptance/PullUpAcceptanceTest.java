@@ -37,7 +37,7 @@ public class PullUpAcceptanceTest extends SeleniumTestBase
         String labelPath = insertLabel(parent, createLabel("foo"));
         String childLabelPath = labelPath.replace(parent, child);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         assertPullUpAvailability(childLabelPath, false);
     }
 
@@ -46,7 +46,7 @@ public class PullUpAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(random, false);
         String labelPath = insertLabel(random, createLabel("foo"));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         assertPullUpAvailability(labelPath, true);
     }
 
@@ -96,7 +96,7 @@ public class PullUpAcceptanceTest extends SeleniumTestBase
         setupHierarchy(parent, child);
         String propertyPath = xmlRpcHelper.insertProjectProperty(child, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage propertyList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(propertyList.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(propertyList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_PULL_UP));

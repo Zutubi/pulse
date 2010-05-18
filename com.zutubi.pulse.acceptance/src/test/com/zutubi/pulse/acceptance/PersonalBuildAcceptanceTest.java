@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Vector;
 
 import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -75,7 +76,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(PROJECT_NAME);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
@@ -85,8 +86,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(true)));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, "admin"));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_USER, "admin"));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, ADMIN_CREDENTIALS.getUserName()));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_USER, ADMIN_CREDENTIALS.getUserName()));
         // Make sure this view is not decorated (CIB-1711).
         assertTextNotPresent("logout");
         
@@ -127,7 +128,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             makeChangeToBuildFile();
             createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_PROXY_HOST, "localhost"), asPair(PersonalBuildConfig.PROPERTY_PROXY_PORT, PROXY_PORT));
 
-            loginAsAdmin();
+            browser.loginAsAdmin();
             ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
@@ -144,7 +145,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         checkout(Constants.VERSIONED_REPOSITORY);
         makeChangeToImportedFile();
         createConfigFile(random);
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
@@ -159,7 +160,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(PROJECT_NAME);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureAgent(AGENT_NAME);
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
@@ -186,7 +187,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
@@ -216,7 +217,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
@@ -234,7 +235,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
@@ -254,7 +255,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         // Set revision to something before the last edit to the build file.
         createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, "1"), asPair(PersonalBuildConfig.PROPERTY_UPDATE, false));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
@@ -284,7 +285,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         
         xmlRpcHelper.waitForProjectToInitialise(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("Force build failure");
@@ -337,7 +338,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             makeChangeToBuildFile();
             createConfigFile(random, asPair(PROPERTY_CLIENT, clientName), asPair(PROPERTY_PORT, P4PORT), asPair(PROPERTY_USER, P4USER), asPair(PROPERTY_PASSWORD, P4PASSWD));
 
-            loginAsAdmin();
+            browser.loginAsAdmin();
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
             verifyPersonalBuildTabs(random, buildNumber, AgentManager.MASTER_AGENT_NAME);
         }
@@ -358,7 +359,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
                 asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING),
                 asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
@@ -375,7 +376,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         File patchFile = copyInputToDirectory("txt", workingCopyDir);
         createConfigFile(random, asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
@@ -461,7 +462,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void createConfigFile(String projectName, Pair<String, ?>... extraProperties) throws IOException
     {
-        buildRunner.createConfigFile(browser.getBaseUrl(), "admin", "admin", projectName, extraProperties);
+        buildRunner.createConfigFile(browser.getBaseUrl(), ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), projectName, extraProperties);
     }
 
     private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException, PersonalBuildException

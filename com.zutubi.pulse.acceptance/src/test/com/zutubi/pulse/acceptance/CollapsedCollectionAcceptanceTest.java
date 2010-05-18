@@ -82,7 +82,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         String recipePath = getRecipePath(random, RECIPE_DEFAULT);
         CompositePage recipePage = browser.openAndWaitFor(CompositePage.class, recipePath);
@@ -119,7 +119,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertSimpleProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         String recipePath = getRecipePath(random, RECIPE_DEFAULT);
         browser.openAndWaitFor(CompositePage.class, recipePath);
@@ -140,7 +140,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         // it now has a collapsed collection.
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         CompositePage typePage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(projectPath, Constants.Project.TYPE));
         assertTrue(typePage.isConfigureLinkPresent());
         typePage.clickConfigure();
@@ -174,7 +174,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         return browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(projectPath, Constants.Project.TYPE));
     }

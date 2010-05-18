@@ -32,7 +32,7 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
         Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
 
-        login(random, "");
+        browser.login(random, "");
         ListPage permissionsPage = browser.openAndWaitFor(ListPage.class, permissionsPath);
         permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
 

@@ -47,17 +47,17 @@ public class UsersAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialUser(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         UsersPage usersPage = browser.openAndWaitFor(UsersPage.class);
 
         assertTrue(usersPage.isActiveCountPresent());
         assertEquals("1 of 2 users have been active in the last 10 minutes", usersPage.getActiveCount());
 
-        logout();
-        login(random, "");
-        logout();
+        browser.logout();
+        browser.login(random, "");
+        browser.logout();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         usersPage.openAndWaitFor();
         assertEquals("2 of 2 users have been active in the last 10 minutes", usersPage.getActiveCount());
     }
@@ -66,30 +66,30 @@ public class UsersAcceptanceTest extends SeleniumTestBase
     {
         String userPath = xmlRpcHelper.insertTrivialUser(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         CompositePage userPage = browser.openAndWaitFor(CompositePage.class, userPath);
 
         assertTrue(userPage.isStateFieldPresent(STATE_LAST_ACCESS));
         assertEquals(ACCESS_NEVER, userPage.getStateField(STATE_LAST_ACCESS));
 
-        logout();
-        login(random, "");
-        logout();
+        browser.logout();
+        browser.login(random, "");
+        browser.logout();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         userPage.openAndWaitFor();
         assertFalse(userPage.getStateField(STATE_LAST_ACCESS).equals(ACCESS_NEVER));
     }
 
     public void testLastAccessTimeForSelf()
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         CompositePage userPage = browser.openAndWaitFor(CompositePage.class, "users/admin");
 
         assertTrue(userPage.isStateFieldPresent(STATE_LAST_ACCESS));
         assertEquals(ACCESS_NOW, userPage.getStateField(STATE_LAST_ACCESS));
 
-        logout();
+        browser.logout();
     }
 
     public void testPrimaryContactPointCreation()
@@ -141,7 +141,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertTrivialUser(random);
         
-        login(random, "");
+        browser.login(random, "");
         
         PreferencesPage preferencesPage = browser.openAndWaitFor(PreferencesPage.class, random);
         preferencesPage.clickAction(UserPreferencesConfigurationActions.ACTION_CHANGE_PASSWORD);
@@ -159,8 +159,8 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         
         changePasswordForm.saveFormElements("", NEW_PASSWORD, NEW_PASSWORD);
         waitForStatus("password changed");
-        logout();
-        
+        browser.logout();
+
         LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
         LoginForm loginForm = browser.createForm(LoginForm.class);
         loginForm.submitNamedFormElements("login", asPair(LoginPage.FIELD_USERNAME, random), asPair(LoginPage.FIELD_PASSWORD, ""));
@@ -172,7 +172,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
     private String createUserWithContact(String name)
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         UsersPage usersPage = browser.openAndWaitFor(UsersPage.class);
         usersPage.clickAdd();
         AddUserForm addUserForm = browser.createForm(AddUserForm.class);

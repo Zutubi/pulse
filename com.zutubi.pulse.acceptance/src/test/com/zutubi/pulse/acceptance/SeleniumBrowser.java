@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -291,7 +292,18 @@ public class SeleniumBrowser
 
     public void loginAsAdmin()
     {
-        login("admin", "admin");
+        login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
+    }
+
+    /**
+     * Click the logout link on the browser and wait for the page to load.
+     *
+     * @param browser   active browser
+     */
+    public void logout()
+    {
+        click("//span[@id='logout']/a");
+        waitForPageToLoad();
     }
 
     /**

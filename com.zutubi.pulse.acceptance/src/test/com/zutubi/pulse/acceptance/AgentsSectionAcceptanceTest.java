@@ -85,7 +85,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         configurationHelper.insertAgent(new AgentConfiguration(AGENT, HOST_LOCALHOST, 8899));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
         browser.refreshUntilText(agentsPage.getStatusId(AGENT), OFFLINE.getPrettyString());
         assertEquals(asList(ACTION_DISABLE, ACTION_PING), agentsPage.getActions(AGENT));
@@ -95,7 +95,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
         assertTrue(agentsPage.isActionAvailable(LOCAL_AGENT, ACTION_DISABLE));
         agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
@@ -120,7 +120,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.triggerBuild(project.getName());
         xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
         agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
 
@@ -165,7 +165,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.triggerBuild(project2.getName());
         xmlRpcHelper.waitForBuildInProgress(project2.getName(), 1);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
         assertBuildingStatus(agentsPage.getStatus(agent1));
         assertBuildingStatus(agentsPage.getStatus(agent2));
@@ -196,7 +196,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         configurationHelper.insertAgent( new AgentConfiguration(agent2, HOST_2, 8890));
         configurationHelper.insertAgent( new AgentConfiguration(agent3, HOST_1, 8890));
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         AgentHierarchyPage globalAgentPage = browser.openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         globalAgentPage.clickAdd();
@@ -208,7 +208,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     
     public void testAgentsExecutingBuild() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         final AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
         assertFalse(agentsPage.isExecutingBuildPresent(AgentManager.MASTER_AGENT_NAME));
 
@@ -230,7 +230,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testAgentStatusExecutingBuild() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
         assertFalse(statusPage.isExecutingBuildPresent());
 
@@ -249,7 +249,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testStatistics() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatisticsPage statisticsPage = browser.openAndWaitFor(AgentStatisticsPage.class, AgentManager.MASTER_AGENT_NAME);
         assertTrue(statisticsPage.isRecipeStatisticsPresent());
         assertTrue(statisticsPage.isUsageStatisticsPresent());
@@ -259,7 +259,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     public void testNoSynchronisationMessages() throws Exception
     {
         xmlRpcHelper.insertLocalAgent(random);
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
         assertTrue(statusPage.isSynchronisationTablePresent());
         assertEquals(0, statusPage.getSynchronisationMessageCount());
@@ -273,7 +273,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.enqueueSynchronisationMessage(random, "test message", true);
         xmlRpcHelper.waitForAgentToBeIdle(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
         assertEquals(1, statusPage.getSynchronisationMessageCount());
         AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "test message", AgentSynchronisationMessage.Status.SUCCEEDED);
@@ -287,7 +287,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.enqueueSynchronisationMessage(random, TEST_DESCRIPTION, false);
         xmlRpcHelper.waitForAgentToBeIdle(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
         assertEquals(1, statusPage.getSynchronisationMessageCount());
         AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.FAILED_PERMANENTLY);
@@ -307,7 +307,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.enqueueSynchronisationMessage(agentName, TEST_DESCRIPTION, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
         assertEquals(1, statusPage.getSynchronisationMessageCount());
         AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.QUEUED);
@@ -335,7 +335,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         }
         xmlRpcHelper.waitForAgentToBeIdle(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
         assertEquals(COMPLETED_MESSAGE_LIMIT, statusPage.getSynchronisationMessageCount());
         int offset = MESSAGE_COUNT - COMPLETED_MESSAGE_LIMIT;

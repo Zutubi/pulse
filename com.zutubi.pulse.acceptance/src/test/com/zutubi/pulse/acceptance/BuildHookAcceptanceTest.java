@@ -56,7 +56,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.ensureProject(PROJECT_NAME);
         xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(HOOKS_PATH, PathUtils.WILDCARD_ANY_ELEMENT));
-        loginAsAdmin();
+        browser.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception

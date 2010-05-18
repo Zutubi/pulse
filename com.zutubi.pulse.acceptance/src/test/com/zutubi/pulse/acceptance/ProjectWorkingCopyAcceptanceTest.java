@@ -46,7 +46,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
-        logout();
+        browser.logout();
 
         super.tearDown();
     }
@@ -55,7 +55,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfiguration project = createProject(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertFalse(homePage.isViewWorkingCopyPresent());
@@ -71,16 +71,16 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         ProjectConfiguration project = createProject(random);
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
 
-        logout();
+        browser.logout();
 
         // create user without view source permissions for the project and log in.
         UserConfiguration user = createUser(randomName());
-        login(user.getName(), "");
+        browser.login(user.getName(), "");
 
         homePage.openAndWaitFor();
         assertFalse(homePage.isViewWorkingCopyPresent());
@@ -103,7 +103,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
         buildRunner.triggerSuccessfulBuild(project);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
@@ -125,7 +125,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         ProjectConfiguration project = createProject(random);
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
@@ -145,7 +145,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.ensureAgent(AGENT_NAME);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         enableAgent(AGENT_NAME);
 
         ProjectConfiguration project = createProject(random, AGENT_NAME);

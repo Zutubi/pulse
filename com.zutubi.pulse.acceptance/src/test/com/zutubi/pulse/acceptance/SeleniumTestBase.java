@@ -4,7 +4,6 @@ import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.ProjectTypeSelectState;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
-import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
@@ -88,24 +87,7 @@ public class SeleniumTestBase extends PulseTestCase
         return getName() + "-" + RandomUtils.randomString(10);
     }
 
-    protected void login(String username, String password)
-    {
-        LoginPage page = browser.openAndWaitFor(LoginPage.class);
-        page.login(username, password);
-    }
-
-    protected void loginAsAdmin()
-    {
-        login("admin", "admin");
-    }
-
-    protected void logout()
-    {
-        browser.click("//span[@id='logout']/a");
-        browser.waitForPageToLoad();
-    }
-    
-    protected void assertElementPresent(String id)
+    private void assertElementPresent(String id)
     {
         assertTrue("No element with id '" + id + "' found", browser.isElementIdPresent(id));
     }

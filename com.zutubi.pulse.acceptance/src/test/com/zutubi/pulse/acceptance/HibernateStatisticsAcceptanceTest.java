@@ -15,7 +15,7 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
     }
 
     public void testCanViewStatistics() throws Exception

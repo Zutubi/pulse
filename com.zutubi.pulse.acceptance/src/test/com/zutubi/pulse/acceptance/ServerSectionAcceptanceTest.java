@@ -11,7 +11,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
 {
     public void testServerMessages() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.openAndWaitFor(ServerMessagesPage.class);
         assertTextPresent("messages found");
     }
@@ -31,7 +31,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ServerMessagesPage page = browser.openAndWaitFor(ServerMessagesPage.class);
 
         assertEquals("100 messages found", page.getMessagesCountText());
@@ -44,7 +44,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
 
     public void testServerInfo() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.openAndWaitFor(ServerInfoPage.class);
         assertTextPresent("system information");
         assertTextPresent("java vm");

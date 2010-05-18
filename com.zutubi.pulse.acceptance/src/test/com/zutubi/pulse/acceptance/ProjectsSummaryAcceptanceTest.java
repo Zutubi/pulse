@@ -62,7 +62,7 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 
         try
         {
-            loginAsAdmin();
+            browser.loginAsAdmin();
             summaryPage.openAndWaitFor();
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
@@ -110,8 +110,8 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
         svn.put("url", "");
         xmlRpcHelper.saveConfig(svnPath, svn, false);
-        
-        loginAsAdmin();
+
+        browser.loginAsAdmin();
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertTrue(browsePage.isInvalidProjectPresent(concrete));
     }

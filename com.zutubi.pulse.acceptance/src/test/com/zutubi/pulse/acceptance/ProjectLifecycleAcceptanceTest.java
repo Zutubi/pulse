@@ -88,7 +88,7 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.waitForProjectToInitialise(random);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         browser.openAndWaitFor(ProjectLogPage.class, project);
         assertTextPresent("Reinitialising");
     }

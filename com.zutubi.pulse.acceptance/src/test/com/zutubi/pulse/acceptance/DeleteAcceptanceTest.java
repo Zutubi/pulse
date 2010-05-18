@@ -48,7 +48,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
         String labelPath = insertLabel(projectPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage labelList = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(labelPath));
         String baseName = PathUtils.getBaseName(labelPath);
         assertItemPresent(labelList, baseName, null, "view", "delete");
@@ -66,7 +66,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
         String labelPath = insertLabel(projectPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage labelList = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(labelPath));
         String baseName = PathUtils.getBaseName(labelPath);
         assertItemPresent(labelList, baseName, null, "view", "delete");
@@ -81,7 +81,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     public void testCancelDeleteProject() throws Exception
     {
         xmlRpcHelper.insertTrivialProject(random, false);
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -93,7 +93,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -116,7 +116,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         String triggerPath = insertBuildCompletedTrigger(refereePath, refererPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage triggersPage = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(triggerPath));
         assertItemPresent(triggersPage, "test", null);
 
@@ -152,7 +152,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         dashboard.put("shownProjects", new Vector<String>(Arrays.asList(projectPath)));
         xmlRpcHelper.saveConfig(dashboardPath, dashboard, false);
 
-        login(authLogin, "");
+        browser.login(authLogin, "");
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -160,9 +160,9 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertTextNotPresent("A further");
         confirmPage.clickCancel();
         hierarchyPage.waitFor();
-        logout();
+        browser.logout();
 
-        login(noAuthLogin, "");
+        browser.login(noAuthLogin, "");
         hierarchyPage.openAndWaitFor();
         confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -194,7 +194,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     private void deleteAgentHelper(String name) throws Exception
     {
         String path = xmlRpcHelper.insertSimpleAgent(name, random);
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, name, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -219,7 +219,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         stage.put("recipe", "");
         String stagePath = xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "stages"), stage);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, agentName, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -238,7 +238,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     public void testDeleteUser() throws Exception
     {
         String path = xmlRpcHelper.insertTrivialUser(random);
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ListPage usersPage = browser.openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
         assertItemPresent(usersPage, random, null, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE, UserConfigurationActions.ACTION_SET_PASSWORD);
@@ -258,7 +258,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
         String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
 
@@ -285,7 +285,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         String cleanupssPath = PathUtils.getPath(projectPath, "cleanup");
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupssPath);
@@ -321,7 +321,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
         String childCleanupPath = PathUtils.getPath(childPath, "cleanup", "default");
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, parentCleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
@@ -354,7 +354,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         childCleanup.put("retain", 928);
         xmlRpcHelper.saveConfig(childCleanupPath, childCleanup, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, parentCleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
@@ -381,7 +381,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
         xmlRpcHelper.deleteConfig(cleanupPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
@@ -411,7 +411,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String baseName = PathUtils.getBaseName(parentReqPath);
         String childReqPath = PathUtils.getPath(childReqsPath, baseName);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ListPage reqsPage = browser.openAndWaitFor(ListPage.class, childReqsPath);
         assertItemPresent(reqsPage, baseName, ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
@@ -442,7 +442,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String childReqPath = PathUtils.getPath(childReqsPath, baseName);
         xmlRpcHelper.deleteConfig(childReqPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ListPage reqsPage = browser.openAndWaitFor(ListPage.class, childReqsPath);
         assertItemPresent(reqsPage, baseName, ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
@@ -457,7 +457,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         String path = PathUtils.getPath(projectPath, "scm");
         CompositePage subversionPage = browser.openAndWaitFor(CompositePage.class, path);
         assertTrue(subversionPage.isActionPresent(AccessManager.ACTION_DELETE));

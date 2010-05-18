@@ -45,6 +45,10 @@ public class AcceptanceTestUtils
     public static final String PROPERTY_AGENT_PORT = "agent.port";
 
     private static final long STATUS_TIMEOUT = 30000;
+    /**
+     * The credentials for the admin user.
+     */
+    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("admin", "admin");
 
     public static int getPulsePort()
     {
@@ -201,7 +205,7 @@ public class AcceptanceTestUtils
      */
     public static String readUriContent(String contentUri) throws IOException
     {
-        return readUriContent(contentUri, getAdminHttpCredentials());
+        return readUriContent(contentUri, ADMIN_CREDENTIALS);
     }
 
     /**
@@ -242,7 +246,7 @@ public class AcceptanceTestUtils
      */
     public static Header readHttpHeader(String uri, String headerName) throws IOException
     {
-        return readHttpHeader(uri, headerName, getAdminHttpCredentials());
+        return readHttpHeader(uri, headerName, ADMIN_CREDENTIALS);
     }
 
     /**
@@ -282,24 +286,6 @@ public class AcceptanceTestUtils
      * Executes an HTTP get of the given Pulse URI and returns the {@link org.apache.commons.httpclient.methods.GetMethod}
      * instance for further processing.  The caller is responsible for
      * releasing the connection (by calling {@link org.apache.commons.httpclient.methods.GetMethod#releaseConnection()})
-     * when it is no longer required.  Supplies administrator credentials to
-     * log in to Pulse.
-     *
-     * @param uri uri to GET
-     * @return the {@link org.apache.commons.httpclient.methods.GetMethod}
-     *         instance used to access the URI
-     * @throws IOException on error
-     */
-    public static GetMethod httpGet(String uri) throws IOException
-    {
-        return httpGet(uri, getAdminHttpCredentials());
-    }
-
-
-    /**
-     * Executes an HTTP get of the given Pulse URI and returns the {@link org.apache.commons.httpclient.methods.GetMethod}
-     * instance for further processing.  The caller is responsible for
-     * releasing the connection (by calling {@link org.apache.commons.httpclient.methods.GetMethod#releaseConnection()})
      * when it is no longer required.  Supplies the given credentials to log in
      * to Pulse.
      *
@@ -309,7 +295,7 @@ public class AcceptanceTestUtils
      *         instance used to access the URI
      * @throws IOException on error
      */
-    public static GetMethod httpGet(String uri, Credentials credentials) throws IOException
+    private static GetMethod httpGet(String uri, Credentials credentials) throws IOException
     {
         HttpClient client = new HttpClient();
 
@@ -324,11 +310,6 @@ public class AcceptanceTestUtils
         }
 
         return get;
-    }
-
-    private static UsernamePasswordCredentials getAdminHttpCredentials()
-    {
-        return new UsernamePasswordCredentials("admin", "admin");
     }
 
     private static void releaseConnection(GetMethod get)
@@ -348,7 +329,7 @@ public class AcceptanceTestUtils
     public static void waitForStatus(final SeleniumBrowser browser, String message)
     {
         browser.waitForElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

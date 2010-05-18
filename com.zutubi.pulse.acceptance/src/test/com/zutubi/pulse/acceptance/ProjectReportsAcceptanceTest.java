@@ -97,7 +97,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(capturesPath, capture);
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
         detailsPage.clickStageAndWait(STAGE_DEFAULT);
@@ -128,7 +128,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(commandsPath, command);
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
         assertEquals(FIELD_VALUE, detailsPage.getCustomFieldValue(0));
@@ -144,7 +144,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.deleteConfig(buildTrendsPath);
         xmlRpcHelper.deleteConfig(testTrendsPath);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         // Check no groups.
         ProjectReportsPage reportsPage = browser.openAndWaitFor(ProjectReportsPage.class, random);

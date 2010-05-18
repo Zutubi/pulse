@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
-import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.CollectionUtils;
@@ -98,9 +97,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         try
         {
             browser.start();
-            
-            LoginPage page = browser.openAndWaitFor(LoginPage.class);
-            page.login("admin", "admin");
+            browser.loginAsAdmin();
 
             // trigger a build
             ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
@@ -114,8 +111,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
             // leave the revision blank
             form.triggerFormElements(asPair("version", "OH_HAI"));
 
-            browser.click("//span[@id='logout']/a");
-            browser.waitForPageToLoad();
+            browser.logout();
         }
         finally
         {

@@ -54,7 +54,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        logout();
+        browser.logout();
         xmlRpcHelper.logout();
 
         super.tearDown();
@@ -68,7 +68,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
         configurationHelper.insertProject(project.getConfig());
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         doTestNoBuildForProjectHomepage();
 
@@ -186,7 +186,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         // user needs 'run personal build' permissions.
         ensureUserCanRunPersonalBuild(userName);
 
-        login(userName, "");
+        browser.login(userName, "");
         xmlRpcHelper.login(userName, "");
 
         File workingCopy = FileSystemUtils.createTempDir();

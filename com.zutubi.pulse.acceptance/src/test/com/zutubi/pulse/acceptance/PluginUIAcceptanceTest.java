@@ -38,7 +38,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     public void testAllPlugins() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
         assertTrue(pluginsPage.isPluginPresent(ID_COMMANDS_CORE));
         assertFalse(pluginsPage.isActionPresent(ID_COMMANDS_CORE, ACTION_ENABLE));
@@ -62,7 +62,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     public void testCancelInstallPlugin() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
         InstallPluginForm form = pluginsPage.clickInstall();
         form.waitFor();
@@ -130,7 +130,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     {
         File testPlugin = makeTestPlugin(id, getRandomProcessorName());
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
         InstallPluginForm form = pluginsPage.clickInstall();
         form.waitFor();

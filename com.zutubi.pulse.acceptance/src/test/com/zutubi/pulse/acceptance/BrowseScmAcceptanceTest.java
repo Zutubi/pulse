@@ -24,7 +24,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         xmlRpcHelper.loginAsAdmin();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
@@ -39,7 +39,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         resetToPulseWindow();
 
         xmlRpcHelper.logout();
-        logout();
+        browser.logout();
 
         super.tearDown();
     }

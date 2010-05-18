@@ -40,7 +40,7 @@ public class ConfigStateAcceptanceTest extends SeleniumTestBase
 
     public void testCompositeState() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         AgentConfigPage agentConfigPage = browser.openAndWaitFor(AgentConfigPage.class, random, false);
         assertTrue(agentConfigPage.isStatePresent());
         assertTrue(agentConfigPage.isStateFieldPresent(FIELD_STATUS));
@@ -48,7 +48,7 @@ public class ConfigStateAcceptanceTest extends SeleniumTestBase
 
     public void testCollectionState() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage agentResourcesPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(agentPath, "resources"));
         assertTrue(agentResourcesPage.isStatePresent());
         assertTrue(agentResourcesPage.isStateFieldPresent(FIELD_COMPATIBLE_STAGES));
@@ -70,7 +70,7 @@ public class ConfigStateAcceptanceTest extends SeleniumTestBase
         resourceRequirement.put("resource", "doesnotexist");
         xmlRpcHelper.insertConfig(PathUtils.getPath(unsatisfiedProjectPath, "requirements"), resourceRequirement);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         ListPage agentResourcesPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(agentPath, "resources"));
         assertTrue(agentResourcesPage.isStatePresent());
         assertTrue(agentResourcesPage.isStateFieldPresent(FIELD_COMPATIBLE_STAGES));

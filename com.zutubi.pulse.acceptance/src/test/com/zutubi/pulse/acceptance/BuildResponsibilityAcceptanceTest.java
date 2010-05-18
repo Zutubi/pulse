@@ -70,7 +70,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     private void takeResponsibilityHelper(ResponsibilityPage page)
     {
-        login(TEST_USER, "");
+        browser.login(TEST_USER, "");
         page.openAndWaitFor();
         assertNobodyResponsible(page);
 
@@ -89,7 +89,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     {
         takeResponsibility(TEST_PROJECT);
 
-        login(TEST_USER, "");
+        browser.login(TEST_USER, "");
 
         // Clear on the project home tab
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
@@ -123,7 +123,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         takeResponsibility(TEST_PROJECT);
 
         xmlRpcHelper.insertTrivialUser(random);
-        login(random, "");
+        browser.login(random, "");
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
         assertOtherResponsible(homePage);
@@ -153,7 +153,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     {
         takeResponsibility(TEST_PROJECT);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
         page.openAndWaitFor();
 
         assertTrue(page.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
@@ -167,7 +167,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
         takeResponsibility(random);
 
-        login(TEST_USER, "");
+        browser.login(TEST_USER, "");
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertSelfResponsible(homePage);
 
@@ -200,7 +200,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         optionsConfig.put(Constants.Project.Options.AUTO_CLEAR_RESPONSIBILITY, false);
         xmlRpcHelper.saveConfig(optionsPath, optionsConfig, false);
 
-        login(TEST_USER, "");
+        browser.login(TEST_USER, "");
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertSelfResponsible(homePage);
 

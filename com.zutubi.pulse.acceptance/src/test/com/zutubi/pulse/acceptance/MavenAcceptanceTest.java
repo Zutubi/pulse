@@ -41,7 +41,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMavenDefaultTestCaptureConfiguration() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         createMavenProject();
 
         // We expect a artifact called surefire-reports to be configured.
@@ -54,7 +54,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMaven2DefaultTestArtifactConfiguration() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         createMaven2Project();
 
         // We expect a artifact called surefire-reports to be configured.
@@ -67,7 +67,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMaven2BuildPicksUpTests() throws Exception
     {
-        loginAsAdmin();
+        browser.loginAsAdmin();
         createMaven2Project();
 
         long buildNumber = runBuild(random);

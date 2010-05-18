@@ -31,7 +31,7 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
     {
         addProject(random, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
 

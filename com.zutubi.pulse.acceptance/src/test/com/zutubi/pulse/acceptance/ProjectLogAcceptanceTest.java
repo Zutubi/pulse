@@ -9,7 +9,7 @@ public class ProjectLogAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         addProject(random, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectLogPage page = browser.openAndWaitFor(ProjectLogPage.class, random);
         assertTrue(page.isDownloadLinkAvailable());
@@ -21,7 +21,7 @@ public class ProjectLogAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         addProject(random, true);
 
-        loginAsAdmin();
+        browser.loginAsAdmin();
 
         ProjectLogPage page = browser.openAndWaitFor(ProjectLogPage.class, random);
 

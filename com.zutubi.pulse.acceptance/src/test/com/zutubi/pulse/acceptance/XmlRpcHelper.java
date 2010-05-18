@@ -38,6 +38,7 @@ import java.util.Vector;
 
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
@@ -76,7 +77,7 @@ public class XmlRpcHelper
 
     public String loginAsAdmin() throws Exception
     {
-        return login("admin", "admin");
+        return login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
     }
 
     public boolean logout() throws Exception
