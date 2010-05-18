@@ -1,6 +1,5 @@
 package com.zutubi.tove.type.record.store;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.UserTransaction;
 import com.zutubi.tove.type.record.Record;
@@ -23,7 +22,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
     {
         super.setUp();
 
-        persistentDirectory = FileSystemUtils.createTempDir();
+        persistentDirectory = createTempDirectory();
 
         transactionManager = new TransactionManager();
         transaction = new UserTransaction(transactionManager);

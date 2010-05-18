@@ -16,7 +16,7 @@ public class ZipUtilsTest extends ZutubiTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
     }
 
     @Override

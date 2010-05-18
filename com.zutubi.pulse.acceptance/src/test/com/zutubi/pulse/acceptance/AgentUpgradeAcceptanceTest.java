@@ -18,7 +18,6 @@ import java.util.Hashtable;
 
 import static com.zutubi.util.Constants.MINUTE;
 import static com.zutubi.util.Constants.SECOND;
-import static com.zutubi.util.FileSystemUtils.createTempDir;
 
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
@@ -31,7 +30,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = createTempDir();
+        tmp = createTempDirectory();
         pulseTestFactory = new JythonPulseTestFactory();
     }
 

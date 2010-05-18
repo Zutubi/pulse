@@ -1,7 +1,6 @@
 package com.zutubi.util.io;
 
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.*;
@@ -13,7 +12,7 @@ public abstract class BaseIOTestCase extends ZutubiTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
     }
 
     protected void tearDown() throws Exception

@@ -10,7 +10,6 @@ import com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValida
 import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.util.Constants;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.validation.FakeValidationContext;
 import com.zutubi.validation.ValidationException;
 
@@ -35,7 +34,7 @@ public class BackupManagerTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
         backupDir = new File(tmp, "backup");
         backupTmpDir = new File(tmp, "tmp");
         assertTrue(backupTmpDir.mkdirs());

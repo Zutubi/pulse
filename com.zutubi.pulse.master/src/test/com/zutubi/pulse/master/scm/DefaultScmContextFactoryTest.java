@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.scm;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 
@@ -18,7 +17,7 @@ public class DefaultScmContextFactoryTest extends PulseTestCase
         // i would like to mock this directory out, but can not see a way to do so with mockito - considering
         // that the context factory attempts to create a new file based on this file.  Maybe insert a
         // file system interface?
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
 
         factory = new DefaultScmContextFactory();
         factory.setProjectsDir(tmp);

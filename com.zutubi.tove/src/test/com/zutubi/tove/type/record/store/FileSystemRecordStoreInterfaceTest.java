@@ -11,7 +11,7 @@ public class FileSystemRecordStoreInterfaceTest extends AbstractRecordStoreInter
 
     protected void setUp() throws Exception
     {
-        persistentDirectory = FileSystemUtils.createTempDir();
+        persistentDirectory = createTempDirectory();
 
         super.setUp();
     }

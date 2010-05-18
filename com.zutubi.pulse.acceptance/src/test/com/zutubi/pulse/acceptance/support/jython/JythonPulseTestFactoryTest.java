@@ -5,15 +5,10 @@ import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-@Test
 public class JythonPulseTestFactoryTest extends PulseTestCase
 {
     private PulseTestFactory factory;
@@ -21,19 +16,17 @@ public class JythonPulseTestFactoryTest extends PulseTestCase
     private File tmp;
     private File pkgFile;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
 
         factory = new JythonPulseTestFactory();
 
         pkgFile = AcceptanceTestUtils.getPulsePackage();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         removeDirectory(tmp);

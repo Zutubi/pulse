@@ -55,7 +55,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         projects = new ProjectConfigurations(configurationHelper);
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
     }
 
     @Override

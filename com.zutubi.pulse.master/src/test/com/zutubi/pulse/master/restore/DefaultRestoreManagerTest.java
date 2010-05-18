@@ -6,7 +6,6 @@ import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.List;
@@ -22,7 +21,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
 
         jobManager = new JobManager();
 

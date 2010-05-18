@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.store.RecordStore;
-import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -17,7 +16,7 @@ public class RecordsArchiveTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
     }
 
     protected void tearDown() throws Exception

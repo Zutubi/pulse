@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.restore;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.Dialect;
@@ -24,7 +23,7 @@ public class DatabaseArchiveTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
 
         dataSource = createDataSource();
     }

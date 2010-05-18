@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class UniqueDatestampedNameGeneratorTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
     }
 
     protected void tearDown() throws Exception

@@ -13,7 +13,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 
 import java.io.File;
@@ -37,7 +36,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         super.setUp();
 
         // base directory will be cleaned up at the end of the test.
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
 
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
         if (!pkgFile.exists())

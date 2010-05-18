@@ -20,7 +20,7 @@ public class XmlRecordSerialiserTest extends ZutubiTestCase
         super.setUp();
 
         serialiser = new XmlRecordSerialiser();
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
     }
 
     protected void tearDown() throws Exception

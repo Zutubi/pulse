@@ -28,7 +28,7 @@ public class DriverRegistryTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
         driverDir = new File(tmp, "drivers");
 
         // copy the postgresql jar from the classpath into the temporary directory.

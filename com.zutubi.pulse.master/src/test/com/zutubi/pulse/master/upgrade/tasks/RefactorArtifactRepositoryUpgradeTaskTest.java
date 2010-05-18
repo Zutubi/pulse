@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
@@ -22,7 +21,7 @@ public class RefactorArtifactRepositoryUpgradeTaskTest extends ZutubiTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
         repositoryBase = new File(tmpDir, "repository");
         workBase = new File(tmpDir, "work");
 

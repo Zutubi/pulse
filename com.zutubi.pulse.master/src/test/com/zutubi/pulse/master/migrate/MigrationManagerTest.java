@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.hibernate.SchemaRefactor;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -43,7 +42,7 @@ public class MigrationManagerTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
 
         jobManager = new JobManager();
         

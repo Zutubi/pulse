@@ -22,7 +22,7 @@ public class DataDirectoryArchiveTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
         data = new File(tmp, "data");
 
         setupDataDirectory(data);

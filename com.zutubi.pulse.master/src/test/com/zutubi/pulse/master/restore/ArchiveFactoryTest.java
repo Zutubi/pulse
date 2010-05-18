@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -19,7 +18,7 @@ public class ArchiveFactoryTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
         factory = new ArchiveFactory();
         exportDir = new File(tmp, "export");
         factory.setTmpDirectory(tmp);

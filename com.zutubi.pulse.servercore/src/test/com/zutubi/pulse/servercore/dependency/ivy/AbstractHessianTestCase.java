@@ -2,7 +2,6 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptorParser;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -23,7 +22,7 @@ public class AbstractHessianTestCase extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
 
         ivy = Ivy.newInstance();
         ivy.configureDefault();

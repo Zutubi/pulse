@@ -30,7 +30,7 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
         workingDir = new File(tmp, "wd");
         persistentWorkingDir = new File(tmp, "pwd");
 

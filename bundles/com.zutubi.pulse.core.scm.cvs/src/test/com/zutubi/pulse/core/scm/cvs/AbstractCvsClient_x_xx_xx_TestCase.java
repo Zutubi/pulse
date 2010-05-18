@@ -35,7 +35,7 @@ public class AbstractCvsClient_x_xx_xx_TestCase extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = createTempDirectory();
 
         scmBaseDir = new File(tmp, "scmContext");
         scmContext = new ScmContextImpl();

@@ -34,7 +34,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         super.setUp();
 
         // create a temporary user home.
-        tmpDir = FileSystemUtils.createTempDir();
+        tmpDir = createTempDirectory();
 
         dataDir = new File(tmpDir, "data");
 

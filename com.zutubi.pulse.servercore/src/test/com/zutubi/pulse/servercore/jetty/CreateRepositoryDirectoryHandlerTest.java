@@ -1,7 +1,6 @@
 package com.zutubi.pulse.servercore.jetty;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 import org.mortbay.http.HttpContext;
@@ -29,7 +28,7 @@ public class CreateRepositoryDirectoryHandlerTest extends PulseTestCase
         context = mock(HttpContext.class);
         handler = new CreateRepositoryDirectoryHandler();
         handler.initialize(context);
-        baseDir = FileSystemUtils.createTempDir();
+        baseDir = createTempDirectory();
     }
 
     protected void tearDown() throws Exception

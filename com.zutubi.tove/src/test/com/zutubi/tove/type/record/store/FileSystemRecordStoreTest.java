@@ -5,7 +5,6 @@ import com.zutubi.tove.type.record.DefaultRecordSerialiser;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -21,7 +20,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
     {
         super.setUp();
 
-        persistentDirectory = FileSystemUtils.createTempDir();
+        persistentDirectory = createTempDirectory();
         transactionManager = new TransactionManager();
 
         restartRecordStore();

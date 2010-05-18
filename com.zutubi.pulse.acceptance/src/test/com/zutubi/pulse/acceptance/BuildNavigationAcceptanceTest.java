@@ -189,7 +189,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         browser.login(userName, "");
         xmlRpcHelper.login(userName, "");
 
-        File workingCopy = FileSystemUtils.createTempDir();
+        File workingCopy = createTempDirectory();
         SubversionWorkspace workspace = new SubversionWorkspace(workingCopy, "pulse", "pulse");
         workspace.doCheckout(Constants.TRIVIAL_ANT_REPOSITORY);
 
@@ -311,5 +311,4 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.saveConfig(groupPath, group, false);
         }
     }
-
 }
