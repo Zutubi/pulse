@@ -3340,7 +3340,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'next-successful',
                 image: 'health/ok.gif',
-                title: 'Next successful (build ' + this.nextSuccessful.number + ')',
+                title: 'next successful (build ' + this.nextSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextSuccessful)
             });
         }
@@ -3349,7 +3349,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'next-broken',
                 image: 'health/broken.gif',
-                title: 'Next broken (build ' + this.nextBroken.number + ')',
+                title: 'next broken (build ' + this.nextBroken.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextBroken)
             });
         }
@@ -3358,7 +3358,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'previous-successful',
                 image: 'health/ok.gif',
-                title: 'Previous successful (build ' + this.previousSuccessful.number + ')',
+                title: 'previous successful (build ' + this.previousSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousSuccessful)
             });
         }
@@ -3367,7 +3367,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'previous-broken',
                 image: 'health/broken.gif',
-                title: 'Previous broken (build ' + this.previousBroken.number + ')',
+                title: 'previous broken (build ' + this.previousBroken.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousBroken)
             });
         }

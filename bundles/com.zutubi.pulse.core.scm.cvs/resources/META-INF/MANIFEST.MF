@@ -3,4 +3,4 @@ Bundle-SymbolicName: com.zutubi.pulse.core.scm.cvs; singleton:=true
 Bundle-Description: Support for CVS
 Bundle-Vendor: Zutubi
 Bundle-Version: 2.1.0
-Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.1.0,2.2.0)"
+Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.2.0,2.3.0)"
