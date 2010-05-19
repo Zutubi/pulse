@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.UsersPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
@@ -95,9 +96,8 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, twoDaysAgo()));
 
-        browser.open(urls.base());
-        browser.waitForPageToLoad();
-        
+        browser.openAndWaitFor(WelcomePage.class);
+
         int tried = 0;
         Condition condition = new Condition()
         {
@@ -109,8 +109,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
         while (!condition.satisfied() && tried < 3)
         {
-            browser.open(urls.base());
-            browser.waitForPageToLoad();
+            browser.openAndWaitFor(WelcomePage.class);
             tried++;
         }
 

@@ -297,8 +297,6 @@ public class SeleniumBrowser
 
     /**
      * Click the logout link on the browser and wait for the page to load.
-     *
-     * @param browser   active browser
      */
     public void logout()
     {
