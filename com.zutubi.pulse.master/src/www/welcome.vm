@@ -190,7 +190,7 @@
             <td>
                 Users can now subscribe to project notifications by label.  This allows a user
                 to create a subscription once, and automatically have apply to projects with the
-                given lables.  When a new project is added, users do not need to modify their
+                given labels.  When a new project is added, users do not need to modify their
                 subscriptions.
             </td>
         </tr>
