@@ -37,9 +37,12 @@ public class CleanupAllCapturedWorkingCopiesUpgradeTask extends AbstractUpgradeT
             for (ProjectBuild build : buildsWithWorkingCopies)
             {
                 File buildDir = new File(data, "projects/" + build.projectId + "/" + String.format("%08d", build.buildNumber));
-                for (File recipeDir : buildDir.listFiles(new DirectoryFileFilter()))
+                if (buildDir.exists())
                 {
-                    fileDeletionService.delete(new File(recipeDir, "base"));
+                    for (File recipeDir : buildDir.listFiles(new DirectoryFileFilter()))
+                    {
+                        fileDeletionService.delete(new File(recipeDir, "base"));
+                    }
                 }
             }
         }
