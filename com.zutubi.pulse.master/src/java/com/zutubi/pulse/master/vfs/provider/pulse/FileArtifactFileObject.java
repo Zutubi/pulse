@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileContentInfoFactory;
@@ -19,6 +17,7 @@ import org.apache.commons.vfs.provider.UriParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,9 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 {
     private static final Logger LOG = Logger.getLogger(FileArtifactFileObject.class);
 
-    private File base;
+    private static final String NO_HASH = "";
 
+    private File base;
     private Boolean canDecorate;
 
     public FileArtifactFileObject(final FileName name, final File base, final AbstractFileSystem fs)
@@ -137,7 +137,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         catch (FileSystemException e)
         {
             LOG.warning(e);
-            return "";
+            return NO_HASH;
         }
     }
 
@@ -169,18 +169,21 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     {
         try
         {
-            String hash = getFileArtifact().getHash();
-            if (hash == null)
+            StoredFileArtifact fileArtifact = getFileArtifact();
+            if (fileArtifact != null)
             {
-                hash = "";
+                String hash = fileArtifact.getHash();
+                if (hash != null)
+                {
+                    return hash;
+                }
             }
-
-            return hash;
         }
         catch (FileSystemException e)
         {
-            return "";
+            // Fall through.
         }
+        return NO_HASH;
     }
 
     public StoredFileArtifact getFileArtifact() throws FileSystemException
@@ -212,10 +215,14 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     @Override
     public Map<String, Object> getExtraAttributes()
     {
-        return asMap(
-                asPair("hash", getHash()),
-                asPair("size", Long.toString(doGetContentSize())),
-                asPair("actions", getActions())
-        );
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (base.isFile())
+        {
+            result.put("hash", getHash());
+            result.put("size", Long.toString(doGetContentSize()));
+        }
+
+        result.put("actions", getActions());
+        return result;
     }
 }
