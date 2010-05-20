@@ -2,4 +2,4 @@ Bundle-Name: Send Email Build Hook Task
 Bundle-SymbolicName: com.zutubi.pulse.master.hook.email; singleton:=true
 Bundle-Description: A build hook task that can be used send emails.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.1.0
+Bundle-Version: 2.2.0

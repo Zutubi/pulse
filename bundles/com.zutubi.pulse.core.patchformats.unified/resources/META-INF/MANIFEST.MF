@@ -2,5 +2,5 @@ Bundle-Name: Unified Patch File Support
 Bundle-SymbolicName: com.zutubi.pulse.core.patchformats.unified; singleton:=true
 Bundle-Description: Support for patches in unified diff format.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.1.0
+Bundle-Version: 2.2.0
 Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.2.0,2.3.0)"

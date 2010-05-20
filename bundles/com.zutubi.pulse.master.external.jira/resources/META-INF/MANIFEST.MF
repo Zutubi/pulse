@@ -2,4 +2,4 @@ Bundle-Name: Jira Integration
 Bundle-SymbolicName: com.zutubi.pulse.master.external.jira; singleton:=true
 Bundle-Description: Provides integration with Atlassian's Jira issue tracker.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.1.0
+Bundle-Version: 2.2.0
