@@ -78,7 +78,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         // logout and log back in again.
         browser.logout();
 
-        loginPage = browser.open(LoginPage.class);
+        loginPage = browser.openAndWaitFor(LoginPage.class);
         loginPage.login(login, password);
 
         welcomePage.waitFor();
@@ -148,13 +148,14 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
 
         browser.newSession();
-        
+
         ProjectHierarchyPage hierarchyPage = browser.open(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        browser.waitForPageToLoad();
         assertFalse(hierarchyPage.isAddPresent());
 
         group.put("serverPermissions", new Vector<String>(Arrays.asList(ServerPermission.CREATE_PROJECT.toString())));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
-        
+
         browser.newSession();
         hierarchyPage.openAndWaitFor();
         browser.waitForElement(ProjectHierarchyPage.LINK_ADD);
