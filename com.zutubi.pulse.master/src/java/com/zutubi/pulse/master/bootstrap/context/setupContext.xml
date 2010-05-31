@@ -42,6 +42,7 @@
         <property name="setupContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/userContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/emailContext.xml</value>
             </list>
         </property>
         <property name="startupContexts">
