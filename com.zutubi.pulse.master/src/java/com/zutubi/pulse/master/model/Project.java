@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.EnumUtils;
+import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -223,7 +223,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                 if (validTransitions == null)
                 {
                     validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIAL),
+                            CollectionUtils.asPair(Transition.STARTUP, INITIALISATION_FAILED),
                             CollectionUtils.asPair(Transition.IDLE, INITIALISING),
                             CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
                     );
