@@ -2215,7 +2215,7 @@
 #macro(resultBasicsRow $key $content)
     <tr>
         <th class="content fit-width right leftmost">#wwtext("name=build.$key")</th>
-        <td class="content rightmost">$content</td>
+        <td id="basics-${key}" class="content rightmost">$content</td>
     </tr>
 #end
 

@@ -31,7 +31,22 @@ public abstract class AbstractBuildStatusPage extends ResponsibilityPage
     {
         return getRow(ID_BUILD_BASICS, index);
     }
+    
+    public boolean isBasicsRowPresent(String key)
+    {
+        return browser.isElementIdPresent(getBasicsId(key));
+    }
 
+    public String getBasicsValue(String key)
+    {
+        return browser.getText(getBasicsId(key));
+    }
+
+    private String getBasicsId(String key)
+    {
+        return "basics-" + key;
+    }
+    
     public boolean isFeaturesTablePresent(Feature.Level level)
     {
         return browser.isElementPresent("features-" + level.getPrettyString());

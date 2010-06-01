@@ -10,7 +10,7 @@
     #resultBasicsRow("completed" "$result.stamps.getPrettyEndDate($locale) ($result.stamps.prettyEndTime)")
 #end
     #resultBasicsRow("elapsed" "$result.stamps.prettyElapsed")
-#if($result.completed())
+#if($buildResult.completed())
     #resultBasicsRow("errors" "$result.errorFeatureCount")
     #resultBasicsRow("warnings" "$result.warningFeatureCount")
 #end

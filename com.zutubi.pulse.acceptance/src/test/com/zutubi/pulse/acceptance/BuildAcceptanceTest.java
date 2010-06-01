@@ -570,7 +570,48 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         artifactConfig.put(PUBLISH, publish);
         return xmlRpcHelper.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
     }
+    
+    public void testDetailsViewInProgress() throws Exception
+    {
+        File tempDir = createTempDirectory();
+        try
+        {
+            final WaitProject project = projects.createWaitAntProject(tempDir, random);
+            configurationHelper.insertProject(project.getConfig());
+            
+            xmlRpcHelper.waitForProjectToInitialise(project.getName());
+            xmlRpcHelper.triggerBuild(project.getName());
+            xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+            
+            browser.loginAsAdmin();
+            BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, project.getName(), 1L);
+            detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
+            while (!ResultState.SUCCESS.getPrettyString().equals(detailsPage.getBasicsValue("status")))
+            {
+                detailsPage.openAndWaitFor();
+                detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
+            }
 
+            assertFalse(detailsPage.isBasicsRowPresent("errors"));
+            assertFalse(detailsPage.isBasicsRowPresent("warnings"));
+            
+            project.releaseBuild();
+            xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+
+            detailsPage.openAndWaitFor();
+            detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
+
+            assertTrue(detailsPage.isBasicsRowPresent("errors"));
+            assertEquals("0", detailsPage.getBasicsValue("errors"));
+            assertTrue(detailsPage.isBasicsRowPresent("warnings"));
+            assertEquals("0", detailsPage.getBasicsValue("warnings"));
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+    
     public void testPulseEnvironmentVariables() throws Exception
     {
         browser.loginAsAdmin();
