@@ -111,78 +111,82 @@
     <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-tests-${stageName}${pathComponent}")'>
         <div id="build-toolbar-holder"></div>
 
-#if($suiteExists)
-    #testSummaryTable($suite.summary)
-
-    #if($suite.suites.size() > 0)
-        <table id="child-suites" class="fill two-content spaced">
-            <th class="two-heading" colspan="9">
-                #wwtext("name=test.suites")
-            </th>
-            <tr>
-                #contentClassHeading("test.name" 1 "leftmost")
-                #contentHeading("test.status" 2)
-                #contentHeading("test.total" 1)
-                #contentHeading("test.failures" 1)
-                #contentHeading("test.errors" 1)
-                #contentHeading("test.expected.failures" 1)
-                #contentHeading("test.skipped" 1)
-                #contentClassHeading("test.duration" 1 "rightmost")
-            </tr>
-        #foreach($childSuite in $suite.suites)
-            #if($childSuite.hasBrokenTests())
-                #set($cssClass = "failed")
-            #else
-                #set($cssClass = "successful")
-            #end
-            <tr class="$cssClass" #if($filterTests && !$childSuite.hasBrokenTests()) style="display: none" #end>
-                <td class="content leftmost"><a id='#id("suite-${childSuite.name}")' href="$urls.stageTests($buildResult, $recipeResultNode)$action.getChildUriPath($childSuite.name)/">#html($childSuite.name)</a></td>
-                #testStatusCell($childSuite "")
-                #rightCell($childSuite.total)
-                #rightCell($childSuite.failures)
-                #rightCell($childSuite.errors)
-                #rightCell($childSuite.expectedFailures)
-                #rightCell($childSuite.skipped)
-                <td class="content-right rightmost">$childSuite.prettyDuration</td>
-            </tr>
-        #end
-        </table>
-    #end
-
-    #if($suite.cases.size() > 0)
-        <table id="child-cases" class="fill two-content spaced">
-            <th class="two-heading" colspan="5">
-                #wwtext("name=test.cases")
-            </th>
-            <tr>
-                #contentClassHeading("test.name" 1 "leftmost")
-                #contentHeading("test.status" 2)
-                #contentHeading("test.details" 1)
-                #contentClassHeading("test.duration" 1 "rightmost")
-            </tr>
-        #foreach($childCase in $suite.cases)
-            #if($childCase.hasBrokenTests())
-                #set($cssClass = "failed")
-            #else
-                #set($cssClass = "successful")
-            #end
-            <tr class="$cssClass" #if($filterTests && !$childCase.hasBrokenTests()) style="display: none" #end>
-                <td class="content leftmost">$!webwork.htmlEncode($childCase.name)</td>
-                #testStatusCell($childCase "")
-                #if($childCase.message)
-                <td class="content-wrap">
-                    $action.plainToHtml($childCase.message)
-                </td>
+#if($recipeResultNode.result.completed())
+    #if($suiteExists)
+        #testSummaryTable($suite.summary)
+    
+        #if($suite.suites.size() > 0)
+            <table id="child-suites" class="fill two-content spaced">
+                <th class="two-heading" colspan="9">
+                    #wwtext("name=test.suites")
+                </th>
+                <tr>
+                    #contentClassHeading("test.name" 1 "leftmost")
+                    #contentHeading("test.status" 2)
+                    #contentHeading("test.total" 1)
+                    #contentHeading("test.failures" 1)
+                    #contentHeading("test.errors" 1)
+                    #contentHeading("test.expected.failures" 1)
+                    #contentHeading("test.skipped" 1)
+                    #contentClassHeading("test.duration" 1 "rightmost")
+                </tr>
+            #foreach($childSuite in $suite.suites)
+                #if($childSuite.hasBrokenTests())
+                    #set($cssClass = "failed")
                 #else
-                    #contentCell("empty.cell")
+                    #set($cssClass = "successful")
                 #end
-                <td class="content-right rightmost">$childCase.prettyDuration</td>
-            </tr>
+                <tr class="$cssClass" #if($filterTests && !$childSuite.hasBrokenTests()) style="display: none" #end>
+                    <td class="content leftmost"><a id='#id("suite-${childSuite.name}")' href="$urls.stageTests($buildResult, $recipeResultNode)$action.getChildUriPath($childSuite.name)/">#html($childSuite.name)</a></td>
+                    #testStatusCell($childSuite "")
+                    #rightCell($childSuite.total)
+                    #rightCell($childSuite.failures)
+                    #rightCell($childSuite.errors)
+                    #rightCell($childSuite.expectedFailures)
+                    #rightCell($childSuite.skipped)
+                    <td class="content-right rightmost">$childSuite.prettyDuration</td>
+                </tr>
+            #end
+            </table>
         #end
-        </table>
+    
+        #if($suite.cases.size() > 0)
+            <table id="child-cases" class="fill two-content spaced">
+                <th class="two-heading" colspan="5">
+                    #wwtext("name=test.cases")
+                </th>
+                <tr>
+                    #contentClassHeading("test.name" 1 "leftmost")
+                    #contentHeading("test.status" 2)
+                    #contentHeading("test.details" 1)
+                    #contentClassHeading("test.duration" 1 "rightmost")
+                </tr>
+            #foreach($childCase in $suite.cases)
+                #if($childCase.hasBrokenTests())
+                    #set($cssClass = "failed")
+                #else
+                    #set($cssClass = "successful")
+                #end
+                <tr class="$cssClass" #if($filterTests && !$childCase.hasBrokenTests()) style="display: none" #end>
+                    <td class="content leftmost">$!webwork.htmlEncode($childCase.name)</td>
+                    #testStatusCell($childCase "")
+                    #if($childCase.message)
+                    <td class="content-wrap">
+                        $action.plainToHtml($childCase.message)
+                    </td>
+                    #else
+                        #contentCell("empty.cell")
+                    #end
+                    <td class="content-right rightmost">$childCase.prettyDuration</td>
+                </tr>
+            #end
+            </table>
+        #end
+    #else
+        <span id="test-load-failure">#wwtext("name=test.load.failure")</span>
     #end
 #else
-        <span id="test-load-failure">#wwtext("name=test.load.failure")</span>
+    <span id="test-stage-incomplete">#wwtext("name=test.stage.incomplete")</span>
 #end
     </div>
 </html>

@@ -17,8 +17,8 @@
         </tr>
         #foreach($node in $result.root.children)
         <tr>
-            <td class="content leftmost"><a id='#id("stage-${node.stageName}")' href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>
             #if($node.result.completed())
+                <td id='#id("stage-${node.stageName}")' class="content leftmost"><a href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>
                 #set($summary = $node.result.testSummary)
                 #testStatusCell($summary "")
                 #rightCell($summary.total)
@@ -28,6 +28,7 @@
                 #rightCell($summary.skipped)
                 <td class="content-right rightmost">${summary.successRate}%</td>
             #else
+                <td id='#id("stage-${node.stageName}")'class="content leftmost">#html($node.stageName)</td>
                 <td id='#id("stage-${node.stageName}-inprogress")' class="content leftmost"><img alt="in progress" src="$base/images/inprogress.gif"/></td>
                 <td class="content">$node.result.state.prettyString</td>
                 <td class="content rightmost" colspan="6">#wwtext("name=tests.stage.in.progress")</td>

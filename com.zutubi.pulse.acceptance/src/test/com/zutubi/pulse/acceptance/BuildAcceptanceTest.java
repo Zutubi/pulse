@@ -1259,10 +1259,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, project.getName(), 1L);
             assertTrue(testsPage.isStagePresent(defaultStageName));
             assertTrue(testsPage.isStageComplete(defaultStageName));
+            assertTrue(testsPage.isStageLinkPresent(defaultStageName));
             assertTrue(testsPage.hasFailedTestsForStage(defaultStageName));
 
             assertTrue(testsPage.isStagePresent(SECOND_STAGE));
             assertFalse(testsPage.isStageComplete(SECOND_STAGE));
+            assertFalse(testsPage.isStageLinkPresent(SECOND_STAGE));
             assertFalse(testsPage.hasFailedTestsForStage(SECOND_STAGE));
                 
             project.releaseBuild();
@@ -1275,6 +1277,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
             assertTrue(testsPage.isStagePresent(SECOND_STAGE));
             assertTrue(testsPage.isStageComplete(SECOND_STAGE));
+            assertTrue(testsPage.isStageLinkPresent(SECOND_STAGE));
             assertTrue(testsPage.hasFailedTestsForStage(SECOND_STAGE));
         }
         finally

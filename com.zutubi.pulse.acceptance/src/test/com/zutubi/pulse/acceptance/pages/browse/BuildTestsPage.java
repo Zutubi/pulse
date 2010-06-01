@@ -41,13 +41,23 @@ public class BuildTestsPage extends AbstractTestsPage
     
     public StageTestsPage clickStageAndWait(String stage)
     {
-        browser.click("stage-" + stage);
+        browser.click(getStageLinkLocator(stage));
         return browser.waitFor(StageTestsPage.class, projectName, buildId, stage);
     }
 
     public boolean isStagePresent(String stage)
     {
         return browser.isElementIdPresent("stage-" + stage);
+    }
+
+    public boolean isStageLinkPresent(String stage)
+    {
+        return browser.isElementPresent(getStageLinkLocator(stage));
+    }
+
+    private String getStageLinkLocator(String stage)
+    {
+        return "//td[@id='stage-" + stage + "']/a";
     }
 
     public boolean isStageComplete(String stage)
