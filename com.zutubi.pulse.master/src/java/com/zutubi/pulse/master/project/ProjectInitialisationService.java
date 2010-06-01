@@ -26,6 +26,8 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
     private static final Logger LOG = Logger.getLogger(ProjectInitialisationService.class);
     private static final Messages I18N = Messages.getInstance(ProjectInitialisationService.class);
 
+    private static final int MAX_CONCURRENT_INITS = Integer.getInteger("pulse.max.concurrent.project.inits", 10);
+    
     /**
      * A mapping from project handle to configuration for projects that have
      * been initialised.  This is used to guarantee that we destroy with the
@@ -38,7 +40,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
 
     public ProjectInitialisationService()
     {
-        super("Project Initialisation");
+        super("Project Initialisation", MAX_CONCURRENT_INITS);
     }
 
     /**
