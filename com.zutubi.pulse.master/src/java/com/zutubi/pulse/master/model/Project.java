@@ -220,7 +220,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                 if (validTransitions == null)
                 {
                     validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIAL),
+                            CollectionUtils.asPair(Transition.STARTUP, INITIALISATION_FAILED),
                             CollectionUtils.asPair(Transition.IDLE, INITIALISING),
                             CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
                     );
