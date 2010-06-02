@@ -1643,7 +1643,7 @@
 ## Shows a test summary table for a result
 ##
 #macro(testSummaryTable $summary)
-    <table id="test.summary" class="fill two-content">
+    <table id="test-summary" class="fill two-content">
         <tr>
             <th class="two-heading" colspan="8">
                 #wwtext("name=test.summary")

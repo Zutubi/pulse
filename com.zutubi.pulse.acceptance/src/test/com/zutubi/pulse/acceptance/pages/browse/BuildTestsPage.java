@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
 
@@ -22,6 +23,17 @@ public class BuildTestsPage extends AbstractTestsPage
     public String getUrl()
     {
         return urls.buildTests(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
+    }
+
+    public TestResultSummary getTestSummary()
+    {
+        int total = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 2, 1));
+        int failures = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 3, 1));
+        int errors = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 4, 1));
+        int expectedFailures = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 5, 1));
+        int skipped = Integer.parseInt(browser.getCellContents(ID_TEST_SUMMARY, 6, 1));
+
+        return new TestResultSummary(expectedFailures, errors, failures, skipped, total);
     }
 
     public boolean isFailureUnavailableMessageShown()

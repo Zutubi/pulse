@@ -10,7 +10,7 @@ import com.zutubi.util.WebUtils;
  */
 public abstract class AbstractTestsPage extends SeleniumPage
 {
-    protected static final String ID_TEST_SUMMARY = "test.summary";
+    protected static final String ID_TEST_SUMMARY = "test-summary";
     protected static final String ID_ALL_CRUMB = "allcrumb";
     protected static final String ID_STAGE_CRUMB = "stagecrumb";
 

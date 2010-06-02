@@ -1,41 +1,89 @@
+#macro(summaryRow $key $content)
+    <tr>
+        <th class="content fit-width right leftmost">#wwtext("name=test.$key")</th>
+        <td id="summary-${key}" class="content rightmost">$content</td>
+    </tr>
+#end
+
 <div id='#id("${result.ownerName}-build-${result.number}-tests")'>
-    #testSummaryTable($result.testSummary)
+    <table class="columns" width="98%">
+        <tr>
+    #if($result.testSummary.errors > 0)
+        #set($statusImage = "exclamation")
+        #set($statusKey = "test.error")
+    #elseif($result.testSummary.failures > 0)
+        #set($statusImage = "exclamation")
+        #set($statusKey = "test.failure")
+    #elseif($result.testSummary.expectedFailures > 0)
+        #set($statusImage = "exclamation")
+        #set($statusKey = "test.expected.failure")
+    #elseif($result.testSummary.total == 0)
+        #set($statusImage = "none_blue")
+        #set($statusKey = "test.none")
+    #elseif($result.testSummary.allTestsSkipped())
+        #set($statusImage = "none_blue")
+        #set($statusKey = "test.skipped")
+    #else
+        #set($statusImage = "accept")
+        #set($statusKey = "test.passed")
+    #end
 
-    <table class="fill spaced two-content">
-        <th class="two-heading" colspan="9">
-            #wwtext("name=build.stages")
-        </th>
-        <tr>
-            #contentClassHeading("build.stage" 1 "leftmost")
-            #contentHeading("test.status" 2)
-            #contentHeading("test.total" 1)
-            #contentHeading("test.failures" 1)
-            #contentHeading("test.errors" 1)
-            #contentHeading("test.expected.failures" 1)
-            #contentHeading("test.skipped" 1)
-            #contentClassHeading("test.success.rate" 1 "rightmost")
+            <td class="columns">
+                <table id="test-summary" class="two-content">
+                    <tr><th class="two-heading" colspan="2">#wwtext("name=test.summary")</th></tr>
+                    <tr>
+                        <th class="content fit-width right leftmost">#wwtext("name=test.status")</th>
+                        <td id="summary-status" class="content rightmost"><img src="$base/images/${statusImage}.gif" alt="$action.getText($statusKey)"/> $action.getText($statusKey)</td>
+                    </tr>
+                    #summaryRow("total" $result.testSummary.total)
+                    #summaryRow("failures" $result.testSummary.failures)
+                    #summaryRow("errors" $result.testSummary.errors)
+                    #summaryRow("expected.failures" $result.testSummary.expectedFailures)
+                    #summaryRow("skipped" $result.testSummary.skipped)
+                    #summaryRow("success.rate" "${result.testSummary.successRate}%")
+                </table>
+            </td>
+            
+            
+            <td class="columns">
+                <table class="two-content">
+                    <th class="two-heading" colspan="9">
+                        #wwtext("name=build.stages")
+                    </th>
+                    <tr>
+                        #contentClassHeading("build.stage" 1 "leftmost")
+                        #contentHeading("test.status" 2)
+                        #contentHeading("test.total" 1)
+                        #contentHeading("test.failures" 1)
+                        #contentHeading("test.errors" 1)
+                        #contentHeading("test.expected.failures" 1)
+                        #contentHeading("test.skipped" 1)
+                        #contentClassHeading("test.success.rate" 1 "rightmost")
+                    </tr>
+                    #foreach($node in $result.root.children)
+                    <tr>
+                        #if($node.result.completed())
+                            <td id='#id("stage-${node.stageName}")' class="content leftmost"><a href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>
+                            #set($summary = $node.result.testSummary)
+                            #testStatusCell($summary "")
+                            #rightCell($summary.total)
+                            #rightCell($summary.failures)
+                            #rightCell($summary.errors)
+                            #rightCell($summary.expectedFailures)
+                            #rightCell($summary.skipped)
+                            <td class="content-right rightmost">${summary.successRate}%</td>
+                        #else
+                            <td id='#id("stage-${node.stageName}")'class="content leftmost">#html($node.stageName)</td>
+                            <td id='#id("stage-${node.stageName}-inprogress")' class="content leftmost"><img alt="in progress" src="$base/images/inprogress.gif"/></td>
+                            <td class="content">$node.result.state.prettyString</td>
+                            <td class="content rightmost" colspan="6">#wwtext("name=tests.stage.in.progress")</td>
+                        #end
+                    </tr>
+                    #end
+                </table>
+            </td>
         </tr>
-        #foreach($node in $result.root.children)
-        <tr>
-            #if($node.result.completed())
-                <td id='#id("stage-${node.stageName}")' class="content leftmost"><a href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>
-                #set($summary = $node.result.testSummary)
-                #testStatusCell($summary "")
-                #rightCell($summary.total)
-                #rightCell($summary.failures)
-                #rightCell($summary.errors)
-                #rightCell($summary.expectedFailures)
-                #rightCell($summary.skipped)
-                <td class="content-right rightmost">${summary.successRate}%</td>
-            #else
-                <td id='#id("stage-${node.stageName}")'class="content leftmost">#html($node.stageName)</td>
-                <td id='#id("stage-${node.stageName}-inprogress")' class="content leftmost"><img alt="in progress" src="$base/images/inprogress.gif"/></td>
-                <td class="content">$node.result.state.prettyString</td>
-                <td class="content rightmost" colspan="6">#wwtext("name=tests.stage.in.progress")</td>
-            #end
-        </tr>
-        #end
     </table>
-
+    
     #buildTestFailures($result)
 </div>
