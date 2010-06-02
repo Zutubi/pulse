@@ -584,13 +584,16 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
             
             browser.loginAsAdmin();
-            BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, project.getName(), 1L);
-            detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
-            while (!ResultState.SUCCESS.getPrettyString().equals(detailsPage.getBasicsValue("status")))
+            final BuildDetailsPage detailsPage = browser.createPage(BuildDetailsPage.class, project.getName(), 1L);
+            AcceptanceTestUtils.waitForCondition(new Condition()
             {
-                detailsPage.openAndWaitFor();
-                detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
-            }
+                public boolean satisfied()
+                {
+                    detailsPage.openAndWaitFor();
+                    detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
+                    return ResultState.SUCCESS.getPrettyString().equals(detailsPage.getBasicsValue("status"));
+                }
+            }, BUILD_TIMEOUT, "bootstrap command to complete");
 
             assertFalse(detailsPage.isBasicsRowPresent("errors"));
             assertFalse(detailsPage.isBasicsRowPresent("warnings"));
