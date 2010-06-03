@@ -14,6 +14,33 @@
 
 #resultPropertyTable($commandResult.properties "command-properties" "command.properties")
 
+#macro(artifactLink $key $url)
+    <a href="$url" class="unadorned" title='#wwtext("name=artifact.$key")'><img src="$base/images/artifacts/${key}.gif" alt='#wwtext("name=artifact.$key")'/></a>
+    <a href="$url">$key</a>
+#end
+
+#if($implicitArtifacts.size() > 0)
+<table id="implicit-artifacts" class="two-content spaced">
+    <tr><th class="two-heading" colspan="2">#wwtext("name=implicit.artifacts")</th></tr>
+    #foreach($artifact in $implicitArtifacts)
+        #foreach($fileArtifact in $artifact.children)
+    <tr>
+        <td class="content leftmost">
+            <img src="$base/images/page.gif" alt='$action.getText("file")'/>
+            #html($fileArtifact.path)
+        </td>
+        <td class="content rightmost fit-width">
+            #artifactLink("download" "$urls.fileFileArtifact($artifact, $fileArtifact)")
+            #if($fileArtifact.canDecorate())
+            <span class="understated">|</span> #artifactLink("decorate" "${urls.commandArtifacts($buildResult, $commandResult)}${fileArtifact.pathUrl}/")
+            #end
+        </td>
+    </tr>
+        #end
+    #end
+</table>
+#end
+
 #foreach($level in $featureLevels)
     #if($commandResult.hasMessages($level))
 <table id="features-${level.prettyString}" class="two-content spaced">

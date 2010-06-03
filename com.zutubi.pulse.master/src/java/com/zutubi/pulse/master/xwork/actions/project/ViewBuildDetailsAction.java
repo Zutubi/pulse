@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.dependency.ivy.IvyRetrievalReport;
 import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommand;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -35,13 +36,19 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
     private static final Logger LOG = Logger.getLogger(ViewBuildDetailsAction.class);
 
     private List<StageDependencyDetails> dependencyDetails = new LinkedList<StageDependencyDetails>();
-
+    private List<StoredArtifact> implicitArtifacts = new LinkedList<StoredArtifact>();
+    
     private MasterLocationProvider masterLocationProvider;
     private ConfigurationProvider configurationProvider;
 
     public List<StageDependencyDetails> getDependencyDetails()
     {
         return dependencyDetails;
+    }
+
+    public List<StoredArtifact> getImplicitArtifacts()
+    {
+        return implicitArtifacts;
     }
 
     public boolean isDependencyDetailsPresent()
@@ -63,6 +70,27 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
         if (result.completed())
         {
             loadDependencyDetails(result);
+        }
+        
+        CommandResult commandResult = getCommandResult();
+        if (commandResult != null)
+        {
+            List<StoredArtifact> artifacts = commandResult.getArtifacts();
+            CollectionUtils.filter(artifacts, new Predicate<StoredArtifact>()
+            {
+                public boolean satisfied(StoredArtifact storedArtifact)
+                {
+                    return !storedArtifact.isExplicit();
+                }
+            }, implicitArtifacts);
+            final Sort.StringComparator stringComparator = new Sort.StringComparator();
+            Collections.sort(implicitArtifacts, new Comparator<StoredArtifact>()
+            {
+                public int compare(StoredArtifact o1, StoredArtifact o2)
+                {
+                    return stringComparator.compare(o1.getName(), o2.getName());
+                }
+            });
         }
 
         return SUCCESS;

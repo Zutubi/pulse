@@ -465,12 +465,6 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findCommandResult(commandResultId).getArtifact(artifactName);
     }
 
-    public Boolean canDecorateArtifact(long artifactId)
-    {
-        StoredFileArtifact artifact = getFileArtifact(artifactId);
-        return artifact != null && artifact.canDecorate();
-    }
-
     public BuildResult getLatestBuildResult(Project project)
     {
         List<BuildResult> results = getLatestBuildResultsForProject(project, 1);

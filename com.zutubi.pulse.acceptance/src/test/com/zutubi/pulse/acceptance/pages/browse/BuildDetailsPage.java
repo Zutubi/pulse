@@ -5,6 +5,9 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Pair;
 import com.zutubi.util.WebUtils;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * The details tab for a build result.
  */
@@ -15,6 +18,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
     public static final String ID_STAGE_BASICS = "stage-basics";
     public static final String ID_COMMAND_BASICS = "command-basics";
     public static final String ID_COMMAND_PROPERTIES = "command-properties";
+    public static final String ID_COMMAND_IMPLICIT_ARTIFACTS = "implicit-artifacts";
 
     public BuildDetailsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
@@ -111,7 +115,25 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
         return getRow(ID_COMMAND_PROPERTIES, index);
     }
 
-    public class DependencyRow
+    public boolean isCommandImplicitArtifactsPresent()
+    {
+        return browser.isElementPresent(ID_COMMAND_IMPLICIT_ARTIFACTS);
+    }
+    
+    public ImplicitArtifactRow getCommandImplicitArtifactRow(int index)
+    {
+        String path = browser.getCellContents(ID_COMMAND_IMPLICIT_ARTIFACTS, index + 1, 0);
+        ImplicitArtifactRow row = new ImplicitArtifactRow(path);
+        String actions = browser.getCellContents(ID_COMMAND_IMPLICIT_ARTIFACTS, index + 1, 1);
+        String[] pieces = actions.split("\\|");
+        for (String action: pieces)
+        {
+            row.addAction(action.trim());
+        }
+        return row;
+    }
+    
+    public static class DependencyRow
     {
         private String project;
         private String build;
@@ -144,6 +166,32 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
         public String getArtifact()
         {
             return artifact;
+        }
+    }
+    
+    public static class ImplicitArtifactRow
+    {
+        private String path;
+        private List<String> actions = new LinkedList<String>();
+
+        public ImplicitArtifactRow(String path)
+        {
+            this.path = path;
+        }
+
+        public String getPath()
+        {
+            return path;
+        }
+
+        public List<String> getActions()
+        {
+            return actions;
+        }
+
+        public void addAction(String action)
+        {
+            actions.add(action);
         }
     }
 }

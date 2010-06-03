@@ -285,8 +285,6 @@ public interface BuildManager
 
     StoredArtifact getCommandResultByArtifact(long commandResultId, String artifactName);
 
-    Boolean canDecorateArtifact(long artifactId);
-
     /**
      * This method allows a build result to be cleaned up.  The details of exactly which
      * portions of a build result are to be cleaned up is defined within the options parameter.

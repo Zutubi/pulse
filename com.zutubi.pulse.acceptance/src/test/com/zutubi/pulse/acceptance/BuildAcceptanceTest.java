@@ -526,6 +526,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEquals(asPair("status", "failure"), detailsPage.getCommandBasicsRow(0));
         assertTrue(detailsPage.isCommandPropertiesPresent());
         assertEquals(asPair("build file", "build.xml"), detailsPage.getCommandPropertiesRow(0));
+        assertTrue(detailsPage.isCommandImplicitArtifactsPresent());
+        BuildDetailsPage.ImplicitArtifactRow row = detailsPage.getCommandImplicitArtifactRow(0);
+        assertEquals("command output/output.txt", row.getPath());
+        assertEquals(Arrays.asList("download", "decorate"), row.getActions());
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
