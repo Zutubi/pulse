@@ -75,6 +75,25 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         assertFileExists(ENV_ARTIFACT_NAME, ENV_FILENAME);
     }
 
+    public void testExecuteExceptionWhenArgumentsAreIncludedInTheExecutable()
+    {
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("/home/..../hammer/hammer.sh -j3 --mode=dbg  build/dbg/obj build/dbg/staging ");
+
+        ExecutableCommand command = new ExecutableCommand(config);
+        TestCommandContext context = new TestCommandContext(createExecutionContext());
+
+        try
+        {
+            command.execute(context);
+            fail("Expect a build exception with a bad executable");
+        }
+        catch (BuildException e)
+        {
+            assertThat(e.getMessage(), containsString("The command contains spaces"));
+        }
+    }
+
     public void testWorkingDir() throws Exception
     {
         File dir = new File(baseDir, "nested");

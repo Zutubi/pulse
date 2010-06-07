@@ -95,7 +95,13 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             String message = e.getMessage();
             if (message.contains("nosuchexe") || message.endsWith("error=2") || message.contains("error=2,"))
             {
-                message = "No such executable '" + builder.command().get(0) + "'";
+                String command = builder.command().get(0);
+                message = "No such executable '" + command + "'";
+                // CIB-2488 - if the command line has spaces in it, provide a suitable hint to the user that this may be causing a problem.
+                if (command.contains(" "))
+                {
+                    message += ". The command contains spaces.  If these are command arguments, please add them as args.";
+                }
             }
 
             throw new BuildException("Unable to create process: " + message, e);
