@@ -6,6 +6,7 @@ ZUTUBI.widget = ZUTUBI.widget || {};
 
 ZUTUBI.FloatManager = function() {
     var idByCategory = {};
+    var clsByCategory = {};
     var displayedCategories = 0;
     var showTime = new Date();
     var initialised = false;
@@ -20,21 +21,21 @@ ZUTUBI.FloatManager = function() {
         });
     }
 
-    function unpress(id)
+    function unpress(id, cls)
     {
         var buttonEl = Ext.get(id + '_button');
         if(buttonEl)
         {
-            buttonEl.removeClass('popdown-pressed');
+            buttonEl.removeClass(cls + '-pressed');
         }
     }
 
-    function press(id)
+    function press(id, cls)
     {
         var buttonEl = Ext.get(id + '_button');
         if(buttonEl)
         {
-            buttonEl.addClass('popdown-pressed');
+            buttonEl.addClass(cls + '-pressed');
         }
     }
 
@@ -50,11 +51,14 @@ ZUTUBI.FloatManager = function() {
     {
         for (var category in idByCategory)
         {
-            unpress(idByCategory[category]);
+            var id = idByCategory[category];
+            var cls = clsByCategory[category];
+            unpress(id, cls);
             Ext.get(getWindowId(category)).setDisplayed(false);
         }
 
         idByCategory = {};
+        clsByCategory = {};
         displayedCategories = 0;
         Ext.getDoc().un('mousedown', onMouseDown);
     }
@@ -65,8 +69,13 @@ ZUTUBI.FloatManager = function() {
     }
 
     return {
-        showHideFloat: function(category, id, align)
+        showHideFloat: function(category, id, align, cls)
         {
+            if (!cls)
+            {
+                cls = 'popdown';
+            }
+
             if(!initialised)
             {
                 initialise();
@@ -77,11 +86,13 @@ ZUTUBI.FloatManager = function() {
             var windowId = getWindowId(category);
             var windowEl = Ext.get(windowId);
             var displayedId = idByCategory[category];
+            var displayedCls = clsByCategory[category];
             if(windowEl && displayedId == id)
             {
-                unpress(id);
+                unpress(id, displayedCls);
                 windowEl.setDisplayed(false);
                 delete idByCategory[category];
+                delete clsByCategory[category];
                 if (--displayedCategories == 0)
                 {
                     Ext.getDoc().un('mousedown', onMouseDown);
@@ -100,6 +111,7 @@ ZUTUBI.FloatManager = function() {
                 }
 
                 idByCategory[category] = id;
+                clsByCategory[category] = cls;
                 if (++displayedCategories == 1)
                 {
                     Ext.getDoc().on('mousedown', onMouseDown);
@@ -107,7 +119,7 @@ ZUTUBI.FloatManager = function() {
 
                 getElement(contentId).innerHTML = getElement(id).innerHTML;
 
-                press(id);
+                press(id, cls);
                 if (!windowEl.isDisplayed())
                 {
                     windowEl.setDisplayed(true);
@@ -130,14 +142,14 @@ ZUTUBI.FloatManager = function() {
  * the user requests a popup of category X, and a popup is already showing of
  * the same category, then this latter popup will be reused and moved.
  */
-function showHideFloat(category, id, align)
+function showHideFloat(category, id, align, cls)
 {
     if (!align)
     {
         align = 'tr-br?';
     }
 
-    ZUTUBI.FloatManager.showHideFloat(category, id, align);
+    ZUTUBI.FloatManager.showHideFloat(category, id, align, cls);
 }
 
 function renderMenu(owner, items, id)
@@ -3196,7 +3208,8 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                 Ext.apply(menuConfig, {
                     id: this.id,
                     personalBuild : this.personalBuild,
-                    selectedTab: this.selectedTab
+                    selectedTab: this.selectedTab,
+                    imgcls: 'popdown_small'
                 });
 
                 this.addItem(new ZUTUBI.BuildNavToolbarMenu(menuConfig));
@@ -3296,6 +3309,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     width: 25,
     height: 25,
     cls: 'popdown',
+    imgcls: 'popdown',
     renderedMenus: {},
 
     initComponent: function()
@@ -3308,7 +3322,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             style: 'position:relative; top:2px;',
             children: [{
                 tag: 'img',
-                cls: 'popdown floating-widget',
+                cls: this.imgcls + ' floating-widget',
                 id: this.id + '_actions_button',
                 src: window.baseUrl + '/images/default/s.gif'
             }]
@@ -3328,7 +3342,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     onClick: function()
     {
         renderMenu(this, this.getMenuItems(), this.id + '_actions');
-        showHideFloat('buildnav', this.id + "_actions", 'tl-bl?');
+        showHideFloat('buildnav', this.id + "_actions", 'tl-bl?', this.imgcls);
     },
 
     getMenuItems: function()

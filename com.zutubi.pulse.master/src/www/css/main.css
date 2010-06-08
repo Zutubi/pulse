@@ -807,6 +807,18 @@ img.popdown-pressed
     background: 0 0 no-repeat url(../images/popdown-pressed.gif);
 }
 
+img.popdown_small
+{
+    width: 13px;
+    height: 13px;
+    background: 0 0 no-repeat url(../images/popdown_s.gif);
+}
+
+img.popdown_small-pressed
+{
+    background: 0 0 no-repeat url(../images/popdown_s-pressed.gif);
+}
+
 .invalid-configs
 {
     margin: 20px;
