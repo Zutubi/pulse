@@ -21,9 +21,9 @@ import java.util.regex.Pattern;
  */
 public class BuildChangesPage extends SeleniumPage
 {
-    private static final String ID_CHANGES_HEADER = "changes-header";
-    private static final String ID_COMPARE_TO_POPUP = "compare.to";
-    private static final String ID_COMPARE_TO_POPUP_BUTTON = "compare.to_button";
+    private static final String ID_CHANGELIST_TABLES = "changelist-tables";
+    private static final String ID_COMPARE_TO_POPUP = "compare-to";
+    private static final String ID_COMPARE_TO_POPUP_BUTTON = "compare-to_button";
 
     private static final String FORMAT_ID_CHANGELIST = "change.%d";
     private static final String FORMAT_ID_CHANGELIST_COMMENT = "change.%d.comment";
@@ -55,7 +55,7 @@ public class BuildChangesPage extends SeleniumPage
 
     public boolean hasChanges()
     {
-        return browser.isElementIdPresent(ID_CHANGES_HEADER);
+        return browser.isElementIdPresent(ID_CHANGELIST_TABLES);
     }
 
     private String getChangelistId(int changeNumber)
@@ -151,6 +151,11 @@ public class BuildChangesPage extends SeleniumPage
         return changelists;
     }
 
+    public boolean isCompareToPopDownPresent()
+    {
+        return browser.isElementPresent(ID_COMPARE_TO_POPUP_BUTTON);
+    }
+    
     /**
      * Clicks the button link to pop down the compare to box.  I would like to
      * add waiting for it to appear, but this fails in Selenium (it keeps

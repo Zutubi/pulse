@@ -76,7 +76,7 @@ public abstract class AbstractLogPage extends SeleniumPage
      */
     public int getMaxLines()
     {
-        Pattern pattern = Pattern.compile("maximum of (\\d+) lines");
+        Pattern pattern = Pattern.compile("max (\\d+) lines");
         String text = browser.getText(ID_SETTINGS);
         Matcher matcher = pattern.matcher(text);
         matcher.find();

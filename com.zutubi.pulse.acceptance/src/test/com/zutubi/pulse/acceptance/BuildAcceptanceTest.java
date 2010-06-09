@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -43,6 +44,7 @@ import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfigu
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
@@ -144,13 +146,30 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // Check changes page handling of no changes.
         BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, 1L);
         assertFalse(changesPage.hasChanges());
-        assertTextPresent("No previous builds or no changes between builds.");
+        assertFalse(changesPage.isCompareToPopDownPresent());
+        assertTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none"));
 
         // Check some properties
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
+    }
+    
+    public void testNoChangesBetweenBuilds() throws Exception
+    {
+        addProject(random, true);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        browser.loginAsAdmin();
+
+        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, 2L);
+        assertFalse(changesPage.hasChanges());
+        // Unlike where there are no previous builds, in this case we expect
+        // the compare-to popdown.
+        assertTrue(changesPage.isCompareToPopDownPresent());
+        assertTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none"));
     }
 
     public void testChangesBetweenBuilds() throws Exception
