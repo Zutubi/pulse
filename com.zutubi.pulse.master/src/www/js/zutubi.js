@@ -3209,7 +3209,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                     id: this.id,
                     personalBuild : this.personalBuild,
                     selectedTab: this.selectedTab,
-                    imgcls: 'popdown_small'
+                    imgcls: 'popdown-small'
                 });
 
                 this.addItem(new ZUTUBI.BuildNavToolbarMenu(menuConfig));
