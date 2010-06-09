@@ -17,10 +17,18 @@
         }
         
 #if($u_stageName)
-        #updater("$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
+        #set($url = "$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal")
 #else
-        #updater("$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
+        #set($url = "$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal")
 #end
+
+        #updater($url "panel" $principle "updaterCallback")
+        
+        function refreshNow()
+        {
+            refreshPanel('panel', '#jss($url)', updaterCallback);
+        }        
+
         Ext.onReady(function() {
             var combo = new Ext.form.ComboBox({
                 transform: 'log-combo',
@@ -99,6 +107,10 @@
                         $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$refreshInterval"])
                         <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
                         <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
+                    </td>
+                    <td>
+                        <a class="unadorned" href="#" onclick="refreshNow(); return false;"><img alt="refresh now" src="$base/images/arrow_refresh.gif"/></a>
+                        <a id="refresh-now" href="#" onclick="refreshNow(); return false;">#wwtext("name=refresh.now")</a>                        
                     </td>
                 </tr>
             </table>

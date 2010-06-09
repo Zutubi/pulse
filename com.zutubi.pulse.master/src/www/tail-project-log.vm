@@ -11,7 +11,13 @@
             Ext.get('refresh-time').update('refreshed ' + now.format('g:i:s a, D F j'));
         }
 
-        #updater("$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle "updaterCallback")
+        #set($url = "$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal")
+        #updater($url "panel" $principle "updaterCallback")
+
+        function refreshNow()
+        {
+            refreshPanel('panel', '#jss($url)', updaterCallback);
+        }        
 
         Ext.onReady(function() {
             updaterCallback();
@@ -46,6 +52,10 @@
                     $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$refreshInterval"])
                     <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
                     <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
+                </td>
+                <td>
+                    <a class="unadorned" href="#" onclick="refreshNow(); return false;"><img alt="refresh now" src="$base/images/arrow_refresh.gif"/></a>
+                    <a id="refresh-now" href="#" onclick="refreshNow(); return false;">#wwtext("name=refresh.now")</a>                        
                 </td>
             </tr>
         </table>

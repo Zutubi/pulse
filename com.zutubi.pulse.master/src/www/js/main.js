@@ -784,3 +784,22 @@ function indentImage(size)
         return '<img src="' + Ext.BLANK_IMAGE_URL + '" width="' + (size * 10) +  '"/>';
     }
 }
+
+function refreshPanel(id, url, callback)
+{
+    var panel = Ext.get(id);
+    panel.mask('Refreshing...');
+    var updater = new Ext.Updater(id);
+    updater.showLoadIndicator = false;
+    updater.update({
+        url: url,
+        scripts: true,
+        callback: function() {
+            panel.unmask();
+            if (callback)
+            {
+                callback();
+            }
+        }
+    });
+}
