@@ -809,8 +809,8 @@ img.popdown-pressed
 
 img.popdown-small
 {
-    width: 13px;
-    height: 13px;
+    width: 11px;
+    height: 11px;
     background: 0 0 no-repeat url(../images/popdown_s.gif);
 }
 

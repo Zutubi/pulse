@@ -3306,8 +3306,8 @@ ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
 
 ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
-    width: 25,
-    height: 25,
+//    width: 11,
+//    height: 11,
     cls: 'popdown',
     imgcls: 'popdown',
     renderedMenus: {},
@@ -3318,8 +3318,8 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
         this.autoEl = {
             id: this.id + "_actions_link",
-            tag: 'span',
-            style: 'position:relative; top:2px;',
+            tag: 'div',
+            style: 'position:relative; top:2px;line-height:11px;font-size:11px',
             children: [{
                 tag: 'img',
                 cls: this.imgcls + ' floating-widget',
