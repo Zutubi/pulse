@@ -18,12 +18,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import com.zutubi.i18n.Messages;
+
 /**
- *
- *
+ * A mutable implementation of the {@link org.hibernate.cfg.Configuration}.  The
+ * default implementation is immutable, making it difficult to 'refactor' the schema
+ * at runtime.
  */
+@SuppressWarnings({"unchecked"})
 public class MutableConfiguration extends Configuration
 {
+    private static final Messages I18N = Messages.getInstance(MutableConfiguration.class);
+
     private List<Resource> resources = new LinkedList<Resource>();
     private Properties properties = new Properties();
     private List<Table> tabs = new LinkedList<Table>();
@@ -33,10 +39,9 @@ public class MutableConfiguration extends Configuration
         String key = getTableKey(table);
         if (tables.containsKey(key))
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(I18N.format("table.exists", key));
         }
         tabs.add(table);
-        
         tables.put(key, table);
     }
 
@@ -50,46 +55,49 @@ public class MutableConfiguration extends Configuration
     public void removeTable(Table table)
     {
         String key = getTableKey(table);
-        if(tables.remove(key) == null)
+        if (tables.remove(key) == null)
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(I18N.format("table.does.not.exist", key));
         }
+        tabs.remove(table);
     }
 
-    public Mapping getMapping() {
-        return new Mapping() {
-            /**
-             * Returns the identifier type of a mapped class
-             */
+    public Mapping getMapping()
+    {
+        return new Mapping()
+        {
             public Type getIdentifierType(String persistentClass) throws MappingException
             {
-                PersistentClass pc = ( (PersistentClass) classes.get( persistentClass ) );
-                if ( pc == null ) {
-                    throw new MappingException( "persistent class not known: " + persistentClass );
+                PersistentClass pc = ((PersistentClass) classes.get(persistentClass));
+                if (pc == null)
+                {
+                    throw new MappingException(I18N.format("unknown.persistent.class", pc));
                 }
                 return pc.getIdentifier().getType();
             }
 
-            public String getIdentifierPropertyName(String persistentClass) throws MappingException {
-                final PersistentClass pc = (PersistentClass) classes.get( persistentClass );
-                if ( pc == null ) {
-                    throw new MappingException( "persistent class not known: " + persistentClass );
+            public String getIdentifierPropertyName(String persistentClass) throws MappingException
+            {
+                final PersistentClass pc = (PersistentClass) classes.get(persistentClass);
+                if (pc == null)
+                {
+                    throw new MappingException(I18N.format("unknown.persistent.class", pc));
                 }
-                if ( !pc.hasIdentifierProperty() ) return null;
+                if (!pc.hasIdentifierProperty()) return null;
                 return pc.getIdentifierProperty().getName();
             }
 
-            public Type getReferencedPropertyType(String persistentClass, String propertyName) throws MappingException {
-                final PersistentClass pc = (PersistentClass) classes.get( persistentClass );
-                if ( pc == null ) {
-                    throw new MappingException( "persistent class not known: " + persistentClass );
+            public Type getReferencedPropertyType(String persistentClass, String propertyName) throws MappingException
+            {
+                final PersistentClass pc = (PersistentClass) classes.get(persistentClass);
+                if (pc == null)
+                {
+                    throw new MappingException(I18N.format("unknown.persistent.class", pc));
                 }
-                Property prop = pc.getReferencedProperty( propertyName );
-                if ( prop == null ) {
-                    throw new MappingException(
-                            "property not known: " +
-                            persistentClass + '.' + propertyName
-                        );
+                Property prop = pc.getReferencedProperty(propertyName);
+                if (prop == null)
+                {
+                    throw new MappingException(I18N.format("unknown.persistent.class.property", persistentClass + '.' + propertyName));
                 }
                 return prop.getType();
             }
@@ -140,40 +148,20 @@ public class MutableConfiguration extends Configuration
 
     public MutableConfiguration copy()
     {
-        // copy via serialisation... seems easiest way to go..
-        // serialization has problems with transient dependencies on other packages.
-/*
-        try
-        {
-            ByteArrayOutputStream raw = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(raw);
-            out.writeObject(this);
-            ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(raw.toByteArray()));
-            return (MutableConfiguration)in.readObject();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-*/
-        // try a manual reconstruction instead.
         MutableConfiguration copy = new MutableConfiguration();
         copy.setProperties(properties);
-        for (Resource resource : resources)
+        try
         {
-            try
-            {
-                copy.addInputStream(resource.getInputStream());
-            }
-            catch (IOException e)
-            {
-                // noop. any errors here would have happened on the original, so we ignore them.
-            }
+            copy.addMappings(resources);
+        }
+        catch (IOException e)
+        {
+            // noop. any errors here would have happened on the original, so we ignore them.
         }
 
         for (Table tab : tabs)
         {
-            tables.put(getTableKey(tab), tab);
+            copy.addTable(tab);
         }
 
         return copy;

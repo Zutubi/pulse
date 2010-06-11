@@ -13,11 +13,6 @@ public class HibernateTriggerDaoTest extends MasterPersistenceTestCase
 {
     private TriggerDao dao;
 
-    public HibernateTriggerDaoTest(String testName)
-    {
-        super(testName);
-    }
-
     public void setUp() throws Exception
     {
         super.setUp();

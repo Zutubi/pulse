@@ -9,8 +9,6 @@ import java.util.Properties;
 
 /**
  * The database configuration object represents all of the connection configuration details.
- *
- *
  */
 public class DatabaseConfig
 {

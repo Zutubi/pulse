@@ -24,10 +24,6 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/**
- *
- *
- */
 public abstract class PersistenceTestCase extends PulseTestCase
 {
     protected ApplicationContext context = null;
@@ -39,16 +35,6 @@ public abstract class PersistenceTestCase extends PulseTestCase
     protected SessionFactory sessionFactory;
     protected DataSource dataSource;
     protected DatabaseConsole console;
-
-    public PersistenceTestCase()
-    {
-
-    }
-
-    public PersistenceTestCase(String testName)
-    {
-        super(testName);
-    }
 
     protected void setUp() throws Exception
     {

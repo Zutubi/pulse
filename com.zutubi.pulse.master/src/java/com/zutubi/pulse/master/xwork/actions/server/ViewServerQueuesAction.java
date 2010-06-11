@@ -19,11 +19,17 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.transaction.PlatformTransactionManager;
+import org.hibernate.SessionFactory;
+
 /**
  * Action to show the build and recipe queues.
  */
 public class ViewServerQueuesAction extends ActionSupport
 {
+    private PlatformTransactionManager transactionManager;
+    private SessionFactory sessionFactory;
+
     private List<BuildRequestEvent> buildQueue;
     private List<BuildResult> executingBuilds;
     private List<RecipeAssignmentRequest> recipeQueueSnapshot;
@@ -62,6 +68,9 @@ public class ViewServerQueuesAction extends ActionSupport
         // We snapshot the queues with full privileges so we can show a more
         // complete picture to the user by replacing entries they don't have
         // the authority to view with placeholders.
+
+//        System.out.println("flushMode: " + sessionFactory.getCurrentSession().getFlushMode());
+//        System.out.println("readOnly: " + sessionFactory.getCurrentSession().connection().isReadOnly());
         snapshotQueuesAsSystem();
         sortBuilds();
         nullOutUnviewableEntries();
@@ -150,5 +159,15 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setTransactionManager(PlatformTransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory)
+    {
+        this.sessionFactory = sessionFactory;
     }
 }

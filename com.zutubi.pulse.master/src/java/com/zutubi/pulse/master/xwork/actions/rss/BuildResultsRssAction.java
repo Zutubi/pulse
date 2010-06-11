@@ -13,9 +13,9 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.RenderService;
-import com.zutubi.pulse.master.search.BuildResultExpressions;
-import com.zutubi.pulse.master.search.Queries;
-import com.zutubi.pulse.master.search.SearchQuery;
+import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultExpressions;
+import com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries;
+import com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQuery;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.util.cache.Cache;
 import com.zutubi.pulse.master.util.cache.CacheManager;
@@ -46,7 +46,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private ConfigurationProvider configurationProvider;
     private RenderService renderService;
 
-    private Queries queries;
+    private HibernateSearchQueries queries;
 
     private JITFeed feed;
 
@@ -176,7 +176,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         this.buildResultRenderer = buildResultRenderer;
     }
 
-    public void setQueries(Queries queries)
+    public void setQueries(HibernateSearchQueries queries)
     {
         this.queries = queries;
     }
@@ -212,7 +212,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
          *
          * @return
          */
-        protected abstract SearchQuery<Long> getQuery();
+        protected abstract HibernateSearchQuery<Long> getQuery();
 
         /**
          * Get the title for this feed.
@@ -276,7 +276,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             this.description = description;
         }
 
-        protected SearchQuery<Long> getQuery()
+        protected HibernateSearchQuery<Long> getQuery()
         {
             return null;
         }
@@ -311,14 +311,14 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     private class AllProjectsResultTemplate extends RssFeedTemplate
     {
-        public SearchQuery<Long> getQuery()
+        public HibernateSearchQuery<Long> getQuery()
         {
-            SearchQuery<Long> query = queries.getIds(BuildResult.class);
-            query.add(BuildResultExpressions.buildResultCompleted());
-            query.add(BuildResultExpressions.isPersonalBuild(false));
+            HibernateSearchQuery<Long> query = queries.getIds(BuildResult.class);
+            query.add(HibernateBuildResultExpressions.buildResultCompleted());
+            query.add(HibernateBuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(BuildResultExpressions.orderByDescEndDate());
+            query.add(HibernateBuildResultExpressions.orderByDescEndDate());
             query.setProjection(Projections.id());
             return query;
         }
@@ -362,7 +362,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             this.group = group;
         }
 
-        public SearchQuery<Long> getQuery()
+        public HibernateSearchQuery<Long> getQuery()
         {
             if(group == null)
             {
@@ -375,13 +375,13 @@ public class BuildResultsRssAction extends ProjectActionSupport
                 return null;
             }
 
-            SearchQuery<Long> query = queries.getIds(BuildResult.class);
-            query.add(BuildResultExpressions.projectIn(projects));
-            query.add(BuildResultExpressions.buildResultCompleted());
-            query.add(BuildResultExpressions.isPersonalBuild(false));
+            HibernateSearchQuery<Long> query = queries.getIds(BuildResult.class);
+            query.add(HibernateBuildResultExpressions.projectIn(projects));
+            query.add(HibernateBuildResultExpressions.buildResultCompleted());
+            query.add(HibernateBuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(BuildResultExpressions.orderByDescEndDate());
+            query.add(HibernateBuildResultExpressions.orderByDescEndDate());
             query.setProjection(Projections.id());
             return query;
         }
@@ -425,15 +425,15 @@ public class BuildResultsRssAction extends ProjectActionSupport
             this.project = project;
         }
 
-        public SearchQuery<Long> getQuery()
+        public HibernateSearchQuery<Long> getQuery()
         {
-            SearchQuery<Long> query = queries.getIds(BuildResult.class);
-            query.add(BuildResultExpressions.projectEq(project));
-            query.add(BuildResultExpressions.buildResultCompleted());
-            query.add(BuildResultExpressions.isPersonalBuild(false));
+            HibernateSearchQuery<Long> query = queries.getIds(BuildResult.class);
+            query.add(HibernateBuildResultExpressions.projectEq(project));
+            query.add(HibernateBuildResultExpressions.buildResultCompleted());
+            query.add(HibernateBuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(BuildResultExpressions.orderByDescId());
+            query.add(HibernateBuildResultExpressions.orderByDescId());
             query.setProjection(Projections.id());
             return query;
         }
@@ -473,20 +473,20 @@ public class BuildResultsRssAction extends ProjectActionSupport
             this.user = user;
         }
 
-        public SearchQuery<Long> getQuery()
+        public HibernateSearchQuery<Long> getQuery()
         {
             Set<Project> projects = userManager.getUserProjects(user, projectManager);
             if (projects.size() == 0)
             {
                 return null;
             }
-            SearchQuery<Long> query = queries.getIds(BuildResult.class);
-            query.add(BuildResultExpressions.buildResultCompleted());
-            query.add(BuildResultExpressions.projectIn(projects));
-            query.add(BuildResultExpressions.isPersonalBuild(false));
+            HibernateSearchQuery<Long> query = queries.getIds(BuildResult.class);
+            query.add(HibernateBuildResultExpressions.buildResultCompleted());
+            query.add(HibernateBuildResultExpressions.projectIn(projects));
+            query.add(HibernateBuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(BuildResultExpressions.orderByDescEndDate());
+            query.add(HibernateBuildResultExpressions.orderByDescEndDate());
             query.setProjection(Projections.id());
             return query;
         }
@@ -528,7 +528,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public BuildJITFeed(RssFeedTemplate template)
         {
-            SearchQuery<Long> query = template.getQuery();
+            HibernateSearchQuery<Long> query = template.getQuery();
             if (query != null)
             {
                 this.results = query.list();

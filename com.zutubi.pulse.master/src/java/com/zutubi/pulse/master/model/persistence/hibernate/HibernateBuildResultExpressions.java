@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.search;
+package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.Project;
@@ -12,7 +12,7 @@ import java.util.Collection;
  * The Build result restrictions provides a set of pre-defined expressions that can be applied to Search Queries
  * that target build resutls.
  */
-public class BuildResultExpressions
+public class HibernateBuildResultExpressions
 {
     public static Criterion projectEq(Project project)
     {

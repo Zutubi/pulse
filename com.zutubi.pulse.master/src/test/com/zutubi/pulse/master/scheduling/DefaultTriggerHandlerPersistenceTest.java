@@ -9,15 +9,6 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
     private TriggerHandler handler;
     private TriggerDao triggerDao;
 
-    public DefaultTriggerHandlerPersistenceTest()
-    {
-    }
-
-    public DefaultTriggerHandlerPersistenceTest(String name)
-    {
-        super(name);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();

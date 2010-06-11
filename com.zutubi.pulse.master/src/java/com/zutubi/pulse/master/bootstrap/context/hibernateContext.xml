@@ -268,4 +268,7 @@ This context requires:
             </props>
         </property>
     </bean>
+
+    <bean id="queries" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries"/>
+    
 </beans>

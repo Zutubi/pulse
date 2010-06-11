@@ -204,8 +204,6 @@
 
     <bean id="guestAccessManager" class="com.zutubi.pulse.master.GuestAccessManager"/>
 
-    <bean id="queries" class="com.zutubi.pulse.master.search.Queries"/>
-
     <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" init-method="init"/>
 
     <!-- re create the file system manager now that the slave details are available. -->

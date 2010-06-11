@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.search;
+package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -22,7 +22,7 @@ import java.util.List;
  *
  * In implementation, it is a wrapper around teh Criteria API that handles the hibernate session management.
  */
-public class SearchQuery<T> implements Serializable
+public class HibernateSearchQuery<T> implements Serializable
 {
     /**
      * The list of Criterion that make up this query.
@@ -73,7 +73,7 @@ public class SearchQuery<T> implements Serializable
      *
      * @param target
      */
-    protected SearchQuery(Class target)
+    public HibernateSearchQuery(Class target)
     {
         this.target = target;
     }
@@ -111,7 +111,7 @@ public class SearchQuery<T> implements Serializable
      *
      * @see Criteria#add(org.hibernate.criterion.Criterion)
      */
-    public SearchQuery add(Criterion expression)
+    public HibernateSearchQuery add(Criterion expression)
     {
         criterion.add(expression);
         return this;
@@ -126,7 +126,7 @@ public class SearchQuery<T> implements Serializable
      *
      * @see Criteria#addOrder(org.hibernate.criterion.Order)
      */
-    public SearchQuery add(Order order)
+    public HibernateSearchQuery add(Order order)
     {
         ordering.add(order);
         return this;
@@ -141,7 +141,7 @@ public class SearchQuery<T> implements Serializable
      *
      * @see Criteria#setProjection(org.hibernate.criterion.Projection)
      */
-    public SearchQuery setProjection(Projection projection)
+    public HibernateSearchQuery setProjection(Projection projection)
     {
         this.projection = projection;
         return this;

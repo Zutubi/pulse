@@ -24,16 +24,17 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     }
 
     @SuppressWarnings({"unchecked"})
-    public <U extends T> U findByIdAndType(long id, Class<U> type)
+    protected <U extends T> U findByIdAndType(long id, Class<U> type)
     {
         return (U)findAnyType(id, type);
     }
 
-    public Object findAnyType(long id, Class type)
+    @SuppressWarnings({"unchecked"})
+    protected <T> T findAnyType(long id, Class type)
     {
         try
         {
-            return getHibernateTemplate().load(type, Long.valueOf(id));
+            return (T)getHibernateTemplate().load(type, Long.valueOf(id));
         }
         catch (ObjectNotFoundException e)
         {
