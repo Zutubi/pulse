@@ -78,7 +78,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     public void testExecuteExceptionWhenArgumentsAreIncludedInTheExecutable()
     {
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
-        config.setExe("/home/..../hammer/hammer.sh -j3 --mode=dbg  build/dbg/obj build/dbg/staging ");
+        config.setExe("hammer.sh -j3 --mode=dbg  build/dbg/obj build/dbg/staging ");
 
         ExecutableCommand command = new ExecutableCommand(config);
         TestCommandContext context = new TestCommandContext(createExecutionContext());
