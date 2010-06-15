@@ -93,7 +93,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         {
             // CIB-149: try and make friendlier error messages for common problems.
             String message = e.getMessage();
-            if (message.contains("nosuchexe") || message.endsWith("error=2") || message.contains("error=2,"))
+            if (message.contains("nosuchexe") || message.endsWith("error=2") || message.contains("error=2,") || message.endsWith("not found"))
             {
                 String command = builder.command().get(0);
                 message = "No such executable '" + command + "'";
