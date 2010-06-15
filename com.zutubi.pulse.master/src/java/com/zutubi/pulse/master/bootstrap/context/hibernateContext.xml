@@ -269,6 +269,8 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="queries" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries"/>
+    <bean id="queries" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries">
+        <property name="objectFactory" ref="objectFactory"/>
+    </bean>
     
 </beans>
