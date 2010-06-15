@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.bean.ObjectFactory;
 
 /**
- * The Queries object is a HibernateSearchQuery factory.
+ * This object is a {@link HibernateSearchQuery} factory.
  *
  * @see HibernateSearchQuery
  */
@@ -25,17 +25,6 @@ public class HibernateSearchQueries
      * @return a configured HibernateSearchQuery instance.
      */
     public HibernateSearchQuery<Long> getIds(Class type)
-    {
-        return objectFactory.buildBean(HibernateSearchQuery.class, new Class[]{Class.class}, new Object[]{type});
-    }
-
-    /**
-     * Create a query used for searching for the strings of the specified type of object.
-     *
-     * @param type of object being searched for.
-     * @return a configured HibernateSearchQuery instance.
-     */
-    public HibernateSearchQuery<String> getStrings(Class type)
     {
         return objectFactory.buildBean(HibernateSearchQuery.class, new Class[]{Class.class}, new Object[]{type});
     }

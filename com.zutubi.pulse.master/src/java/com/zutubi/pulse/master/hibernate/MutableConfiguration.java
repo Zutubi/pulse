@@ -25,7 +25,6 @@ import com.zutubi.i18n.Messages;
  * default implementation is immutable, making it difficult to 'refactor' the schema
  * at runtime.
  */
-@SuppressWarnings({"unchecked"})
 public class MutableConfiguration extends Configuration
 {
     private static final Messages I18N = Messages.getInstance(MutableConfiguration.class);

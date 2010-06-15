@@ -70,8 +70,10 @@ public class HibernateSearchQuery<T> implements Serializable
     private int maxResults = NOT_SPECIFIED;
 
     /**
+     * Create a new query instance that can be used to lookup data of the
+     * target type.
      *
-     * @param target
+     * @param target    the type of data to be queried.
      */
     public HibernateSearchQuery(Class target)
     {
@@ -81,7 +83,7 @@ public class HibernateSearchQuery<T> implements Serializable
     /**
      * Specify the index of the first result within the results to be returned when this query is executed.
      *
-     * @param firstResult
+     * @param firstResult   the index of the first result
      *
      * @see Criteria#setFirstResult(int)
      */
@@ -93,7 +95,7 @@ public class HibernateSearchQuery<T> implements Serializable
     /**
      * Specify the maximum number of results to be returned by this search query.
      *
-     * @param maxResults
+     * @param maxResults    the max number of results
      *
      * @see Criteria#setMaxResults(int)
      */
@@ -105,7 +107,7 @@ public class HibernateSearchQuery<T> implements Serializable
     /**
      * Add a criterion to this search query.
      *
-     * @param expression
+     * @param expression    the criterion expression to be added to this query.
      *
      * @return the modified search query instance.
      *
@@ -120,7 +122,7 @@ public class HibernateSearchQuery<T> implements Serializable
     /**
      * Add an Order clause to this search query.
      *
-     * @param order
+     * @param order the order clause to add to this query
      *
      * @return the modified search query instance.
      *
@@ -135,7 +137,7 @@ public class HibernateSearchQuery<T> implements Serializable
     /**
      * Add a projection to this search query.
      *
-     * @param projection
+     * @param projection    the projection to add to this query
      *
      * @return the modified search query instance.
      *
@@ -242,11 +244,6 @@ public class HibernateSearchQuery<T> implements Serializable
         return sessionFactory;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param sessionFactory
-     */
     public void setSessionFactory(SessionFactory sessionFactory)
     {
         this.sessionFactory = sessionFactory;

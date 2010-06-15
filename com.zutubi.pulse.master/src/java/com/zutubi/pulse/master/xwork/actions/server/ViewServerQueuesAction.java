@@ -1,11 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
 import com.zutubi.pulse.master.build.control.BuildController;
-import com.zutubi.pulse.master.build.queue.FatController;
-import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
-import com.zutubi.pulse.master.build.queue.RecipeQueue;
-import com.zutubi.pulse.master.build.queue.ActivatedRequest;
-import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
+import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -19,17 +15,11 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.transaction.PlatformTransactionManager;
-import org.hibernate.SessionFactory;
-
 /**
  * Action to show the build and recipe queues.
  */
 public class ViewServerQueuesAction extends ActionSupport
 {
-    private PlatformTransactionManager transactionManager;
-    private SessionFactory sessionFactory;
-
     private List<BuildRequestEvent> buildQueue;
     private List<BuildResult> executingBuilds;
     private List<RecipeAssignmentRequest> recipeQueueSnapshot;
@@ -68,9 +58,6 @@ public class ViewServerQueuesAction extends ActionSupport
         // We snapshot the queues with full privileges so we can show a more
         // complete picture to the user by replacing entries they don't have
         // the authority to view with placeholders.
-
-//        System.out.println("flushMode: " + sessionFactory.getCurrentSession().getFlushMode());
-//        System.out.println("readOnly: " + sessionFactory.getCurrentSession().connection().isReadOnly());
         snapshotQueuesAsSystem();
         sortBuilds();
         nullOutUnviewableEntries();
@@ -159,15 +146,5 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public void setTransactionManager(PlatformTransactionManager transactionManager)
-    {
-        this.transactionManager = transactionManager;
-    }
-
-    public void setSessionFactory(SessionFactory sessionFactory)
-    {
-        this.sessionFactory = sessionFactory;
     }
 }
