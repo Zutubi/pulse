@@ -20,7 +20,6 @@ import java.util.Vector;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -773,8 +772,13 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectB.addExpectedFiles("lib/BIGFILE");
         insertProject(projectB);
 
-        buildRunner.triggerSuccessfulBuild(projectA);
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        // double the timeout to give pulse enough time to capture and upload the large file.
+        long extendedTimeout = XmlRpcHelper.BUILD_TIMEOUT * 2;
+        int buildNumber = buildRunner.triggerBuild(projectA);
+        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), buildNumber, extendedTimeout);
+        ResultState buildStatus = buildRunner.getBuildStatus(projectA, buildNumber);
+        assertEquals(ResultState.SUCCESS, buildStatus);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, extendedTimeout);
     }
 
     // setup the repository for the propagate revision tests.

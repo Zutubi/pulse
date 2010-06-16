@@ -1001,7 +1001,7 @@ public class XmlRpcHelper
             Hashtable<String, Object> build = buildHolder.build;
             if (build == null)
             {
-                message += ": build does not seem to exist";
+                message += ": build does not exist";
             }
             else
             {
