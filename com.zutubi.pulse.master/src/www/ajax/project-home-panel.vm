@@ -22,7 +22,7 @@
             <h2 class="section">#wwtext("name=recent.builds")</h2>
             <table id="recent.builds" class="content">
                 <tr>
-                    <th class="heading" colspan="$recentColumns.getTotalSpan($project)">
+                    <th class="heading" colspan="$recentColumns.totalSpan">
                         <span class="action">
                         #if($loggedInUser)
                             <a class="unadorned" href="#" id="columns-popup-link-project.recent" onclick="recentPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
@@ -34,7 +34,7 @@
                         #wwtext("name=recent.builds")
                     </th>
                 </tr>
-                #buildTableHeading($recentColumns $project)
+                #buildTableHeading($recentColumns)
             #foreach($buildResult in $recentBuilds)
                 #buildTableRow($buildResult $recentColumns false)
             #end

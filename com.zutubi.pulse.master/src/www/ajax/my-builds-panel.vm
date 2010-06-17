@@ -11,7 +11,7 @@
             #wwtext("name=my.builds")
         </th>
     </tr>
-    #buildTableHeading($columns false)
+    #buildTableHeading($columns)
 #if($myBuilds.size() > 0)
     #foreach($buildResult in $myBuilds)
         #buildTableRow($buildResult $columns false)

@@ -1350,7 +1350,7 @@
 #macro(showBuild $buildResult)
     <table id="build.summary" class="content">
         <tr>
-            <th class="heading" colspan="$summaryColumns.getTotalSpan($project)">
+            <th class="heading" colspan="$summaryColumns.totalSpan">
 #if($loggedInUser)
                 <span class="action">
                     <a class="unadorned" href="#" id="columns-popup-link-project.summary" onclick="summaryPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
@@ -1359,10 +1359,10 @@
                 #wwtext("name=build.summary")
             </th>
         </tr>
-        #buildTableHeading($summaryColumns $project)
+        #buildTableHeading($summaryColumns)
         #buildTableRow($buildResult $summaryColumns false)
     #if($detailedView)
-        #directMessages($buildResult $summaryColumns.getTotalSpan($project))
+        #directMessages($buildResult $summaryColumns.totalSpan)
     #end
     </table>
 
@@ -1685,13 +1685,9 @@
 ##
 ## Outputs the table headers a build results table (but not the row tags).
 ##
-#macro(buildTableHeaders $buildColumns $project)
+#macro(buildTableHeaders $buildColumns)
     #foreach($key in $buildColumns.columns)
-        #if($project)
-            #set($colspan = $buildColumns.getSpan($key, $project))
-        #else
-            #set($colspan = $buildColumns.getSpan($key))
-        #end
+        #set($colspan = $buildColumns.getSpan($key))
         <th class="content" #if($colspan > 1) colspan="$colspan" #end>#wwtext("name=build.$key")</th>
     #end
 #end
@@ -1699,9 +1695,9 @@
 ##
 ## Outputs the heading row for a build results table
 ##
-#macro(buildTableHeading $buildColumns $project)
+#macro(buildTableHeading $buildColumns)
     <tr>
-        #buildTableHeaders($buildColumns $project)
+        #buildTableHeaders($buildColumns)
     </tr>
 #end
 

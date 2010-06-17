@@ -12,7 +12,7 @@
             <td>
     <table width="100%" class="content">
         <tr>
-            <th class="heading" colspan="$columns.getTotalSpan($project)">
+            <th class="heading" colspan="$columns.totalSpan">
                 <span class="action">
                 #if($loggedInUser)
                     <a class="unadorned" href="#" id="columns-popup-link-project.history" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
@@ -24,7 +24,7 @@
                 #wwtext("name=historic.builds")
             </th>
         </tr>
-        #buildTableHeading($columns $project)
+        #buildTableHeading($columns)
 #if($history.size() > 0)
     #foreach($buildResult in $history)
         #buildTableRow($buildResult $columns false)
@@ -42,7 +42,7 @@
             </table>
 #else
         <tr>
-            <td class="content" colspan="$columns.getTotalSpan($project)">
+            <td class="content" colspan="$columns.totalSpan">
                 #wwtext("name=no.history")
             </td>
         </tr>

@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.tove.security.AccessManager;
-
 /**
+ * Utility class exposing details of build columns to display in the web UI.
  */
 public class BuildColumns
 {
@@ -23,12 +21,10 @@ public class BuildColumns
     public static final String KEY_ERRORS = "errors";
 
     private String[] columns;
-    private AccessManager accessManager;
 
-    public BuildColumns(String columns, AccessManager accessManager)
+    public BuildColumns(String columns)
     {
         this.columns = columns.split(",");
-        this.accessManager = accessManager;
     }
 
     public int getCount()
@@ -43,32 +39,13 @@ public class BuildColumns
 
     public int getSpan(String key)
     {
-        return getSpan(key, null);
-    }
-
-    public int getSpan(String key, Project project)
-    {
         if (key.equals(KEY_STATUS))
         {
             return 2;
         }
         else if (key.equals(KEY_ACTIONS))
         {
-            if (project == null)
-            {
-                return 6;
-            }
-            else
-            {
-                if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project))
-                {
-                    return 6;
-                }
-                else
-                {
-                    return 5;
-                }
-            }
+            return 5;
         }
         else
         {
@@ -78,16 +55,11 @@ public class BuildColumns
 
     public int getTotalSpan()
     {
-        return getTotalSpan(null);
-    }
-
-    public int getTotalSpan(Project project)
-    {
         int total = 0;
 
         for (String key : columns)
         {
-            total += getSpan(key, project);
+            total += getSpan(key);
         }
 
         return total;

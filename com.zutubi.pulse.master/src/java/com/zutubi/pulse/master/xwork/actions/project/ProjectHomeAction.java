@@ -192,8 +192,8 @@ public class ProjectHomeAction extends ProjectActionBase
         }
 
         User user = getLoggedInUser();
-        summaryColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectSummaryColumns(), accessManager);
-        recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns(), accessManager);
+        summaryColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectSummaryColumns());
+        recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns());
 
         File contentRoot = systemPaths.getContentRoot();
         List<String> availableActions = actionManager.getActions(project.getConfig(), false, true);

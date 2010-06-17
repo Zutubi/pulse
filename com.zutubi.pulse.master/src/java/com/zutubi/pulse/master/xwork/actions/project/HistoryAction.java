@@ -113,7 +113,7 @@ public class HistoryAction extends ProjectActionBase implements Preparable
         }
 
         User user = getLoggedInUser();
-        columns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectHistoryColumns(), accessManager);
+        columns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectHistoryColumns());
 
         return SUCCESS;
     }
