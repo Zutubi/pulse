@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -359,6 +360,15 @@ public class XmlRpcHelper
     public AgentStatus getAgentStatus(String name) throws Exception
     {
         return EnumUtils.fromPrettyString(AgentStatus.class, (String)call("getAgentStatus", name));
+    }
+
+    public AgentState getAgentEnableState(String name) throws Exception
+    {
+        AgentState state = new AgentState();
+        state.setEnableState(EnumUtils.fromPrettyString(
+                AgentState.EnableState.class, (String)call("getAgentEnableState", name)
+        ));
+        return state;
     }
 
     public Vector<String> getAllAgentNames() throws Exception

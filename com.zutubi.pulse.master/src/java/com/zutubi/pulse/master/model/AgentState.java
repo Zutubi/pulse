@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.util.EnumUtils;
 
 /**
  * Represents a slave server that builds may be farmed out to.
@@ -15,7 +16,17 @@ public class AgentState extends Entity
     {
         ENABLED,
         DISABLED,
-        DISABLING,
+        DISABLING;
+
+        /**
+         * Returns a human-readble version of this constant.
+         *
+         * @return a pretty version of this constant
+         */
+        public String getPrettyString()
+        {
+            return EnumUtils.toPrettyString(this);
+        }
     }
 
     private EnableState enableState = EnableState.ENABLED;

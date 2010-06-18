@@ -133,14 +133,20 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         browser.refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), BUILDING.getPrettyString(),RECIPE_ASSIGNED.getPrettyString());
 
+        assertTrue(xmlRpcHelper.getAgentEnableState(LOCAL_AGENT).isEnabled());
+
         agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
 
         browser.refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), STATUS_DISABLE_ON_IDLE);
+
+        assertTrue(xmlRpcHelper.getAgentEnableState(LOCAL_AGENT).isDisabling());
 
         project.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
 
         browser.refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), DISABLED.getPrettyString());
+
+        assertTrue(xmlRpcHelper.getAgentEnableState(LOCAL_AGENT).isDisabled());
     }
 
     public void testConcurrentBuildsSameHost() throws Exception
