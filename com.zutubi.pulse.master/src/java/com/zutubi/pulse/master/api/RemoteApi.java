@@ -3755,7 +3755,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            return lookupAgent(name).getStatus().getPrettyString();
+            return internalGetAgent(name).getStatus().getPrettyString();
         }
         finally
         {
@@ -3764,7 +3764,7 @@ public class RemoteApi
     }
 
     /**
-     * Returns the state of the given agent as a simple string.  Possible state values are:
+     * Returns the enable state of the given agent as a simple string.  Possible values are:
      * <ul>
      * <li>enabled</li>
      * <li>disabled</li>
@@ -3775,12 +3775,12 @@ public class RemoteApi
      * @return the current state for the given agent.
      * @access available to users with view permission for the given agent.
      */
-    public String getAgentState(String token, String name)
+    public String getAgentEnableState(String token, String name)
     {
         tokenManager.loginUser(token);
         try
         {
-            return lookupAgent(name).getEnableState().getPrettyString();
+            return internalGetAgent(name).getEnableState().getPrettyString();
         }
         finally
         {
@@ -3806,7 +3806,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = lookupAgent(name);
+            Agent agent = internalGetAgent(name);
 
             eventManager.publish(new AgentEnableRequestedEvent(this, agent));
             return true;
@@ -3836,7 +3836,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = lookupAgent(name);
+            Agent agent = internalGetAgent(name);
 
             eventManager.publish(new AgentDisableRequestedEvent(this, agent));
             return true;
@@ -3847,7 +3847,7 @@ public class RemoteApi
         }
     }
 
-    private Agent lookupAgent(String name) throws IllegalArgumentException
+    private Agent internalGetAgent(String name) throws IllegalArgumentException
     {
         Agent agent = agentManager.getAgent(name);
         if (agent == null)

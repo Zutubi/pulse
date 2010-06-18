@@ -351,11 +351,11 @@ public class XmlRpcHelper
         return EnumUtils.fromPrettyString(AgentStatus.class, (String)call("getAgentStatus", name));
     }
 
-    public AgentState getAgentState(String name) throws Exception
+    public AgentState getAgentEnableState(String name) throws Exception
     {
         AgentState state = new AgentState();
         state.setEnableState(EnumUtils.fromPrettyString(
-                AgentState.EnableState.class, (String)call("getAgentState", name)
+                AgentState.EnableState.class, (String)call("getAgentEnableState", name)
         ));
         return state;
     }
