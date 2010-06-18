@@ -52,12 +52,14 @@ import org.acegisecurity.AccessDeniedException;
 import java.util.*;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import com.zutubi.i18n.Messages;
 
 /**
  * Implements a simple API for remote monitoring and control.
  */
 public class RemoteApi
 {
+    private static final Messages I18N = Messages.getInstance(RemoteApi.class);
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 
     private TransactionContext transactionContext;
@@ -3724,7 +3726,7 @@ public class RemoteApi
     }
 
     /**
-     * Returns the state of the given agent as a simple string.  Possible states are:
+     * Returns the status of the given agent as a simple string.  Possible status values are:
      * <ul>
      * <li>awaiting ping</li>
      * <li>building</li>
@@ -3741,8 +3743,8 @@ public class RemoteApi
      * </ul>
      *
      * @param token authentication token (see {@link #login})
-     * @param name  the name of the agent to retrieve the state for
-     * @return the current state of the given agent
+     * @param name  the name of the agent to retrieve the status for
+     * @return the current status of the given agent
      * @throws IllegalArgumentException if the given agent does not exist
      * @access available to users with view permission for the given agent
      * @see #disableAgent(String, String)
@@ -3753,13 +3755,32 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = agentManager.getAgent(name);
-            if (agent == null)
-            {
-                throw new IllegalArgumentException("Unknown agent '" + name + "'");
-            }
+            return lookupAgent(name).getStatus().getPrettyString();
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
 
-            return agent.getStatus().getPrettyString();
+    /**
+     * Returns the state of the given agent as a simple string.  Possible state values are:
+     * <ul>
+     * <li>enabled</li>
+     * <li>disabled</li>
+     * <li>disabling</li>
+     * </ul>
+     * @param token authentication token (see {@link #login})
+     * @param name  the name of the agent to retrieve this state for.
+     * @return the current state for the given agent.
+     * @access available to users with view permission for the given agent.
+     */
+    public String getAgentState(String token, String name)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return lookupAgent(name).getEnableState().getPrettyString();
         }
         finally
         {
@@ -3785,11 +3806,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = agentManager.getAgent(name);
-            if (agent == null)
-            {
-                throw new IllegalArgumentException("Unknown agent '" + name + "'");
-            }
+            Agent agent = lookupAgent(name);
 
             eventManager.publish(new AgentEnableRequestedEvent(this, agent));
             return true;
@@ -3819,11 +3836,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Agent agent = agentManager.getAgent(name);
-            if (agent == null)
-            {
-                throw new IllegalArgumentException("Unknown agent '" + name + "'");
-            }
+            Agent agent = lookupAgent(name);
 
             eventManager.publish(new AgentDisableRequestedEvent(this, agent));
             return true;
@@ -3832,6 +3845,16 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    private Agent lookupAgent(String name) throws IllegalArgumentException
+    {
+        Agent agent = agentManager.getAgent(name);
+        if (agent == null)
+        {
+            throw new IllegalArgumentException(I18N.format("unknown.agent", name));
+        }
+        return agent;
     }
 
     /**
