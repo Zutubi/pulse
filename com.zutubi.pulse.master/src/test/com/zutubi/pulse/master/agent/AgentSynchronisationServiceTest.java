@@ -17,21 +17,20 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.util.Constants;
 import com.zutubi.util.bean.DefaultObjectFactory;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.*;
 
 public class AgentSynchronisationServiceTest extends PulseTestCase
 {
@@ -119,10 +118,9 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         synchronisationTaskFactory.setObjectFactory(new DefaultObjectFactory());
         
         AgentSynchronisationService service = new AgentSynchronisationService();
-        service.setAgentManager(agentManager);
         service.setEventManager(eventManager);
         service.setThreadFactory(new PulseThreadFactory());
-        service.init();
+        service.init(agentManager);
     }
 
     private List<AgentSynchronisationMessage> copy(List<AgentSynchronisationMessage> messages)

@@ -222,6 +222,8 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
             inProgressLock.lock();
             systemStarted = true;
             inProgressLock.unlock();
+
+            hostManager.pingHosts();
         }
         else
         {

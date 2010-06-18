@@ -210,7 +210,7 @@ public class DefaultHostManager implements HostManager
                 return agent.isEnabled();
             }
         });
-        
+
         if (hasEnabledAgent)
         {
             hostPingService.requestPing(host, getServiceForHost(host));

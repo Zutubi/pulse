@@ -33,10 +33,19 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
     public static final int COMPLETED_MESSAGE_LIMIT = 10;
 
     private AgentManager agentManager;
+    private EventManager eventManager;
 
     public AgentSynchronisationService()
     {
         super("Agent Synchronisation");
+    }
+
+    public void init(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
+
+        super.init();
+        eventManager.register(this);
     }
 
     private void syncAgent(final Agent agent)
@@ -145,14 +154,9 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         return new Class[]{AgentStatusChangeEvent.class};
     }
 
-    public void setAgentManager(AgentManager agentManager)
-    {
-        this.agentManager = agentManager;
-    }
-
     public void setEventManager(EventManager eventManager)
     {
-        eventManager.register(this);
+        this.eventManager = eventManager;
     }
 
     public static class PendingMessagesPredicate implements Predicate<AgentSynchronisationMessage>
