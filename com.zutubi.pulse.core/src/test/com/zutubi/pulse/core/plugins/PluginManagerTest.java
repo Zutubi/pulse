@@ -392,6 +392,28 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
     }
 
+    public void testDowngradePrepackagedPlugins() throws Exception
+    {
+        FileSystemUtils.copy(paths.getPrepackagedPluginStorageDir(), producer2);
+
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "2.0.0", Plugin.State.ENABLED);
+
+        shutdownPluginCore();
+
+        // add downgrade to the prepackaged plugin directory
+        FileSystemUtils.cleanOutputDir(paths.getPrepackagedPluginStorageDir());
+        FileSystemUtils.copy(paths.getPrepackagedPluginStorageDir(), producer11);
+
+        startupPluginCore();
+
+        // plugins do not downgrade
+        plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "2.0.0", Plugin.State.ENABLED);
+    }
+
     public void testDoNotUpgradeUninstalledPrepackagedPlugins() throws Exception
     {
         startupPluginCore();
@@ -414,14 +436,13 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     public void testUpgradeInternalPlugin() throws Exception
     {
         // internal plugins 'just upgrade'.  None of the standard processing applies.
-        
+
         FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
 
         startupPluginCore();
 
         Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertNotNull(plugin);
-        assertEquals(Plugin.State.ENABLED, plugin.getState());
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
 
         shutdownPluginCore();
 
@@ -432,8 +453,30 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertNotNull(plugin);
-        assertEquals(Plugin.State.ENABLED, plugin.getState());
+        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
+    }
+
+    public void testDowngradeInternalPlugin() throws Exception
+    {
+        // internal plugins 'just upgrade'.  None of the standard processing applies.
+
+        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer2);
+
+        startupPluginCore();
+
+        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "2.0.0", Plugin.State.ENABLED);
+
+        shutdownPluginCore();
+
+        // downgrade the internally packaged plugin.
+        FileSystemUtils.cleanOutputDir(paths.getInternalPluginStorageDir());
+        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
+
+        startupPluginCore();
+
+        plugin = manager.getInternalPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
     }
 
     public void testUninstallPlugin() throws Exception
@@ -840,7 +883,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         delete(pluginFile);
         copyFile(getInputFile("com.zutubi.bundles.onstartup_1.0.0_succeeds", EXTENSION_JAR), pluginFile);
         manuallyDeploy(pluginFile);
-        
+
         startupPluginCore();
 
         plugin = manager.getPlugin("com.zutubi.bundles.onstartup");
@@ -877,7 +920,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         File base = new File(paths.getPrepackagedPluginStorageDir(), producer1.getName());
         assertTrue(base.mkdirs());
         ZipUtils.extractZip(new ZipInputStream(new FileInputStream(producer1)), base);
-        
+
         startupPluginCore();
 
         Plugin plugin = manager.getPlugin(PRODUCER_ID);
@@ -889,7 +932,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         FileSystemUtils.copy(paths.getPrepackagedPluginStorageDir(), producer1);
         manuallyDeploy(producer1);
-        
+
         startupPluginCore();
 
         Plugin plugin = manager.getPlugin(PRODUCER_ID);

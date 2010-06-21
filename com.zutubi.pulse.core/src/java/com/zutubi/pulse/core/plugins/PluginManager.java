@@ -231,7 +231,7 @@ public class PluginManager
             switch (plugin.getBundle().getState())
             {
                 case Bundle.INSTALLED:
-                    // resolve failed.
+                    // resolve failed - can we get any more details about this?
                     try
                     {
                         plugin.getBundle().uninstall();

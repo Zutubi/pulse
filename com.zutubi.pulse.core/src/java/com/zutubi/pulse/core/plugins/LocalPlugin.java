@@ -219,13 +219,14 @@ public abstract class LocalPlugin implements Plugin
 
     public List<PluginDependency> getRequiredPlugins()
     {
+        // note that this only really gives a correct answer if this plugin was resolved.
+        // Ie: if it fails to resolve a dependency, then this call will return 0, even though
+        // we know there is at least one dependency.
         return manager.getRequiredPlugins(this);
     }
 
     public List<Plugin> getDependentPlugins()
     {
-        // logically, the code for dependent plugins should be in the plugin.  However, for now we
-        // just delegate.
         return manager.getDependentPlugins(this);
     }
 
