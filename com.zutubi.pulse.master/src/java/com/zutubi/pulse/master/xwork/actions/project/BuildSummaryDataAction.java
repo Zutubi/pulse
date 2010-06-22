@@ -7,6 +7,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
+import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
@@ -31,8 +32,6 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 
 /**
  * Action to provide data for the build summary tab.
@@ -178,7 +177,11 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
             VelocityManager velocityManager = VelocityManager.getInstance();
             Context context = velocityManager.createContext(actionContext.getValueStack(), ServletActionContext.getRequest(), ServletActionContext.getResponse());
             String mainPanel = renderTemplate("ajax/build-summary-main.vm", context, velocityManager);
-            String rightPanel = renderTemplate("ajax/build-summary-right.vm", context, velocityManager);
+            String rightPanel = null;
+            if (haveRightPanelContent())
+            {
+                rightPanel = renderTemplate("ajax/build-summary-right.vm", context, velocityManager);
+            }
             data = new SummaryData(mainPanel, rightPanel);
         }
         catch (Exception e)
@@ -188,6 +191,11 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         }
 
         return SUCCESS;
+    }
+
+    private boolean haveRightPanelContent()
+    {
+        return actions.size() > 0 || relatedLinks.size() > 0 || featuredArtifacts.size() > 0 || hooks.size() > 0;
     }
 
     private void gatherRelatedLinks(BuildResult buildResult)

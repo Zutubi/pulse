@@ -13,6 +13,7 @@
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript">
         var buildPanel;
+        var eastPanelHasHadContent = false;
         var initialised = false;
         var runner = null;
         
@@ -24,7 +25,23 @@
                 {
                     var response = eval("(" + transport.responseText + ")");
                     buildPanel.layout.center.panel.update(response.mainPanel);
-                    buildPanel.layout.east.panel.update(response.rightPanel);
+                    
+                    var eastPanel = buildPanel.layout.east.panel;
+                    if (response.rightPanel)
+                    {
+                        eastPanel.update(response.rightPanel);
+                        if (!eastPanelHasHadContent && eastPanel.collapsed)
+                        {
+                            eastPanel.expand();
+                        }
+
+                        eastPanelHasHadContent = true;
+                    }
+                    else
+                    {
+                        eastPanel.collapse();
+                    }
+
                     initialised = true;
                 },
                 

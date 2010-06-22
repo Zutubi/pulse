@@ -25,6 +25,11 @@ public class BuildSummaryPage extends AbstractBuildStatusPage
         return urls.buildSummary(uriComponentEncode(projectName), Long.toString(buildId));
     }
 
+    public boolean isRightPaneVisible()
+    {
+        return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().buildPanel.layout.east.panel.isVisible()"));
+    }
+
     private String getHookId(String hookName)
     {
         return "hook." + hookName;
