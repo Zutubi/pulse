@@ -5,6 +5,8 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItemInArray;
 
 import java.util.Vector;
 
@@ -42,5 +44,15 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         // Two options could just be the default plus the current value.  As
         // there are at least 3 groups, we can safely assert more than 2.
         assertTrue(groups.length > 2);
+
+        String[] actionDisplays = aclForm.getComboBoxDisplays("allowedActions");
+        assertThat(actionDisplays, hasItemInArray("view"));
+        assertThat(actionDisplays, hasItemInArray("cancel build"));
+        assertThat(actionDisplays, hasItemInArray("view source"));
+
+        String[] actionValues = aclForm.getComboBoxOptions("allowedActions");
+        assertThat(actionValues, hasItemInArray("view"));
+        assertThat(actionValues, hasItemInArray("cancelBuild"));
+        assertThat(actionValues, hasItemInArray("viewSource"));
     }
 }

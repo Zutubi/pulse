@@ -14,13 +14,12 @@ import freemarker.template.utility.StringUtil;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 public class AcceptanceTestUtils
 {
@@ -383,6 +382,26 @@ public class AcceptanceTestUtils
                         "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
                         "var values = []; " +
                         "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
+                        "return values; " +
+                    "}(); " +
+                    "result";
+        return browser.evalExpression(js).split(",");
+    }
+
+    /**
+     * Retrieves the displayed strings for available options in the Ext combo
+     * box with the given component id.
+     *
+     * @param browser selenium instance
+     * @param comboId component id of the combo
+     * @return displayed strings for available options in the combo
+     */
+    public static String[] getComboDisplays(SeleniumBrowser browser, String comboId)
+    {
+        String js = "var result = function() { " +
+                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
+                        "var values = []; " +
+                        "combo.store.each(function(r) { values.push(r.get(combo.displayField)); }); " +
                         "return values; " +
                     "}(); " +
                     "result";

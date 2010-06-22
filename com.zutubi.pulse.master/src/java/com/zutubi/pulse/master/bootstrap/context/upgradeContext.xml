@@ -143,6 +143,7 @@
                 <ref local="artifactHash"/>
                 <ref local="fileArtifactHash"/>
                 <ref local="dropForceCleanAgents"/>
+                <ref local="renameCancelBuildPermission"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -726,5 +727,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.99-patch-05.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="renameCancelBuildPermission" class="com.zutubi.pulse.master.upgrade.tasks.RenameCancelBuildPermissionUpgradeTask">
+        <property name="buildNumber" value="202001001"/>
     </bean>
 </beans>

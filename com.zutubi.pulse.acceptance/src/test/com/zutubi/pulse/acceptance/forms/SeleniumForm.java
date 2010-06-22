@@ -119,6 +119,11 @@ public abstract class SeleniumForm
         return AcceptanceTestUtils.getComboOptions(browser, getFieldId(name));
     }
 
+    public String[] getComboBoxDisplays(String name)
+    {
+        return AcceptanceTestUtils.getComboDisplays(browser, getFieldId(name));
+    }
+
     public void submitNamedFormElements(String submitValue, Pair<String, String>... fieldValues)
     {
         if (fieldValues != null)

@@ -350,7 +350,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         for (String groupNameSuffix : viewableBy)
         {
             Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
-            acl.put("group", "groups/"+random + "group" + groupNameSuffix);
+            acl.put("group", "groups/" + random + "group" + groupNameSuffix);
             acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_VIEW)));
             xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "permissions"), acl);
         }

@@ -29,6 +29,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Pair;
 import com.zutubi.util.TreeNode;
@@ -37,14 +38,12 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
-import static com.zutubi.util.CollectionUtils.asPair;
-
 /**
  * Action links for the project config page.
  */
 public class ProjectConfigurationActions
 {
-    public static final String ACTION_CANCEL_BUILD         = "cancel build";
+    public static final String ACTION_CANCEL_BUILD         = "cancelBuild";
     public static final String ACTION_CONVERT_TO_CUSTOM    = "convertToCustom";
     public static final String ACTION_CONVERT_TO_VERSIONED = "convertToVersioned";
     public static final String ACTION_CLEAR_RESPONSIBILITY = "clearResponsibility";

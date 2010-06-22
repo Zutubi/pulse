@@ -1,12 +1,16 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
+ * Formats fields of {@link ProjectAclConfiguration} instances for the UI.
  */
 public class ProjectAclConfigurationFormatter
 {
@@ -19,6 +23,15 @@ public class ProjectAclConfigurationFormatter
     public String getAllowedActions(ProjectAclConfiguration configuration)
     {
         List<String> allowedActions = configuration.getAllowedActions();
+        final Messages messages = Messages.getInstance(ProjectAuthorityProvider.class);
+        allowedActions = CollectionUtils.map(allowedActions, new Mapping<String, String>()
+        {
+            public String map(String s)
+            {
+                return messages.format(s + ".label");
+            }
+        });
+        
         Collections.sort(allowedActions, new Sort.StringComparator());
         return allowedActions.toString();
     }
