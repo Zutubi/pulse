@@ -99,10 +99,12 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
     /**
-     * Maps from a project to those projects that directly depend upon it, as
-     * this information is only indirectly available in the configuration.
+     * Maps from a project to the handles of those projects that directly
+     * depend upon it, as this information is only indirectly available in the
+     * configuration.  Handles are used as holding onto instances via
+     * references can result in stale data (e.g. CIB-2503).
      */
-    private Map<ProjectConfiguration, List<ProjectConfiguration>> configToDownstreamConfigs;
+    private Map<ProjectConfiguration, List<Long>> configToDownstreamConfigHandles;
 
     private ConcurrentMap<Long, ReentrantLock> projectStateLocks = new ConcurrentHashMap<Long, ReentrantLock>();
 
@@ -127,7 +129,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 cacheLock.writeLock().lock();
                 try
                 {
-                    registerProjectConfig(instance);
+                    registerProjectConfig(instance, true);
                     refreshDownstreamCache();
                 }
                 finally
@@ -167,9 +169,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                         nameToConfig.remove(old.getName());
                         validConfigs.remove(old);
                         removeFromLabelMap(old);
+                        reloadDownstreamProjects(old);
                     }
 
-                    registerProjectConfig(instance);
+                    registerProjectConfig(instance, true);
                     refreshDownstreamCache();
                 }
                 finally
@@ -212,6 +215,42 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
         };
         scmListener.register(configurationProvider, true);
+    }
+
+    private void reloadDownstreamProjects(ProjectConfiguration oldProjectConfiguration)
+    {
+        // Patch for CIB-2503: manually figure out projects that can "reach" a
+        // changed project via dependency configuration, and refresh them in
+        // the caches.  Note this is recursive to handle transitive
+        // dependencies.
+        List<Long> downstreamHandles = configToDownstreamConfigHandles.get(oldProjectConfiguration);
+        if (downstreamHandles != null)
+        {
+            List<ProjectConfiguration> downstreamConfigs = CollectionUtils.map(downstreamHandles, new Mapping<Long, ProjectConfiguration>()
+            {
+                public ProjectConfiguration map(Long handle)
+                {
+                    return configurationProvider.get(handle, ProjectConfiguration.class);
+                }
+            });
+
+            for (ProjectConfiguration config: downstreamConfigs)
+            {
+                if (config != null)
+                {
+                    ProjectConfiguration cachedConfig = idToConfig.remove(config.getProjectId());
+                    if (cachedConfig != null)
+                    {
+                        validConfigs.remove(cachedConfig);
+                        nameToConfig.remove(cachedConfig.getName());
+                        removeFromLabelMap(cachedConfig);
+                        registerProjectConfig(config, false);
+                    }
+
+                    reloadDownstreamProjects(cachedConfig);
+                }
+            }
+        }
     }
 
     private void initialise()
@@ -648,7 +687,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             for (ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))
             {
-                registerProjectConfig(config);
+                registerProjectConfig(config, true);
             }
         }
         finally
@@ -663,13 +702,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void registerProjectConfig(ProjectConfiguration projectConfig)
+    private void registerProjectConfig(ProjectConfiguration projectConfig, boolean checkLifecycle)
     {
         nameToConfig.put(projectConfig.getName(), projectConfig);
         idToConfig.put(projectConfig.getProjectId(), projectConfig);
         if (configurationTemplateManager.isDeeplyValid(projectConfig.getConfigurationPath()))
         {
-            checkProjectLifecycle(projectConfig);
+            if (checkLifecycle)
+            {
+                checkProjectLifecycle(projectConfig);
+            }
+
             validConfigs.add(projectConfig);
 
             for (LabelConfiguration label: projectConfig.getLabels())
@@ -688,7 +731,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void refreshDownstreamCache()
     {
-        configToDownstreamConfigs = new HashMap<ProjectConfiguration, List<ProjectConfiguration>>();
+        configToDownstreamConfigHandles = new HashMap<ProjectConfiguration, List<Long>>();
 
         for (ProjectConfiguration config: idToConfig.values())
         {
@@ -713,14 +756,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void addToDownstreamCache(ProjectConfiguration upstream, ProjectConfiguration config)
     {
-        List<ProjectConfiguration> downstreamConfigs = configToDownstreamConfigs.get(upstream);
+        List<Long> downstreamConfigs = configToDownstreamConfigHandles.get(upstream);
         if (downstreamConfigs == null)
         {
-            downstreamConfigs = new LinkedList<ProjectConfiguration>();
-            configToDownstreamConfigs.put(upstream, downstreamConfigs);
+            downstreamConfigs = new LinkedList<Long>();
+            configToDownstreamConfigHandles.put(upstream, downstreamConfigs);
         }
 
-        downstreamConfigs.add(config);
+        downstreamConfigs.add(config.getHandle());
     }
 
     public void checkProjectLifecycle(ProjectConfiguration projectConfig)
@@ -819,7 +862,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         cacheLock.readLock().lock();
         try
         {
-            return checkValidity(idToConfig.get(id), allowInvalid);
+            ProjectConfiguration configuration = idToConfig.get(id);
+            configuration = configurationProvider.get(configuration.getHandle(), ProjectConfiguration.class);
+            return checkValidity(configuration, allowInvalid);
         }
         finally
         {
@@ -1319,12 +1364,19 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         cacheLock.readLock().lock();
         try
         {
-            List<ProjectConfiguration> result = configToDownstreamConfigs.get(projectConfig);
+            List<Long> result = configToDownstreamConfigHandles.get(projectConfig);
             if (result == null)
             {
                 result = Collections.emptyList();
             }
-            return result;
+
+            return CollectionUtils.map(result, new Mapping<Long, ProjectConfiguration>()
+            {
+                public ProjectConfiguration map(Long handle)
+                {
+                    return configurationProvider.get(handle, ProjectConfiguration.class);
+                }
+            });
         }
         finally
         {
