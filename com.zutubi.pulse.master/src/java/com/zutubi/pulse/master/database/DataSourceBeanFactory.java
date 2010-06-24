@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import com.zutubi.pulse.master.xwork.interceptor.ReadOnlyAwareBasicDataSource;
-
 /**
  *
  */
@@ -70,7 +68,7 @@ public class DataSourceBeanFactory implements FactoryBean
 
     private BasicDataSource createDataSource() throws IOException
     {
-        BasicDataSource dataSource = new ReadOnlyAwareBasicDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
 
         // We don't set the driver class as it is loaded earlier (potentially
         // from a dynamic classpath).

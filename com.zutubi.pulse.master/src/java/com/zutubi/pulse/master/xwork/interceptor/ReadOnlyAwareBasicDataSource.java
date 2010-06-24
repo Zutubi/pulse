@@ -17,6 +17,8 @@ import java.sql.SQLException;
  */
 public class ReadOnlyAwareBasicDataSource extends BasicDataSource
 {
+    public static final ThreadLocal<Boolean> READONLY = new ThreadLocal<Boolean>();
+
     @Override
     public Connection getConnection() throws SQLException
     {
@@ -31,7 +33,7 @@ public class ReadOnlyAwareBasicDataSource extends BasicDataSource
 
     private Connection markReadOnlyIfNecessary(Connection con) throws SQLException
     {
-        Boolean readOnly = ReadOnlyInterceptor.READONLY.get();
+        Boolean readOnly = READONLY.get();
         if (readOnly != null && readOnly)
         {
             con.setReadOnly(readOnly);
