@@ -21,11 +21,13 @@ import java.util.Vector;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNException;
+import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -453,6 +455,34 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(projectB, buildNumber);
+    }
+
+    // CIB-2503
+    public void testRetrieve_AfterUpstreamRename() throws Exception
+    {
+        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream");
+        upstreamProject.addArtifacts("build/artifact.jar");
+        upstreamProject.addFilesToCreate("build/artifact.jar");
+        insertProject(upstreamProject);
+
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+
+        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream");
+        downstreamProject.addDependency(upstreamProject.getConfig());
+        downstreamProject.addExpectedFiles("lib/artifact.jar");
+        insertProject(downstreamProject);
+
+        upstreamProject.getConfig().setName(randomName + "-upstream-renamed");
+        updateProject(upstreamProject);
+
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+        
+        int buildNumber = buildRunner.triggerSuccessfulBuild(downstreamProject.getConfig());
+
+        IvyModuleDescriptor ivyModuleDescriptor = repository.getIvyModuleDescriptor(downstreamProject.getName(), buildNumber);
+        DependencyDescriptor[] descriptors = ivyModuleDescriptor.getDescriptor().getDependencies();
+        assertEquals(1, descriptors.length);
+        assertEquals(upstreamProject.getName(), descriptors[0].getDependencyId().getName());
     }
 
     public void testDependentBuild_TriggeredOnSuccess() throws Exception

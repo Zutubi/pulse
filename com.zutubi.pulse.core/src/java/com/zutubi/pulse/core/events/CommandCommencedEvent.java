@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.events;
 
 /**
+ * Event raised when a command is started.
  */
 public class CommandCommencedEvent extends RecipeEvent
 {
