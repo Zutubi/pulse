@@ -11,9 +11,8 @@ import org.apache.ivy.core.settings.IvySettings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
-
 import static java.util.Arrays.asList;
+import java.util.*;
 
 /**
  * The ivy module descriptor provides a wrapper around ivy's ModuleDescriptor and
@@ -143,22 +142,6 @@ public class IvyModuleDescriptor
     public IvyModuleDescriptor(String org, String module, String revision, IvyConfiguration configuration)
     {
         this(ModuleRevisionId.newInstance(org, module, revision), configuration);
-    }
-
-    /**
-     * Create a new ivy module descriptor.
-     *
-     * @param org               the organisation for the new descriptor
-     * @param module            the module for the new descriptor
-     * @param revision          the revision for the new descriptor
-     * @param status            the status for the new descriptor
-     * @param configuration     the ivy configuration
-     *
-     * @see IvyStatus
-     */
-    public IvyModuleDescriptor(String org, String module, String revision, String status, IvyConfiguration configuration)
-    {
-        this(ModuleRevisionId.newInstance(org, module, revision), status, configuration);
     }
 
     /**
