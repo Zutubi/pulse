@@ -41,7 +41,7 @@
                 #contentCell("queue.revision.floating")
             #end
                 #contentCell($buildRequest.prettyQueueTime)
-                #staticCell($buildRequest.reason.summary)
+                #dynamicCell($buildRequest.reason.summary)
             #if($action.canCancel($buildRequest))
                 #actionCellId("cancel" "$base/cancelQueuedBuild.action?id=$buildRequest.id" "cancel.gif" "cancel.queued.${buildRequest.id}" false)
             #else
@@ -94,7 +94,7 @@
             #end
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
-            #staticCell($buildResult.reason.summary)
+            #dynamicCell($buildResult.reason.summary)
             #elapsedCell($buildResult)
 
             #if($action.canCancel($buildResult))

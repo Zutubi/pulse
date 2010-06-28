@@ -24,7 +24,7 @@
         <!-- external libraries -->
         <dependency org="codehaus" name="groovy" rev="1.6-RC-1" conf="build,release->all"/>
         <dependency org="xom" name="xom" rev="20080314" conf="build,release->default"/>
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0.0" conf="build,release->default"/>
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.7" conf="build,release->default"/>
         <dependency org="junit" name="junit" rev="3.8.1" conf="build->default"/>
         
         <!-- Project module dependencies -->
