@@ -6,7 +6,9 @@ import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.security.Actor;
 import org.acegisecurity.Authentication;
+import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.context.SecurityContextImpl;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
@@ -76,15 +78,19 @@ public class AcegiUtils
      */
     public static void runAsUser(AcegiUser user, Runnable runnable)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Note: replacing the authentication itself is unsafe in the presence
+        // of the HttpSessionContextIntegrationFilter, which shares contexts
+        // among threads from the same session.
+        SecurityContext existingContext = SecurityContextHolder.getContext();
         try
         {
+            SecurityContextHolder.setContext(new SecurityContextImpl());
             loginAs(user);
             runnable.run();
         }
         finally
         {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.setContext(existingContext);
         }
     }
 

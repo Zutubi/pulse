@@ -28,7 +28,7 @@
     <dependencies>
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
 
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0.0" conf="external,build,release->default"/>
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.7" conf="external,build,release->default"/>
 
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-fileupload" rev="1.1.1" conf="external,build,release->default"/>
