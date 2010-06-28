@@ -44,13 +44,25 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         // Two options could just be the default plus the current value.  As
         // there are at least 3 groups, we can safely assert more than 2.
         assertTrue(groups.length > 2);
+    }
 
-        String[] actionDisplays = aclForm.getComboBoxDisplays("allowedActions");
+    public void testPermissionLabels() throws Exception
+    {
+        String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
+        Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
+
+        browser.loginAsAdmin();
+        ListPage permissionsPage = browser.openAndWaitFor(ListPage.class, permissionsPath);
+        permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
+
+        ProjectAclForm aclForm = browser.createForm(ProjectAclForm.class);
+        aclForm.waitFor();
+        String[] actionDisplays = aclForm.getComboBoxDisplays("allowedActions.choice");
         assertThat(actionDisplays, hasItemInArray("view"));
         assertThat(actionDisplays, hasItemInArray("cancel build"));
         assertThat(actionDisplays, hasItemInArray("view source"));
 
-        String[] actionValues = aclForm.getComboBoxOptions("allowedActions");
+        String[] actionValues = aclForm.getComboBoxOptions("allowedActions.choice");
         assertThat(actionValues, hasItemInArray("view"));
         assertThat(actionValues, hasItemInArray("cancelBuild"));
         assertThat(actionValues, hasItemInArray("viewSource"));
