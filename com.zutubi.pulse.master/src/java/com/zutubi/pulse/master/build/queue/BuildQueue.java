@@ -70,20 +70,17 @@ public class BuildQueue
      *
      * @param requests the requests to be enqueued.
      */
-    public void enqueue(List<QueuedRequest> requests)
+    public synchronized void enqueue(List<QueuedRequest> requests)
     {
-        synchronized (this)
+        if (assimilateRequests(requests))
         {
-            if (assimilateRequests(requests))
-            {
-                return;
-            }
+            return;
+        }
 
-            for (QueuedRequest request : requests)
-            {
-                queuedRequests.add(0, request);
-                buildRequestRegistry.requestQueued(request.getRequest());
-            }
+        for (QueuedRequest request : requests)
+        {
+            queuedRequests.add(0, request);
+            buildRequestRegistry.requestQueued(request.getRequest());
         }
 
         activateWhatWeCan();
@@ -95,7 +92,7 @@ public class BuildQueue
      * @param requests the requests to enqueue.
      * @see #enqueue(java.util.List)
      */
-    public void enqueue(QueuedRequest... requests)
+    public synchronized void enqueue(QueuedRequest... requests)
     {
         enqueue(Arrays.asList(requests));
     }
@@ -108,26 +105,19 @@ public class BuildQueue
      * @return true if a queued request matching the request id was located and cancelled,
      *         false otherwise.
      */
-    public boolean cancel(long requestId)
+    public synchronized boolean cancel(long requestId)
     {
-        boolean cancelled;
-        synchronized (this)
-        {
-            QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId));
-            cancelled = requestToCancel != null;
-            if (cancelled)
-            {
-                queuedRequests.remove(requestToCancel);
-                buildRequestRegistry.requestCancelled(requestToCancel.getRequest());
-            }
-        }
+        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId));
 
-        if (cancelled)
+        if (requestToCancel != null)
         {
+            queuedRequests.remove(requestToCancel);
+            buildRequestRegistry.requestCancelled(requestToCancel.getRequest());
+
             activateWhatWeCan();
         }
 
-        return cancelled;
+        return requestToCancel != null;
     }
 
     /**
@@ -138,25 +128,18 @@ public class BuildQueue
      * @return true if an activated request matching the request is was located and completed,
      *         false otherwise.
      */
-    public boolean complete(long requestId)
+    public synchronized boolean complete(long requestId)
     {
-        boolean completed;
-        synchronized (this)
-        {
-            ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId));
-            completed = completedRequest != null;
-            if (completed)
-            {
-                activatedRequests.remove(completedRequest);
-            }
-        }
+        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId));
 
-        if (completed)
+        if (completedRequest != null)
         {
+            activatedRequests.remove(completedRequest);
+
             activateWhatWeCan();
         }
 
-        return completed;
+        return completedRequest != null;
     }
 
     /**
@@ -237,7 +220,7 @@ public class BuildQueue
         activateWhatWeCan();
     }
 
-    private void activateWhatWeCan()
+    private synchronized void activateWhatWeCan()
     {
         // activation has been disabled either temporarily or permanently
         if (paused || stopped)
@@ -247,29 +230,26 @@ public class BuildQueue
 
         List<ActivatedRequest> toActivateRequests = new LinkedList<ActivatedRequest>();
         List<QueuedRequest> queueSnapshot = new LinkedList<QueuedRequest>();
+        queueSnapshot.addAll(queuedRequests);
 
-        synchronized (this)
+        // We need to update the queuedRequest and activatedRequest lists as we go to
+        // ensure that subsequent .satisfied() checks have an accurate state to work with.
+        for (QueuedRequest queuedRequest : CollectionUtils.reverse(queueSnapshot))
         {
-            queueSnapshot.addAll(queuedRequests);
-
-            // We need to update the queuedRequest and activatedRequest lists as we go to
-            // ensure that subsequent .satisfied() checks have an accurate state to work with.
-            for (QueuedRequest queuedRequest : CollectionUtils.reverse(queueSnapshot))
+            if (queuedRequest.satisfied())
             {
-                if (queuedRequest.satisfied())
-                {
-                    queuedRequests.remove(queuedRequest);
+                queuedRequests.remove(queuedRequest);
 
-                    ActivatedRequest activatedRequest = new ActivatedRequest(queuedRequest.getRequest());
-                    activatedRequests.add(0, activatedRequest);
-                    toActivateRequests.add(activatedRequest);
-                }
+                ActivatedRequest activatedRequest = new ActivatedRequest(queuedRequest.getRequest());
+                activatedRequests.add(0, activatedRequest);
+                toActivateRequests.add(activatedRequest);
             }
         }
 
         // Now we go through and finish activating the newly activated requests.
         for (ActivatedRequest activatedRequest : toActivateRequests)
         {
+            // it may be worth taking this startup processing outside the synchronisation block since it may take some time.
             BuildController controller = buildControllerFactory.create(activatedRequest.getRequest());
             long buildNumber = controller.start();
 
