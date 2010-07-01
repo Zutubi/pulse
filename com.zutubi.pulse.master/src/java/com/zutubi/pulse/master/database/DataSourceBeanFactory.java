@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.database;
 
-import com.zutubi.pulse.master.xwork.interceptor.ReadOnlyAwareBasicDataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -69,7 +68,7 @@ public class DataSourceBeanFactory implements FactoryBean
 
     private BasicDataSource createDataSource() throws IOException
     {
-        BasicDataSource dataSource = new ReadOnlyAwareBasicDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
 
         // We don't set the driver class as it is loaded earlier (potentially
         // from a dynamic classpath).
