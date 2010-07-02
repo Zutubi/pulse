@@ -15,8 +15,6 @@ import com.zutubi.util.WebUtils;
  */
 public class BrowseScmAcceptanceTest extends SeleniumTestBase
 {
-    private static final String MAIN_TITLE_PREFIX = ":: pulse ::";
-    
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
 
@@ -34,27 +32,10 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
-        // if something goes wrong whilst focused on the browse window, then
-        // logout fails with an error.  Avoid this by resetting the focused window.
-        resetToPulseWindow();
-
         xmlRpcHelper.logout();
         browser.logout();
 
         super.tearDown();
-    }
-
-    private void resetToPulseWindow()
-    {
-        String[] titles = browser.getAllWindowTitles();
-        for (String title : titles)
-        {
-            if (title.startsWith(MAIN_TITLE_PREFIX))
-            {
-                browser.selectWindow(title);
-                return;
-            }
-        }
     }
 
     //---( Test the rendering of the 'browse' link on the project wizard type form )---
