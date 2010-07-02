@@ -1,105 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-autowire="byName">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util classpath:/org/springframework/beans/factory/xml/spring-util-2.0.xsd" default-autowire="byName">
+
+    <util:map id="defaultTransactionAttributes">
+        <entry key="get*" value="PROPAGATION_REQUIRED, readOnly"/>
+        <entry key="*" value="PROPAGATION_REQUIRED"/>
+    </util:map>
 
     <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
+
+    <util:list id="transactionInterceptors">
+        <value>transactionInterceptor</value>
+    </util:list>
+
+    <util:list id="securityInterceptors">
+        <value>securityInterceptor</value>
+    </util:list>
+
+    <util:list id="securityAndTransactionInterceptors">
+        <value>securityInterceptor</value>
+        <value>transactionInterceptor</value>
+    </util:list>
 
     <bean id="transactionContextTarget" class="com.zutubi.pulse.master.util.TransactionContext"/>
     <bean id="transactionContext" class="org.springframework.aop.framework.ProxyFactoryBean">
-        <property name="target">
-            <ref local="transactionContextTarget"/>
-        </property>
-        <property name="interceptorNames">
-            <list>
-                <value>transactionInterceptor</value>
-            </list>
-        </property>
+        <property name="target" ref="transactionContextTarget"/>
+        <property name="interceptorNames" ref="transactionInterceptors"/>
     </bean>
 
-    <bean id="buildManagerTarget" class="com.zutubi.pulse.master.model.DefaultBuildManager" init-method="init"/>
     <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref local="buildManagerTarget"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultBuildManager" init-method="init"/>
         </property>
-        <property name="interceptorNames">
-            <list>
-                <value>securityInterceptor</value>
-                <value>transactionInterceptor</value>
-            </list>
-        </property>
+        <property name="interceptorNames" ref="securityAndTransactionInterceptors"/>
     </bean>
 
     <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" init-method="init"/>
     <bean id="pollingService" class="com.zutubi.pulse.master.scm.polling.PollingService"/>
-
     <bean id="projectInitialisationService" class="com.zutubi.pulse.master.project.ProjectInitialisationService" init-method="init"/>
-
     <bean id="projectLoggerManager" class="com.zutubi.pulse.master.project.ProjectLoggerManager"/>
 
     <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <!-- specifying the target this way since using the 'target' property is causing an assertion failure. -->
         <property name="targetName" value="projectManagerTarget"/>
-        <property name="interceptorNames">
-            <list>
-                <value>securityInterceptor</value>
-            </list>
-        </property>
+        <property name="interceptorNames" ref="securityInterceptors"/>
     </bean>
 
-    <bean id="resourceManagerTarget" class="com.zutubi.pulse.master.model.DefaultResourceManager"/>
     <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref local="resourceManagerTarget"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultResourceManager"/>
         </property>
-        <property name="interceptorNames">
-            <list>
-                <value>transactionInterceptor</value>
-            </list>
-        </property>
+        <property name="interceptorNames" ref="transactionInterceptors"/>
     </bean>
 
-    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"/>
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref local="agentStateManagerTarget"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"/>
         </property>
-        <property name="interceptorNames">
-            <list>
-                <value>transactionInterceptor</value>
-            </list>
-        </property>
+        <property name="interceptorNames" ref="transactionInterceptors"/>
     </bean>
 
-    <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager"/>
     <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref local="testManagerTarget"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultTestManager"/>
         </property>
-        <property name="interceptorNames">
-            <list>
-                <value>transactionInterceptor</value>
-            </list>
-        </property>
+        <property name="interceptorNames" ref="transactionInterceptors"/>
     </bean>
 
-    <bean id="agentManagerTarget" class="com.zutubi.pulse.master.agent.DefaultAgentManager"/>
     <bean id="agentManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref local="agentManagerTarget"/>
+            <bean class="com.zutubi.pulse.master.agent.DefaultAgentManager"/>
         </property>
-        <property name="interceptorNames">
-            <list>
-                <value>securityInterceptor</value>
-            </list>
-        </property>
+        <property name="interceptorNames" ref="securityInterceptors"/>
     </bean>
 
     <bean id="hostManager" class="com.zutubi.pulse.master.agent.DefaultHostManager"/>
@@ -166,6 +145,7 @@
 
     <bean id="resultNotifier" class="com.zutubi.pulse.master.notifications.ResultNotifier" init-method="init"/>
 
+    <!-- todo: beans should really be registering themselves with the shutdown manager on startup. -->
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">
             <list>
@@ -225,10 +205,7 @@
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
         <property name="projectsDir">
-            <bean id="projectDir" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName" value="configurationManager"/>
-                <property name="propertyPath" value="userPaths.projectRoot"/>
-            </bean>
+            <util:property-path path="configurationManager.userPaths.projectRoot"/>
         </property>
     </bean>
 
@@ -240,20 +217,14 @@
 
     <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">
         <property name="dataDir">
-            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName" value="configurationManager"/>
-                <property name="propertyPath" value="userPaths.data"/>
-            </bean>
+            <util:property-path path="configurationManager.userPaths.data"/>
         </property>
     </bean>
     <alias name="dependencyManager" alias="ivyManager"/>
 
     <bean id="repositoryAttributes" class="com.zutubi.pulse.core.dependency.RepositoryAttributes" init-method="init">
         <constructor-arg index="0">
-            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName" value="configurationManager"/>
-                <property name="propertyPath" value="userPaths.repositoryRoot"/>
-            </bean>
+            <util:property-path path="configurationManager.userPaths.repositoryRoot"/>
         </constructor-arg>
     </bean>
 

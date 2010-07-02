@@ -1,14 +1,15 @@
 package com.zutubi.pulse.master.xwork.actions.admin.debug;
 
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Sort;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.QueryStatistics;
 import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.hibernate.stat.Statistics;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The hibernate statistics action provides access to the various
@@ -25,9 +26,12 @@ public class HibernateStatisticsAction extends ActionSupport
     private boolean on;
     private Statistics stats;
     private long secondLevelCacheSize = 0;
+
     private Map<String, SecondLevelCacheStatistics> secondLevelCacheStats = new TreeMap<String, SecondLevelCacheStatistics>();
     private Map<String, QueryStatistics> queryStats = new TreeMap<String, QueryStatistics>();
     private Map<String, EntityStatistics> entityStats = new TreeMap<String, EntityStatistics>();
+
+    private List<String> entityNames = new LinkedList<String>();
 
     public boolean isOn()
     {
@@ -67,6 +71,11 @@ public class HibernateStatisticsAction extends ActionSupport
     public Map<String, EntityStatistics> getEntityStats()
     {
         return entityStats;
+    }
+
+    public List<String> getEntityNames()
+    {
+        return entityNames;
     }
 
     public String getSecondLevelCacheSizeMB()
@@ -117,6 +126,9 @@ public class HibernateStatisticsAction extends ActionSupport
             {
                 entityStats.put(entity, stats.getEntityStatistics(entity));
             }
+
+            entityNames.addAll(entityStats.keySet());
+            Collections.sort(entityNames, new Sort.StringComparator());
         }
     }
 

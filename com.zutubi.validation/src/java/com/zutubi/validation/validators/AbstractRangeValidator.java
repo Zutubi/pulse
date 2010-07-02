@@ -7,6 +7,7 @@ import com.zutubi.validation.ValidationException;
  */
 public abstract class AbstractRangeValidator<T extends Comparable> extends FieldValidatorSupport
 {
+    @SuppressWarnings({"unchecked"})
     public void validateField(Object obj) throws ValidationException
     {
         // if there is no value - don't do comparison. If a value is required, a required validator should be

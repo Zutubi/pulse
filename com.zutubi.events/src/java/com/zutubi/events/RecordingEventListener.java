@@ -35,9 +35,10 @@ public class RecordingEventListener implements EventListener
         return events;
     }
 
+    @SuppressWarnings({"unchecked"})
     public <T extends Event> List<T> getEventsReceived(final Class<T> type)
     {
-        return (List<T>) CollectionUtils.filter(events, new InstanceOfPredicate(type));
+        return (List<T>) CollectionUtils.filter(events, new InstanceOfPredicate<Event>(type));
     }
 
     public int getReceivedCount()
