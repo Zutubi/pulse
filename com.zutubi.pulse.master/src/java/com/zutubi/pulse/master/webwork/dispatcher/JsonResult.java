@@ -40,7 +40,7 @@ public class JsonResult extends WebWorkResultSupport
         OgnlValueStack stack = ai.getStack();
 
         
-        Writer writer = new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
+        Writer writer = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
         JSONWriter jw = new JSONWriter(writer);
 
         // parse structural definition.
