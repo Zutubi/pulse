@@ -32,7 +32,7 @@ public class FlexJsonResult extends WebWorkResultSupport
         serializer.exclude("*.class");
         Object o = stack.findValue(finalLocation);
         String json = deep ? serializer.deepSerialize(o) : serializer.serialize(o);
-        Writer writer = new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
+        Writer writer = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
         writer.write(json);
         response.setContentType("application/json"); // opera does not like this...
         writer.flush();
