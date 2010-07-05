@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.dependency.ivy;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.Constants;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.cache.ArtifactOrigin;
@@ -362,7 +363,7 @@ public class IvyRetrievalReport
         {
             SAXTransformerFactory transformerFact = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
             TransformerHandler saxHandler = transformerFact.newTransformerHandler();
-            saxHandler.getTransformer().setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            saxHandler.getTransformer().setOutputProperty(OutputKeys.ENCODING, Constants.UTF8);
             saxHandler.getTransformer().setOutputProperty(OutputKeys.INDENT, "yes");
             saxHandler.setResult(new StreamResult(outputStream));
             return saxHandler;

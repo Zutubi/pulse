@@ -3,7 +3,7 @@ package com.zutubi.util;
 import java.util.Date;
 
 /**
- * <class-comment/>
+ * A namespace for constant values.
  */
 public class Constants
 {
@@ -22,4 +22,8 @@ public class Constants
     // Line separator string.  This is the value of the line.separator
     // property at the moment that the StdOutErrReader was created.
     public static final String LINE_SEPARATOR = (String) System.getProperty("line.separator");
+
+    public static final String UTF8 = "UTF-8"; 
+    public static final String UTF16 = "UTF-16"; 
+    public static final String UTF32 = "UTF-32"; 
 }

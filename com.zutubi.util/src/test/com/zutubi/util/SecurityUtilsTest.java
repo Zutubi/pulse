@@ -2,6 +2,7 @@ package com.zutubi.util;
 
 import static com.zutubi.util.SecurityUtils.*;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static com.zutubi.util.Constants.UTF8;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class SecurityUtilsTest extends ZutubiTestCase
         byte[] bytes;
         try
         {
-            bytes = STRING_HELLO.getBytes("UTF-8");
+            bytes = STRING_HELLO.getBytes(UTF8);
         }
         catch (UnsupportedEncodingException e)
         {

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
+import com.zutubi.util.Constants;
+import static com.zutubi.util.Constants.UTF8;
 
 import java.io.File;
 
@@ -42,7 +44,7 @@ public class PerforceUnicodeTest extends PerforceTestBase
     {
         deployPerforceServer("snapshot", P4D_PORT, 1, true);
         configuration.setUnicodeServer(true);
-        configuration.setCharset("utf8");
+        configuration.setCharset(UTF8);
 
         client = new PerforceClient(configuration, new PerforceWorkspaceManager());
         client.checkout(createExecutionContext(workDir, false), null, null);

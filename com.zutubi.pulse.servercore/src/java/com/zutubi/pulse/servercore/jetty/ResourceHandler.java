@@ -14,6 +14,9 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
+import com.zutubi.util.Constants;
+import static com.zutubi.util.Constants.UTF8;
+
 /**
  * This resource handler implementation is an extension of the original implementation
  * that fixes a bug in the original implementation of the html directory listing code.
@@ -175,7 +178,7 @@ public class ResourceHandler extends org.mortbay.http.handler.ResourceHandler
                         "No directory");
                 return;
             }
-            data = dir.getBytes("UTF8");
+            data = dir.getBytes(UTF8);
             if (resource instanceof CachedResource)
                 ((CachedResource) resource).setCachedData(data);
         }

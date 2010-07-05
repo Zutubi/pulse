@@ -5,6 +5,7 @@ import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -40,7 +41,7 @@ public class JsonResult extends WebWorkResultSupport
         OgnlValueStack stack = ai.getStack();
 
         
-        Writer writer = new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
+        Writer writer = new OutputStreamWriter(response.getOutputStream(), UTF8);
         JSONWriter jw = new JSONWriter(writer);
 
         // parse structural definition.

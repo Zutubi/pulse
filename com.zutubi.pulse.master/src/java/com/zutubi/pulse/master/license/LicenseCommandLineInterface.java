@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.license;
 
+import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.cli.*;
 import org.apache.commons.codec.binary.Base64;
@@ -101,7 +102,7 @@ public class LicenseCommandLineInterface
             String encodedHolder = commandLine.getOptionValue('b');
             if (StringUtils.stringSet(encodedHolder))
             {
-                holder = new String(Base64.decodeBase64(encodedHolder.getBytes("US-ASCII")), "UTF-8");
+                holder = new String(Base64.decodeBase64(encodedHolder.getBytes("US-ASCII")), UTF8);
             }
 
             String expiryString = commandLine.getOptionValue('e');
@@ -163,7 +164,7 @@ public class LicenseCommandLineInterface
             String holder = license.getHolder();
             if (encode)
             {
-                holder = new String(Base64.encodeBase64(holder.getBytes("UTF-8")), "US-ASCII");
+                holder = new String(Base64.encodeBase64(holder.getBytes(UTF8)), "US-ASCII");
             }
             System.out.println("holder:" + holder);
             System.out.println("expiry:" + ((license.getExpiryDate() != null) ? getDateFormat().format(license.getExpiryDate()): "Never"));

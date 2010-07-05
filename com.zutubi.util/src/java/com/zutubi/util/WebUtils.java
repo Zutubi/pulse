@@ -1,5 +1,7 @@
 package com.zutubi.util;
 
+import static com.zutubi.util.Constants.UTF8;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class WebUtils
     {
         try
         {
-            return URLEncoder.encode(s, "UTF-8");
+            return URLEncoder.encode(s, UTF8);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -207,7 +209,7 @@ public class WebUtils
 
                 try
                 {
-                    byte[] bytes = in.substring(i, i + 1).getBytes("UTF-8");
+                    byte[] bytes = in.substring(i, i + 1).getBytes(Constants.UTF8);
                     for (byte b: bytes)
                     {
                         sb.append(tag);
@@ -428,7 +430,7 @@ public class WebUtils
         {
             try
             {
-                sb.append(new String(bytes, 0, byteOffset, "UTF-8"));
+                sb.append(new String(bytes, 0, byteOffset, Constants.UTF8));
                 byteOffset = 0;
             }
             catch (UnsupportedEncodingException e)

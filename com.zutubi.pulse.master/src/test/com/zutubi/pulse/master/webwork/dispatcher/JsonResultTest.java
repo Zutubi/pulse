@@ -5,7 +5,9 @@ import com.opensymphony.xwork.MockActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import static com.zutubi.util.Constants.UTF8;
 import org.displaytag.filter.SimpleServletOutputStream;
+import static org.mockito.Mockito.mock;
 import org.mortbay.http.HttpResponse;
 import org.mortbay.jetty.servlet.ServletHttpRequest;
 import org.mortbay.jetty.servlet.ServletHttpResponse;
@@ -14,8 +16,6 @@ import javax.servlet.ServletOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
-
-import static org.mockito.Mockito.mock;
 
 public class JsonResultTest extends PulseTestCase
 {
@@ -341,7 +341,7 @@ public class JsonResultTest extends PulseTestCase
 
     private static class FakeHttpServletResponse extends ServletHttpResponse
     {
-        private String encoding = "UTF-8";
+        private String encoding = UTF8;
         private SimpleServletOutputStream outputStream = null;
 
         public FakeHttpServletResponse()

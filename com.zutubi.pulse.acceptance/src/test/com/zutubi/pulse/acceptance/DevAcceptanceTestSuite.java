@@ -51,6 +51,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectReportsAcceptanceTest.class);
         suite.addTestSuite(ProjectWorkingCopyAcceptanceTest.class);
         suite.addTestSuite(UsersAcceptanceTest.class);
+        suite.addTestSuite(InternationalisationAcceptanceTest.class);
 
         //---( build tests )---
         suite.addTestSuite(BuildAcceptanceTest.class);

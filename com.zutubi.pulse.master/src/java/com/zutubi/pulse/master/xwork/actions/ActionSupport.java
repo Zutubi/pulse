@@ -21,6 +21,7 @@ import com.zutubi.pulse.master.xwork.interceptor.Cancelable;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.Constants;
+import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.WebUtils;
@@ -185,7 +186,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         try
         {
-            return URLDecoder.decode(s, "UTF-8");
+            return URLDecoder.decode(s, UTF8);
         }
         catch (UnsupportedEncodingException e)
         {

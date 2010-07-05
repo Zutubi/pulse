@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.Constants;
+import static com.zutubi.util.Constants.UTF8;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
 
@@ -96,7 +98,7 @@ public class TestSuitePersister
     {
         try
         {
-            return new String(Base64.encodeBase64(value.getBytes("UTF-8")), "UTF-8");
+            return new String(Base64.encodeBase64(value.getBytes(UTF8)), UTF8);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -203,7 +205,7 @@ public class TestSuitePersister
     {
         try
         {
-            return new String(Base64.decodeBase64(value.getBytes("UTF-8")), "UTF-8");
+            return new String(Base64.decodeBase64(value.getBytes(UTF8)), UTF8);
         }
         catch (UnsupportedEncodingException e)
         {
