@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Map;
  */
 public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTask
 {
+    private ObjectFactory objectFactory;
     private RecordManager recordManager;
 
     public boolean haltOnFailure()
@@ -27,12 +29,10 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
         deleteAll("projects/*/stages/*/publications");
         deleteAll("projects/*/dependencies/publications");
 
-        RemoveProjectDependenciesPublicationPattern removeProjectDependenciesPublicationPattern = new RemoveProjectDependenciesPublicationPattern();
-        removeProjectDependenciesPublicationPattern.setRecordManager(recordManager);
+        RemoveProjectDependenciesPublicationPattern removeProjectDependenciesPublicationPattern = objectFactory.buildBean(RemoveProjectDependenciesPublicationPattern.class);
         removeProjectDependenciesPublicationPattern.execute();
 
-        AddPublishToFileSystemArtifactConfiguration addPublishToFileSystemArtifactConfiguration = new AddPublishToFileSystemArtifactConfiguration();
-        addPublishToFileSystemArtifactConfiguration.setRecordManager(recordManager);
+        AddPublishToFileSystemArtifactConfiguration addPublishToFileSystemArtifactConfiguration = objectFactory.buildBean(AddPublishToFileSystemArtifactConfiguration.class);
         addPublishToFileSystemArtifactConfiguration.execute();
     }
 
@@ -45,12 +45,17 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
         }
     }
 
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
     }
 
-    private class RemoveProjectDependenciesPublicationPattern extends AbstractRecordPropertiesUpgradeTask
+    public static class RemoveProjectDependenciesPublicationPattern extends AbstractRecordPropertiesUpgradeTask
     {
         protected RecordLocator getRecordLocator()
         {
@@ -68,7 +73,7 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
         }
     }
 
-    private class AddPublishToFileSystemArtifactConfiguration extends AbstractRecordPropertiesUpgradeTask
+    public static class AddPublishToFileSystemArtifactConfiguration extends AbstractRecordPropertiesUpgradeTask
     {
         protected RecordLocator getRecordLocator()
         {
