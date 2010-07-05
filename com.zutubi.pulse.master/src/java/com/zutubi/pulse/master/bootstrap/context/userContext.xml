@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util classpath:/org/springframework/beans/factory/xml/spring-util-2.0.xsd">
+
     <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
+
+    <util:map id="defaultTransactionAttributes">
+        <entry key="get*" value="PROPAGATION_REQUIRED, readOnly"/>
+        <entry key="*" value="PROPAGATION_REQUIRED"/>
+    </util:map>
 
     <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target" ref="userManagerTarget"/>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
+        <property name="target">
+            <bean class="com.zutubi.pulse.master.model.DefaultUserManager" autowire="byName"/>
         </property>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
-    <bean id="userManagerTarget" class="com.zutubi.pulse.master.model.DefaultUserManager" autowire="byName"/>
 </beans>

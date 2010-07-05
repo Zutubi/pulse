@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 This subsystem context file contains the systems DAO layer configuration, using Hibernate. Since
 the transaction manager is coupled to hibernate, it is also defined here.
@@ -16,7 +15,11 @@ This context requires:
 
         hibernateMappings: a list of all of the hibernate mapping resource references.
 -->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util classpath:/org/springframework/beans/factory/xml/spring-util-2.0.xsd">
 
     <import resource="classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml"/>
 
@@ -43,145 +46,84 @@ This context requires:
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
+    <util:map id="defaultTransactionAttributes">
+        <entry key="find*" value="PROPAGATION_REQUIRED, readOnly"/>
+        <entry key="*" value="PROPAGATION_REQUIRED"/>
+    </util:map>
+
     <bean id="artifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateArtifactDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="artifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="artifactDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="artifactDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="buildResultDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="buildResultDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="buildResultDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="buildResultDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="changelistDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateChangelistDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="changelistDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="changelistDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="changelistDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="fileArtifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateFileArtifactDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="fileArtifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="fileArtifactDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="fileArtifactDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="projectDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateProjectDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="projectDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="projectDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="projectDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="sequenceEntryDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSequenceEntryDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="sequenceEntryDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="sequenceEntryDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="sequenceEntryDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTestCaseIndexDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="testCaseIndexDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="testCaseIndexDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="testCaseIndexDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="agentStateDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentStateDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="agentStateDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="agentStateDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="agentStateDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="agentSynchronisationMessageDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentSynchronisationMessageDao">
@@ -202,71 +144,39 @@ This context requires:
     </bean>
 
     <bean id="agentDailyStatisticsDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentDailyStatisticsDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="agentDailyStatisticsDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="agentDailyStatisticsDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="agentDailyStatisticsDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="hostStateDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateHostStateDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="hostStateDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="hostStateDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="hostStateDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="triggerDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTriggerDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="triggerDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="triggerDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="triggerDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="userDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateUserDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <bean id="userDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="userDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
+        <property name="target" ref="userDaoTarget"/>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
     <bean id="queries" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries">

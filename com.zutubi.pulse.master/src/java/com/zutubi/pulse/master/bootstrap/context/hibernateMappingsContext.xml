@@ -8,28 +8,28 @@ This context exports:
         hibernateMappings: a list of the hibernate mappings defining the database configuration.
 
 -->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util classpath:/org/springframework/beans/factory/xml/spring-util-2.0.xsd">
 
-    <bean id="hibernateMappings" class="com.zutubi.pulse.servercore.bootstrap.SpringListBean">
-        <property name="list">
-            <list>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/BuildResult.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/Changelist.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/CommandResult.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/Comment.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/Feature.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/HostState.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/Project.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentState.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentSynchronisationMessage.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentDailyStatistics.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/Sequence.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/TestCaseIndex.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/Trigger.hbm.xml</value>
-                <value>com/zutubi/pulse/master/model/persistence/hibernate/User.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
+    <util:list id="hibernateMappings">
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/BuildResult.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/Changelist.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/CommandResult.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/Comment.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/Feature.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/HostState.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/Project.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentState.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentSynchronisationMessage.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/AgentDailyStatistics.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/Sequence.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/TestCaseIndex.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/Trigger.hbm.xml</value>
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/User.hbm.xml</value>
+    </util:list>
 
 </beans>
