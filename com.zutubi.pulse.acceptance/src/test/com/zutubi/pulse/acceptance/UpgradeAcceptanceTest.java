@@ -1,328 +1,245 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.support.Pulse;
+import com.zutubi.pulse.acceptance.support.embedded.EmbeddedPulse;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
+import com.zutubi.pulse.master.bootstrap.Data;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
+import static com.zutubi.pulse.master.database.DatabaseConfig.*;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
-import com.zutubi.pulse.master.license.LicenseException;
-import com.zutubi.pulse.master.license.LicenseHelper;
-import com.zutubi.pulse.master.license.LicenseType;
-import com.zutubi.pulse.master.transfer.TransferAPI;
-import com.zutubi.pulse.master.transfer.TransferException;
-import com.zutubi.pulse.servercore.cli.ShutdownCommand;
-import com.zutubi.pulse.servercore.cli.StartCommand;
+import com.zutubi.pulse.master.migrate.MigrationManager;
+import com.zutubi.pulse.master.util.monitor.JobManager;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.sql.SQLException;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
-/**
- * <class-comment/>
- */
 public class UpgradeAcceptanceTest extends SeleniumTestBase
 {
-    File dataArea = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "data"));
-    private File tmpDir = null;
-    private DriverManagerDataSource dataSource = new DriverManagerDataSource();
-    private String dialect = "org.hibernate.dialect.HSQLDialect";
-    private String db;
+    private File dataArea;
+    private File work;
+    private int port = 8990;
 
+    @Override
     protected void setUp() throws Exception
     {
-        AcceptanceTestUtils.setPulsePort(8990);
+        AcceptanceTestUtils.setPulsePort(port);
+
+        dataArea = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "data"));
 
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDir("UAT", "");
-        db = System.getenv("PULSE_DB");
+        work = FileSystemUtils.createTempDir("uat", "");
+
+        // ensure drivers are registered before attempting to use them.
+        DriverManager.registerDriver((Driver) Class.forName("org.hsqldb.jdbcDriver").newInstance());
+        DriverManager.registerDriver((Driver) Class.forName("org.postgresql.Driver").newInstance());
+//        DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver").newInstance());
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.rmdir(tmpDir))
+        if (!FileSystemUtils.rmdir(work))
         {
-            //throw new RuntimeException("Failed to remove the temporary directory: " + tmpDir.getAbsolutePath());
             System.out.println("failed to remove tmp directory due to earlier error.");
         }
         super.tearDown();
     }
 
-    public void testPostBuildActionSpecifications() throws Exception
+    public void testMigrateToPostgres() throws Exception
     {
-        importAndUpgradeTest("0102015000");
+        String version = "2.1.30";
+
+        Properties targetDatabase = postgresJdbcProperties();
+        prepareTargetDatabase(targetDatabase);
+
+        File dataDir = dataDir(version);
+        List<File> mappings = hibernateMappings(version);
+
+        migrateToTargetDatabase(dataDir, mappings, targetDatabase);
     }
 
-    public void testDanglingSlaveHostRequirements() throws Exception
+    public void testMigrateToPostgresAndUpgradeToCurrent() throws Exception
     {
-        importAndUpgradeTest("0102017001");
+        String version = "2.1.30";
+
+        Properties targetDatabase = postgresJdbcProperties();
+        prepareTargetDatabase(targetDatabase);
+
+        File dataDir = dataDir(version);
+        List<File> mappings = hibernateMappings(version);
+
+        migrateToTargetDatabase(dataDir, mappings, targetDatabase);
+
+        upgradeToCurrent(dataDir);
     }
 
-    public void testFeatureStorage() throws Exception
+    public void testUpgradeToCurrentVersion() throws Exception
     {
-        importAndUpgradeTest("0102018000");
+        File dataDir = dataDir("2.1.30");
+        upgradeToCurrent(dataDir);
     }
 
-    public void testDuplicateChangelists() throws Exception
+    private void migrateToTargetDatabase(final File dataDir, final List<File> hibernateMappings, Properties targetDatabase) throws Exception
     {
-        importAndUpgradeTest("0102018001");
-    }
-
-    public void testSubscriptionConditions() throws Exception
-    {
-        importAndUpgradeTest("0102019000");
-    }
-
-    public void testLongRevisionComments() throws Exception
-    {
-        // the import will not run for postgres, but this is ok as a postgres
-        // dm cannot contain a long revision comment anyway
-        if (!"postgres".equals(db))
+        MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
-            importAndUpgradeTest("0102030000");
-        }
+            public File getDataDirectory()
+            {
+                return dataDir;
+            }
+
+            public MasterUserPaths getUserPaths()
+            {
+                return new Data(getDataDirectory());
+            }
+        };
+
+        MigrationManager migrationManager = new MigrationManager();
+        migrationManager.setJobManager(new JobManager());
+        migrationManager.setConfigurationManager(configurationManager);
+
+        MutableConfiguration hibernateConfiguration = new MutableConfiguration();
+        hibernateConfiguration.addFileSystemMappings(hibernateMappings);
+        hibernateConfiguration.setProperties(configurationManager.getDatabaseConfig().getHibernateProperties());
+        migrationManager.setHibernateConfiguration(hibernateConfiguration);
+
+        migrationManager.scheduleMigration(targetDatabase);
+        migrationManager.runMigration();
     }
 
-    public void importAndUpgradeTest(String build) throws Exception
+    private void upgradeToCurrent(File dataDir) throws IOException, InterruptedException
     {
-        if ("mysql".equals(db))
-        {
-            setupMySQL();
-        }
-        else if ("postgresql".equals(db))
-        {
-            setupPostgreSQL();
-        }
-        else
-        {
-            setupHSQL();
-        }
+        Pulse pulse = new EmbeddedPulse();
+        pulse.setDataDir(dataDir.getCanonicalPath());
+        pulse.setPort(port);
+        pulse.start(true);
 
-        File buildDir = new File(dataArea, build);
+        browser.open("/");
+        browser.waitForElement("upgrade.preview", 120 * SECOND);
 
-        File configFile = new File(buildDir, "pulse.properties");
-        File configDir = new File(tmpDir, "config");
-        if (!configDir.exists() && !configDir.mkdirs())
-        {
-            fail("Failed to create config directory: " + configDir);
-        }
-        FileSystemUtils.copy(configDir, configFile);
+        // check that we have received the upgrade preview, and that the data is as expected.
+        assertTrue(browser.isTextPresent("Upgrade Preview"));
 
-        restoreDatabase(buildDir);
+        browser.click("continue");
+        browser.waitForElement("upgrade.progress", 120 * SECOND);
 
-        setupServerProperties(build);
-        System.setProperty("bootstrap", "com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml");
+        // waiting..
+        assertTrue(browser.isTextPresent("Upgrade Progress"));
 
-        runUpgrade(build);
+        // how long should we be waiting for the upgrade to complete?
+        browser.waitForElement("upgrade.complete", 120 * SECOND);
+
+        assertTrue(browser.isTextPresent("Upgrade Complete"));
+        assertTrue(browser.isTextPresent("The upgrade has been successful"));
+
+        browser.click("continue");
+
+        // need to wait for pulse to start up completely before closing it down.  Early shutdowns make pulse sad.
+        Thread.sleep(30000);
+
+        pulse.stop(30000);
     }
 
-    private void restoreDatabase(File buildDir) throws IOException, TransferException
+    private File dataDir(String version) throws Exception
     {
-        MutableConfiguration configuration = new MutableConfiguration();
-        File mappingsDir = new File(buildDir, "mappings");
-        File[] mappings = mappingsDir.listFiles(new FilenameFilter()
+        PulseZipUtils.extractZip(new File(dataArea, "pulse-"+version+"-data.zip"), work);
+        return new File(work, "data");
+    }
+
+    private List<File> hibernateMappings(String version) throws IOException
+    {
+        File mappingsZip = new File(dataArea, "pulse-"+version+"-mappings.zip");
+        PulseZipUtils.extractZip(mappingsZip, work);
+        File[] mappings = work.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
             {
                 return name.endsWith(".hbm.xml");
             }
         });
-
-        configuration.addFileSystemMappings(Arrays.asList(mappings));
-        configuration.setProperty("hibernate.dialect", dialect);
-
-        TransferAPI transferAPI = new TransferAPI();
-        transferAPI.restore(configuration, new File(buildDir, "dump.xml"), dataSource);
+        return Arrays.asList(mappings);
     }
 
-    private void setupMySQL()
+    private Properties postgresJdbcProperties()
     {
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/mysql");
-        dataSource.setUsername("pulsetest");
-        dataSource.setPassword("pulsetest");
-
-        JdbcTemplate template = new JdbcTemplate(dataSource);
-        template.update("drop schema if exists pulse_accept");
-        template.update("create schema pulse_accept");
-
-        dataSource.setUrl("jdbc:mysql://localhost:3306/pulse_accept");
-        dialect = "org.hibernate.dialect.MySQLDialect";
+        Properties postgres = new Properties();
+        postgres.setProperty(JDBC_URL, "jdbc:postgresql://localhost:5432/pulse_accept");
+        postgres.setProperty(JDBC_USERNAME, "pulse");
+        postgres.setProperty(JDBC_PASSWORD, "pulse");
+        postgres.setProperty(HIBERNATE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+        return postgres;
     }
 
-    private void setupPostgreSQL()
+    private Properties mysqlJdbcProperties()
     {
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/template1");
-        dataSource.setUsername("pulsetest");
-        dataSource.setPassword("pulsetest");
+        Properties mysql = new Properties();
+        mysql.setProperty(JDBC_URL, "jdbc:mysql://localhost:3306/pulse_accept");
+        mysql.setProperty(JDBC_USERNAME, "pulse");
+        mysql.setProperty(JDBC_PASSWORD, "pulse");
+        mysql.setProperty(HIBERNATE_DIALECT, "org.hibernate.dialect.MySQLDialect");
+        return mysql;
+    }
+
+    private void prepareTargetDatabase(Properties properties)
+    {
+        String jdbcUrl = (String) properties.get(JDBC_URL);
+        if (jdbcUrl.contains(":postgresql:"))
+        {
+            preparePostgresDatabase(properties);
+        }
+        else if (jdbcUrl.contains(":mysql:"))
+        {
+            prepareMysqlDatabase(properties);
+        }
+    }
+
+    private void prepareMysqlDatabase(Properties properties)
+    {
+        String jdbcUrl = (String) properties.get(JDBC_URL);
+        String databaseName = jdbcUrl.substring(jdbcUrl.lastIndexOf('/') + 1);
+
+        // we can not connect to the database we are going to drop
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setUrl(jdbcUrl.substring(0, jdbcUrl.lastIndexOf('/')) + "/mysql");
+        dataSource.setUsername((String) properties.get(JDBC_USERNAME));
+        dataSource.setPassword((String) properties.get(JDBC_PASSWORD));
 
         JdbcTemplate template = new JdbcTemplate(dataSource);
-        Long count = template.queryForLong("select count(*) from pg_database where datname = 'pulse_accept'");
+        template.update("drop schema if exists " + databaseName);
+        template.update("create schema " + databaseName);
+    }
+
+    private void preparePostgresDatabase(Properties properties)
+    {
+        String jdbcUrl = (String) properties.get(JDBC_URL);
+        String databaseName = jdbcUrl.substring(jdbcUrl.lastIndexOf('/') + 1);
+
+        // we can not connect to the database we are going to drop
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setUrl(jdbcUrl.substring(0, jdbcUrl.lastIndexOf('/')) + "/template1");
+        dataSource.setUsername((String) properties.get(JDBC_USERNAME));
+        dataSource.setPassword((String) properties.get(JDBC_PASSWORD));
+
+        JdbcTemplate template = new JdbcTemplate(dataSource);
+        Long count = template.queryForLong("select count(*) from pg_database where datname = '"+databaseName+"'");
         if (count > 0)
         {
-            template.update("drop database pulse_accept");
+            template.update("drop database " + databaseName);
         }
-
-        template.update("create database pulse_accept");
-
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/pulse_accept");
-        dialect = "org.hibernate.dialect.PostgreSQLDialect";
-    }
-
-    private void setupHSQL() throws SQLException
-    {
-        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:" + new File(tmpDir, "data").getAbsolutePath() + "/db");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
-        dialect = "org.hibernate.dialect.HSQLDialect";
-    }
-
-    private void setupServerProperties(String build) throws IOException, LicenseException
-    {
-        File propFile = new File(tmpDir, "pulse.config.properties");
-        Properties props = new Properties();
-        props.put("build.date", "@BUILD_DATE@");
-        props.put("build.number", build);
-        props.put("release.date", "@RELEASE_DATE@");
-        props.put("version.number", "@VERSION@");
-        props.put("license.key", LicenseHelper.newLicenseKey(LicenseType.EVALUATION, "S. O. MeBody"));
-        dumpProperties(propFile, props);
-
-        File configDir = new File(tmpDir, "config");
-        if (!configDir.exists() && !configDir.mkdirs())
-        {
-            fail("Failed to create config directory: " + configDir);
-        }
-        propFile = new File(configDir, "database.properties");
-        props = new Properties();
-        props.put("jdbc.driverClassName", dataSource.getDriverClassName());
-        props.put("jdbc.url", dataSource.getUrl());
-        props.put("jdbc.username", dataSource.getUsername());
-        props.put("jdbc.password", dataSource.getPassword());
-        props.put("hibernate.dialect", dialect);
-        dumpProperties(propFile, props);
-    }
-
-    private void dumpProperties(File propFile, Properties props) throws IOException
-    {
-        FileOutputStream out = null;
-
-        try
-        {
-            out = new FileOutputStream(propFile);
-            props.store(out, null);
-        }
-        finally
-        {
-            IOUtils.close(out);
-        }
-    }
-
-    public void testUpgradeFromVersionOnePointOne() throws Exception
-    {
-        System.setProperty("bootstrap", "com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml");
-
-        // extract zip file.
-        File data = new File(dataArea, "pulse-1.1.0-data.zip");
-        PulseZipUtils.extractZip(data, tmpDir);
-
-        runUpgrade("0101000000");
-    }
-
-    private void runUpgrade(String build) throws Exception
-    {
-        // start pulse using the extracted data directory.
-        final StartCommand start = new StartCommand();
-
-        Thread serverStartup = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
-                    assertEquals(0, start.execute("-p", "8990", "-d", tmpDir.getAbsolutePath()));
-                }
-                catch (ParseException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
-        serverStartup.start();
-
-        // now we need to go to the Web UI and wait.
-
-        Thread.sleep(30000);
-
-        browser.open(urls.base());
-
-        browser.waitForElement("upgrade.preview", 120 * SECOND);
-
-        // check that we have received the upgrade preview, and that the data is as expected.
-        assertTextPresent("Upgrade Preview");
-        assertTextPresent(build);
-
-        browser.click("continue");
-
-        browser.waitForElement("upgrade.progress", 120 * SECOND);
-
-        // waiting..
-        assertTextPresent("Upgrade Progress");
-
-        browser.waitForElement("upgrade.complete", 120 * SECOND);
-
-        assertTextPresent("Upgrade Complete");
-        assertTextPresent("The upgrade has been successful");
-
-        browser.click("continue");
-
-        Thread.sleep(30000);
-
-        ShutdownCommand shutdown = new ShutdownCommand();
-        shutdown.setExitJvm(false);
-        assertEquals(0, shutdown.execute("-F", "true", "-p", "8990"));
-        waitForServerToExit(8990);
-        
-        // allow time for the shutdown to complete.
-        Thread.sleep(3000);
-    }
-
-    protected void waitForServerToExit(int port) throws IOException
-    {
-        int retries = 0;
-
-        while(retries++ < 30)
-        {
-            Socket sock = new Socket();
-            try
-            {
-                sock.connect(new InetSocketAddress(port));
-                sock.close();
-                try
-                {
-                    Thread.sleep(1000);
-                }
-                catch (InterruptedException e)
-                {
-                    // Empty
-                }
-            }
-            catch (IOException e)
-            {
-                break;
-            }
-        }
+        template.update("create database " + databaseName);
     }
 }

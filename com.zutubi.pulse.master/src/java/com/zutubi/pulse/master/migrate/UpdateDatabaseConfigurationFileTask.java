@@ -11,7 +11,7 @@ import java.util.Properties;
  *
  *
  */
-public class UpdateDatabaseConfigurationFileTask  extends AbstractTask
+public class UpdateDatabaseConfigurationFileTask extends AbstractTask
 {
     private Properties updatedConfiguration;
 

@@ -3,22 +3,21 @@
     <script type="text/javascript">
         Ext.onReady(function() {
             var button = new Ext.Button({
+                id: 'continue',
                 text: 'continue',
-                renderTo: 'continue',
+                renderTo: 'continue-anchor',
                 listeners: {
                     click: function() {
                         document.location = 'execute.action';
                     }
                 }
             });
-
             button.render();
         });
     </script>
 </head>
 <body>
 <h1 id="upgrade.preview">Upgrade Preview</h1>
-
 <p>
     The data directory being used by this installation of pulse contains an existing data directory from an older installation.
     <table class="columns" width="40%">
@@ -69,7 +68,7 @@
     </p>
 
     <div style="text-align: center; margin-top: 20px">
-        <div id="continue" style="margin: 0 auto; width: 100px">
+        <div id="continue-anchor" style="margin: 0 auto; width: 100px">
         </div>
     </div>
 </div>
