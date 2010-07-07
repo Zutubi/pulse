@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
+ * Finds installed versions of the .Net framework and returns MsBuild resources
+ * for them.
  */
 public class MsBuildResourceLocator implements ResourceLocator
 {
@@ -35,17 +37,28 @@ public class MsBuildResourceLocator implements ResourceLocator
         }
 
         windowsDir = FileSystemUtils.normaliseSeparators(windowsDir);
-        String dotNetPattern = StringUtils.join(PathPatternFileLocator.SEPARATOR, windowsDir, "Microsoft.NET", "Framework", PathPatternFileLocator.WILDCARD);
+        ResourceLocator locator = new CompositeResourceLocator(getLocator(windowsDir, true), getLocator(windowsDir, false));
+        return locator.locate();
+    }
+
+    private FileSystemResourceLocator getLocator(String windowsDir, final boolean bit64)
+    {
+        String dotNetPattern = StringUtils.join(PathPatternFileLocator.SEPARATOR, windowsDir, "Microsoft.NET", bit64 ? "Framework64" : "Framework", PathPatternFileLocator.WILDCARD);
         FileLocator fileLocator = new ReversingFileLocator(new SortingFileLocator(new FilteringFileLocator(new DirectoryFilteringFileLocator(new PathPatternFileLocator(dotNetPattern)), new DotNetInstallPredicate()), new VersionComparator()));
 
-        FileSystemResourceLocator locator = new FileSystemResourceLocator(fileLocator, new ResourceBuilder()
+        return new FileSystemResourceLocator(fileLocator, new ResourceBuilder()
         {
             public ResourceConfiguration buildResource(File home)
             {
                 try
                 {
                     ResourceConfiguration resource = new ResourceConfiguration("msbuild");
-                    ResourceVersionConfiguration version = new ResourceVersionConfiguration(home.getName().substring(1));
+                    String versionName = home.getName().substring(1);
+                    if (bit64)
+                    {
+                        versionName += " (64-bit)";
+                    }
+                    ResourceVersionConfiguration version = new ResourceVersionConfiguration(versionName);
                     resource.add(version);
                     resource.setDefaultVersion(version.getValue());
                     version.addProperty(new ResourcePropertyConfiguration("msbuild.bin", FileSystemUtils.normaliseSeparators(getMsBuildBinary(home).getCanonicalPath()), false, false, false));
@@ -58,8 +71,6 @@ public class MsBuildResourceLocator implements ResourceLocator
                 }
             }
         });
-
-        return locator.locate();
     }
 
     private File getMsBuildBinary(File home)
