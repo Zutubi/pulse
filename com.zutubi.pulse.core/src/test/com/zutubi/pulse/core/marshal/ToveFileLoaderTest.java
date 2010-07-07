@@ -450,6 +450,11 @@ public class ToveFileLoaderTest extends PulseTestCase
             FileSystemUtils.rmdir(tempDir);
         }
     }
+    
+    public void testDuplicateName()
+    {
+        errorHelper("Duplicated Recipe name 'jim'");        
+    }
 
     private void assertSingleCommandRecipe(FakePulseFile pf, String name)
     {

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.*;
@@ -43,7 +44,8 @@ import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESO
 public class ToveFileLoader
 {
     private static final int MAX_RECURSION_DEPTH = 128;
-
+    private static final String KEY_LABEL = "label";
+    
     private TypeDefinitions typeDefinitions;
     private ObjectFactory factory;
     private TypeRegistry typeRegistry;
@@ -483,6 +485,23 @@ public class ToveFileLoader
                         @SuppressWarnings("unchecked")
                         Map<String, Object> map = (Map) value;
                         String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
+                        if (map.containsKey(key))
+                        {
+                            Class targetClass = type.getTargetType().getClazz();
+                            Messages targetMessages = Messages.getInstance(targetClass);
+                            String targetLabel;
+                            if (targetMessages.isKeyDefined(KEY_LABEL))
+                            {
+                                targetLabel = targetMessages.format(KEY_LABEL);
+                            }
+                            else
+                            {
+                                targetLabel = targetClass.getSimpleName();
+                            }
+                            
+                            throw new FileLoadException("Duplicated " + targetLabel + " name '" + key + "'");
+                        }
+                        
                         map.put(key, instance);
                     }
                     
