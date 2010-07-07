@@ -176,7 +176,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
 
     public void validate(ValidationContext context)
     {
-        if (remote)
+        if (remote && slaveProxyFactory != null)
         {
             try
             {
