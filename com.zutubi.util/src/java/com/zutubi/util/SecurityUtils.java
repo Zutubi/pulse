@@ -16,8 +16,6 @@ public class SecurityUtils
     public static final String ALGORITHM_MD5 = "MD5";
     public static final String ALGORITHM_SHA1 = "SHA-1";
     
-    private static final String ENCODING_UTF_8 = Constants.UTF8;
-
     /**
      * Returns the specified type of digest of the given input as a hexadecimal
      * string.
@@ -79,7 +77,7 @@ public class SecurityUtils
      */
     public static String digest(String algorithm, String input) throws NoSuchAlgorithmException, UnsupportedEncodingException
     {
-        return digest(algorithm, input.getBytes(ENCODING_UTF_8));
+        return digest(algorithm, input.getBytes(Constants.UTF8));
     }
 
     /**
