@@ -173,7 +173,7 @@ public class PersonalBuildRunner
         int exitCode = command.execute(client);
         if (exitCode != 0)
         {
-            throw new IOException("Unexpected exit code " + exitCode + " from personal build command.");
+            throw new IOException("Unexpected exit code " + exitCode + " from personal build command. Errors: " + ui.getErrorMessages());
         }
         return ui;
     }

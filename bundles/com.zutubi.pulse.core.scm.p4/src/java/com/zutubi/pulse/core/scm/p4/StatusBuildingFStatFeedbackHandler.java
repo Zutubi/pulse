@@ -26,7 +26,7 @@ public class StatusBuildingFStatFeedbackHandler extends AbstractPerforceFStatFee
     {
         if(currentItem.containsKey(FSTAT_CLIENT_FILE))
         {
-            String path = getPath(currentItem.get(FSTAT_CLIENT_FILE));
+            String path = PerforceCore.stripClientPrefix(currentItem.get(FSTAT_CLIENT_FILE));
             String depotPath = currentItem.get(FSTAT_DEPOT_FILE);
             String action = currentItem.get(FSTAT_ACTION);
             FileStatus.State state = FileStatus.State.UNCHANGED;

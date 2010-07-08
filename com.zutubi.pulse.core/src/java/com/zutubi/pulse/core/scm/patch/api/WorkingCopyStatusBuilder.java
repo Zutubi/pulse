@@ -51,7 +51,7 @@ public interface WorkingCopyStatusBuilder
     /**
      * Indicates if the file at the given path in the working copy can be
      * diffed.  This method is called for files that are indicated as changed
-     * by {@link #getLocalStatus(WorkingCopyContext, String[])}.  In most
+     * by {@link #getLocalStatus(WorkingCopyContext, String...)}.  In most
      * cases, therefore, the file should be diffable if it is a text file, but
      * not if it is a binary file.  Specific implementations may make other
      * exceptions, however.

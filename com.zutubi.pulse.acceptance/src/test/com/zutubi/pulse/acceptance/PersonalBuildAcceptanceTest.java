@@ -11,6 +11,7 @@ import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
@@ -32,10 +33,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
 
@@ -80,7 +80,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, AgentManager.MASTER_AGENT_NAME);
+        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, "build.xml");
 
         PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
@@ -132,7 +132,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
-            verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, AgentManager.MASTER_AGENT_NAME);
+            verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, "build.xml");
         }
         finally
         {
@@ -165,7 +165,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, AGENT_NAME);
+        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, "build.xml");
     }
 
     public void testPersonalBuildWithHooks() throws Exception
@@ -314,33 +314,72 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     public void testPerforcePersonalBuild() throws Exception
     {
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(xmlRpcHelper), xmlRpcHelper.getAntConfig());
-        runPerforcePersonalBuild();
+        runPerforcePersonalBuild("build.xml", PerforceUtils.WORKSPACE_PREFIX + random, null);
     }
 
     public void testPerforcePersonalBuildRemappedFile() throws Exception
     {
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.MAPPED_VIEW), xmlRpcHelper.getAntConfig("mapped/build.xml"));
-        runPerforcePersonalBuild();
+        runPerforcePersonalBuild("build.xml", PerforceUtils.WORKSPACE_PREFIX + random, null);
     }
 
-    private void runPerforcePersonalBuild() throws Exception
+    public void testPerforcePersonalBuildComplexClientOnDeveloperSide() throws Exception
+    {
+        buildRunner.setBase(new File(workingCopyDir, "trunk"));
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.TRIVIAL_VIEW), xmlRpcHelper.getAntConfig("build.xml"));
+        String clientName = PerforceUtils.WORKSPACE_PREFIX + random;
+        runPerforcePersonalBuild("trunk/build.xml", clientName, "//depot/triviant/trunk/... //" + clientName + "/trunk/...");
+    }
+
+    public void testPerforcePersonalAddedAndDeletedFiles() throws Exception
+    {
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.MAPPED_VIEW), xmlRpcHelper.getAntConfig("mapped/newbuild.xml"));
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+
+        PerforceCore core = PerforceUtils.createCore();
+        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, PerforceUtils.WORKSPACE_PREFIX + random, "Test workspace", workingCopyDir.getAbsolutePath(), null);
+        try
+        {
+            core.setEnv(ENV_CLIENT, PerforceUtils.WORKSPACE_PREFIX + random);
+            core.runP4(null, P4_COMMAND, COMMAND_SYNC);
+
+            File originalBuildFile = new File(workingCopyDir, "build.xml");
+            File newBuildFile = new File(workingCopyDir, "newbuild.xml");
+            FileSystemUtils.copy(newBuildFile, originalBuildFile);
+
+            core.runP4(null, P4_COMMAND, COMMAND_DELETE, originalBuildFile.getAbsolutePath());
+            core.runP4(null, P4_COMMAND, COMMAND_ADD, newBuildFile.getAbsolutePath());
+            createConfigFile(random, asPair(PROPERTY_CLIENT, PerforceUtils.WORKSPACE_PREFIX + random), asPair(PROPERTY_PORT, P4PORT), asPair(PROPERTY_USER, P4USER), asPair(PROPERTY_PASSWORD, P4PASSWD));
+
+            browser.loginAsAdmin();
+            long buildNumber = runPersonalBuild(ResultState.SUCCESS);
+            // An unclean patch will raise warnings.
+            Hashtable<String, Object> build = xmlRpcHelper.getPersonalBuild((int) buildNumber);
+            assertEquals(0, build.get("warningCount"));
+        }
+        finally
+        {
+            PerforceUtils.deleteAllPulseWorkspaces(core);
+        }
+    }
+    
+    private void runPerforcePersonalBuild(String buildFilePath, String clientName, String developerClientMapping) throws Exception
     {
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         PerforceCore core = PerforceUtils.createCore();
-        String clientName = PerforceUtils.WORKSPACE_PREFIX + random;
-        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, clientName, "Test workspace", workingCopyDir.getAbsolutePath(), null);
+        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, clientName, "Test workspace", workingCopyDir.getAbsolutePath(), developerClientMapping);
         try
         {
             core.setEnv(ENV_CLIENT, clientName);
             core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-            core.runP4(null, P4_COMMAND, COMMAND_EDIT, new File(workingCopyDir, "build.xml").getAbsolutePath());
-            makeChangeToBuildFile();
+            core.runP4(null, P4_COMMAND, COMMAND_EDIT, new File(workingCopyDir, buildFilePath).getAbsolutePath());
+            makeChangeToBuildFile(buildFilePath);
             createConfigFile(random, asPair(PROPERTY_CLIENT, clientName), asPair(PROPERTY_PORT, P4PORT), asPair(PROPERTY_USER, P4USER), asPair(PROPERTY_PASSWORD, P4PASSWD));
 
             browser.loginAsAdmin();
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
-            verifyPersonalBuildTabs(random, buildNumber, AgentManager.MASTER_AGENT_NAME);
+            verifyPersonalBuildTabs(random, buildNumber, buildFilePath);
         }
         finally
         {
@@ -417,8 +456,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void makeChangeToBuildFile() throws IOException
     {
+        makeChangeToBuildFile("build.xml");
+    }
+
+    private void makeChangeToBuildFile(String path) throws IOException
+    {
         // Edit the build.xml file so we have an outstanding change
-        File buildFile = new File(workingCopyDir, "build.xml");
+        File buildFile = new File(workingCopyDir, path);
         String target = RandomUtils.randomString(10);
         FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
                 "<project default=\"" + target + "\">\n" +
@@ -470,7 +514,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         return buildRunner.triggerBuild();
     }
 
-    private void verifyPersonalBuildTabs(String projectName, long buildNumber, String agent)
+    private void verifyPersonalBuildTabs(String projectName, long buildNumber, String buildFilePath)
     {
         // Verify each tab in turn
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
@@ -493,7 +537,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         // Just parse to make sure it's a number: asserting the revision has
         // proven too fragile.
         Long.parseLong(changesPage.getCheckedOutRevision());
-        assertEquals("build.xml", changesPage.getChangedFile(0));
+        assertEquals(buildFilePath, changesPage.getChangedFile(0));
 
         browser.click(IDs.buildTestsTab());
         PersonalBuildTestsPage testsPage = browser.createPage(PersonalBuildTestsPage.class, buildNumber);
