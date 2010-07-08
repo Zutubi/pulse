@@ -23,7 +23,6 @@ import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
-import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
@@ -55,7 +54,6 @@ public class DefaultBuildManager implements BuildManager
     private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
     private MasterConfigurationManager configurationManager;
-    private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
 
     private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
@@ -66,10 +64,6 @@ public class DefaultBuildManager implements BuildManager
 
     public void init()
     {
-        fileDeletionService = new FileDeletionService();
-        fileDeletionService.setThreadFactory(threadFactory);
-        fileDeletionService.init();
-
         // CIB-1147: detect and remove old .dead dirs on restart.
         cleanupDeadDirectories();
     }
@@ -805,6 +799,11 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
+    public void setFileDeletionService(FileDeletionService fileDeletionService)
+    {
+        this.fileDeletionService = fileDeletionService;
+    }
+
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
@@ -823,11 +822,6 @@ public class DefaultBuildManager implements BuildManager
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
     {
         this.databaseConsole = databaseConsole;
-    }
-
-    public void setThreadFactory(PulseThreadFactory threadFactory)
-    {
-        this.threadFactory = threadFactory;
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)

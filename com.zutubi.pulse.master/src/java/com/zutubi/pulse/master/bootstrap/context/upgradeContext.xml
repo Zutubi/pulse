@@ -129,6 +129,7 @@
                 <ref local="addCommandCollectionSkeletons"/>
                 <ref local="gccLinkerPatterns"/>
                 <ref local="regexTestMultipleStatuses"/>
+                <ref local="cleanIvyCache"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -626,5 +627,9 @@
 
     <bean id="regexTestMultipleStatuses" class="com.zutubi.pulse.master.upgrade.tasks.RegexTestPostProcessorMultipleStatusesUpgradeTask">
         <property name="buildNumber" value="201025001"/>
+    </bean>
+
+    <bean id="cleanIvyCache" class="com.zutubi.pulse.master.upgrade.tasks.CleanIvyCacheUpgradeTask">
+        <property name="buildNumber" value="201030001"/>
     </bean>
 </beans>

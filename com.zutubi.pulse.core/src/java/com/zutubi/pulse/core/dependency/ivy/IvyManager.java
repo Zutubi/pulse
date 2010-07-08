@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import static com.zutubi.util.RandomUtils.randomString;
 import org.apache.ivy.core.cache.RepositoryCacheManager;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.util.Message;
@@ -37,8 +38,13 @@ public class IvyManager
 
     public IvyClient createIvyClient(IvyConfiguration configuration) throws Exception
     {
-        applyCacheSettings(configuration);
-
+        if (cacheBase != null && configuration.getCacheBase() == null)
+        {
+            // Give each ivy client a unique cache base directory so that they
+            // can be cleaned up without interferring with each other.
+            File clientCacheBase = new File(cacheBase, randomString(5));
+            configuration.setCacheBase(clientCacheBase);
+        }
         return new IvyClient(configuration);
     }
 
@@ -47,36 +53,21 @@ public class IvyManager
      *
      * Note: Do not run this while ivy processing is active.  The caches may be in use.
      *
-     * @param configuration     the configuration defining the caches.
-     *
      * @throws IOException on error.
      * @throws ParseException on error.
      */
-    public void cleanCaches(IvyConfiguration configuration) throws IOException, ParseException
+    public void cleanCaches() throws IOException, ParseException
     {
-        // implementation note:  the problem with caching is that I can not find a way to turn it
-        // off completely.  this means potentially large artifacts are being cached on potentially
-        // resource limited systems.  cleaning caches regularly helps by requires synchronisation
-        // so that caches that are in use are not cleaned.
-        
-        applyCacheSettings(configuration);
+        IvyConfiguration configuration = new IvyConfiguration();
+        configuration.setCacheBase(cacheBase);
         
         IvySettings settings = configuration.loadSettings();
-
         settings.getResolutionCacheManager().clean();
         
         RepositoryCacheManager[] caches = settings.getRepositoryCacheManagers();
         for (RepositoryCacheManager cache : caches)
         {
             cache.clean();
-        }
-    }
-
-    private void applyCacheSettings(IvyConfiguration configuration) throws IOException
-    {
-        if (cacheBase != null)
-        {
-            configuration.setCacheBase(cacheBase);
         }
     }
 }

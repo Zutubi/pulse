@@ -2,10 +2,13 @@ package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.FileSystemUtils.rmdir;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.IvyPatternHelper;
+import org.apache.ivy.core.cache.RepositoryCacheManager;
+import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -35,8 +38,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
-
-import static com.zutubi.util.FileSystemUtils.rmdir;
 
 /**
  * The ivy client provides the core interface for interacting with ivy processes, encapsulating
@@ -94,6 +95,9 @@ public class IvyClient
 
         settings.addResolver(resolver);
         settings.setDefaultResolver(RESOLVER_NAME);
+        
+        // disable the caching of the artifacts themselves when they are already available on the local filesystem.
+        settings.setDefaultUseOrigin(true);
 
         this.ivy = Ivy.newInstance(settings);
     }
@@ -110,7 +114,7 @@ public class IvyClient
      *                   blank, all artifacts will be published.
      * @throws IOException if there is a failure to publish an artifact.
      */
-    public void publishArtifacts(IvyModuleDescriptor descriptor, String... stageNames) throws IOException
+    public synchronized void publishArtifacts(IvyModuleDescriptor descriptor, String... stageNames) throws IOException
     {
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
         ivy.pushContext();
@@ -183,7 +187,7 @@ public class IvyClient
      * @param descriptor to be published
      * @throws IOException if there are any errors publishing the descriptor.
      */
-    public void publishDescriptor(IvyModuleDescriptor descriptor) throws IOException
+    public synchronized void publishDescriptor(IvyModuleDescriptor descriptor) throws IOException
     {
         // we can only publish from a file, so we need to deliver the descriptor to a local file first.
         File tmp = null;
@@ -241,7 +245,7 @@ public class IvyClient
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    public IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern, boolean sync) throws IOException, ParseException
+    public synchronized IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern, boolean sync) throws IOException, ParseException
     {
         // annoying but necessary.  See CustomURLHandler for details.
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
@@ -278,6 +282,23 @@ public class IvyClient
         }
     }
 
+    /**
+     * Cleanup any items loaded into the cache used by this client.
+     */
+    public synchronized void cleanup()
+    {
+        IvySettings settings = ivy.getSettings();
+
+        ResolutionCacheManager resolutionCacheManager = settings.getResolutionCacheManager();
+        resolutionCacheManager.clean();
+
+        RepositoryCacheManager[] caches = settings.getRepositoryCacheManagers();
+        for (RepositoryCacheManager cache : caches)
+        {
+            cache.clean();
+        }
+    }
+
     private void decodeArtifactFilenames(String targetPattern, IvyRetrievalReport report)
     {
         for (Artifact decodedArtifact : report.getRetrievedArtifacts())
@@ -299,6 +320,7 @@ public class IvyClient
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     private boolean resolveReportHasProblems(ResolveReport resolveReport, IvyRetrievalReport report, String confName, Set<String> optionalDependencies)
     {
         ConfigurationResolveReport configurationResolveReport = resolveReport.getConfigurationReport(confName);
@@ -359,6 +381,7 @@ public class IvyClient
         return problemMessage.contains("configuration not found in");
     }
 
+    @SuppressWarnings({"unchecked"})
     private void recordDownloadedArtifacts(String targetPattern, IvyRetrievalReport report, ModuleRevisionId mrid, RetrieveOptions options) throws ParseException, IOException
     {
         Map<ArtifactDownloadReport, Set<String>> artifactDownloadReports = ivy.getRetrieveEngine().determineArtifactsToCopy(mrid, targetPattern, options);
@@ -396,12 +419,12 @@ public class IvyClient
      * @param logger the logger to receive logging messages.
      * @see #popMessageLogger()
      */
-    public void pushMessageLogger(MessageLogger logger)
+    public synchronized void pushMessageLogger(MessageLogger logger)
     {
         ivy.getLoggerEngine().pushLogger(logger);
     }
 
-    public void popMessageLogger()
+    public synchronized void popMessageLogger()
     {
         ivy.getLoggerEngine().popLogger();
     }
