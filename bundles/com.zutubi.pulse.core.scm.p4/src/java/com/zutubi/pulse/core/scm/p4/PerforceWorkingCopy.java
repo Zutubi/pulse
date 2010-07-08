@@ -133,7 +133,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     private long searchForLocalRevisionInProjectChanges(PerforceCore core, String client, long revision) throws ScmException
     {
         // Looks like we hit a tricky case.  Get the next few changelists
-        // submitted for out project, and try them.
+        // submitted for our project, and try them.
         List<Long> tried = new LinkedList<Long>();
         tried.add(revision);
 
@@ -285,7 +285,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     {
         FileTypeFStatFeedbackHandler handler = new FileTypeFStatFeedbackHandler();
         PerforceCore core = createCore(context);
-        File f = new File(context.getBase(), path);
+        File f = new File(core.getClientRoot(), path);
         core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, f.getAbsolutePath());
         return handler.isText();
     }
@@ -293,17 +293,40 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     public void diff(WorkingCopyContext context, String path, OutputStream output) throws ScmException
     {
         PerforceCore core = createCore(context);
-        File f = new File(context.getBase(), path);
+        File f = new File(core.getClientRoot(), path);
         final PrintWriter writer = new PrintWriter(output);
 
         // p4 outputs only hunks, no header, so we output a header ourselves
         writer.println(UnifiedPatch.HEADER_OLD_FILE + " " + path);
         writer.println(UnifiedPatch.HEADER_NEW_FILE + " " + path);
         
+        core.setEnv(ENV_DIFF, "");
+        
         core.runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(true)
         {
+            private boolean reachedFirstHunk = false;
+            
             public void handleStdout(String line)
             {
+                if (!reachedFirstHunk)
+                {
+                    if (line.startsWith("@@"))
+                    {
+                        // Now we have seen a hunk, there is no longer any
+                        // chance of a header.
+                        reachedFirstHunk = true;
+                    }
+                    else
+                    {
+                        if (line.startsWith("---") || line.startsWith("+++"))
+                        {
+                            // Some versions of perforce output headers, which
+                            // we need to ignore.
+                            return;
+                        }
+                    }
+                }
+                
                 writer.println(line);
             }
 

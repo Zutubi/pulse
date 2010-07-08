@@ -794,13 +794,36 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public void beforePatch(ExecutionContext context, List<FileStatus> statuses) throws ScmException
     {
+        Predicate<FileStatus> addedPredicate = new Predicate<FileStatus>()
+        {
+            public boolean satisfied(FileStatus fileStatus)
+            {
+                return fileStatus.getState() == FileStatus.State.ADDED || fileStatus.getState() == FileStatus.State.BRANCHED;
+            }
+        };
+        
+        List<FileStatus> addedFiles = CollectionUtils.filter(statuses, addedPredicate);
+        List<FileStatus> existingFiles = CollectionUtils.filter(statuses, new InvertedPredicate<FileStatus>(addedPredicate));
+        
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
-            List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, statuses);
-            for (List<FileStatus> sublist: partitioned)
+            if (!addedFiles.isEmpty())
             {
-                convertTargetPaths(workspace, sublist);
+                List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, addedFiles);
+                for (List<FileStatus> sublist: partitioned)
+                {
+                    convertTargetPathsForAddedFiles(workspace, sublist);
+                }
+            }
+
+            if (!existingFiles.isEmpty())
+            {
+                List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, existingFiles);
+                for (List<FileStatus> sublist: partitioned)
+                {
+                    convertTargetPathsForExistingFiles(workspace, sublist);
+                }
             }
         }
         finally
@@ -809,7 +832,41 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         }
     }
 
-    private void convertTargetPaths(PerforceWorkspace workspace, List<FileStatus> statuses) throws ScmException
+    private void convertTargetPathsForAddedFiles(PerforceWorkspace workspace, List<FileStatus> statuses) throws ScmException
+    {
+        List<String> whereCommand = new LinkedList<String>();
+        whereCommand.add(getP4Command(COMMAND_WHERE));
+        whereCommand.add(FLAG_CLIENT);
+        whereCommand.add(workspace.getName());
+        whereCommand.add(COMMAND_WHERE);
+
+        if (addFilesToMapToCommand(statuses, whereCommand))
+        {
+            final Map<String, String> mappedPaths = new HashMap<String, String>();
+            core.runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(true)
+            {
+                public void handleStdout(String line)
+                {
+                    if (line.startsWith("//"))
+                    {
+                        String[] parts = line.split("\\s+");
+                        if (parts.length == 3)
+                        {
+                            mappedPaths.put(parts[0], PerforceCore.stripClientPrefix(parts[1]));
+                        }
+                    }
+                }
+
+                public void checkCancelled() throws ScmCancelledException
+                {
+                }
+            }, null, whereCommand.toArray(new String[whereCommand.size()]));
+            
+            mapFiles(statuses, mappedPaths);
+        }
+    }
+
+    private void convertTargetPathsForExistingFiles(PerforceWorkspace workspace, List<FileStatus> statuses) throws ScmException
     {
         List<String> fstatCommand = new LinkedList<String>();
         fstatCommand.add(getP4Command(COMMAND_FSTAT));
@@ -818,6 +875,29 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         fstatCommand.add(COMMAND_FSTAT);
         fstatCommand.add(FLAG_PATH_IN_DEPOT_FORMAT);
 
+        if (addFilesToMapToCommand(statuses, fstatCommand))
+        {
+            final Map<String, String> mappedPaths = new HashMap<String, String>();
+            core.runP4WithHandler(new AbstractPerforceFStatFeedbackHandler()
+            {
+                @Override
+                protected void handleCurrentItem()
+                {
+                    String depotFile = currentItem.get("depotFile");
+                    String path = currentItem.get("clientFile");
+                    if (StringUtils.stringSet(depotFile) && StringUtils.stringSet(path))
+                    {
+                        mappedPaths.put(depotFile, PerforceCore.stripClientPrefix(path));
+                    }
+                }
+            }, null, fstatCommand.toArray(new String[fstatCommand.size()]));
+            
+            mapFiles(statuses, mappedPaths);
+        }
+    }
+
+    private boolean addFilesToMapToCommand(List<FileStatus> statuses, List<String> command)
+    {
         boolean fileToMap = false;
         for (FileStatus status: statuses)
         {
@@ -825,33 +905,14 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
             if (StringUtils.stringSet(targetPath) && targetPath.startsWith("//"))
             {
                 fileToMap = true;
-                fstatCommand.add(targetPath);
+                command.add(targetPath);
             }
         }
-
-        if (fileToMap)
-        {
-            mapFiles(statuses, fstatCommand);
-        }
+        return fileToMap;
     }
 
-    private void mapFiles(List<FileStatus> statuses, List<String> fstatCommand) throws ScmException
+    private void mapFiles(List<FileStatus> statuses, Map<String, String> mappedPaths) throws ScmException
     {
-        final Map<String, String> mappedPaths = new HashMap<String, String>();
-        core.runP4WithHandler(new AbstractPerforceFStatFeedbackHandler()
-        {
-            @Override
-            protected void handleCurrentItem()
-            {
-                String depotFile = currentItem.get("depotFile");
-                String path = currentItem.get("clientFile");
-                if (StringUtils.stringSet(depotFile) && StringUtils.stringSet(path))
-                {
-                    mappedPaths.put(depotFile, getPath(path));
-                }
-            }
-        }, null, fstatCommand.toArray(new String[fstatCommand.size()]));
-
         for (FileStatus status: statuses)
         {
             String mapped = mappedPaths.get(status.getTargetPath());

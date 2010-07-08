@@ -435,4 +435,26 @@ public class PerforceCore
     {
         return PATTERN_LINE_SPLITTER.split(result.stdout);
     }
+
+    /**
+     * Converts a path from client to local syntax by removing //<client>/.
+     *
+     * @param clientFile file path in client syntax
+     * @return the file path relative to the client root
+     */
+    public static String stripClientPrefix(String clientFile)
+    {
+        // clientFile has form //<client>/<path>
+        int length = clientFile.length();
+        if(length > 3)
+        {
+            int index = clientFile.indexOf('/', 2);
+            if(index >= 0 && index < length - 1)
+            {
+                clientFile = clientFile.substring(index + 1);
+            }
+        }
+
+        return clientFile;
+    }
 }
