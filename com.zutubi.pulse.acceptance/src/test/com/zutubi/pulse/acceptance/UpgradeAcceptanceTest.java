@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.embedded.EmbeddedPulse;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Condition;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -87,7 +89,13 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         upgradeToCurrent(dataDir);
     }
 
-    public void testUpgradeToCurrentVersion() throws Exception
+    public void testUpgrade2050ToCurrentVersion() throws Exception
+    {
+        File dataDir = dataDir("2.0.50");
+        upgradeToCurrent(dataDir);
+    }
+
+    public void testUpgrade2130ToCurrentVersion() throws Exception
     {
         File dataDir = dataDir("2.1.30");
         upgradeToCurrent(dataDir);
@@ -121,7 +129,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         migrationManager.runMigration();
     }
 
-    private void upgradeToCurrent(File dataDir) throws IOException, InterruptedException
+    private void upgradeToCurrent(File dataDir) throws Exception
     {
         Pulse pulse = new EmbeddedPulse();
         pulse.setDataDir(dataDir.getCanonicalPath());
@@ -148,16 +156,33 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         browser.click("continue");
 
-        // need to wait for pulse to start up completely before closing it down.  Early shutdowns make pulse sad.
-        Thread.sleep(30000);
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    xmlRpcHelper.ping();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+        }, 30 * SECOND, "pulse to start up");
 
-        pulse.stop(30000);
+        // Until we have a way of detecting that spring has finished setting up,
+        // we need to wait or risk shutdown failing.
+        Thread.sleep(30 * SECOND);
+        
+        pulse.stop(30 * SECOND);
     }
 
     private File dataDir(String version) throws Exception
     {
-        PulseZipUtils.extractZip(new File(dataArea, "pulse-"+version+"-data.zip"), work);
-        return new File(work, "data");
+        PulseZipUtils.extractZip(new File(dataArea, "pulse-"+version+"-data.zip"), new File(work, version));
+        return new File(work, version + "/data");
     }
 
     private List<File> hibernateMappings(String version) throws IOException

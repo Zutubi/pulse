@@ -1176,6 +1176,11 @@ public class XmlRpcHelper
         return (String) call("threadDump");
     }
 
+    public void ping() throws Exception
+    {
+        callWithoutToken("ping");
+    }
+
     private static class BuildHolder
     {
         Hashtable<String, Object> build = null;
