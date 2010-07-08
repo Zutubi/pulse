@@ -94,6 +94,8 @@ public class RetrieveDependenciesCommand implements Command
                         // Don't close the writer: the underlying output stream
                         // is used by subsequent commands.
                         outputWriter.flush();
+
+                        ivy.cleanup(); // cleanup the cached artifacts, they are not needed after they have been delivered.
                     }
                 }
             });

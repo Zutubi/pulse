@@ -49,6 +49,11 @@ public class IvyConfiguration
      */
     private String repositoryBase;
 
+    /**
+     * The base path for the cache.
+     */
+    private File cacheBase;
+
     public IvyConfiguration()
     {
     }
@@ -59,7 +64,7 @@ public class IvyConfiguration
         this.artifactPattern = artifactPattern;
         this.ivyPattern = ivyPattern;
     }
-    
+
     public IvyConfiguration(String repositoryBase)
     {
         this.repositoryBase = repositoryBase;
@@ -80,7 +85,7 @@ public class IvyConfiguration
     }
 
     /**
-     * The ivy pattern defines the expected layout of ivy files within 
+     * The ivy pattern defines the expected layout of ivy files within
      * the remote repository.
      *
      * @return the ivy pattern
@@ -142,9 +147,15 @@ public class IvyConfiguration
      */
     public void setCacheBase(File cacheBase) throws IOException
     {
+        this.cacheBase = cacheBase;
         setVariable(IVY_CACHE_DIR, cacheBase.toURI().toString());
         setVariable(IVY_CACHE_RESOLUTION, cacheBase.getCanonicalPath());
         setVariable(IVY_CACHE_REPOSITORY, cacheBase.getCanonicalPath());
+    }
+
+    public File getCacheBase()
+    {
+        return cacheBase;
     }
 
     public String getRepositoryBase()

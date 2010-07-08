@@ -919,9 +919,7 @@ public class DefaultBuildController implements EventListener, BuildController
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
             String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
 
-            IvyConfiguration configuration = new IvyConfiguration(repositoryUrl);
-
-            final IvyClient ivy = ivyManager.createIvyClient(configuration);
+            final IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
             ivy.pushMessageLogger(buildLogger.getMessageLogger());
 
             String host = new URL(masterUrl).getHost();
