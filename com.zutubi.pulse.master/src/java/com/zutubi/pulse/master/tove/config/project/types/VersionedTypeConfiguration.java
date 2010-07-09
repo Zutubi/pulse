@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
-import com.zutubi.pulse.core.tove.config.annotations.BrowseScmDirAction;
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.FileSystemUtils;
@@ -14,7 +14,7 @@ import com.zutubi.util.FileSystemUtils;
 @Wire
 public class VersionedTypeConfiguration extends TypeConfiguration
 {
-    @BrowseScmDirAction
+    @BrowseScmFileAction
     private String pulseFileName;
 
     public String getPulseFileName()
