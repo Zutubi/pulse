@@ -1,9 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
 import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
 import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
@@ -14,29 +11,23 @@ import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
-import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
-import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.variables.api.Variable;
-import com.zutubi.tove.variables.api.VariableMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.Pair;
 import com.zutubi.util.TreeNode;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Action links for the project config page.
@@ -57,15 +48,12 @@ public class ProjectConfigurationActions
     public static final String ACTION_REBUILD              = "rebuild";
 
     private static final Logger LOG = Logger.getLogger(ProjectConfigurationActions.class);
-    private static final Messages I18N = Messages.getInstance(ProjectConfigurationActions.class);
     
-    private AgentManager agentManager;
     private ProjectManager projectManager;
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ScmManager scmManager;
     private ObjectFactory objectFactory;
-    private SynchronisationTaskFactory synchronisationTaskFactory;
 
     public boolean actionsEnabled(ProjectConfiguration instance, boolean deeplyValid)
     {
@@ -215,49 +203,7 @@ public class ProjectConfigurationActions
     @Permission(ACTION_TRIGGER)
     public void doClean(ProjectConfiguration projectConfig)
     {
-        Project project = projectManager.getProject(projectConfig.getProjectId(), true);
-        if (project != null)
-        {
-            
-            AgentRecipeDetails details = new AgentRecipeDetails();
-            details.setProject(projectConfig.getName());
-            details.setProjectHandle(projectConfig.getHandle());
-            for (Agent agent: agentManager.getAllAgents())
-            {
-                List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
-
-                AgentConfiguration agentConfig = agent.getConfig();
-                details.setAgent(agent.getName());
-                details.setAgentHandle(agentConfig.getHandle());
-                for (BuildStageConfiguration stageConfig: projectConfig.getStages().values())
-                {
-                    details.setStage(stageConfig.getName());
-                    details.setStageHandle(stageConfig.getHandle());
-                
-                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), projectConfig.getOptions().getPersistentWorkDir(), getVariables(details));
-                    SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
-                    messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
-                }
-                
-                if (messageDescriptionPairs.size() > 0)
-                {
-                    agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
-                }
-            }
-            
-        }
-    }
-
-    private Map<String, String> getVariables(AgentRecipeDetails details)
-    {
-        VariableMap variables = details.createPathVariableMap();
-        Map<String, String> result = new HashMap<String, String>();
-        for (Variable variable: variables.getVariables())
-        {
-            result.put(variable.getName(), variable.getValue().toString());
-        }
-        
-        return result;
+        projectManager.cleanupWorkDirs(projectConfig);
     }
 
     public CustomTypeConfiguration prepareConvertToCustom(final ProjectConfiguration projectConfiguration)
@@ -317,11 +263,6 @@ public class ProjectConfigurationActions
         });
     }
 
-    public void setAgentManager(AgentManager agentManager)
-    {
-        this.agentManager = agentManager;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
@@ -345,10 +286,5 @@ public class ProjectConfigurationActions
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
-    }
-
-    public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
-    {
-        this.synchronisationTaskFactory = synchronisationTaskFactory;
     }
 }

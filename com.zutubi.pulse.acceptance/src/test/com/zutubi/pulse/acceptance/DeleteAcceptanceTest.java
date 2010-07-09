@@ -3,22 +3,27 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
+import com.zutubi.util.FileSystemUtils;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.io.File;
+import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!
@@ -91,8 +96,11 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void testDeleteProject() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
-
+        // Set up the project to build on the master agent, using a custom
+        // persistent work directory.
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        File buildDirectory = runBuildInPersistentWorkDirectory();
+        
         browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
@@ -105,6 +113,95 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertFalse(browsePage.isProjectPresent(null, random));
+
+        waitForDirectoryToBeCleaned(buildDirectory);
+    }
+
+    public void testDeleteStage() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        File buildDirectory = runBuildInPersistentWorkDirectory();
+
+        xmlRpcHelper.deleteConfig(getPath(projectPath, Constants.Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE));
+
+        waitForDirectoryToBeCleaned(buildDirectory);
+    }
+
+    public void testEditPersistentWorkDirPattern() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+        File buildDirectory = runBuildInPersistentWorkDirectory();
+
+        setCustomPersistentDir("$(agent.data.dir)/work/$(project.handle)/$(stage)");
+
+        waitForDirectoryToBeCleaned(buildDirectory);
+    }
+    
+    private File runBuildInPersistentWorkDirectory() throws Exception
+    {
+        // Set up the project to build on the master agent, using a custom
+        // persistent work directory.
+        setIncrementalUpdate();
+        setMasterAgent();
+        setCustomPersistentDir("$(agent.data.dir)/work/$(project)/$(stage)");
+
+        // Run a build, make sure the directory we expect appeared.
+        xmlRpcHelper.runBuild(random, XmlRpcHelper.BUILD_TIMEOUT);
+
+        File agentsDir = new File(AcceptanceTestUtils.getDataDirectory(), "agents");
+        final File buildDirectory = new File(agentsDir, FileSystemUtils.composeFilename(getMasterAgentId(agentsDir), "work", random, ProjectConfigurationWizard.DEFAULT_STAGE));
+        assertTrue(buildDirectory.isDirectory());
+        return buildDirectory;
+    }
+
+    private void setIncrementalUpdate() throws Exception
+    {
+        String scmPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.SCM);
+        Hashtable<String, Object> scm = xmlRpcHelper.getConfig(scmPath);
+        scm.put(Constants.Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.name());
+        xmlRpcHelper.saveConfig(scmPath, scm, false);
+        xmlRpcHelper.waitForProjectToInitialise(random);
+    }
+
+    private void setMasterAgent() throws Exception
+    {
+        String stagePath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE);
+        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        stage.put(Constants.Project.Stage.AGENT, getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        xmlRpcHelper.saveConfig(stagePath, stage, false);
+    }
+
+    private void setCustomPersistentDir(String pattern) throws Exception
+    {
+        String optionsPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.OPTIONS);
+        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        options.put("persistentWorkDir", pattern);
+        xmlRpcHelper.saveConfig(optionsPath, options, false);
+    }
+
+    private String getMasterAgentId(File agentsDir)
+    {
+        List<String> agentDirs = new LinkedList<String>(Arrays.asList(agentsDir.list()));
+        Collections.sort(agentDirs, new Comparator<String>()
+        {
+            public int compare(String o1, String o2)
+            {
+                return (int) (Long.parseLong(o1) - Long.parseLong(o2));
+            }
+        });
+
+        return agentDirs.get(0);
+    }
+
+    private void waitForDirectoryToBeCleaned(final File buildDirectory)
+    {
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !buildDirectory.isDirectory();
+            }
+        }, 30000, "agent persistent directory for project to be cleaned up");
     }
 
     public void testDeleteProjectWithReference() throws Exception
@@ -146,7 +243,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
-        String dashboardPath = PathUtils.getPath(authPath, "preferences", "dashboard");
+        String dashboardPath = getPath(authPath, "preferences", "dashboard");
         Hashtable<String, Object> dashboard = xmlRpcHelper.getConfig(dashboardPath);
         dashboard.put("showAllProjects", false);
         dashboard.put("shownProjects", new Vector<String>(Arrays.asList(projectPath)));
@@ -156,7 +253,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
-        assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS, PathUtils.getPath(dashboardPath, "shownProjects", "0"), "remove reference");
+        assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS, getPath(dashboardPath, "shownProjects", "0"), "remove reference");
         assertTextNotPresent("A further");
         confirmPage.clickCancel();
         hierarchyPage.waitFor();
@@ -217,13 +314,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         stage.put("name", "agent");
         stage.put("agent", agentPath);
         stage.put("recipe", "");
-        String stagePath = xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "stages"), stage);
+        String stagePath = xmlRpcHelper.insertConfig(getPath(projectPath, "stages"), stage);
 
         browser.loginAsAdmin();
         AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, agentName, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
-        assertTasks(confirmPage, agentPath, ACTION_DELETE_RECORD, agentPath, "delete agent state", PathUtils.getPath(stagePath, "agent"), "null out reference");
+        assertTasks(confirmPage, agentPath, ACTION_DELETE_RECORD, agentPath, "delete agent state", getPath(stagePath, "agent"), "null out reference");
         confirmPage.clickDelete();
 
         AgentHierarchyPage globalPage = browser.createPage(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
@@ -259,8 +356,8 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
         browser.loginAsAdmin();
-        String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
-        String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
+        String cleanupsPath = getPath(projectPath, "cleanup");
+        String cleanupPath = getPath(cleanupsPath, "default");
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupsPath);
         cleanupsPage.expandTreeNode(cleanupsPath);
@@ -286,7 +383,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
         browser.loginAsAdmin();
-        String cleanupssPath = PathUtils.getPath(projectPath, "cleanup");
+        String cleanupssPath = getPath(projectPath, "cleanup");
 
         ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupssPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
@@ -316,10 +413,10 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         setupTemplateProjectWithDefaultCleanup(grandParentName);
 
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, grandParentName, true);
-        String parentCleanupsPath = PathUtils.getPath(parentPath, "cleanup");
-        String parentCleanupPath = PathUtils.getPath(parentCleanupsPath, "default");
+        String parentCleanupsPath = getPath(parentPath, "cleanup");
+        String parentCleanupPath = getPath(parentCleanupsPath, "default");
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
-        String childCleanupPath = PathUtils.getPath(childPath, "cleanup", "default");
+        String childCleanupPath = getPath(childPath, "cleanup", "default");
 
         browser.loginAsAdmin();
 
@@ -346,10 +443,10 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         setupTemplateProjectWithDefaultCleanup(grandParentName);
 
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, grandParentName, true);
-        String parentCleanupsPath = PathUtils.getPath(parentPath, "cleanup");
-        String parentCleanupPath = PathUtils.getPath(parentCleanupsPath, "default");
+        String parentCleanupsPath = getPath(parentPath, "cleanup");
+        String parentCleanupPath = getPath(parentCleanupsPath, "default");
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
-        String childCleanupPath = PathUtils.getPath(childPath, "cleanup", "default");
+        String childCleanupPath = getPath(childPath, "cleanup", "default");
         Hashtable<String, Object> childCleanup = xmlRpcHelper.getConfig(childCleanupPath);
         childCleanup.put("retain", 928);
         xmlRpcHelper.saveConfig(childCleanupPath, childCleanup, false);
@@ -377,8 +474,8 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         setupTemplateProjectWithDefaultCleanup(parentName);
 
         String projectPath = xmlRpcHelper.insertSimpleProject(random, parentName, false);
-        String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
-        String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
+        String cleanupsPath = getPath(projectPath, "cleanup");
+        String cleanupPath = getPath(cleanupsPath, "default");
         xmlRpcHelper.deleteConfig(cleanupPath);
 
         browser.loginAsAdmin();
@@ -403,13 +500,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
 
-        String parentReqsPath = PathUtils.getPath(parentPath, "requirements");
-        String childReqsPath = PathUtils.getPath(childPath, "requirements");
+        String parentReqsPath = getPath(parentPath, "requirements");
+        String childReqsPath = getPath(childPath, "requirements");
         Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirementConfiguration.class);
         req.put("resource", "foo");
         String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
         String baseName = PathUtils.getBaseName(parentReqPath);
-        String childReqPath = PathUtils.getPath(childReqsPath, baseName);
+        String childReqPath = getPath(childReqsPath, baseName);
 
         browser.loginAsAdmin();
 
@@ -433,13 +530,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
 
-        String parentReqsPath = PathUtils.getPath(parentPath, "requirements");
-        String childReqsPath = PathUtils.getPath(childPath, "requirements");
+        String parentReqsPath = getPath(parentPath, "requirements");
+        String childReqsPath = getPath(childPath, "requirements");
         Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirementConfiguration.class);
         req.put("resource", "foo");
         String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
         String baseName = PathUtils.getBaseName(parentReqPath);
-        String childReqPath = PathUtils.getPath(childReqsPath, baseName);
+        String childReqPath = getPath(childReqsPath, baseName);
         xmlRpcHelper.deleteConfig(childReqPath);
 
         browser.loginAsAdmin();
@@ -458,7 +555,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
 
         browser.loginAsAdmin();
-        String path = PathUtils.getPath(projectPath, "scm");
+        String path = getPath(projectPath, "scm");
         CompositePage subversionPage = browser.openAndWaitFor(CompositePage.class, path);
         assertTrue(subversionPage.isActionPresent(AccessManager.ACTION_DELETE));
         subversionPage.clickAction(AccessManager.ACTION_DELETE);
@@ -474,14 +571,14 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> trigger = xmlRpcHelper.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
         trigger.put("name", "test");
         trigger.put("project", refereePath);
-        return xmlRpcHelper.insertConfig(PathUtils.getPath(refererPath, "triggers"), trigger);
+        return xmlRpcHelper.insertConfig(getPath(refererPath, "triggers"), trigger);
     }
 
     private String insertLabel(String projectPath) throws Exception
     {
         Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
         label.put("label", "test");
-        return xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), label);
+        return xmlRpcHelper.insertConfig(getPath(projectPath, "labels"), label);
     }
 
     public void assertTasks(DeleteConfirmPage page, String... pathActionPairs)
@@ -502,5 +599,4 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         actionsCell = actionsCell.replaceAll(" +", " ");
         assertEquals((page.isHide() ? "hide" : "delete") + " cancel", actionsCell);
     }
-
 }

@@ -11,6 +11,8 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
@@ -29,12 +31,14 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
-import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -45,10 +49,9 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
+import com.zutubi.tove.variables.api.Variable;
+import com.zutubi.tove.variables.api.VariableMap;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -60,6 +63,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
@@ -68,6 +72,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private static final Messages I18N = Messages.getInstance(DefaultProjectManager.class);
 
     private static final Map<Project.Transition, String> TRANSITION_TO_ACTION_MAP = new HashMap<Project.Transition, String>();
+    private static final String[] SAFE_CLEAN_PREFIXES = {"$(data.dir)", "${data.dir}", "$(agent.data.dir)", "${agent.data.dir}"};
 
     private ProjectDao projectDao;
     private TestCaseIndexDao testCaseIndexDao;
@@ -76,6 +81,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ChangelistIsolator changelistIsolator;
     private ScmManager scmManager;
     private LicenseManager licenseManager;
+    private AgentManager agentManager;
+    private SynchronisationTaskFactory synchronisationTaskFactory;
 
     private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
@@ -178,27 +185,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     cacheLock.writeLock().unlock();
                 }
 
-                // Check for addition or removal of an SCM.  Note this must
-                // come after registering the new config.  Handling this here
-                // rather than in the SCM config listener is easier as we
-                // know only the SCM has been added/removed (not the whole
-                // project).
                 if (old != null)
                 {
-                    if (old.getScm() == null)
-                    {
-                        if (instance.getScm() != null)
-                        {
-                            handleNewScm(instance);
-                        }
-                    }
-                    else
-                    {
-                        if (instance.getScm() == null)
-                        {
-                            makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
-                        }
-                    }
+                    // Check for addition or removal of an SCM.  Note this must
+                    // come after registering the new config.  Handling this here
+                    // rather than in the SCM config listener is easier as we
+                    // know only the SCM has been added/removed (not the whole
+                    // project).
+                    checkForScmAddOrRemove(instance, old);
+                    checkForPersistentWorkDirChange(instance, old);
+                    checkForStageRemoval(instance, old);
                 }
             }
         };
@@ -251,6 +247,49 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
+    private void checkForScmAddOrRemove(ProjectConfiguration instance, ProjectConfiguration old)
+    {
+        if (old.getScm() == null)
+        {
+            if (instance.getScm() != null)
+            {
+                handleNewScm(instance);
+            }
+        }
+        else
+        {
+            if (instance.getScm() == null)
+            {
+                makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
+            }
+        }
+    }
+
+    private void checkForPersistentWorkDirChange(ProjectConfiguration instance, ProjectConfiguration old)
+    {
+        if (!StringUtils.equals(instance.getOptions().getPersistentWorkDir(), old.getOptions().getPersistentWorkDir()))
+        {
+            cleanupWorkDirs(old, false, null);
+        }
+    }
+
+    private void checkForStageRemoval(ProjectConfiguration instance, ProjectConfiguration old)
+    {
+        for (final BuildStageConfiguration oldStage: old.getStages().values())
+        {
+            if (!CollectionUtils.contains(instance.getStages().values(), new Predicate<BuildStageConfiguration>()
+            {
+                public boolean satisfied(BuildStageConfiguration stage)
+                {
+                    return stage.getHandle() == oldStage.getHandle();
+                }
+            }))
+            {
+                cleanupWorkDirs(old, false, oldStage);
+            }
+        }
+    }
+    
     private void initialise()
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
@@ -971,16 +1010,95 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void deleteProject(Project entity)
+    public void cleanupWorkDirs(ProjectConfiguration projectConfig)
     {
-        projectInitialisationService.requestDestruction(entity.getConfig(), true);
-        buildManager.deleteAllBuilds(entity);
+        cleanupWorkDirs(projectConfig, true, null);
+    }
 
+    private void cleanupWorkDirs(ProjectConfiguration projectConfig, boolean explicit, BuildStageConfiguration specificStage)
+    {
+        String workDirPattern = projectConfig.getOptions().getPersistentWorkDir();
+
+        if (explicit || safeToClean(workDirPattern))
+        {
+            AgentRecipeDetails details = new AgentRecipeDetails();
+            details.setProject(projectConfig.getName());
+            details.setProjectHandle(projectConfig.getHandle());
+            for (Agent agent: agentManager.getAllAgents())
+            {
+                List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
+    
+                AgentConfiguration agentConfig = agent.getConfig();
+                details.setAgent(agent.getName());
+                details.setAgentHandle(agentConfig.getHandle());
+                
+                Collection<BuildStageConfiguration> stageConfigs;
+                if (specificStage == null)
+                {
+                    stageConfigs = projectConfig.getStages().values();
+                }
+                else
+                {
+                    stageConfigs = Arrays.asList(specificStage);
+                }
+                
+                for (BuildStageConfiguration stageConfig: stageConfigs)
+                {
+                    details.setStage(stageConfig.getName());
+                    details.setStageHandle(stageConfig.getHandle());
+
+                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
+                    SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
+                    messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
+                }
+                    
+                if (messageDescriptionPairs.size() > 0)
+                {
+                    agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
+                }
+            }
+        }
+    }
+
+    private boolean safeToClean(String workDirPattern)
+    {
+        // Some paranoia in cleanup: if the work directory pattern is not
+        // within the data (or agent data) directory, then don't automatically
+        // clean it up.
+        for (String prefix: SAFE_CLEAN_PREFIXES)
+        {
+            if (workDirPattern.startsWith(prefix))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private Map<String, String> getVariables(AgentRecipeDetails details)
+    {
+        VariableMap variables = details.createPathVariableMap();
+        Map<String, String> result = new HashMap<String, String>();
+        for (Variable variable: variables.getVariables())
+        {
+            result.put(variable.getName(), variable.getValue().toString());
+        }
+        
+        return result;
+    }
+    
+    private void deleteProject(Project project)
+    {
+        projectInitialisationService.requestDestruction(project.getConfig(), true);
+        buildManager.deleteAllBuilds(project);
+        cleanupWorkDirs(project.getConfig(), false, null);
+        
         // Remove test case index
         List<TestCaseIndex> tests;
         do
         {
-            tests = testCaseIndexDao.findByProject(entity.getId(), 100);
+            tests = testCaseIndexDao.findByProject(project.getId(), 100);
             for(TestCaseIndex index: tests)
             {
                 testCaseIndexDao.delete(index);
@@ -988,7 +1106,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
         while(tests.size() > 0);
         
-        projectDao.delete(entity);
+        projectDao.delete(project);
     }
 
     public void delete(Project project)
@@ -1512,5 +1630,15 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
+    }
+
+    public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
+    {
+        this.synchronisationTaskFactory = synchronisationTaskFactory;
     }
 }

@@ -113,6 +113,15 @@ public interface ProjectManager extends EntityManager<Project>
      */
     boolean makeStateTransition(long projectId, Project.Transition transition);
 
+    /**
+     * Cleans up all persistent working directories for this project on all
+     * agents.
+     * 
+     * @param projectConfig configuration of the project to clean up after
+     */
+    @SecureParameter(action = AccessManager.ACTION_WRITE)
+    void cleanupWorkDirs(ProjectConfiguration projectConfig);
+    
     void delete(Project project);
 
     void save(Project project);
