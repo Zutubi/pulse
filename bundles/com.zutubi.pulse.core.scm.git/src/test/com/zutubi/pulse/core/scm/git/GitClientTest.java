@@ -252,7 +252,7 @@ public class GitClientTest extends GitClientTestBase
     {
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
-        assertThat(handler.getStatusMessages(), hasItem(startsWith("Branch local set up")));
+        assertThat(handler.getStatusMessages(), anyOf(hasItem(startsWith("Branch local set up")), hasItem(startsWith("Switched to a new branch 'local'"))));
         assertThat(handler.getStatusMessages(), not(hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT))));
 
         handler.reset();
