@@ -82,10 +82,17 @@ public class ViewServerQueuesAction extends ActionSupport
                 for (ActivatedRequest activatedRequest: snapshot.getActivatedRequests())
                 {
                     BuildController controller = activatedRequest.getController();
-                    BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
-                    if (buildResult != null && !buildResult.completed())
+                    if (controller == null)
                     {
-                        executingBuilds.add(buildResult);
+                        buildQueue.add(activatedRequest.getRequest());
+                    }
+                    else
+                    {
+                        BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
+                        if (buildResult != null && !buildResult.completed())
+                        {
+                            executingBuilds.add(buildResult);
+                        }
                     }
                 }
             }
