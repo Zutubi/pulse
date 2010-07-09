@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
@@ -173,6 +174,26 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         assertActivated();
         assertQueued();
         verify(projectManager, times(1)).makeStateTransition(client.getId(), Transition.IDLE);
+    }
+
+    public void testRebuildOfProjectTreeAtFixedVersion()
+    {
+        Revision revision = new Revision(1111);
+        BuildRevision buildRevision = new BuildRevision(revision, true);
+        BuildRequestEvent request = createRebuildRequest(client);
+        request.setRevision(buildRevision);
+
+        controller.handleEvent(request);
+
+        assertQueuedCount(3);
+        assertActivatedCount(1);
+
+        List<QueuedRequest> queuedRequests = controller.getSnapshot().getQueuedRequests();
+        for (QueuedRequest queuedRequest : queuedRequests)
+        {
+            Revision queuedRevision = queuedRequest.getRequest().getRevision().getRevision();
+            assertEquals(revision, queuedRevision);
+        }
     }
 
     public void testRebuildOfProjectTreeHasFailure()
