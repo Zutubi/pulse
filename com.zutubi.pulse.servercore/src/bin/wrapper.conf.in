@@ -40,6 +40,9 @@ wrapper.app.parameter.7=stopservice
 
 wrapper.on_exit.111=RESTART
 
+wrapper.ping.interval=600
+wrapper.ping.timeout=0
+
 #wrapper.debug=true
 
 #********************************************************************
