@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
-import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 
 /**
  */
@@ -21,9 +20,5 @@ public class PerforceProgressPrintingFeedbackHandler extends PerforceErrorDetect
         {
             ui.status(line);
         }
-    }
-
-    public void checkCancelled() throws ScmCancelledException
-    {
     }
 }

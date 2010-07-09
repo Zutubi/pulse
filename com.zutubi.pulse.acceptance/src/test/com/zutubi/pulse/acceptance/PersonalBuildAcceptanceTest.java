@@ -46,6 +46,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "PersonalBuildAcceptanceTest-Project";
     private static final int BUILD_TIMEOUT = 90000;
+    private static final String DEFAULT_ANT_BUILD_FILE = "build.xml";
 
     private File workingCopyDir;
     private PersonalBuildRunner buildRunner;
@@ -80,7 +81,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, "build.xml");
+        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
 
         PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
@@ -132,7 +133,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
-            verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, "build.xml");
+            verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
         }
         finally
         {
@@ -165,7 +166,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, "build.xml");
+        verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
     }
 
     public void testPersonalBuildWithHooks() throws Exception
@@ -274,7 +275,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         runGit(null, "clone", gitUrl, workingCopyDir.getAbsolutePath());
         createConfigFile(random);
 
-        File buildFile = new File(workingCopyDir, "build.xml");
+        File buildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
         FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
                 "<project default=\"build\">\n" +
                 "  <target name=\"build\">\n" +
@@ -292,7 +293,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         
         PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals("0f267c3c48939fd51dacbbddcf15f530f82f1523", changesPage.getCheckedOutRevision());
-        assertEquals("build.xml", changesPage.getChangedFile(0));
+        assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
     }
 
     private void runGit(File working, String... args) throws IOException
@@ -314,19 +315,19 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     public void testPerforcePersonalBuild() throws Exception
     {
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(xmlRpcHelper), xmlRpcHelper.getAntConfig());
-        runPerforcePersonalBuild("build.xml", PerforceUtils.WORKSPACE_PREFIX + random, null);
+        runPerforcePersonalBuild(DEFAULT_ANT_BUILD_FILE, PerforceUtils.WORKSPACE_PREFIX + random, null);
     }
 
     public void testPerforcePersonalBuildRemappedFile() throws Exception
     {
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.MAPPED_VIEW), xmlRpcHelper.getAntConfig("mapped/build.xml"));
-        runPerforcePersonalBuild("build.xml", PerforceUtils.WORKSPACE_PREFIX + random, null);
+        runPerforcePersonalBuild(DEFAULT_ANT_BUILD_FILE, PerforceUtils.WORKSPACE_PREFIX + random, null);
     }
 
     public void testPerforcePersonalBuildComplexClientOnDeveloperSide() throws Exception
     {
         buildRunner.setBase(new File(workingCopyDir, "trunk"));
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.TRIVIAL_VIEW), xmlRpcHelper.getAntConfig("build.xml"));
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.TRIVIAL_VIEW), xmlRpcHelper.getAntConfig(DEFAULT_ANT_BUILD_FILE));
         String clientName = PerforceUtils.WORKSPACE_PREFIX + random;
         runPerforcePersonalBuild("trunk/build.xml", clientName, "//depot/triviant/trunk/... //" + clientName + "/trunk/...");
     }
@@ -343,7 +344,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             core.setEnv(ENV_CLIENT, PerforceUtils.WORKSPACE_PREFIX + random);
             core.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
-            File originalBuildFile = new File(workingCopyDir, "build.xml");
+            File originalBuildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
             File newBuildFile = new File(workingCopyDir, "newbuild.xml");
             FileSystemUtils.copy(newBuildFile, originalBuildFile);
 
@@ -406,7 +407,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("unified diffs will sink you");
 
         PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
-        assertEquals("build.xml", changesPage.getChangedFile(0));
+        assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
     }
 
     public void testPatchToVersionedPulseFile() throws Exception
@@ -456,7 +457,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void makeChangeToBuildFile() throws IOException
     {
-        makeChangeToBuildFile("build.xml");
+        makeChangeToBuildFile(DEFAULT_ANT_BUILD_FILE);
     }
 
     private void makeChangeToBuildFile(String path) throws IOException

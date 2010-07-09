@@ -329,10 +329,6 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
                 
                 writer.println(line);
             }
-
-            public void checkCancelled() throws ScmCancelledException
-            {
-            }
         }, null, getP4Command(COMMAND_DIFF), COMMAND_DIFF, FLAG_UNIFIED_DIFF, f.getAbsolutePath());
         writer.flush();
     }

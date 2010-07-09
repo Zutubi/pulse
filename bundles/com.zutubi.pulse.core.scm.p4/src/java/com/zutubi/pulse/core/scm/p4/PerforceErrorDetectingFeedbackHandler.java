@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
 /**
@@ -59,6 +60,10 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceF
         {
             throw new ScmException(prefix + " returned error '" + stderr.toString().trim() + "'");
         }
+    }
+
+    public void checkCancelled() throws ScmCancelledException
+    {
     }
 
     public StringBuffer getStderr()

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.util.HashMap;
@@ -190,10 +189,6 @@ public abstract class AbstractPerforceFStatFeedbackHandler extends PerforceError
         {
             handleCurrentItem();
         }
-    }
-
-    public void checkCancelled() throws ScmCancelledException
-    {
     }
 
     protected String getCurrentItemType()

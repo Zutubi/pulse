@@ -242,10 +242,6 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
             {
                 stdoutSeen[0] = true;
             }
-
-            public void checkCancelled() throws ScmCancelledException
-            {
-            }
         }, null, command.toArray(new String[command.size()]));
 
         return stdoutSeen[0];
@@ -651,10 +647,6 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                         }
                     }
                 }
-
-                public void checkCancelled() throws ScmCancelledException
-                {
-                }
             }, null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, workspace.getName(), COMMAND_CLIENT, FLAG_OUTPUT);
         }
         finally
@@ -808,22 +800,16 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
-            if (!addedFiles.isEmpty())
+            List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, addedFiles);
+            for (List<FileStatus> sublist: partitioned)
             {
-                List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, addedFiles);
-                for (List<FileStatus> sublist: partitioned)
-                {
-                    convertTargetPathsForAddedFiles(workspace, sublist);
-                }
+                convertTargetPathsForAddedFiles(workspace, sublist);
             }
 
-            if (!existingFiles.isEmpty())
+            partitioned = CollectionUtils.partition(FILE_LIMIT, existingFiles);
+            for (List<FileStatus> sublist: partitioned)
             {
-                List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, existingFiles);
-                for (List<FileStatus> sublist: partitioned)
-                {
-                    convertTargetPathsForExistingFiles(workspace, sublist);
-                }
+                convertTargetPathsForExistingFiles(workspace, sublist);
             }
         }
         finally
@@ -855,10 +841,6 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                             mappedPaths.put(parts[0], PerforceCore.stripClientPrefix(parts[1]));
                         }
                     }
-                }
-
-                public void checkCancelled() throws ScmCancelledException
-                {
                 }
             }, null, whereCommand.toArray(new String[whereCommand.size()]));
             

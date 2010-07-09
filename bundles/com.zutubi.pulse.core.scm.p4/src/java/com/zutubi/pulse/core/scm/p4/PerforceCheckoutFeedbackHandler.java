@@ -4,6 +4,9 @@ import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 
 /**
+ * Adapts between the API callback interface {@link com.zutubi.pulse.core.scm.api.ScmFeedbackHandler}
+ * and the Perforce implementation's own equivalent {@link PerforceFeedbackHandler}
+ * to report feedback during checkout/update operations.
  */
 public class PerforceCheckoutFeedbackHandler extends PerforceErrorDetectingFeedbackHandler
 {
@@ -33,7 +36,7 @@ public class PerforceCheckoutFeedbackHandler extends PerforceErrorDetectingFeedb
 
     public void checkCancelled() throws ScmCancelledException
     {
-        if(handler != null)
+        if (handler != null)
         {
             handler.checkCancelled();
         }

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
@@ -106,10 +105,6 @@ public class PerforceCore
                 super.handleExitCode(code);
                 result.stderr = getStderr();
                 result.exitCode = code;
-            }
-
-            public void checkCancelled() throws ScmCancelledException
-            {
             }
         }, input, commands);
 
@@ -330,10 +325,6 @@ public class PerforceCore
                 {
                     result[0] = new File(line.substring(ROOT_PREFIX.length()).trim());
                 }
-            }
-
-            public void checkCancelled() throws ScmCancelledException
-            {
             }
         }, null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_OUTPUT);
 
