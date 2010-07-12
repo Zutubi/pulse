@@ -448,17 +448,32 @@
 
         <action name="xls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <result name="success" type="flexjson">listing</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MakeDirectoryAction">
-            <result name="success" type="json">mkdir.xml</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RemoveDirectoryAction">
-            <result name="success" type="json">rmdir.xml</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="customiseBuildColumns" class="com.zutubi.pulse.master.xwork.actions.user.CustomiseBuildColumnsAction">
@@ -477,7 +492,7 @@
         </action>
 
         <action name="getLatestRevision" class="com.zutubi.pulse.master.xwork.actions.ajax.GetLatestRevisionAction">
-            <result name="success" type="json">revision.xml</result>
+            <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
@@ -595,7 +610,10 @@
         <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
-            <result name="error" type="json">/ajax/error.xml</result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="check" class="com.zutubi.pulse.master.tove.webwork.CheckAction">
@@ -694,7 +712,10 @@
         <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <param name="basePath">templates</param>
             <result name="success" type="flexjson">listing</result>
-            <result name="error" type="json">/ajax/error.xml</result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayTemplateAction">

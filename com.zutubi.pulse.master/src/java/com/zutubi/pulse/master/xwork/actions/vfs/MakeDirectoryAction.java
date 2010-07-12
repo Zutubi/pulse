@@ -50,7 +50,15 @@ public class MakeDirectoryAction extends VFSActionSupport
             return ERROR;
         }
 
-        newFolder.createFolder();
-        return SUCCESS;
+        try
+        {
+            newFolder.createFolder();
+            return SUCCESS;
+        }
+        catch (Exception e)
+        {
+            addActionError(e.getMessage());
+            return ERROR;
+        }
     }
 }

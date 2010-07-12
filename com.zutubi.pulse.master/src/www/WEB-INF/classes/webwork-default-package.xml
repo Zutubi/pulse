@@ -15,7 +15,6 @@
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
             <result-type name="velocity-xml" class="com.zutubi.pulse.master.webwork.dispatcher.VelocityXmlResult"/>
-            <result-type name="json" class="com.zutubi.pulse.master.webwork.dispatcher.JsonResult"/>
             <result-type name="flexjson" class="com.zutubi.pulse.master.webwork.dispatcher.FlexJsonResult"/>
             <result-type name="rss" class="com.zutubi.pulse.master.webwork.dispatcher.JITFeedResult"/>
             <result-type name="up" class="com.zutubi.pulse.master.xwork.results.UpResult"/>

@@ -14,38 +14,29 @@ import com.zutubi.util.TimeStamps;
  */
 public class GetLatestRevisionAction extends ProjectActionSupport
 {
-    private boolean successful = false;
-    private String latestRevision;
-    private String error;
     private ScmManager scmManager;
 
-    public boolean isSuccessful()
-    {
-        return successful;
-    }
+    private GetLatestRevisionActionResult result;
 
-    public String getLatestRevision()
+    public GetLatestRevisionActionResult getResult()
     {
-        return latestRevision;
-    }
-
-    public String getError()
-    {
-        return error;
+        return result;
     }
 
     public String execute()
     {
+        result = new GetLatestRevisionActionResult();
+
         final Project project = getProject();
         if(project == null)
         {
-            error = "Unknown project";
+            result.setError("Unknown project");
         }
         else
         {
             try
             {
-                latestRevision = withScmClient(project.getConfig(), scmManager, new ScmContextualAction<String>()
+                result.setLatestRevision(withScmClient(project.getConfig(), scmManager, new ScmContextualAction<String>()
                 {
                     public String process(ScmClient client, ScmContext context) throws ScmException
                     {
@@ -59,13 +50,13 @@ public class GetLatestRevisionAction extends ProjectActionSupport
                             return new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), getLocale())).getRevisionString();
                         }
                     }
-                });
+                }));
 
-                successful = true;
+                result.setSuccessful(true);
             }
             catch (Exception e)
             {
-                error = e.toString();
+                result.setError(e.toString());
             }
         }
         

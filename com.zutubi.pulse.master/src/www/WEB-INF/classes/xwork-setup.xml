@@ -105,7 +105,7 @@
         <action name="execute" class="com.zutubi.pulse.master.xwork.actions.migrate.ExecuteMigrateAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
-            <result name="cancel" type="redirect"></result>
+            <result name="cancel" type="redirect">/</result>
             <result name="success" type="velocity">complete.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -162,13 +162,25 @@
         </action>
         
         <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MakeDirectoryAction">
-            <result name="success" type="json">mkdir.xml</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RemoveDirectoryAction">
-            <result name="success" type="json">rmdir.xml</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
         <action name="requestLicense" class="com.zutubi.pulse.master.xwork.actions.ajax.RequestLicenseAction">
@@ -184,7 +196,10 @@
 
         <action name="xls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <result name="success" type="flexjson">listing</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
         </action>
 
     </package>
