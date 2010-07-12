@@ -192,9 +192,9 @@ def main(argv):
             global VERBOSE
             VERBOSE = True
         elif opt in ("-a", "--agents"):
-            numAgents = arg
+            numAgents = int(arg)
         elif opt in ("-p", "--projects"):
-            numProjects = arg
+            numProjects = int(arg)
         elif opt in ("--user"):
             user = arg
         elif opt in ("--pass"):
