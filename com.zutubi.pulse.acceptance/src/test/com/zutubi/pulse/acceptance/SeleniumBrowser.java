@@ -250,6 +250,7 @@ public class SeleniumBrowser
     {
         T page = createPage(pageType, extraArgs);
         page.open();
+        page.waitForPageToLoad();
         page.waitFor();
         return page;
     }

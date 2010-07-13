@@ -77,6 +77,11 @@ public abstract class SeleniumPage
         browser.waitForElement(toValidHtmlName(id));
     }
 
+    public void waitForPageToLoad()
+    {
+        browser.waitForPageToLoad();
+    }
+
     /**
      * Wait for the browser to reload, and for this page to be avaialble. 
      */
