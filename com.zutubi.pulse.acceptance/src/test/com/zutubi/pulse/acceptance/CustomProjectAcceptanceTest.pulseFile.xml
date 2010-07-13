@@ -97,7 +97,7 @@
      </dir-artifact>
  </executable>
 
- <executable name="copy" exe="/bin/sh">
+ <executable name="copy.tests" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>rm -rf /tmp/dniPlatformprofile /tmp/gps_test_log.trace /tmp/MyRouteDbTest.db /tmp/qloc* /tmp/hsperfdata_autobuild /tmp/share /tmp/TestSettings_save.xml /tmp/TestSettings.xml /tmp/test.tst /tmp/unzipOverwrite /tmp/workspace </arg>
@@ -109,7 +109,7 @@
  <executable name="mkdir" exe="/bin/mkdir" args="-p ${project.qe.dist}">
  </executable>
 
- <executable name="copy" exe="/bin/sh">
+ <executable name="copy.dist" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.qe.dist}</arg>
@@ -119,11 +119,11 @@
  <!-- START OF MAKE REPORT MACRO -->
 
  <macro name="reports">
- <executable name="make" exe="/usr/bin/make" args="reports" working-dir="${project.home}/build/${mode}">
+ <executable name="make.reports" exe="/usr/bin/make" args="reports" working-dir="${project.home}/build/${mode}">
  <process processor="${compile.pp}"/>
  </executable>
 
- <executable name="copy" exe="/bin/sh">
+ <executable name="copy.reports" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/reports ${project.home}/build/${mode}/dist/app-*</arg>
