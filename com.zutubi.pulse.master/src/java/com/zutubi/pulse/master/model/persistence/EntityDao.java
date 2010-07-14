@@ -17,6 +17,11 @@ public interface EntityDao<T extends Entity>
     T findById(long id);
 
     /**
+     * Force a flush of the current changes to the database.
+     */
+    void flush();
+
+    /**
      * Find all instances of the entity defined by the implementation of this type.
      * @return a list of entities.
      */

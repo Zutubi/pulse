@@ -23,6 +23,11 @@ public class InMemoryEntityDao<T extends Entity> implements EntityDao<T>
         entities.remove(entity);
     }
 
+    public void flush()
+    {
+
+    }
+
     public int deleteAll(Collection<T> toDelete)
     {
         int deleted = 0;
