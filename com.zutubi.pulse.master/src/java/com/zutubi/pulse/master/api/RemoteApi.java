@@ -3421,7 +3421,7 @@ public class RemoteApi
      * @param token          authentication token, see {@link #login(String, String)}
      * @param projectName    the name of the project to trigger
      * @param triggerOptions the set of options to be used to configure this build request
-     * @return true
+     * @return build request ids.
      */
     public Vector<String> triggerBuild(String token, String projectName, Hashtable<String, Object> triggerOptions)
     {

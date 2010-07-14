@@ -22,6 +22,7 @@ import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -806,9 +807,29 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // double the timeout to give pulse enough time to capture and upload the large file.
 
         int buildNumber = buildRunner.triggerBuild(projectA);
+
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), buildNumber, XmlRpcHelper.BUILD_TIMEOUT * 2);
         ResultState buildStatus = buildRunner.getBuildStatus(projectA, buildNumber);
         assertEquals(ResultState.SUCCESS, buildStatus);
+
+        // The completion of project A's build will trigger a build of project B.
+        // To sync, wait for the build queue to empty -> indicating project b's
+        // build has started, then wait for it to complete.
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    return xmlRpcHelper.getBuildQueueSnapshot().size() == 0;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, XmlRpcHelper.BUILD_TIMEOUT, " build queue to clear");
+
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, XmlRpcHelper.BUILD_TIMEOUT * 2);
     }
 
