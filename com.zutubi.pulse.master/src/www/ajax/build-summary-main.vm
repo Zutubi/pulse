@@ -20,13 +20,13 @@
                         <td class="content leftmost"><a href="$urls.stageDetails($buildResult, $node)">#html($node.stageName)</a></td>
                         <td class="content">#statusImage($recipeResult false) $recipeResult.state.prettyString</td>
                         <td class="content rightmost">
-        #if($result.stamps.hasEstimatedTimeRemaining())
-            #set($percentComplete = $result.stamps.estimatedPercentComplete)
+        #if($recipeResult.stamps.hasEstimatedTimeRemaining())
+            #set($percentComplete = $recipeResult.stamps.estimatedPercentComplete)
             #set($percentRemaining = 100 - $percentComplete)
                         
-                            #if($percentComplete > 0)<img class="centre" title="$result.stamps.prettyElapsed (${percentComplete}%) elapsed" src="$base/images/box-elapsed.gif" height="10" width="$percentComplete"/>#end#if($percentRemaining > 0)<img class="centre" title="$result.stamps.prettyEstimatedTimeRemaining (${percentRemaining}%) remaining" src="$base/images/box-remaining.gif" height="10" width="$percentRemaining"/>#end
+                            #if($percentComplete > 0)<img class="centre" title="$recipeResult.stamps.prettyElapsed (${percentComplete}%) elapsed" src="$base/images/box-elapsed.gif" height="10" width="$percentComplete"/>#end#if($percentRemaining > 0)<img class="centre" title="$recipeResult.stamps.prettyEstimatedTimeRemaining (${percentRemaining}%) remaining" src="$base/images/box-remaining.gif" height="10" width="$percentRemaining"/>#end
         #else
-                            $result.stamps.prettyElapsed
+                            $recipeResult.stamps.prettyElapsed
                         </td>
         #end
                     </tr>
