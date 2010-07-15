@@ -4,8 +4,6 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
-import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.util.Condition;
 
 /**
  * Form for configuration of ant commands.

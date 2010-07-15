@@ -31,6 +31,7 @@ public class LoginPage extends SeleniumPage
     public WelcomePage login(String username, String password)
     {
         LoginForm form = browser.createForm(LoginForm.class);
+        form.waitFor();
         form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password));
         try
         {

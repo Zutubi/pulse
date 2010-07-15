@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.CollectionUtils;
@@ -24,7 +23,6 @@ public abstract class SeleniumForm
     public static final int ITEM_PICKER     = 9;
 
     protected SeleniumBrowser browser;
-    protected Selenium selenium;
     protected boolean inherited = false;
     protected boolean ajax = true;
 

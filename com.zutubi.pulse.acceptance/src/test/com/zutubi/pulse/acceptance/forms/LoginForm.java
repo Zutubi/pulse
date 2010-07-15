@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
