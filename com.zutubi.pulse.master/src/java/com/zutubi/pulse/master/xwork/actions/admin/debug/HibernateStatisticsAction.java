@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.admin.debug;
 
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.EntityStatistics;
@@ -90,7 +89,13 @@ public class HibernateStatisticsAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        loadStatistics();
+        stats = sessionFactory.getStatistics();
+        on = stats.isStatisticsEnabled();
+
+        if (on)
+        {
+            loadStatistics();
+        }
 
         return SUCCESS;
     }
@@ -105,31 +110,25 @@ public class HibernateStatisticsAction extends ActionSupport
 
     private void loadStatistics()
     {
-        stats = sessionFactory.getStatistics();
-        on = stats.isStatisticsEnabled();
-
-        if (on)
+        for (String region : stats.getSecondLevelCacheRegionNames())
         {
-            for (String region : stats.getSecondLevelCacheRegionNames())
-            {
-                SecondLevelCacheStatistics regionStats = stats.getSecondLevelCacheStatistics(region);
-                secondLevelCacheSize += regionStats.getSizeInMemory();
-                secondLevelCacheStats.put(region, regionStats);
-            }
-
-            for(String query: stats.getQueries())
-            {
-                queryStats.put(query, stats.getQueryStatistics(query));
-            }
-
-            for (String entity : stats.getEntityNames())
-            {
-                entityStats.put(entity, stats.getEntityStatistics(entity));
-            }
-
-            entityNames.addAll(entityStats.keySet());
-            Collections.sort(entityNames, new Sort.StringComparator());
+            SecondLevelCacheStatistics regionStats = stats.getSecondLevelCacheStatistics(region);
+            secondLevelCacheSize += regionStats.getSizeInMemory();
+            secondLevelCacheStats.put(region, regionStats);
         }
+
+        for(String query: stats.getQueries())
+        {
+            queryStats.put(query, stats.getQueryStatistics(query));
+        }
+
+        for (String entity : stats.getEntityNames())
+        {
+            entityStats.put(entity, stats.getEntityStatistics(entity));
+        }
+
+        entityNames.addAll(entityStats.keySet());
+        Collections.sort(entityNames, new Sort.StringComparator());
     }
 
     public void setSessionFactory(SessionFactory sessionFactory)

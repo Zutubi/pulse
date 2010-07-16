@@ -2,6 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
     <class name="com.zutubi.pulse.core.model.PersistentChangelist" table="BUILD_CHANGELIST" lazy="false">
+        <cache usage="read-write"/>
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -23,6 +24,7 @@
         </property>
 
         <list name="changes" cascade="all,delete-orphan" lazy="true">
+            <cache usage="read-write"/>
             <key column="CHANGELIST_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.core.model.PersistentFileChange"/>

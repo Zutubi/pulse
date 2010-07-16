@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-
     <class name="com.zutubi.pulse.core.model.CommandResult" table="COMMAND_RESULT" lazy="false">
-
+        <cache usage="read-write"/>
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -22,6 +21,7 @@
         <property name="outputDir" type="string" length="1023"/>
 
         <bag name="features" cascade="all,delete-orphan" lazy="true">
+            <cache usage="read-write"/>
             <key column="COMMAND_RESULT_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.PersistentFeature"/>
         </bag>
@@ -37,6 +37,7 @@
         <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" length="4095"/>
 
         <list name="artifacts" cascade="all,delete-orphan" lazy="true">
+            <cache usage="read-write"/>
             <key column="COMMAND_RESULT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.core.model.StoredArtifact"/>

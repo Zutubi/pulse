@@ -15,6 +15,7 @@
         <property name="lastAccessTime" column="LAST_ACCESS_TIME" type="long"/>
 
         <set name="browseViewCollapsed" table="USER_BROWSE_VIEW_COLLAPSED" lazy="true">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <composite-element class="com.zutubi.pulse.master.model.LabelProjectTuple">
                 <property name="label" type="string" column="LABEL" length="255" not-null="true"/>
@@ -23,6 +24,7 @@
         </set>
 
         <set name="dashboardCollapsed" table="USER_DASHBOARD_COLLAPSED" lazy="true">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <composite-element class="com.zutubi.pulse.master.model.LabelProjectTuple">
                 <property name="label" type="string" column="LABEL" length="255" not-null="true"/>
