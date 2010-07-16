@@ -1081,6 +1081,26 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(results.get(5), buildResults.get(1));
     }
 
+    public void testFindByLatestBuild()
+    {
+        Project project = new Project();
+        projectDao.save(project);
+
+        List<BuildResult> results = save(createCompletedBuild(project, 1),
+                createCompletedBuild(project, 2),
+                createFailedBuild(project, 3),
+                createCompletedBuild(project, 4));
+
+        BuildResult buildResult = buildResultDao.findByLatestBuild(results.get(0).getId());
+        assertEquals(results.get(3), buildResult);
+
+        buildResult = buildResultDao.findByLatestBuild(results.get(0).getId(), ResultState.SUCCESS);
+        assertEquals(results.get(3), buildResult);
+
+        buildResult = buildResultDao.findByLatestBuild(results.get(0).getId(), ResultState.FAILURE);
+        assertEquals(results.get(2), buildResult);
+    }
+
     private List<BuildResult> save(BuildResult... results)
     {
         for (BuildResult result: results)

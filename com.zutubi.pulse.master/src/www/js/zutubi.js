@@ -3353,7 +3353,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'next-successful',
-                image: 'health/ok.gif',
+                image: this.getImage(this.nextSuccessful),
                 title: 'next successful (build ' + this.nextSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextSuccessful)
             });
@@ -3362,7 +3362,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'next-broken',
-                image: 'health/broken.gif',
+                image: this.getImage(this.nextBroken),
                 title: 'next broken (build ' + this.nextBroken.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextBroken)
             });
@@ -3371,7 +3371,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'previous-successful',
-                image: 'health/ok.gif',
+                image: this.getImage(this.previousSuccessful),
                 title: 'previous successful (build ' + this.previousSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousSuccessful)
             });
@@ -3380,12 +3380,39 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'previous-broken',
-                image: 'health/broken.gif',
+                image: this.getImage(this.previousBroken),
                 title: 'previous broken (build ' + this.previousBroken.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousBroken)
             });
         }
+
+        if (this.latest)
+        {
+            items.push({
+                id: 'latest',
+                image: this.getImage(this.latest),
+                title: 'latest (build ' + this.latest.number + ')',
+                url: this.getUrl(this.personalBuild, this.latest)
+            });
+        }
+
         return items;
+    },
+
+    getImage: function(build)
+    {
+        if (build.status == 'success')
+        {
+            return 'health/ok.gif';    
+        }
+        else if (build.status == 'failure')
+        {
+            return 'health/broken.gif';
+        }
+        else
+        {
+            return 'health/unknown.gif';
+        }
     },
 
     getUrl: function(isPersonalBuild, build)

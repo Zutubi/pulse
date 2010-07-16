@@ -594,6 +594,26 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public BuildResult findByLatestBuild(final long buildId, final ResultState... states)
+    {
+        final BuildResult result = findById(buildId);
+        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, result.isPersonal());
+                if (result.isPersonal())
+                {
+                    criteria.add(Expression.eq("user", result.getUser()));
+                }
+                criteria.addOrder(Order.desc("id"));
+                criteria.setMaxResults(1);
+                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+                return criteria.uniqueResult();
+            }
+        });
+    }
+
     public static void initialise(final BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
