@@ -18,7 +18,7 @@ public class FileSystemRecordStoreInterfaceTest extends AbstractRecordStoreInter
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.rmdir(persistentDirectory));
+        removeDirectory(persistentDirectory);
         super.tearDown();
     }
 

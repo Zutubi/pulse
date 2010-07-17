@@ -81,7 +81,7 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
         super.tearDown();
     }
 

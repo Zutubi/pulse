@@ -26,7 +26,7 @@ import java.util.logging.LogRecord;
 
 public abstract class PersistenceTestCase extends PulseTestCase
 {
-    protected ApplicationContext context = null;
+    protected ApplicationContext context;
 
     private PlatformTransactionManager transactionManager;
     private TransactionStatus transactionStatus;

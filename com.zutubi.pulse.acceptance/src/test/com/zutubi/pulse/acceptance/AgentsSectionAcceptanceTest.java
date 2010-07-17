@@ -58,7 +58,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
 
         removeNonMasterAgents();
         xmlRpcHelper.logout();

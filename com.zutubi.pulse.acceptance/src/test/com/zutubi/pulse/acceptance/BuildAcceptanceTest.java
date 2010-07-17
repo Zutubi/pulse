@@ -673,7 +673,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
     
@@ -1347,7 +1347,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 

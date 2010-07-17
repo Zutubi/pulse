@@ -287,7 +287,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 
@@ -303,7 +303,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 
@@ -323,7 +323,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 
@@ -343,7 +343,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 
@@ -371,7 +371,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 
@@ -397,7 +397,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 
@@ -447,7 +447,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
     

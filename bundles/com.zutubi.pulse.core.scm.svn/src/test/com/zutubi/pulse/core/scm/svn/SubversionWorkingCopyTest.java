@@ -129,16 +129,8 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         ProcessControl.destroyProcess(svnProcess);
         svnProcess.waitFor();
-        int retries = 0;
-        while (!FileSystemUtils.rmdir(tempDir))
-        {
-            if (retries++ > 5)
-            {
-                throw new RuntimeException("Can't ramve temp directory '" + tempDir.getAbsolutePath() + "'");
-            }
-
-            Thread.sleep(100);
-        }
+        removeDirectory(tempDir);
+        super.tearDown();
     }
 
     public void testMatchesLocationMatches() throws ScmException

@@ -42,11 +42,7 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.rmdir(workingDir));
-        tmp = null;
-        workingDir = null;
-        persistentWorkingDir = null;
-        context = null;
+        removeDirectory(workingDir);
 
         super.tearDown();
     }

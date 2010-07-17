@@ -66,7 +66,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
-        FileSystemUtils.rmdir(workingCopyDir);
+        removeDirectory(workingCopyDir);
 
         super.tearDown();
     }
@@ -271,7 +271,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(gitUrl), xmlRpcHelper.getAntConfig());
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
-        FileSystemUtils.rmdir(workingCopyDir);
+        removeDirectory(workingCopyDir);
         runGit(null, "clone", gitUrl, workingCopyDir.getAbsolutePath());
         createConfigFile(random);
 

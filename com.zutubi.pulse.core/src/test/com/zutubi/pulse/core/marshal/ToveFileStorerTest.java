@@ -433,7 +433,7 @@ public class ToveFileStorerTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 

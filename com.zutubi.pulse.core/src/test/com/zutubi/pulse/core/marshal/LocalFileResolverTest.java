@@ -28,8 +28,8 @@ public class LocalFileResolverTest extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
+        removeDirectory(tempDir);
         super.tearDown();
-        FileSystemUtils.rmdir(tempDir);
     }
 
     public void testSimple() throws Exception

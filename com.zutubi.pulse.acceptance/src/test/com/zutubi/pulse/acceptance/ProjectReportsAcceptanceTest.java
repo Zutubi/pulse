@@ -61,7 +61,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
         super.tearDown();
     }
 

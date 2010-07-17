@@ -62,7 +62,7 @@ public class FileArtifactTest extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
     }
 
     public void testRelativePath() throws IOException

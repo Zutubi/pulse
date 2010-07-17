@@ -63,7 +63,7 @@ public class PatchArchiveTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
         super.tearDown();
     }
 
