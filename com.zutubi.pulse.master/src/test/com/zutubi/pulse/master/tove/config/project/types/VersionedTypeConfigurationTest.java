@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import org.hibernate.lob.ReaderInputStream;
+import org.hibernate.engine.jdbc.ReaderInputStream;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 

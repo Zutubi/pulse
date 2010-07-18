@@ -38,9 +38,9 @@
         
         <dependency org="displaytag" name="displaytag" rev="1.0" conf="external,build,release->default"/>
 
-        <dependency org="ehcache" name="ehcache" rev="1.1" conf="external,build,release->default"/>
-
-        <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external,build,release->default"/>
+        <dependency org="ehcache" name="ehcache" rev="1.5.0" conf="external,build,release->default"/>
+        <dependency org="slf4j" name="slf4j" rev="1.5.8" conf="external,build,release->jdk14"/>
+        <dependency org="hibernate" name="hibernate" rev="3.5.3" conf="external,build,release->default"/>
 
         <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default"/>
 

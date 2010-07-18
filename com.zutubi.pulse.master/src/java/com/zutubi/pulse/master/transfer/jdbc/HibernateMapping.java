@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.transfer.jdbc;
 
 import org.hibernate.MappingException;
+import org.hibernate.id.factory.DefaultIdentifierGeneratorFactory;
+import org.hibernate.id.factory.IdentifierGeneratorFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.PersistentClass;
@@ -14,6 +16,7 @@ import org.hibernate.type.Type;
 public class HibernateMapping implements Mapping
 {
     private final Configuration configuration;
+    private IdentifierGeneratorFactory identifierGeneratorFactory = new DefaultIdentifierGeneratorFactory();
 
     public HibernateMapping(Configuration configuration)
     {
@@ -57,5 +60,10 @@ public class HibernateMapping implements Mapping
             );
         }
         return prop.getType();
+    }
+
+    public IdentifierGeneratorFactory getIdentifierGeneratorFactory()
+    {
+        return identifierGeneratorFactory;
     }
 }

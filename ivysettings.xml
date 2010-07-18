@@ -16,14 +16,6 @@
             <artifact pattern="${ivy.settings.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
         </filesystem>
 
-        <!-- It would be nice while testing to be able to switch resolvers at
-             runtime (via -D option)
-        <filesystem name="local" local="true" checkmodified="true" changingPattern="*">
-            <ivy pattern="c:/projects/repository/[organisation]/[module]/ivy-[revision].xml"/>
-            <artifact pattern="c:/projects/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
-        </filesystem>
-        -->
-
         <svn name="private" repositoryRoot="svn+ssh://zutubi.com/svnroot" binaryDiff="false"
              userName="${svn.user.name}" userPassword="${svn.user.password}">
             <ivy pattern="repository/[organisation]/[module]/ivy-[revision].xml"/>

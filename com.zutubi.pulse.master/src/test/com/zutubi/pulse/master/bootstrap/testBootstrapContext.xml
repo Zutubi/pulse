@@ -12,6 +12,13 @@
                 <prop key="jdbc.username">sa</prop>
                 <prop key="jdbc.password"></prop>
                 <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+
+                <!-- Enable the second-level cache -->
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+                <prop key="hibernate.cache.use_structured_entries">true</prop>
+                <prop key="hibernate.cache.use_query_cache">false</prop>
+
             </props>
         </constructor-arg>
     </bean>

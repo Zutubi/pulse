@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.Collection;
 
@@ -16,17 +16,17 @@ public class HibernateBuildResultExpressions
 {
     public static Criterion projectEq(Project project)
     {
-        return Expression.eq("project", project);
+        return Restrictions.eq("project", project);
     }
 
     public static Criterion projectEq(long projectId)
     {
-        return Expression.eq("project.id", projectId);
+        return Restrictions.eq("project.id", projectId);
     }
 
     public static Criterion projectIn(Collection<Project> projects)
     {
-        return Expression.in("project", projects);
+        return Restrictions.in("project", projects);
     }
 
     public static Criterion statesIn(ResultState... states)
@@ -36,7 +36,7 @@ public class HibernateBuildResultExpressions
         {
             stateNames[i] = states[i].toString();
         }
-        return Expression.in("stateName", stateNames);
+        return Restrictions.in("stateName", stateNames);
     }
 
     public static Criterion buildResultCompleted()
@@ -46,22 +46,22 @@ public class HibernateBuildResultExpressions
 
     public static Criterion startsAfter(long timestamp)
     {
-        return Expression.ge("stamps.startTime", timestamp);
+        return Restrictions.ge("stamps.startTime", timestamp);
     }
 
     public static Criterion startsBefore(long timestamp)
     {
-        return Expression.le("stamps.startTime", timestamp);
+        return Restrictions.le("stamps.startTime", timestamp);
     }
 
     public static Criterion hasWorkDirectory(boolean b)
     {
-        return Expression.eq("hasWorkDir", b);
+        return Restrictions.eq("hasWorkDir", b);
     }
 
     public static Criterion isPersonalBuild(boolean b)
     {
-        return (b) ? Expression.isNotNull("user") : Expression.isNull("user");
+        return (b) ? Restrictions.isNotNull("user") : Restrictions.isNull("user");
     }
 
     public static Order orderByDescEndDate()

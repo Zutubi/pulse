@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Pulse" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:zutubi="antlib:com.zutubi.ant">
+
+    <!--
+When testing new dependencies, it is easier to run them from a local repository first rather than uploading
+them to zutubi.com/ivy .  So support this, use -Divy.settings.file=ivysettings.local.xml
+
+For example:
+    ant clean build.all -Dskip.tests=true -Divy.settings.file=ivysettings.local.xml
+      -->
+    <property name="ivy.settings.file" value="ivysettings.xml"/>
+
     <!-- Import general purpose macros. -->
     <import file="macros.xml"/>
 
@@ -42,6 +52,7 @@
         <taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
 
         <load-ivy-taskdef/>
+        <ivy:settings file="${ivy.settings.file}"/>
 
     </target>
 

@@ -26,7 +26,7 @@ public class ReadOnlyInterceptor implements Interceptor
     public String intercept(ActionInvocation invocation) throws Exception
     {
         Session session = SessionFactoryUtils.getSession(sessionFactory, false);
-        session.setFlushMode(FlushMode.NEVER);
+        session.setFlushMode(FlushMode.MANUAL);
         return invocation.invoke();
     }
 

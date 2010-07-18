@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivysettings>
+    <settings defaultResolver="local"/>
+
+    <resolvers>
+        <filesystem name="build" local="true" checkmodified="true" changingPattern="*">
+            <ivy pattern="${ivy.settings.dir}/build/repository/[module]/ivy-[revision].xml"/>
+            <artifact pattern="${ivy.settings.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
+        </filesystem>
+
+        <filesystem name="local" local="true" checkmodified="true" changingPattern="*">
+            <ivy pattern="/home/daniel/projects/repository/[organisation]/[module]/ivy-[revision].xml"/>
+            <artifact pattern="/home/daniel/projects/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+        </filesystem>
+
+    </resolvers>
+
+    <modules>
+        <!-- We know where all of our own packages are located, no point searching through the others. -->
+        <module organisation="zutubi" name="com.zutubi.*" resolver="build"/>
+    </modules>
+</ivysettings>

@@ -128,7 +128,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
 
     public int getSize(final PersistentChangelist changelist)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
@@ -137,7 +137,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();
             }
-        });
+        }));
     }
 
     public List<PersistentFileChange> getFiles(final PersistentChangelist changelist, final int offset, final int max)

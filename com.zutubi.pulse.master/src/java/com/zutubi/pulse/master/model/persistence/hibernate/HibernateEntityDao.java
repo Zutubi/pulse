@@ -74,7 +74,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public int count()
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -83,7 +83,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                 SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
                 return criteria.uniqueResult();
             }
-        });
+        }));
     }
 
     public Object findFirstByNamedQuery(final String queryName)
@@ -221,6 +221,22 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                 return queryObject.uniqueResult();
             }
         });
+    }
+
+    /**
+     * Temporary method used to shrink long values to integers.  If the long value is
+     * greater than the maximum integer value, Integer.MAX_VALUE is returned.
+     *
+     * @param l     the long value being 'squeezed' into an int field.
+     * @return the integer equivalent of the long value, or Integer.MAX_VALUE
+     */
+    protected int toInt(long l)
+    {
+        if (l > Integer.MAX_VALUE)
+        {
+            return Integer.MAX_VALUE;
+        }
+        return (int)l;
     }
 
     public abstract Class persistentClass();
