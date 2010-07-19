@@ -42,7 +42,7 @@
         <dependency org="slf4j" name="slf4j" rev="1.5.8" conf="external,build,release->jdk14"/>
         <dependency org="hibernate" name="hibernate" rev="3.5.3" conf="external,build,release->default"/>
 
-        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default"/>
+        <dependency org="hsqldb" name="hsqldb" rev="2.0" conf="external,build,release->default"/>
 
         <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default"/>
 

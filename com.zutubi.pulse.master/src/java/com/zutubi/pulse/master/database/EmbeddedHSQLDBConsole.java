@@ -42,8 +42,8 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole
     {
         try
         {
-            JDBCUtils.execute(dataSource, "SET PROPERTY \"hsqldb.default_table_type\" 'cached'");
-            JDBCUtils.execute(dataSource, "SET PROPERTY \"hsqldb.cache_file_scale\" 8");
+            JDBCUtils.execute(dataSource, "SET DATABASE DEFAULT TABLE TYPE CACHED");
+            JDBCUtils.execute(dataSource, "SET FILES SCALE 8");
         }
         catch (SQLException e)
         {
