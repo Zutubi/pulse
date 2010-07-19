@@ -14,6 +14,8 @@ For example:
     <import file="macros.xml"/>
 
     <property file="build.properties"/>
+    <property file="local.properties"/>
+    
     <property environment="env"/>
 
     <condition property="on.windows">
@@ -625,7 +627,7 @@ For example:
         </antcall>
     </target>
 
-    <target name="build.idea.modules" depends="build.all"
+    <target name="build.idea.modules" depends="buildlist"
             description="Adds modules to an IDEA project file (pulse.ipr) for all Pulse modules and plugins.">
 
         <!-- copy the template idea project files into the project directory if they dont already exist. -->
@@ -653,7 +655,7 @@ For example:
             </then>
         </if>
 
-        <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
+        <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties" sourceRepository="${source.repository}">
             <fileset dir="${project.root.dir}/">
                 <include name="*/ivy.xml"/>
                 <include name="bundles/*/ivy.xml"/>
