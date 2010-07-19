@@ -174,7 +174,6 @@ public class DatabaseConfig
         // Enable second level caching, required since by default it is disabled.
         hibernateProperties.put("hibernate.cache.use_second_level_cache", "true");
         hibernateProperties.put("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
-        hibernateProperties.put("hibernate.cache.use_structured_entries", "true"); // store the second-level cache entries in a more human-friendly format
         hibernateProperties.put("hibernate.cache.use_query_cache", "false"); // enable/disable the query cache
 
         for (Object o : properties.keySet())
