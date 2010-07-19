@@ -71,7 +71,6 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        sessionFactory.close();
         try
         {
             transactionManager.commit(transactionStatus);
@@ -81,6 +80,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
             // catch the exception and continue.
             e.printStackTrace();
         }
+        sessionFactory.close();
 
         console.stop(false);
         SpringComponentContext.closeAll();
