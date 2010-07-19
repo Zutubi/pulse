@@ -141,7 +141,7 @@ public interface ProjectManager extends EntityManager<Project>
     long triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
-    long getNextBuildNumber(Project project, boolean allocate);
+    long updateAndGetNextBuildNumber(Project project, boolean allocate);
 
     // These are secured as they use mapConfigsToProjects underneath
     Collection<ProjectGroup> getAllProjectGroups();

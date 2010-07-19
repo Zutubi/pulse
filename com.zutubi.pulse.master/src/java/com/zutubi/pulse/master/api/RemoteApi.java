@@ -2082,7 +2082,7 @@ public class RemoteApi
         try
         {
             Project project = internalGetProject(projectName, true);
-            return (int) projectManager.getNextBuildNumber(project, false);
+            return (int) projectManager.updateAndGetNextBuildNumber(project, false);
         }
         finally
         {

@@ -127,7 +127,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong());
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong(), anyLong());
     
-        stub(projectManager.getNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
+        stub(projectManager.updateAndGetNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
 
         buildControllerFactory = mock(BuildControllerFactory.class);
         stub(buildControllerFactory.create((BuildRequestEvent)anyObject())).toAnswer(new Answer()
