@@ -46,7 +46,7 @@
 
         <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default"/>
 
-        <dependency org="opensymphony" name="quartz" rev="20060404" conf="external,build,release->default"/>
+        <dependency org="quartz" name="quartz" rev="1.8.3" conf="external,build,release->default"/>
         <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default"/>
         <dependency org="opensymphony" name="webwork" rev="2.2.6" conf="external,build,release->default"/>
 

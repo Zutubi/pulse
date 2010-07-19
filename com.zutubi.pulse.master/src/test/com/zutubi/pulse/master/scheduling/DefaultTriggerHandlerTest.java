@@ -41,8 +41,6 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         executor.shutdown();
-        handler = null;
-        triggerDao = null;
 
         super.tearDown();
     }
