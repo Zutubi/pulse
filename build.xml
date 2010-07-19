@@ -14,7 +14,6 @@ For example:
     <import file="macros.xml"/>
 
     <property file="build.properties"/>
-    <property file="local.properties"/>
     
     <property environment="env"/>
 
@@ -655,7 +654,7 @@ For example:
             </then>
         </if>
 
-        <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties" sourceRepository="${source.repository}">
+        <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
                 <include name="*/ivy.xml"/>
                 <include name="bundles/*/ivy.xml"/>
