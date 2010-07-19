@@ -6,7 +6,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
-import org.hsqldb.types.Types;
+import org.hsqldb.Types;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
