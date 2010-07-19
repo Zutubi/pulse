@@ -147,7 +147,7 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        number = userManager.getNextBuildNumber(user);
+        number = userManager.updateAndGetNextBuildNumber(user);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File patchDir = paths.getUserPatchDir(user.getId());
         if(!patchDir.isDirectory())
