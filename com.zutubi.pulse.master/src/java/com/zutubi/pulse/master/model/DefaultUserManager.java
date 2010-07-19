@@ -207,7 +207,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         licenseManager.refreshAuthorisations();
     }
 
-    public long getNextBuildNumber(User user)
+    public long updateAndGetNextBuildNumber(User user)
     {
         user = getUser(user.getId());
         long number = user.getNextBuildNumber();

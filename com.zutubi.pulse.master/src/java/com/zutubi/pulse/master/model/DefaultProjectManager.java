@@ -1196,7 +1196,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
  	 	return request.getId();
  	}
 
-    public long getNextBuildNumber(Project project, boolean allocate)
+    public long updateAndGetNextBuildNumber(Project project, boolean allocate)
     {
         Project idLeader = project;
         ProjectConfiguration idLeaderConfig = project.getConfig().getOptions().getIdLeader();

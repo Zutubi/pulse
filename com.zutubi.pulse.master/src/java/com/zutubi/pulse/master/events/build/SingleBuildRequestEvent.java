@@ -40,7 +40,7 @@ public class SingleBuildRequestEvent extends BuildRequestEvent
     public BuildResult createResult(ProjectManager projectManager, BuildManager buildManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false); // can we use the 'owner' project instance instead of loading here?
-        BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project, true), getRevision().isUser());
+        BuildResult result = new BuildResult(options.getReason(), project, projectManager.updateAndGetNextBuildNumber(project, true), getRevision().isUser());
         result.setStatus(getStatus());
         result.setMetaBuildId(getMetaBuildId());
 

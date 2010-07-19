@@ -70,7 +70,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     
     void setPassword(UserConfiguration user, String rawPassword);
 
-    long getNextBuildNumber(User user);
+    long updateAndGetNextBuildNumber(User user);
 
     UserGroupConfiguration getGroupConfig(String name);
 
