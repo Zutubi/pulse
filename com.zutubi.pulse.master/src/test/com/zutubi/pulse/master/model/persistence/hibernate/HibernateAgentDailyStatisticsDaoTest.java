@@ -2,12 +2,13 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 public class HibernateAgentDailyStatisticsDaoTest extends MasterPersistenceTestCase
 {
@@ -58,7 +59,7 @@ public class HibernateAgentDailyStatisticsDaoTest extends MasterPersistenceTestC
         assertThat(found, hasItem(agent2));
     }
     
-    public void testFindByAgentIdAndDay()
+    public void testSafeFindByAgentIdAndDay()
     {
         final long AGENT_ID = 22;
         final long OTHER_AGENT_ID = 23;
@@ -75,10 +76,25 @@ public class HibernateAgentDailyStatisticsDaoTest extends MasterPersistenceTestC
         agentDailyStatisticsDao.save(otherAgentAndDay);
         agentDailyStatisticsDao.save(otherAgentAndOtherDay);
         
-        AgentDailyStatistics found = agentDailyStatisticsDao.findByAgentAndDay(AGENT_ID, DAY_STAMP);
+        AgentDailyStatistics found = agentDailyStatisticsDao.safeFindByAgentAndDay(AGENT_ID, DAY_STAMP);
         assertEquals(agentAndDay, found);
     }
 
+    public void testSafeFindByAgentIdAndDayMultipleHits()
+    {
+        final long AGENT_ID = 22;
+        final long DAY_STAMP = 12345;
+
+        AgentDailyStatistics agentAndDay = new AgentDailyStatistics(AGENT_ID, DAY_STAMP);
+        AgentDailyStatistics sameAgentAndDay = new AgentDailyStatistics(AGENT_ID, DAY_STAMP);
+
+        agentDailyStatisticsDao.save(agentAndDay);
+        agentDailyStatisticsDao.save(sameAgentAndDay);
+        
+        AgentDailyStatistics found = agentDailyStatisticsDao.safeFindByAgentAndDay(AGENT_ID, DAY_STAMP);
+        assertNull(found);
+    }
+    
     public void testDeleteByDayStampBefore()
     {
         final long DAY_STAMP = 21345;

@@ -19,14 +19,17 @@ public interface AgentDailyStatisticsDao extends EntityDao<AgentDailyStatistics>
     List<AgentDailyStatistics> findByAgent(long agentId);
 
     /**
-     * Finds the statistics for the given agent on the given day.
+     * Finds the statistics for the given agent on the given day.  May reset
+     * the statistics for the agent/day combination if multiple entries are
+     * found to match.
      *
      * @param agentId  id of the agent to get the statistics for
      * @param dayStamp stamp of the day (millisecond time for midnight that
      *                 starts the day)
-     * @return the statistics for the given agent on the given day
+     * @return the statistics for the given agent on the given day, or null if
+     *         there are no such statistics yet
      */
-    AgentDailyStatistics findByAgentAndDay(long agentId, long dayStamp);
+    AgentDailyStatistics safeFindByAgentAndDay(long agentId, long dayStamp);
 
     /**
      * Deletes all statistics for days before the given day stamp.

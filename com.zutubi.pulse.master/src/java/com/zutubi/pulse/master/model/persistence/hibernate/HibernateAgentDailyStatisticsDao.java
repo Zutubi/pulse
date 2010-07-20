@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -17,11 +18,14 @@ import java.util.Set;
  */
 public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDailyStatistics> implements AgentDailyStatisticsDao
 {
+    private static final Logger LOG = Logger.getLogger(HibernateAgentDailyStatisticsDao.class);
+    
     public Class persistentClass()
     {
         return AgentDailyStatistics.class;
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<AgentDailyStatistics> findByAgent(final long agentId)
     {
         return (List<AgentDailyStatistics>) getHibernateTemplate().execute(new HibernateCallback()
@@ -36,9 +40,10 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
         });
     }
 
-    public AgentDailyStatistics findByAgentAndDay(final long agentId, final long dayStamp)
+    public AgentDailyStatistics safeFindByAgentAndDay(final long agentId, final long dayStamp)
     {
-        return (AgentDailyStatistics) getHibernateTemplate().execute(new HibernateCallback()
+        @SuppressWarnings({"unchecked"})
+        List<AgentDailyStatistics> results = (List<AgentDailyStatistics>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -46,9 +51,28 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
                 queryObject.setLong("agentId", agentId);
                 queryObject.setLong("dayStamp", dayStamp);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.uniqueResult();
+                return queryObject.list();
             }
         });
+        
+        if (results.size() == 0)
+        {
+            return null;
+        }
+        else if (results.size() == 1)
+        {
+            return results.get(0);
+        }
+        else
+        {
+            LOG.warning("Expected unique result for agent id '" + agentId + "' and day '" + dayStamp + "', but got " + results.size() + " results.  Resetting statistics for this day.");
+            for (AgentDailyStatistics stats: results)
+            {
+                delete(stats);
+            }
+            
+            return null;
+        }
     }
 
     public int deleteByDayStampBefore(final long dayStamp)

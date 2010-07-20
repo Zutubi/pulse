@@ -21,7 +21,7 @@ public class TestAgentStatisticsDao extends InMemoryEntityDao<AgentDailyStatisti
         });
     }
 
-    public AgentDailyStatistics findByAgentAndDay(final long agentId, final long dayStamp)
+    public AgentDailyStatistics safeFindByAgentAndDay(final long agentId, final long dayStamp)
     {
         return findUniqueByPredicate(new Predicate<AgentDailyStatistics>()
         {
