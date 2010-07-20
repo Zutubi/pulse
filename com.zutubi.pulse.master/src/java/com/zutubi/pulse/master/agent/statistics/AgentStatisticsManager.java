@@ -63,14 +63,22 @@ public class AgentStatisticsManager implements EventListener
 
     public synchronized void update()
     {
-        long timeNow = clock.getCurrentTimeMillis();
-        if (timeNow > tomorrowStamp)
+        try
         {
-            rollover(timeNow);
-        }
+            long timeNow = clock.getCurrentTimeMillis();
+            if (timeNow > tomorrowStamp)
+            {
+                rollover(timeNow);
+            }
 
-        collectGarbage();
-        updateToTime(timeNow);
+            collectGarbage();
+            updateToTime(timeNow);
+        }
+        finally
+        {
+            // Ensure changes to effect before the lock is released.
+            agentDailyStatisticsDao.flush();
+        }
     }
 
     private void collectGarbage()
@@ -142,7 +150,7 @@ public class AgentStatisticsManager implements EventListener
 
     private void updateStatistics(long agentId, AgentStatus status, int duration, boolean newRecipe)
     {
-        AgentDailyStatistics currentStats = agentDailyStatisticsDao.findByAgentAndDay(agentId, todayStamp);
+        AgentDailyStatistics currentStats = agentDailyStatisticsDao.safeFindByAgentAndDay(agentId, todayStamp);
         if (currentStats == null)
         {
             currentStats = new AgentDailyStatistics(agentId, todayStamp);
@@ -198,7 +206,15 @@ public class AgentStatisticsManager implements EventListener
 
     public synchronized void handleEvent(Event event)
     {
-        handleStatusChange((AgentStatusChangeEvent) event);
+        try
+        {
+            handleStatusChange((AgentStatusChangeEvent) event);
+        }
+        finally
+        {
+            // Ensure changes to effect before the lock is released.
+            agentDailyStatisticsDao.flush();
+        }
     }
 
     public Class[] getHandledEvents()

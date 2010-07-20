@@ -56,6 +56,11 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         getHibernateTemplate().saveOrUpdate(entity);
     }
 
+    public void flush()
+    {
+        getHibernateTemplate().flush();
+    }
+
     public void delete(T entity)
     {
         getHibernateTemplate().delete(entity);

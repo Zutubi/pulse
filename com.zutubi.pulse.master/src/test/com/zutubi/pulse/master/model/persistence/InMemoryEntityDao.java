@@ -76,6 +76,10 @@ public class InMemoryEntityDao<T extends Entity> implements EntityDao<T>
         return null;
     }
 
+    public void flush()
+    {
+    }
+
     public void refresh(T entity)
     {
 
