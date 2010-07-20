@@ -181,6 +181,21 @@ public class FileDeletionServiceTest extends PulseTestCase
         assertTrue(notDead.exists());
     }
     
+    public void testOutsideOfData() throws IOException, ExecutionException, InterruptedException
+    {
+        File dir = FileSystemUtils.createTempDir(getName(), null);
+        try
+        {
+            Future<Boolean> future = deletionService.delete(dir);
+            assertEquals(Boolean.TRUE, future.get());
+            assertTrue(dir.isDirectory());
+        }
+        finally
+        {
+            removeDirectory(dir);
+        }
+    }
+    
     private void waitForFileToBeDeleted(File file)
     {
         long start = System.currentTimeMillis();

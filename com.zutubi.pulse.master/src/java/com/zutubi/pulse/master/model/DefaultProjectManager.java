@@ -72,7 +72,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private static final Messages I18N = Messages.getInstance(DefaultProjectManager.class);
 
     private static final Map<Project.Transition, String> TRANSITION_TO_ACTION_MAP = new HashMap<Project.Transition, String>();
-    private static final String[] SAFE_CLEAN_PREFIXES = {"$(data.dir)", "${data.dir}", "$(agent.data.dir)", "${agent.data.dir}"};
 
     private ProjectDao projectDao;
     private TestCaseIndexDao testCaseIndexDao;
@@ -269,7 +268,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         if (!StringUtils.equals(instance.getOptions().getPersistentWorkDir(), old.getOptions().getPersistentWorkDir()))
         {
-            cleanupWorkDirs(old, false, null);
+            cleanupWorkDirs(old, null);
         }
     }
 
@@ -285,7 +284,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 }
             }))
             {
-                cleanupWorkDirs(old, false, oldStage);
+                cleanupWorkDirs(old, oldStage);
             }
         }
     }
@@ -1012,68 +1011,49 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void cleanupWorkDirs(ProjectConfiguration projectConfig)
     {
-        cleanupWorkDirs(projectConfig, true, null);
+        cleanupWorkDirs(projectConfig, null);
     }
 
-    private void cleanupWorkDirs(ProjectConfiguration projectConfig, boolean explicit, BuildStageConfiguration specificStage)
+    private void cleanupWorkDirs(ProjectConfiguration projectConfig, BuildStageConfiguration specificStage)
     {
         String workDirPattern = projectConfig.getOptions().getPersistentWorkDir();
 
-        if (explicit || safeToClean(workDirPattern))
+        AgentRecipeDetails details = new AgentRecipeDetails();
+        details.setProject(projectConfig.getName());
+        details.setProjectHandle(projectConfig.getHandle());
+        for (Agent agent: agentManager.getAllAgents())
         {
-            AgentRecipeDetails details = new AgentRecipeDetails();
-            details.setProject(projectConfig.getName());
-            details.setProjectHandle(projectConfig.getHandle());
-            for (Agent agent: agentManager.getAllAgents())
-            {
-                List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
-    
-                AgentConfiguration agentConfig = agent.getConfig();
-                details.setAgent(agent.getName());
-                details.setAgentHandle(agentConfig.getHandle());
-                
-                Collection<BuildStageConfiguration> stageConfigs;
-                if (specificStage == null)
-                {
-                    stageConfigs = projectConfig.getStages().values();
-                }
-                else
-                {
-                    stageConfigs = Arrays.asList(specificStage);
-                }
-                
-                for (BuildStageConfiguration stageConfig: stageConfigs)
-                {
-                    details.setStage(stageConfig.getName());
-                    details.setStageHandle(stageConfig.getHandle());
+            List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
 
-                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
-                    SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
-                    messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
-                }
-                    
-                if (messageDescriptionPairs.size() > 0)
-                {
-                    agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
-                }
+            AgentConfiguration agentConfig = agent.getConfig();
+            details.setAgent(agent.getName());
+            details.setAgentHandle(agentConfig.getHandle());
+            
+            Collection<BuildStageConfiguration> stageConfigs;
+            if (specificStage == null)
+            {
+                stageConfigs = projectConfig.getStages().values();
+            }
+            else
+            {
+                stageConfigs = Arrays.asList(specificStage);
+            }
+            
+            for (BuildStageConfiguration stageConfig: stageConfigs)
+            {
+                details.setStage(stageConfig.getName());
+                details.setStageHandle(stageConfig.getHandle());
+
+                DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
+                SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
+                messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
+            }
+                
+            if (messageDescriptionPairs.size() > 0)
+            {
+                agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
             }
         }
-    }
-
-    private boolean safeToClean(String workDirPattern)
-    {
-        // Some paranoia in cleanup: if the work directory pattern is not
-        // within the data (or agent data) directory, then don't automatically
-        // clean it up.
-        for (String prefix: SAFE_CLEAN_PREFIXES)
-        {
-            if (workDirPattern.startsWith(prefix))
-            {
-                return true;
-            }
-        }
-        
-        return false;
     }
 
     private Map<String, String> getVariables(AgentRecipeDetails details)
@@ -1092,7 +1072,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         projectInitialisationService.requestDestruction(project.getConfig(), true);
         buildManager.deleteAllBuilds(project);
-        cleanupWorkDirs(project.getConfig(), false, null);
+        cleanupWorkDirs(project.getConfig(), null);
         
         // Remove test case index
         List<TestCaseIndex> tests;
