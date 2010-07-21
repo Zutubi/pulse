@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.admin;
 
 import com.zutubi.pulse.master.build.queue.RecipeQueue;
+import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 /**
@@ -12,6 +13,7 @@ public class ToggleRecipeQueueAction extends ActionSupport
 
     public String execute() throws Exception
     {
+        accessManager.ensurePermission(ServerPermission.ADMINISTER.name(), null);
         if(recipeQueue.isRunning())
         {
             recipeQueue.stop();
