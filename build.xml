@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Pulse" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:zutubi="antlib:com.zutubi.ant">
 
-    <!--
-When testing new dependencies, it is easier to run them from a local repository first rather than uploading
-them to zutubi.com/ivy .  So support this, use -Divy.settings.file=ivysettings.local.xml
-
-For example:
-    ant clean build.all -Dskip.tests=true -Divy.settings.file=ivysettings.local.xml
-      -->
-    <property name="ivy.settings.file" value="ivysettings.xml"/>
-
     <!-- Import general purpose macros. -->
     <import file="macros.xml"/>
 
+    <property file="local.properties"/>
     <property file="build.properties"/>
-    
+
     <property environment="env"/>
 
     <condition property="on.windows">
@@ -50,10 +42,9 @@ For example:
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
-        <taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
 
         <load-ivy-taskdef/>
-        <ivy:settings file="${ivy.settings.file}"/>
+        <ivy:settings file="ivysettings.xml"/>
 
     </target>
 
@@ -654,7 +645,7 @@ For example:
             </then>
         </if>
 
-        <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
+        <zutubi:ivytoidea conf="build, src" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
                 <include name="*/ivy.xml"/>
                 <include name="bundles/*/ivy.xml"/>

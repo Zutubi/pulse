@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.pulse.slave" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
-        <description homepage="http://www.zutubi.com/">
-            The pulse remote slave agent.
-        </description>
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
-        <conf name="build" description="All of the packages required during the build."/>
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
-        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
         <artifact name="com.zutubi.pulse.slave" type="jar" conf="release,build"/>
         <artifact name="com.zutubi.pulse.slave-src" type="jar" conf="src"/>
+        <!--<artifact name="com.zutubi.pulse.slave-test" type="jar" conf="build"/>-->
     </publications>
 
     <dependencies>
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
     </dependencies>
 </ivy-module>

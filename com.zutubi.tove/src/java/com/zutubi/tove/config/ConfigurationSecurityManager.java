@@ -81,6 +81,7 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
     }
 
     /**
+     *
      * Checks if the calling thread has permission to perform the given action
      * on the given path.  If the path is in an owned scope (see
      * {@link #registerOwnedScope(String)}, then this amounts to checking if

@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.util" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
-        <description homepage="http://www.zutubi.com/">
-            Zutubi utilities library.
-        </description>
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
-        <conf name="build" description="All of the packages required during the build."/>
-        <conf name="src" description="The source packages included as part of the source release"/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
     </configurations>
 
     <publications>
@@ -21,7 +18,9 @@
     </publications>
 
     <dependencies>
-        <dependency org="junit" name="junit" rev="3.8.1" conf="build->default"/>
-        <dependency org="mockito" name="mockito" rev="1.5" conf="build->default"/>
+        <!-- Test dependencies -->
+        <dependency org="junit" name="junit" rev="${org.junit.version}"  conf="build->default;src->src"/>
+        <!--<dependency org="org.junit" name="com.springsource.junit" rev="${org.junit.version}"  conf="build->runtime"/>-->
+        <dependency org="mockito" name="mockito" rev="${mockito.version}" conf="build->default;src->src"/>
     </dependencies>
 </ivy-module>

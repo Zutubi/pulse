@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurations>
+
+    <conf name="release" description="Defines those packages that are included in the final release."/>
+    <conf name="build" description="All of the packages required during the build."/>
+    <conf name="src" description="The source packages included as part of the source release"/>
+    
+</configurations>

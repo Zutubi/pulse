@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.tove.annotations" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
-        <description homepage="http://www.zutubi.com/">
-            Annotations for the Zutubi tove library.
-        </description>
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
-        <conf name="build" description="All of the packages required during the build."/>
-        <conf name="src" description="The source packages included as part of the source release"/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
     </configurations>
 
     <publications>
         <artifact name="com.zutubi.tove.annotations" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.tove.annotations-src" type="jar" conf="src"/>
+        <!--<artifact name="com.zutubi.tove.annotations-test" type="jar" conf="build"/>-->
     </publications>
     
     <dependencies>
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.validation.annotations" rev="latest.integration" conf="*->@"/>
     </dependencies>
 </ivy-module>
