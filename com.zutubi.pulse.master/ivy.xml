@@ -30,7 +30,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
 
         <!-- External dependencies -->
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.7" conf="external,build,release->default;src->src"/>
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.7.0" conf="external,build,release->default;src->src"/>
         <!--<dependency org="org.acegisecurity" name="com.springsource.org.acegisecurity" rev="1.0.7" conf="external,build,release->runtime"/>-->
 
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default;src->src"/>
