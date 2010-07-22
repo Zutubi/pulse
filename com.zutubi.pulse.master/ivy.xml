@@ -79,6 +79,7 @@
         <dependency org="rife" name="jhighlight" rev="1.0" conf="external,build,release->default;src->src"/>
 
         <!--<dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-aop,spring-jdbc,spring-hibernate3,spring-support"/>-->
+        <dependency org="org.springframework" name="org.springframework.aop" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.jdbc" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.orm" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.transaction" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
