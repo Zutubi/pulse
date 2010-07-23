@@ -164,7 +164,7 @@ public class DefaultHostManager implements HostManager
         {
             public Agent map(Long agentHandle)
             {
-                return agentManager.getAgent(agentHandle);
+                return agentManager.getAgentByHandle(agentHandle);
             }
         });
 

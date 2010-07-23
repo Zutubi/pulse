@@ -612,9 +612,14 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             fn.run(new LinkedList<Agent>(availableAgents));
         }
 
-        public synchronized Agent getAgent(long handle)
+        public synchronized Agent getAgentByHandle(long handle)
         {
             return agents.get(handle);
+        }
+
+        public Agent getAgentById(long agentId)
+        {
+            throw new RuntimeException("Not implemented");
         }
 
         public synchronized Agent getAgent(AgentConfiguration agent)
@@ -712,7 +717,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Not implemented");
         }
 
-        public boolean completeSynchronisation(long agentId, boolean successful)
+        public boolean completeSynchronisation(Agent agent, boolean successful)
         {
             throw new RuntimeException("Method not implemented.");
         }

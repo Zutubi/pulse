@@ -26,7 +26,9 @@ public interface AgentManager extends AgentPersistentStatusManager
     @SecureResult
     List<Agent> getOnlineAgents();
     @SecureResult
-    Agent getAgent(long handle);
+    Agent getAgentByHandle(long handle);
+    @SecureResult
+    Agent getAgentById(long agentId);
     @SecureResult
     Agent getAgent(AgentConfiguration agent);
     @SecureResult
@@ -123,11 +125,11 @@ public interface AgentManager extends AgentPersistentStatusManager
      * send out the relevant event.  This may fail if there are new messages
      * that should be processed now.
      *
-     * @param agentId    id of the agent to complete the cycle for if possible
+     * @param agent      the agent to complete the cycle for if possible
      * @param successful indicates if sending of the last batch of messages
      *                   succeeded (if not, the event is always sent indicating
      *                   the cycle should be retried later)
      * @return true if the cycle is complete, false if it should re-run
      */
-    boolean completeSynchronisation(long agentId, boolean successful);
+    boolean completeSynchronisation(Agent agent, boolean successful);
 }

@@ -374,7 +374,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         return agentSynchronisationMessageDao.findById(messageId);
     }
 
-    public boolean completeSynchronisation(final long agentId, final boolean successful)
+    public boolean completeSynchronisation(final Agent agent, final boolean successful)
     {
         return agentStatusManager.withAgentsLock(new NullaryFunction<Boolean>()
         {
@@ -384,9 +384,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 // agent), we declare it complete and let the status manager
                 // move the agent offline.  When we get a successful ping, a
                 // new cycle will start.
-                if (!successful || allSynchronisationMessagesComplete(agentId))
+                if (!successful || allSynchronisationMessagesComplete(agent.getId()))
                 {
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgent(agentId), successful));
+                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, agent, successful));
                     return true;
                 }
                 else
@@ -475,7 +475,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         });
     }
 
-    public Agent getAgent(long handle)
+    public Agent getAgentByHandle(long handle)
     {
         lock.lock();
         try
@@ -488,9 +488,20 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
+    public Agent getAgentById(final long agentId)
+    {
+        return CollectionUtils.find(agents.values(), new Predicate<Agent>()
+        {
+            public boolean satisfied(Agent agent)
+            {
+                return agent.getId() == agentId;
+            }
+        });
+    }
+
     public Agent getAgent(AgentConfiguration agent)
     {
-        return getAgent(agent.getHandle());
+        return getAgentByHandle(agent.getHandle());
     }
 
     public void pingAgent(AgentConfiguration agent)

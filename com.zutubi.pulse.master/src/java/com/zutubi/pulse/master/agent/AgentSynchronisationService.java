@@ -116,7 +116,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             
             for (Long agentId: affectedAgentIds)
             {
-                agentManager.completeSynchronisation(agentId, true);
+                agentManager.completeSynchronisation(agentManager.getAgentById(agentId), true);
             }
         }
         finally
@@ -153,7 +153,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     }
                     finally
                     {
-                        if (!agentManager.completeSynchronisation(agent.getId(), successful))
+                        if (!agentManager.completeSynchronisation(agent, successful))
                         {
                             // More messages have come in, go around again.
                             syncAgent(agent);
@@ -277,7 +277,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     {
                         message.applyResult(result);
                         agentManager.saveSynchronisationMessages(Arrays.asList(message));
-                        agentManager.completeSynchronisation(agent.getId(), true);
+                        agentManager.completeSynchronisation(agent, true);
                     }
                 }
                 finally
