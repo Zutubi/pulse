@@ -11,12 +11,8 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
@@ -25,7 +21,6 @@ import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -40,6 +35,12 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 /**
  */
@@ -65,7 +66,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private AgentSynchronisationMessageDao agentSynchronisationMessageDao;
     private AgentSynchronisationService agentSynchronisationService;
     private HostManager hostManager;
-    private HostPingService hostPingService;
 
     private LicenseManager licenseManager;
 
@@ -347,11 +347,13 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             agentSynchronisationMessageDao.save(message);
         }
+
+        agentSynchronisationMessageDao.flush();
     }
 
-    public List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent)
+    public List<AgentSynchronisationMessage> getSynchronisationMessages(long agentId)
     {
-        AgentState agentState = agentStateDao.findById(agent.getId());
+        AgentState agentState = agentStateDao.findById(agentId);
         if (agentState != null)
         {
             return agentSynchronisationMessageDao.findByAgentState(agentState);
@@ -362,15 +364,29 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    public boolean completeSynchronisation(final Agent agent, final boolean successful)
+    public List<AgentSynchronisationMessage> getProcessingSynchronisationMessages()
+    {
+        return agentSynchronisationMessageDao.findByStatus(AgentSynchronisationMessage.Status.PROCESSING);
+    }
+
+    public AgentSynchronisationMessage getSynchronisationMessage(long messageId)
+    {
+        return agentSynchronisationMessageDao.findById(messageId);
+    }
+
+    public boolean completeSynchronisation(final long agentId, final boolean successful)
     {
         return agentStatusManager.withAgentsLock(new NullaryFunction<Boolean>()
         {
             public Boolean process()
             {
-                if (!successful || noPendingSynchronisationMessages(agent))
+                // When a cycle is unsuccessful (unable to sent messages to the
+                // agent), we declare it complete and let the status manager
+                // move the agent offline.  When we get a successful ping, a
+                // new cycle will start.
+                if (!successful || allSynchronisationMessagesComplete(agentId))
                 {
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, agent, successful));
+                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgent(agentId), successful));
                     return true;
                 }
                 else
@@ -381,10 +397,15 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         });
     }
 
-    private boolean noPendingSynchronisationMessages(Agent agent)
+    private boolean allSynchronisationMessagesComplete(long agentId)
     {
-        List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agent);
-        return !CollectionUtils.contains(messages, new AgentSynchronisationService.PendingMessagesPredicate());
+        List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agentId);
+        EnumSet<AgentSynchronisationMessage.Status> incompleteStates = EnumSet.of(
+                AgentSynchronisationMessage.Status.QUEUED,
+                AgentSynchronisationMessage.Status.PROCESSING,
+                AgentSynchronisationMessage.Status.SENDING_FAILED
+        );
+        return !CollectionUtils.contains(messages, new AgentSynchronisationService.StatusInPredicate(incompleteStates));
     }
 
     public void setEnableState(Agent agent, AgentState.EnableState state)
@@ -620,8 +641,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         this.agentSynchronisationService = agentSynchronisationService;
     }
 
-    public void setHostPingService(HostPingService hostPingService)
+    void setAgentStatusManager(AgentStatusManager agentStatusManager)
     {
-        this.hostPingService = hostPingService;
+        this.agentStatusManager = agentStatusManager;
     }
 }

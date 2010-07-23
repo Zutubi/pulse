@@ -145,6 +145,7 @@
                 <ref local="dropForceCleanAgents"/>
                 <ref local="renameCancelBuildPermission"/>
                 <ref local="cleanIvyCache"/>
+                <ref local="addAgentSynchTimestamp"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -738,4 +739,12 @@
         <property name="buildNumber" value="202004001"/>
     </bean>
 
+    <bean id="addAgentSynchTimestamp" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="202999001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.2.99-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
 </beans>

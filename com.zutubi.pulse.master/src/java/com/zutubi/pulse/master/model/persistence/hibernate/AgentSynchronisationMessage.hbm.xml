@@ -15,6 +15,8 @@
 
         <property name="description" column="DESCRIPTION" type="string" length="1023"/>
         <property name="statusName" column="STATUS_NAME" type="string" length="127"/>
+        <property name="processingTimestamp" column="PROCESSING_TIMESTAMP" type="long"/>
         <property name="statusMessage" column="STATUS_MESSAGE" type="string" length="4091"/>
     </class>
 </hibernate-mapping>
+        

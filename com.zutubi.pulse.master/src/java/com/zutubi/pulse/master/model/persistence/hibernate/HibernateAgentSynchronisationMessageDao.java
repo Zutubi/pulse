@@ -35,6 +35,20 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
         });
     }
 
+    public List<AgentSynchronisationMessage> findByStatus(final AgentSynchronisationMessage.Status status)
+    {
+        return (List<AgentSynchronisationMessage>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from AgentSynchronisationMessage where statusName = :statusName");
+                queryObject.setString("statusName", status.name());
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+    }
+
     public int deleteByAgentState(final AgentState agentState)
     {
         return (Integer) getHibernateTemplate().execute(new HibernateCallback()

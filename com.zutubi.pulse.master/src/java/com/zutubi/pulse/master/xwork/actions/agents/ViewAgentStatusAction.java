@@ -95,7 +95,7 @@ public class ViewAgentStatusAction extends AgentActionBase
             model.addStatusInfo("agent.status", agent.getStatus().getPrettyString());
         }
 
-        List<AgentSynchronisationMessage> synchronisationMessages = agentManager.getSynchronisationMessages(agent);
+        List<AgentSynchronisationMessage> synchronisationMessages = agentManager.getSynchronisationMessages(agent.getId());
         model.setSynchronisationMessages(synchronisationMessages);
 
         return SUCCESS;

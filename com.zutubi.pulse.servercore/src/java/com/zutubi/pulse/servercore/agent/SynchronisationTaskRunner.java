@@ -37,11 +37,11 @@ public class SynchronisationTaskRunner
         {
             SynchronisationTask task = synchronisationTaskFactory.fromMessage(message);
             task.execute();
-            return new SynchronisationMessageResult();
+            return new SynchronisationMessageResult(message.getId());
         }
         catch (Exception e)
         {
-            return new SynchronisationMessageResult(e);
+            return new SynchronisationMessageResult(message.getId(), e);
         }
     }
 

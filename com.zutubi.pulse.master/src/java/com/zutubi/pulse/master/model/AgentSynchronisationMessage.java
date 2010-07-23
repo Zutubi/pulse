@@ -1,8 +1,10 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.util.Constants;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
 
@@ -15,10 +17,13 @@ import java.io.StringWriter;
  */
 public class AgentSynchronisationMessage extends Entity
 {
+    private static final Messages I18N = Messages.getInstance(AgentSynchronisationMessage.class);
+    
     private AgentState agentState;
     private SynchronisationMessage message;
     private String description;
     private Status status = Status.QUEUED;
+    private long processingTimestamp = -1;
     private String statusMessage;
 
     /**
@@ -30,44 +35,35 @@ public class AgentSynchronisationMessage extends Entity
          * The initial state for a message that has been queued and not yet
          * processed.
          */
-        QUEUED(true),
+        QUEUED,
         /**
          * The state for a message that has been sent to an agent for
          * processing, before the agent has responded.
          */
-        PROCESSING(true),
+        PROCESSING,
         /**
          * Indicates the message has been successfully processed.
          */
-        SUCCEEDED(false),
+        SUCCEEDED,
         /**
-         * Indicates that the message failed to be sent to the agent, or the
-         * agent failed to respond.  The message should be retried.
+         * Indicates that the message possibly failed to be sent to the agent.
+         * This could be due to network failure, or due to an untimely master
+         * restart.  Note it is possible that the message got through before
+         * the network problem/restart.  In any case the message should be
+         * retried.
          */
-        SENDING_FAILED(true),
+        SENDING_FAILED,
+        /**
+         * Indicates that the message was sent to the agent, but no reply was
+         * received in a suitable time period.  At present such messages are
+         * not retried.
+         */
+        TIMED_OUT,
         /**
          * Indicates that the task corresponding to the message failed and the
          * task should not be retried.
          */
-        FAILED_PERMANENTLY(false);
-
-        private boolean pending;
-
-        Status(boolean pending)
-        {
-            this.pending = pending;
-        }
-
-        /**
-         * Indicates if this status is for pending messages: i.e. messages that
-         * should be sent (or resent) on the next synchronisation cycle.
-         *
-         * @return true if messages with this status are pending
-         */
-        public boolean isPending()
-        {
-            return pending;
-        }
+        FAILED_PERMANENTLY;
 
         public String getPrettyString()
         {
@@ -153,6 +149,23 @@ public class AgentSynchronisationMessage extends Entity
         this.status = status;
     }
 
+    /**
+     * When this message is in the {@link Status#PROCESSING} state, indicates
+     * the time at which processing began.
+     * 
+     * @return the time at which this message started processing, in
+     *         milliseconds since the unix epoch
+     */
+    public long getProcessingTimestamp()
+    {
+        return processingTimestamp;
+    }
+
+    public void setProcessingTimestamp(long processingTimestamp)
+    {
+        this.processingTimestamp = processingTimestamp;
+    }
+
     private String getStatusName()
     {
         return status.name();
@@ -183,10 +196,14 @@ public class AgentSynchronisationMessage extends Entity
     /**
      * Should be called when this message is about to be processed: moves to
      * the {@link Status#PROCESSING} state and clears any status message.
+     * 
+     * @param timestamp the time at which this processing was started, in
+     *                  milliseconds since the unix epoch
      */
-    public void startProcessing()
+    public void startProcessing(long timestamp)
     {
         status = Status.PROCESSING;
+        processingTimestamp = timestamp;
         statusMessage = null;
     }
 
@@ -224,5 +241,28 @@ public class AgentSynchronisationMessage extends Entity
         StringWriter writer = new StringWriter();
         exception.printStackTrace(new PrintWriter(writer));
         setStatusMessage(writer.toString());
+    }
+
+    /**
+     * Moves this message to the timed out state, indicating it was processing
+     * too long without a response.
+     * 
+     * @param timeSpentProcessing the number of milliseconds ago the message
+     *                            processing started
+     */
+    public void timedOut(long timeSpentProcessing)
+    {
+        status = Status.TIMED_OUT;
+        setStatusMessage(I18N.format("timed.out", timeSpentProcessing / Constants.SECOND));
+    }
+
+    /**
+     * Moves this message to the sending failed state, based on a master
+     * restart while the message was processing.
+     */
+    public void masterRestarted()
+    {
+        status = Status.SENDING_FAILED;
+        setStatusMessage(I18N.format("master.restarted"));
     }
 }
