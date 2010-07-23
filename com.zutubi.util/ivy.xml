@@ -19,8 +19,7 @@
 
     <dependencies>
         <!-- Test dependencies -->
-        <dependency org="junit" name="junit" rev="${org.junit.version}"  conf="build->default;src->src"/>
-        <!--<dependency org="org.junit" name="com.springsource.junit" rev="${org.junit.version}"  conf="build->runtime"/>-->
-        <dependency org="mockito" name="mockito" rev="${mockito.version}" conf="build->default;src->src"/>
+        <dependency org="junit" name="junit" rev="3.8.1"  conf="build->default;src->src"/>
+        <dependency org="mockito" name="mockito" rev="1.5" conf="build->default;src->src"/>
     </dependencies>
 </ivy-module>

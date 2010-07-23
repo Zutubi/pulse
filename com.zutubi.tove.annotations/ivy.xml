@@ -14,7 +14,6 @@
     <publications>
         <artifact name="com.zutubi.tove.annotations" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.tove.annotations-src" type="jar" conf="src"/>
-        <!--<artifact name="com.zutubi.tove.annotations-test" type="jar" conf="build"/>-->
     </publications>
     
     <dependencies>

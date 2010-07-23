@@ -17,7 +17,6 @@
     <publications>
         <artifact name="com.zutubi.pulse.slave" type="jar" conf="release,build"/>
         <artifact name="com.zutubi.pulse.slave-src" type="jar" conf="src"/>
-        <!--<artifact name="com.zutubi.pulse.slave-test" type="jar" conf="build"/>-->
     </publications>
 
     <dependencies>

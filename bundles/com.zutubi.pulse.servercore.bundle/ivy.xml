@@ -20,7 +20,6 @@
     <publications>
         <artifact name="com.zutubi.pulse.servercore.bundle" type="jar" conf="build,bundle"/>
         <artifact name="com.zutubi.pulse.servercore.bundle-src" type="jar" conf="src"/>
-        <!--<artifact name="com.zutubi.pulse.servercore.bundle-test" type="jar" conf="build"/>-->
     </publications>
 
     <dependencies>

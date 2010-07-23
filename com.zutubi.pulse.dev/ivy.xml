@@ -28,10 +28,7 @@
 
         <!-- External dependencies -->
         <dependency org="apache" name="commons-httpclient" rev="3.1" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.httpclient" rev="3.1.0" conf="external,build,release->runtime"/>-->
-
         <dependency org="apache" name="commons-lang" rev="2.1" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.1.0" conf="external,build,release->runtime"/>-->
     </dependencies>
 </ivy-module>
 

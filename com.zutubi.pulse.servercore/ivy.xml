@@ -30,24 +30,12 @@
 
         <!-- Library dependencies -->
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.collections" rev="3.2.1" conf="external,build,release->runtime"/>-->
-        
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.cli" rev="1.1.0" conf="external,build,release->runtime"/>-->
-        
         <dependency org="apache" name="commons-vfs" rev="20100409" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.vfs" rev="1.0.0" conf="external,build,release->runtime"/>-->
-        
         <dependency org="apache" name="ivy" rev="2.0.0" conf="external,build,release->core;src->src"/>
-        <!--<dependency org="org.apache.ant" name="com.springsource.org.apache.ivy" rev="2.0.0" conf="external,build,release->runtime"/>-->
-
         <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="com.caucho" name="com.springsource.com.caucho" rev="3.2.1" conf="external,build,release->runtime"/>-->
-        
         <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.14" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="org.mortbay.jetty" name="com.springsource.org.mortbay.jetty" rev="5.1.14" conf="external,build,release->runtime"/>-->
-
         <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default;src->src"/>
-        <!--<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.4.0" conf="external,build,release->runtime"/>-->
+
     </dependencies>
 </ivy-module>
