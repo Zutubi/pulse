@@ -182,13 +182,6 @@
 
         <antcall target="nsis.dev"/>
 
-        <!--
-         Now we retrieve the source dependencies into the ${package.root.dev}/src directory.
-         -->
-        <retrieve-package-src-deps module="dev" dest="${package.root.dev}/src"/>
-
-        <native-zip dir="${package.root.dev}/.." file="../${package.name.dev}-src.zip" path="${package.name.dev}/src"/>
-
     </target>
     
 
@@ -297,13 +290,6 @@
         </tar>
 
         <antcall target="nsis.slave"/>
-
-        <!--
-         Now we retrieve the source dependencies into the ${package.root.slave}/src directory.
-         -->
-        <retrieve-package-src-deps module="slave" dest="${package.root.slave}/src"/>
-
-        <native-zip dir="${package.root.slave}/.." file="../${package.name.slave}-src.zip" path="${package.name.slave}/src"/>
 
     </target>
 
@@ -434,14 +420,6 @@
         </tar>
 
         <antcall target="nsis.master"/>
-
-        <!--
-         Now we retrieve the source dependencies into the ${package.root.slave}/src directory.
-         -->
-        <retrieve-package-src-deps module="master" dest="${package.root.master}/src"/>
-
-        <native-zip dir="${package.root.master}/.." file="../${package.name.master}-src.zip" path="${package.name.master}/src"/>
-
 
     </target>
 
@@ -688,6 +666,7 @@
                 <exclude name="build/**"/>
                 <exclude name="classes/**"/>
                 <exclude name="etc/*.src"/>
+                <exclude name="plugins/**"/>
                 <exclude name="**/LicenseEncoder.java"/>
                 <exclude name="**/LicenseEncodeDecodeTest.java"/>
                 <exclude name="**/LicenseKeyValidatorTest.java"/>
@@ -699,6 +678,7 @@
                 <!-- other excludes that are useful when generating source package from an existing workspace. -->
                 <exclude name="**/*.*~"/>
                 <exclude name="velocity.log"/>
+                <exclude name="local.properties"/>
             </fileset>
             <fileset dir="${project.root.dir}">
                 <include name="etc/pulse.ipr"/>
