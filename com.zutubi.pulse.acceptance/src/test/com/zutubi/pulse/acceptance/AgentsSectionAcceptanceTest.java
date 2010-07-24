@@ -264,7 +264,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testNoSynchronisationMessages() throws Exception
     {
-        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.insertSimpleAgent(random, "localhost");
         browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
         assertTrue(statusPage.isSynchronisationTablePresent());
@@ -274,7 +274,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testSimpleSynchronisationMessage() throws Exception
     {
-        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.insertSimpleAgent(random, "localhost");
         xmlRpcHelper.waitForAgentToBeIdle(random);
         xmlRpcHelper.enqueueSynchronisationMessage(random, "test message", true);
         xmlRpcHelper.waitForAgentToBeIdle(random);
@@ -288,7 +288,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     public void testFailedSynchronisationMessage() throws Exception
     {
-        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.insertSimpleAgent(random, "localhost");
         xmlRpcHelper.waitForAgentToBeIdle(random);
         xmlRpcHelper.enqueueSynchronisationMessage(random, TEST_DESCRIPTION, false);
         xmlRpcHelper.waitForAgentToBeIdle(random);
@@ -307,7 +307,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         String agentName = random + "-agent";
         String projectName = random + "-project";
 
-        xmlRpcHelper.insertLocalAgent(agentName);
+        xmlRpcHelper.insertSimpleAgent(agentName, "localhost");
 
         WaitProject project = startBuildOnAgent(projectName, agentName);
 
@@ -333,7 +333,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         final int MESSAGE_COUNT = 12;
 
-        xmlRpcHelper.insertLocalAgent(random);
+        xmlRpcHelper.insertSimpleAgent(random, "localhost");
         xmlRpcHelper.waitForAgentToBeIdle(random);
         for (int i = 0; i < MESSAGE_COUNT; i++)
         {

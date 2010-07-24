@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
@@ -39,6 +41,16 @@ public interface SlaveService
     boolean updateVersion(String token, String build, String master, long hostId, String packageUrl, long packageSize);
 
     HostStatus getStatus(String token, String master);
+
+    /**
+     * Synchronises the agent by processing all of the given messages.
+     * Messages are converted to tasks, the tasks executed and the results
+     * returned.
+     *
+     * @param messages messages to process
+     * @return results corresponding results for each of the messages
+     */
+    List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages);
 
     /**
      * A request to build a recipe on the slave, if the slave is currently idle.

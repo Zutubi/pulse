@@ -322,36 +322,39 @@ public class AgentStatusManager implements EventListener
 
     private void handleSynchronisationComplete(AgentSynchronisationCompleteEvent event)
     {
-        Agent agent = event.getAgent();
-        AgentStatus oldStatus = agent.getStatus();
-        if (oldStatus == AgentStatus.SYNCHRONISING)
+        Agent agent = agentsById.get(event.getAgent().getId());
+        if (agent != null)
         {
-            if (agent.isDisabling())
+            AgentStatus oldStatus = agent.getStatus();
+            if (oldStatus == AgentStatus.SYNCHRONISING)
             {
-                agent.updateStatus(AgentStatus.DISABLED);
-                agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
-                publishEvent(new AgentOfflineEvent(this, agent));
-            }
-            else
-            {
-                if (event.isSuccessful())
+                if (agent.isDisabling())
                 {
-                    agent.updateStatus(AgentStatus.SYNCHRONISED);
+                    agent.updateStatus(AgentStatus.DISABLED);
+                    agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
+                    publishEvent(new AgentOfflineEvent(this, agent));
                 }
                 else
                 {
-                    agent.updateStatus(AgentStatus.OFFLINE);
-                    publishEvent(new AgentOfflineEvent(this, agent));
+                    if (event.isSuccessful())
+                    {
+                        agent.updateStatus(AgentStatus.SYNCHRONISED);
+                    }
+                    else
+                    {
+                        agent.updateStatus(AgentStatus.OFFLINE);
+                        publishEvent(new AgentOfflineEvent(this, agent));
+                    }
+    
+                    publishEvent(new AgentPingRequestedEvent(this, agent));
                 }
-
-                publishEvent(new AgentPingRequestedEvent(this, agent));
+    
+                publishEvent(new AgentStatusChangeEvent(this, agent, oldStatus, agent.getStatus()));
             }
-
-            publishEvent(new AgentStatusChangeEvent(this, agent, oldStatus, agent.getStatus()));
-        }
-        else
-        {
-            LOG.warning("Synchronisation complete event for agent '" + agent.getName() + "' which is in state '" + agent.getStatus() + "'");
+            else
+            {
+                LOG.warning("Synchronisation complete event for agent '" + agent.getName() + "' which is in state '" + agent.getStatus() + "'");
+            }
         }
     }
 

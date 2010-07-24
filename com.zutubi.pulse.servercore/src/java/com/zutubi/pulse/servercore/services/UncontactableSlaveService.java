@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
@@ -33,6 +35,11 @@ public class UncontactableSlaveService implements SlaveService
     }
 
     public HostStatus getStatus(String token, String master)
+    {
+        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
+    }
+
+    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

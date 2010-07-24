@@ -5,14 +5,11 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
-import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.IOUtils;
@@ -24,6 +21,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general
@@ -38,7 +38,6 @@ public class SlaveAgentService implements AgentService
     private AgentConfiguration agentConfig;
     private ServiceTokenManager serviceTokenManager;
     private MasterLocationProvider masterLocationProvider;
-    private SynchronisationTaskRunner synchronisationTaskRunner;
 
     public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
@@ -162,7 +161,7 @@ public class SlaveAgentService implements AgentService
 
     public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
-        return synchronisationTaskRunner.synchronise(messages);
+        return service.synchronise(messages);
     }
 
     public List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String path)
@@ -205,10 +204,5 @@ public class SlaveAgentService implements AgentService
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
-    }
-
-    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
-    {
-        this.synchronisationTaskRunner = synchronisationTaskRunner;
     }
 }

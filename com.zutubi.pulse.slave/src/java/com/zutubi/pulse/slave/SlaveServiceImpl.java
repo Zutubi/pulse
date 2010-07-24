@@ -10,6 +10,9 @@ import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
@@ -41,6 +44,7 @@ public class SlaveServiceImpl implements SlaveService
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
     private ObjectFactory objectFactory;
+    private SynchronisationTaskRunner synchronisationTaskRunner;
 
     private boolean firstStatus = true;
 
@@ -105,6 +109,11 @@ public class SlaveServiceImpl implements SlaveService
         }
 
         return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
+    }
+
+    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+    {
+        return synchronisationTaskRunner.synchronise(messages);
     }
 
     private void pongMaster(String master) throws MalformedURLException
@@ -232,5 +241,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setServerRecipeService(ServerRecipeService serverRecipeService)
     {
         this.serverRecipeService = serverRecipeService;
+    }
+
+    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
+    {
+        this.synchronisationTaskRunner = synchronisationTaskRunner;
     }
 }
