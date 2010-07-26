@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.api.FileSystemArtifactConfigurationSupport;
-import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.engine.ReferenceCollectingProjectRecipesConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.config.api.ConfigurationExample;
 
@@ -69,12 +69,12 @@ public class ExamplesBuilder
         return new ConfigurationExample("project", recipes(exe, postProcessor));
     }
 
-    private static ProjectRecipesConfiguration recipes(CommandConfiguration command, PostProcessorConfiguration postProcessor)
+    private static ReferenceCollectingProjectRecipesConfiguration recipes(CommandConfiguration command, PostProcessorConfiguration postProcessor)
     {
         RecipeConfiguration recipe = new RecipeConfiguration("default");
         recipe.addCommand(command);
 
-        ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
+        ReferenceCollectingProjectRecipesConfiguration recipes = new ReferenceCollectingProjectRecipesConfiguration();
         if (postProcessor != null)
         {
             recipes.addPostProcessor(postProcessor);
