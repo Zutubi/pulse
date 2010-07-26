@@ -147,7 +147,7 @@ public class HostStatus
     public String toString()
     {
         String result = status.getPrettyString();
-        result += "recipes " + agentHandleToRecipeId;
+        result += ", recipes " + agentHandleToRecipeId;
 
         if(first)
         {

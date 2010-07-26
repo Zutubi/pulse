@@ -17,14 +17,17 @@ import java.util.concurrent.FutureTask;
 
 /**
  * The delete file processor, as the name suggests, handles the deletion of
- * files and directories.  When deleting files, it does a couple of other
- * useful things.
+ * files and directories.  When deleting files, it does a few useful things.
  * <p/>
  * Firstly, the deletion is handled on a separate thread to the calling thread.
  * This ensures that if the directory is large, its deletion does not impact on
  * performance.
  * <p/>
  * Secondly, it allows the deletion to occur across Pulse restarts.
+ * <p/>
+ * Finally, it will not delete files outside of the Pulse data directory.
+ * This is a safety measure to prevent Pulse from deleting files that it does
+ * not manage.
  */
 public class FileDeletionService extends BackgroundServiceSupport
 {
@@ -35,6 +38,7 @@ public class FileDeletionService extends BackgroundServiceSupport
     public static final String SUFFIX = ".dead";
 
     public Set<File> index = new HashSet<File>();
+    private File dataDir;
     public File indexFile;
     
     private ConfigurationManager configurationManager;
@@ -47,9 +51,11 @@ public class FileDeletionService extends BackgroundServiceSupport
     @Override
     public synchronized void init()
     {
-        super.init();
+        dataDir = configurationManager.getUserPaths().getData();
         
-        indexFile = new File(configurationManager.getUserPaths().getData(), INDEX_FILE_NAME);
+        super.init();
+
+        indexFile = new File(dataDir, INDEX_FILE_NAME);
         loadIndex();
     }
 
@@ -69,7 +75,7 @@ public class FileDeletionService extends BackgroundServiceSupport
             throw new IllegalArgumentException(I18N.format("delete.null.exception"));
         }
 
-        if (!file.exists())
+        if (!file.exists() || !withinDataDir(file))
         {
             FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>()
             {
@@ -93,6 +99,19 @@ public class FileDeletionService extends BackgroundServiceSupport
         }
 
         return indexAndScheduleDeletion(file);
+    }
+
+    private boolean withinDataDir(File file)
+    {
+        try
+        {
+            return FileSystemUtils.isParentOf(dataDir, file);
+        }
+        catch (IOException e)
+        {
+            LOG.warning(e);
+            return false;
+        }
     }
 
     /**
