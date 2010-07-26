@@ -339,6 +339,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             agentSynchronisationMessageDao.delete(message);
         }
+        agentSynchronisationMessageDao.flush();
     }
 
     public void saveSynchronisationMessages(List<AgentSynchronisationMessage> messages)
