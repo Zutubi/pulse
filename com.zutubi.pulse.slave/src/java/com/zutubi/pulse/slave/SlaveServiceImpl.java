@@ -111,8 +111,9 @@ public class SlaveServiceImpl implements SlaveService
         return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
     }
 
-    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+    public List<SynchronisationMessageResult> synchronise(String token, List<SynchronisationMessage> messages)
     {
+        serviceTokenManager.validateToken(token);
         return synchronisationTaskRunner.synchronise(messages);
     }
 

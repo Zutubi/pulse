@@ -47,10 +47,11 @@ public interface SlaveService
      * Messages are converted to tasks, the tasks executed and the results
      * returned.
      *
+     * @param token    secure token for inter-agent communication
      * @param messages messages to process
      * @return results corresponding results for each of the messages
      */
-    List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages);
+    List<SynchronisationMessageResult> synchronise(String token, List<SynchronisationMessage> messages);
 
     /**
      * A request to build a recipe on the slave, if the slave is currently idle.
