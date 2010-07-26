@@ -99,7 +99,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         agentManager = new DefaultAgentManager()
         {
             @Override
-            public Agent getAgentByHandle(long handle)
+            public Agent getAgentById(long id)
             {
                 return agent;
             }
