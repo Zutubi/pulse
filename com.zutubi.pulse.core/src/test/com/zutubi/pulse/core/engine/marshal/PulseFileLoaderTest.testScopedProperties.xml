@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <property name="foo" value="bar"/>
+    <scope>
+        <property name="foo" value="quux"/>
+        <recipe name="$(foo)"/>
+    </scope>
+    <recipe name="$(foo)"/>
+</project>

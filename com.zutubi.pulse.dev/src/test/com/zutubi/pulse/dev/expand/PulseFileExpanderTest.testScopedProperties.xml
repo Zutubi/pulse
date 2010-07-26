@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default-recipe="default">
+    <property name="foo" value="bar"/>
+    
+    <scope>
+        <property name="foo" value="quux"/>
+
+        <recipe name="inner">
+            <noop name="$(foo)"/>
+        </recipe>
+    </scope>
+
+    <recipe name="outer">
+        <noop name="$(foo)"/>
+    </recipe>
+</project>

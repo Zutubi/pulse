@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default-recipe="default">
-    <recipe name="default">
+    <recipe name="inner">
+        <noop name="quux"/>
+    </recipe>
+    <recipe name="outer">
         <noop name="bar"/>
     </recipe>
 </project>

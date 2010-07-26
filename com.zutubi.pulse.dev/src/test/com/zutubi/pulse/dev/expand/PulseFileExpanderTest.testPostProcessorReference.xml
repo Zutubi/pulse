@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default-recipe="default">
+    <noop.pp name="processor"/>
+    
+    <recipe name="default">
+        <noop name="command">
+            <artifact name="art" file="f.txt">
+                <process processor="$(processor)"/>
+            </artifact>
+        </noop>
+    </recipe>
+</project>

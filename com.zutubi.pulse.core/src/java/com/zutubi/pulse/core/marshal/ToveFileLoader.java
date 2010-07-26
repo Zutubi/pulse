@@ -481,27 +481,34 @@ public class ToveFileLoader
                     {
                         MapType mapType = (MapType) type;
                         CompositeType elementType = mapType.getTargetType();
-    
+
                         @SuppressWarnings("unchecked")
                         Map<String, Object> map = (Map) value;
                         String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
-                        if (map.containsKey(key))
-                        {
-                            Class targetClass = type.getTargetType().getClazz();
-                            Messages targetMessages = Messages.getInstance(targetClass);
-                            String targetLabel;
-                            if (targetMessages.isKeyDefined(KEY_LABEL))
-                            {
-                                targetLabel = targetMessages.format(KEY_LABEL);
-                            }
-                            else
-                            {
-                                targetLabel = targetClass.getSimpleName();
-                            }
-                            
-                            throw new FileLoadException("Duplicated " + targetLabel + " name '" + key + "'");
-                        }
                         
+                        // Referenceable instances are excluded from this check
+                        // as they can sensibly exist with duplicate names (by
+                        // use of scopes).
+                        if (!elementType.hasAnnotation(Referenceable.class, true))
+                        {
+                            if (map.containsKey(key))
+                            {
+                                Class targetClass = type.getTargetType().getClazz();
+                                Messages targetMessages = Messages.getInstance(targetClass);
+                                String targetLabel;
+                                if (targetMessages.isKeyDefined(KEY_LABEL))
+                                {
+                                    targetLabel = targetMessages.format(KEY_LABEL);
+                                }
+                                else
+                                {
+                                    targetLabel = targetClass.getSimpleName();
+                                }
+                                
+                                throw new FileLoadException("Duplicated " + targetLabel + " name '" + key + "'");
+                            }
+                        }
+
                         map.put(key, instance);
                     }
                     

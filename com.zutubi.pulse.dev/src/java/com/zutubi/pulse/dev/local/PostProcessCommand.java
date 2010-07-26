@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.cli.HelpCommand;
-import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.ReferenceCollectingProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
@@ -116,7 +116,7 @@ public class PostProcessCommand implements Command
         try
         {
             File in = checkFile(inputFile, "Input");
-            ProjectRecipesConfiguration projectRecipesConfiguration = loadPulseFile(pulseFile, loadResources(resourcesFile));
+            ReferenceCollectingProjectRecipesConfiguration projectRecipesConfiguration = loadPulseFile(pulseFile, loadResources(resourcesFile));
             PostProcessorConfiguration postProcessorConfiguration = projectRecipesConfiguration.getPostProcessors().get(processorName);
             if (postProcessorConfiguration == null)
             {
@@ -221,13 +221,13 @@ public class PostProcessCommand implements Command
         return resourceRepository;
     }
 
-    private ProjectRecipesConfiguration loadPulseFile(String fileName, ResourceRepository resourceRepository)
+    private ReferenceCollectingProjectRecipesConfiguration loadPulseFile(String fileName, ResourceRepository resourceRepository)
     {
         PulseFileLoaderFactory fileLoaderFactory = SpringComponentContext.getBean("fileLoaderFactory");
 
         File f = checkFile(fileName, "Pulse");
         PulseFileLoader loader = fileLoaderFactory.createLoader();
-        ProjectRecipesConfiguration result = new ProjectRecipesConfiguration();
+        ReferenceCollectingProjectRecipesConfiguration result = new ReferenceCollectingProjectRecipesConfiguration();
         try
         {
             PulseScope pulseScope = new PulseScope();

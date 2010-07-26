@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.engine.marshal;
 
-import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.ReferenceCollectingProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.doc.ToveFileDocManager;
 import com.zutubi.tove.type.CompositeType;
@@ -17,7 +17,7 @@ public class MasterPulseFileLoaderFactory extends PulseFileLoaderFactory
     public void init()
     {
         super.init();
-        toveFileDocManager.registerRoot(ROOT_ELEMENT, typeRegistry.getType(ProjectRecipesConfiguration.class), typeDefinitions);
+        toveFileDocManager.registerRoot(ROOT_ELEMENT, typeRegistry.getType(ReferenceCollectingProjectRecipesConfiguration.class), typeDefinitions);
     }
 
     @Override
