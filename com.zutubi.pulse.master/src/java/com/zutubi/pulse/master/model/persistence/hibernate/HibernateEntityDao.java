@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.persistence.EntityDao;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoSupport implements EntityDao<T>
 {
+    private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
+
     @SuppressWarnings({"unchecked"})
     public T findById(long id)
     {
@@ -234,6 +237,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     {
         if (l > Integer.MAX_VALUE)
         {
+            LOG.warning("toInt limit reached.  Truncating value (" + l + ") to Integer.MAX_VALUE");
             return Integer.MAX_VALUE;
         }
         return (int)l;
