@@ -43,6 +43,9 @@
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
 
+        <!-- create the local.properties file if it does not yet exist. -->
+        <copy file="etc/local.properties.template" tofile="local.properties" overwrite="false"/>
+
         <load-ivy-taskdef/>
         <ivy:settings file="ivysettings.xml"/>
 

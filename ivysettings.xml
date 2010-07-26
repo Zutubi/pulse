@@ -6,7 +6,7 @@
 
     <!-- initialise the required properties. -->
     <property name="ivy.default.resolver" value="ivy.zutubi.com" override="false"/>
-    <property name="ivy.local.repository" value="./repository" override="false"/>
+    <property name="ivy.local.repository" value="${ivy.project.dir}/repository" override="false"/>
 
     <settings defaultResolver="${ivy.default.resolver}"/>
 
