@@ -375,7 +375,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         return agentSynchronisationMessageDao.findById(messageId);
     }
 
-    public boolean completeSynchronisation(final Agent agent, final boolean successful)
+    public boolean completeSynchronisation(final long agentId, final boolean successful)
     {
         return agentStatusManager.withAgentsLock(new NullaryFunction<Boolean>()
         {
@@ -385,9 +385,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 // agent), we declare it complete and let the status manager
                 // move the agent offline.  When we get a successful ping, a
                 // new cycle will start.
-                if (!successful || allSynchronisationMessagesComplete(agent.getId()))
+                if (!successful || allSynchronisationMessagesComplete(agentId))
                 {
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, agent, successful));
+                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgentById(agentId), successful));
                     return true;
                 }
                 else

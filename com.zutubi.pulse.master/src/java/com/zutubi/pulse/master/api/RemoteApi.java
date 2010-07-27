@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -37,9 +38,7 @@ import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
-import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
-import com.zutubi.pulse.servercore.agent.TestSynchronisationTask;
+import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
@@ -53,14 +52,13 @@ import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import com.zutubi.i18n.Messages;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -1495,16 +1493,19 @@ public class RemoteApi
      * @internal Enqueues a test synchronisation message for the given agent.
      * @param token       authentication token
      * @param agent       name of the agent to queue the message for
+     * @param synchronous if true, enqueue a synchronous message, otherwise
+     *                    enqueue an asynchronous one
      * @param description description of the message
      * @param succeed     true if the task should succeed, false otherwise
      * @return true
      */
-    public boolean enqueueSynchronisationMessage(String token, String agent, String description, boolean succeed)
+    public boolean enqueueSynchronisationMessage(String token, String agent, boolean synchronous, String description, boolean succeed)
     {
         tokenManager.loginUser(token);
         try
         {
-            SynchronisationMessage message = synchronisationTaskFactory.toMessage(new TestSynchronisationTask(succeed));
+            SynchronisationTask task = synchronous ? new TestSynchronisationTask(succeed): new TestAsyncSynchronisationTask(succeed);
+            SynchronisationMessage message = synchronisationTaskFactory.toMessage(task);
             agentManager.enqueueSynchronisationMessages(internalGetAgent(agent), asList(asPair(message, description)));
             return true;
         }

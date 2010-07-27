@@ -82,4 +82,43 @@ public class SynchronisationMessageResult
     {
         return message;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        SynchronisationMessageResult that = (SynchronisationMessageResult) o;
+
+        if (messageId != that.messageId)
+        {
+            return false;
+        }
+        if (successful != that.successful)
+        {
+            return false;
+        }
+        if (message != null ? !message.equals(that.message) : that.message != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = (int) (messageId ^ (messageId >>> 32));
+        result = 31 * result + (successful ? 1 : 0);
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        return result;
+    }
 }

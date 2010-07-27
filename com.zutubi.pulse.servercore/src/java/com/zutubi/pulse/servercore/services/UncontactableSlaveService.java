@@ -39,7 +39,7 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+    public List<SynchronisationMessageResult> synchronise(String token, String master, long agentId, List<SynchronisationMessage> messages)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

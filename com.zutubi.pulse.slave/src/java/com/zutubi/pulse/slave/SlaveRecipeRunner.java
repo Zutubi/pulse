@@ -1,10 +1,8 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
@@ -18,6 +16,8 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.net.MalformedURLException;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * Runner for recipes executing on a slave service.
@@ -39,13 +39,6 @@ public class SlaveRecipeRunner implements RecipeRunner
     {
         this.master = master;
         recipeCleanup = new RecipeCleanup(new FileSystem());
-    }
-
-    private EventListener registerMasterListener(String master, MasterService service, long id)
-    {
-        EventListener listener = new ForwardingEventListener(master, service, serviceTokenManager, id);
-        eventManager.register(listener);
-        return listener;
     }
 
     private MasterService getMasterProxy(String master)
@@ -74,7 +67,6 @@ public class SlaveRecipeRunner implements RecipeRunner
             File dataDir = configurationManager.getUserPaths().getData();
             ServerRecipePaths processorPaths = new ServerRecipePaths(details, dataDir);
 
-            EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(details.getAgentHandle(), masterProxy, serviceTokenManager);
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
@@ -114,7 +106,6 @@ public class SlaveRecipeRunner implements RecipeRunner
             {
                 IOUtils.close(outputStream);
                 context.pop();
-                eventManager.unregister(listener);
             }
         }
     }

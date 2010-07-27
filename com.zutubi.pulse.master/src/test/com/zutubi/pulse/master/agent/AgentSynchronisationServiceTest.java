@@ -6,7 +6,6 @@ import com.zutubi.events.RecordingEventListener;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.events.AgentSynchronisationCompleteEvent;
-import com.zutubi.pulse.master.events.AgentSynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.HostState;
@@ -19,6 +18,7 @@ import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
+import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import org.mockito.InOrder;
@@ -455,12 +455,12 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
     private void publishSuccessfulResult(long messageId)
     {
-        eventManager.publish(new AgentSynchronisationMessageProcessedEvent(this, agent, new SynchronisationMessageResult(messageId)));
+        eventManager.publish(new SynchronisationMessageProcessedEvent(this, agent.getId(), new SynchronisationMessageResult(messageId)));
     }
     
     private void publishFailedResult(long messageId)
     {
-        eventManager.publish(new AgentSynchronisationMessageProcessedEvent(this, agent, new SynchronisationMessageResult(messageId, false, "nasty")));
+        eventManager.publish(new SynchronisationMessageProcessedEvent(this, agent.getId(), new SynchronisationMessageResult(messageId, false, "nasty")));
     }
     
     private AgentSynchronisationCompleteEvent awaitEvent()

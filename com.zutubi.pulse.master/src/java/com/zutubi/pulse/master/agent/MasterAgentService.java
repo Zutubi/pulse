@@ -12,7 +12,7 @@ import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
 import com.zutubi.util.CollectionUtils;
@@ -35,7 +35,7 @@ public class MasterAgentService implements AgentService
     private MasterConfigurationManager configurationManager;
     private ObjectFactory objectFactory;
     private ResourceManager resourceManager;
-    private SynchronisationTaskRunner synchronisationTaskRunner;
+    private SynchronisationTaskRunnerService synchronisationTaskRunnerService;
 
     public MasterAgentService(AgentConfiguration agentConfig)
     {
@@ -98,7 +98,7 @@ public class MasterAgentService implements AgentService
 
     public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
-        return synchronisationTaskRunner.synchronise(messages);
+        return synchronisationTaskRunnerService.synchronise(agentConfig.getAgentStateId(), messages);
     }
 
     public List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String relativePath)
@@ -153,8 +153,8 @@ public class MasterAgentService implements AgentService
         this.resourceManager = resourceManager;
     }
 
-    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
+    public void setSynchronisationTaskRunnerService(SynchronisationTaskRunnerService synchronisationTaskRunnerService)
     {
-        this.synchronisationTaskRunner = synchronisationTaskRunner;
+        this.synchronisationTaskRunnerService = synchronisationTaskRunnerService;
     }
 }

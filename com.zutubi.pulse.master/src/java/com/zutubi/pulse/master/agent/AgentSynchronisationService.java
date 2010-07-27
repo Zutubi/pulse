@@ -4,11 +4,11 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
-import com.zutubi.pulse.master.events.AgentSynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
@@ -116,7 +116,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             
             for (Long agentId: affectedAgentIds)
             {
-                agentManager.completeSynchronisation(agentManager.getAgentById(agentId), true);
+                agentManager.completeSynchronisation(agentId, true);
             }
         }
         finally
@@ -153,7 +153,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     }
                     finally
                     {
-                        if (!agentManager.completeSynchronisation(agent, successful))
+                        if (!agentManager.completeSynchronisation(agent.getId(), successful))
                         {
                             // More messages have come in, go around again.
                             syncAgent(agent);
@@ -263,13 +263,13 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         }
     }
 
-    private void handleMessageProcessed(final Agent agent, final SynchronisationMessageResult result)
+    private void handleMessageProcessed(final long agentId, final SynchronisationMessageResult result)
     {
         getExecutorService().submit(new Runnable()
         {
             public void run()
             {
-                lockAgent(agent.getId());
+                lockAgent(agentId);
                 try
                 {
                     AgentSynchronisationMessage message = agentManager.getSynchronisationMessage(result.getMessageId());
@@ -277,12 +277,12 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     {
                         message.applyResult(result);
                         agentManager.saveSynchronisationMessages(Arrays.asList(message));
-                        agentManager.completeSynchronisation(agent, true);
+                        agentManager.completeSynchronisation(agentId, true);
                     }
                 }
                 finally
                 {
-                    unlockAgent(agent.getId());
+                    unlockAgent(agentId);
                 }
             }
         });
@@ -300,14 +300,14 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         }
         else
         {
-            AgentSynchronisationMessageProcessedEvent asmpe = (AgentSynchronisationMessageProcessedEvent) event;
-            handleMessageProcessed(asmpe.getAgent(), asmpe.getResult());
+            SynchronisationMessageProcessedEvent smpe = (SynchronisationMessageProcessedEvent) event;
+            handleMessageProcessed(smpe.getAgentId(), smpe.getResult());
         }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{AgentStatusChangeEvent.class, AgentSynchronisationMessageProcessedEvent.class};
+        return new Class[]{AgentStatusChangeEvent.class, SynchronisationMessageProcessedEvent.class};
     }
 
     public void setEventManager(EventManager eventManager)

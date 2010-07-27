@@ -12,7 +12,7 @@ import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
@@ -44,7 +44,8 @@ public class SlaveServiceImpl implements SlaveService
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
     private ObjectFactory objectFactory;
-    private SynchronisationTaskRunner synchronisationTaskRunner;
+    private SynchronisationTaskRunnerService synchronisationTaskRunnerService;
+    private ForwardingEventListener forwardingEventListener;
 
     private boolean firstStatus = true;
 
@@ -111,9 +112,19 @@ public class SlaveServiceImpl implements SlaveService
         return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
     }
 
-    public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
+    public List<SynchronisationMessageResult> synchronise(String token, String master, long agentId, List<SynchronisationMessage> messages)
     {
-        return synchronisationTaskRunner.synchronise(messages);
+        serviceTokenManager.validateToken(token);
+        try
+        {
+            MasterService masterService = masterProxyFactory.createProxy(master);
+            forwardingEventListener.setMaster(master, masterService);
+            return synchronisationTaskRunnerService.synchronise(agentId, messages);
+        }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     private void pongMaster(String master) throws MalformedURLException
@@ -130,8 +141,10 @@ public class SlaveServiceImpl implements SlaveService
 
         try
         {
+            MasterService masterService = masterProxyFactory.createProxy(master);
+            forwardingEventListener.setMaster(master, masterService);
             SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, new Class[]{String.class}, new Object[]{master});
-            ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), delegateRunner);
+            ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getId(), delegateRunner);
             serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
             return true;
         }
@@ -243,8 +256,13 @@ public class SlaveServiceImpl implements SlaveService
         this.serverRecipeService = serverRecipeService;
     }
 
-    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
+    public void setSynchronisationTaskRunnerService(SynchronisationTaskRunnerService synchronisationTaskRunnerService)
     {
-        this.synchronisationTaskRunner = synchronisationTaskRunner;
+        this.synchronisationTaskRunnerService = synchronisationTaskRunnerService;
+    }
+
+    public void setForwardingEventListener(ForwardingEventListener forwardingEventListener)
+    {
+        this.forwardingEventListener = forwardingEventListener;
     }
 }

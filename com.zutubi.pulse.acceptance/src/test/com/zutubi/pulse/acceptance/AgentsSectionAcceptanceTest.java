@@ -276,7 +276,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleAgent(random, "localhost");
         xmlRpcHelper.waitForAgentToBeIdle(random);
-        xmlRpcHelper.enqueueSynchronisationMessage(random, "test message", true);
+        xmlRpcHelper.enqueueSynchronisationMessage(random, true, "test message", true);
         xmlRpcHelper.waitForAgentToBeIdle(random);
 
         browser.loginAsAdmin();
@@ -286,11 +286,25 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
     }
 
+    public void testAsyncSynchronisationMessage() throws Exception
+    {
+        xmlRpcHelper.insertSimpleAgent(random, "localhost");
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+        xmlRpcHelper.enqueueSynchronisationMessage(random, false, "test async message", true);
+        xmlRpcHelper.waitForAgentToBeIdle(random);
+
+        browser.loginAsAdmin();
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
+        assertEquals(1, statusPage.getSynchronisationMessageCount());
+        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST_ASYNC, "test async message", AgentSynchronisationMessage.Status.SUCCEEDED);
+        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
+    }
+    
     public void testFailedSynchronisationMessage() throws Exception
     {
         xmlRpcHelper.insertSimpleAgent(random, "localhost");
         xmlRpcHelper.waitForAgentToBeIdle(random);
-        xmlRpcHelper.enqueueSynchronisationMessage(random, TEST_DESCRIPTION, false);
+        xmlRpcHelper.enqueueSynchronisationMessage(random, true, TEST_DESCRIPTION, false);
         xmlRpcHelper.waitForAgentToBeIdle(random);
 
         browser.loginAsAdmin();
@@ -311,7 +325,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         WaitProject project = startBuildOnAgent(projectName, agentName);
 
-        xmlRpcHelper.enqueueSynchronisationMessage(agentName, TEST_DESCRIPTION, true);
+        xmlRpcHelper.enqueueSynchronisationMessage(agentName, true, TEST_DESCRIPTION, true);
 
         browser.loginAsAdmin();
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
@@ -334,17 +348,30 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         final int MESSAGE_COUNT = 12;
 
         xmlRpcHelper.insertSimpleAgent(random, "localhost");
-        xmlRpcHelper.waitForAgentToBeIdle(random);
-        for (int i = 0; i < MESSAGE_COUNT; i++)
+        multipleMessageHelper(random, MESSAGE_COUNT);
+    }
+
+    public void testMultipleSynchronisationMessagesOnMaster() throws Exception
+    {
+        final int MESSAGE_COUNT = 12;
+
+        xmlRpcHelper.insertLocalAgent(random);
+        multipleMessageHelper(random, MESSAGE_COUNT);
+    }
+
+    private void multipleMessageHelper(String agentName, int messageCount) throws Exception
+    {
+        xmlRpcHelper.waitForAgentToBeIdle(agentName);
+        for (int i = 0; i < messageCount; i++)
         {
-            xmlRpcHelper.enqueueSynchronisationMessage(random, "Description " + i, true);
+            xmlRpcHelper.enqueueSynchronisationMessage(agentName, true, "Description " + i, true);
         }
-        xmlRpcHelper.waitForAgentToBeIdle(random);
+        xmlRpcHelper.waitForAgentToBeIdle(agentName);
 
         browser.loginAsAdmin();
-        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
+        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
         assertEquals(COMPLETED_MESSAGE_LIMIT, statusPage.getSynchronisationMessageCount());
-        int offset = MESSAGE_COUNT - COMPLETED_MESSAGE_LIMIT;
+        int offset = messageCount - COMPLETED_MESSAGE_LIMIT;
         for (int i = 0; i < COMPLETED_MESSAGE_LIMIT; i++)
         {
             AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "Description " + (i + offset), AgentSynchronisationMessage.Status.SUCCEEDED);

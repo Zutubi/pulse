@@ -110,7 +110,7 @@
 
     <bean id="synchronisationTaskFactory" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory"/>
 
-    <bean id="synchronisationTaskRunner" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner"/>
+    <bean id="synchronisationTaskRunnerService" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService"/>
 
     <bean id="buildResultRenderer" class="com.zutubi.pulse.master.notifications.renderer.FreemarkerBuildResultRenderer"/>
 

@@ -8,9 +8,9 @@ import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
+import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -37,9 +37,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
@@ -777,9 +777,9 @@ public class XmlRpcHelper
         call("logWarning", message);
     }
 
-    public void enqueueSynchronisationMessage(String agent, String description, boolean succeed) throws Exception
+    public void enqueueSynchronisationMessage(String agent, boolean synchronous, String description, boolean succeed) throws Exception
     {
-        call("enqueueSynchronisationMessage", agent, description, succeed);
+        call("enqueueSynchronisationMessage", agent, synchronous, description, succeed);
     }
 
     public int getNextBuildNumber(String projectName) throws Exception
