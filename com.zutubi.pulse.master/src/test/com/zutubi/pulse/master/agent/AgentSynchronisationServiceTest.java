@@ -450,6 +450,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     
     private void publishStatusChange()
     {
+        agent.updateStatus(AgentStatus.SYNCHRONISING);
         eventManager.publish(new AgentStatusChangeEvent(this, agent, AgentStatus.OFFLINE, AgentStatus.SYNCHRONISING));
     }
 
@@ -483,6 +484,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             }
         }
 
+        agent.updateStatus(AgentStatus.SYNCHRONISED);
         return (AgentSynchronisationCompleteEvent) listener.getEventsReceived().remove(0);
     }
 

@@ -36,6 +36,10 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
     private static final Logger LOG = Logger.getLogger(AgentSynchronisationService.class);
 
     public static final int COMPLETED_MESSAGE_LIMIT = 10;
+
+    public static final StatusInPredicate PENDING_MESSAGES_PREDICATE = new StatusInPredicate(EnumSet.of(AgentSynchronisationMessage.Status.QUEUED, AgentSynchronisationMessage.Status.SENDING_FAILED));
+    public static final StatusInPredicate INCOMPLETE_MESSAGES_PREDICATE = new StatusInPredicate(EnumSet.of(AgentSynchronisationMessage.Status.QUEUED, AgentSynchronisationMessage.Status.SENDING_FAILED, AgentSynchronisationMessage.Status.PROCESSING));
+    public static final StatusInPredicate COMPLETED_MESSAGES_PREDICATE = new StatusInPredicate(EnumSet.of(AgentSynchronisationMessage.Status.FAILED_PERMANENTLY, AgentSynchronisationMessage.Status.SUCCEEDED));
     
     static final long MESSAGE_TIMEOUT_SECONDS = Long.getLong("pulse.agent.sync.message.timeout", 1800);
     static final long TIMEOUT_CHECK_INTERVAL = Long.getLong("pulse.agent.sync.message.timeout.interval", 300);
@@ -116,7 +120,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             
             for (Long agentId: affectedAgentIds)
             {
-                agentManager.completeSynchronisation(agentId, true);
+                tryToComplete(agentId, true);
             }
         }
         finally
@@ -125,24 +129,30 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         }
     }
 
-    private void syncAgent(final Agent agent)
+    private void syncAgent(final long agentId)
     {
         getExecutorService().submit(new Runnable()
         {
             public void run()
             {
-                lockAgent(agent.getId());
+                Agent agent = agentManager.getAgentById(agentId);
+                if (agent == null)
+                {
+                    return;
+                }
+                
+                lockAgent(agentId);
                 try
                 {
                     boolean successful = true;
                     try
                     {
-                        List<AgentSynchronisationMessage> messages = agentManager.getSynchronisationMessages(agent.getId());
-                        List<AgentSynchronisationMessage> pendingMessages = filter(messages, new StatusInPredicate(EnumSet.of(AgentSynchronisationMessage.Status.QUEUED, AgentSynchronisationMessage.Status.SENDING_FAILED)));
+                        List<AgentSynchronisationMessage> messages = agentManager.getSynchronisationMessages(agentId);
+                        List<AgentSynchronisationMessage> pendingMessages = filter(messages, PENDING_MESSAGES_PREDICATE);
                         if (pendingMessages.size() > 0)
                         {
                             setMessagesToProcessing(pendingMessages);
-                            successful = sendPendingMessages(pendingMessages);
+                            successful = sendPendingMessages(agent, pendingMessages);
                         }
     
                         cleanupOldCompletedMessages(messages);
@@ -153,16 +163,12 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     }
                     finally
                     {
-                        if (!agentManager.completeSynchronisation(agent.getId(), successful))
-                        {
-                            // More messages have come in, go around again.
-                            syncAgent(agent);
-                        }
+                        tryToComplete(agentId, successful);
                     }
                 }
                 finally
                 {
-                    unlockAgent(agent.getId());
+                    unlockAgent(agentId);
                 }
             }
 
@@ -177,7 +183,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                 agentManager.saveSynchronisationMessages(pendingMessages);
             }
 
-            private boolean sendPendingMessages(List<AgentSynchronisationMessage> pendingMessages)
+            private boolean sendPendingMessages(Agent agent, List<AgentSynchronisationMessage> pendingMessages)
             {
                 List<SynchronisationMessage> toSend = map(pendingMessages, new ExtractMessageMapping());
 
@@ -227,7 +233,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 
             private void cleanupOldCompletedMessages(List<AgentSynchronisationMessage> messages)
             {
-                List<AgentSynchronisationMessage> completed = filter(messages, new StatusInPredicate(EnumSet.of(AgentSynchronisationMessage.Status.FAILED_PERMANENTLY, AgentSynchronisationMessage.Status.SUCCEEDED)));
+                List<AgentSynchronisationMessage> completed = filter(messages, COMPLETED_MESSAGES_PREDICATE);
                 if (completed.size() > COMPLETED_MESSAGE_LIMIT)
                 {
                     agentManager.dequeueSynchronisationMessages(completed.subList(0, completed.size() - COMPLETED_MESSAGE_LIMIT));
@@ -263,6 +269,14 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         }
     }
 
+    private void tryToComplete(long agentId, boolean successful)
+    {
+        if (!agentManager.completeSynchronisation(agentId, successful))
+        {
+            syncAgent(agentId);
+        }
+    }
+
     private void handleMessageProcessed(final long agentId, final SynchronisationMessageResult result)
     {
         getExecutorService().submit(new Runnable()
@@ -277,7 +291,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     {
                         message.applyResult(result);
                         agentManager.saveSynchronisationMessages(Arrays.asList(message));
-                        agentManager.completeSynchronisation(agentId, true);
+                        tryToComplete(agentId, true);
                     }
                 }
                 finally
@@ -295,7 +309,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             AgentStatusChangeEvent asce = (AgentStatusChangeEvent) event;
             if (asce.getNewStatus() == AgentStatus.SYNCHRONISING)
             {
-                syncAgent(asce.getAgent());
+                syncAgent(asce.getAgent().getId());
             }
         }
         else

@@ -381,32 +381,32 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             public Boolean process()
             {
-                // When a cycle is unsuccessful (unable to sent messages to the
-                // agent), we declare it complete and let the status manager
-                // move the agent offline.  When we get a successful ping, a
-                // new cycle will start.
-                if (!successful || allSynchronisationMessagesComplete(agentId))
+                Agent agent = getAgentById(agentId);
+                if (agent != null)
                 {
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgentById(agentId), successful));
-                    return true;
+                    List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agentId);
+                    if (agent.getStatus() == AgentStatus.SYNCHRONISING)
+                    {
+                        // When a cycle is unsuccessful (unable to sent messages to the
+                        // agent), we declare it complete and let the status manager
+                        // move the agent offline.  When we get a successful ping, a
+                        // new cycle will start.
+                        if (!successful || !CollectionUtils.contains(messages, AgentSynchronisationService.INCOMPLETE_MESSAGES_PREDICATE))
+                        {
+                            eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgentById(agentId), successful));
+                            return true;
+                        }
+                    }
+                    
+                    return !CollectionUtils.contains(messages, AgentSynchronisationService.PENDING_MESSAGES_PREDICATE);
                 }
                 else
                 {
-                    return false;
+                    // We don't want a new cycle to start in this case.
+                    return true;
                 }
             }
         });
-    }
-
-    private boolean allSynchronisationMessagesComplete(long agentId)
-    {
-        List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agentId);
-        EnumSet<AgentSynchronisationMessage.Status> incompleteStates = EnumSet.of(
-                AgentSynchronisationMessage.Status.QUEUED,
-                AgentSynchronisationMessage.Status.PROCESSING,
-                AgentSynchronisationMessage.Status.SENDING_FAILED
-        );
-        return !CollectionUtils.contains(messages, new AgentSynchronisationService.StatusInPredicate(incompleteStates));
     }
 
     public void setEnableState(Agent agent, AgentState.EnableState state)

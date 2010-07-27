@@ -129,7 +129,8 @@ public interface AgentManager extends AgentPersistentStatusManager
      * @param successful indicates if sending of the last batch of messages
      *                   succeeded (if not, the event is always sent indicating
      *                   the cycle should be retried later)
-     * @return true if the cycle is complete, false if it should re-run
+     * @return true if the cycle is complete, false if it should re-run because
+     *         new messages are available
      */
     boolean completeSynchronisation(long agentId, boolean successful);
 }
