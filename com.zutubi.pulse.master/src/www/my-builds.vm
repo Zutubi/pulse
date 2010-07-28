@@ -4,8 +4,8 @@
 <html>
 <head>
     <title>#wwtext("name=my.builds")</title>
-    <script type="text/javascript" src="$base/js/yahoo/utilities.js"></script>
-    <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/utilities.js?#version()"></script>
+    <script type="text/javascript" src="$base/js/buildcolumns.js?#version()"></script>
     <script type="text/javascript">
     //<![CDATA[
         #updater("$base/ajax/myBuildsPanel.action" "panel" $principle "Ext.emptyFn")

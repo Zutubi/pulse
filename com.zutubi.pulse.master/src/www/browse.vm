@@ -4,20 +4,21 @@
 <html>
 <head>
     <title>#wwtext("name=projects")</title>
-    <script type="text/javascript" src="$base/js/StatusBar.js"></script>
-    <script type="text/javascript" src="$base/js/projects.js"></script>
+    <script type="text/javascript" src="$base/js/StatusBar.js?#version()"></script>
+    <script type="text/javascript" src="$base/js/projects.js?#version()"></script>
     <script type="text/javascript">
+        var refreshInterval;
         #if($refreshInterval)
-            var refreshInterval = $refreshInterval;
+            refreshInterval = $refreshInterval;
         #elseif($principle.preferences.refreshingEnabled)
-            var refreshInterval = $principle.preferences.refreshInterval;
+            refreshInterval = $principle.preferences.refreshInterval;
         #else
-            var refreshInterval = 0;
+            refreshInterval = 0;
         #end
 
         var invalidEl;
         var projectsTable;
-        var view;
+        var view;e
 
         function update(data)
         {

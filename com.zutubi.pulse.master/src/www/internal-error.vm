@@ -1,6 +1,6 @@
 <html>
 <head>
-    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="$base/css/main.css?#version()" rel="stylesheet" type="text/css" media="screen"/>
     <title>#wwtext("name=internal.error")</title>
 </head>
 <body>

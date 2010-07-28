@@ -4,8 +4,8 @@
 <html>
 <head>
     <title>#wwtext("name=dashboard")</title>
-    <script type="text/javascript" src="$base/js/StatusBar.js"></script>
-    <script type="text/javascript" src="$base/js/projects.js"></script>
+    <script type="text/javascript" src="$base/js/StatusBar.js?#version()"></script>
+    <script type="text/javascript" src="$base/js/projects.js?#version()"></script>
     <script type="text/javascript">
         #if($refreshInterval)
             var refreshInterval = $refreshInterval;
