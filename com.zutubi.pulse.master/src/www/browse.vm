@@ -18,7 +18,7 @@
 
         var invalidEl;
         var projectsTable;
-        var view;e
+        var view;
 
         function update(data)
         {
