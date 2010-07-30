@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.spring;
+package com.zutubi.pulse.servercore.servlet;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.StringUtils;

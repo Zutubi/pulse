@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.spring;
+package com.zutubi.pulse.servercore.servlet;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.StringUtils;
@@ -9,8 +9,6 @@ import java.io.IOException;
 
 /**
  *  This servlet implementation is used to support autowiring of the specified delegate.
- *
- * @author Daniel Ostermeier
  */
 public class ServletWrapper implements Servlet
 {
