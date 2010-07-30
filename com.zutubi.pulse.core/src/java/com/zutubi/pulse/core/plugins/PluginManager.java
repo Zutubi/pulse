@@ -2,28 +2,27 @@ package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.plugins.osgi.Equinox;
 import com.zutubi.pulse.core.plugins.osgi.OSGiFramework;
+import com.zutubi.pulse.core.plugins.util.DependencySort;
+import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.tove.type.record.PathUtils;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The PluginManager is responsible for handling everything needed to support plugins.
@@ -53,13 +52,6 @@ public class PluginManager
      */
     private List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
 
-    // Special plugins that are loaded ahead of all others.  Upgrade handling does not apply to these plugins.
-    // These plugins are also NOT registered in the registry.  They can not be disabled, uninstalled, upgraded
-    // etc etc.
-    private List<LocalPlugin> internalPlugins = new LinkedList<LocalPlugin>();
-
-    private IExtensionRegistry extensionRegistry;
-    private IExtensionTracker extensionTracker;
 
     //-- plugin registry keys. --
 
@@ -133,15 +125,8 @@ public class PluginManager
 
         // setup the configuration.
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
-        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA + ".readOnly", Boolean.TRUE.toString());
-        equinox.start();
-
-        startupInternalPlugins();
-
-        // extension registry is not available until the internal plugins containing the eclipse registry have
-        // been loaded, that is, the internal plugins have been started up.
-        extensionRegistry = RegistryFactory.getRegistry();
-        extensionTracker = new ExtensionTracker(extensionRegistry);
+        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA_READONLY, Boolean.TRUE.toString());
+        equinox.start(paths.getInternalPluginStorageDir());
 
         // Step 3: scan the various directories and update the registry accordingly.
         //  - install the pre-packaged plugins, unless they have been explicitly marked as uninstalled.
@@ -284,29 +269,6 @@ public class PluginManager
                     }
                 }
             }
-        }
-    }
-
-    private void startupInternalPlugins() throws PluginException, BundleException
-    {
-        // A) load and install each of the plugins located in the internal storage location.
-        for (File file : paths.getInternalPluginStorageDir().listFiles(PLUGIN_FILTER))
-        {
-            LocalPlugin internalPlugin = createPluginHandle(file, Plugin.Type.INTERNAL);
-            internalPlugin.setBundle(equinox.install(internalPlugin.getSource()));
-            internalPlugin.setBundleDescription(equinox.getBundleDescription(internalPlugin.getId(), internalPlugin.getVersion().toString()));
-            internalPlugins.add(internalPlugin);
-        }
-
-        // B) Resolve all bundles, in this case all of the internal bundles.
-        equinox.resolveBundles();
-
-        // C) Start each of the internal plugins, ensuring that we do so in the order of there dependencies.
-        internalPlugins = sortPlugins(internalPlugins);
-        for (LocalPlugin plugin : internalPlugins)
-        {
-            plugin.getBundle().start(Bundle.START_TRANSIENT);
-            plugin.setState(Plugin.State.ENABLED);
         }
     }
 
@@ -940,7 +902,7 @@ public class PluginManager
         List<Plugin> dependents = new LinkedList<Plugin>();
         if (plugin.getBundleDescription() != null)
         {
-            dependents.addAll(getDependentPlugins(plugin, plugins, false));
+            dependents.addAll(getDependentPlugins(plugin, plugins));
         }
         return dependents;
     }
@@ -1073,11 +1035,6 @@ public class PluginManager
         return findPlugin(id, plugins);
     }
 
-    public Plugin getInternalPlugin(String id)
-    {
-        return findPlugin(id, internalPlugins);
-    }
-
     private LocalPlugin findPlugin(final String id, List<LocalPlugin> plugins)
     {
         return CollectionUtils.find(plugins, new Predicate<LocalPlugin>()
@@ -1170,39 +1127,18 @@ public class PluginManager
             throw new IllegalStateException("Can not sort plugins that have not been installed.");
         }
 
-        // A normal sort will not work as there is no ordering relationship
-        // between plugins that have no dependency relationship.
-        List<LocalPlugin> sorted = new LinkedList<LocalPlugin>();
-        for (LocalPlugin plugin : plugins)
+        return DependencySort.sort(plugins, new UnaryFunction<LocalPlugin, Set<LocalPlugin>>()
         {
-            // Insert it as late as we can in sorted without inserting after
-            // a transitive dependent.  If a dependent comes first, we are
-            // sure to insert before it.  If it comes after, it will end up
-            // after by virtue of being inserted as late as possible.
-            int i;
-            List<LocalPlugin> dependents = getDependentPlugins(plugin, plugins, true);
-            for (i = 0; i < sorted.size(); i++)
+            public Set<LocalPlugin> process(LocalPlugin plugin)
             {
-                if (dependents.contains(sorted.get(i)))
-                {
-                    break;
-                }
+                return getDependentPlugins(plugin, plugins);
             }
-            sorted.add(i, plugin);
-        }
-
-        return sorted;
+        });
     }
 
-    private List<LocalPlugin> getDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins, boolean transitive)
+    private Set<LocalPlugin> getDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins)
     {
-        List<LocalPlugin> result = new LinkedList<LocalPlugin>();
-        addDependentPlugins(plugin, plugins, transitive, result);
-        return result;
-    }
-
-    private void addDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins, boolean transitive, List<LocalPlugin> result)
-    {
+        Set<LocalPlugin> result = new HashSet<LocalPlugin>();
         BundleDescription description = plugin.getBundleDescription();
         BundleDescription[] required = description.getDependents();
         if (required != null)
@@ -1213,13 +1149,11 @@ public class PluginManager
                 if (p != null)
                 {
                     result.add(p);
-                    if (transitive)
-                    {
-                        addDependentPlugins(p, plugins, transitive, result);
-                    }
                 }
             }
         }
+        
+        return result;
     }
 
     public PluginRegistry getPluginRegistry()
@@ -1229,12 +1163,12 @@ public class PluginManager
 
     public IExtensionRegistry getExtensionRegistry()
     {
-        return extensionRegistry;
+        return equinox.getExtensionRegistry();
     }
 
     public IExtensionTracker getExtensionTracker()
     {
-        return extensionTracker;
+        return equinox.getExtensionTracker();
     }
 
     public void registerExtensionManager(ExtensionManager extensionManager)

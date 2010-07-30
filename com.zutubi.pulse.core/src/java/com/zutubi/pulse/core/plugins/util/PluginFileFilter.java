@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.plugins;
+package com.zutubi.pulse.core.plugins.util;
 
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;

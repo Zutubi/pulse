@@ -1,13 +1,18 @@
 package com.zutubi.pulse.core.plugins.osgi;
 
-import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.core.plugins.util.DependencySort;
+import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryFunction;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
-import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
-import org.eclipse.osgi.framework.util.Headers;
+import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
+import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.osgi.internal.baseadaptor.StateManager;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
-import org.eclipse.osgi.service.resolver.State;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -16,15 +21,17 @@ import org.osgi.service.packageadmin.PackageAdmin;
 
 import java.io.File;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
- *
- *
+ * Wraps the Equinox framework and low-level plugins (such as the extension
+ * registry) in a Pulse-friendly API.
  */
 public class Equinox implements OSGiFramework
 {
-    private static final Logger LOG = Logger.getLogger(Equinox.class);
-
     // embedded equinox resources.
     private BundleContext context;
     private ServiceReference packageAdminRef;
@@ -32,7 +39,10 @@ public class Equinox implements OSGiFramework
     private ServiceReference platformAdminRef;
     private PlatformAdmin platformAdmin;
 
-    public void start() throws Exception
+    private IExtensionRegistry extensionRegistry;
+    private IExtensionTracker extensionTracker;
+    
+    public void start(File internalPluginDir) throws Exception
     {
         context = EclipseStarter.startup(new String[]{"-clean"}, null);
 
@@ -58,6 +68,29 @@ public class Equinox implements OSGiFramework
             throw new RuntimeException("Could not access platform admin service");
         }
 
+        startInternalPlugins(internalPluginDir);
+
+        // extension registry is not available until the internal plugins containing the eclipse registry have
+        // been loaded, that is, the internal plugins have been started up.
+        extensionRegistry = RegistryFactory.getRegistry();
+        extensionTracker = new ExtensionTracker(extensionRegistry);
+    }
+
+    private void startInternalPlugins(File internalPluginDir) throws BundleException
+    {
+        List<Bundle> bundles = new LinkedList<Bundle>();
+        for (File file : internalPluginDir.listFiles(new PluginFileFilter()))
+        {
+            bundles.add(installBundle(file));
+        }
+
+        resolveBundles();
+
+        bundles = DependencySort.sort(bundles, new DirectDependenciesFunction(bundles));
+        for (Bundle bundle: bundles)
+        {
+            bundle.start(Bundle.START_TRANSIENT);
+        }
     }
 
     public void stop() throws Exception
@@ -109,35 +142,6 @@ public class Equinox implements OSGiFramework
         return packageAdmin.resolveBundles(bundles);
     }
 
-    public void checkInstallAndResolve(Headers manifest, File source) throws BundleException
-    {
-        State temporaryState = platformAdmin.getFactory().createState(platformAdmin.getState());
-        temporaryState.setResolver(platformAdmin.getResolver());
-        temporaryState.setPlatformProperties(FrameworkProperties.getProperties());
-
-        long highestBundleId = 0;
-        for (BundleDescription bundle : temporaryState.getBundles())
-        {
-            if (bundle.getBundleId() > highestBundleId)
-            {
-                highestBundleId = bundle.getBundleId();
-            }
-        }
-
-        BundleDescription bundleDescription = platformAdmin.getFactory().createBundleDescription(temporaryState, manifest, getBundleLocation(source), highestBundleId + 1);
-
-        temporaryState.addBundle(bundleDescription);
-        temporaryState.resolve();
-
-        if (!bundleDescription.isResolved())
-        {
-            LOG.info("!bundleDescription.isResolved()");
-            // which required are missing?
-
-            // need to evaluate the missing dependencies.
-        }
-    }
-
     private String getBundleLocation(File pluginFile)
     {
         return "reference:file:" + pluginFile.getAbsolutePath();
@@ -168,5 +172,61 @@ public class Equinox implements OSGiFramework
 
         bundle.start(Bundle.START_TRANSIENT);
         return bundle;
+    }
+
+    public IExtensionRegistry getExtensionRegistry()
+    {
+        return extensionRegistry;
+    }
+
+    public IExtensionTracker getExtensionTracker()
+    {
+        return extensionTracker;
+    }
+
+    private class DirectDependenciesFunction implements UnaryFunction<Bundle, Set<Bundle>> 
+    {
+        private List<Bundle> bundles;
+
+        public DirectDependenciesFunction(List<Bundle> bundles)
+        {
+            this.bundles = bundles;
+        }
+
+        public Set<Bundle> process(Bundle bundle)
+        {
+            Set<Bundle> result = new HashSet<Bundle>();
+            BundleDescription description = ((StateManager) platformAdmin).getSystemState().getBundle(bundle.getBundleId());
+    
+            BundleDescription[] required = description.getDependents();
+            if (required != null)
+            {
+                for (final BundleDescription r : required)
+                {
+                    Bundle dependent = CollectionUtils.find(bundles, new BundleSymbolicNamePredicate(r.getSymbolicName()));
+                    if (dependent != null)
+                    {
+                        result.add(dependent);
+                    }
+                }
+            }
+            
+            return result;
+        }
+    }
+
+    private static class BundleSymbolicNamePredicate implements Predicate<Bundle>
+    {
+        private final String symbolicName;
+
+        public BundleSymbolicNamePredicate(String symbolicName)
+        {
+            this.symbolicName = symbolicName;
+        }
+
+        public boolean satisfied(Bundle bundle)
+        {
+            return bundle.getSymbolicName().equals(symbolicName);
+        }
     }
 }

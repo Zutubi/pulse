@@ -4,6 +4,7 @@ import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.delete;
 import com.zutubi.util.ZipUtils;
 import static com.zutubi.util.io.IOUtils.copyFile;
+import org.eclipse.osgi.service.resolver.BundleDescription;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -354,8 +355,8 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         startupPluginCore();
 
-        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+        BundleDescription description = manager.equinox.getBundleDescription(PRODUCER_ID, "1.0.0");
+        assertNotNull(description);
     }
 
     public void testLoadPrepackagedPlugins() throws Exception
@@ -431,52 +432,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // verify that the plugin is still uninstalled, and is still the old version.
         plugin = manager.getPlugin(PRODUCER_ID);
         assertNull(plugin);
-    }
-
-    public void testUpgradeInternalPlugin() throws Exception
-    {
-        // internal plugins 'just upgrade'.  None of the standard processing applies.
-
-        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
-
-        startupPluginCore();
-
-        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
-
-        shutdownPluginCore();
-
-        // upgrade the internally packaged plugin.
-        FileSystemUtils.cleanOutputDir(paths.getInternalPluginStorageDir());
-        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer11);
-
-        startupPluginCore();
-
-        plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
-    }
-
-    public void testDowngradeInternalPlugin() throws Exception
-    {
-        // internal plugins 'just upgrade'.  None of the standard processing applies.
-
-        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer2);
-
-        startupPluginCore();
-
-        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "2.0.0", Plugin.State.ENABLED);
-
-        shutdownPluginCore();
-
-        // downgrade the internally packaged plugin.
-        FileSystemUtils.cleanOutputDir(paths.getInternalPluginStorageDir());
-        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
-
-        startupPluginCore();
-
-        plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
     }
 
     public void testUninstallPlugin() throws Exception
@@ -578,25 +533,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         plugin = manager.getPlugin(PRODUCER_ID);
         assertNull(plugin);
-    }
-
-    public void testCanNotUninstallInternalPlugin() throws Exception
-    {
-        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
-
-        startupPluginCore();
-
-        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
-        assertNotNull(plugin);
-        try
-        {
-            plugin.uninstall();
-            fail();
-        }
-        catch (PluginException e)
-        {
-            assertEquals("Cannot uninstall plugin: this is an internal plugin.", e.getMessage());
-        }
     }
 
     public void testUninstalledJarFileDeleted() throws Exception
