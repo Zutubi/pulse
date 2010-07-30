@@ -358,6 +358,65 @@ public class FileSystemUtils
         }
     }
 
+    // code snippet taken and adapted from org.apache.commons.vfs.provider.AbstractFileName
+    public static String relativePath(File from, File to)
+    {
+        char SEPARATOR_CHAR = File.separatorChar;
+
+        final String path = to.getPath();
+
+        // Calculate the common prefix
+        final int basePathLen = from.getPath().length();
+        final int pathLen = path.length();
+
+        // Deal with root
+        if (basePathLen == 1 && pathLen == 1)
+        {
+            return ".";
+        }
+        else if (basePathLen == 1)
+        {
+            return path.substring(1);
+        }
+
+        final int maxlen = Math.min(basePathLen, pathLen);
+        int pos = 0;
+        for (; pos < maxlen && from.getPath().charAt(pos) == path.charAt(pos); pos++)
+        {
+        }
+
+        if (pos == basePathLen && pos == pathLen)
+        {
+            // Same names
+            return ".";
+        }
+        else if (pos == basePathLen && pos < pathLen && path.charAt(pos) == SEPARATOR_CHAR)
+        {
+            // A descendent of the base path
+            return path.substring(pos + 1);
+        }
+
+        // Strip the common prefix off the path
+        final StringBuffer buffer = new StringBuffer();
+        if (pathLen > 1 && (pos < pathLen || from.getPath().charAt(pos) != SEPARATOR_CHAR))
+        {
+            // Not a direct ancestor, need to back up
+            pos = from.getPath().lastIndexOf(SEPARATOR_CHAR, pos);
+            buffer.append(path.substring(pos));
+        }
+
+        // Prepend a '../' for each element in the base path past the common
+        // prefix
+        buffer.insert(0, "..");
+        pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
+        while (pos != -1)
+        {
+            buffer.insert(0, "../");
+            pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
+        }
+        return buffer.toString();
+    }
+
     public static boolean isParentOf(File parent, File child) throws IOException
     {
         String parentPath = parent.getCanonicalPath();

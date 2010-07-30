@@ -1,3 +1,6 @@
+// dependency: js/zutubi.js
+// dependency: js/StatusBar.js
+
 ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</td>' +
                        '<td class="fit-width" rowspan="{rowspan}">' +
                            '<img alt="-" src="{base}/images/default/s.gif" class="project-name" style="width: {indent}px; height: 16px;"/> ' +

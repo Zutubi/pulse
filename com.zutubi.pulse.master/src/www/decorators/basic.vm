@@ -10,11 +10,7 @@
 <link rel="stylesheet" type="text/css" href="$base/css/main.css?#version()" media="screen"/>
 <link rel="stylesheet" type="text/css" href="$base/css/form.css?#version()" media="screen"/>
 <link rel="stylesheet" type="text/css" href="$base/css/statusbar.css?#version()" media="screen"/>
-<script type="text/javascript" src="$base/js/ext-base.js?#version()"></script>
-<script type="text/javascript" src="$base/js/ext-all.js?#version()"></script>
-<script type="text/javascript" src="$base/js/StatusBar.js?#version()"></script>
-<script type="text/javascript" src="$base/js/main.js?#version()"></script>
-<script type="text/javascript" src="$base/js/zutubi.js?#version()"></script>
+#javascript()
 <script type="text/javascript">
     Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
     Ext.MessageBox.buttonText.yes = 'yes';

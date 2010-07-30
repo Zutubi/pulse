@@ -42,6 +42,7 @@
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
+        <taskdef name="jscomp" classname="com.google.javascript.jscomp.ant.CompileTask" classpathref="custom.task.path"/>
 
         <!-- create the local.properties file if it does not yet exist. -->
         <copy file="etc/local.properties.template" tofile="local.properties" overwrite="false"/>
@@ -322,7 +323,6 @@
         </exec>
 
         <build-package-deps module="master"/>
-
         <antcall target="assemble.package.dev"/>
         <antcall target="assemble.package.slave"/>
 
@@ -359,8 +359,30 @@
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${version.root.master}/system/www">
-            <fileset dir="com.zutubi.pulse.master/src/www" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.master/src/www" includes="**/*" excludes="js/**"/>
         </copy>
+
+        <!-- Unfortunately, the jscomp ant task does not support file sets, requiring that
+         we explicitly name all javascript files to be processed.
+         -->
+        <jscomp compilationLevel="whitespace" debug="false" output="${version.root.master}/system/www/js/pulse.js">
+            <sources dir="com.zutubi.pulse.master/src/www/js">
+                <file name="ext-base.js"/>
+                <file name="ext-all.js"/>
+                <file name="yahoo/utilities.js"/>
+                <file name="widget/treegrid/TreeGridSorter.js"/>
+                <file name="buildcolumns.js"/>
+                <file name="main.js"/>
+                <file name="StatusBar.js"/>
+                <file name="widget/treegrid/TreeGridLoader.js"/>
+                <file name="widget/treegrid/TreeGridNodeUI.js"/>
+                <file name="widget/treegrid/TreeGridColumnResizer.js"/>
+                <file name="widget/treegrid/TreeGrid.js"/>
+                <file name="widget/treegrid/TreeGridColumns.js"/>
+                <file name="zutubi.js"/>
+                <file name="projects.js"/>
+            </sources>
+        </jscomp>
 
         <!-- copy the readme file. -->
         <copy todir="${package.root.master}">

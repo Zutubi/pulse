@@ -1,3 +1,6 @@
+// dependency: js/ext-all.js
+// dependency: js/ext-base.js
+
 /*!
  * Ext JS Library 3.1.1
  * Copyright(c) 2006-2010 Ext JS, LLC

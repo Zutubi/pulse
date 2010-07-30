@@ -1,3 +1,6 @@
+// dependency: js/ext-all.js
+// dependency: js/ext-base.js
+
 function each(a, f)
 {
     for(var i = 0; i < a.length; i++)

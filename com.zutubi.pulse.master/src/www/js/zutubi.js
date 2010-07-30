@@ -1,3 +1,7 @@
+// dependency: js/ext-all.js
+// dependency: js/ext-base.js
+// dependency: js/StatusBar.js
+
 // setup the namespace for the zutubi components.
 var ZUTUBI = window.ZUTUBI || {};
 
@@ -3144,7 +3148,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
         }, this);
 
         this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
-        this.addItem({xtype: 'xztblink', text:"pulse 2.2 [beta]", url: window.baseUrl + '/default.action'});
+        this.addItem({xtype: 'xztblink', text:"pulse 2.3 [beta]", url: window.baseUrl + '/default.action'});
         this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
 
         if (this.projectName)

@@ -60,17 +60,8 @@
 #if ($rssEnabled && $projectId && "$projectId" != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
-        <script type="text/javascript" src="$base/js/ext-base.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/ext-all.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/StatusBar.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridSorter.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridColumnResizer.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridNodeUI.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridLoader.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridColumns.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGrid.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/main.js?#version()"></script>
-        <script type="text/javascript" src="$base/js/zutubi.js?#version()"></script>
+        #javascript()
+        
         <script type="text/javascript">
             Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
             Ext.MessageBox.buttonText.yes = 'yes';
