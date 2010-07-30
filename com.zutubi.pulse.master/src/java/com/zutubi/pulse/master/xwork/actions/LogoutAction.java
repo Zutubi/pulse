@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions;
 import com.opensymphony.webwork.ServletActionContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
-import org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.ui.rememberme.TokenBasedRememberMeServices;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class LogoutAction extends ActionSupport
         session.invalidate();
 
         // set a new acegi remember me cookie that expires immediately.
-        Cookie terminate = new Cookie(TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, null);
+        Cookie terminate = new Cookie(TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, null);
         terminate.setMaxAge(0);
         String contextPath = getContextPath();
         if (!contextPath.equals(ROOT_CONTEXT))

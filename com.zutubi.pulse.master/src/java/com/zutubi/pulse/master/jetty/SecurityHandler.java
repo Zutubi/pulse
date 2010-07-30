@@ -9,8 +9,8 @@ import org.mortbay.http.HttpResponse;
 import org.mortbay.http.handler.AbstractHttpHandler;
 import org.mortbay.jetty.servlet.ServletHttpRequest;
 import org.mortbay.jetty.servlet.ServletHttpResponse;
-import org.acegisecurity.ui.AuthenticationEntryPoint;
-import org.acegisecurity.AuthenticationException;
+import org.springframework.security.ui.AuthenticationEntryPoint;
+import org.springframework.security.AuthenticationException;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

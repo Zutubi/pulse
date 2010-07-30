@@ -25,7 +25,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
+import org.springframework.security.providers.encoding.Md5PasswordEncoder;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;

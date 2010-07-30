@@ -8,7 +8,7 @@ import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.StringUtils.capitalise;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;

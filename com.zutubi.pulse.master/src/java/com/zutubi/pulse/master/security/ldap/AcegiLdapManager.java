@@ -19,14 +19,19 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.BadCredentialsException;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.ldap.DefaultInitialDirContextFactory;
-import org.acegisecurity.ldap.search.FilterBasedLdapUserSearch;
-import org.acegisecurity.providers.ldap.authenticator.BindAuthenticator;
-import org.acegisecurity.providers.ldap.populator.DefaultLdapAuthoritiesPopulator;
-import org.acegisecurity.userdetails.ldap.LdapUserDetails;
-import org.acegisecurity.userdetails.ldap.LdapUserDetailsMapper;
+import org.springframework.security.BadCredentialsException;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.Authentication;
+import org.springframework.security.ldap.DefaultInitialDirContextFactory;
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
+import org.springframework.security.providers.ldap.authenticator.BindAuthenticator;
+import org.springframework.security.providers.ldap.LdapAuthenticationProvider;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.ldap.populator.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.userdetails.ldap.LdapUserDetails;
+import org.springframework.security.userdetails.ldap.LdapUserDetailsMapper;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.ldap.core.DirContextOperations;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -40,8 +45,53 @@ import java.util.*;
 
 /**
  */
-public class AcegiLdapManager implements LdapManager, ConfigurationEventListener, com.zutubi.events.EventListener
+public class AcegiLdapManager implements LdapManager, ConfigurationEventListener //, com.zutubi.events.EventListener
 {
+    public void connect()
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public UserConfiguration authenticate(String username, String password, boolean addContact)
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void addLdapRoles(AcegiUser user)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean canAutoAdd()
+    {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getStatusMessage()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public List<UserGroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword)
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void handleConfigurationEvent(ConfigurationEvent event)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void handleEvent(Event event)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[0];  //To change body of implemented methods use File | Settings | File Templates.
+    }
+    /*
     private static final Logger LOG = Logger.getLogger(AcegiLdapManager.class);
 
     private static final String EMAIL_CONTACT_NAME = "LDAP email";
@@ -51,13 +101,13 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private ConfigurationProvider configurationProvider;
     private boolean enabled = false;
     private DefaultInitialDirContextFactory contextFactory;
-    private BindAuthenticator authenticator;
+    private LdapAuthenticationProvider authenticator;
     private List<DefaultLdapAuthoritiesPopulator> populators = new LinkedList<DefaultLdapAuthoritiesPopulator>();
     private boolean autoAdd = false;
     private String statusMessage = null;
     private String emailAttribute = null;
     private UserManager userManager;
-    private Map<String, LdapUserDetails> detailsMap = new HashMap<String, LdapUserDetails>();
+    private Map<String, DirContextOperations> detailsMap = new HashMap<String, DirContextOperations>();
 
     private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
@@ -86,17 +136,6 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
             contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, followReferrals, escapeSpaces);
             authenticator = createAuthenticator(ldapConfiguration.getUserBaseDn(), ldapConfiguration.getUserFilter(), ldapConfiguration.getPasswordAttribute(), contextFactory);
-
-            try
-            {
-                authenticator.afterPropertiesSet();
-            }
-            catch (Exception e)
-            {
-                LOG.error(e);
-                statusMessage = e.getMessage();
-                return;
-            }
 
             if (!ldapConfiguration.getGroupBaseDns().isEmpty())
             {
@@ -149,21 +188,24 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return result;
     }
 
-    private BindAuthenticator createAuthenticator(String userBase, String userFilter, String passwordAttribute, DefaultInitialDirContextFactory contextFactory)
+    private LdapAuthenticationProvider createAuthenticator(String userBase, String userFilter, String passwordAttribute, DefaultInitialDirContextFactory contextFactory)
     {
         FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch(userBase, convertUserFilter(userFilter), contextFactory);
         search.setSearchSubtree(true);
 
         BindAuthenticator authenticator = new BindAuthenticator(contextFactory);
         authenticator.setUserSearch(search);
+
+        LdapAuthenticationProvider provider = new LdapAuthenticationProvider(authenticator);
+
         if (StringUtils.stringSet(passwordAttribute))
         {
             LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
             mapper.setPasswordAttributeName(passwordAttribute);
-            authenticator.setUserDetailsMapper(mapper);
+            provider.setUserDetailsContextMapper(mapper);
         }
 
-        return authenticator;
+        return provider;
     }
 
     private List<DefaultLdapAuthoritiesPopulator> createPopulators(List<String> groupDns, String groupFilter, String groupRoleAttribute, boolean searchSubtree, boolean escapeSpaces, DefaultInitialDirContextFactory contextFactory)
@@ -232,7 +274,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         {
             try
             {
-                LdapUserDetails details = ldapAuthenticate(authenticator, username, password);
+                Authentication authentication = ldapAuthenticate(authenticator, username, password);
+                UserDetails details = (UserDetails) authentication.getPrincipal();
+
                 String name = getStringAttribute(details, "cn", username);
                 if (name == null)
                 {
@@ -268,18 +312,19 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return null;
     }
 
-    private LdapUserDetails ldapAuthenticate(BindAuthenticator authenticator, String username, String password)
+    private Authentication ldapAuthenticate(LdapAuthenticationProvider authenticator, String username, String password)
     {
         if(!StringUtils.stringSet(password))
         {
             throw new BadCredentialsException("LDAP users cannot have an empty password");
         }
-        return authenticator.authenticate(username, password);
+
+        return authenticator.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 
     public synchronized void addLdapRoles(AcegiUser user)
     {
-        LdapUserDetails details = detailsMap.get(user.getUsername());
+        DirContextOperations details = detailsMap.get(user.getUsername());
         if (details != null)
         {
             try
@@ -287,7 +332,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                 List<UserGroupConfiguration> groups = getLdapGroups(details, populators);
                 for(UserGroupConfiguration group: groups)
                 {
-                    LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
+                    LOG.debug("Adding user '" + user.getUsername() + "' to group '" + group.getName() + "' via LDAP");
                     user.addGroup(group);
                 }
             }
@@ -298,12 +343,12 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    private List<UserGroupConfiguration> getLdapGroups(LdapUserDetails details, List<DefaultLdapAuthoritiesPopulator> populators)
+    private List<UserGroupConfiguration> getLdapGroups(DirContextOperations details, List<DefaultLdapAuthoritiesPopulator> populators)
     {
         List<UserGroupConfiguration> groups = new LinkedList<UserGroupConfiguration>();
         for (DefaultLdapAuthoritiesPopulator populator: populators)
         {
-            GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details);
+            GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details, details.getDn().);
             for (GrantedAuthority authority : ldapAuthorities)
             {
                 UserGroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
@@ -317,7 +362,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return groups;
     }
 
-    private void addContact(UserConfiguration user, LdapUserDetails details)
+    private void addContact(UserConfiguration user, DirContextOperations details)
     {
         UserPreferencesConfiguration prefs = user.getPreferences();
         Map<String, ContactConfiguration> contacts = prefs.getContacts();
@@ -343,7 +388,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    private String getStringAttribute(LdapUserDetails details, String attribute, String username)
+    private String getStringAttribute(Authentication details, String attribute, String username)
     {
         Attribute att = details.getAttributes().get(attribute);
         if (att != null)
@@ -380,7 +425,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         contextFactory.newInitialDirContext();
 
         BindAuthenticator authenticator = createAuthenticator(configuration.getUserBaseDn(), configuration.getUserFilter(), configuration.getPasswordAttribute(), contextFactory);
-        LdapUserDetails details = ldapAuthenticate(authenticator, testLogin, testPassword);
+        DirContextOperations details = ldapAuthenticate(authenticator, testLogin, testPassword);
 
         if (!configuration.getGroupBaseDns().isEmpty())
         {
@@ -427,14 +472,14 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     {
         return new Class[]{ ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
-
+*/
     public void setUserManager(UserManager userManager)
     {
-        this.userManager = userManager;
+
     }
 
     public void setEventManager(EventManager eventManager)
     {
-        eventManager.register(this);
+
     }
 }

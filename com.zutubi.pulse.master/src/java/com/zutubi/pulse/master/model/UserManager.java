@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import org.acegisecurity.userdetails.UserDetailsService;
+import org.springframework.security.userdetails.UserDetailsService;
 
 import java.util.Collection;
 import java.util.List;

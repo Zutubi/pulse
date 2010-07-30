@@ -30,7 +30,6 @@
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
 
         <!-- External dependencies -->
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.7.0" conf="external,build,release->default;src->src"/>
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default;src->src"/>
         <dependency org="apache" name="commons-fileupload" rev="1.1.1" conf="external,build,release->default;src->src"/>
         <dependency org="apache" name="commons-io" rev="1.1" conf="external,build,release->default;src->src"/>
@@ -55,6 +54,7 @@
         <dependency org="org.springframework" name="org.springframework.orm" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.transaction" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.web" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.security.core" rev="2.0.5.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="sun" name="rome" rev="0.8" conf="external,build,release->default;src->src"/>
         <dependency org="sun" name="rome-content" rev="20060508" conf="external,build,release->default;src->src"/>
         <dependency org="sun" name="transaction" rev="1.1" conf="external,build,release->default;src->src"/>

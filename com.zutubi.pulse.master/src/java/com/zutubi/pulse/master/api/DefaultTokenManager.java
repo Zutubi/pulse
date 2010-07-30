@@ -10,8 +10,8 @@ import com.zutubi.pulse.servercore.api.APIAuthenticationToken;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.util.Constants;
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.AuthenticationManager;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -98,7 +98,7 @@ public class DefaultTokenManager implements TokenManager
 
         User user = verifyToken(token);
         AcegiUser principle = userManager.getPrinciple(user);
-        for (org.acegisecurity.GrantedAuthority authority : principle.getAuthorities())
+        for (org.springframework.security.GrantedAuthority authority : principle.getAuthorities())
         {
             for (String allowedAuthority : allowedAuthorities)
             {

@@ -29,7 +29,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <!-- ============================================================= -->
     <!-- The first half of this context is dedicated to authentication -->
 
-    <bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager">
+    <bean id="authenticationManager" class="org.springframework.security.providers.ProviderManager">
         <property name="providers">
             <list>
                 <ref local="customAuthenticationProvider"/>
@@ -52,7 +52,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <!--
     this filter chain proxy is referenced in web.xml
     -->
-    <bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy">
+    <bean id="filterChainProxy" class="org.springframework.security.util.FilterChainProxy">
         <property name="filterInvocationDefinitionSource">
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
@@ -104,7 +104,7 @@ The beans defined within the security subsystem need not be accessed by other co
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
     sent to 'filterProcessesUrl', and uses the 'authenticationManager' to handle the actual authentication.
     -->
-    <bean id="authenticationProcessingFilter" class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+    <bean id="authenticationProcessingFilter" class="org.springframework.security.ui.webapp.AuthenticationProcessingFilter">
         <property name="authenticationManager">
             <ref local="authenticationManager"/>
         </property>
@@ -120,7 +120,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <!--
     This filter provides support for processing basic authentication credentials presented in HTTP headers.
     -->
-    <bean id="basicProcessingFilter" class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
+    <bean id="basicProcessingFilter" class="org.springframework.security.ui.basicauth.BasicProcessingFilter">
         <property name="authenticationManager">
             <ref local="authenticationManager"/>
         </property>
@@ -132,14 +132,14 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="basicProcessingFilterEntryPoint" class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
+    <bean id="basicProcessingFilterEntryPoint" class="org.springframework.security.ui.basicauth.BasicProcessingFilterEntryPoint">
         <property name="realmName" value="Pulse"/>
     </bean>
 
     <!--
     We override the default details class to aid in detecting HTTP basic authentication.
     -->
-    <bean id="basicProcessingAuthenticationDetailsSource" class="org.acegisecurity.ui.AuthenticationDetailsSourceImpl">
+    <bean id="basicProcessingAuthenticationDetailsSource" class="org.springframework.security.ui.AuthenticationDetailsSourceImpl">
         <property name="clazz" value="com.zutubi.pulse.master.security.BasicAuthenticationDetails"/>
     </bean>
 
@@ -147,7 +147,7 @@ The beans defined within the security subsystem need not be accessed by other co
     This endpoint defines where a user is directed when authentication is required.
     -->
     <bean id="authenticationProcessingFilterEntryPoint"
-          class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+          class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
         <property name="loginFormUrl" value="/login!input.action"/>
         <property name="forceHttps" value="false"/>
         <property name="portResolver">
@@ -155,13 +155,13 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="portResolver" class="org.acegisecurity.util.PortResolverImpl">
+    <bean id="portResolver" class="org.springframework.security.util.PortResolverImpl">
         <property name="portMapper">
             <ref local="portMapper"/>
         </property>
     </bean>
 
-    <bean id="portMapper" class="org.acegisecurity.util.PortMapperImpl">
+    <bean id="portMapper" class="org.springframework.security.util.PortMapperImpl">
         <property name="portMappings">
             <map>
                 <entry key="80" value="80"/>
@@ -171,7 +171,7 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="ajaxEntryPoint" class="com.zutubi.pulse.master.security.AjaxAuthenticationEntryPoint"/>
 
-    <bean id="httpRequestAccessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
+    <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.vote.AffirmativeBased">
         <property name="allowIfAllAbstainDecisions" value="false"/>
         <property name="decisionVoters">
             <list>
@@ -180,7 +180,7 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter">
+    <bean id="roleVoter" class="org.springframework.security.vote.RoleVoter">
         <property name="rolePrefix" value=""/>
     </bean>
 
@@ -191,7 +191,7 @@ The beans defined within the security subsystem need not be accessed by other co
     b) AuthenticationManager.setProviders()
     c) FilterChainProxy
     -->
-    <bean id="rememberMeProcessingFilter" class="org.acegisecurity.ui.rememberme.RememberMeProcessingFilter">
+    <bean id="rememberMeProcessingFilter" class="org.springframework.security.ui.rememberme.RememberMeProcessingFilter">
         <property name="authenticationManager">
             <ref local="authenticationManager"/>
         </property>
@@ -200,13 +200,13 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="rememberMeServices" class="org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices">
+    <bean id="rememberMeServices" class="org.springframework.security.ui.rememberme.TokenBasedRememberMeServices">
         <property name="userDetailsService" ref="userManager"/>
         <property name="key" value="pulse"/>
     </bean>
 
     <bean id="rememberMeAuthenticationProvider"
-          class="org.acegisecurity.providers.rememberme.RememberMeAuthenticationProvider">
+          class="org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider">
         <property name="key" value="pulse"/>
     </bean>
 
@@ -215,13 +215,13 @@ The beans defined within the security subsystem need not be accessed by other co
     add an AnonymousAuthenticationToken to the SecurityContextHolder if there is no existing Authentication
     held there.
     -->
-    <bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+    <bean id="anonymousProcessingFilter" class="org.springframework.security.providers.anonymous.AnonymousProcessingFilter">
         <property name="key" value="foobar"/>
         <property name="userAttribute" value="anonymous,ROLE_ANONYMOUS"/>
     </bean>
 
     <bean id="anonymousAuthenticationProvider"
-          class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
+          class="org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider">
         <property name="key" value="foobar"/>
     </bean>
 
@@ -229,7 +229,7 @@ The beans defined within the security subsystem need not be accessed by other co
     Not exactly sure what this one does.... other than redirecting a user to the login endpoint
     if they do not comply with the authorization requirements?
     -->
-    <bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
+    <bean id="exceptionTranslationFilter" class="org.springframework.security.ui.ExceptionTranslationFilter">
         <property name="authenticationEntryPoint">
             <ref local="authenticationProcessingFilterEntryPoint"/>
         </property>
@@ -238,7 +238,7 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="ajaxExceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
+    <bean id="ajaxExceptionTranslationFilter" class="org.springframework.security.ui.ExceptionTranslationFilter">
         <property name="authenticationEntryPoint">
             <ref local="ajaxEntryPoint"/>
         </property>
@@ -251,7 +251,7 @@ The beans defined within the security subsystem need not be accessed by other co
     matches the request URL. Accordingly, you should place MOST SPECIFIC (ie a/b/c/d.*) expressions
     first, with LEAST SPECIFIC (ie a/.*) expressions last
     -->
-    <bean id="filterInvocationInterceptor" class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+    <bean id="filterInvocationInterceptor" class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
         <property name="authenticationManager">
             <ref local="authenticationManager"/>
         </property>

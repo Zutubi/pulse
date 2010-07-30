@@ -19,7 +19,7 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;

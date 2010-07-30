@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.model;
 /**
  * <class-comment/>
  */
-public class GrantedAuthority implements org.acegisecurity.GrantedAuthority
+public class GrantedAuthority implements org.springframework.security.GrantedAuthority
 {
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
     public static final String GUEST = "ROLE_GUEST";
@@ -51,6 +51,16 @@ public class GrantedAuthority implements org.acegisecurity.GrantedAuthority
         {
             return false;
         }
+    }
+
+    public int compareTo(Object o)
+    {
+        if (o instanceof GrantedAuthority)
+        {
+            GrantedAuthority other = (GrantedAuthority) o;
+            return authority.compareTo(other.authority);
+        }
+        return -1;
     }
 
     public int hashCode()

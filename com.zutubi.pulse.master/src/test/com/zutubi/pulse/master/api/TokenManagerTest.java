@@ -9,11 +9,11 @@ import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.util.Constants;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.BadCredentialsException;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.userdetails.UserDetails;
+import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationManager;
+import org.springframework.security.BadCredentialsException;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.userdetails.UserDetails;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
@@ -45,7 +45,7 @@ public class TokenManagerTest extends PulseTestCase
         tokenManager.setUserManager(userManager);
         tokenManager.setAuthenticationManager(new AuthenticationManager()
         {
-            public Authentication authenticate(Authentication authentication) throws org.acegisecurity.AuthenticationException
+            public Authentication authenticate(Authentication authentication) throws org.springframework.security.AuthenticationException
             {
                 UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
                 User u = userManager.getUser(token.getName());
