@@ -40,7 +40,7 @@
         <dependency org="hibernate" name="hibernate" rev="3.5.3" conf="external,build,release->default;src->src"/>
         <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default;src->src"/>
         <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default;src->src"/>
-        <dependency org="quartz" name="quartz" rev="1.8.3" conf="external,build,release->default;src->src"/>
+        <dependency org="quartz" name="quartz" rev="1.6.6" conf="external,build,release->default;src->src"/>
 
         <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default;src->src"/>
         <dependency org="opensymphony" name="webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
