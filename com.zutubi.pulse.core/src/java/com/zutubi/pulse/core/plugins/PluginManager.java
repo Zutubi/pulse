@@ -1056,7 +1056,7 @@ public class PluginManager
      */
     public List<IExtension> sortExtensions(IExtension[] extensions)
     {
-        Map<Plugin, List<IExtension>> extensionsByPlugin = new HashMap<Plugin, List<IExtension>>();
+        final Map<Plugin, List<IExtension>> extensionsByPlugin = new HashMap<Plugin, List<IExtension>>();
         for (IExtension extension: extensions)
         {
             Plugin contributingPlugin = getPlugin(extension.getContributor().getName());
@@ -1070,35 +1070,25 @@ public class PluginManager
             byPlugin.add(extension);
         }
 
-        List<IExtension> sorted = new LinkedList<IExtension>();
-        for (IExtension extension: extensions)
+        return DependencySort.sort(Arrays.asList(extensions), new UnaryFunction<IExtension, Set<IExtension>>()
         {
-            LocalPlugin contributingPlugin = (LocalPlugin) getPlugin(extension.getContributor().getName());
-            List<Plugin> dependentPlugins = getDependentPlugins(contributingPlugin);
-            List<IExtension> dependentExtensions = new LinkedList<IExtension>();
-            for (Plugin dependentPlugin: dependentPlugins)
+            public Set<IExtension> process(IExtension extension)
             {
-                List<IExtension> byPlugin = extensionsByPlugin.get(dependentPlugin);
-                if (byPlugin != null)
+                LocalPlugin contributingPlugin = (LocalPlugin) getPlugin(extension.getContributor().getName());
+                List<Plugin> dependentPlugins = getDependentPlugins(contributingPlugin);
+                Set<IExtension> dependentExtensions = new HashSet<IExtension>();
+                for (Plugin dependentPlugin: dependentPlugins)
                 {
-                    dependentExtensions.addAll(byPlugin);
+                    List<IExtension> byPlugin = extensionsByPlugin.get(dependentPlugin);
+                    if (byPlugin != null)
+                    {
+                        dependentExtensions.addAll(byPlugin);
+                    }
                 }
+                
+                return dependentExtensions;
             }
-
-            int i = 0;
-            for (IExtension e: sorted)
-            {
-                if (dependentExtensions.contains(e))
-                {
-                    break;
-                }
-                i++;
-            }
-
-            sorted.add(i, extension);
-        }
-        
-        return sorted;
+        });
     }
 
     /**
