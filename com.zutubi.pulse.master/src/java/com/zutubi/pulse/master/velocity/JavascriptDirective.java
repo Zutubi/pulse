@@ -5,17 +5,16 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.FileSuffixPredicate;
-import com.zutubi.util.io.IOUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * Generate html <script/> references for the javascript files located in
@@ -56,11 +55,6 @@ public class JavascriptDirective extends AbstractDirective
     private static final String DIRECTIVE_NAME = "javascript";
 
     /**
-     * Regex pattern for matching the dependency header on js files.
-     */
-    private static final Pattern PATTERN_DEPENDENCY_HEADER = Pattern.compile("[\\s]*//[\\s]*dependency[\\s]*:.*");
-
-    /**
      * The verison string to be appended to each of the source references.  It will ensure that
      * caches don't get js files confused between releases.
      */
@@ -76,8 +70,6 @@ public class JavascriptDirective extends AbstractDirective
      * This cache is only used when {@link #IS_DEVELOPMENT} is false.
      */
     private static final Map<String, String> cache = new HashMap<String, String>();
-
-    private static final String JS_ROOT = "js";
 
     public JavascriptDirective()
     {
@@ -140,7 +132,7 @@ public class JavascriptDirective extends AbstractDirective
         }
 
         File contentRoot = configurationManager.getSystemPaths().getContentRoot();
-        File jsRoot = new File(contentRoot, JS_ROOT);
+        File jsRoot = new File(contentRoot, "js");
 
         return generateContent(base, jsRoot, requestedPaths);
     }
@@ -149,7 +141,7 @@ public class JavascriptDirective extends AbstractDirective
     private String generateContent(String base) throws IOException
     {
         File contentRoot = configurationManager.getSystemPaths().getContentRoot();
-        File jsRoot = new File(contentRoot, JS_ROOT);
+        File jsRoot = new File(contentRoot, "js");
 
         List<String> jsPaths = new LinkedList<String>();
         List<File> jsFiles = FileSystemUtils.filter(jsRoot,new FileSuffixPredicate(".js"));
@@ -165,7 +157,7 @@ public class JavascriptDirective extends AbstractDirective
     {
         StringBuffer content = new StringBuffer();
 
-        List<String> sortedPaths = expandAndSortPaths(jsRoot, jsPaths);
+        List<String> sortedPaths = JavascriptDependencies.expandAndSortPaths(jsRoot, jsPaths);
 
         // ensure that the requested paths exist and are files.
         for (String requestedPath : sortedPaths)
@@ -176,85 +168,12 @@ public class JavascriptDirective extends AbstractDirective
         for (String path : sortedPaths)
         {
             content.append("<script type=\"text/javascript\" src=\"");
-            content.append(base).append("/"+JS_ROOT+"/").append(path);
+            content.append(base).append("/js/").append(path);
             content.append("?ver=").append(version);
             content.append("\"> </script>\n");
         }
 
         return content.toString();
-    }
-
-    private List<String> expandAndSortPaths(File jsRoot, List<String> jsPaths) throws IOException
-    {
-        Map<String, List<String>> directDependencies = new HashMap<String, List<String>>();
-        expand(jsRoot, jsPaths, directDependencies);
-
-        List<String> sortedPaths = new LinkedList<String>();
-        while (directDependencies.size() > 0)
-        {
-            List<String> paths = new LinkedList<String>(directDependencies.keySet());
-            for (String path : paths)
-            {
-                if (directDependencies.get(path).size() == 0)
-                {
-                    sortedPaths.add(path);
-
-                    directDependencies.remove(path);
-                    List<String> linkedList = new LinkedList<String>(directDependencies.keySet());
-                    for (String s : linkedList)
-                    {
-                        List<String> deps = directDependencies.get(s);
-                        deps.remove(path);
-                    }
-                }
-            }
-        }
-        return sortedPaths;
-    }
-
-    private void expand(File jsRoot, List<String> paths, Map<String, List<String>> expanded) throws IOException
-    {
-        for (String path: paths)
-        {
-            if (!expanded.containsKey(path))
-            {
-                List<String> dependencies = readDependencyHeader(new File(jsRoot, path));
-                expanded.put(path, dependencies);
-
-                expand(jsRoot, dependencies, expanded);
-            }
-        }
-    }
-
-    private List<String> readDependencyHeader(File file) throws IOException
-    {
-        List<String> dependencies = new LinkedList<String>();
-
-        InputStream input = new FileInputStream(file);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        try
-        {
-            String line = reader.readLine();
-            Matcher matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
-            while (matcher.matches())
-            {
-                line = line.substring(line.indexOf(":") + 1);
-                StringTokenizer tokens = new StringTokenizer(line, ",", false);
-                while (tokens.hasMoreTokens())
-                {
-                    dependencies.add(tokens.nextToken().trim());
-                }
-                
-                line = reader.readLine();
-                matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
-            }
-        }
-        finally
-        {
-            IOUtils.close(reader);
-        }
-
-        return dependencies;
     }
 
     private void ensureIsFile(File base, String path) throws IOException
