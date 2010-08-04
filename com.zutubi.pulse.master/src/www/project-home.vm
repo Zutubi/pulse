@@ -5,6 +5,9 @@
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
     #javascript()
+        yahoo/utilities.js
+        buildcolumns.js
+    #end
     <script type="text/javascript">
     //<![CDATA[
         #set($ajaxUrl = "$base/ajax/projectHomePanel.action?projectName=$u_projectName")

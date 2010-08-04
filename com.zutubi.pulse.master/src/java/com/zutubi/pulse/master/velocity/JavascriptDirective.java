@@ -14,6 +14,8 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Generate html <script/> references for the javascript files located in
@@ -35,13 +37,29 @@ import java.util.*;
  * Usage of this directive within a velocity template looks as follows:
  * <code>
  *     #javascript()
+ *         fileA.js
+ *         fileB.js 
+ *     #end
  * </code>
  *
- * NOTE: This directive will not pick up javascript files that are dropped into the CONTENT_ROOT/js
- * directory after Pulse has rendered the first page.
+ * During development, this directive will render the js files contained within the body of the
+ * directive.  During production, it will default to loading the javascript files available on the
+ * file system.
  */
 public class JavascriptDirective extends AbstractDirective
 {
+    /**
+     * A system flag that is true when we are running in development, false otherwise.
+     */
+    private static final boolean IS_DEVELOPMENT = Boolean.getBoolean("development");
+    
+    private static final String DIRECTIVE_NAME = "javascript";
+
+    /**
+     * Regex pattern for matching the dependency header on js files.
+     */
+    private static final Pattern PATTERN_DEPENDENCY_HEADER = Pattern.compile("[\\s]*//[\\s]*dependency[\\s]*:.*");
+
     /**
      * The verison string to be appended to each of the source references.  It will ensure that
      * caches don't get js files confused between releases.
@@ -54,63 +72,124 @@ public class JavascriptDirective extends AbstractDirective
      * A cache of generated output.  The key is the base string, the value is the generated html.
      *
      * The output from this directive is the same (except for possible changes to the base).
+     *
+     * This cache is only used when {@link #IS_DEVELOPMENT} is false.
      */
     private static final Map<String, String> cache = new HashMap<String, String>();
 
+    private static final String JS_ROOT = "js";
+
     public JavascriptDirective()
     {
+        // Until we can manage the creation of the directives, we need to autowire them here.
         SpringComponentContext.autowire(this);
     }
 
     public String getName()
     {
-        return "javascript";
+        return DIRECTIVE_NAME;
     }
 
     public int getType()
     {
-        return LINE;
+        return BLOCK;
     }
 
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException
     {
         String base = configurationManager.getSystemConfig().getContextPathNormalised();
 
-        synchronized (cache)
+        if (IS_DEVELOPMENT)
         {
-            if (!cache.containsKey(base))
-            {
-                // generate the content.
-                String content = generateContent(base);
-                cache.put(base, content);
-            }
+            // in development, we generate the content fresh each time as
+            // we are dealing with the individual pre-processed js files.
+            writer.write(generateContent(base, context, node));
         }
-
-        writer.write(cache.get(base));
+        else
+        {
+            synchronized (cache)
+            {
+                if (!cache.containsKey(base))
+                {
+                    // generate the content.
+                    String content = generateContent(base);
+                    cache.put(base, content);
+                }
+            }
+            writer.write(cache.get(base));
+        }
 
         return true;
     }
 
+     // In development, we generate content based on the strings contained
+     // within the body of the directive.
+    private String generateContent(String base, InternalContextAdapter context, Node node) throws MethodInvocationException, IOException, ResourceNotFoundException, ParseErrorException
+    {
+        String bodyContent = extractBodyContext(node, context);
+
+        List<String> requestedPaths = new LinkedList<String>();
+        StringTokenizer tokens = new StringTokenizer(bodyContent, "\n", false);
+        while (tokens.hasMoreTokens())
+        {
+            String requestedPath = tokens.nextToken().trim();
+            if (requestedPath.length() > 0)
+            {
+                requestedPaths.add(requestedPath);
+            }
+        }
+
+        File contentRoot = configurationManager.getSystemPaths().getContentRoot();
+        File jsRoot = new File(contentRoot, JS_ROOT);
+
+        return generateContent(base, jsRoot, requestedPaths);
+    }
+
+    // In production, we generate content based on the js files on the file system.
     private String generateContent(String base) throws IOException
+    {
+        File contentRoot = configurationManager.getSystemPaths().getContentRoot();
+        File jsRoot = new File(contentRoot, JS_ROOT);
+
+        List<String> jsPaths = new LinkedList<String>();
+        List<File> jsFiles = FileSystemUtils.filter(jsRoot,new FileSuffixPredicate(".js"));
+        for (File jsFile : jsFiles)
+        {
+            jsPaths.add(FileSystemUtils.relativePath(jsRoot, jsFile));
+        }
+
+        return generateContent(base, jsRoot, jsPaths);
+    }
+
+    private String generateContent(String base, File jsRoot, List<String> jsPaths) throws IOException
     {
         StringBuffer content = new StringBuffer();
 
-        File contentRoot = configurationManager.getSystemPaths().getContentRoot();
+        List<String> sortedPaths = expandAndSortPaths(jsRoot, jsPaths);
 
-        List<File> jsFiles = FileSystemUtils.filter(
-                new File(contentRoot, "js"),
-                new FileSuffixPredicate(".js")
-        );
-
-        Map<String, List<String>> directDependencies = new HashMap<String, List<String>>();
-        for (File jsFile : jsFiles)
+        // ensure that the requested paths exist and are files.
+        for (String requestedPath : sortedPaths)
         {
-            String path = FileSystemUtils.relativePath(contentRoot, jsFile);
-            directDependencies.put(path, readDependencyHeader(jsFile));
+            ensureIsFile(jsRoot, requestedPath);
         }
 
-        // Sort the js files according to there dependencies..
-        List<String> orderedPaths = new LinkedList<String>();
+        for (String path : sortedPaths)
+        {
+            content.append("<script type=\"text/javascript\" src=\"");
+            content.append(base).append("/"+JS_ROOT+"/").append(path);
+            content.append("?ver=").append(version);
+            content.append("\"> </script>\n");
+        }
+
+        return content.toString();
+    }
+
+    private List<String> expandAndSortPaths(File jsRoot, List<String> jsPaths) throws IOException
+    {
+        Map<String, List<String>> directDependencies = new HashMap<String, List<String>>();
+        expand(jsRoot, jsPaths, directDependencies);
+
+        List<String> sortedPaths = new LinkedList<String>();
         while (directDependencies.size() > 0)
         {
             List<String> paths = new LinkedList<String>(directDependencies.keySet());
@@ -118,9 +197,8 @@ public class JavascriptDirective extends AbstractDirective
             {
                 if (directDependencies.get(path).size() == 0)
                 {
-                    orderedPaths.add(path);
+                    sortedPaths.add(path);
 
-                    // remove all references to path from the direct dependencies map.
                     directDependencies.remove(path);
                     List<String> linkedList = new LinkedList<String>(directDependencies.keySet());
                     for (String s : linkedList)
@@ -131,41 +209,44 @@ public class JavascriptDirective extends AbstractDirective
                 }
             }
         }
+        return sortedPaths;
+    }
 
-        for (String path : orderedPaths)
+    private void expand(File jsRoot, List<String> paths, Map<String, List<String>> expanded) throws IOException
+    {
+        for (String path: paths)
         {
-            content.append("<script type=\"text/javascript\" src=\"");
-            content.append(base).append("/").append(path);
-            content.append("?ver=").append(version);
-            content.append("\"></script>\n");
+            if (!expanded.containsKey(path))
+            {
+                List<String> dependencies = readDependencyHeader(new File(jsRoot, path));
+                expanded.put(path, dependencies);
+
+                expand(jsRoot, dependencies, expanded);
+            }
         }
-        
-        return content.toString();
     }
 
     private List<String> readDependencyHeader(File file) throws IOException
     {
-        // The expected header format is as follows:
-        // dependency:  comma,separated,list
-        // dependency:  of,dependencies
-        // .......
-
         List<String> dependencies = new LinkedList<String>();
 
         InputStream input = new FileInputStream(file);
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         try
         {
-            String tag = "// dependency:";
             String line = reader.readLine();
-            while (line.startsWith(tag))
+            Matcher matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
+            while (matcher.matches())
             {
-                StringTokenizer tokens = new StringTokenizer(line.substring(tag.length()), " ,", false);
+                line = line.substring(line.indexOf(":") + 1);
+                StringTokenizer tokens = new StringTokenizer(line, ",", false);
                 while (tokens.hasMoreTokens())
                 {
-                    dependencies.add(tokens.nextToken());
+                    dependencies.add(tokens.nextToken().trim());
                 }
+                
                 line = reader.readLine();
+                matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
             }
         }
         finally
@@ -174,6 +255,15 @@ public class JavascriptDirective extends AbstractDirective
         }
 
         return dependencies;
+    }
+
+    private void ensureIsFile(File base, String path) throws IOException
+    {
+        File file = new File(base, path);
+        if (!file.isFile())
+        {
+            throw new IOException("Unknown file: " + path);
+        }
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

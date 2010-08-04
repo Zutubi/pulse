@@ -1,4 +1,4 @@
-// dependency: js/widget/treegrid/TreeGridSorter.js
+// dependency: widget/treegrid/TreeGridSorter.js
 
 /*!
  * Ext JS Library 3.1.1

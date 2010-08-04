@@ -5,6 +5,9 @@
 <head>
     <title>#wwtext("name=projects")</title>
     #javascript()
+        StatusBar.js
+        projects.js
+    #end
     <script type="text/javascript">
         var refreshInterval;
         #if($refreshInterval)

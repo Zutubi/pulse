@@ -1,5 +1,5 @@
-// dependency: js/ext-all.js
-// dependency: js/ext-base.js
+// dependency: ext-all.js
+// dependency: ext-base.js
 
 function each(a, f)
 {

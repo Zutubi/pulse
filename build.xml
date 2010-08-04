@@ -42,7 +42,7 @@
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
-        <taskdef name="jscomp" classname="com.google.javascript.jscomp.ant.CompileTask" classpathref="custom.task.path"/>
+        <taskdef name="jscomp" classname="com.zutubi.ant.closure.CompileTask" classpathref="custom.task.path"/>
 
         <!-- create the local.properties file if it does not yet exist. -->
         <copy file="etc/local.properties.template" tofile="local.properties" overwrite="false"/>
@@ -366,22 +366,7 @@
          we explicitly name all javascript files to be processed.
          -->
         <jscomp compilationLevel="whitespace" debug="false" output="${version.root.master}/system/www/js/pulse.js">
-            <sources dir="com.zutubi.pulse.master/src/www/js">
-                <file name="ext-base.js"/>
-                <file name="ext-all.js"/>
-                <file name="yahoo/utilities.js"/>
-                <file name="widget/treegrid/TreeGridSorter.js"/>
-                <file name="buildcolumns.js"/>
-                <file name="main.js"/>
-                <file name="StatusBar.js"/>
-                <file name="widget/treegrid/TreeGridLoader.js"/>
-                <file name="widget/treegrid/TreeGridNodeUI.js"/>
-                <file name="widget/treegrid/TreeGridColumnResizer.js"/>
-                <file name="widget/treegrid/TreeGrid.js"/>
-                <file name="widget/treegrid/TreeGridColumns.js"/>
-                <file name="zutubi.js"/>
-                <file name="projects.js"/>
-            </sources>
+            <sources dir="com.zutubi.pulse.master/src/www/js" includes="**/*.js"/>
         </jscomp>
 
         <!-- copy the readme file. -->
@@ -446,6 +431,12 @@
 
         <antcall target="nsis.master"/>
 
+    </target>
+
+    <target name="test.jscomp" depends="init">
+        <jscomp compilationLevel="whitespace" debug="false" output="build/pulse.js">
+            <sources dir="com.zutubi.pulse.master/src/www/js" includes="**/*.js"/>
+        </jscomp>
     </target>
 
     <target name="nsis.master" if="run.nsis">

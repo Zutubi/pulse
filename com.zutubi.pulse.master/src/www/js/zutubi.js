@@ -1,6 +1,6 @@
-// dependency: js/ext-all.js
-// dependency: js/ext-base.js
-// dependency: js/StatusBar.js
+// dependency: ext-all.js
+// dependency: ext-base.js
+// dependency: StatusBar.js
 
 // setup the namespace for the zutubi components.
 var ZUTUBI = window.ZUTUBI || {};

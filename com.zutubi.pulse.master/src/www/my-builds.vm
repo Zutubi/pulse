@@ -5,6 +5,9 @@
 <head>
     <title>#wwtext("name=my.builds")</title>
     #javascript()
+        yahoo/utilities.js
+        buildcolumns.js
+    #end    
     <script type="text/javascript">
     //<![CDATA[
         #updater("$base/ajax/myBuildsPanel.action" "panel" $principle "Ext.emptyFn")

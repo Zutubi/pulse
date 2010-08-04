@@ -1,5 +1,5 @@
-// dependency: js/zutubi.js
-// dependency: js/StatusBar.js
+// dependency: zutubi.js
+// dependency: StatusBar.js
 
 ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</td>' +
                        '<td class="fit-width" rowspan="{rowspan}">' +

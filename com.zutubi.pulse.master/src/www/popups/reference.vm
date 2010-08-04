@@ -7,6 +7,11 @@
     <link type="text/css" rel="stylesheet" href="$base/css/ext-all.css?#version()"/>
     <link type="text/css" rel="stylesheet" href="$base/css/main.css?#version()" media="screen"/>
     #javascript()
+        ext-base.js
+        ext-all.js
+        main.js
+        zutubi.js
+    #end
     <script type="text/javascript">
         Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
         window.baseUrl = '$base';

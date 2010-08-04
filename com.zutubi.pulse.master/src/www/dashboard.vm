@@ -5,6 +5,9 @@
 <head>
     <title>#wwtext("name=dashboard")</title>
     #javascript()
+        StatusBar.js
+        projects.js
+    #end
     <script type="text/javascript">
         #if($refreshInterval)
             var refreshInterval = $refreshInterval;

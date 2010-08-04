@@ -22,7 +22,7 @@
     </configuration>
     <configuration default="false" name="Pulse Slave 8890" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="VM_PARAMETERS" value="-Ddevelopment=true -Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="-p 8890" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -43,7 +43,7 @@
     </configuration>
     <configuration default="false" name="Pulse Slave 8891" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="VM_PARAMETERS" value="-Ddevelopment=true -Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="-p 8891" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -64,7 +64,7 @@
     </configuration>
     <configuration default="false" name="Pulse Slave 8892" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="VM_PARAMETERS" value="-Ddevelopment=true -Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="-p 8892" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -85,7 +85,7 @@
     </configuration>
     <configuration default="false" name="Pulse Slave 8893" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="VM_PARAMETERS" value="-Ddevelopment=true -Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="-p 8893" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -106,7 +106,7 @@
     </configuration>
     <configuration default="false" name="Pulse Slave 8894" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="VM_PARAMETERS" value="-Ddevelopment=true -Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="-p 8894" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -127,7 +127,7 @@
     </configuration>
     <configuration default="false" name="Pulse Slave 8895" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="VM_PARAMETERS" value="-Ddevelopment=true -Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
       <option name="PROGRAM_PARAMETERS" value="-p 8895" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
