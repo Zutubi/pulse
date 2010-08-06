@@ -5,7 +5,10 @@ import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
+import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
+
+import java.util.logging.Level;
 
 /**
  * A simple service to farm assigned recipes out to the agents.  This is done
@@ -44,6 +47,11 @@ public class RecipeDispatchService extends BackgroundServiceSupport
         {
             public void run()
             {
+                if (LOG.isLoggable(Level.FINER))
+                {
+                    LOG.finer("Recipe dispatch service: dispatching " + safeToString(assignment));
+                }
+
                 try
                 {
                     assignment.getAgent().getService().build(assignment.getRequest());
@@ -53,6 +61,13 @@ public class RecipeDispatchService extends BackgroundServiceSupport
                 {
                     LOG.warning("Unable to dispatch recipe: " + e.getMessage(), e);
                     eventManager.publish(new RecipeErrorEvent(this, assignment.getRecipeId(), "Unable to dispatch recipe: " + e.getMessage()));
+                }
+                finally
+                {
+                    if (LOG.isLoggable(Level.FINER))
+                    {
+                        LOG.finer("Recipe dispatch service: dispatched " + safeToString(assignment));
+                    }
                 }
             }
         });

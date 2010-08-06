@@ -15,6 +15,7 @@ import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -28,6 +29,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
@@ -41,6 +43,7 @@ import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.CallbackService;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -50,6 +53,7 @@ import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -59,10 +63,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+import java.util.logging.Level;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -316,6 +317,11 @@ public class DefaultBuildController implements EventListener, BuildController
 
     public void handleEvent(Event evt)
     {
+        if (LOG.isLoggable(Level.FINER))
+        {
+            LOG.finer("Build controller (" + buildResult.getId() + "): handle event: " + safeToString(evt));
+        }
+
         try
         {
             if (evt instanceof BuildControllerBootstrapEvent)
@@ -362,6 +368,13 @@ public class DefaultBuildController implements EventListener, BuildController
             buildResult.error();
             recordUnexpectedError(Feature.Level.ERROR, e, "Handling " + evt.getClass().getSimpleName());
             completeBuild();
+        }
+        finally
+        {
+            if (LOG.isLoggable(Level.FINER))
+            {
+                LOG.finer("Build controller (" + buildResult.getId() + "): event handled: " + safeToString(evt));
+            }
         }
     }
 
@@ -674,6 +687,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 ScmClient client = null;
                 try
                 {
+                    buildLogger.status("Retrieving changes in build...");
                     Set<ScmCapability> capabilities = getCapabilities(project, projectConfig, scmManager);
                     if (capabilities.contains(ScmCapability.CHANGESETS))
                     {
@@ -702,6 +716,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
                 finally
                 {
+                    buildLogger.status("Changes retrieved.");
                     IOUtils.close(client);
                 }
             }

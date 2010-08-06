@@ -903,6 +903,33 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals("0c807fff", StringUtils.toHexString(new byte[]{12, -128, 127, -1}));
     }
 
+    public void testSafeToStringSimple()
+    {
+        assertEquals("hello", StringUtils.safeToString(new Object(){
+            @Override
+            public String toString()
+            {
+                return "hello";
+            }
+        }));
+    }
+
+    public void testSafeToStringNull()
+    {
+        assertEquals("<null>", StringUtils.safeToString(null));
+    }
+
+    public void testSafeToStringThrows()
+    {
+        assertEquals("<error calling toString>", StringUtils.safeToString(new Object(){
+            @Override
+            public String toString()
+            {
+                throw new RuntimeException("badness");
+            }
+        }));
+    }
+
     private void assertEquals(String[] expected, String[] got)
     {
         assertTrue("Expected " + format(expected) + ", got " + format(got), Arrays.equals(expected, got));

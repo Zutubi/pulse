@@ -953,4 +953,29 @@ public class StringUtils
 
         return formatter.toString();
     }
+
+    /**
+     * Returns the given object converted to a string, handling null objects
+     * and errors so that this conversion will never fail.  Suitable for use
+     * in error handling blocks where further errors need to be prevented.
+     *
+     * @param o the object to convert
+     * @return the output of o.toString(), or a place holder string
+     */
+    public static String safeToString(Object o)
+    {
+        if (o == null)
+        {
+            return "<null>";
+        }
+
+        try
+        {
+            return o.toString();
+        }
+        catch (Exception e)
+        {
+            return "<error calling toString>";
+        }
+    }
 }
