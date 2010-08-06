@@ -44,16 +44,7 @@
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
-        <taskdef name="compact" classname="com.zutubi.ant.javascript.compact.CompactJavascriptTask" classpathref="custom.task.path"/>
-
-        <path id="shrinksafe.task.path">
-            <filelist dir="${project.root.dir}/etc">
-                <file name="shrinksafe-task.jar"/>
-                <file name="shrinksafe-1.4.3.jar"/>
-                <file name="js.jar"/>
-            </filelist>
-        </path>
-        <taskdef name="shrinksafe" classname="com.zutubi.ant.shrinksafe.ShrinksafeTask" classpathref="shrinksafe.task.path"/>
+        <taskdef name="jsconcat" classname="com.zutubi.ant.javascript.concatenate.ConcatenateJavascriptTask" classpathref="custom.task.path"/>
 
         <!-- create the local.properties file if it does not yet exist. -->
         <copy file="etc/local.properties.template" tofile="local.properties" overwrite="false"/>
@@ -373,12 +364,20 @@
             <fileset dir="com.zutubi.pulse.master/src/www" includes="**/*" excludes="js/**"/>
         </copy>
 
-        <compact outputFile="build/pulse.js" sourceDir="com.zutubi.pulse.master/src/www/js">
+        <jscompact outputFile="build/pulse.js" sourceDir="com.zutubi.pulse.master/src/www/js">
             <include name="**/*.js"/>
-        </compact>
-        <shrinksafe outputDir="${version.root.master}/system/www/js/" sourceDir="build" force="true">
-            <include name="pulse.js"/>
-        </shrinksafe>
+        </jscompact>
+
+        <java jar="etc/yuicompressor-2.4.2.jar" fork="true">
+            <arg value="--nomunge"/>
+            <arg value="-o"/>
+            <arg value="${version.root.master}/system/www/js/pulse.js"/>
+            <arg value="build/pulse.js"/>
+            <classpath>
+                <pathelement location="etc/jargs-1.0.jar"/>
+                <pathelement location="etc/rhino-1.6R7.jar"/>
+            </classpath>
+        </java>
 
         <!-- copy the readme file. -->
         <copy todir="${package.root.master}">
@@ -446,12 +445,24 @@
 
     <target name="test.jscomp" depends="init">
 
-        <compact outputFile="build/out.js" sourceDir="com.zutubi.pulse.master/src/www/js">
+        <mkdir dir="build"/>
+
+        <jsconcat outputFile="build/out.js" sourceDir="com.zutubi.pulse.master/src/www/js">
             <include name="**/*.js"/>
-        </compact>
-        <shrinksafe outputDir="build" sourceDir="build" force="true" suffix="shrunk">
-            <include name="out.js"/>
-        </shrinksafe>
+        </jsconcat>
+
+        <!--java -jar yuicompressor-x.y.z.jar myfile.js -o myfile-min.js-->
+        <java jar="etc/yuicompressor-2.4.2.jar" fork="true">
+            <arg value="--nomunge"/>
+            <arg value="-o"/>
+            <arg value="build/out-shrunk.js"/>
+            <arg value="build/out.js"/>
+            <classpath>
+                <pathelement location="etc/jargs-1.0.jar"/>
+                <pathelement location="etc/rhino-1.6R7.jar"/>
+                <pathelement location="etc/rhino-1.6R7.jar"/>
+            </classpath>
+        </java>
 
     </target>
 

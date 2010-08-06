@@ -1,3 +1,4 @@
+// dependency: ext-all.js
 // dependency: zutubi.js
 // dependency: StatusBar.js
 
