@@ -438,6 +438,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, "desc");
         agentMessage.setId(nextId.getAndIncrement());
         messageDao.save(agentMessage);
+        messageDao.flush();
         return agentMessage;
     }
 
@@ -503,6 +504,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     private static class InMemoryAgentSynchronisationMessageDao implements AgentSynchronisationMessageDao
     {
         private List<AgentSynchronisationMessage> messages = new LinkedList<AgentSynchronisationMessage>();
+        private List<AgentSynchronisationMessage> unflushed = null;
         
         public AgentSynchronisationMessage findById(final long id)
         {
@@ -517,6 +519,11 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         public void flush()
         {
+            if (unflushed != null)
+            {
+                messages = unflushed;
+                unflushed = null;
+            }
         }
 
         public List<AgentSynchronisationMessage> findAll()
@@ -526,6 +533,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         public void save(AgentSynchronisationMessage entity)
         {
+            List<AgentSynchronisationMessage> messages = getUnflushed();
             int index = messages.indexOf(entity);
             if (index < 0)
             {
@@ -540,6 +548,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         public void delete(AgentSynchronisationMessage entity)
         {
+            List<AgentSynchronisationMessage> messages = getUnflushed();
             messages.remove(entity);
         }
 
@@ -570,6 +579,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         public int deleteByAgentState(AgentState agentState)
         {
+            List<AgentSynchronisationMessage> messages = getUnflushed();
             int count = messages.size();
             messages.clear();
             return count;
@@ -606,6 +616,16 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             Properties arguments = new Properties();
             arguments.putAll(message.getArguments());
             return new SynchronisationMessage(message.getTypeName(), arguments);
+        }
+
+        private List<AgentSynchronisationMessage> getUnflushed()
+        {
+            if (unflushed == null)
+            {
+                unflushed = copy(messages);
+            }
+            
+            return unflushed;
         }
     }    
 }
