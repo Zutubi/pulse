@@ -7,27 +7,29 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Utility class to help sorting in the plugin-related classes.
+ * Utility class to help sorting by dependency relationships.
  */
 public class DependencySort
 {
     /**
-     * Sorts the given collection of plugins such that no plugin appears after
-     * a dependent.  This allows the plugins to be "added" in the order they
-     * are found in the returned list.
+     * Sorts the given collection of items such that no item appears after a
+     * dependent as defined by the given function.  Some items may have no
+     * dependency relationship, in which case their returned relative order is
+     * undefined.  The dependency graph must not contain any cycles.
      *
-     * @param plugins            plugins to sort
-     * @param directDependentsFn a function that maps from a plugin to the set
-     *                           of its direct dependents
-     * @param <T> the type of plugin we are dealing with
-     * @return the sorted collection of plugins
+     * @param items              items to sort
+     * @param directDependentsFn a function that maps from an item to the set
+     *                           of its direct dependents (i.e. the set of all
+     *                           items that depend upon this item)
+     * @param <T> the type of item we are dealing with
+     * @return the sorted collection of items
      */
-    public static <T> List<T> sort(List<T> plugins, UnaryFunction<T, Set<T>> directDependentsFn)
+    public static <T> List<T> sort(List<T> items, UnaryFunction<T, Set<T>> directDependentsFn)
     {
         // A normal sort will not work as there is no ordering relationship
         // between plugins that have no dependency relationship.
         List<T> sorted = new LinkedList<T>();
-        for (T plugin: plugins)
+        for (T plugin: items)
         {
             // Insert it as late as we can in sorted without inserting after
             // a transitive dependent.  If a dependent comes first, we are

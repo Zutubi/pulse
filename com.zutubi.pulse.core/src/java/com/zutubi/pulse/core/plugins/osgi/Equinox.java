@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.plugins.osgi;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryFunction;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -37,11 +36,11 @@ public class Equinox implements OSGiFramework
     private ServiceReference packageAdminRef;
     private PackageAdmin packageAdmin;
     private ServiceReference platformAdminRef;
-    private PlatformAdmin platformAdmin;
 
     private IExtensionRegistry extensionRegistry;
     private IExtensionTracker extensionTracker;
-    
+    private StateManager stateManager;
+
     public void start(File internalPluginDir) throws Exception
     {
         context = EclipseStarter.startup(new String[]{"-clean"}, null);
@@ -60,12 +59,12 @@ public class Equinox implements OSGiFramework
         platformAdminRef = context.getServiceReference(PlatformAdmin.class.getName());
         if (platformAdminRef != null)
         {
-            platformAdmin = (PlatformAdmin) context.getService(platformAdminRef);
+            stateManager = (StateManager) context.getService(platformAdminRef);
         }
 
-        if (platformAdmin == null)
+        if (stateManager == null)
         {
-            throw new RuntimeException("Could not access platform admin service");
+            throw new RuntimeException("Could not access state manager service");
         }
 
         startInternalPlugins(internalPluginDir);
@@ -124,12 +123,12 @@ public class Equinox implements OSGiFramework
 
     public int getBundleCount(String id)
     {
-        return ((StateManager) platformAdmin).getSystemState().getBundles(id).length;
+        return stateManager.getSystemState().getBundles(id).length;
     }
 
     public BundleDescription getBundleDescription(String symbolicName, String version)
     {
-        return ((StateManager) platformAdmin).getSystemState().getBundle(symbolicName, new org.osgi.framework.Version(version));
+        return stateManager.getSystemState().getBundle(symbolicName, new org.osgi.framework.Version(version));
     }
 
     public boolean resolveBundles()
@@ -196,7 +195,7 @@ public class Equinox implements OSGiFramework
         public Set<Bundle> process(Bundle bundle)
         {
             Set<Bundle> result = new HashSet<Bundle>();
-            BundleDescription description = ((StateManager) platformAdmin).getSystemState().getBundle(bundle.getBundleId());
+            BundleDescription description = stateManager.getSystemState().getBundle(bundle.getBundleId());
     
             BundleDescription[] required = description.getDependents();
             if (required != null)
@@ -212,21 +211,6 @@ public class Equinox implements OSGiFramework
             }
             
             return result;
-        }
-    }
-
-    private static class BundleSymbolicNamePredicate implements Predicate<Bundle>
-    {
-        private final String symbolicName;
-
-        public BundleSymbolicNamePredicate(String symbolicName)
-        {
-            this.symbolicName = symbolicName;
-        }
-
-        public boolean satisfied(Bundle bundle)
-        {
-            return bundle.getSymbolicName().equals(symbolicName);
         }
     }
 }
