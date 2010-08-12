@@ -38,7 +38,6 @@ import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
-import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
@@ -57,8 +56,6 @@ import java.io.PrintStream;
 import java.util.*;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -90,7 +87,6 @@ public class RemoteApi
     private FatController fatController;
     private BuildResultDao buildResultDao;
     private BuildRequestRegistry buildRequestRegistry;
-    private SynchronisationTaskFactory synchronisationTaskFactory;
 
     public RemoteApi()
     {
@@ -1461,58 +1457,6 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
 
-    }
-
-    /**
-     * @internal Writes an error message to the log for testing.
-     * @param token   authentication token
-     * @param message message to write
-     * @return true
-     */
-    public boolean logError(String token, String message)
-    {
-        tokenManager.verifyAdmin(token);
-        LOG.severe(message);
-        return true;
-    }
-
-    /**
-     * @internal Writes a warning message to the log for testing.
-     * @param token   authentication token
-     * @param message message to write
-     * @return true
-     */
-    public boolean logWarning(String token, String message)
-    {
-        tokenManager.verifyAdmin(token);
-        LOG.warning(message);
-        return true;
-    }
-
-    /**
-     * @internal Enqueues a test synchronisation message for the given agent.
-     * @param token       authentication token
-     * @param agent       name of the agent to queue the message for
-     * @param synchronous if true, enqueue a synchronous message, otherwise
-     *                    enqueue an asynchronous one
-     * @param description description of the message
-     * @param succeed     true if the task should succeed, false otherwise
-     * @return true
-     */
-    public boolean enqueueSynchronisationMessage(String token, String agent, boolean synchronous, String description, boolean succeed)
-    {
-        tokenManager.loginUser(token);
-        try
-        {
-            SynchronisationTask task = synchronous ? new TestSynchronisationTask(succeed): new TestAsyncSynchronisationTask(succeed);
-            SynchronisationMessage message = synchronisationTaskFactory.toMessage(task);
-            agentManager.enqueueSynchronisationMessages(internalGetAgent(agent), asList(asPair(message, description)));
-            return true;
-        }
-        finally
-        {
-            tokenManager.logoutUser();
-        }
     }
 
     /**
@@ -4170,10 +4114,5 @@ public class RemoteApi
     public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
     {
         this.buildRequestRegistry = buildRequestRegistry;
-    }
-
-    public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
-    {
-        this.synchronisationTaskFactory = synchronisationTaskFactory;
     }
 }

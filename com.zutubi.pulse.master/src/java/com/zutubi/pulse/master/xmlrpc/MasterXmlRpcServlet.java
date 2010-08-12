@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xmlrpc;
 
 import com.zutubi.pulse.master.api.RemoteApi;
+import com.zutubi.pulse.master.api.TestApi;
 import com.zutubi.pulse.servercore.xmlrpc.XmlRpcServlet;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -8,6 +9,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 /**
+ * Servlet for XML-RPC APIs.
  */
 public class MasterXmlRpcServlet extends XmlRpcServlet
 {
@@ -19,6 +21,8 @@ public class MasterXmlRpcServlet extends XmlRpcServlet
 
         RemoteApi remoteApi = objectFactory.buildBean(RemoteApi.class);
         xmlrpc.addHandler("RemoteApi", remoteApi);
+        TestApi testApi = objectFactory.buildBean(TestApi.class);
+        xmlrpc.addHandler("TestApi", testApi);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
