@@ -9,6 +9,11 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for displaying/adding/removing comments on builds.
@@ -125,6 +130,87 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
 
         page.openAndWaitFor();
         assertTextPresent(TEST_COMMENT);
+    }
+    
+    public void testRemoteApi() throws Exception
+    {
+        final String ANOTHER_TEST_COMMENT = "another comment";
+        
+        String user1 = random + "-user1";
+        String user2 = random + "-user2";
+        
+        configurationHelper.insertUser(users.createSimpleUser(user1));
+        configurationHelper.insertUser(users.createSimpleUser(user2));
+        
+        int buildNumber = buildRunner.triggerAndWaitForBuild(testProject);
+
+        XmlRpcHelper user1Helper = new XmlRpcHelper();
+        user1Helper.login(user1, "");
+        XmlRpcHelper user2Helper = new XmlRpcHelper();
+        user2Helper.login(user2, "");
+        
+        try
+        {
+            // Starts with no comments.
+            Vector<Hashtable<String,Object>> comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(0, comments.size());
+            
+            // Add and verify a comment.
+            String id1 = user1Helper.addBuildComment(TEST_PROJECT, buildNumber, TEST_COMMENT);
+            assertTrue(Long.parseLong(id1) > 0);
+            
+            comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(1, comments.size());
+
+            Hashtable<String, Object> comment = comments.get(0);
+            assertEquals(user1, comment.get("author"));
+            assertEquals(TEST_COMMENT, comment.get("message"));
+            assertEquals(id1, comment.get("id"));
+
+            // Add a second comment, verify again.
+            String id2 = user1Helper.addBuildComment(TEST_PROJECT, buildNumber, ANOTHER_TEST_COMMENT);
+            assertTrue(Long.parseLong(id2) > 0);
+            
+            comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(2, comments.size());
+            assertEquals(TEST_COMMENT, comments.get(0).get("message"));
+            assertEquals(ANOTHER_TEST_COMMENT, comments.get(1).get("message"));
+            
+            // Delete the second comment.
+            assertTrue(user1Helper.deleteBuildComment(TEST_PROJECT, buildNumber, id2));
+            comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(1, comments.size());
+            assertEquals(id1, comments.get(0).get("id"));
+            
+            // Deleting an unknown comment just returns false.
+            assertFalse(user1Helper.deleteBuildComment(TEST_PROJECT, buildNumber, id2));            
+            
+            // A second user should be able to see, but not delete, a comment.
+            comments = user2Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(1, comments.size());
+            
+            try
+            {
+                user2Helper.deleteBuildComment(TEST_PROJECT, buildNumber, id1);
+                fail("Should not be able to delete another user's comments");
+            }
+            catch (Exception e)
+            {
+                assertThat(e.getMessage(), containsString("Permission to perform action 'delete' denied"));
+            }
+            
+            // An admin can both see and delete any comments.
+            comments = xmlRpcHelper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(1, comments.size());
+            assertTrue(xmlRpcHelper.deleteBuildComment(TEST_PROJECT, buildNumber, id1));
+            comments = xmlRpcHelper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertEquals(0, comments.size());
+        }
+        finally
+        {
+            user1Helper.logout();
+            user2Helper.logout();
+        }
     }
 
     private BuildSummaryPage addCommentHelper() throws Exception
