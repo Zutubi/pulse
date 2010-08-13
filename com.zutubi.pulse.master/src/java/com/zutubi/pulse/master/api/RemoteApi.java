@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -53,14 +54,13 @@ import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import com.zutubi.i18n.Messages;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -2563,6 +2563,7 @@ public class RemoteApi
     {
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
         stage.put("name", recipeResultNode.getStageName());
+        stage.put("recipe", recipeResultNode.getResult().getRecipeNameSafe());
         stage.put("agent", recipeResultNode.getHostSafe());
         stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
         addResultFields(recipeResultNode.getResult(), stage);
