@@ -1,5 +1,4 @@
-// dependency: ext-all.js
-// dependency: ext-base.js
+// dependency: ./package.js
 
 /*!
  * Ext JS Library 3.1.1

@@ -1,6 +1,6 @@
-// dependency: ext-all.js
+// dependency: ext/package.js
+// dependency: ext/StatusBar.js
 // dependency: zutubi.js
-// dependency: StatusBar.js
 
 ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</td>' +
                        '<td class="fit-width" rowspan="{rowspan}">' +

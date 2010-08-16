@@ -1,6 +1,6 @@
-// dependency: ext-all.js
-// dependency: ext-base.js
-// dependency: StatusBar.js
+// dependency: ext/package.js
+// dependency: ext/StatusBar.js
+// dependency: widget/treegrid/package.js
 
 // setup the namespace for the zutubi components.
 var ZUTUBI = window.ZUTUBI || {};
@@ -2311,6 +2311,15 @@ ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, 
     }
 });
 
+ZUTUBI.viewWorkingCopy = function (project)
+{
+    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
+        baseUrl : window.baseUrl,
+        basePath: 'projects/' + project + '/latest/wc',
+        title : 'browse working copy'
+    });
+    browser.show(this);
+};
 
 /**
  * Button used to select a node in a tree.

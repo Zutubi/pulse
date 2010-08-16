@@ -1,5 +1,4 @@
-// dependency: ext-all.js
-// dependency: ext-base.js
+// dependency: ext/package.js
 
 function each(a, f)
 {
@@ -763,17 +762,6 @@ function toggleStateList(e)
 {
     var target = e.target || e.srcElement;
     Ext.get(target).findParent('ul.top-level', document.body, true).toggleClass('expanded');
-}
-
-function viewWorkingCopy(project)
-{
-
-    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
-        baseUrl : window.baseUrl,
-        basePath: 'projects/' + project + '/latest/wc',
-        title : 'browse working copy'
-    });
-    browser.show(this);
 }
 
 function indentImage(size)

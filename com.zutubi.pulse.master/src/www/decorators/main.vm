@@ -61,15 +61,12 @@
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
         #javascript()
-            ext-base.js
-            ext-all.js
-            StatusBar.js
-            widget/treegrid/TreeGridSorter.js
-            widget/treegrid/TreeGridColumnResizer.js
-            widget/treegrid/TreeGridNodeUI.js
-            widget/treegrid/TreeGridLoader.js
-            widget/treegrid/TreeGridColumns.js
-            widget/treegrid/TreeGrid.js
+#if($page.getProperty("page.header.javascript"))
+            $page.getProperty("page.header.javascript")
+#end
+            ext/package.js
+            ext/StatusBar.js
+            widget/treegrid/package.js
             main.js
             zutubi.js
         #end

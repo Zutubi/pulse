@@ -1,13 +1,13 @@
 #helpTag("Project+History+Tab")
 #authorisationTags($principle)
 #projectTags($project)
+<content tag="header.javascript">
+    yahoo/utilities.js
+    buildcolumns.js
+</content>
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
-    #javascript()
-        yahoo/utilities.js
-        buildcolumns.js
-    #end
     <script type="text/javascript">
         var popup;
         YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("project.history", "$base", "$base/ajax/historyPanel.action?projectName=$u_projectName", "panel"); });

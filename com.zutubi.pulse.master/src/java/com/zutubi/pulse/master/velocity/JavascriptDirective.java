@@ -30,8 +30,8 @@ import java.util.*;
  * javascript files.  The headers should be in comments at the very top of the file, and
  * take the following form:
  *
- * // dependency: a,comma, separated, list
- * // dependency: that, can, span, multiple, lines
+ * // dependency: depA.js
+ * // dependency: depB.js
  *
  * Usage of this directive within a velocity template looks as follows:
  * <code>
@@ -50,7 +50,7 @@ public class JavascriptDirective extends AbstractDirective
     /**
      * A system flag that is true when we are running in development, false otherwise.
      */
-    private static final boolean IS_DEVELOPMENT = Boolean.getBoolean("development");
+    private static final boolean IS_DEVELOPMENT = Boolean.getBoolean("pulse.development");
     
     private static final String DIRECTIVE_NAME = "javascript";
 

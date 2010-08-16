@@ -11,9 +11,11 @@
 <link rel="stylesheet" type="text/css" href="$base/css/form.css?#version()" media="screen"/>
 <link rel="stylesheet" type="text/css" href="$base/css/statusbar.css?#version()" media="screen"/>
 #javascript()
-    ext-base.js
-    ext-all.js
-    StatusBar.js
+    #if($page.getProperty("page.header.javascript"))
+    $page.getProperty("page.header.javascript")
+    #end
+    ext/package.js
+    ext/StatusBar.js
     main.js
     zutubi.js
 #end

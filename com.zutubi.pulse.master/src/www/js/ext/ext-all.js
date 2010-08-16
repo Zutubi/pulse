@@ -1,4 +1,4 @@
-// dependency: ext-base.js
+// dependency: ./ext-base.js
 
 /*
  * Ext JS Library 3.1.1

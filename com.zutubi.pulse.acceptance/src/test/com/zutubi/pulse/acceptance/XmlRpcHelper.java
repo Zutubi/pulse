@@ -117,12 +117,12 @@ public class XmlRpcHelper
 
     public <T> T call(String function, Object... args) throws Exception
     {
-        return callApi("RemoteApi", function, args);
+        return (T)callApi("RemoteApi", function, args);
     }
 
     public <T> T callTest(String function, Object... args) throws Exception
     {
-        return callApi("TestApi", function, args);
+        return (T)callApi("TestApi", function, args);
     }
     
     @SuppressWarnings({ "unchecked" })

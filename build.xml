@@ -364,10 +364,11 @@
             <fileset dir="com.zutubi.pulse.master/src/www" includes="**/*" excludes="js/**"/>
         </copy>
 
-        <jscompact outputFile="build/pulse.js" sourceDir="com.zutubi.pulse.master/src/www/js">
+        <jsconcat outputFile="build/pulse.js" sourceDir="com.zutubi.pulse.master/src/www/js">
             <include name="**/*.js"/>
-        </jscompact>
+        </jsconcat>
 
+        <mkdir dir="${version.root.master}/system/www/js/"/>
         <java jar="etc/yuicompressor-2.4.2.jar" fork="true">
             <arg value="--nomunge"/>
             <arg value="-o"/>

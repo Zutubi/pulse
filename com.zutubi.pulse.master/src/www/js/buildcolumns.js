@@ -1,4 +1,4 @@
-// dependency: ext-all.js
+// dependency: ext/package.js
 // dependency: yahoo/utilities.js
 
 var keyToText = {
