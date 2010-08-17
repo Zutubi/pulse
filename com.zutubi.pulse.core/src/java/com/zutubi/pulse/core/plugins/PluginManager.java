@@ -80,8 +80,6 @@ public class PluginManager
 
     private List<ExtensionManager> extensionManagers = new LinkedList<ExtensionManager>();
 
-    private boolean versionChangeDetected = false;
-
     /**
      * The plugin states.
      */
@@ -181,27 +179,8 @@ public class PluginManager
 
         // enable all of the installed plugins - enable in batch.
         // - this processing is exactly the same as that done during the enable, except in bulk
-        versionChangeDetected = false;
         for (LocalPlugin plugin : installedPlugins)
         {
-            PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-            if (entry.getVersion() != null)
-            {
-                PluginVersion registryVersion = entry.getVersion();
-                if (registryVersion == null)
-                {
-                    LOG.warning("Unexpected null version string in plugin registry for " + plugin.getId() + ".");
-                    continue;
-                }
-                // we should check for older versions here... can we go back?, and if we do, what happens to the
-                // registry version.
-                if (registryVersion.compareTo(plugin.getVersion()) != 0)
-                {
-                    plugin.setState(Plugin.State.VERSION_CHANGE);
-                    versionChangeDetected = true;
-                }
-            }
-
             plugin.setBundle(equinox.install(plugin.getSource()));
             plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
         }
@@ -213,17 +192,19 @@ public class PluginManager
         List<LocalPlugin> resolvedPlugins = new LinkedList<LocalPlugin>();
         for (LocalPlugin plugin : installedPlugins)
         {
-            switch (plugin.getBundle().getState())
+            Bundle bundle = plugin.getBundle();
+            switch (bundle.getState())
             {
                 case Bundle.INSTALLED:
                     // resolve failed - can we get any more details about this?
+                    plugin.setBundle(null);
+                    plugin.setBundleDescription(null);
+                    plugin.setState(Plugin.State.DISABLED);
+                    plugin.setErrorMessage("Failed to resolve bundle.");
+
                     try
                     {
-                        plugin.getBundle().uninstall();
-                        plugin.setBundle(null);
-                        plugin.setBundleDescription(null);
-                        plugin.setState(Plugin.State.DISABLED);
-                        plugin.setErrorMessage("Failed to resolve bundle.");
+                        bundle.uninstall();
                     }
                     catch (BundleException e)
                     {
@@ -236,45 +217,31 @@ public class PluginManager
                     resolvedPlugins.add(plugin);
                     break;
                 default:
-                    LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + plugin.getBundle().getState());
+                    LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + bundle.getState());
             }
         }
 
         List<LocalPlugin> sortedPlugins = sortPlugins(resolvedPlugins);
-
-        // c) if none have version change, then start them all.
-        if (!versionChangeDetected)
+        for (LocalPlugin plugin : sortedPlugins)
         {
-            for (LocalPlugin plugin : sortedPlugins)
+            // only want plugins that were successfully resolved.
+            if (plugin.getState() == Plugin.State.INSTALLED)
             {
-                // only want plugins that were successfully resolved.
-                if (plugin.getState() == Plugin.State.INSTALLED)
+                try
                 {
-                    try
-                    {
-                        plugin.getBundle().start(Bundle.START_TRANSIENT);
-                        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-                        entry.setVersion(plugin.getVersion());
-                        saveRegistry();
-
-                        plugin.setState(Plugin.State.ENABLED);
-                    }
-                    catch (BundleException e)
-                    {
-                        plugin.getBundle().uninstall();
-                        plugin.setBundle(null);
-                        plugin.setBundleDescription(null);
-                        plugin.setState(Plugin.State.DISABLED);
-                        plugin.setErrorMessage(e.getMessage());
-                    }
+                    plugin.getBundle().start(Bundle.START_TRANSIENT);
+                    plugin.setState(Plugin.State.ENABLED);
+                }
+                catch (BundleException e)
+                {
+                    plugin.getBundle().uninstall();
+                    plugin.setBundle(null);
+                    plugin.setBundleDescription(null);
+                    plugin.setState(Plugin.State.DISABLED);
+                    plugin.setErrorMessage(e.getMessage());
                 }
             }
         }
-    }
-
-    public boolean isVersionChangeDetected()
-    {
-        return versionChangeDetected;
     }
 
     private void scanForManualUninstalls() throws PluginException
@@ -619,51 +586,16 @@ public class PluginManager
 
     void enablePlugin(LocalPlugin plugin) throws PluginException
     {
-        // assumption: we can enable
-
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.setState(State.ENABLED);
         saveRegistry();
 
-        // check version, if it has changed, then set the plugin state to VERSION_CHANGED.
-        try
-        {
-            if (entry.getVersion() != null)
-            {
-                PluginVersion registryVersion = entry.getVersion();
-                if (registryVersion.compareTo(plugin.getVersion()) != 0)
-                {
-                    plugin.setState(Plugin.State.VERSION_CHANGE);
-                }
-            }
-        }
-        catch (IllegalArgumentException e)
-        {
-            throw new PluginException("Version check during plugin enable failed. Cause: IllegalArgumentException - " + e.getMessage(), e);
-        }
-
-        //TODO: OK, so this plugin is enabled, when does the extension manager receive a callback
-        //      notifying of this change in state?.
-
         // activate this plugin within osgi.
         try
         {
-            if (plugin.getState() == Plugin.State.VERSION_CHANGE)
-            {
-                // install only.
-                plugin.setBundle(equinox.resolve(plugin.getSource()));
-                plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
-            }
-            else
-            {
-                // fully activate the plugin.
-                plugin.setBundle(equinox.activate(plugin.getSource()));
-                plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
-
-                entry.setVersion(plugin.getVersion());
-                saveRegistry();
-                plugin.setState(Plugin.State.ENABLED);
-            }
+            plugin.setBundle(equinox.activate(plugin.getSource()));
+            plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
+            plugin.setState(Plugin.State.ENABLED);
         }
         catch (Exception e)
         {
@@ -750,25 +682,6 @@ public class PluginManager
         plugin.setState(Plugin.State.UPDATING);
     }
 
-    void resolveVersionChange(LocalPlugin plugin)
-    {
-        plugin.setState(Plugin.State.INSTALLED);
-
-        try
-        {
-            // fully activate the plugin.
-            plugin.getBundle().start(Bundle.START_TRANSIENT);
-            PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
-            registryEntry.setVersion(plugin.getVersion());
-            plugin.setState(Plugin.State.ENABLED);
-        }
-        catch (Exception e)
-        {
-            plugin.setState(Plugin.State.DISABLED);
-            plugin.setErrorMessage(e.getMessage());
-        }
-    }
-
     private LocalPlugin createPluginHandle(String source) throws PluginException
     {
         return createPluginHandle(getPluginSourceFile(source));
@@ -776,17 +689,15 @@ public class PluginManager
 
     private File getPluginSourceFile(String source) throws PluginException
     {
-        if (isUriFormat(source))
-        {
-            return parseUriFormat(source);
-        }
-        else
-        {
-            return new File(paths.getPluginStorageDir(), source);
-        }
+        return getSourceFile(source, paths.getPluginStorageDir());
     }
 
     private File getUpgradeSourceFile(String source) throws PluginException
+    {
+        return getSourceFile(source, paths.getPluginWorkDir());
+    }
+
+    private File getSourceFile(String source, File baseDir) throws PluginException
     {
         if (isUriFormat(source))
         {
@@ -794,7 +705,7 @@ public class PluginManager
         }
         else
         {
-            return new File(paths.getPluginWorkDir(), source);
+            return new File(baseDir, source);
         }
     }
 

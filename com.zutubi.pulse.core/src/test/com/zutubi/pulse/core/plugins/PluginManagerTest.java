@@ -285,12 +285,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         restartPluginCore();
 
         plugin = manager.getPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.VERSION_CHANGE);
-        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
-
-        plugin.resolve();
-
-        assertEquals(Plugin.State.ENABLED, plugin.getState());
+        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
 
@@ -316,10 +311,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         restartPluginCore();
 
         plugin = manager.getPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "2.0.0", Plugin.State.VERSION_CHANGE);
-
-        plugin.resolve();
-
         assertPlugin(plugin, PRODUCER_ID, "2.0.0", Plugin.State.ENABLED);
 
         assertEquals(0, paths.getPluginWorkDir().list().length);
@@ -342,10 +333,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         plugin = manager.getPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.VERSION_CHANGE);
-        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
-
-        plugin.resolve();
         assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
@@ -388,9 +375,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         plugin = manager.getPlugin(PRODUCER_ID);
-        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.VERSION_CHANGE);
-
-        plugin.resolve();
         assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
     }
 
@@ -713,7 +697,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         PluginRegistryEntry entry = registry.register(PRODUCER_ID);
         entry.setSource(new File(paths.getPluginStorageDir(), producer1.getName()).toURI().toString());
         entry.setState(PluginManager.State.DISABLED);
-        entry.setVersion(new PluginVersion("1.0.0"));
         registry.flush();
 
         manuallyDeploy(producer1);

@@ -42,12 +42,6 @@ public interface Plugin
         UNINSTALLED,
 
         /**
-         * Indicates that there was a plugin version change since the last time the plugin
-         * system was initialised and the plugin may require an upgrading.
-         */
-        VERSION_CHANGE,
-        
-        /**
          * The plugin will be uninstalled on restart, and is no longer valid.
          */
         UNINSTALLING,
@@ -132,8 +126,6 @@ public interface Plugin
     void uninstall() throws PluginException;
 
     Plugin upgrade(URI newSource) throws PluginException;
-
-    void resolve() throws PluginException;
 
     /**
      * @return the list of plugins that this plugin depends upon.

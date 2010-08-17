@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.plugins;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginPaths;
-import com.zutubi.pulse.core.plugins.PluginRegistryEntry;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.master.upgrade.DefaultUpgradeManager;
@@ -97,7 +96,11 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         upgradeManager.prepareUpgrade();
         upgradeManager.executeUpgrade();
 
-        // restart plugin core
+        Plugin plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+        plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.pulse.core.commands.ant");
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+
         restartPluginCore();
 
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
@@ -119,9 +122,9 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         restartPluginCore();
 
         assertTrue(pluginUpgradeManager.isUpgradeRequired());
-
         plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
-        assertEquals(Plugin.State.VERSION_CHANGE, plugin.getState());
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+        assertEquals("3.0.0", plugin.getVersion().toString());
     }
 
     public void testInPlaceNew() throws Exception
@@ -131,12 +134,12 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     public void testInPlaceNoUpgrade() throws Exception
     {
-        assertNoUpgradeHandledCorrectly(paths.getPluginStorageDir(), false);
+        assertNoUpgradeHandledCorrectly(paths.getPluginStorageDir());
     }
 
     public void testInPlaceUpgrade() throws Exception
     {
-        assertUpgradeHandledCorrectly(paths.getPluginStorageDir(), false);
+        assertUpgradeHandledCorrectly(paths.getPluginStorageDir());
     }
 
     public void testInternalNew() throws Exception
@@ -146,7 +149,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     public void testInternalNoUpgrade() throws Exception
     {
-        assertNoUpgradeHandledCorrectly(paths.getInternalPluginStorageDir(), true);
+        assertNoUpgradeHandledCorrectly(paths.getInternalPluginStorageDir());
     }
 
     public void testPrepackagedNew() throws Exception
@@ -156,12 +159,12 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     public void testPrepackagedNoUpgrade() throws Exception
     {
-        assertNoUpgradeHandledCorrectly(paths.getPrepackagedPluginStorageDir(), false);
+        assertNoUpgradeHandledCorrectly(paths.getPrepackagedPluginStorageDir());
     }
 
     public void testPrepackagedUpgrade() throws Exception
     {
-        assertUpgradeHandledCorrectly(paths.getPrepackagedPluginStorageDir(), false);
+        assertUpgradeHandledCorrectly(paths.getPrepackagedPluginStorageDir());
     }
 
     private void assertNewPluginHandledCorrectly(File dir) throws Exception
@@ -173,7 +176,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         startupPluginCore();
 
-        assertFalse(pluginSystem.getPluginManager().isVersionChangeDetected());
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
 
         Plugin plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
@@ -183,7 +185,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         }
     }
 
-    private void assertNoUpgradeHandledCorrectly(File dir, boolean internal) throws Exception
+    private void assertNoUpgradeHandledCorrectly(File dir) throws Exception
     {
         if (!dir.exists())
         {
@@ -202,11 +204,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         startupPluginCore();
 
-        if (!internal)
-        {
-            assertTrue(pluginSystem.getPluginManager().isVersionChangeDetected());
-        }
-
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
 
         Plugin plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
@@ -216,7 +213,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         }
     }
 
-    private void assertUpgradeHandledCorrectly(File dir, boolean internal) throws Exception
+    private void assertUpgradeHandledCorrectly(File dir) throws Exception
     {
         if (!dir.exists())
         {
@@ -226,7 +223,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         startupPluginCore();
 
-        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginRegistryEntry.PLUGIN_VERSION_KEY));
+        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginUpgradeManager.PLUGIN_VERSION_KEY));
 
         shutdownPluginCore();
 
@@ -235,13 +232,8 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         startupPluginCore();
         
-        if (!internal)
-        {
-            assertTrue(pluginSystem.getPluginManager().isVersionChangeDetected());
-        }
-
         assertTrue(pluginUpgradeManager.isUpgradeRequired());
-        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginRegistryEntry.PLUGIN_VERSION_KEY));
+        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginUpgradeManager.PLUGIN_VERSION_KEY));
     }
 
     private void restartPluginCore() throws Exception

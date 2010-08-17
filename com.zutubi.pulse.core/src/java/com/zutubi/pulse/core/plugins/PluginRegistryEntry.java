@@ -9,7 +9,6 @@ import java.util.Map;
 public class PluginRegistryEntry
 {
     public static final String PLUGIN_STATE_KEY = "plugin.state";
-    public static final String PLUGIN_VERSION_KEY = "plugin.version";
     public static final String PLUGIN_SOURCE_KEY = "plugin.uri";
     public static final String PLUGIN_PENDING_KEY = "plugin.pending.action";
     public static final String UPGRADE_SOURCE_KEY = "plugin.upgrade.source";
@@ -74,21 +73,6 @@ public class PluginRegistryEntry
     public void setState(PluginManager.State state)
     {
         put(PLUGIN_STATE_KEY, state.toString());
-    }
-
-    public PluginVersion getVersion()
-    {
-        String versionString = get(PLUGIN_VERSION_KEY);
-        if (!StringUtils.stringSet(versionString))
-        {
-            return null;
-        }
-        return new PluginVersion(versionString);
-    }
-
-    public void setVersion(PluginVersion version)
-    {
-        put(PLUGIN_VERSION_KEY, version.toString());
     }
 
     public Collection<String> keySet()

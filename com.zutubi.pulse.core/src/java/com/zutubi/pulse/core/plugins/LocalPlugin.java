@@ -189,19 +189,6 @@ public abstract class LocalPlugin implements Plugin
         }
     }
 
-    public void resolve() throws PluginException
-    {
-        setErrorMessage(null);
-        switch (pluginState)
-        {
-            case VERSION_CHANGE:
-                manager.resolveVersionChange(this);
-                break;
-            default:
-                throw new PluginException("Unable to resolve plugin version: no version change detected.");
-        }
-    }
-
     public List<PluginDependency> getRequiredPlugins()
     {
         // note that this only really gives a correct answer if this plugin was resolved.
