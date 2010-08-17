@@ -36,7 +36,6 @@ public abstract class LocalPlugin implements Plugin
     private String errorMessage;
 
     private State pluginState;
-    private Type pluginType;
 
     public LocalPlugin(File source)
     {
@@ -98,16 +97,6 @@ public abstract class LocalPlugin implements Plugin
         this.pluginState = pluginState;
     }
 
-    public Type getType()
-    {
-        return pluginType;
-    }
-
-    void setType(Type type)
-    {
-        this.pluginType = type;
-    }
-
     public String getErrorMessage()
     {
         return errorMessage;
@@ -165,10 +154,6 @@ public abstract class LocalPlugin implements Plugin
 
     public void uninstall() throws PluginException
     {
-        if (pluginType == Type.INTERNAL)
-        {
-            throw new PluginException("Cannot uninstall plugin: this is an internal plugin.");
-        }
         setErrorMessage(null);
         switch (pluginState)
         {
@@ -262,7 +247,7 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canUninstall()
     {
-        return (isEnabled() || isDisabled()) && pluginType != Type.INTERNAL;
+        return (isEnabled() || isDisabled());
     }
 
     public boolean isUpdating()

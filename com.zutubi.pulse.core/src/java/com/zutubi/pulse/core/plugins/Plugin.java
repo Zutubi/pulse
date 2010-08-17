@@ -64,20 +64,6 @@ public interface Plugin
         UPDATING
     }
 
-    public enum Type
-    {
-        /**
-         * Internal plugins are required plugins that are shipped and located within the
-         * pulse distribution and can not be uninstalled.
-         */
-        INTERNAL,
-        
-        /**
-         * User plugins are optional plugins that can be configured by the user.
-         */
-        USER
-    }
-
     /**
      * @return the plugin id, which is the OSGi bundle symbolic name.  This
      *         is unique for every plugin, and by convention is in the style of a
@@ -117,12 +103,6 @@ public interface Plugin
      * @return the current state of the plugin.
      */
     State getState();
-
-    /**
-     * @see com.zutubi.pulse.core.plugins.Plugin.Type
-     * @return the type of this plugin.
-     */
-    Type getType();
 
     /**
      * @return the error message associated with this plugin.  Only valid

@@ -48,7 +48,7 @@ public class PluginManager
     private PluginPaths paths;
 
     /**
-     * The list of non-internal plugins.
+     * The list of all plugins.
      */
     private List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
 
@@ -156,7 +156,7 @@ public class PluginManager
             {
                 try
                 {
-                    LocalPlugin plugin = createPluginHandle(entry.getSource(), entry.getType());
+                    LocalPlugin plugin = createPluginHandle(entry.getSource());
                     plugin.setState(Plugin.State.INSTALLED);
                     State targetState = entry.getState();
                     switch (targetState)
@@ -180,7 +180,7 @@ public class PluginManager
         }
 
         // enable all of the installed plugins - enable in batch.
-        // - this processing is exactly the same as that done during the enable, except on in bulk
+        // - this processing is exactly the same as that done during the enable, except in bulk
         versionChangeDetected = false;
         for (LocalPlugin plugin : installedPlugins)
         {
@@ -394,7 +394,42 @@ public class PluginManager
 
     private void scanUserPlugins() throws PluginException
     {
-        scanInplacePluginDirectory(paths.getPluginStorageDir(), Plugin.Type.USER);
+        for (File file : paths.getPluginStorageDir().listFiles(PLUGIN_FILTER))
+        {
+            LocalPlugin plugin = createPluginHandle(file);
+
+            if (!registry.isRegistered(plugin))
+            {
+                // plugin is already where we want it, just a matter of installing it.
+                registerPlugin(createPluginHandle(file));
+            }
+            else
+            {
+                PluginRegistryEntry entry = registry.getEntry(plugin.getId());
+
+                if (State.UNINSTALLED.equals(entry.getState()))
+                {
+                    // plugin is already where we want it, just a matter of installing it.
+                    registerPlugin(createPluginHandle(file));
+                }
+                else
+                {
+                    // is the current file the same as the registered file?
+                    if (getPluginSourceFile(entry.getSource()).getName().compareTo(file.getName()) == 0)
+                    {
+                        continue;
+                    }
+
+                    // we always want to be using the latest version of the internal plugins, so update
+                    // the registry with whatever we find. The system startup will detect the version change
+                    // if one exists.
+                    entry.put(PLUGIN_SOURCE_KEY, file.getName());
+                    saveRegistry();
+
+                    // Alternative - only update if a) no version specified, b) there is a known version increase.
+                }
+            }
+        }
     }
 
     private void scanPrepackagedPlugins() throws PluginException
@@ -409,7 +444,7 @@ public class PluginManager
         // discover pre-packaged plugins.
         for (File file : paths.getPrepackagedPluginStorageDir().listFiles(PLUGIN_FILTER))
         {
-            LocalPlugin plugin = createPluginHandle(file, Plugin.Type.USER);
+            LocalPlugin plugin = createPluginHandle(file);
             try
             {
                 if (!registry.isRegistered(plugin))
@@ -432,7 +467,7 @@ public class PluginManager
 
                     File downloadedSource = downloadPlugin(file.toURI(), file.getName(), paths.getPluginStorageDir());
 
-                    registerPlugin(createPluginHandle(downloadedSource, Plugin.Type.USER));
+                    registerPlugin(createPluginHandle(downloadedSource));
                 }
                 else
                 {
@@ -451,7 +486,7 @@ public class PluginManager
                         continue;
                     }
 
-                    LocalPlugin registeredPlugin = createPluginHandle(entry.getSource(), entry.getType());
+                    LocalPlugin registeredPlugin = createPluginHandle(entry.getSource());
 
                     if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) > 0)
                     {
@@ -473,47 +508,6 @@ public class PluginManager
         }
     }
 
-    private void scanInplacePluginDirectory(File dir, Plugin.Type type) throws PluginException
-    {
-        for (File file : dir.listFiles(PLUGIN_FILTER))
-        {
-            LocalPlugin plugin = createPluginHandle(file, type);
-
-            if (!registry.isRegistered(plugin))
-            {
-                // plugin is already where we want it, just a matter of installing it.
-                registerPlugin(createPluginHandle(file, type));
-            }
-            else
-            {
-                PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-
-                if (State.UNINSTALLED.equals(entry.getState()))
-                {
-                    // plugin is already where we want it, just a matter of installing it.
-                    registerPlugin(createPluginHandle(file, type));
-                }
-                else
-                {
-                    // is the current file the same as the registered file?
-                    if (getPluginSourceFile(entry.getSource()).getName().compareTo(file.getName()) == 0)
-                    {
-                        continue;
-                    }
-
-                    // we always want to be using the latest version of the internal plugins, so update
-                    // the registry with whatever we find. The system startup will detect the version change
-                    // if one exists.
-                    // NOTE: We are effectively re-registering each of the internal plugins each time round
-                    entry.put(PLUGIN_SOURCE_KEY, file.getName());
-                    saveRegistry();
-
-                    // Alternative - only update if a) no version specified, b) there is a known version increase.
-                }
-            }
-        }
-    }
-
     public Plugin install(URI uri) throws PluginException
     {
         return install(uri, true);
@@ -528,7 +522,7 @@ public class PluginManager
     {
         //TODO: check that the plugin we download does not already exist.  We do not want to install the same plugin twice.
 
-        // copy it into the internal plugin storage directory
+        // copy it into the plugin storage directory
         File file = downloadPlugin(uri, filename, paths.getPluginStorageDir());
 
         LocalPlugin installedPlugin;
@@ -539,7 +533,7 @@ public class PluginManager
                 throw new PluginException("'" + uri + "' does not define a valid plugin.");
             }
 
-            installedPlugin = createPluginHandle(file, Plugin.Type.USER);
+            installedPlugin = createPluginHandle(file);
             registerPlugin(installedPlugin);
         }
         catch (Exception e)
@@ -706,7 +700,7 @@ public class PluginManager
 
             File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
 
-            LocalPlugin installedPlugin = createPluginHandle(installedSource, Plugin.Type.USER);
+            LocalPlugin installedPlugin = createPluginHandle(installedSource);
 
             // register the plugin with the registry
             PluginRegistryEntry registryEntry = registry.register(installedPlugin);
@@ -775,9 +769,9 @@ public class PluginManager
         }
     }
 
-    private LocalPlugin createPluginHandle(String source, Plugin.Type type) throws PluginException
+    private LocalPlugin createPluginHandle(String source) throws PluginException
     {
-        return createPluginHandle(getPluginSourceFile(source), type);
+        return createPluginHandle(getPluginSourceFile(source));
     }
 
     private File getPluginSourceFile(String source) throws PluginException
@@ -829,7 +823,7 @@ public class PluginManager
         return source.startsWith("file:/");
     }
 
-    private LocalPlugin createPluginHandle(File file, Plugin.Type type) throws PluginException
+    private LocalPlugin createPluginHandle(File file) throws PluginException
     {
         if (!PLUGIN_FILTER.accept(file))
         {
@@ -847,7 +841,6 @@ public class PluginManager
         }
 
         plugin.manager = this;
-        plugin.setType(type);
 
         return plugin;
     }
@@ -871,7 +864,6 @@ public class PluginManager
             PluginRegistryEntry registryEntry = registry.register(plugin);
             registryEntry.put(PLUGIN_SOURCE_KEY, new File(plugin.getSource()).getName());
             registryEntry.setState(State.ENABLED);
-            registryEntry.setType(plugin.getType());
             saveRegistry();
             return registryEntry;
         }

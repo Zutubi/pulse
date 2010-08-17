@@ -1,18 +1,19 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.delete;
 import com.zutubi.util.ZipUtils;
-import static com.zutubi.util.io.IOUtils.copyFile;
 import org.eclipse.osgi.service.resolver.BundleDescription;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipInputStream;
+
+import static com.zutubi.util.FileSystemUtils.delete;
+import static com.zutubi.util.io.IOUtils.copyFile;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class PluginManagerTest extends BasePluginSystemTestCase
 {
@@ -712,7 +713,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         PluginRegistryEntry entry = registry.register(PRODUCER_ID);
         entry.setSource(new File(paths.getPluginStorageDir(), producer1.getName()).toURI().toString());
         entry.setState(PluginManager.State.DISABLED);
-        entry.setType(Plugin.Type.USER);
         entry.setVersion(new PluginVersion("1.0.0"));
         registry.flush();
 
