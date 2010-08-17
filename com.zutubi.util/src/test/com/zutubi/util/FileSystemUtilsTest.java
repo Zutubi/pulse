@@ -1311,7 +1311,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         assertEquals(".", relativePath(new File("./a"), new File("./a")));
         assertEquals("..", relativePath(new File("./a/b"), new File("./a")));
-        assertEquals("../a", relativePath(new File("./b"), new File("./a")));
+        assertEquals(".." + File.separator + "a", relativePath(new File("./b"), new File("./a")));
         assertEquals("b", relativePath(new File("./a"), new File("./a/b")));
     }
 
