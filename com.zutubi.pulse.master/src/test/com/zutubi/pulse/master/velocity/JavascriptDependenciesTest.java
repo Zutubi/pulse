@@ -10,6 +10,8 @@ import java.io.IOException;
 import static java.util.Arrays.asList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 public class JavascriptDependenciesTest extends PulseTestCase
 {
     private File jsRoot;
@@ -67,7 +69,7 @@ public class JavascriptDependenciesTest extends PulseTestCase
 
     private void assertExpected(List<String> expected, List<String> paths) throws IOException
     {
-        assertEquals(normalise(expected), expandAndSortPaths(jsRoot, paths));
+         Assert.assertEquals(normalise(expected), expandAndSortPaths(jsRoot, paths));
     }
 
     private List<String> normalise(List<String> paths)
@@ -81,15 +83,4 @@ public class JavascriptDependenciesTest extends PulseTestCase
         });
     }
 
-    private void assertEquals(List<String> expected, List<String> actual)
-    {
-        assertEquals(expected.size(), actual.size());
-        for (int i = 0; i < expected.size(); i++)
-        {
-            String expectedItem = expected.get(i);
-            String actualItem = actual.get(i);
-
-            assertEquals(expectedItem, actualItem);
-        }
-    }
 }
