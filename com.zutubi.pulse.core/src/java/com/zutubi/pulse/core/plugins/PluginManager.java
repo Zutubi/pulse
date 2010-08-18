@@ -120,22 +120,19 @@ public class PluginManager
         //  - configure start equinox
         //  - install and startup the internal plugins.
         equinox = new Equinox();
-
-        // setup the configuration.
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA_READONLY, Boolean.TRUE.toString());
         equinox.start(paths.getInternalPluginStorageDir());
 
         // Step 3: scan the various directories and update the registry accordingly.
-        //  - install the pre-packaged plugins, unless they have been explicitly marked as uninstalled.
         //  - register new plugins, mark uninstalls as uninstalled.
+        //  - install the pre-packaged plugins, unless they have been explicitly marked as uninstalled.
 
-        // run scans over the directories before checking for manual uninstalls so that manual upgrades are not
-        // miss interpreted.
-        scanPrepackagedPlugins();
+        // Check for new plugins in the user directory before checking for
+        // manual uninstalls so that manual upgrades are not misinterpreted.
         scanUserPlugins();
-
         scanForManualUninstalls();
+        scanPrepackagedPlugins();
 
         // Step 4: plugin startup
         //  - install and resolve the plugins. (deal with unresolved plugins - provide as much feedback as possible).
@@ -250,7 +247,6 @@ public class PluginManager
         {
             PluginRegistryEntry entry = registry.getEntry(id);
 
-            // check for manually uninstalled plugins.
             if (entry.hasSource())
             {
                 File source = getPluginSourceFile(entry.getSource());
@@ -274,7 +270,6 @@ public class PluginManager
                 PluginRegistryEntry entry = registry.getEntry(id);
                 try
                 {
-                    // process the pending actions.
                     if (entry.containsKey(PLUGIN_PENDING_KEY))
                     {
                         processPendingAction(id, entry);
@@ -322,7 +317,6 @@ public class PluginManager
             URI newSource = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY)).toURI();
             upgradePluginSource(id, newSource);
 
-            // cleanup the temporary file.
             File tmpPluginFile = new File(newSource);
             delete(tmpPluginFile);
 
@@ -344,17 +338,11 @@ public class PluginManager
 
     private void upgradePluginSource(String id, URI newSource) throws URISyntaxException, IOException, PluginException
     {
-        // replace the old plugin, install and register the new source
         PluginRegistryEntry entry = registry.getEntry(id);
-
-        // delete the old
         File pluginFile = getPluginSourceFile(entry.getSource());
         delete(pluginFile);
 
-        // combination of uninstall the current plugin and installing the new.
         File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
-
-        // register the plugin with the registry
         entry.put(PLUGIN_SOURCE_KEY, installedSource.getName());
         saveRegistry();
     }
@@ -381,19 +369,25 @@ public class PluginManager
                 }
                 else
                 {
-                    // is the current file the same as the registered file?
                     if (getPluginSourceFile(entry.getSource()).getName().compareTo(file.getName()) == 0)
                     {
                         continue;
                     }
 
-                    // we always want to be using the latest version of the internal plugins, so update
-                    // the registry with whatever we find. The system startup will detect the version change
-                    // if one exists.
+                    File registeredSource = getPluginSourceFile(entry.getSource());
+                    if (registeredSource.exists())
+                    {
+                        LOG.warning("Two versions of plugin '" + plugin.getId() + "' found: '" + registeredSource.getAbsolutePath() + "' and '" + file.getAbsolutePath() + "'.  Selecting the newer version.");
+                        LocalPlugin registeredPlugin = createPluginHandle(registeredSource);
+                        if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) < 0)
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    // Sync the registry to the manual change found on disk.
                     entry.put(PLUGIN_SOURCE_KEY, file.getName());
                     saveRegistry();
-
-                    // Alternative - only update if a) no version specified, b) there is a known version increase.
                 }
             }
         }
@@ -408,7 +402,6 @@ public class PluginManager
             return;
         }
 
-        // discover pre-packaged plugins.
         for (File file : paths.getPrepackagedPluginStorageDir().listFiles(PLUGIN_FILTER))
         {
             LocalPlugin plugin = createPluginHandle(file);
@@ -416,24 +409,7 @@ public class PluginManager
             {
                 if (!registry.isRegistered(plugin))
                 {
-                    // SPECIAL CASE: check if a file of the same name already exists in the destination directory.
-                    // If so, we over write it.  This is rather aggressive, but can a file in the storage directory
-                    // that is the same name as a pre-packaged file be considered valid if it is not registered?
-                    File downloadDest = new File(paths.getPluginStorageDir(), file.getName());
-                    if (downloadDest.exists())
-                    {
-                        try
-                        {
-                            delete(downloadDest);
-                        }
-                        catch (IOException e)
-                        {
-                            LOG.warning(e);
-                        }
-                    }
-
                     File downloadedSource = downloadPlugin(file.toURI(), file.getName(), paths.getPluginStorageDir());
-
                     registerPlugin(createPluginHandle(downloadedSource));
                 }
                 else
@@ -441,20 +417,14 @@ public class PluginManager
                     PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
                     State state = entry.getState();
-                    if (state == State.UNINSTALLED)
+                    if (state == State.UNINSTALLED || !entry.hasSource())
                     {
                         // this plugin has been uninstalled, nothing further is required from it.
                         continue;
                     }
 
                     // version check. if new version available, mark it for pending upgrade.
-                    if (!entry.hasSource())
-                    {
-                        continue;
-                    }
-
                     LocalPlugin registeredPlugin = createPluginHandle(entry.getSource());
-
                     if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) > 0)
                     {
                         try
@@ -533,8 +503,6 @@ public class PluginManager
 
     void disablePlugin(LocalPlugin plugin) throws PluginException
     {
-        // assumption: we can disable
-
         // process the disable.  this is the same thing that is done if PENDING_DISABLE is encountered.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.setState(State.DISABLED);

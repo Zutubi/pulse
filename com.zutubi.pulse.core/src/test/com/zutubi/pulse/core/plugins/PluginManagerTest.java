@@ -326,7 +326,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         shutdownPluginCore();
 
-        // manually upgrade the plugin in teh plugin store directory.
+        // manually upgrade the plugin in the plugin store directory.
         assertTrue(new File(paths.getPluginStorageDir(), producer1.getName()).delete());
         manuallyDeploy(producer11);
 
@@ -337,6 +337,42 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
 
+    public void testManualUpgradeWithoutRemovingExisting() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin plugin = manager.install(producer1.toURI());
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+
+        shutdownPluginCore();
+
+        manuallyDeploy(producer11);
+
+        startupPluginCore();
+
+        plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+    
+    public void testManualDowngradeWithoutRemovingExisting() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin plugin = manager.install(producer11.toURI());
+        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
+
+        shutdownPluginCore();
+
+        manuallyDeploy(producer1);
+
+        startupPluginCore();
+
+        plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "1.1.0", Plugin.State.ENABLED);
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+    
     public void testLoadInternalPlugins() throws Exception
     {
         FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
