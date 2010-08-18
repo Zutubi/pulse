@@ -126,7 +126,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         // install the consumer before we install the producer.
         Plugin installedConsumer = manager.install(consumer1.toURI());
-        assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
+        assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.ERROR);
         assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessages().get(0));
 
         assertEquals(0, manager.equinox.getBundleCount(CONSUMER_ID));
@@ -138,7 +138,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         // install the consumer before we install the producer.
         Plugin installedConsumer = manager.install(consumer1.toURI());
-        assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
+        assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.ERROR);
         assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessages().get(0));
         assertTrue(new File(paths.getPluginStorageDir(), consumer1.getName()).isFile());
 
@@ -766,7 +766,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         Plugin consumer = manager.install(consumer1.toURI());
         assertEquals("Failed to resolve bundle dependencies.", consumer.getErrorMessages().get(0));
-        assertEquals(Plugin.State.DISABLED, consumer.getState());
+        assertEquals(Plugin.State.ERROR, consumer.getState());
     }
 
     public void testDependencyCheckMessagesOnStartup() throws PluginException, IOException
@@ -804,7 +804,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         Plugin plugin = manager.install(failonstartup.toURI());
-        assertEquals(Plugin.State.DISABLED, plugin.getState());
+        assertEquals(Plugin.State.ERROR, plugin.getState());
         assertTrue(plugin.getErrorMessages().size() > 0);
     }
 
