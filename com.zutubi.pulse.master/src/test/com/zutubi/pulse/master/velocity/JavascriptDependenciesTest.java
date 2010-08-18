@@ -78,7 +78,7 @@ public class JavascriptDependenciesTest extends PulseTestCase
         {
             public String map(String s)
             {
-                return s.replace('/', File.separatorChar);
+                return s.replaceAll("/", File.separator);
             }
         });
     }
