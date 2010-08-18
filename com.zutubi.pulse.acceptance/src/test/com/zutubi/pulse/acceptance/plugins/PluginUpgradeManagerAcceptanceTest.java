@@ -57,7 +57,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     public void testPluginUpgradeSanityCheck() throws Exception
     {
-        assertTrue(paths.getPluginStorageDir().mkdirs());
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
 
         startupPluginCore();
@@ -108,7 +107,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     public void testRequestUpgradeViaPluginInterface() throws Exception
     {
-        assertTrue(paths.getPluginStorageDir().mkdirs());
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
 
         startupPluginCore();

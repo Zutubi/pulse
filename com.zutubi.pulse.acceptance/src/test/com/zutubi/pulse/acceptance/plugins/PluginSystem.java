@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.plugins.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,7 +35,11 @@ public class PluginSystem
         File osgiDir = new File(pluginRoot, "config");
 
         File storageDir = new File(tmpDir, "plugin/storage");
-
+        if (!storageDir.exists() && !storageDir.mkdirs())
+        {
+            throw new IOException("Cannot create plugin storage directory '" + storageDir.getAbsolutePath() + "'");
+        }
+        
         File workDir = new File(tmpDir, "plugin/work");
 
         paths = new ConfigurablePluginPaths();
