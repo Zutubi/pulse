@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.velocity;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import static com.zutubi.pulse.master.velocity.JavascriptDependencies.expandAndSortPaths;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +67,18 @@ public class JavascriptDependenciesTest extends PulseTestCase
 
     private void assertExpected(List<String> expected, List<String> paths) throws IOException
     {
-        assertEquals(expected, expandAndSortPaths(jsRoot, paths));
+        assertEquals(normalise(expected), expandAndSortPaths(jsRoot, paths));
+    }
+
+    private List<String> normalise(List<String> paths)
+    {
+        return CollectionUtils.map(paths, new Mapping<String, String>()
+        {
+            public String map(String s)
+            {
+                return s.replace('/', File.separatorChar);
+            }
+        });
     }
 
     private void assertEquals(List<String> expected, List<String> actual)
