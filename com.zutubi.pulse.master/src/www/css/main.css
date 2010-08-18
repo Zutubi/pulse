@@ -1481,6 +1481,12 @@ table.detail td li
     padding-bottom: 2px;
 }
 
+table.detail td li.error
+{
+    padding-left: 20px;
+    background-position: 0 4px;
+}
+
 /*
  * Template display
  */

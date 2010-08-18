@@ -24,11 +24,15 @@
         </td>
     </tr>
     
-#if(!$plugin.enabled && $plugin.errorMessage)
+#if($plugin.errorMessages.size() > 0)
     <tr>
         #pluginHeader("plugin.error")
-        <td if="plugin.error" class="detail">
-            <img src="$base/images/error.gif" alt="error"/> #html($plugin.errorMessage)
+        <td id="plugin.error" class="detail">
+            <ul>
+    #foreach($message in $plugin.errorMessages)
+                <li class="error">#html($message)</li>
+    #end
+            </ul>
         </td>
     </tr>
 #end

@@ -9,6 +9,8 @@ import org.osgi.framework.BundleException;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,7 +35,7 @@ public abstract class LocalPlugin implements Plugin
 
     private BundleDescription bundleDescription;
 
-    private String errorMessage;
+    private List<String> errorMessages = new LinkedList<String>();
 
     private State pluginState;
 
@@ -97,19 +99,24 @@ public abstract class LocalPlugin implements Plugin
         this.pluginState = pluginState;
     }
 
-    public String getErrorMessage()
+    public List<String> getErrorMessages()
     {
-        return errorMessage;
+        return Collections.unmodifiableList(errorMessages);
     }
 
-    public void setErrorMessage(String errorMessage)
+    public void addErrorMessage(String errorMessage)
     {
-        this.errorMessage = errorMessage;
+        errorMessages.add(errorMessage);
     }
 
+    public void clearErrorMessages()
+    {
+        errorMessages.clear();
+    }
+    
     public void enable() throws PluginException
     {
-        setErrorMessage(null);
+        clearErrorMessages();
         switch (pluginState)
         {
             case UNINSTALLING:
@@ -119,6 +126,7 @@ public abstract class LocalPlugin implements Plugin
             case DISABLING:
                 manager.enablePlugin(this);
             case DISABLED:
+            case ERROR:
                 manager.enablePlugin(this);
                 break;
             case ENABLED:
@@ -128,13 +136,7 @@ public abstract class LocalPlugin implements Plugin
 
     public void disable() throws PluginException
     {
-        disable(null);
-    }
-
-    public void disable(String reason) throws PluginException
-    {
-        setErrorMessage(reason);
-        
+        clearErrorMessages();
         switch (pluginState)
         {
             case DISABLED:
@@ -154,7 +156,7 @@ public abstract class LocalPlugin implements Plugin
 
     public void uninstall() throws PluginException
     {
-        setErrorMessage(null);
+        clearErrorMessages();
         switch (pluginState)
         {
             case ENABLED:
@@ -172,7 +174,7 @@ public abstract class LocalPlugin implements Plugin
 
     public Plugin upgrade(URI newSource) throws PluginException
     {
-        setErrorMessage(null);
+        clearErrorMessages();
         switch (pluginState)
         {
             case ENABLED:
@@ -209,7 +211,7 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canEnable()
     {
-        return isDisabled() || isDisabling();
+        return isDisabled() || isDisabling() || isError();
     }
 
     public boolean isDisabled()
@@ -219,7 +221,7 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canDisable()
     {
-        return isEnabled();
+        return isEnabled() || isError();
     }
 
     public boolean isDisabling()
@@ -227,9 +229,19 @@ public abstract class LocalPlugin implements Plugin
         return pluginState == Plugin.State.DISABLING;
     }
 
+    public boolean isError()
+    {
+        return pluginState == Plugin.State.ERROR;
+    }
+    
     public boolean isUninstalling()
     {
         return pluginState == Plugin.State.UNINSTALLING;
+    }
+
+    public boolean isUninstalled()
+    {
+        return pluginState == Plugin.State.UNINSTALLED;
     }
 
     public boolean canUninstall()
@@ -244,7 +256,7 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canUpdate()
     {
-        return isEnabled() || isDisabled();
+        return isEnabled() || isDisabled() || isError();
     }
 
     public boolean equals(Object obj)

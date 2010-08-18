@@ -41,24 +41,6 @@ public class PluginManager
 
     private static final Logger LOG = Logger.getLogger(PluginManager.class);
 
-    protected Equinox equinox;
-
-    private PluginRegistry registry;
-
-    private PluginPaths paths;
-
-    /**
-     * The list of all plugins.
-     */
-    private List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
-
-
-    //-- plugin registry keys. --
-
-    private static final String PLUGIN_SOURCE_KEY = PluginRegistryEntry.PLUGIN_SOURCE_KEY;
-    private static final String PLUGIN_PENDING_KEY = PluginRegistryEntry.PLUGIN_PENDING_KEY;
-    private static final String UPGRADE_SOURCE_KEY = PluginRegistryEntry.UPGRADE_SOURCE_KEY;
-
     //--- pending action strings
     // There are some things that the plugin manager can not do whilst the equinox system
     // is running.  These actions are defined as pending actions, and will be carried out
@@ -66,46 +48,26 @@ public class PluginManager
     /**
      * The plugin will be uninstalled on the next restart.
      */
-    private static final String UNINSTALL_PENDING_ACTION = "uninstall";
+    private static final String PENDING_ACTION_UNINSTALL = "uninstall";
     /**
      * The plugin will be disabled on the next restart.
      */
-    private static final String DISABLE_PENDING_ACTION = "disable";
+    private static final String PENDING_ACTION_DISABLE = "disable";
     /**
      * The plugin will be upgraded to a new version on the next restart.
      */
-    private static final String UPGRADE_PENDING_ACTION = "upgrade";
+    private static final String PENDING_ACTION_UPGRADE = "upgrade";
+
 
     private static final PluginFileFilter PLUGIN_FILTER = new PluginFileFilter();
 
+
+    Equinox equinox;
+    private PluginRegistry registry;
+    private PluginPaths paths;
+    private List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
     private List<ExtensionManager> extensionManagers = new LinkedList<ExtensionManager>();
 
-    /**
-     * The plugin states.
-     */
-    public enum State
-    {
-        /**
-         * The plugin is deployed and running within the embedded equinox instance.
-         */
-        ENABLED,
-        /**
-         * The plugin is currently disabled.  It has not been registered with the equinox
-         * system, but is located within the plugin storage directory, and as such can be
-         * deployed.
-         */
-        DISABLED,
-        /**
-         * This plugin has been uninstalled.  It does not exist in the plugin storage
-         * directory, and will not be automatically upgraded if it was one of the pre-packaged
-         * plugins.
-         */
-        UNINSTALLED
-    }
-
-    public PluginManager()
-    {
-    }
 
     public void init() throws Exception
     {
@@ -153,13 +115,13 @@ public class PluginManager
                 {
                     LocalPlugin plugin = createPluginHandle(entry.getSource());
                     plugin.setState(Plugin.State.INSTALLED);
-                    State targetState = entry.getState();
-                    switch (targetState)
+                    PluginRegistryEntry.Mode targetMode = entry.getMode();
+                    switch (targetMode)
                     {
-                        case ENABLED:
+                        case ENABLE:
                             installedPlugins.add(plugin);
                             break;
-                        case DISABLED:
+                        case DISABLE:
                             plugin.setState(Plugin.State.DISABLED);
                             break;
                         default:
@@ -196,8 +158,8 @@ public class PluginManager
                     // resolve failed - can we get any more details about this?
                     plugin.setBundle(null);
                     plugin.setBundleDescription(null);
-                    plugin.setState(Plugin.State.DISABLED);
-                    plugin.setErrorMessage("Failed to resolve bundle.");
+                    plugin.setState(Plugin.State.ERROR);
+                    plugin.addErrorMessage("Failed to resolve bundle.");
 
                     try
                     {
@@ -234,8 +196,8 @@ public class PluginManager
                     plugin.getBundle().uninstall();
                     plugin.setBundle(null);
                     plugin.setBundleDescription(null);
-                    plugin.setState(Plugin.State.DISABLED);
-                    plugin.setErrorMessage(e.getMessage());
+                    plugin.setState(Plugin.State.ERROR);
+                    plugin.addErrorMessage(e.getMessage());
                 }
             }
         }
@@ -253,8 +215,8 @@ public class PluginManager
                 if (!source.exists())
                 {
                     // looks like this plugin is no longer available.
-                    entry.setState(State.UNINSTALLED);
-                    entry.remove(PLUGIN_SOURCE_KEY);
+                    entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
+                    entry.removeSource();
                     saveRegistry();
                 }
             }
@@ -270,10 +232,10 @@ public class PluginManager
                 PluginRegistryEntry entry = registry.getEntry(id);
                 try
                 {
-                    if (entry.containsKey(PLUGIN_PENDING_KEY))
+                    if (entry.hasPendingAction())
                     {
                         processPendingAction(id, entry);
-                        entry.remove(PLUGIN_PENDING_KEY);
+                        entry.removePendingAction();
                         saveRegistry(); // this may be overly aggressive flushing.                        
                     }
                 }
@@ -291,36 +253,36 @@ public class PluginManager
 
     private void processPendingAction(String id, PluginRegistryEntry entry) throws PluginException, IOException, URISyntaxException
     {
-        String pendingAction = entry.get(PLUGIN_PENDING_KEY);
+        String pendingAction = entry.getPendingAction();
         if (!StringUtils.stringSet(pendingAction))
         {
             LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Missing pending action.");
             return;
         }
 
-        if (pendingAction.equals(DISABLE_PENDING_ACTION))
+        if (pendingAction.equals(PENDING_ACTION_DISABLE))
         {
-            entry.setState(State.DISABLED);
+            entry.setMode(PluginRegistryEntry.Mode.DISABLE);
         }
-        else if (pendingAction.equals(UNINSTALL_PENDING_ACTION))
+        else if (pendingAction.equals(PENDING_ACTION_UNINSTALL))
         {
             if (entry.hasSource())
             {
                 File plugin = getPluginSourceFile(entry.getSource());
                 delete(plugin);
-                entry.remove(PLUGIN_SOURCE_KEY);
+                entry.removeSource();
             }
-            entry.setState(State.UNINSTALLED);
+            entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
         }
-        else if (pendingAction.equals(UPGRADE_PENDING_ACTION))
+        else if (pendingAction.equals(PENDING_ACTION_UPGRADE))
         {
-            URI newSource = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY)).toURI();
+            URI newSource = getUpgradeSourceFile(entry.getUpgradeSource()).toURI();
             upgradePluginSource(id, newSource);
 
             File tmpPluginFile = new File(newSource);
             delete(tmpPluginFile);
 
-            entry.remove(UPGRADE_SOURCE_KEY);
+            entry.removeUpgradeSource();
         }
     }
 
@@ -343,7 +305,7 @@ public class PluginManager
         delete(pluginFile);
 
         File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
-        entry.put(PLUGIN_SOURCE_KEY, installedSource.getName());
+        entry.setSource(installedSource.getName());
         saveRegistry();
     }
 
@@ -362,7 +324,7 @@ public class PluginManager
             {
                 PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
-                if (State.UNINSTALLED.equals(entry.getState()))
+                if (entry.getMode() == PluginRegistryEntry.Mode.UNINSTALLED)
                 {
                     // plugin is already where we want it, just a matter of installing it.
                     registerPlugin(createPluginHandle(file));
@@ -386,7 +348,7 @@ public class PluginManager
                     }
                     
                     // Sync the registry to the manual change found on disk.
-                    entry.put(PLUGIN_SOURCE_KEY, file.getName());
+                    entry.setSource(file.getName());
                     saveRegistry();
                 }
             }
@@ -416,8 +378,8 @@ public class PluginManager
                 {
                     PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
-                    State state = entry.getState();
-                    if (state == State.UNINSTALLED || !entry.hasSource())
+                    PluginRegistryEntry.Mode mode = entry.getMode();
+                    if (mode == PluginRegistryEntry.Mode.UNINSTALLED || !entry.hasSource())
                     {
                         // this plugin has been uninstalled, nothing further is required from it.
                         continue;
@@ -505,7 +467,7 @@ public class PluginManager
     {
         // process the disable.  this is the same thing that is done if PENDING_DISABLE is encountered.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-        entry.setState(State.DISABLED);
+        entry.setMode(PluginRegistryEntry.Mode.DISABLE);
         saveRegistry();
         plugin.setState(Plugin.State.DISABLED);
     }
@@ -514,7 +476,7 @@ public class PluginManager
     {
         // the plugin is currently enabled, so we need to request a pending action.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-        entry.put(PLUGIN_PENDING_KEY, DISABLE_PENDING_ACTION);
+        entry.setPendingAction(PENDING_ACTION_DISABLE);
         saveRegistry();
         plugin.setState(Plugin.State.DISABLING);
     }
@@ -529,9 +491,9 @@ public class PluginManager
                 File pluginFile = getPluginSourceFile(entry.getSource());
                 delete(pluginFile);
 
-                entry.remove(PLUGIN_SOURCE_KEY);
+                entry.removeSource();
             }
-            entry.setState(State.UNINSTALLED);
+            entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
             saveRegistry();
 
             plugin.setState(Plugin.State.UNINSTALLED);
@@ -546,7 +508,7 @@ public class PluginManager
     {
         // the plugin is currently enabled, so we need to request a pending action.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-        entry.put(PLUGIN_PENDING_KEY, UNINSTALL_PENDING_ACTION);
+        entry.setPendingAction(PENDING_ACTION_UNINSTALL);
         saveRegistry();
 
         plugin.setState(Plugin.State.UNINSTALLING);
@@ -555,7 +517,7 @@ public class PluginManager
     void enablePlugin(LocalPlugin plugin) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-        entry.setState(State.ENABLED);
+        entry.setMode(PluginRegistryEntry.Mode.ENABLE);
         saveRegistry();
 
         // activate this plugin within osgi.
@@ -581,8 +543,8 @@ public class PluginManager
 
             plugin.setBundle(null);
             plugin.setBundleDescription(null);
-            plugin.setState(Plugin.State.DISABLED);
-            plugin.setErrorMessage(e.getMessage());
+            plugin.setState(Plugin.State.ERROR);
+            plugin.addErrorMessage(e.getMessage());
         }
     }
 
@@ -604,11 +566,11 @@ public class PluginManager
 
             // register the plugin with the registry
             PluginRegistryEntry registryEntry = registry.register(installedPlugin);
-            registryEntry.put(PLUGIN_SOURCE_KEY, installedSource.getName());
+            registryEntry.setSource(installedSource.getName());
             saveRegistry();
 
             plugins.add(installedPlugin);
-            installedPlugin.setState(Plugin.State.DISABLED);
+            installedPlugin.setState(currentPlugin.getState());
 
             return installedPlugin;
         }
@@ -624,11 +586,11 @@ public class PluginManager
         {
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
-            File pluginFile = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY));
+            File pluginFile = getUpgradeSourceFile(entry.getUpgradeSource());
             delete(pluginFile);
 
-            entry.remove(PLUGIN_PENDING_KEY);
-            entry.remove(UPGRADE_SOURCE_KEY);
+            entry.removePendingAction();
+            entry.removeUpgradeSource();
             saveRegistry();
             plugin.setState(Plugin.State.ENABLED);
         }
@@ -644,8 +606,8 @@ public class PluginManager
 
         // the plugin is currently enabled, so we need to request a pending action.
         PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
-        registryEntry.put(PLUGIN_PENDING_KEY, UPGRADE_PENDING_ACTION);
-        registryEntry.put(UPGRADE_SOURCE_KEY, installedSource.getName());
+        registryEntry.setPendingAction(PENDING_ACTION_UPGRADE);
+        registryEntry.setUpgradeSource(installedSource.getName());
         saveRegistry();
         plugin.setState(Plugin.State.UPDATING);
     }
@@ -741,8 +703,8 @@ public class PluginManager
         try
         {
             PluginRegistryEntry registryEntry = registry.register(plugin);
-            registryEntry.put(PLUGIN_SOURCE_KEY, new File(plugin.getSource()).getName());
-            registryEntry.setState(State.ENABLED);
+            registryEntry.setSource(new File(plugin.getSource()).getName());
+            registryEntry.setMode(PluginRegistryEntry.Mode.ENABLE);
             saveRegistry();
             return registryEntry;
         }
@@ -982,9 +944,6 @@ public class PluginManager
 
         if (unsortablePlugin)
         {
-            // we have plugins with no bundle descriptions.  These may be sorted as though they have no
-            // dependencies, but is that correct?.  The problem here is really that all plugins should
-            // already have there bundle descriptions.  If not, they will need to be installed.
             throw new IllegalStateException("Can not sort plugins that have not been installed.");
         }
 

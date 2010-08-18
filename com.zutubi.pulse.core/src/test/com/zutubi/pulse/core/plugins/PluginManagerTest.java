@@ -59,7 +59,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         // verify that the plugin has been installed.
         assertTrue(installedPluginFile.isFile());
-        assertEquals(null, installedPlugin.getErrorMessage());
+        assertEquals(0, installedPlugin.getErrorMessages().size());
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
 
         assertEquals(0, paths.getPluginWorkDir().list().length);
@@ -72,7 +72,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         Plugin installedPlugin = manager.install(producer1.toURI(), false);
         assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
-        assertEquals(null, installedPlugin.getErrorMessage());
+        assertEquals(0, installedPlugin.getErrorMessages().size());
 
         assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
     }
@@ -83,7 +83,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         Plugin installedPlugin = manager.install(producer1.toURI(), true);
         assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
-        assertEquals(null, installedPlugin.getErrorMessage());
+        assertEquals(0, installedPlugin.getErrorMessages().size());
 
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
@@ -127,7 +127,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // install the consumer before we install the producer.
         Plugin installedConsumer = manager.install(consumer1.toURI());
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
-        assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessage());
+        assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessages().get(0));
 
         assertEquals(0, manager.equinox.getBundleCount(CONSUMER_ID));
     }
@@ -139,7 +139,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // install the consumer before we install the producer.
         Plugin installedConsumer = manager.install(consumer1.toURI());
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
-        assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessage());
+        assertEquals("Failed to resolve bundle dependencies.", installedConsumer.getErrorMessages().get(0));
         assertTrue(new File(paths.getPluginStorageDir(), consumer1.getName()).isFile());
 
         // install the missing consumer dependency
@@ -150,7 +150,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // and ensure that we can now start the consumer.
         installedConsumer.enable();
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.ENABLED);
-        assertEquals(null, installedConsumer.getErrorMessage());
+        assertEquals(0, installedConsumer.getErrorMessages().size());
 
         assertEquals(1, manager.equinox.getBundleCount(CONSUMER_ID));
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
@@ -210,7 +210,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
 
-    public void testDisablingRequiredPluginAlsoDisablesDependent() throws Exception
+    public void testDisablingRequiredPluginEffectOnDependent() throws Exception
     {
         startupPluginCore();
 
@@ -227,12 +227,10 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         producer = manager.getPlugin(PRODUCER_ID);
         assertPlugin(producer, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         consumer = manager.getPlugin(CONSUMER_ID);
-        assertPlugin(consumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
+        assertPlugin(consumer, CONSUMER_ID, "1.0.0", Plugin.State.ERROR);
 
         producer.enable();
         assertPlugin(producer, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
-
-        //FIXME: should we be restarting any dependent plugins that are marked in the registry as ENABLED?
 
         restartPluginCore();
         producer = manager.getPlugin(PRODUCER_ID);
@@ -732,7 +730,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         PluginRegistry registry = new PluginRegistry(paths.getPluginRegistryDir());
         PluginRegistryEntry entry = registry.register(PRODUCER_ID);
         entry.setSource(new File(paths.getPluginStorageDir(), producer1.getName()).toURI().toString());
-        entry.setState(PluginManager.State.DISABLED);
+        entry.setMode(PluginRegistryEntry.Mode.DISABLE);
         registry.flush();
 
         manuallyDeploy(producer1);
@@ -767,7 +765,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         Plugin consumer = manager.install(consumer1.toURI());
-        assertEquals("Failed to resolve bundle dependencies.", consumer.getErrorMessage());
+        assertEquals("Failed to resolve bundle dependencies.", consumer.getErrorMessages().get(0));
         assertEquals(Plugin.State.DISABLED, consumer.getState());
     }
 
@@ -778,8 +776,8 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         Plugin consumer = manager.getPlugin("com.zutubi.bundles.consumer");
-        assertEquals("Failed to resolve bundle.", consumer.getErrorMessage());
-        assertEquals(Plugin.State.DISABLED, consumer.getState());
+        assertEquals("Failed to resolve bundle.", consumer.getErrorMessages().get(0));
+        assertEquals(Plugin.State.ERROR, consumer.getState());
     }
 
     public void testInstallingZeroLengthJarFile() throws Exception
@@ -807,7 +805,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         Plugin plugin = manager.install(failonstartup.toURI());
         assertEquals(Plugin.State.DISABLED, plugin.getState());
-        assertNotNull(plugin.getErrorMessage());
+        assertTrue(plugin.getErrorMessages().size() > 0);
     }
 
     public void testPluginThatFailsOnStartup_ManualInstall() throws IOException, PluginException
@@ -817,8 +815,8 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         Plugin plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
-        assertEquals(Plugin.State.DISABLED, plugin.getState());
-        assertNotNull(plugin.getErrorMessage());
+        assertEquals(Plugin.State.ERROR, plugin.getState());
+        assertTrue(plugin.getErrorMessages().size() > 0);
     }
 
     public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup() throws Exception
@@ -831,7 +829,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         startupPluginCore();
 
         Plugin plugin = manager.getPlugin("com.zutubi.bundles.onstartup");
-        assertEquals(Plugin.State.DISABLED, plugin.getState());
+        assertEquals(Plugin.State.ERROR, plugin.getState());
 
         shutdownPluginCore();
 

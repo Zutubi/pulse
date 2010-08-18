@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.jar.JarFile;
 
 /**
- * A FileFilter implementation that does some basic varification that
+ * A FileFilter implementation that does some basic verification that
  * the provided file is a valid plugin.
  * <p/>
  * The checks include that the file is either a directory or a jar file,

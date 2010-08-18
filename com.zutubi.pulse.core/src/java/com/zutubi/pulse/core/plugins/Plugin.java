@@ -34,6 +34,12 @@ public interface Plugin
         DISABLED,
 
         /**
+         * Loading the plugin failed for some reason, explained in the error
+         * message where possible.
+         */
+        ERROR,
+        
+        /**
          * The plugin has been uninstalled, and is no longer available for use.
          *
          * The primary purpose of this state is to remember which plugins have been
@@ -99,13 +105,17 @@ public interface Plugin
     State getState();
 
     /**
-     * @return the error message associated with this plugin.  Only valid
-     *         when state is DISABLED.  If DISABLED and this message is non-null, the
-     *         message indicates a problem with the plugin that caused it to be
-     *         automatically disabled.
+     * @return error messages associated with this plugin.
      */
-    String getErrorMessage();
+    List<String> getErrorMessages();
 
+    /**
+     * Records a new error message against this plugin.
+     * 
+     * @param message the message to record
+     */
+    void addErrorMessage(String message);
+    
     /**
      * Enable the plugin.  This will start the plugin and make it available to other
      * plugins that may depend on it.
@@ -120,8 +130,6 @@ public interface Plugin
     void enable() throws PluginException;
 
     void disable() throws PluginException;
-
-    void disable(String reason) throws PluginException;
 
     void uninstall() throws PluginException;
 
