@@ -121,7 +121,7 @@ public abstract class LocalPlugin implements Plugin
         {
             case UNINSTALLING:
                 throw new PluginException("Unable to enable plugin: already marked for uninstall");
-            case UPDATING:
+            case UPGRADING:
                 throw new PluginException("Unable to enable plugin: already marked for update");
             case DISABLING:
                 manager.enablePlugin(this);
@@ -147,8 +147,8 @@ public abstract class LocalPlugin implements Plugin
                 break;
             case UNINSTALLING:
                 throw new PluginException("Unable to disable plugin: already marked for uninstall");
-            case UPDATING:
-                throw new PluginException("Unable to disable plugin: already marked for update");
+            case UPGRADING:
+                throw new PluginException("Unable to disable plugin: already marked for upgrade");
             default:
                 manager.disablePlugin(this);
         }
@@ -164,8 +164,8 @@ public abstract class LocalPlugin implements Plugin
                 break;
             case UNINSTALLING:
                 throw new PluginException("Cannot uninstall plugin: already marked for uninstall");
-            case UPDATING:
-                throw new PluginException("Cannot uninstall plugin: already marked for update");
+            case UPGRADING:
+                throw new PluginException("Cannot uninstall plugin: already marked for upgrade");
             default:
                 manager.uninstallPlugin(this);
                 break;
@@ -180,7 +180,7 @@ public abstract class LocalPlugin implements Plugin
             case ENABLED:
                 manager.requestUpgrade(this, newSource);
                 return this;
-            case UPDATING:
+            case UPGRADING:
                 manager.cancelUpgrade(this);
                 manager.requestUpgrade(this, newSource);
                 return this;
@@ -239,19 +239,14 @@ public abstract class LocalPlugin implements Plugin
         return pluginState == Plugin.State.UNINSTALLING;
     }
 
-    public boolean isUninstalled()
-    {
-        return pluginState == Plugin.State.UNINSTALLED;
-    }
-
     public boolean canUninstall()
     {
         return (isEnabled() || isDisabled());
     }
 
-    public boolean isUpdating()
+    public boolean isUpgrading()
     {
-        return pluginState == Plugin.State.UPDATING;
+        return pluginState == Plugin.State.UPGRADING;
     }
 
     public boolean canUpdate()

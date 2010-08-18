@@ -115,7 +115,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         Plugin plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
         plugin.upgrade(producer3.toURI());
-        assertEquals(Plugin.State.UPDATING, plugin.getState());
+        assertEquals(Plugin.State.UPGRADING, plugin.getState());
 
         restartPluginCore();
 

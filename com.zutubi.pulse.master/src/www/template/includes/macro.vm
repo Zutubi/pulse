@@ -1896,7 +1896,7 @@
         #set($image = "exclamation.gif")
     #elseif($plugin.enabled)
         #set($image = "accept.gif")
-    #elseif($plugin.uninstalling || $plugin.uninstalled)
+    #elseif($plugin.uninstalling)
         #set($image = "delete.gif")
     #elseif($plugin.upgrading)
         #set($image = "arrow-refresh.gif")

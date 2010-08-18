@@ -103,7 +103,6 @@ public class PluginManager
         //  - start the plugins that we can start.
 
         List<LocalPlugin> installedPlugins = new LinkedList<LocalPlugin>();
-
         for (String id : registry.getRegistrations())
         {
             PluginRegistryEntry entry = registry.getEntry(id);
@@ -114,7 +113,6 @@ public class PluginManager
                 try
                 {
                     LocalPlugin plugin = createPluginHandle(entry.getSource());
-                    plugin.setState(Plugin.State.INSTALLED);
                     PluginRegistryEntry.Mode targetMode = entry.getMode();
                     switch (targetMode)
                     {
@@ -173,6 +171,7 @@ public class PluginManager
                     break;
                 case Bundle.RESOLVED:
                 case Bundle.STARTING:
+                case Bundle.ACTIVE:
                     resolvedPlugins.add(plugin);
                     break;
                 default:
@@ -183,22 +182,18 @@ public class PluginManager
         List<LocalPlugin> sortedPlugins = sortPlugins(resolvedPlugins);
         for (LocalPlugin plugin : sortedPlugins)
         {
-            // only want plugins that were successfully resolved.
-            if (plugin.getState() == Plugin.State.INSTALLED)
+            try
             {
-                try
-                {
-                    plugin.getBundle().start(Bundle.START_TRANSIENT);
-                    plugin.setState(Plugin.State.ENABLED);
-                }
-                catch (BundleException e)
-                {
-                    plugin.getBundle().uninstall();
-                    plugin.setBundle(null);
-                    plugin.setBundleDescription(null);
-                    plugin.setState(Plugin.State.ERROR);
-                    plugin.addErrorMessage(e.getMessage());
-                }
+                plugin.getBundle().start(Bundle.START_TRANSIENT);
+                plugin.setState(Plugin.State.ENABLED);
+            }
+            catch (BundleException e)
+            {
+                plugin.getBundle().uninstall();
+                plugin.setBundle(null);
+                plugin.setBundleDescription(null);
+                plugin.setState(Plugin.State.ERROR);
+                plugin.addErrorMessage(e.getMessage());
             }
         }
     }
@@ -448,7 +443,6 @@ public class PluginManager
             throw new PluginException(e);
         }
 
-        installedPlugin.setState(Plugin.State.INSTALLED);
         plugins.add(installedPlugin);
 
         if (autostart)
@@ -496,7 +490,7 @@ public class PluginManager
             entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
             saveRegistry();
 
-            plugin.setState(Plugin.State.UNINSTALLED);
+            plugins.remove(plugin);
         }
         catch (IOException e)
         {
@@ -609,7 +603,7 @@ public class PluginManager
         registryEntry.setPendingAction(PENDING_ACTION_UPGRADE);
         registryEntry.setUpgradeSource(installedSource.getName());
         saveRegistry();
-        plugin.setState(Plugin.State.UPDATING);
+        plugin.setState(Plugin.State.UPGRADING);
     }
 
     private LocalPlugin createPluginHandle(String source) throws PluginException

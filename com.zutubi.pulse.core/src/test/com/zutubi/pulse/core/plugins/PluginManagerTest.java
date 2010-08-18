@@ -277,7 +277,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         // upgrading an enabled plugin requires a core restart.
         plugin = plugin.upgrade(producer11.toURI());
-        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.UPDATING);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.UPGRADING);
 
         // restart the plugin system.
         restartPluginCore();
@@ -296,12 +296,12 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(0, paths.getPluginWorkDir().list().length);
 
         plugin = plugin.upgrade(producer11.toURI());
-        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.UPDATING);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.UPGRADING);
         assertEquals(1, paths.getPluginWorkDir().list().length);
         assertTrue(new File(paths.getPluginWorkDir(), producer11.getName()).isFile());
 
         plugin = plugin.upgrade(producer2.toURI());
-        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.UPDATING);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.UPGRADING);
         assertEquals(1, paths.getPluginWorkDir().list().length);
         assertTrue(new File(paths.getPluginWorkDir(), producer2.getName()).isFile());
 
@@ -440,7 +440,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         Plugin plugin = manager.install(producer1.toURI(), false);
         plugin.uninstall();
-        assertEquals(Plugin.State.UNINSTALLED, plugin.getState());
+        assertNull(manager.getPlugin(plugin.getId()));
 
         shutdownPluginCore();
 
@@ -448,9 +448,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         startupPluginCore();
 
-        // verify that the plugin is still uninstalled, and is still the old version.
-        plugin = manager.getPlugin(PRODUCER_ID);
-        assertNull(plugin);
+        assertNull(manager.getPlugin(PRODUCER_ID));
     }
 
     public void testUninstallPlugin() throws Exception
@@ -478,7 +476,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(Plugin.State.DISABLED, plugin.getState());
 
         plugin.uninstall();
-        assertEquals(Plugin.State.UNINSTALLED, plugin.getState());
+        assertNull(manager.getPlugin(plugin.getId()));
 
         restartPluginCore();
 
