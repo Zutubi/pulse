@@ -306,7 +306,13 @@ public class PluginManager
 
     private void scanUserPlugins() throws PluginException
     {
-        for (File file : paths.getPluginStorageDir().listFiles(PLUGIN_FILTER))
+        File storageDir = paths.getPluginStorageDir();
+        if (!storageDir.exists() && !storageDir.mkdirs())
+        {
+            throw new PluginException("Cannot create plugin storage directory '" + storageDir.getAbsolutePath() + "'");
+        }
+
+        for (File file : storageDir.listFiles(PLUGIN_FILTER))
         {
             LocalPlugin plugin = createPluginHandle(file);
 
@@ -352,14 +358,15 @@ public class PluginManager
 
     private void scanPrepackagedPlugins() throws PluginException
     {
-        if (paths.getPrepackagedPluginStorageDir() == null)
+        File prepackagedDir = paths.getPrepackagedPluginStorageDir();
+        if (prepackagedDir == null || !prepackagedDir.isDirectory())
         {
             // During dev, the prepackaged plugins are compiled directly into the storage directory.
             // Lets just work with this for now.
             return;
         }
 
-        for (File file : paths.getPrepackagedPluginStorageDir().listFiles(PLUGIN_FILTER))
+        for (File file : prepackagedDir.listFiles(PLUGIN_FILTER))
         {
             LocalPlugin plugin = createPluginHandle(file);
             try
