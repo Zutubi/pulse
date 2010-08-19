@@ -3065,6 +3065,131 @@ public class RemoteApi
     }
 
     /**
+     * Returns an array of all comments on a build.  Comments are sorted from oldest
+     * to newest.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param buildId     ID of the build to get the comments for
+     * @return {@xtype array<[RemoteApi.Comment]>} all comments on the given
+     *         build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     * @see #addBuildComment(String, String, int, String)
+     * @see #deleteBuildComment(String, String, int, String)
+     */
+    public Vector<Hashtable<String, Object>> getBuildComments(String token, String projectName, int buildId)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
+            List<Comment> comments = buildResult.getComments();
+            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(comments.size());
+            for (Comment comment: comments)
+            {
+                result.add(convertComment(comment));
+            }
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> convertComment(Comment comment)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("id", Long.toString(comment.getId()));
+        result.put("author", comment.getAuthor());
+        result.put("message", comment.getMessage());
+        result.put("time", Long.toString(comment.getTime()));
+        return result;
+    }
+
+    /**
+     * Adds a comment to a build result.  Comments are used to communicate with
+     * other users viewing the build.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param buildId     ID of the build to comment on
+     * @return the id of the created comment
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     * @see #getBuildComments(String, String, int) 
+     * @see #deleteBuildComment(String, String, int, String)
+     */
+    public String addBuildComment(String token, String projectName, int buildId, String message)
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
+            Comment comment = new Comment(user.getLogin(), System.currentTimeMillis(), message);
+            buildResult.addComment(comment);
+            buildManager.save(buildResult);
+            return Long.toString(comment.getId());
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+    
+    /**
+     * Deletes a comment from a build result.  Comments are generally only deleted by
+     * the user that left them, although admins may also delete comments.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param buildId     ID of the build to delete the comment from
+     * @param commentId   ID of the comment to delete
+     * @return true if the comment existed on the build and was deleted, false if no
+     *         comment of the given ID exists on the build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires ownership of the given comment or server admin permission
+     * @see #getBuildComments(String, String, int) 
+     * @see #addBuildComment(String, String, int, String) 
+     */
+    public boolean deleteBuildComment(String token, String projectName, int buildId, String commentId)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id;
+            try
+            {
+                id = Long.parseLong(commentId);
+            }
+            catch (NumberFormatException e)
+            {
+                throw new IllegalArgumentException("Invalid comment id '" + commentId + "'");
+            }
+            
+            BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
+            Comment comment = CollectionUtils.find(buildResult.getComments(), new EntityWithIdPredicate<Comment>(id));
+            if (comment == null)
+            {
+                return false;
+            }
+            else
+            {
+                accessManager.ensurePermission(AccessManager.ACTION_DELETE, comment);
+                buildResult.removeComment(comment);
+                buildManager.save(buildResult);
+                return true;
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }        
+    }
+    
+    /**
      * Returns an array of all queued build requests.  These build requests
      * may be cancelled without affecting the build history for the project.
      * Note that this list does not include "active" builds even if they have

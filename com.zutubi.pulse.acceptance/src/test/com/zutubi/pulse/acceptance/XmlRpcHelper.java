@@ -1182,7 +1182,22 @@ public class XmlRpcHelper
     {
         return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);
     }
+    
+    public Vector<Hashtable<String, Object>> getBuildComments(String projectName, int buildId) throws Exception
+    {
+        return call("getBuildComments", projectName, buildId);
+    }
 
+    public String addBuildComment(String projectName, int buildId, String message) throws Exception
+    {
+        return call("addBuildComment", projectName, buildId, message);
+    }
+
+    public boolean deleteBuildComment(String projectName, int buildId, String commentId) throws Exception
+    {
+        return (Boolean) call("deleteBuildComment", projectName, buildId, commentId);
+    }
+    
     public String threadDump() throws Exception
     {
         return (String) call("threadDump");
