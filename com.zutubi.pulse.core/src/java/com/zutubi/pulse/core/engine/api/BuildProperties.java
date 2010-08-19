@@ -224,6 +224,11 @@ public class BuildProperties
      */
     public static final String PROPERTY_RECIPE_PATHS            = "recipe.paths";
     /**
+     * The current status of a running recipe, added to the context of commands
+     * during recipe processing.
+     */
+    public static final String PROPERTY_RECIPE_STATUS           = "recipe.status";
+    /**
      * The time that the recipe commenced, in the format yyyy-MM-dd HH:mm.
      */
     public static final String PROPERTY_RECIPE_TIMESTAMP        = "recipe.timestamp";

@@ -365,6 +365,7 @@ public class RecipeProcessor
         context.setLabel(LABEL_EXECUTE);
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_STATUS, status.getState().getString());
 
         if (scope != null)
         {
@@ -539,12 +540,17 @@ public class RecipeProcessor
 
     private static class RecipeStatus
     {
-        private boolean success = true;
+        private ResultState state = ResultState.SUCCESS;
         private int commandIndex = 0;
+
+        public ResultState getState()
+        {
+            return state;
+        }
 
         public boolean isSuccess()
         {
-            return success;
+            return state == ResultState.SUCCESS;
         }
 
         public int nextCommandIndex()
@@ -557,8 +563,14 @@ public class RecipeProcessor
             switch (state)
             {
                 case FAILURE:
+                    if (state != ResultState.ERROR)
+                    {
+                        this.state = ResultState.FAILURE;
+                    }
+                    break;
                 case ERROR:
-                    success = false;
+                    this.state = ResultState.ERROR;
+                    break;
             }
         }
     }

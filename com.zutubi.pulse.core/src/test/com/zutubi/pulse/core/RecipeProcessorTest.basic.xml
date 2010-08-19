@@ -19,4 +19,10 @@
     <recipe name="specials">
         <noop name="special:characters here!"/>
     </recipe>
+
+    <recipe name="recipe status">
+        <capture-status name="succeed"/>
+        <capture-status name="fail" fail="true"/>
+        <capture-status name="force" force="true"/>
+    </recipe>
 </project>

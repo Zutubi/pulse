@@ -94,6 +94,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         typeRegistry.register(FailureCommandConfiguration.class);
         typeRegistry.register(ExceptionCommandConfiguration.class);
         typeRegistry.register(UnexpectedExceptionCommandConfiguration.class);
+        typeRegistry.register(CaptureStatusCommandConfiguration.class);
 
         objectFactory.initProperties(this);
 
@@ -106,6 +107,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         fileLoaderFactory.register("failure", FailureCommandConfiguration.class);
         fileLoaderFactory.register("exception", ExceptionCommandConfiguration.class);
         fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommandConfiguration.class);
+        fileLoaderFactory.register("capture-status", CaptureStatusCommandConfiguration.class);
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
 
@@ -128,7 +130,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         runBasicRecipe("default");
         assertRecipeCommenced(1, "default");
         assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "greeting");
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
@@ -140,9 +142,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "bootstrap");
         assertCommandError(1, "test exception");
-        // Counter intuitive perhaps: the state is maintained by
-        // RecipeControllers so it is not used from this event
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
@@ -164,9 +164,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "born to fail");
         assertCommandFailure(1, "failure command");
-        // Counter intuitive perhaps: the state is maintained by
-        // RecipeControllers so it is not used from this event
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
@@ -178,9 +176,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "predictable");
         assertCommandError(1, "exception command");
-        // Counter intuitive perhaps: the state is maintained by
-        // RecipeControllers so it is not used from this event
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
@@ -192,9 +188,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "oops");
         assertCommandError(1, "Unexpected error: unexpected exception command");
-        // Counter intuitive perhaps: the state is maintained by
-        // RecipeControllers so it is not used from this event
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
@@ -233,9 +227,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandCompleted(1, ResultState.SUCCESS);
         recipeProcessor.terminateRecipe(1);
         semaphore.release();
-        // Counter intuitive perhaps: the state is maintained by
-        // RecipeControllers so it is not used from this event
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         semaphore.release();
         assertNoMoreEvents();
         thread.join();
@@ -294,9 +286,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         semaphore.release();
         assertCommandCompleted(1, ResultState.ERROR);
         semaphore.release();
-        // Counter intuitive perhaps: the state is maintained by
-        // RecipeControllers so it is not used from this event
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         semaphore.release();
         assertNoMoreEvents();
         thread.join();
@@ -308,7 +298,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("command"), context));
         assertRecipeCommenced(1, "default");
         assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "nested-name", "outer-name");
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
@@ -317,10 +307,32 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         runBasicRecipe("specials");
         assertRecipeCommenced(1, "specials");
         assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "special:characters here!");
-        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1);
         assertNoMoreEvents();
     }
 
+    public void testForcedCommands() throws IOException
+    {
+        runBasicRecipe("recipe status");
+        assertRecipeCommenced(1, "recipe status");
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap");
+        
+        assertCommandCommenced(1, "succeed");
+        CommandCompletedEvent completedEvent = assertCommandCompleted(1, ResultState.SUCCESS);
+        assertEquals(ResultState.SUCCESS.getString(), completedEvent.getResult().getProperties().get(PROPERTY_RECIPE_STATUS));
+        
+        assertCommandCommenced(1, "fail");
+        completedEvent = assertCommandFailure(1, CaptureStatusCommand.FAILURE_MESSAGE);
+        assertEquals(ResultState.SUCCESS.getString(), completedEvent.getResult().getProperties().get(PROPERTY_RECIPE_STATUS));
+        
+        assertCommandCommenced(1, "force");
+        completedEvent = assertCommandCompleted(1, ResultState.SUCCESS);
+        assertEquals(ResultState.FAILURE.getString(), completedEvent.getResult().getProperties().get(PROPERTY_RECIPE_STATUS));
+        
+        assertRecipeCompleted(1);
+        assertNoMoreEvents();
+    }
+    
     private void assertNoMoreEvents()
     {
         assertEquals(0, events.size());
@@ -354,12 +366,13 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         return ce;
     }
 
-    private void assertCommandFailure(long id, String message)
+    private CommandCompletedEvent assertCommandFailure(long id, String message)
     {
         CommandCompletedEvent e = assertCommandCompleted(id, ResultState.FAILURE);
         PersistentFeature feature = e.getResult().getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals(message, feature.getSummary());
+        return e;
     }
 
     private void assertCommandError(long id, String message)
@@ -379,19 +392,18 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         }
     }
 
-    private RecipeCompletedEvent assertRecipeCompleted(long id, ResultState state)
+    private RecipeCompletedEvent assertRecipeCompleted(long id)
     {
+        // Note that the recipe status will always be success, as the recipe
+        // processor itself does not manage this state.
         Event e = assertEvent(id);
         assertTrue(e instanceof RecipeCompletedEvent);
-
-        RecipeCompletedEvent ce = (RecipeCompletedEvent) e;
-        assertEquals(state, ce.getResult().getState());
-        return ce;
+        return (RecipeCompletedEvent) e;
     }
 
     private void assertRecipeError(long id, String message)
     {
-        RecipeCompletedEvent e = assertRecipeCompleted(id, ResultState.ERROR);
+        RecipeCompletedEvent e = assertRecipeCompleted(id);
         PersistentFeature feature = e.getResult().getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals(message, feature.getSummary());
