@@ -266,6 +266,12 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(1, build.get("id"));
         assertEquals(projectName, build.get("project"));
         assertEquals("success", build.get("status"));
+        
+        @SuppressWarnings("unchecked")
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        assertEquals(1, stages.size());
+        Hashtable<String, Object> stage = stages.get(0);
+        assertEquals("[default]", stage.get("recipe"));
     }
 
     public void testErrorAndWarningCounts() throws Exception

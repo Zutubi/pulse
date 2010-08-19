@@ -2508,6 +2508,7 @@ public class RemoteApi
     {
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
         stage.put("name", recipeResultNode.getStageName());
+        stage.put("recipe", recipeResultNode.getResult().getRecipeNameSafe());
         stage.put("agent", recipeResultNode.getHostSafe());
         stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
         addResultFields(recipeResultNode.getResult(), stage);

@@ -9,7 +9,7 @@ import com.zutubi.util.EnumUtils;
 public enum AgentStatus
 {
     /**
-     * The agent has been explcitly disabled, and is not in use.
+     * The agent has been explicitly disabled, and is not in use.
      */
     DISABLED(false, false, false, true),
     /**
