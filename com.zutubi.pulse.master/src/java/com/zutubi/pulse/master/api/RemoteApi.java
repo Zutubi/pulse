@@ -3116,6 +3116,7 @@ public class RemoteApi
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project owning the build
      * @param buildId     ID of the build to comment on
+     * @param message     the comment message to add
      * @return the id of the created comment
      * @throws IllegalArgumentException if the given project or build does not exist
      * @access requires view permission for the given project
