@@ -124,6 +124,7 @@ public abstract class LocalPlugin implements Plugin
             case UPGRADING:
                 throw new PluginException("Unable to enable plugin: already marked for update");
             case DISABLING:
+            case INSTALLING:
                 manager.enablePlugin(this);
             case DISABLED:
             case ERROR:
@@ -234,6 +235,11 @@ public abstract class LocalPlugin implements Plugin
         return pluginState == Plugin.State.ERROR;
     }
     
+    public boolean isInstalling()
+    {
+        return pluginState == Plugin.State.INSTALLING;
+    }
+
     public boolean isUninstalling()
     {
         return pluginState == Plugin.State.UNINSTALLING;
@@ -308,18 +314,35 @@ public abstract class LocalPlugin implements Plugin
         return bundle;
     }
 
-    public void setBundle(Bundle bundle)
-    {
-        this.bundle = bundle;
-    }
-
     public BundleDescription getBundleDescription()
     {
         return bundleDescription;
     }
 
-    public void setBundleDescription(BundleDescription bundleDescription)
+    /**
+     * Links this plugin with a successfully installed Equinox bundle and
+     * related description.
+     * 
+     * @param bundle            the bundle to link with
+     * @param bundleDescription information about the bundle from the framework
+     */
+    public void associateBundle(Bundle bundle, BundleDescription bundleDescription)
     {
+        this.bundle = bundle;
         this.bundleDescription = bundleDescription;
+    }
+
+    /**
+     * Removes all links to an Equinox bundle due to an error and moves this
+     * plugin to the error state.
+     * 
+     * @param errorMessage a message describing what went wrong
+     */
+    public void disassociateBundle(String errorMessage)
+    {
+        bundle = null;
+        bundleDescription = null;
+        pluginState = State.ERROR;
+        addErrorMessage(errorMessage);
     }
 }

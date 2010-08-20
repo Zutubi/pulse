@@ -12,6 +12,7 @@ import java.util.zip.ZipInputStream;
 
 import static com.zutubi.util.FileSystemUtils.delete;
 import static com.zutubi.util.io.IOUtils.copyFile;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -66,22 +67,11 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(1, paths.getPluginStorageDir().list().length);
     }
 
-    public void testInstallWithAutostartDisabled() throws Exception
-    {
-        startupPluginCore();
-
-        Plugin installedPlugin = manager.install(producer1.toURI(), false);
-        assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
-        assertEquals(0, installedPlugin.getErrorMessages().size());
-
-        assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
-    }
-
     public void testInstallWithAutostartEnabled() throws Exception
     {
         startupPluginCore();
 
-        Plugin installedPlugin = manager.install(producer1.toURI(), true);
+        Plugin installedPlugin = manager.install(producer1.toURI());
         assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
         assertEquals(0, installedPlugin.getErrorMessages().size());
 
@@ -120,6 +110,46 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertNoInstalledJars();
     }
 
+    public void testInstallFileAlreadyExists() throws Exception
+    {
+        startupPluginCore();
+
+        manager.install(producer1.toURI());
+        
+        try
+        {
+            manager.install(producer1.toURI());
+            fail("Should not be able to install when plugin file already exists");
+        }
+        catch (PluginException e)
+        {
+            assertThat(e.getMessage(), containsString("already exists"));
+        }
+        
+        assertEquals(1, manager.getPlugins().size());
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+
+    public void testInstallSameIdAlreadyExists() throws Exception
+    {
+        startupPluginCore();
+
+        manager.install(producer1.toURI());
+        
+        try
+        {
+            manager.install(producer11.toURI());
+            fail("Should not be able to install when plugin of same id already exists");
+        }
+        catch (PluginException e)
+        {
+            assertThat(e.getMessage(), containsString("is already installed"));
+        }
+        
+        assertEquals(1, manager.getPlugins().size());
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+    
     public void testInstallWithMissingDependency() throws Exception
     {
         startupPluginCore();
@@ -160,11 +190,15 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         startupPluginCore();
 
-        Plugin plugin = manager.install(producer1.toURI(), false);
+        Plugin plugin = manager.install(producer1.toURI());
+        plugin.disable();
+        restartPluginCore();
+        plugin = manager.getPlugin(PRODUCER_ID);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
-
+        
         plugin.enable();
+
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
@@ -191,7 +225,12 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         startupPluginCore();
 
-        Plugin plugin = manager.install(producer1.toURI(), false);
+        Plugin plugin = manager.install(producer1.toURI());
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+        plugin.disable();
+
+        restartPluginCore();
+        plugin = manager.getPlugin(PRODUCER_ID);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
 
@@ -199,7 +238,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         plugin = manager.getPlugin(PRODUCER_ID);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
-
+        
         plugin.enable();
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
@@ -239,13 +278,116 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertPlugin(consumer, CONSUMER_ID, "1.0.0", Plugin.State.ENABLED);
     }
 
+    public void testRequestInstall() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin plugin = manager.requestInstall(producer1.toURI());
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.INSTALLING);
+        assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
+
+        restartPluginCore();
+
+        plugin = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);        
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+
+    public void testRequestInstallMultiple() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin consumer = manager.requestInstall(consumer1.toURI());
+        assertPlugin(consumer, CONSUMER_ID, "1.0.0", Plugin.State.INSTALLING);
+        assertEquals(0, manager.equinox.getBundleCount(CONSUMER_ID));
+        Plugin producer = manager.requestInstall(producer1.toURI());
+        assertPlugin(producer, PRODUCER_ID, "1.0.0", Plugin.State.INSTALLING);
+        assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
+
+        restartPluginCore();
+
+        consumer = manager.getPlugin(CONSUMER_ID);
+        assertPlugin(consumer, CONSUMER_ID, "1.0.0", Plugin.State.ENABLED);        
+        assertEquals(1, manager.equinox.getBundleCount(CONSUMER_ID));
+        producer = manager.getPlugin(PRODUCER_ID);
+        assertPlugin(producer, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);        
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+    
+    public void testInstallAllSinglePlugin() throws Exception
+    {
+        startupPluginCore();
+
+        File installedPluginFile = new File(paths.getPluginStorageDir(), producer1.getName());
+        assertFalse(installedPluginFile.isFile());
+
+        List<? extends Plugin> installedPlugins = manager.installAll(asList(producer1.toURI()));
+        assertEquals(1, installedPlugins.size());
+        Plugin installedPlugin = installedPlugins.get(0);
+        assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+        assertEquals(1, manager.getPlugins().size());
+
+        // verify that the plugin has been installed.
+        assertTrue(installedPluginFile.isFile());
+        assertEquals(0, installedPlugin.getErrorMessages().size());
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+
+        assertEquals(0, paths.getPluginWorkDir().list().length);
+        assertEquals(1, paths.getPluginStorageDir().list().length);
+    }
+
+    public void testInstallAllMultiplePlugins() throws Exception
+    {
+        startupPluginCore();
+
+        List<? extends Plugin> installedPlugins = manager.installAll(asList(producer1.toURI(), consumer1.toURI()));
+        assertEquals(2, installedPlugins.size());
+        assertEquals(2, manager.getPlugins().size());
+        
+        Plugin producerPlugin = installedPlugins.get(0);
+        assertPlugin(producerPlugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+        
+        Plugin consumerPlugin = installedPlugins.get(1);
+        assertPlugin(consumerPlugin, CONSUMER_ID, "1.0.0", Plugin.State.ENABLED);
+    }
+    
+    public void testInstallAllOutOfDependencyOrder() throws Exception
+    {
+        startupPluginCore();
+
+        List<? extends Plugin> installedPlugins = manager.installAll(asList(consumer1.toURI(), producer1.toURI()));
+        assertEquals(2, installedPlugins.size());
+        assertEquals(2, manager.getPlugins().size());
+        
+        Plugin consumerPlugin = installedPlugins.get(0);
+        assertPlugin(consumerPlugin, CONSUMER_ID, "1.0.0", Plugin.State.ENABLED);
+        
+        Plugin producerPlugin = installedPlugins.get(1);
+        assertPlugin(producerPlugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
+    }
+
+    public void testInstallAllMissingDependency() throws PluginException
+    {
+        startupPluginCore();
+
+        List<? extends Plugin> plugins = manager.installAll(asList(consumer1.toURI()));
+        assertEquals(1, plugins.size());
+        Plugin installedConsumer = plugins.get(0);
+        assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.ERROR);
+        assertEquals("Failed to resolve bundle.", installedConsumer.getErrorMessages().get(0));
+
+        assertEquals(0, manager.equinox.getBundleCount(CONSUMER_ID));
+    }
+    
     public void testUpgradeDisabledPlugin() throws Exception
     {
         startupPluginCore();
 
-        Plugin plugin = manager.install(producer1.toURI(), false);
+        Plugin plugin = manager.install(producer1.toURI());
+        plugin.disable();
+        restartPluginCore();
+        plugin = manager.getPlugin(PRODUCER_ID);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
-        assertEquals(1, manager.getPlugins().size());
 
         // upgraded plugin should retain the state of the original. So, upgrading a disabled plugin
         // will remain disabled.
@@ -438,8 +580,9 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         startupPluginCore();
 
-        Plugin plugin = manager.install(producer1.toURI(), false);
+        Plugin plugin = manager.install(producer1.toURI());
         plugin.uninstall();
+        restartPluginCore();
         assertNull(manager.getPlugin(plugin.getId()));
 
         shutdownPluginCore();
@@ -472,7 +615,10 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         startupPluginCore();
 
-        Plugin plugin = manager.install(producer1.toURI(), false);
+        Plugin plugin = manager.install(producer1.toURI());
+        plugin.disable();
+        restartPluginCore();
+        plugin = manager.getPlugin(PRODUCER_ID);
         assertEquals(Plugin.State.DISABLED, plugin.getState());
 
         plugin.uninstall();
@@ -497,7 +643,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         startupPluginCore();
 
-        Plugin plugin = manager.install(producer1.toURI(), true);
+        Plugin plugin = manager.install(producer1.toURI());
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
         restartPluginCore();

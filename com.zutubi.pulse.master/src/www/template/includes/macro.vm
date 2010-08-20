@@ -1898,7 +1898,7 @@
         #set($image = "accept.gif")
     #elseif($plugin.uninstalling)
         #set($image = "delete.gif")
-    #elseif($plugin.upgrading)
+    #elseif($plugin.installing || $plugin.upgrading)
         #set($image = "arrow-refresh.gif")
     #end
 

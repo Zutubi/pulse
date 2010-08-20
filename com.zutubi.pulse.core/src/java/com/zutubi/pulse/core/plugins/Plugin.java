@@ -29,6 +29,12 @@ public interface Plugin
          * message where possible.
          */
         ERROR,
+
+        /**
+         * The plugin is available but will not be installed until the next
+         * resart.
+         */
+        INSTALLING,
         
         /**
          * The plugin will be uninstalled on restart, and is no longer valid.

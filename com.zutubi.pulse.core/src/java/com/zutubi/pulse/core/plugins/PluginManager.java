@@ -98,8 +98,6 @@ public class PluginManager
 
         // Step 4: plugin startup
         //  - install and resolve the plugins. (deal with unresolved plugins - provide as much feedback as possible).
-        //  - check for version changes.  Those plugins with version changes may require upgrades - leave that to
-        //    the plugin upgrade process
         //  - start the plugins that we can start.
 
         List<LocalPlugin> installedPlugins = new LinkedList<LocalPlugin>();
@@ -134,68 +132,7 @@ public class PluginManager
             }
         }
 
-        // enable all of the installed plugins - enable in batch.
-        // - this processing is exactly the same as that done during the enable, except in bulk
-        for (LocalPlugin plugin : installedPlugins)
-        {
-            plugin.setBundle(equinox.install(plugin.getSource()));
-            plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
-        }
-
-        //The extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgraded.
-        // resolve them all.
-        equinox.resolveBundles();
-
-        List<LocalPlugin> resolvedPlugins = new LinkedList<LocalPlugin>();
-        for (LocalPlugin plugin : installedPlugins)
-        {
-            Bundle bundle = plugin.getBundle();
-            switch (bundle.getState())
-            {
-                case Bundle.INSTALLED:
-                    // resolve failed - can we get any more details about this?
-                    plugin.setBundle(null);
-                    plugin.setBundleDescription(null);
-                    plugin.setState(Plugin.State.ERROR);
-                    plugin.addErrorMessage("Failed to resolve bundle.");
-
-                    try
-                    {
-                        bundle.uninstall();
-                    }
-                    catch (BundleException e)
-                    {
-                        //TODO: do we need to do more here?.
-                        LOG.warning("Failed to uninstall bundle. Disabling plugin '" + plugin.getId() + "'. Cause: " + e.getMessage(), e);
-                    }
-                    break;
-                case Bundle.RESOLVED:
-                case Bundle.STARTING:
-                case Bundle.ACTIVE:
-                    resolvedPlugins.add(plugin);
-                    break;
-                default:
-                    LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + bundle.getState());
-            }
-        }
-
-        List<LocalPlugin> sortedPlugins = sortPlugins(resolvedPlugins);
-        for (LocalPlugin plugin : sortedPlugins)
-        {
-            try
-            {
-                plugin.getBundle().start(Bundle.START_TRANSIENT);
-                plugin.setState(Plugin.State.ENABLED);
-            }
-            catch (BundleException e)
-            {
-                plugin.getBundle().uninstall();
-                plugin.setBundle(null);
-                plugin.setBundleDescription(null);
-                plugin.setState(Plugin.State.ERROR);
-                plugin.addErrorMessage(e.getMessage());
-            }
-        }
+        enableAll(installedPlugins);
     }
 
     private void scanForManualUninstalls() throws PluginException
@@ -264,7 +201,7 @@ public class PluginManager
             if (entry.hasSource())
             {
                 File plugin = getPluginSourceFile(entry.getSource());
-                delete(plugin);
+                delete(plugin, true);
                 entry.removeSource();
             }
             entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
@@ -273,31 +210,35 @@ public class PluginManager
         {
             URI newSource = getUpgradeSourceFile(entry.getUpgradeSource()).toURI();
             upgradePluginSource(id, newSource);
-
-            File tmpPluginFile = new File(newSource);
-            delete(tmpPluginFile);
-
+            delete(new File(newSource), false);
             entry.removeUpgradeSource();
         }
     }
 
-    private void delete(File file) throws IOException
+    private void delete(File file, boolean throwOnError) throws PluginException
     {
-        if (file.isDirectory())
-        {
-            FileSystemUtils.rmdir(file);
-        }
-        else if (file.isFile())
+        try
         {
             FileSystemUtils.delete(file);
         }
+        catch (IOException e)
+        {
+            if (throwOnError)
+            {
+                throw new PluginException(e);
+            }
+            else
+            {
+                LOG.warning(e);
+            }
+        }
     }
 
-    private void upgradePluginSource(String id, URI newSource) throws URISyntaxException, IOException, PluginException
+    private void upgradePluginSource(String id, URI newSource) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(id);
         File pluginFile = getPluginSourceFile(entry.getSource());
-        delete(pluginFile);
+        delete(pluginFile, true);
 
         File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
         entry.setSource(installedSource.getName());
@@ -369,104 +310,89 @@ public class PluginManager
         for (File file : prepackagedDir.listFiles(PLUGIN_FILTER))
         {
             LocalPlugin plugin = createPluginHandle(file);
-            try
+            if (!registry.isRegistered(plugin))
             {
-                if (!registry.isRegistered(plugin))
-                {
-                    File downloadedSource = downloadPlugin(file.toURI(), file.getName(), paths.getPluginStorageDir());
-                    registerPlugin(createPluginHandle(downloadedSource));
-                }
-                else
-                {
-                    PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-
-                    PluginRegistryEntry.Mode mode = entry.getMode();
-                    if (mode == PluginRegistryEntry.Mode.UNINSTALLED || !entry.hasSource())
-                    {
-                        // this plugin has been uninstalled, nothing further is required from it.
-                        continue;
-                    }
-
-                    // version check. if new version available, mark it for pending upgrade.
-                    LocalPlugin registeredPlugin = createPluginHandle(entry.getSource());
-                    if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) > 0)
-                    {
-                        try
-                        {
-                            upgradePluginSource(plugin.getId(), file.toURI());
-                        }
-                        catch (IOException e)
-                        {
-                            throw new PluginException(e);
-                        }
-                    }
-                }
+                File downloadedSource = downloadPlugin(file.toURI(), file.getName(), paths.getPluginStorageDir());
+                registerPlugin(createPluginHandle(downloadedSource));
             }
-            catch (URISyntaxException e)
+            else
             {
-                LOG.warning("Registry entry for plugin '" + plugin.getId() + "' is corrupt. Error: " + e.getMessage());
+                PluginRegistryEntry entry = registry.getEntry(plugin.getId());
+
+                PluginRegistryEntry.Mode mode = entry.getMode();
+                if (mode == PluginRegistryEntry.Mode.UNINSTALLED || !entry.hasSource())
+                {
+                    // this plugin has been uninstalled, nothing further is required from it.
+                    continue;
+                }
+
+                // version check. if new version available, mark it for pending upgrade.
+                LocalPlugin registeredPlugin = createPluginHandle(entry.getSource());
+                if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) > 0)
+                {
+                    upgradePluginSource(plugin.getId(), file.toURI());
+                }
             }
         }
     }
 
     public Plugin install(URI uri) throws PluginException
     {
-        return install(uri, true);
+        return install(uri, null);
     }
 
-    public Plugin install(URI uri, boolean autostart) throws PluginException
+    public Plugin install(URI uri, String filename) throws PluginException
     {
-        return install(uri, null, autostart);
+        LocalPlugin plugin = downloadAndAdd(uri, filename);
+        enablePlugin(plugin);
+        return plugin;
+    }
+    
+    public Plugin requestInstall(URI uri) throws PluginException
+    {
+        LocalPlugin plugin = downloadAndAdd(uri, null);
+        plugin.setState(Plugin.State.INSTALLING);
+        return plugin;
     }
 
-    public Plugin install(URI uri, String filename, boolean autostart) throws PluginException
+    public List<? extends Plugin> installAll(List<URI> uris) throws PluginException
     {
-        //TODO: check that the plugin we download does not already exist.  We do not want to install the same plugin twice.
+        List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
+        for (URI uri: uris)
+        {
+            plugins.add(downloadAndAdd(uri, null));
+        }
+        
+        enableAll(plugins);
+        return plugins;
+    }
 
-        // copy it into the plugin storage directory
+    private LocalPlugin downloadAndAdd(URI uri, String filename) throws PluginException
+    {
         File file = downloadPlugin(uri, filename, paths.getPluginStorageDir());
-
         LocalPlugin installedPlugin;
         try
         {
-            if (!PLUGIN_FILTER.accept(file))
+            installedPlugin = createPluginHandle(file);
+            if (getPlugin(installedPlugin.getId()) != null)
             {
-                throw new PluginException("'" + uri + "' does not define a valid plugin.");
+                throw new PluginException("A plugin with id '" + installedPlugin.getId() + "' is already installed");
             }
 
-            installedPlugin = createPluginHandle(file);
             registerPlugin(installedPlugin);
         }
         catch (Exception e)
         {
-            try
-            {
-                delete(file);
-            }
-            catch (IOException e1)
-            {
-                LOG.error(e1);
-            }
+            delete(file, false);
             throw new PluginException(e);
         }
 
         plugins.add(installedPlugin);
-
-        if (autostart)
-        {
-            enablePlugin(installedPlugin);
-        }
-        else
-        {
-            disablePlugin(installedPlugin);
-        }
-
         return installedPlugin;
     }
-
+    
     void disablePlugin(LocalPlugin plugin) throws PluginException
     {
-        // process the disable.  this is the same thing that is done if PENDING_DISABLE is encountered.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.setMode(PluginRegistryEntry.Mode.DISABLE);
         saveRegistry();
@@ -484,25 +410,18 @@ public class PluginManager
 
     void uninstallPlugin(LocalPlugin plugin) throws PluginException
     {
-        try
+        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
+        if (entry.hasSource())
         {
-            PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-            if (entry.hasSource())
-            {
-                File pluginFile = getPluginSourceFile(entry.getSource());
-                delete(pluginFile);
+            File pluginFile = getPluginSourceFile(entry.getSource());
+            delete(pluginFile, false);
 
-                entry.removeSource();
-            }
-            entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
-            saveRegistry();
+            entry.removeSource();
+        }
+        entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
+        saveRegistry();
 
-            plugins.remove(plugin);
-        }
-        catch (IOException e)
-        {
-            LOG.warning(e);
-        }
+        plugins.remove(plugin);
     }
 
     void requestUninstall(LocalPlugin plugin) throws PluginException
@@ -524,8 +443,7 @@ public class PluginManager
         // activate this plugin within osgi.
         try
         {
-            plugin.setBundle(equinox.activate(plugin.getSource()));
-            plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
+            plugin.associateBundle(equinox.activate(plugin.getSource()), equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
             plugin.setState(Plugin.State.ENABLED);
         }
         catch (Exception e)
@@ -542,63 +460,117 @@ public class PluginManager
                 LOG.warning(e1);
             }
 
-            plugin.setBundle(null);
-            plugin.setBundleDescription(null);
-            plugin.setState(Plugin.State.ERROR);
-            plugin.addErrorMessage(e.getMessage());
+            plugin.disassociateBundle(e.getMessage());
+        }
+    }
+
+    private void enableAll(List<LocalPlugin> plugins)
+    {
+        List<Bundle> bundles = new LinkedList<Bundle>();
+        for (LocalPlugin plugin : plugins)
+        {
+            try
+            {
+                Bundle bundle = equinox.install(plugin.getSource());
+                bundles.add(bundle);
+                plugin.associateBundle(bundle, equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
+            }
+            catch (BundleException e)
+            {
+                plugin.disassociateBundle("Unable to install bundle for plugin: " + e.getMessage());
+            }
+        }
+
+        equinox.resolveBundles(bundles.toArray(new Bundle[bundles.size()]));
+
+        List<LocalPlugin> resolvedPlugins = new LinkedList<LocalPlugin>();
+        for (LocalPlugin plugin : plugins)
+        {
+            Bundle bundle = plugin.getBundle();
+            if (bundle != null)
+            {
+                switch (bundle.getState())
+                {
+                    case Bundle.INSTALLED:
+                        // resolve failed - can we get any more details about this?
+                        safeUninstallBundle(plugin);
+                        plugin.disassociateBundle("Failed to resolve bundle.");
+                        break;
+                    case Bundle.RESOLVED:
+                    case Bundle.STARTING:
+                    case Bundle.ACTIVE:
+                        resolvedPlugins.add(plugin);
+                        break;
+                    default:
+                        LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + bundle.getState());
+                }
+            }
+        }
+
+        List<LocalPlugin> sortedPlugins = sortPlugins(resolvedPlugins);
+        for (LocalPlugin plugin : sortedPlugins)
+        {
+            try
+            {
+                plugin.getBundle().start(Bundle.START_TRANSIENT);
+                plugin.setState(Plugin.State.ENABLED);
+            }
+            catch (BundleException e)
+            {
+                safeUninstallBundle(plugin);
+                plugin.disassociateBundle(e.getMessage());
+            }
+        }
+    }
+
+    private void safeUninstallBundle(LocalPlugin plugin)
+    {
+        try
+        {
+            plugin.getBundle().uninstall();
+        }
+        catch (BundleException e)
+        {
+            LOG.warning("Failed to uninstall bundle for plugin '" + plugin.getId() + "': " + e.getMessage(), e);
         }
     }
 
     Plugin upgradePlugin(LocalPlugin currentPlugin, URI newSource) throws PluginException
     {
-        try
-        {
-            // replace the old plugin, install and register the new source
-            File pluginFile = new File(currentPlugin.getSource());
-            delete(pluginFile);
+        // replace the old plugin, install and register the new source
+        File pluginFile = new File(currentPlugin.getSource());
+        delete(pluginFile, true);
 
-            plugins.remove(currentPlugin);
+        plugins.remove(currentPlugin);
 
-            // combination of uninstall the current plugin and installing the new.
+        // combination of uninstall the current plugin and installing the new.
 
-            File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
+        File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
 
-            LocalPlugin installedPlugin = createPluginHandle(installedSource);
+        LocalPlugin installedPlugin = createPluginHandle(installedSource);
 
-            // register the plugin with the registry
-            PluginRegistryEntry registryEntry = registry.register(installedPlugin);
-            registryEntry.setSource(installedSource.getName());
-            saveRegistry();
+        // register the plugin with the registry
+        PluginRegistryEntry registryEntry = registry.register(installedPlugin);
+        registryEntry.setSource(installedSource.getName());
+        saveRegistry();
 
-            plugins.add(installedPlugin);
-            installedPlugin.setState(currentPlugin.getState());
+        plugins.add(installedPlugin);
+        installedPlugin.setState(currentPlugin.getState());
 
-            return installedPlugin;
-        }
-        catch (IOException e)
-        {
-            throw new PluginException(e);
-        }
+        return installedPlugin;
     }
 
     void cancelUpgrade(LocalPlugin plugin) throws PluginException
     {
-        try
-        {
-            PluginRegistryEntry entry = registry.getEntry(plugin.getId());
+        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
-            File pluginFile = getUpgradeSourceFile(entry.getUpgradeSource());
-            delete(pluginFile);
+        File pluginFile = getUpgradeSourceFile(entry.getUpgradeSource());
+        delete(pluginFile, true);
 
-            entry.removePendingAction();
-            entry.removeUpgradeSource();
-            saveRegistry();
-            plugin.setState(Plugin.State.ENABLED);
-        }
-        catch (IOException e)
-        {
-            throw new PluginException(e);
-        }
+        entry.removePendingAction();
+        entry.removeUpgradeSource();
+        saveRegistry();
+        plugin.setState(Plugin.State.ENABLED);
     }
 
     void requestUpgrade(LocalPlugin plugin, URI newSource) throws PluginException

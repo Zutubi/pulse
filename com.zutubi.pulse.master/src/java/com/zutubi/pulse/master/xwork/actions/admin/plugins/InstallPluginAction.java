@@ -5,8 +5,6 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
-import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -19,6 +17,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
+
+import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 
 /**
  * An action to install a plugin from an uploaded file.
@@ -175,7 +176,7 @@ public class InstallPluginAction extends PluginActionSupport
 
         try
         {
-            pluginManager.install(files[0].toURI(), fileNames[0], true);
+            pluginManager.install(files[0].toURI(), fileNames[0]);
         }
         catch (Exception e)
         {
