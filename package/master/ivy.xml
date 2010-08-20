@@ -24,5 +24,9 @@
         <dependency org="zutubi" name="com.zutubi.pulse.master.external.jira" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master.hook.email" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master.hook.tag" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+
+        <!-- Internal plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.master.bundle" rev="latest.integration" conf="src->@;internal-bundles->bundle"/>
     </dependencies>
 </ivy-module>
+
