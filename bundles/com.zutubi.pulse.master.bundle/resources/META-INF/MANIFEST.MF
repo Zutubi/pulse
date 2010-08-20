@@ -1,0 +1,6 @@
+Bundle-Name: Pulse Master
+Bundle-SymbolicName: com.zutubi.pulse.master; singleton:=true
+Bundle-Description: The pulse master subsystem.
+Bundle-Vendor: Zutubi
+Bundle-Version: 2.3.0
+Import-Package: org.osgi.framework
