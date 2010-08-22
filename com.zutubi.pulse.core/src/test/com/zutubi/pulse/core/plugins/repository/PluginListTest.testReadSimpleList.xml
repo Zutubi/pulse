@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugins>
+    <plugin id="test.core" version="1.0.0" scope="CORE"/>
+    <plugin id="test.server" version="2.2.0" scope="SERVER"/>
+    <plugin id="test.master" version="1.0.1" scope="MASTER"/>
+</plugins>
+        

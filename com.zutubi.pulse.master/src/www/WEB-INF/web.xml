@@ -163,6 +163,15 @@
     </servlet>
 
     <servlet>
+        <servlet-name>plugin</servlet-name>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.PluginRepositoryServlet</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet>
         <servlet-name>patch</servlet-name>
         <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
@@ -285,6 +294,11 @@
     <servlet-mapping>
         <servlet-name>package</servlet-name>
         <url-pattern>/packages/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>plugin</servlet-name>
+        <url-pattern>/pluginrepository/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

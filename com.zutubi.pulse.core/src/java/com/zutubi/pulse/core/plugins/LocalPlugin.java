@@ -94,6 +94,20 @@ public abstract class LocalPlugin implements Plugin
         return this.pluginState;
     }
 
+    public boolean isRunning()
+    {
+        switch (pluginState)
+        {
+            case ENABLED:
+            case DISABLING:
+            case INSTALLING:
+            case UPGRADING:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     void setState(State pluginState)
     {
         this.pluginState = pluginState;

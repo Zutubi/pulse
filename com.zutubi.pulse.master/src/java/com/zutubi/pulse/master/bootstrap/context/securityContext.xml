@@ -274,6 +274,7 @@ The beans defined within the security subsystem need not be accessed by other co
                 /xmlrpc/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /hessian/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /packages/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
+                /pluginrepository/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /patch*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /rss.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /view/**/*=ROLE_GUEST,ROLE_USER

@@ -1208,6 +1208,11 @@ public class XmlRpcHelper
         callWithoutToken("ping");
     }
 
+    public void installPlugin(String path) throws Exception
+    {
+        callTest("installPlugin", path);
+    }
+    
     private static class BuildHolder
     {
         Hashtable<String, Object> build = null;

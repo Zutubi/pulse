@@ -3,10 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
-import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +18,6 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     private static final String STATE_UNINSTALLING = "uninstalling";
 
     private static final String ID_COMMANDS_CORE = "com.zutubi.pulse.core.commands.core";
-    private static final String ID_TEST = "com.zutubi.pulse.core.postprocessors.test";
 
     private static final String ACTION_ENABLE    = "enable";
     private static final String ACTION_DISABLE   = "disable";
@@ -146,24 +142,12 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private String getRandomId()
     {
-        return ID_TEST + "." + random;
+        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + random;
     }
 
     private File makeTestPlugin(String id, String name) throws IOException
     {
-        File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "misc", ID_TEST + ".jar"));
         tmpDir = FileSystemUtils.createTempDir("PluginUIAcceptanceTest", "");
-        File unzipDir = new File(tmpDir, "unzip");
-        PulseZipUtils.extractZip(testPlugin, unzipDir);
-
-        File manifestFile = new File(unzipDir, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF"));
-        String manifest = IOUtils.fileToString(manifestFile);
-        manifest = manifest.replaceAll(ID_TEST, id);
-        manifest = manifest.replaceAll("Test Post-Processor", name);
-        FileSystemUtils.createFile(manifestFile, manifest);
-
-        File pluginFile = new File(tmpDir, id + ".jar");
-        PulseZipUtils.createZip(pluginFile, unzipDir, null);
-        return pluginFile;
+        return AcceptanceTestUtils.createTestPlugin(tmpDir, id, name);
     }
 }

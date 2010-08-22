@@ -21,6 +21,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(LoggingAcceptanceTest.class);
         suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
+        suite.addTestSuite(PluginRepositoryAcceptanceTest.class);
 
         suite.addTestSuite(RssAcceptanceTest.class);
         suite.addTestSuite(HibernateStatisticsAcceptanceTest.class);

@@ -1,12 +1,16 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.plugins.PluginException;
+import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.logging.Logger;
+
+import java.io.File;
 
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
@@ -22,7 +26,8 @@ public class TestApi
     private AgentManager agentManager;
     private SynchronisationTaskFactory synchronisationTaskFactory;
     private TokenManager tokenManager;
-
+    private PluginManager pluginManager;
+    
     public TestApi()
     {
     }
@@ -80,6 +85,20 @@ public class TestApi
         }
     }
 
+    /**
+     * @internal Installs a plugin from a local jar file.
+     * @param token authentication token
+     * @param pluginJar path of the jar file to install as a plugin
+     * @return true
+     * @throws PluginException on any error
+     */
+    public boolean installPlugin(String token, String pluginJar) throws PluginException
+    {
+        tokenManager.verifyAdmin(token);
+        pluginManager.install(new File(pluginJar).toURI());
+        return true;
+    }
+
     private Agent internalGetAgent(String name) throws IllegalArgumentException
     {
         Agent agent = agentManager.getAgent(name);
@@ -117,5 +136,10 @@ public class TestApi
     public void setTokenManager(TokenManager tokenManager)
     {
         this.tokenManager = tokenManager;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
     }
 }

@@ -32,7 +32,7 @@ public interface Plugin
 
         /**
          * The plugin is available but will not be installed until the next
-         * resart.
+         * restart.
          */
         INSTALLING,
         
@@ -92,6 +92,15 @@ public interface Plugin
      * @return the current state of the plugin.
      */
     State getState();
+
+    /**
+     * Indicates if this plugin is currently running in the system.  This
+     * includes all plugins that are enabled, or have been enabled but are
+     * marked to be otherwise on the next restart.
+     * 
+     * @return true if this plugin is or was enabled since the last restart 
+     */
+    boolean isRunning();
 
     /**
      * @return error messages associated with this plugin.
