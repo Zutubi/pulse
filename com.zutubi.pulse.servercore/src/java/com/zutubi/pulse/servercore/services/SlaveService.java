@@ -40,6 +40,18 @@ public interface SlaveService
      */
     boolean updateVersion(String token, String build, String master, long hostId, String packageUrl, long packageSize);
 
+    /**
+     * Requests that the slave synchronises its plugins with the master.
+     *  
+     * @param token               secure token for inter-host communication
+     * @param master              url of the master requesting the sync
+     * @param hostId              the slave host's id, for when it calls back
+     * @param pluginRepositoryUrl base url of the master's plugin repository
+     * @return true if synchronisation is required (and will be started
+     *         asynchronously), false if the plugins are already in sync
+     */
+    boolean syncPlugins(String token, String master, long hostId, String pluginRepositoryUrl);
+
     HostStatus getStatus(String token, String master);
 
     /**

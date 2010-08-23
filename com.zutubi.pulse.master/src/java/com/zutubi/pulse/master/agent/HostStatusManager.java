@@ -51,7 +51,7 @@ public class HostStatusManager implements EventListener, Stoppable
                 }
             }
 
-            if (hostStatus.getStatus() == PingStatus.VERSION_MISMATCH)
+            if (hostStatus.getStatus() == PingStatus.VERSION_MISMATCH || hostStatus.getStatus() == PingStatus.PLUGIN_MISMATCH)
             {
                 startUpdater((DefaultHost) host);
             }

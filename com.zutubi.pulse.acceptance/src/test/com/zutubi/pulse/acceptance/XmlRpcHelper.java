@@ -1213,6 +1213,11 @@ public class XmlRpcHelper
         callTest("installPlugin", path);
     }
     
+    public Vector<Hashtable<String, Object>> getRunningPlugins() throws Exception
+    {
+        return callTest("getRunningPlugins");
+    }
+    
     private static class BuildHolder
     {
         Hashtable<String, Object> build = null;

@@ -25,8 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.*;
 
 public class HostUpdaterTest extends PulseTestCase implements EventListener
 {
@@ -93,9 +92,35 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         download();
         apply();
         reboot();
+        syncPlugins();
+        reboot();
         assertCompleted(true);
     }
 
+    public void testNoPluginUpdates() throws Exception
+    {
+        configureService(true, 3);
+        doReturn(false).when(hostService).syncPlugins(anyString(), anyLong(), anyString());
+
+        updater.start();
+        start();
+        download();
+        apply();
+        reboot();
+        assertCompleted(true);
+    }
+    
+    public void testOnlyPluginUpdates() throws Exception
+    {
+        doReturn(Version.getVersion().getBuildNumberAsInt()).when(hostService).ping();
+        doReturn(true).when(hostService).syncPlugins(anyString(), anyLong(), anyString());
+
+        updater.start();
+        syncPlugins();
+        reboot();
+        assertCompleted(true);
+    }
+    
     public void testHostRejects() throws Exception
     {
         configureService(false, 0);
@@ -174,6 +199,17 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         assertStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.  Expected build "+expectedVersion+" but found 6");
     }
 
+    public void testErrorDuringPluginUpdates() throws Exception
+    {
+        doReturn(Version.getVersion().getBuildNumberAsInt()).when(hostService).ping();
+        doReturn(true).when(hostService).syncPlugins(anyString(), anyLong(), anyString());
+
+        updater.start();
+        syncPlugins();
+        updater.upgradeStatus(new UpgradeStatus(host.getId(), UpgradeState.ERROR, -1, "badness"));
+        assertCompleted(false);
+    }
+    
     private void configureService(boolean accept, int successfulPing)
     {
         configureService(accept, successfulPing, Version.getVersion().getBuildNumberAsInt());
@@ -181,20 +217,25 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
 
     private void configureService(boolean accept, int successfulPing, final int build)
     {
-        stub(hostService.updateVersion(anyString(), anyString(), anyLong(), anyString(), anyLong())).toReturn(accept);
-        if (successfulPing <= 0)
+        doReturn(accept).when(hostService).updateVersion(anyString(), anyString(), anyLong(), anyString(), anyLong());
+        configurePing(successfulPing, true, build);
+        doReturn(true).when(hostService).syncPlugins(anyString(), anyLong(), anyString());
+    }
+
+    private void configurePing(int successfulPing, final boolean firstTime, final int build)
+    {
+        final boolean[] first = new boolean[]{firstTime};
+        final int[] remaining = new int[]{successfulPing};
+        doAnswer(new Answer<Object>()
         {
-            for(int i = 0; i < 100; i++)
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                stub(hostService.ping()).toReturn(build);
-            }
-        }
-        else
-        {
-            final int[] remaining = new int[]{successfulPing};
-            stub(hostService.ping()).toAnswer(new Answer<Object>()
-            {
-                public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+                if (first[0])
+                {
+                    first[0] = false;
+                    return build - 1;
+                }
+                else
                 {
                     if (remaining[0] > 0)
                     {
@@ -206,8 +247,8 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
                         return build;
                     }
                 }
-            });
-        }
+            }
+        }).when(hostService).ping();
     }
 
     private void start() throws Exception
@@ -234,6 +275,12 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         assertStatus(UpgradeState.REBOOTING, -1, null);
     }
 
+    private void syncPlugins() throws Exception
+    {
+        assertStatus(UpgradeState.SYNCHRONISING_PLUGINS, -1, null);
+        configurePing(3, false, Version.getVersion().getBuildNumberAsInt());
+    }
+    
     private void assertStatus(UpgradeState state, int progress, String message) throws Exception
     {
         assertTrue(hostSemaphore.tryAcquire(10, TimeUnit.SECONDS));

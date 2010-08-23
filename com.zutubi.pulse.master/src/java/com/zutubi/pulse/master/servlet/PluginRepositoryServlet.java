@@ -30,6 +30,8 @@ public class PluginRepositoryServlet extends HttpServlet
 {
     private static final Logger LOG = Logger.getLogger(PluginRepositoryServlet.class);
 
+    public static final String PATH_REPOSITORY = "pluginrepository";
+    
     private PluginManager pluginManager;
 
     @Override
@@ -55,7 +57,8 @@ public class PluginRepositoryServlet extends HttpServlet
     private String stripPrefix(String path)
     {
         path = StringUtils.stripPrefix(path, "/");
-        return StringUtils.stripPrefix(path, "pluginrepository/");
+        path = StringUtils.stripPrefix(path, PATH_REPOSITORY);
+        return StringUtils.stripPrefix(path, "/");
     }
 
     private void listAvailable(HttpServletResponse response) throws IOException

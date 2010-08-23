@@ -85,4 +85,10 @@ public class PluginInfo
         result = 31 * result + (scope != null ? scope.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return id + ":" + version + " (" + scope + ")";
+    }
 }

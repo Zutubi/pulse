@@ -3,6 +3,10 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.repository.PluginInfo;
+import com.zutubi.pulse.core.plugins.repository.PluginRepository;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
@@ -20,6 +24,7 @@ import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
+import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -46,6 +51,8 @@ public class SlaveServiceImpl implements SlaveService
     private ObjectFactory objectFactory;
     private SynchronisationTaskRunnerService synchronisationTaskRunnerService;
     private ForwardingEventListener forwardingEventListener;
+    private PluginManager pluginManager;
+    private PluginSynchroniser pluginSynchroniser;
 
     private boolean firstStatus = true;
 
@@ -62,6 +69,15 @@ public class SlaveServiceImpl implements SlaveService
 
         // Currently we always accept the request
         UpdateCommand command = new UpdateCommand(build, master, token, hostId, packageUrl);
+        SpringComponentContext.autowire(command);
+        threadPool.execute(command);
+        return true;
+    }
+
+    public boolean syncPlugins(String token, String master, long hostId, String pluginRepositoryUrl)
+    {
+        serviceTokenManager.validateToken(token);
+        SyncPluginsCommand command = new SyncPluginsCommand(master, token, hostId, pluginRepositoryUrl);
         SpringComponentContext.autowire(command);
         threadPool.execute(command);
         return true;
@@ -92,18 +108,24 @@ public class SlaveServiceImpl implements SlaveService
         }
 
         // Pong the master (CIB-825)
+        List<PluginInfo> masterPlugins;
         try
         {
-            pongMaster(master);
+            masterPlugins = pongMaster(master);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             LOG.severe(e);
             return new HostStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
+        
+        if (pluginManager.getPlugins().isEmpty() || pluginSynchroniser.isRebootRequired(masterPlugins, PluginRepository.Scope.SERVER))
+        {
+            return new HostStatus(PingStatus.PLUGIN_MISMATCH);
+        }
 
         boolean first = false;
-        if(firstStatus)
+        if (firstStatus)
         {
             first = true;
             firstStatus = false;
@@ -127,10 +149,10 @@ public class SlaveServiceImpl implements SlaveService
         }
     }
 
-    private void pongMaster(String master) throws MalformedURLException
+    private List<PluginInfo> pongMaster(String master) throws MalformedURLException
     {
         MasterService service = masterProxyFactory.createProxy(master);
-        service.pong();
+        return service.pong();
     }
 
     //---( Build API )---
@@ -264,5 +286,15 @@ public class SlaveServiceImpl implements SlaveService
     public void setForwardingEventListener(ForwardingEventListener forwardingEventListener)
     {
         this.forwardingEventListener = forwardingEventListener;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
+    }
+
+    public void setPluginSynchroniser(PluginSynchroniser pluginSynchroniser)
+    {
+        this.pluginSynchroniser = pluginSynchroniser;
     }
 }

@@ -24,7 +24,8 @@ public class JettyServerManager implements Stoppable
      * Cache of all the created servers keyed by their names.
      */
     private final Map<String, Server> servers = new HashMap<String, Server>();
-
+    private boolean stopped = false;
+    
     /**
      * Configure a server using the provided handler to configure the instance.  If the named server does
      * not already exist, a new one is created.
@@ -114,21 +115,25 @@ public class JettyServerManager implements Stoppable
         return servers.get(name);
     }
 
-    public void stop(boolean force)
+    public synchronized void stop(boolean force)
     {
-        for (Map.Entry<String, Server> entry : servers.entrySet())
+        if (!stopped)
         {
-            try
+            stopped = true;
+            for (Map.Entry<String, Server> entry : servers.entrySet())
             {
-                Server server = entry.getValue();
-                if (server.isStarted())
+                try
                 {
-                    server.stop(true);
+                    Server server = entry.getValue();
+                    if (server.isStarted())
+                    {
+                        server.stop(!force);
+                    }
                 }
-            }
-            catch (InterruptedException e)
-            {
-                LOG.severe("Error while stopping Jetty(" + entry.getKey() + ")", e);
+                catch (InterruptedException e)
+                {
+                    LOG.severe("Error while stopping Jetty(" + entry.getKey() + ")", e);
+                }
             }
         }
     }

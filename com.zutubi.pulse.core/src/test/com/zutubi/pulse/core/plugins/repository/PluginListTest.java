@@ -9,6 +9,7 @@ import com.zutubi.util.Mapping;
 import nu.xom.Document;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -30,6 +31,21 @@ public class PluginListTest extends PulseTestCase
         doReturn(new PluginVersion(INFO_CORE.getVersion())).when(plugin).getVersion();
         
         assertEquals(asList(INFO_CORE), PluginList.toInfos(asList(plugin)));
+    }
+    
+    public void testToHashes()
+    {
+        Plugin plugin = makePluginWithDependencies();
+        doReturn(INFO_CORE.getId()).when(plugin).getId();
+        doReturn(new PluginVersion(INFO_CORE.getVersion())).when(plugin).getVersion();
+        
+        List<Hashtable<String, Object>> hashes = PluginList.toHashes(asList(plugin));
+        assertEquals(1, hashes.size());
+        Hashtable<String, Object> expected = new Hashtable<String, Object>();
+        expected.put("id", INFO_CORE.getId());
+        expected.put("version", INFO_CORE.getVersion());
+        expected.put("scope", INFO_CORE.getScope().toString());
+        assertEquals(expected, hashes.get(0));
     }
     
     public void testGetScopeNoDependencies()

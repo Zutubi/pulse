@@ -44,6 +44,27 @@ public class PluginList
     }
 
     /**
+     * Converts a list of plugins to corresponding hashtables of plugin info.
+     * 
+     * @param plugins the plugins to convert
+     * @return a list of hashstables corresponding to the input
+     */
+    public static List<Hashtable<String, Object>> toHashes(List<Plugin> plugins)
+    {
+        return CollectionUtils.map(plugins, new Mapping<Plugin, Hashtable<String, Object>>()
+        {
+            public Hashtable<String, Object> map(Plugin plugin)
+            {
+                Hashtable<String, Object> hash = new Hashtable<String, Object>();
+                hash.put("id", plugin.getId());
+                hash.put("version", plugin.getVersion().toString());
+                hash.put("scope", getScope(plugin).toString());
+                return hash;
+            }
+        });
+    }
+
+    /**
      * Returns the scope that the given plugin belongs to.
      * 
      * @param plugin the plugin to get the scope of

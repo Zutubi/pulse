@@ -1,16 +1,23 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginException;
 import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
+import com.zutubi.pulse.core.plugins.repository.PluginList;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;
@@ -97,6 +104,18 @@ public class TestApi
         tokenManager.verifyAdmin(token);
         pluginManager.install(new File(pluginJar).toURI());
         return true;
+    }
+
+    /**
+     * @internal Lists information about all plugins running on this server.
+     * @param token authentication token
+     * @return an array of plugin structs, one for each running plugin
+     */
+    public Vector<Hashtable<String, Object>> getRunningPlugins(String token)
+    {
+        tokenManager.verifyAdmin(token);
+        List<Plugin> plugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+        return new Vector<Hashtable<String, Object>>(PluginList.toHashes(plugins));
     }
 
     private Agent internalGetAgent(String name) throws IllegalArgumentException

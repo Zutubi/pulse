@@ -7,7 +7,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
@@ -18,16 +17,18 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.variables.GenericVariable;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
@@ -873,6 +874,35 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
+    public void testPluginMismatch()
+    {
+        Agent agent = addAgent(DEFAULT_AGENT_ID);
+        sendPing(agent, new HostStatus(PingStatus.PLUGIN_MISMATCH));
+
+        assertEquals(PLUGIN_MISMATCH, agent.getStatus());
+        assertStatusChanges(agent, INITIAL, PLUGIN_MISMATCH);
+
+        onComplete();
+    }
+
+    public void testPluginMismatchBuilding()
+    {
+        Agent agent = addAgentAndAssignRecipe(DEFAULT_AGENT_ID, 1000);
+        sendBuilding(agent, 1000);
+        clearEvents();
+        sendPing(agent, new HostStatus(PingStatus.PLUGIN_MISMATCH));
+
+        assertEquals(PLUGIN_MISMATCH, agent.getStatus());
+        assertEvents(
+                new RecipeErrorEvent(this, 1000, "Agent status changed to 'plugin mismatch' while recipe in progress"),
+                new AgentOfflineEvent(this, agent)
+        );
+        assertStatusChanges(agent, BUILDING, PLUGIN_MISMATCH);
+
+        sendRecipeCollecting(agent, 1000);
+        onComplete();
+    }
+    
     public void testTokenMismatch()
     {
         Agent agent = addAgent(DEFAULT_AGENT_ID);

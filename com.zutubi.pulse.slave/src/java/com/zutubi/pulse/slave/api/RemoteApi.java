@@ -1,9 +1,18 @@
 package com.zutubi.pulse.slave.api;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.plugins.Plugin;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
+import com.zutubi.pulse.core.plugins.repository.PluginList;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
+import com.zutubi.util.CollectionUtils;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 /**
  */
@@ -11,7 +20,8 @@ public class RemoteApi
 {
     private AdminTokenManager tokenManager;
     private ShutdownManager shutdownManager;
-
+    private PluginManager pluginManager;
+    
     public RemoteApi()
     {
     }
@@ -38,6 +48,13 @@ public class RemoteApi
         return Version.getVersion().getBuildNumberAsInt();
     }
 
+    public Vector<Hashtable<String, Object>> getRunningPlugins(String token)
+    {
+        checkToken(token);
+        List<Plugin> plugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+        return new Vector<Hashtable<String, Object>>(PluginList.toHashes(plugins));
+    }
+    
     private void checkToken(String token) throws AuthenticationException
     {
         if(!tokenManager.checkAdminToken(token))
@@ -64,5 +81,10 @@ public class RemoteApi
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
     }
 }

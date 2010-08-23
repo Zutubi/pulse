@@ -7,12 +7,12 @@
             <list>
                 <value>com.zutubi.pulse.slave.bootstrap.tasks.SlaveContextStartupTask</value>
                 <value>com.zutubi.pulse.slave.bootstrap.tasks.SlaveSystemPropertiesStartupTask</value>
+                <value>com.zutubi.pulse.slave.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
                 <value>com.zutubi.pulse.slave.bootstrap.tasks.SlaveJettyStartupTask</value>
             </list>
         </property>
         <property name="postStartupTasks">
             <list>
-                <value>com.zutubi.pulse.slave.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
                 <value>com.zutubi.pulse.slave.bootstrap.tasks.SlaveStartedMessageStartupTask</value>
             </list>
         </property>

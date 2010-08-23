@@ -71,4 +71,16 @@ public interface HostService
      * @return true if the host will attempt the upgrade
      */
     boolean updateVersion(String masterBuild, String masterUrl, long hostId, String packageUrl, long packageSize);
+
+    /**
+     * Requests that the host synchronise its plugins with the master if
+     * required.
+     * 
+     * @param masterUrl           the url the host can reach this master on
+     * @param hostId              id of the host, passed back in status updates
+     * @param pluginRepositoryUrl the url of the repository to synchronise with
+     * @return true if the plugins need to be synchronised (the host will begin
+     *         synchronising them), false if they are already in sync.
+     */
+    boolean syncPlugins(String masterUrl, long hostId, String pluginRepositoryUrl);
 }

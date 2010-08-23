@@ -69,7 +69,7 @@ public class PluginManager
     private List<ExtensionManager> extensionManagers = new LinkedList<ExtensionManager>();
 
 
-    public void init() throws Exception
+    public synchronized void init() throws Exception
     {
         // Step 1: process any pending actions.
         //  - these need to be executed BEFORE we start working with the underlying equinox system, in particular,
@@ -336,26 +336,26 @@ public class PluginManager
         }
     }
 
-    public Plugin install(URI uri) throws PluginException
+    public synchronized Plugin install(URI uri) throws PluginException
     {
         return install(uri, null);
     }
 
-    public Plugin install(URI uri, String filename) throws PluginException
+    public synchronized Plugin install(URI uri, String filename) throws PluginException
     {
         LocalPlugin plugin = downloadAndAdd(uri, filename);
         enablePlugin(plugin);
         return plugin;
     }
     
-    public Plugin requestInstall(URI uri) throws PluginException
+    public synchronized Plugin requestInstall(URI uri) throws PluginException
     {
         LocalPlugin plugin = downloadAndAdd(uri, null);
         plugin.setState(Plugin.State.INSTALLING);
         return plugin;
     }
 
-    public List<? extends Plugin> installAll(List<URI> uris) throws PluginException
+    public synchronized List<? extends Plugin> installAll(List<URI> uris) throws PluginException
     {
         List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
         for (URI uri: uris)
@@ -391,7 +391,7 @@ public class PluginManager
         return installedPlugin;
     }
     
-    void disablePlugin(LocalPlugin plugin) throws PluginException
+    synchronized void disablePlugin(LocalPlugin plugin) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.setMode(PluginRegistryEntry.Mode.DISABLE);
@@ -399,7 +399,7 @@ public class PluginManager
         plugin.setState(Plugin.State.DISABLED);
     }
 
-    void requestDisable(LocalPlugin plugin) throws PluginException
+    synchronized void requestDisable(LocalPlugin plugin) throws PluginException
     {
         // the plugin is currently enabled, so we need to request a pending action.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
@@ -408,7 +408,7 @@ public class PluginManager
         plugin.setState(Plugin.State.DISABLING);
     }
 
-    void uninstallPlugin(LocalPlugin plugin) throws PluginException
+    synchronized void uninstallPlugin(LocalPlugin plugin) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         if (entry.hasSource())
@@ -424,7 +424,7 @@ public class PluginManager
         plugins.remove(plugin);
     }
 
-    void requestUninstall(LocalPlugin plugin) throws PluginException
+    synchronized void requestUninstall(LocalPlugin plugin) throws PluginException
     {
         // the plugin is currently enabled, so we need to request a pending action.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
@@ -434,7 +434,7 @@ public class PluginManager
         plugin.setState(Plugin.State.UNINSTALLING);
     }
 
-    void enablePlugin(LocalPlugin plugin) throws PluginException
+    synchronized void enablePlugin(LocalPlugin plugin) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.setMode(PluginRegistryEntry.Mode.ENABLE);
@@ -535,7 +535,7 @@ public class PluginManager
         }
     }
 
-    Plugin upgradePlugin(LocalPlugin currentPlugin, URI newSource) throws PluginException
+    synchronized Plugin upgradePlugin(LocalPlugin currentPlugin, URI newSource) throws PluginException
     {
         // replace the old plugin, install and register the new source
         File pluginFile = new File(currentPlugin.getSource());
@@ -560,7 +560,7 @@ public class PluginManager
         return installedPlugin;
     }
 
-    void cancelUpgrade(LocalPlugin plugin) throws PluginException
+    synchronized void cancelUpgrade(LocalPlugin plugin) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
@@ -573,7 +573,7 @@ public class PluginManager
         plugin.setState(Plugin.State.ENABLED);
     }
 
-    void requestUpgrade(LocalPlugin plugin, URI newSource) throws PluginException
+    synchronized void requestUpgrade(LocalPlugin plugin, URI newSource) throws PluginException
     {
         File installedSource = downloadPlugin(newSource, paths.getPluginWorkDir());
 
@@ -688,22 +688,22 @@ public class PluginManager
         }
     }
 
-    public void destroy() throws Exception
+    public synchronized void destroy() throws Exception
     {
         equinox.stop();
     }
 
-    public void setPluginPaths(PluginPaths paths)
+    public synchronized void setPluginPaths(PluginPaths paths)
     {
         this.paths = paths;
     }
 
-    public List<Plugin> getPlugins()
+    public synchronized List<Plugin> getPlugins()
     {
         return new LinkedList<Plugin>(plugins);
     }
 
-    public List<Plugin> getDependentPlugins(LocalPlugin plugin)
+    public synchronized List<Plugin> getDependentPlugins(LocalPlugin plugin)
     {
         List<Plugin> dependents = new LinkedList<Plugin>();
         if (plugin.getBundleDescription() != null)
@@ -713,7 +713,7 @@ public class PluginManager
         return dependents;
     }
 
-    public List<PluginDependency> getRequiredPlugins(LocalPlugin plugin)
+    public synchronized List<PluginDependency> getRequiredPlugins(LocalPlugin plugin)
     {
         BundleDescription description = plugin.getBundleDescription();
         if (description == null)
@@ -823,7 +823,7 @@ public class PluginManager
         }
         finally
         {
-            if (!tmpFile.delete())
+            if (tmpFile.exists() && !tmpFile.delete())
             {
                 LOG.warning("Failed to delete: " + tmpFile.getAbsolutePath());
             }
@@ -836,7 +836,7 @@ public class PluginManager
         return PathUtils.getBaseName(path);
     }
 
-    public Plugin getPlugin(String id)
+    public synchronized Plugin getPlugin(String id)
     {
         return findPlugin(id, plugins);
     }
@@ -860,7 +860,7 @@ public class PluginManager
      * @param extensions the extensions to sort
      * @return the given extensions sorted by plugin dependencies
      */
-    public List<IExtension> sortExtensions(IExtension[] extensions)
+    public synchronized List<IExtension> sortExtensions(IExtension[] extensions)
     {
         final Map<Plugin, List<IExtension>> extensionsByPlugin = new HashMap<Plugin, List<IExtension>>();
         for (IExtension extension: extensions)
@@ -949,27 +949,27 @@ public class PluginManager
         return result;
     }
 
-    public PluginRegistry getPluginRegistry()
+    public synchronized PluginRegistry getPluginRegistry()
     {
         return registry;
     }
 
-    public IExtensionRegistry getExtensionRegistry()
+    public synchronized IExtensionRegistry getExtensionRegistry()
     {
         return equinox.getExtensionRegistry();
     }
 
-    public IExtensionTracker getExtensionTracker()
+    public synchronized IExtensionTracker getExtensionTracker()
     {
         return equinox.getExtensionTracker();
     }
 
-    public void registerExtensionManager(ExtensionManager extensionManager)
+    public synchronized void registerExtensionManager(ExtensionManager extensionManager)
     {
         extensionManagers.add(extensionManager);
     }
 
-    public void initialiseExtensions()
+    public synchronized void initialiseExtensions()
     {
         for (ExtensionManager extensionManager : extensionManagers)
         {

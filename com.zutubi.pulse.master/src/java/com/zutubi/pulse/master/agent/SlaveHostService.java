@@ -57,6 +57,11 @@ public class SlaveHostService implements HostService
         return service.updateVersion(serviceTokenManager.getToken(), masterBuild, masterUrl, hostId, packageUrl, packageSize);
     }
 
+    public boolean syncPlugins(String masterUrl, long hostId, String pluginRepositoryUrl)
+    {
+        return service.syncPlugins(serviceTokenManager.getToken(), masterUrl, hostId, pluginRepositoryUrl);
+    }
+
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
