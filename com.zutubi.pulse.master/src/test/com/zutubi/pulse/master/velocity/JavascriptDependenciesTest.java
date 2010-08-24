@@ -74,13 +74,23 @@ public class JavascriptDependenciesTest extends PulseTestCase
 
     private List<String> normalise(List<String> paths)
     {
-        return CollectionUtils.map(paths, new Mapping<String, String>()
+        if (File.separator.equals("/"))
         {
-            public String map(String s)
+            // no change is required.
+            return paths;
+        }
+        else
+        {
+            return CollectionUtils.map(paths, new Mapping<String, String>()
             {
-                return s.replaceAll("/", File.separator);
-            }
-        });
+                public String map(String s)
+                {
+                    // we need to use the double \\ since it gets escaped in the
+                    // replaceAll processing.
+                    return s.replaceAll("/", "\\\\");
+                }
+            });
+        }
     }
 
 }
