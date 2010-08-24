@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.plugins.*;
+import com.zutubi.util.FileSystemUtils;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;
@@ -42,6 +43,10 @@ public class PluginSystem
         
         File workDir = new File(tmpDir, "plugin/work");
 
+        // Remove the jobs plugin as it is not possible to restart within a
+        // process, and we don't need it for these tests.
+        removeJobsPlugin(internalDir);
+        
         paths = new ConfigurablePluginPaths();
         paths.setPrepackagedPluginStorageDir(prepackagedDir);
         paths.setInternalPluginStorageDir(internalDir);
@@ -49,6 +54,15 @@ public class PluginSystem
         paths.setPluginRegistryDir(storageDir);
         paths.setPluginStorageDir(storageDir);
         paths.setPluginWorkDir(workDir);
+    }
+
+    private void removeJobsPlugin(File internalDir)
+    {
+        File jobsPlugin = FileSystemUtils.findFirstChildMatching(internalDir, ".*jobs.*");
+        if (!jobsPlugin.delete())
+        {
+            throw new RuntimeException("Unable to remove that troublesome jobs plugin");
+        }
     }
 
     public Plugin install(File file) throws PluginException

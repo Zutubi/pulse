@@ -3,10 +3,15 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Tests for the plugin management UI.
@@ -23,6 +28,8 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     private static final String ACTION_DISABLE   = "disable";
     private static final String ACTION_UNINSTALL = "uninstall";
 
+    private static final long AGENT_SYNC_TIMEOUT = 120000;
+    
     private File tmpDir = null;
 
     protected void tearDown() throws Exception
@@ -49,11 +56,52 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     public void testInstallPlugin() throws Exception
     {
-        String id = getRandomId();
-        PluginsPage pluginsPage = installPlugin(id);
+        final String AGENT_NAME = "localhost";
+        
+        xmlRpcHelper.loginAsAdmin();
+        try
+        {
+            ensureAgent(AGENT_NAME);
 
-        assertTrue(pluginsPage.isPluginPresent(id));
-        assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
+            final String id = getRandomId();
+            PluginsPage pluginsPage = installPlugin(id);
+
+            assertTrue(pluginsPage.isPluginPresent(id));
+            assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
+
+            xmlRpcHelper.doConfigAction(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AGENT_NAME), AgentConfigurationActions.ACTION_PING);
+            AcceptanceTestUtils.waitForCondition(new Condition()
+            {
+                public boolean satisfied()
+                {
+                    return agentHasPlugin(id);
+                }
+            }, AGENT_SYNC_TIMEOUT, "agent to sync plugin");
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
+    }
+
+    private boolean agentHasPlugin(final String id)
+    {
+        try
+        {
+            XmlRpcHelper agentXmlRpcHelper = new XmlRpcHelper("http://localhost:" + AcceptanceTestUtils.getAgentPort() + "/xmlrpc");
+            Vector<Hashtable<String, Object>> plugins = agentXmlRpcHelper.callWithoutToken("getRunningPlugins", AcceptanceTestUtils.getAgentAdminToken());
+            return CollectionUtils.contains(plugins, new Predicate<Hashtable<String, Object>>()
+            {
+                public boolean satisfied(Hashtable<String, Object> pluginInfo)
+                {
+                    return id.equals(pluginInfo.get("id"));
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void testCancelInstallPlugin() throws Exception
@@ -142,7 +190,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private String getRandomId()
     {
-        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + random;
+        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + RandomUtils.randomString(10);
     }
 
     private File makeTestPlugin(String id, String name) throws IOException

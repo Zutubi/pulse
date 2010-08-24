@@ -1,10 +1,9 @@
 package com.zutubi.pulse.master.servlet;
 
-import com.zutubi.pulse.core.plugins.JarFilePlugin;
-import com.zutubi.pulse.core.plugins.Plugin;
-import com.zutubi.pulse.core.plugins.PluginManager;
-import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
+import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.core.plugins.repository.PluginList;
+import com.zutubi.pulse.core.util.PulseZipUtils;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
@@ -15,6 +14,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -33,6 +34,7 @@ public class PluginRepositoryServlet extends HttpServlet
     public static final String PATH_REPOSITORY = "pluginrepository";
     
     private PluginManager pluginManager;
+    private SystemPaths systemPaths;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -103,21 +105,26 @@ public class PluginRepositoryServlet extends HttpServlet
             return;
         }
         
-        if (!(plugin instanceof JarFilePlugin))
+        if (plugin instanceof JarFilePlugin)
         {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "No jar file for plugin: " + pluginFileName);
-            return;
+            uploadPlugin(new File(plugin.getSource()), response);
         }
-        
-        uploadPlugin((JarFilePlugin) plugin, response);
+        else if (plugin instanceof DirectoryPlugin)
+        {
+            uploadPlugin((DirectoryPlugin) plugin, response);
+        }
+        else
+        {
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Cannot upload plugin '" + pluginFileName + "' as it has unsupported type: " + plugin.getClass());
+        }
     }
 
-    private void uploadPlugin(JarFilePlugin plugin, HttpServletResponse response) throws IOException
+    private void uploadPlugin(File jarFile, HttpServletResponse response) throws IOException
     {
         InputStream inputStream = null;
         try
         {
-            inputStream = plugin.getSource().toURL().openStream();
+            inputStream = new FileInputStream(jarFile);
             IOUtils.joinStreams(inputStream, response.getOutputStream());
             response.getOutputStream().flush();
         }
@@ -131,6 +138,26 @@ public class PluginRepositoryServlet extends HttpServlet
         }
     }
 
+    private synchronized void uploadPlugin(DirectoryPlugin plugin, HttpServletResponse response) throws IOException
+    {
+        // In development we have plugin directories.  We create jars for them
+        // on demand and cache them in the system temp directory.
+        File jarFile = new File(systemPaths.getTmpRoot(), plugin.getId() + "-" + plugin.getVersion() + ".jar");
+        try
+        {
+            if (!jarFile.exists())
+            {
+                File pluginDir = new File(plugin.getSource());
+                PulseZipUtils.createZip(jarFile, pluginDir, null);
+            }
+            uploadPlugin(jarFile, response);
+        }
+        catch (IOException e)
+        {
+            sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "I/O error: " + e.getMessage());
+        }
+    }
+
     private void sendError(HttpServletResponse response, int code, String message) throws IOException
     {
         LOG.warning(message);
@@ -140,5 +167,10 @@ public class PluginRepositoryServlet extends HttpServlet
     public void setPluginManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
+    }
+    
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
     }
 }

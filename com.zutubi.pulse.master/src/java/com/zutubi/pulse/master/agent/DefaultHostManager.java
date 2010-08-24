@@ -203,17 +203,20 @@ public class DefaultHostManager implements HostManager
 
     public void pingHost(Host host)
     {
-        boolean hasEnabledAgent = CollectionUtils.contains(getAgentsForHost(host), new Predicate<Agent>()
+        if (!host.isUpgrading())
         {
-            public boolean satisfied(Agent agent)
+            boolean hasEnabledAgent = CollectionUtils.contains(getAgentsForHost(host), new Predicate<Agent>()
             {
-                return agent.isEnabled();
+                public boolean satisfied(Agent agent)
+                {
+                    return agent.isEnabled();
+                }
+            });
+    
+            if (hasEnabledAgent)
+            {
+                hostPingService.requestPing(host, getServiceForHost(host));
             }
-        });
-
-        if (hasEnabledAgent)
-        {
-            hostPingService.requestPing(host, getServiceForHost(host));
         }
     }
 

@@ -6,7 +6,9 @@ import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
+import com.zutubi.pulse.core.plugins.repository.PluginScopePredicate;
 import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
+import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
@@ -24,6 +26,7 @@ import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
+import com.zutubi.pulse.slave.command.InstallPluginsCommand;
 import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.CollectionUtils;
@@ -119,7 +122,7 @@ public class SlaveServiceImpl implements SlaveService
             return new HostStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
         
-        if (pluginManager.getPlugins().isEmpty() || pluginSynchroniser.isRebootRequired(masterPlugins, PluginRepository.Scope.SERVER))
+        if (pluginManager.getPlugins().isEmpty() || checkForPluginSync(master, masterPlugins))
         {
             return new HostStatus(PingStatus.PLUGIN_MISMATCH);
         }
@@ -132,6 +135,26 @@ public class SlaveServiceImpl implements SlaveService
         }
 
         return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
+    }
+
+    private boolean checkForPluginSync(String masterUrl, List<PluginInfo> masterPlugins)
+    {
+        List<PluginInfo> serverPlugins = CollectionUtils.filter(masterPlugins, new PluginScopePredicate(PluginRepository.Scope.SERVER));
+        SynchronisationActions requiredActions = pluginSynchroniser.determineRequiredActions(serverPlugins);
+        if (requiredActions.isRebootRequired())
+        {
+            return true;
+        }
+        else if (requiredActions.isSyncRequired())
+        {
+            // Simple case: new plugins are available.  Just install them in
+            // the background.
+            InstallPluginsCommand command = new InstallPluginsCommand(masterUrl);
+            SpringComponentContext.autowire(command);
+            threadPool.execute(command);
+        }
+        
+        return false;
     }
 
     public List<SynchronisationMessageResult> synchronise(String token, String master, long agentId, List<SynchronisationMessage> messages)

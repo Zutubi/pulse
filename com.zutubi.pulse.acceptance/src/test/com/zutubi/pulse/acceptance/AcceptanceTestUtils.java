@@ -4,19 +4,21 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.utility.StringUtil;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.annotation.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -42,6 +44,8 @@ public class AcceptanceTestUtils
      * The acceptance test system property for the agent startup port.
      */
     public static final String PROPERTY_AGENT_PORT = "agent.port";
+
+    public static final String PROPERTY_WORK_DIR = "work.dir";
 
     /**
      * Id of the plugin which can be used to make test-specific plugins with
@@ -74,12 +78,17 @@ public class AcceptanceTestUtils
     {
         // from IDEA, the working directory is located in the same directory as where the projects are run.
         File workingDir = new File("./working");
-        if (System.getProperties().contains("work.dir"))
+        if (isAntBuild())
         {
             // from the acceptance test suite, the work.dir system property is specified
-            workingDir = new File(System.getProperty("work.dir"));
+            workingDir = new File(System.getProperty(PROPERTY_WORK_DIR));
         }
         return workingDir;
+    }
+
+    private static boolean isAntBuild()
+    {
+        return System.getProperties().containsKey(PROPERTY_WORK_DIR);
     }
 
     public static File getDataDirectory() throws IOException
@@ -109,6 +118,30 @@ public class AcceptanceTestUtils
         }
 
         return null;
+    }
+
+    /**
+     * Returns the admin token for the testing agent.
+     * 
+     * @return the admin token for the testing agent
+     * @throws IOException on error reading the token file
+     */
+    public static String getAgentAdminToken() throws IOException
+    {
+        File configDir;
+        if (isAntBuild())
+        {
+            File agentWork = new File(getWorkingDirectory(), AcceptanceTestSuiteSetupTeardown.WORK_DIR_AGENT);
+            File versionHome = new File(FileSystemUtils.findFirstChildMatching(agentWork, "pulse-agent-.*"), "versions");
+            configDir = new File(FileSystemUtils.findFirstChildMatching(versionHome, "[0-9]+"), "system/config");
+        }
+        else
+        {
+            configDir = new File("com.zutubi.pulse.slave/etc");
+        }
+        
+        File tokenFile = new File(configDir, "admin.token");
+        return IOUtils.fileToString(tokenFile);
     }
 
     /**
@@ -436,14 +469,28 @@ public class AcceptanceTestUtils
         File unzipDir = new File(tmpDir, "unzip");
         PulseZipUtils.extractZip(testPlugin, unzipDir);
 
+        rewritePluginManifest(id, name, unzipDir);
+        rewritePluginXml(id, unzipDir);
+
+        File pluginJarFile = new File(tmpDir, id + ".jar");
+        PulseZipUtils.createZip(pluginJarFile, unzipDir, null);
+        return pluginJarFile;
+    }
+
+    private static void rewritePluginManifest(String id, String name, File unzipDir) throws IOException
+    {
         File manifestFile = new File(unzipDir, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF"));
         String manifest = IOUtils.fileToString(manifestFile);
         manifest = manifest.replaceAll(PLUGIN_ID_TEST, id);
         manifest = manifest.replaceAll("Test Post-Processor", name);
         FileSystemUtils.createFile(manifestFile, manifest);
+    }
 
-        File pluginFile = new File(tmpDir, id + ".jar");
-        PulseZipUtils.createZip(pluginFile, unzipDir, null);
-        return pluginFile;
+    private static void rewritePluginXml(String id, File unzipDir) throws IOException
+    {
+        File pluginXmlFile = new File(unzipDir, "plugin.xml");
+        String xml = IOUtils.fileToString(pluginXmlFile);
+        xml = xml.replaceAll("test\\.pp", id + ".pp");
+        FileSystemUtils.createFile(pluginXmlFile, xml);
     }
 }

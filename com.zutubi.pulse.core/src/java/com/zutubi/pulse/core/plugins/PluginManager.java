@@ -12,6 +12,7 @@ import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.osgi.framework.Bundle;
@@ -962,6 +963,11 @@ public class PluginManager
     public synchronized IExtensionTracker getExtensionTracker()
     {
         return equinox.getExtensionTracker();
+    }
+
+    public synchronized IJobManager getJobManager()
+    {
+        return equinox.getJobManager();
     }
 
     public synchronized void registerExtensionManager(ExtensionManager extensionManager)

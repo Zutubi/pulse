@@ -1470,4 +1470,22 @@ public class FileSystemUtils
         File[] files = dir.listFiles();
         return files == null ? new File[0] : files;
     }
+
+    public static File findFirstChildMatching(File dir, final String regex)
+    {
+        File[] matchingFiles = dir.listFiles(new FilenameFilter()
+        {
+            public boolean accept(File dir, String name)
+            {
+                return name.matches(regex);
+            }
+        });
+        
+        if (matchingFiles == null || matchingFiles.length == 0)
+        {
+            throw new RuntimeException("No file matching '" + regex + "' in '" + dir.getAbsolutePath() + "'");
+        }
+        
+        return matchingFiles[0];
+    }
 }

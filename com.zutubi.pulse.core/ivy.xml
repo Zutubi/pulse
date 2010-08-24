@@ -51,7 +51,7 @@
         <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default;src->src"/>
         <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default;src->src"/>
         <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default;src->src"/>
-        <dependency org="eclipse" name="equinox-bundles" rev="3.3_1" conf="build->default;src->src"/>
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3_2" conf="build->default;src->src"/>
 
         <!-- Test dependencies -->
         <dependency org="junit" name="junit" rev="3.8.1"  conf="external,build->default;src->src"/>

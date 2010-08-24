@@ -1,5 +1,7 @@
 package com.zutubi.pulse.slave.command;
 
+import com.zutubi.pulse.core.plugins.PluginException;
+import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository;
 import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
@@ -9,7 +11,9 @@ import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.pulse.slave.MasterProxyFactory;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
+import org.eclipse.core.runtime.jobs.IJobManager;
 
 import java.net.MalformedURLException;
 
@@ -20,6 +24,8 @@ public class SyncPluginsCommand implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(SyncPluginsCommand.class);
 
+    private static final long EXTENSIONS_TIMEOUT = 5 * Constants.MINUTE;
+    
     private String master;
     private String token;
     private long hostId;
@@ -29,6 +35,7 @@ public class SyncPluginsCommand implements Runnable
     private PluginSynchroniser pluginSynchroniser;
     private JettyServerManager jettyServerManager;
     private ShutdownManager shutdownManager;
+    private PluginManager pluginManager;
 
     public SyncPluginsCommand(String master, String token, long hostId, String pluginRepositoryUrl)
     {
@@ -61,8 +68,8 @@ public class SyncPluginsCommand implements Runnable
             }
             else
             {
-                System.out.println("Sync command: send complete");
-                sendMessage(masterService, UpgradeState.COMPLETE);
+                waitForExtensions();
+                sendMessage(masterService, UpgradeState.COMPLETE);                
             }
         }
         catch (Exception e)
@@ -72,6 +79,27 @@ public class SyncPluginsCommand implements Runnable
         }
     }
 
+    private void waitForExtensions() throws PluginException
+    {
+        long endTime = System.currentTimeMillis() + EXTENSIONS_TIMEOUT;
+        IJobManager jobManager = pluginManager.getJobManager();
+        while (!jobManager.isIdle())
+        {
+            if (System.currentTimeMillis() > endTime)
+            {
+                throw new PluginException("Timed out waiting for extensions");
+            }
+            try
+            {
+                Thread.sleep(Constants.SECOND);
+            }
+            catch (InterruptedException e)
+            {
+                throw new PluginException("Interrupted waiting for extension", e);
+            }
+        }
+    }
+    
     private void sendMessage(MasterService masterService, UpgradeState state)
     {
         sendMessage(masterService, state, null);
@@ -112,5 +140,10 @@ public class SyncPluginsCommand implements Runnable
     public void setJettyServerManager(JettyServerManager jettyServerManager)
     {
         this.jettyServerManager = jettyServerManager;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
     }
 }

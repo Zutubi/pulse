@@ -64,17 +64,20 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
 
     public void addExtension(IExtensionTracker tracker, IExtension extension)
     {
-        IConfigurationElement[] configs = extension.getConfigurationElements();
-        for (IConfigurationElement config : configs)
+        synchronized (pluginManager)
         {
-            try
+            IConfigurationElement[] configs = extension.getConfigurationElements();
+            for (IConfigurationElement config : configs)
             {
-                handleConfigurationElement(extension, tracker, config);
-            }
-            catch (InvalidRegistryObjectException e)
-            {
-                // what causes this?
-                LOG.error(e);
+                try
+                {
+                    handleConfigurationElement(extension, tracker, config);
+                }
+                catch (InvalidRegistryObjectException e)
+                {
+                    // what causes this?
+                    LOG.error(e);
+                }
             }
         }
     }

@@ -14,6 +14,9 @@ import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 
 public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 {
+    public static final String WORK_DIR_MASTER = "master";
+    public static final String WORK_DIR_AGENT = "agent";
+
     private Pulse pulse;
     private Pulse agent;
 
@@ -35,7 +38,7 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
         
         File pulsePackage = AcceptanceTestUtils.getPulsePackage();
         PulsePackage pkg = factory.createPackage(pulsePackage);
-        pulse = pkg.extractTo(new File(dir, "master").getCanonicalPath());
+        pulse = pkg.extractTo(new File(dir, WORK_DIR_MASTER).getCanonicalPath());
         pulse.setPort(pulsePort);
         pulse.setUserHome(userHome.getCanonicalPath());
         pulse.start();
@@ -43,7 +46,7 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
         // start up an agent as well.  port 8890
         File agentPackage = AcceptanceTestUtils.getAgentPackage();
         PulsePackage agentPkg = factory.createPackage(agentPackage);
-        agent = agentPkg.extractTo(new File(dir, "agent").getCanonicalPath());
+        agent = agentPkg.extractTo(new File(dir, WORK_DIR_AGENT).getCanonicalPath());
         agent.setPort(agentPort);
         agent.setUserHome(userHome.getCanonicalPath());
         agent.start();

@@ -33,9 +33,9 @@
     <bean id="pluginPaths" class="com.zutubi.pulse.core.plugins.ConfigurablePluginPaths">
         <property name="internalPluginStorageString" value="plugins/internal"/>
         <property name="osgiConfigurationString" value="com.zutubi.pulse.master/etc/osgi"/>
-        <property name="pluginRegistryString" value="plugins"/>
-        <property name="pluginStorageString" value="plugins/prepackaged"/>
-        <property name="pluginWorkString" value="plugins/work"/>
+        <property name="pluginRegistryString" value="plugins/agent"/>
+        <property name="pluginStorageString" value="plugins/agent"/>
+        <property name="pluginWorkString" value="plugins/agent/work"/>
     </bean>
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>

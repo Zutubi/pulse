@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.osgi.internal.baseadaptor.StateManager;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
@@ -36,10 +37,12 @@ public class Equinox implements OSGiFramework
     private ServiceReference packageAdminRef;
     private PackageAdmin packageAdmin;
     private ServiceReference platformAdminRef;
+    private StateManager stateManager;
+    private ServiceReference jobManagerRef;
+    private IJobManager jobManager;
 
     private IExtensionRegistry extensionRegistry;
     private IExtensionTracker extensionTracker;
-    private StateManager stateManager;
 
     public void start(File internalPluginDir) throws Exception
     {
@@ -73,6 +76,12 @@ public class Equinox implements OSGiFramework
         // been loaded, that is, the internal plugins have been started up.
         extensionRegistry = RegistryFactory.getRegistry();
         extensionTracker = new ExtensionTracker(extensionRegistry);
+
+        jobManagerRef = context.getServiceReference(IJobManager.class.getName());
+        if (jobManagerRef != null)
+        {
+            jobManager = (IJobManager) context.getService(jobManagerRef);
+        }
     }
 
     private void startInternalPlugins(File internalPluginDir) throws BundleException
@@ -102,6 +111,11 @@ public class Equinox implements OSGiFramework
         if (platformAdminRef != null)
         {
             context.ungetService(platformAdminRef);
+        }
+        
+        if (jobManagerRef != null)
+        {
+            context.ungetService(jobManagerRef);
         }
 
         if (context != null)
@@ -181,6 +195,11 @@ public class Equinox implements OSGiFramework
     public IExtensionTracker getExtensionTracker()
     {
         return extensionTracker;
+    }
+
+    public IJobManager getJobManager()
+    {
+        return jobManager;
     }
 
     private class DirectDependenciesFunction implements UnaryFunction<Bundle, Set<Bundle>> 
