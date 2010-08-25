@@ -75,7 +75,6 @@ public class JavascriptDependenciesTest extends PulseTestCase
 
     private List<String> normalise(List<String> paths)
     {
-
         return CollectionUtils.map(paths, new Mapping<String, String>()
         {
             public String map(String s)
