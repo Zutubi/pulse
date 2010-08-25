@@ -70,7 +70,7 @@ public class JavascriptDependenciesTest extends PulseTestCase
 
     private void assertExpected(List<String> expected, List<String> paths) throws IOException
     {
-        Assert.assertEquals(normalise(expected), expandAndSortPaths(jsRoot, paths));
+        Assert.assertEquals(normalise(expected), normalise(expandAndSortPaths(jsRoot, paths)));
     }
 
     private List<String> normalise(List<String> paths)

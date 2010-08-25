@@ -170,7 +170,7 @@ public class JavascriptDependencies
             }
             else // already relative to the root.
             {
-                return FileSystemUtils.localiseSeparators(dependency);
+                return dependency;
             }
         }
         catch (IOException e)
