@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import static com.zutubi.pulse.master.velocity.JavascriptDependencies.expandAndSortPaths;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,34 +64,25 @@ public class JavascriptDependenciesTest extends PulseTestCase
         }
         catch (IOException e)
         {
-            
+
         }
     }
 
     private void assertExpected(List<String> expected, List<String> paths) throws IOException
     {
-         Assert.assertEquals(normalise(expected), expandAndSortPaths(jsRoot, paths));
+        Assert.assertEquals(normalise(expected), expandAndSortPaths(jsRoot, paths));
     }
 
     private List<String> normalise(List<String> paths)
     {
-        if (File.separator.equals("/"))
+
+        return CollectionUtils.map(paths, new Mapping<String, String>()
         {
-            // no change is required.
-            return paths;
-        }
-        else
-        {
-            return CollectionUtils.map(paths, new Mapping<String, String>()
+            public String map(String s)
             {
-                public String map(String s)
-                {
-                    // we need to use the double \\ since it gets escaped in the
-                    // replaceAll processing.
-                    return s.replaceAll("/", "\\\\");
-                }
-            });
-        }
+                return FileSystemUtils.localiseSeparators(s);
+            }
+        });
     }
 
 }
