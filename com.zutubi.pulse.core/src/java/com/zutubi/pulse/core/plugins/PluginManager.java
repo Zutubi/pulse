@@ -202,7 +202,7 @@ public class PluginManager
             if (entry.hasSource())
             {
                 File plugin = getPluginSourceFile(entry.getSource());
-                delete(plugin, true);
+                delete(plugin, false);
                 entry.removeSource();
             }
             entry.setMode(PluginRegistryEntry.Mode.UNINSTALLED);
@@ -210,17 +210,20 @@ public class PluginManager
         else if (pendingAction.equals(PENDING_ACTION_UPGRADE))
         {
             URI newSource = getUpgradeSourceFile(entry.getUpgradeSource()).toURI();
-            upgradePluginSource(id, newSource);
-            delete(new File(newSource), false);
-            entry.removeUpgradeSource();
+            if (upgradePluginSource(id, newSource))
+            {
+                delete(new File(newSource), false);
+                entry.removeUpgradeSource();
+            }
         }
     }
 
-    private void delete(File file, boolean throwOnError) throws PluginException
+    private boolean delete(File file, boolean throwOnError) throws PluginException
     {
         try
         {
             FileSystemUtils.delete(file);
+            return true;
         }
         catch (IOException e)
         {
@@ -232,18 +235,24 @@ public class PluginManager
             {
                 LOG.warning(e);
             }
+            
+            return false;
         }
     }
 
-    private void upgradePluginSource(String id, URI newSource) throws PluginException
+    private boolean upgradePluginSource(String id, URI newSource) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(id);
         File pluginFile = getPluginSourceFile(entry.getSource());
-        delete(pluginFile, true);
+        if (!delete(pluginFile, false))
+        {
+            return false;
+        }
 
         File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
         entry.setSource(installedSource.getName());
         saveRegistry();
+        return true;
     }
 
     private void scanUserPlugins() throws PluginException
