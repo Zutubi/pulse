@@ -29,7 +29,7 @@ import static org.hamcrest.Matchers.not;
 public class SynchroniseCommandAcceptanceTest extends PulseTestCase
 {
     private static final String MASTER_URL = "http://localhost:" + AcceptanceTestUtils.getPulsePort();
-    private static final long SYNC_TIMEOUT_MINS = 5;
+    private static final long SYNC_TIMEOUT_SECS = 300;
     
     private File tmpDir;
     private Pulse pulse;
@@ -96,7 +96,7 @@ public class SynchroniseCommandAcceptanceTest extends PulseTestCase
         BufferingCharHandler handler = new BufferingCharHandler();
         AsyncProcess process = new AsyncProcess(builder.start(), handler, true);
 
-        int exitCode = process.waitForOrThrow(SYNC_TIMEOUT_MINS, TimeUnit.MINUTES);
+        int exitCode = process.waitForOrThrow(SYNC_TIMEOUT_SECS, TimeUnit.SECONDS);
         assertEquals("Non-zero exit code from sync command: " + exitCode +
                 "\n[stdout]\n" + handler.getStdout() + "\n[/stdout]" +
                 "\n[stderr]\n" + handler.getStderr() + "[/stderr]\n",
