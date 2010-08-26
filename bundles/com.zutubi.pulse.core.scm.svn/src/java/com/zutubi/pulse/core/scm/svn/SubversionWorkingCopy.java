@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
-import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
+import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
 import org.tmatesoft.svn.core.*;
@@ -21,6 +21,8 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 
 /**
  */
@@ -88,7 +90,7 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         return authenticationManager;
     }
 
-    public String getPassword(PersonalBuildUI ui, Config config)
+    public String getPassword(UserInterface ui, Config config)
     {
         String password = config.getProperty(PROPERTY_PASSWORD);
         if(password == null)
@@ -518,9 +520,9 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
 
     private class UpdateHandler implements ISVNEventHandler
     {
-        private PersonalBuildUI ui;
+        private UserInterface ui;
 
-        private UpdateHandler(PersonalBuildUI ui)
+        private UpdateHandler(UserInterface ui)
         {
             this.ui = ui;
         }

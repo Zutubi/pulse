@@ -10,4 +10,6 @@
     <bean id="scmExtensionManager" class="com.zutubi.pulse.core.scm.ScmExtensionManager" init-method="init"/>
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
     <bean id="hessianExtensionManager" class="com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager" init-method="init"/>
+
+    <bean id="pluginSynchroniser" class="com.zutubi.pulse.core.plugins.sync.PluginSynchroniser"/>
 </beans>

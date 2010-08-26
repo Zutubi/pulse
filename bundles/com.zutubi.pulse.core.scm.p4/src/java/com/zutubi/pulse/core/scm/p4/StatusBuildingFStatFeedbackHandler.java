@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.EOLStyle;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
+import com.zutubi.pulse.core.ui.api.UserInterface;
 
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
@@ -12,10 +12,10 @@ import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
  */
 public class StatusBuildingFStatFeedbackHandler extends AbstractPerforceFStatFeedbackHandler
 {
-    private PersonalBuildUI ui;
+    private UserInterface ui;
     private WorkingCopyStatus status;
 
-    public StatusBuildingFStatFeedbackHandler(PersonalBuildUI ui, WorkingCopyStatus status)
+    public StatusBuildingFStatFeedbackHandler(UserInterface ui, WorkingCopyStatus status)
     {
         super();
         this.ui = ui;

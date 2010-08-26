@@ -1,16 +1,20 @@
 package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
+import com.zutubi.pulse.core.ui.api.MenuChoice;
+import com.zutubi.pulse.core.ui.api.MenuOption;
+import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
+import com.zutubi.pulse.dev.client.AbstractClient;
+import com.zutubi.pulse.dev.client.ClientException;
+import com.zutubi.pulse.dev.client.UserAbortException;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
-import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
@@ -28,7 +32,6 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +41,7 @@ import java.util.Set;
  * The client does the work of actually talking to the Pulse server, sending
  * personal build requests and getting back the results.
  */
-public class PersonalBuildClient
+public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
 {
     private static final Messages I18N = Messages.getInstance(PersonalBuildClient.class);
 
@@ -48,149 +51,45 @@ public class PersonalBuildClient
     static final String REVISION_OPTION_GOOD     = "@good";
     static final String REVISION_OPTION_CUSTOM   = "@custom";
 
-    private PersonalBuildConfig config;
-    private PersonalBuildUI ui;
     private PatchFormatFactory patchFormatFactory;
-    private String password;
 
-    public PersonalBuildClient(PersonalBuildConfig config, PersonalBuildUI ui)
+    public PersonalBuildClient(PersonalBuildConfig config, UserInterface ui)
     {
-        this.config = config;
-        this.ui = ui;
+        super(config, ui);
     }
 
-    public PersonalBuildConfig getConfig()
+    public PersonalBuildContext checkConfiguration() throws ClientException
     {
-        return config;
-    }
+        ensureServerConfigured();
+        ensureProjectConfigured();
+        
+        PulseXmlRpcClient rpc = getXmlRpcClient();
+        checkVersion(rpc);
 
-    public PersonalBuildUI getUI()
-    {
-        return ui;
-    }
-
-    public PersonalBuildContext checkConfiguration() throws PersonalBuildException
-    {
-        ui.debug("Verifying configuration with pulse server...");
-        checkRequiredConfig();
-
+        String token = null;
         try
         {
-            PulseXmlRpcClient rpc = new PulseXmlRpcClient(config.getPulseUrl(), config.getProxyHost(), config.getProxyPort());
-
-            checkVersion(rpc);
-
-            String token = null;
-
-            try
-            {
-                ui.debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
-                token = rpc.login(config.getPulseUser(), getPassword());
-                ui.debug("Login successful.");
-                PersonalBuildContext context = prepare(rpc, token, patchFormatFactory);
-                ui.debug("Verified: personal build for project: " + config.getProject() + ".");
-                return context;
-            }
-            catch (PersonalBuildException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new PersonalBuildException("Unable to log in to pulse server: " + e.getMessage(), e);
-            }
-            finally
-            {
-                rpc.failSafeLogout(token);
-            }
+            token = login(rpc);
+            PersonalBuildContext context = prepare(rpc, token, patchFormatFactory);
+            ui.debug("Verified: personal build for project: " + config.getProject() + ".");
+            return context;
         }
-        catch (MalformedURLException e)
+        catch (ClientException e)
         {
-            throw new PersonalBuildException("Invalid pulse server URL '" + config.getPulseUrl() + "'", e);
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new ClientException("Unable to log in to pulse server: " + e.getMessage(), e);
+        }
+        finally
+        {
+            rpc.failSafeLogout(token);
         }
     }
 
-    private String getPassword()
+    private void ensureProjectConfigured() throws ClientException
     {
-        if (password == null)
-        {
-            password = config.getPulsePassword();
-            if (password == null)
-            {
-                password = ui.passwordPrompt("Pulse password");
-                if (password == null)
-                {
-                    password = "";
-                }
-            }
-        }
-
-        return password;
-    }
-
-    private void checkVersion(PulseXmlRpcClient rpc) throws PersonalBuildException
-    {
-        int ourBuild = Version.getVersion().getBuildNumberAsInt();
-        int confirmedBuild = config.getConfirmedVersion();
-
-        ui.debug("Checking pulse server version...");
-        try
-        {
-            int serverBuild = rpc.getVersion();
-            if (serverBuild != ourBuild)
-            {
-                ui.debug(String.format("Server build (%d) does not match local build (%d)", serverBuild, ourBuild));
-                if (serverBuild != confirmedBuild)
-                {
-                    String serverVersion = Version.buildNumberToVersion(serverBuild);
-                    String ourVersion = Version.buildNumberToVersion(ourBuild);
-                    String question;
-
-                    if (serverVersion.equals(ourVersion))
-                    {
-                        question = I18N.format("prompt.build.mismatch", serverBuild, ourBuild);
-                    }
-                    else
-                    {
-                        question = I18N.format("prompt.version.mismatch", serverVersion, ourVersion);
-                    }
-
-                    YesNoResponse response = ui.yesNoPrompt(question, true, false, YesNoResponse.NO);
-                    if (response.isPersistent())
-                    {
-                        config.setConfirmedVersion(serverBuild);
-                    }
-
-                    if (!response.isAffirmative())
-                    {
-                        throw new UserAbortException();
-                    }
-                }
-            }
-
-            ui.debug("Version accepted.");
-        }
-        catch (PulseXmlRpcException e)
-        {
-            throw new PersonalBuildException("Unable to get pulse server version: " + e.getMessage(), e);
-        }
-    }
-
-    private void checkRequiredConfig() throws PersonalBuildException
-    {
-        if (config.getPulseUrl() == null)
-        {
-            YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.pulse.server"), false, false, YesNoResponse.YES);
-            if (response.isAffirmative())
-            {
-                new ConfigCommand().setupPulseConfig(ui, config);
-            }
-            else
-            {
-                throw new PersonalBuildException("Required property '" + PersonalBuildConfig.PROPERTY_PULSE_URL + "' not specified.");                
-            }
-        }
-
         if (config.getProject() == null)
         {
             YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.pulse.project"), false, false, YesNoResponse.YES);
@@ -200,12 +99,12 @@ public class PersonalBuildClient
             }
             else
             {
-                throw new PersonalBuildException("Required property '" + PersonalBuildConfig.PROPERTY_PROJECT + "' not specified.");
+                throw new ClientException("Required property '" + PersonalBuildConfig.PROPERTY_PROJECT + "' not specified.");
             }
         }
     }
 
-    private PersonalBuildContext prepare(PulseXmlRpcClient rpc, String token, PatchFormatFactory patchFormatFactory) throws PersonalBuildException
+    private PersonalBuildContext prepare(PulseXmlRpcClient rpc, String token, PatchFormatFactory patchFormatFactory) throws ClientException
     {
         try
         {
@@ -225,7 +124,7 @@ public class PersonalBuildClient
                 Pair<String, PatchFormat> typeAndFormat = patchFormatFactory.createByScmType(scmType);
                 if (typeAndFormat == null)
                 {
-                    throw new PersonalBuildException("No patch format registered for this SCM (" + scmType + ")");
+                    throw new ClientException("No patch format registered for this SCM (" + scmType + ")");
                 }
 
                 return new PersonalBuildContext(wc, context, typeAndFormat.first, typeAndFormat.second);
@@ -236,13 +135,13 @@ public class PersonalBuildClient
                 return new PersonalBuildContext(wc, context, patchType, patchFormatFactory.createByFormatType(patchType));
             }
         }
-        catch (PersonalBuildException e)
+        catch (ClientException e)
         {
             throw e;
         }
         catch (Exception e)
         {
-            throw new PersonalBuildException("Unable to prepare personal build: " + e.getMessage(), e);
+            throw new ClientException("Unable to prepare personal build: " + e.getMessage(), e);
         }
     }
 
@@ -271,13 +170,13 @@ public class PersonalBuildClient
         }
     }
 
-    private String guessExistingPatchType(PatchFormatFactory patchFormatFactory) throws PersonalBuildException
+    private String guessExistingPatchType(PatchFormatFactory patchFormatFactory) throws ClientException
     {
         String patchFilename = config.getPatchFile();
         File patchFile = new File(patchFilename);
         if (!patchFile.exists())
         {
-            throw new PersonalBuildException("Specified patch file '" + patchFilename + "' does not exist.");
+            throw new ClientException("Specified patch file '" + patchFilename + "' does not exist.");
         }
         
         String patchType = config.getPatchType();
@@ -289,7 +188,7 @@ public class PersonalBuildClient
             {
                 List<String> supportedTypes = patchFormatFactory.getFormatTypes();
                 Collections.sort(supportedTypes, new Sort.StringComparator());
-                throw new PersonalBuildException("Unable to guess type of patch.  Please specify a type (supported types are " + supportedTypes + ").");
+                throw new ClientException("Unable to guess type of patch.  Please specify a type (supported types are " + supportedTypes + ").");
             }
 
             ui.status("Guessed type '" + patchType + "'.");
@@ -298,7 +197,7 @@ public class PersonalBuildClient
         return patchType;
     }
 
-    public PersonalBuildRevision chooseRevision(PersonalBuildContext context) throws PersonalBuildException
+    public PersonalBuildRevision chooseRevision(PersonalBuildContext context) throws ClientException
     {
         String chosenRevision = config.getRevision();
         boolean fromConfig = true;
@@ -363,7 +262,7 @@ public class PersonalBuildClient
         }
         else
         {
-            throw new PersonalBuildException("Unknown revision choice '" + chosenRevision + "'");
+            throw new ClientException("Unknown revision choice '" + chosenRevision + "'");
         }
     }
 
@@ -372,7 +271,7 @@ public class PersonalBuildClient
         return new MenuOption<String>(value, I18N.format("revision.option." + value.substring(1)), defaultOption);
     }
 
-    private PersonalBuildRevision guessLocalRevision(PersonalBuildContext context) throws PersonalBuildException
+    private PersonalBuildRevision guessLocalRevision(PersonalBuildContext context) throws ClientException
     {
         Revision revision;
         ui.status(I18N.format("status.guessing.revision"));
@@ -383,7 +282,7 @@ public class PersonalBuildClient
         }
         catch (ScmException e)
         {
-            throw new PersonalBuildException("Unable to guess local revision: " + e.getMessage(), e);
+            throw new ClientException("Unable to guess local revision: " + e.getMessage(), e);
         }
         finally
         {
@@ -394,7 +293,7 @@ public class PersonalBuildClient
         return new PersonalBuildRevision(revision, true);
     }
 
-    private PersonalBuildRevision getLatestRemoteRevision(PersonalBuildContext context) throws PersonalBuildException
+    private PersonalBuildRevision getLatestRemoteRevision(PersonalBuildContext context) throws ClientException
     {
         Revision revision;
         ui.status(I18N.format("status.getting.latest.revision"));
@@ -404,7 +303,7 @@ public class PersonalBuildClient
         }
         catch (ScmException e)
         {
-            throw new PersonalBuildException("Unable to guess local revision: " + e.getMessage(), e);
+            throw new ClientException("Unable to guess local revision: " + e.getMessage(), e);
         }
         finally
         {
@@ -415,7 +314,7 @@ public class PersonalBuildClient
         return new PersonalBuildRevision(revision, true);
     }
 
-    public void updateIfDesired(PersonalBuildContext context, Revision revision) throws PersonalBuildException
+    public void updateIfDesired(PersonalBuildContext context, Revision revision) throws ClientException
     {
         WorkingCopy wc = context.getWorkingCopy();
         if (wc != null && wc.getCapabilities().contains(WorkingCopyCapability.UPDATE))
@@ -450,13 +349,13 @@ public class PersonalBuildClient
                 }
                 catch (ScmException e)
                 {
-                    throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
+                    throw new ClientException("Unable to update working copy: " + e.getMessage(), e);
                 }
             }
         }
     }
 
-    public boolean preparePatch(PersonalBuildContext context, File patchFile, String... spec) throws PersonalBuildException
+    public boolean preparePatch(PersonalBuildContext context, File patchFile, String... spec) throws ClientException
     {
         try
         {
@@ -486,11 +385,11 @@ public class PersonalBuildClient
         }
         catch (ScmException e)
         {
-            throw new PersonalBuildException("Unable to create patch file: " + e.getMessage(), e);
+            throw new ClientException("Unable to create patch file: " + e.getMessage(), e);
         }
     }
 
-    public long sendRequest(PersonalBuildContext context, Revision revision, File patchFile) throws PersonalBuildException
+    public long sendRequest(PersonalBuildContext context, Revision revision, File patchFile) throws ClientException
     {
         HttpClient client = new HttpClient();
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getPulseUser(), getPassword());
@@ -544,27 +443,27 @@ public class PersonalBuildClient
                     }
                     else
                     {
-                        throw new PersonalBuildException("Patch rejected.");
+                        throw new ClientException("Patch rejected.");
                     }
                 }
                 catch (ParsingException e)
                 {
-                    throw new PersonalBuildException("Unable to parse response from server: " + e.getMessage(), e);
+                    throw new ClientException("Unable to parse response from server: " + e.getMessage(), e);
                 }
                 catch (XMLException e)
                 {
-                    throw new PersonalBuildException("Invalid response from server: " + e.getMessage(), e);
+                    throw new ClientException("Invalid response from server: " + e.getMessage(), e);
                 }
             }
             else
             {
                 // Not good
-                throw new PersonalBuildException("Pulse server returned error code " + status + " (" + HttpStatus.getStatusText(status) + ")");
+                throw new ClientException("Pulse server returned error code " + status + " (" + HttpStatus.getStatusText(status) + ")");
             }
         }
         catch (IOException e)
         {
-            throw new PersonalBuildException("I/O error sending patch to pulse server: " + e.getMessage(), e);
+            throw new ClientException("I/O error sending patch to pulse server: " + e.getMessage(), e);
         }
         finally
         {

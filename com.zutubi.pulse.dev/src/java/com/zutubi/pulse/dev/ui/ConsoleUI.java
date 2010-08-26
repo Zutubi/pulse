@@ -1,9 +1,9 @@
-package com.zutubi.pulse.dev.personal;
+package com.zutubi.pulse.dev.ui;
 
-import com.zutubi.pulse.core.scm.api.MenuChoice;
-import com.zutubi.pulse.core.scm.api.MenuOption;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
-import com.zutubi.pulse.core.scm.api.YesNoResponse;
+import com.zutubi.pulse.core.ui.api.MenuChoice;
+import com.zutubi.pulse.core.ui.api.MenuOption;
+import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
@@ -11,14 +11,15 @@ import com.zutubi.util.StringUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * A personal build UI that uses the console to interact with the user.
  */
-public class ConsoleUI implements PersonalBuildUI
+public class ConsoleUI implements UserInterface
 {
     private static final String ECHO_PROPERTY = "pulse.echo.passwords";
 

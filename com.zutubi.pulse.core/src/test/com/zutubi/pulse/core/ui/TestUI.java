@@ -1,9 +1,9 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.ui;
 
-import com.zutubi.pulse.core.scm.api.MenuChoice;
-import com.zutubi.pulse.core.scm.api.MenuOption;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
-import com.zutubi.pulse.core.scm.api.YesNoResponse;
+import com.zutubi.pulse.core.ui.api.MenuChoice;
+import com.zutubi.pulse.core.ui.api.MenuOption;
+import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -11,11 +11,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * An implementation of {@link com.zutubi.pulse.core.scm.api.PersonalBuildUI}
+ * An implementation of {@link com.zutubi.pulse.core.ui.api.UserInterface}
  * that just captures messages and gives blank/default responses for testing
  * purposes.
  */
-public class TestPersonalBuildUI implements PersonalBuildUI
+public class TestUI implements UserInterface
 {
     private List<String> debugMessages = new LinkedList<String>();
     private List<String> statusMessages = new LinkedList<String>();

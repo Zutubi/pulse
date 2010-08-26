@@ -4,21 +4,19 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.utility.StringUtil;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.annotation.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -35,6 +33,11 @@ public class AcceptanceTestUtils
      */
     protected static final String PROPERTY_AGENT_PACKAGE = "agent.package";
 
+    /**
+     * The acceptance test system property for the built dev package.
+     */
+    protected static final String PROPERTY_DEV_PACKAGE = "dev.package";
+    
     /**
      * The acceptance test system property for the pulse startup port.
      */
@@ -208,7 +211,7 @@ public class AcceptanceTestUtils
     }
 
     /**
-     * Returns the location of the Pulse agent pacakge, based on the agent.package
+     * Returns the location of the Pulse agent package, based on the agent.package
      * system property.
      *
      * @return file reference to the pulse agent package.
@@ -218,6 +221,17 @@ public class AcceptanceTestUtils
         return getPackage(PROPERTY_AGENT_PACKAGE);
     }
 
+    /**
+     * Returns the location of the Pulse dev package, based on the dev.package
+     * system property.
+     *
+     * @return file reference to the pulse agent package.
+     */
+    public static File getDevPackage()
+    {
+        return getPackage(PROPERTY_DEV_PACKAGE);
+    }
+    
     private static File getPackage(String packageProperty)
     {
         String pkgProperty = System.getProperty(packageProperty);

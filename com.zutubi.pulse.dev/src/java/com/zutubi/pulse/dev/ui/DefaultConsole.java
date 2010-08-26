@@ -1,4 +1,4 @@
-package com.zutubi.pulse.dev.personal;
+package com.zutubi.pulse.dev.ui;
 
 import com.zutubi.util.io.PasswordReader;
 

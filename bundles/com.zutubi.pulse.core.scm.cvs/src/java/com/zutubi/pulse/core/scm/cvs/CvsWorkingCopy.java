@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
+import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.io.IOUtils;
@@ -13,7 +14,6 @@ import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.FileInfoEvent;
-import static org.netbeans.lib.cvsclient.file.FileStatus.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
+
+import static org.netbeans.lib.cvsclient.file.FileStatus.*;
 
 /**
  */
@@ -188,9 +190,9 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
     private class UpdateHandler extends CVSAdapter
     {
         private String basePath = new File("").getAbsolutePath();
-        private PersonalBuildUI ui;
+        private UserInterface ui;
 
-        public UpdateHandler(PersonalBuildUI ui)
+        public UpdateHandler(UserInterface ui)
         {
             this.ui = ui;
         }
@@ -219,9 +221,9 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
         private File workingDir;
         private String localWorkingModule;
         private WorkingCopyStatus status = null;
-        private PersonalBuildUI ui;
+        private UserInterface ui;
 
-        public StatusHandler(File workingDir, String localWorkingModule, WorkingCopyStatus status, PersonalBuildUI ui)
+        public StatusHandler(File workingDir, String localWorkingModule, WorkingCopyStatus status, UserInterface ui)
         {
             this.workingDir = workingDir;
             this.localWorkingModule = localWorkingModule;

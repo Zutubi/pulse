@@ -70,6 +70,8 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(CleanupAcceptanceTest.class);
         suite.addTestSuite(CleanupUIAcceptanceTest.class);
 
+        suite.addTestSuite(SynchroniseCommandAcceptanceTest.class);
+        
         return suite;
     }
 }

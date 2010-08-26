@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.ui.api;
 
 /**
  * Used to represent a simple positive or negative response from the user.

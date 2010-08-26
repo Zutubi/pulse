@@ -1,14 +1,13 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.ui.api;
 
 import java.util.List;
 
 /**
- * An interface for interaction with a user that is running personal build/
- * working copy operations.  Can be used to query for user input such as
- * passwords or confirmation, or to provide feedback during long-running
- * operations.
+ * An interface for interaction with a user that is running Pulse operations.
+ * Can be used to query for user input such as passwords or confirmation, or
+ * to provide feedback during long-running operations.
  */
-public interface PersonalBuildUI
+public interface UserInterface
 {
 
     /**

@@ -5,6 +5,8 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
+import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
@@ -189,7 +191,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             revision = getLatestRemoteRevision(context);
         }
 
-        PersonalBuildUI ui = context.getUI();
+        UserInterface ui = context.getUI();
         PerforceSyncFeedbackHandler syncHandler = new PerforceSyncFeedbackHandler(ui);
         core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
 

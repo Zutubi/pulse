@@ -1,14 +1,15 @@
-package com.zutubi.pulse.dev.personal;
+package com.zutubi.pulse.dev.ui;
 
-import com.zutubi.pulse.core.scm.api.MenuChoice;
-import com.zutubi.pulse.core.scm.api.MenuOption;
-import com.zutubi.pulse.core.scm.api.YesNoResponse;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.ui.api.MenuChoice;
+import com.zutubi.pulse.core.ui.api.MenuOption;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
 
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class ConsoleUITest extends PulseTestCase
 {

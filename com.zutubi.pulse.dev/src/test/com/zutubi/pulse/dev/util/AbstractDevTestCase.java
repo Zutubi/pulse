@@ -1,7 +1,7 @@
-package com.zutubi.pulse.dev.personal;
+package com.zutubi.pulse.dev.util;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.dev.config.DevConfig;
 import com.zutubi.util.Pair;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.io.IOUtils;
@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Base for classes that test personal build functionality.  Sets up an
- * environment for personal build configuration.
+ * Base for classes that test dev command functionality.  Sets up an
+ * environment for dev configuration.
  */
-public abstract class AbstractPersonalBuildTestCase extends PulseTestCase
+public abstract class AbstractDevTestCase extends PulseTestCase
 {
     private File tempDir;
     protected File baseParentDir;
@@ -49,12 +49,12 @@ public abstract class AbstractPersonalBuildTestCase extends PulseTestCase
             p.put(property.first, property.second);
         }
 
-        IOUtils.write(p, new File(dir, PersonalBuildConfig.PROPERTIES_FILENAME));
+        IOUtils.write(p, new File(dir, DevConfig.PROPERTIES_FILENAME));
     }
 
     protected void assertProperties(File dir, Pair<String, String>... expectedProperties) throws IOException
     {
-        File propertiesFile = new File(dir, PersonalBuildConfig.PROPERTIES_FILENAME);
+        File propertiesFile = new File(dir, DevConfig.PROPERTIES_FILENAME);
         Properties properties;
         if (propertiesFile.exists())
         {

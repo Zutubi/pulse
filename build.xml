@@ -524,6 +524,7 @@
             <sysproperty key="pulse.port" value="8889"/>
             <sysproperty key="pulse.package" value="build/pulse-${pulse.version}.${extension}"/>
             <sysproperty key="agent.package" value="build/pulse-agent-${pulse.version}.${extension}"/>
+            <sysproperty key="dev.package" value="build/pulse-dev-${pulse.version}.${extension}"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <sysproperty key="work.dir" value="working"/>
             <classpath>

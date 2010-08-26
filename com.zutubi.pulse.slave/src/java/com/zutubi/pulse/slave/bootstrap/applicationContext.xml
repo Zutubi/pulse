@@ -119,6 +119,4 @@
     <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init"/>
     
     <bean id="forwardingEventListener" class="com.zutubi.pulse.slave.ForwardingEventListener"/>
-
-    <bean id="pluginSynchroniser" class="com.zutubi.pulse.core.plugins.sync.PluginSynchroniser"/>
 </beans>

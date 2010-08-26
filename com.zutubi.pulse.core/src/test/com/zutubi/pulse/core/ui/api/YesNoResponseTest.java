@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.ui.api;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 
 import java.lang.reflect.Constructor;
@@ -13,7 +13,7 @@ public class WorkingCopyFactory
 {
     private static Map<String, Constructor> typeMap = new TreeMap<String, Constructor>();
 
-    public static WorkingCopy create(String type) throws PersonalBuildException
+    public static WorkingCopy create(String type) throws ScmException
     {
         Constructor constructor = typeMap.get(type);
         if(constructor != null)
@@ -24,15 +24,15 @@ public class WorkingCopyFactory
             }
             catch (Exception e)
             {
-                if (e instanceof PersonalBuildException)
+                if (e instanceof ScmException)
                 {
-                    throw (PersonalBuildException)e;
+                    throw (ScmException)e;
                 }
-                if (e.getCause() instanceof PersonalBuildException)
+                if (e.getCause() instanceof ScmException)
                 {
-                    throw (PersonalBuildException)e.getCause();
+                    throw (ScmException)e.getCause();
                 }
-                return null;
+                throw new ScmException(e);
             }
         }
 

@@ -1,9 +1,9 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.ui.api;
 
 /**
  * Represents a single option in a menu shown to the user.
  *
- * @see PersonalBuildUI
+ * @see com.zutubi.pulse.core.ui.api.UserInterface
  */
 public class MenuOption<T>
 {
