@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.sun.org.apache.bcel.internal.classfile.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -13,13 +14,13 @@ import freemarker.template.utility.StringUtil;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class AcceptanceTestUtils
 {
@@ -485,6 +486,7 @@ public class AcceptanceTestUtils
 
         rewritePluginManifest(id, name, unzipDir);
         rewritePluginXml(id, unzipDir);
+        rewritePluginSymbolicName(id, unzipDir);
 
         File pluginJarFile = new File(tmpDir, id + ".jar");
         PulseZipUtils.createZip(pluginJarFile, unzipDir, null);
@@ -506,5 +508,42 @@ public class AcceptanceTestUtils
         String xml = IOUtils.fileToString(pluginXmlFile);
         xml = xml.replaceAll("test\\.pp", id + ".pp");
         FileSystemUtils.createFile(pluginXmlFile, xml);
+    }
+
+    private static void rewritePluginSymbolicName(String id, File unzipDir) throws IOException
+    {
+        File configClassFile = new File(unzipDir, FileSystemUtils.composeFilename("com", "zutubi", "pulse", "core", "postprocessors", "test", "TestPostProcessorConfiguration.class"));
+        JavaClass javaClass = parseClass(configClassFile);
+        ConstantPool constantPool = javaClass.getConstantPool();
+        for (int i = 0; i < constantPool.getLength(); i++)
+        {
+            Constant constant = constantPool.getConstant(i);
+            if (constant instanceof ConstantUtf8)
+            {
+                ConstantUtf8 utf8 = (ConstantUtf8) constant;
+                String value = utf8.getBytes();
+                if (value.equals("zutubi.testPostProcessorConfig"))
+                {
+                    utf8.setBytes(id);
+                }
+            }
+        }
+
+        javaClass.dump(configClassFile);
+    }
+
+    private static JavaClass parseClass(File configClassFile) throws IOException
+    {
+        FileInputStream is = null;
+        try
+        {
+            is = new FileInputStream(configClassFile);
+            ClassParser classParser = new ClassParser(is, configClassFile.getName());
+            return classParser.parse();
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
     }
 }
