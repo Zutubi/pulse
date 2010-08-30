@@ -57,7 +57,7 @@ public class PluginSynchroniser
 
         for (final Plugin runningPlugin : CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate()))
         {
-            if (!pluginInRepository(repositoryPlugins, runningPlugin))
+            if (!pluginInList(repositoryPlugins, runningPlugin))
             {
                 actions.addUninstall(runningPlugin.getId());
             }
@@ -111,7 +111,7 @@ public class PluginSynchroniser
         }
     }
 
-    private boolean pluginInRepository(List<PluginInfo> repositoryPlugins, final Plugin plugin)
+    private boolean pluginInList(List<PluginInfo> repositoryPlugins, final Plugin plugin)
     {
         return CollectionUtils.contains(repositoryPlugins, new Predicate<PluginInfo>()
         {
