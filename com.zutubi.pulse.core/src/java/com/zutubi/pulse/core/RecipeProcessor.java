@@ -558,18 +558,18 @@ public class RecipeProcessor
             return commandIndex++;
         }
 
-        public void commandCompleted(ResultState state)
+        public void commandCompleted(ResultState commandState)
         {
-            switch (state)
+            switch (commandState)
             {
                 case FAILURE:
                     if (state != ResultState.ERROR)
                     {
-                        this.state = ResultState.FAILURE;
+                        state = ResultState.FAILURE;
                     }
                     break;
                 case ERROR:
-                    this.state = ResultState.ERROR;
+                    state = ResultState.ERROR;
                     break;
             }
         }
