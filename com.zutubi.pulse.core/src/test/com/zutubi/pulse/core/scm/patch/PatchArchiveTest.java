@@ -16,9 +16,14 @@ import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,6 +34,13 @@ public class PatchArchiveTest extends PulseTestCase
 {
     private static final String TEST_FILENAME = "test.txt";
     private static final String TEST_FILE_CONTENT = "test file";
+    
+    private static final String TEST_DIFF = "--- test.txt\t2010-08-30 15:06:16.840449310 +1000\n" +
+            "+++ test.txt\t2010-08-30 15:06:24.910449120 +1000\n" +
+            "@@ -1 +1 @@\n" +
+            "-test file\n" +
+            "+edited content\n" +
+            "\\ No newline at end of file";
 
     private File tempDir;
     private File wcDir;
@@ -101,6 +113,53 @@ public class PatchArchiveTest extends PulseTestCase
         assertEquals(0, features.size());
     }
 
+    public void testModificationToFileWithExecutablePermissions() throws IOException, PulseException
+    {
+        final String EDITED_CONTENT = "edited content";
+        
+        FileSystemUtils.setExecutable(targetTestFile);
+        FileSystemUtils.createFile(wcTestFile, EDITED_CONTENT);
+
+        WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
+        status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
+
+        List<Feature> features = createAndApplyPatch(status);
+        
+        assertEquals(EDITED_CONTENT, IOUtils.fileToString(targetTestFile));
+        assertEquals(FileSystemUtils.PERMISSION_OWNER_EXECUTE, FileSystemUtils.getPermissions(targetTestFile) & FileSystemUtils.PERMISSION_OWNER_EXECUTE);
+        assertEquals(0, features.size());
+    }
+
+    public void testApplyDiffToFileWithExecutablePermissions() throws IOException, PulseException
+    {
+        final String EDITED_CONTENT = "edited content";
+
+        stub(statusBuilder.canDiff(eq(context), anyString())).toReturn(true);
+        doAnswer(new Answer<Object>()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                OutputStream os = (OutputStream) invocationOnMock.getArguments()[2];
+                OutputStreamWriter writer = new OutputStreamWriter(os);
+                writer.write(TEST_DIFF);
+                writer.flush();
+                return null;
+            }
+        }).when(statusBuilder).diff(eq(context), anyString(), Matchers.<OutputStream>anyObject());
+        
+        FileSystemUtils.setExecutable(targetTestFile);
+        FileSystemUtils.createFile(wcTestFile, EDITED_CONTENT);
+
+        WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
+        status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
+
+        List<Feature> features = createAndApplyPatch(status);
+        
+        assertEquals(EDITED_CONTENT, IOUtils.fileToString(targetTestFile));
+        assertEquals(FileSystemUtils.PERMISSION_OWNER_EXECUTE, FileSystemUtils.getPermissions(targetTestFile) & FileSystemUtils.PERMISSION_OWNER_EXECUTE);
+        assertEquals(0, features.size());
+    }
+    
     public void testApplyDelete() throws IOException, PulseException
     {
         assertTrue(wcTestFile.delete());
@@ -147,7 +206,7 @@ public class PatchArchiveTest extends PulseTestCase
         assertEquals(1, features.size());
         assertThat(features.get(0).getSummary(), containsString("Target file 'notintarget' with status MODIFIED in patch does not exist"));
     }
-
+    
     public void testApplyNewEmptyDirectory() throws PulseException, IOException
     {
         final String DIR_NAME = "iamnew";
