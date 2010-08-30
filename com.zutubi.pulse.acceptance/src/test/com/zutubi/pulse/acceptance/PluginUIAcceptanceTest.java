@@ -3,8 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 
@@ -12,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 
 /**
  * Tests for the plugin management UI.
@@ -69,7 +70,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
             assertTrue(pluginsPage.isPluginPresent(id));
             assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
 
-            xmlRpcHelper.doConfigAction(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AGENT_NAME), AgentConfigurationActions.ACTION_PING);
+            xmlRpcHelper.doConfigAction(PathUtils.getPath(AGENTS_SCOPE, AGENT_NAME), ACTION_PING);
             AcceptanceTestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
