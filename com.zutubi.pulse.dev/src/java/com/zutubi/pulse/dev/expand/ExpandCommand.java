@@ -5,6 +5,8 @@ import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.pulse.dev.client.UserAbortException;
+import com.zutubi.pulse.dev.sync.SynchronisePluginsClientFactory;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.cli.ParseException;
@@ -33,10 +35,16 @@ public class ExpandCommand implements Command
         DevBootstrapManager.startup("com/zutubi/pulse/dev/expand/bootstrap/context/applicationContext.xml");
         try
         {
+            new SynchronisePluginsClientFactory().newInstance().syncIfBare();
+            
             ObjectFactory objectFactory = SpringComponentContext.getBean("objectFactory");
             PulseFileExpander expander = objectFactory.buildBean(PulseFileExpander.class);
             expander.expand(new PulseFileExpanderOptions(argv));
             return 0;
+        }
+        catch (UserAbortException e)
+        {
+            return 2;
         }
         catch (Exception e)
         {

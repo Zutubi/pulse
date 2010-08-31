@@ -28,6 +28,8 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.pulse.dev.client.ClientException;
+import com.zutubi.pulse.dev.sync.SynchronisePluginsClientFactory;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import org.apache.commons.cli.*;
@@ -109,10 +111,12 @@ public class PostProcessCommand implements Command
         return 0;
     }
 
-    private void postProcess(String processorName, String inputFile, String pulseFile, String resourcesFile, PrintStream out)
+    private void postProcess(String processorName, String inputFile, String pulseFile, String resourcesFile, PrintStream out) throws ParseException, ClientException
     {
         DevBootstrapManager.startup("com/zutubi/pulse/dev/local/bootstrap/context/applicationContext.xml");
 
+        new SynchronisePluginsClientFactory().newInstance().syncIfBare();
+        
         try
         {
             File in = checkFile(inputFile, "Input");
@@ -287,7 +291,6 @@ public class PostProcessCommand implements Command
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
         options.put("-p [--pulse-file] file",     "use specified pulse file [default: pulse.xml]");
-        options.put("-o [--output-dir] dir",      "write output to directory [default: pulse.out]");
         options.put("-e [--resources-file] file", "use specified resources file [default: <none>]");
         return options;
     }

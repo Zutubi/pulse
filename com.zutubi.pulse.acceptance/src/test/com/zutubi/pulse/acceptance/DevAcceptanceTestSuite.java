@@ -70,7 +70,11 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(CleanupAcceptanceTest.class);
         suite.addTestSuite(CleanupUIAcceptanceTest.class);
 
+        //--( dev tools tests)--
         suite.addTestSuite(SynchroniseCommandAcceptanceTest.class);
+        suite.addTestSuite(ExpandCommandAcceptanceTest.class);
+        suite.addTestSuite(LocalBuildAcceptanceTest.class);
+        suite.addTestSuite(PostProcessCommandAcceptanceTest.class);
         
         return suite;
     }

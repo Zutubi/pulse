@@ -51,6 +51,7 @@ public class LocalBuildCommand implements Command
         options.put("-q [--require] name[/ver]", "require specified resource with optional version");
         options.put("-e [--resources-file] file", "use specified resources file [default: <none>]");
         options.put("-l [--failure-limit] limit", "limit number of test failures shown [default: 50]");
+        options.put("-v [--verbose]", "show verbose output");
         return options;
     }
 

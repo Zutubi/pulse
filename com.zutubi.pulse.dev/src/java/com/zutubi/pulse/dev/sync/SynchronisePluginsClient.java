@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository;
 import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
 import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.pulse.dev.client.AbstractClient;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.config.DevConfig;
@@ -35,12 +36,34 @@ public class SynchronisePluginsClient extends AbstractClient<DevConfig>
     }
 
     /**
-     * Synchronises the plugins with the Pulse master.
+     * Runs a synchronise if the system has no plugins installed (and the user
+     * agrees).  After this method returns the calling command should continue.
      * 
      * @throws ClientException on any error
      */
-    public void syncPlugins() throws ClientException
+    public void syncIfBare() throws ClientException
     {
+        if (pluginManager.getPlugins().size() == 0)
+        {
+            YesNoResponse response = ui.yesNoPrompt(I18N.format("no.plugins"), false, false, YesNoResponse.YES);
+            if (response.isAffirmative())
+            {
+                syncPlugins();
+            }
+        }
+    }
+    
+    /**
+     * Synchronises the plugins with the Pulse master.
+     * 
+     * @return true if a reboot is required to complete the synchronisation,
+     *         false if it is possible to just continue
+     * @throws ClientException on any error
+     */
+    public boolean syncPlugins() throws ClientException
+    {
+        boolean rebootRequired = false;
+        
         ensureServerConfigured();
 
         HttpPluginRepository repository = new HttpPluginRepository(StringUtils.join("/", true, config.getPulseUrl(), "pluginrepository/"));
@@ -56,7 +79,7 @@ public class SynchronisePluginsClient extends AbstractClient<DevConfig>
             if (requiredActions.isSyncRequired())
             {
                 ui.status(I18N.format("synchronising"));
-                pluginSynchroniser.synchronise(repository, requiredActions);
+                rebootRequired = pluginSynchroniser.synchronise(repository, requiredActions);
                 waitForExtensions();
                 ui.status(I18N.format("synchronisation.complete"));
             }
@@ -64,6 +87,8 @@ public class SynchronisePluginsClient extends AbstractClient<DevConfig>
             {
                 ui.status(I18N.format("plugins.up.to.date"));
             }
+            
+            return rebootRequired;
         }
         catch (Exception e)
         {

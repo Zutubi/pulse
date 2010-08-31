@@ -14,14 +14,17 @@ import java.util.List;
  */
 public class LocalBuildOptions
 {
-    private static final int DEFAULT_FAILURE_LIMIT = 50;
+    public static final String DEFAULT_PULSE_FILE = "pulse.xml";
+    public static final String DEFAULT_OUTPUT_DIRECTORY = "pulse.out";
+    public static final int DEFAULT_FAILURE_LIMIT = 50;
 
-    private String pulseFile = "pulse.xml";
+    private String pulseFile = DEFAULT_PULSE_FILE;
     private String resourcesFile = null;
-    private String outputDir = "pulse.out";
+    private String outputDir = DEFAULT_OUTPUT_DIRECTORY;
     private String recipe = null;
     private List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>();
     private int failureLimit = DEFAULT_FAILURE_LIMIT;
+    private boolean verbose = false;
 
     public LocalBuildOptions()
     {
@@ -57,6 +60,9 @@ public class LocalBuildOptions
                 .withType(Number.class)
                 .create('l'));
 
+        options.addOption(OptionBuilder.withLongOpt("verbose")
+                .create('v'));
+        
         CommandLineParser parser = new GnuParser();
         CommandLine commandLine;
         try
@@ -99,6 +105,11 @@ public class LocalBuildOptions
         if (commandLine.hasOption('l'))
         {
            failureLimit = ((Number) commandLine.getOptionObject('l')).intValue();
+        }
+
+        if (commandLine.hasOption('v'))
+        {
+           verbose = true;
         }
     }
 
@@ -180,5 +191,10 @@ public class LocalBuildOptions
     public void setFailureLimit(int failureLimit)
     {
         this.failureLimit = failureLimit;
+    }
+
+    public boolean isVerbose()
+    {
+        return verbose;
     }
 }

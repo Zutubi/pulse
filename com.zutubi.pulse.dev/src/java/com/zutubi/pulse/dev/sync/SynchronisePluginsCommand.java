@@ -3,9 +3,6 @@ package com.zutubi.pulse.dev.sync;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.plugins.PluginManager;
-import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.dev.client.AbstractClientFactory;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -29,10 +26,7 @@ public class SynchronisePluginsCommand implements Command
         DevBootstrapManager.startup("com/zutubi/pulse/dev/sync/bootstrap/context/applicationContext.xml");
         try
         {
-            SynchronisePluginsClient client = new SynchronisePluginsClientFactory().newInstance(argv);
-            client.setPluginManager(SpringComponentContext.<PluginManager>getBean("pluginManager"));
-            client.setPluginSynchroniser(SpringComponentContext.<PluginSynchroniser>getBean("pluginSynchroniser"));
-            return execute(client);
+            return execute(new SynchronisePluginsClientFactory().newInstance(argv));
         }
         finally
         {

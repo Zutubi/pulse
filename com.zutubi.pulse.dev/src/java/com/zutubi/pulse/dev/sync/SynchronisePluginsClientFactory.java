@@ -1,5 +1,8 @@
 package com.zutubi.pulse.dev.sync;
 
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.dev.client.AbstractClientFactory;
 import com.zutubi.pulse.dev.config.DevConfig;
@@ -17,7 +20,10 @@ public class SynchronisePluginsClientFactory extends AbstractClientFactory<Synch
     @Override
     protected SynchronisePluginsClient newInstance(File base, CompositeConfig uiConfig, ConsoleUI ui, String[] args)
     {
-        return new SynchronisePluginsClient(new DevConfig(base, uiConfig, ui, args), ui);
+        SynchronisePluginsClient client = new SynchronisePluginsClient(new DevConfig(base, uiConfig, ui, args), ui);
+        client.setPluginManager(SpringComponentContext.<PluginManager>getBean("pluginManager"));
+        client.setPluginSynchroniser(SpringComponentContext.<PluginSynchroniser>getBean("pluginSynchroniser"));
+        return client;
     }
 
     @Override
