@@ -3,8 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -19,6 +17,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -82,7 +83,7 @@ public class SeleniumBrowser
     public SeleniumBrowser(int port, String browser)
     {
         this.browser = browser;
-        baseUrl = "http://localhost:" + port + "/";
+        baseUrl = AcceptanceTestUtils.getPulseUrl(port) + "/";
         selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
         urls = new Urls(baseUrl);
     }
@@ -207,7 +208,7 @@ public class SeleniumBrowser
     }
 
     /**
-     * Create {@link #createPage(Class, Object[])} and open
+     * Create {@link #createPage(Class, Object...)} and open
      * {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#open()} a new selenium page.
      *
      * @param pageType      the type of page being opened.
@@ -223,7 +224,7 @@ public class SeleniumBrowser
     }
 
     /**
-     * Create {@link #createPage(Class, Object[])} and waitFor
+     * Create {@link #createPage(Class, Object...)} and waitFor
      * {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#waitFor()} a new selenium page.
      *
      * @param pageType      the type of page being opened.
@@ -239,7 +240,7 @@ public class SeleniumBrowser
     }
 
     /**
-     * Create {@link #createPage(Class, Object[])}, open {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#open()}
+     * Create {@link #createPage(Class, Object...)}, open {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#open()}
      * and waitFor {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#waitFor()} a new selenium page.
      *
      * @param pageType      the type of page being opened.

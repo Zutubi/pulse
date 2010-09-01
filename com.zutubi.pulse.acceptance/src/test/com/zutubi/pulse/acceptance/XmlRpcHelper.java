@@ -59,7 +59,7 @@ public class XmlRpcHelper
 
     public XmlRpcHelper() throws MalformedURLException
     {
-        this(new URL("http", "localhost", AcceptanceTestUtils.getPulsePort(), "/xmlrpc"));
+        this(new URL("http", AcceptanceTestUtils.MASTER_HOST, AcceptanceTestUtils.getPulsePort(), "/xmlrpc"));
     }
 
     public XmlRpcHelper(String url) throws MalformedURLException
@@ -1225,7 +1225,7 @@ public class XmlRpcHelper
 
     public static void main(String[] argv) throws Exception
     {
-        XmlRpcHelper helper = new XmlRpcHelper("http://localhost:8080/xmlrpc");
+        XmlRpcHelper helper = new XmlRpcHelper();
         helper.loginAsAdmin();
         try
         {

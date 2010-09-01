@@ -25,7 +25,7 @@ public class SynchroniseCommandAcceptanceTest extends DevToolsTestBase
         runPluginSync();
         assertTrue(pluginDir.exists());
 
-        HttpPluginRepository repository = new HttpPluginRepository(MASTER_URL + "/" + PluginRepositoryServlet.PATH_REPOSITORY);
+        HttpPluginRepository repository = new HttpPluginRepository(AcceptanceTestUtils.getPulseUrl() + "/" + PluginRepositoryServlet.PATH_REPOSITORY);
         List<PluginInfo> corePlugins = repository.getAvailablePlugins(PluginRepository.Scope.CORE);
         assertEquals(corePlugins.size(), pluginDir.list(new SuffixFileFilter(".jar")).length);
     }

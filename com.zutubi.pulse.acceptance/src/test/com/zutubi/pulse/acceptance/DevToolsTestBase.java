@@ -30,8 +30,6 @@ import static org.hamcrest.Matchers.not;
  */
 public class DevToolsTestBase extends PulseTestCase
 {
-    protected static final String MASTER_URL = "http://localhost:" + AcceptanceTestUtils.getPulsePort();
-    
     protected static final long COMMAND_TIMEOUT_SECS = 300;
     
     protected static final String COMMAND_EXPAND = "expand";
@@ -93,7 +91,7 @@ public class DevToolsTestBase extends PulseTestCase
     
     protected String getServerSetupInputLines()
     {
-        return inputLines(YesNoResponse.YES.name(), YesNoResponse.YES.name(), MASTER_URL, ADMIN_CREDENTIALS.getUserName());
+        return inputLines(YesNoResponse.YES.name(), YesNoResponse.YES.name(), AcceptanceTestUtils.getPulseUrl(), ADMIN_CREDENTIALS.getUserName());
     }
 
     protected String runCommand(String... command) throws Exception
@@ -138,7 +136,7 @@ public class DevToolsTestBase extends PulseTestCase
 
     protected String runPluginSync() throws Exception
     {
-        String output = runCommand(COMMAND_SYNCHRONISE, FLAG_SERVER, MASTER_URL);
+        String output = runCommand(COMMAND_SYNCHRONISE, FLAG_SERVER, AcceptanceTestUtils.getPulseUrl());
         
         // Quick check for good and bad signs.
         String lowerOutput = output.toLowerCase();

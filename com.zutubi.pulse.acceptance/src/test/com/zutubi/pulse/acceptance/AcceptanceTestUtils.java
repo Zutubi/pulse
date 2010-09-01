@@ -14,16 +14,22 @@ import freemarker.template.utility.StringUtil;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 public class AcceptanceTestUtils
 {
+    /**
+     * The host portion of the master URL.
+     */
+    public static final String MASTER_HOST = "localhost";
+    
     /**
      * The acceptance test system property for the built pulse package.
      */
@@ -67,7 +73,7 @@ public class AcceptanceTestUtils
     {
         return Integer.getInteger(PROPERTY_PULSE_PORT, 8080);
     }
-
+    
     public static void setPulsePort(int port)
     {
         System.setProperty(PROPERTY_PULSE_PORT, Integer.toString(port));
@@ -76,6 +82,16 @@ public class AcceptanceTestUtils
     public static int getAgentPort()
     {
         return Integer.getInteger(PROPERTY_AGENT_PORT, 8890);
+    }
+    
+    public static String getPulseUrl()
+    {
+        return getPulseUrl(getPulsePort());
+    }
+
+    public static String getPulseUrl(int port)
+    {
+        return "http://" + MASTER_HOST + ":" + port;
     }
 
     public static File getWorkingDirectory()

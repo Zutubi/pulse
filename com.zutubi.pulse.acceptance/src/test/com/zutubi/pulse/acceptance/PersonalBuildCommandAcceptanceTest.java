@@ -90,7 +90,7 @@ public class PersonalBuildCommandAcceptanceTest extends DevToolsTestBase
 
         return runCommandWithInput(inputLines(YesNoResponse.YES.name()),
                 COMMAND_PERSONAL,
-                FLAG_SERVER, MASTER_URL,
+                FLAG_SERVER, AcceptanceTestUtils.getPulseUrl(),
                 FLAG_USER, ADMIN_CREDENTIALS.getUserName(),
                 FLAG_PASSWORD, ADMIN_CREDENTIALS.getPassword(),
                 FLAG_PROJECT, projectName,
