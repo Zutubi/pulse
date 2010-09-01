@@ -8,6 +8,7 @@ import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
@@ -285,10 +286,10 @@ public class SeleniumBrowser
         }
     }
 
-    public void login(String username, String password)
+    public boolean login(String username, String password)
     {
         LoginPage page = this.openAndWaitFor(LoginPage.class);
-        page.login(username, password);
+        return page.login(username, password) instanceof WelcomePage;
     }
 
     public void loginAsAdmin()

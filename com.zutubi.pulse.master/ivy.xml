@@ -62,5 +62,8 @@
         <dependency org="flexjson" name="flexjson" rev="1.6" conf="external,build,release->default;src->src"/>
         <dependency org="jfree" name="jfreechart" rev="1.0.0-rc1" conf="external,build,release->default;src->src"/>
 
+        <!-- Test dependencies-->
+        <dependency org="org.apache.directory" name="org.apache.directory.server" rev="1.5.7"  conf="build->default;src->src"/>
+
     </dependencies>
 </ivy-module>

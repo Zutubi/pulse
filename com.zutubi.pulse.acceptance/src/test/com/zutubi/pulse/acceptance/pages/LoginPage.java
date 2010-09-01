@@ -28,7 +28,7 @@ public class LoginPage extends SeleniumPage
         return urls.login();
     }
 
-    public WelcomePage login(String username, String password)
+    public SeleniumPage login(String username, String password)
     {
         LoginForm form = browser.createForm(LoginForm.class);
         form.waitFor();
@@ -36,8 +36,15 @@ public class LoginPage extends SeleniumPage
         try
         {
             WelcomePage welcomePage = browser.createPage(WelcomePage.class);
-            welcomePage.waitFor();
-            return welcomePage;
+            browser.waitForPageToLoad();
+            if (welcomePage.isPresent())
+            {
+                return welcomePage;
+            }
+            else
+            {
+                return this;
+            }
         }
         catch (Exception e)
         {

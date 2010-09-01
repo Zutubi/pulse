@@ -27,6 +27,6 @@
         <dependency org="sun" name="javamail" rev="1.3.2" conf="build,release->default;src->src"/>
 
         <!-- Test dependencies-->
-        <dependency org="junit" name="junit" rev="3.8.1"  conf="build->default;src->src"/>
+        <dependency org="junit" name="junit" rev="4.8.2"  conf="build->default;src->src"/>
     </dependencies>
 </ivy-module>

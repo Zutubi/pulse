@@ -36,7 +36,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     private LdapManager ldapManager;
 
     /**
-     * Implementation of the {@link org.acegisecurity.providers.AuthenticationProvider#authenticate(org.acegisecurity.Authentication)}
+     * Implementation of the {@link org.springframework.security.providers.AuthenticationProvider#authenticate(org.springframework.security.Authentication)}
      * method.
      *
      * This implementation will attempt to add an unknown user to the system if they are
