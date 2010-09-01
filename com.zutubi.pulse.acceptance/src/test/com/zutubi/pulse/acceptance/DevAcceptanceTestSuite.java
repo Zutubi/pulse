@@ -75,7 +75,9 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ExpandCommandAcceptanceTest.class);
         suite.addTestSuite(LocalBuildAcceptanceTest.class);
         suite.addTestSuite(PostProcessCommandAcceptanceTest.class);
-        
+
+        suite.addTestSuite(LdapAcceptanceTest.class);
+
         return suite;
     }
 }
