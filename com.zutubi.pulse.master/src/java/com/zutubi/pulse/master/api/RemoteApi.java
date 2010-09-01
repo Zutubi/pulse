@@ -7,7 +7,14 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.scm.ScmLocation;
+import com.zutubi.pulse.core.plugins.Plugin;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
+import com.zutubi.pulse.core.plugins.repository.PluginInfo;
+import com.zutubi.pulse.core.plugins.repository.PluginList;
+import com.zutubi.pulse.core.plugins.repository.PluginRepository;
+import com.zutubi.pulse.core.plugins.repository.PluginScopePredicate;
+import com.zutubi.pulse.core.scm.PersonalBuildInfo;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
@@ -87,6 +94,7 @@ public class RemoteApi
     private FatController fatController;
     private BuildResultDao buildResultDao;
     private BuildRequestRegistry buildRequestRegistry;
+    private PluginManager pluginManager;
 
     public RemoteApi()
     {
@@ -3781,7 +3789,7 @@ public class RemoteApi
      * @return SCM configuration details for the project
      * @throws ScmException if there is an error retrieving SCM details
      */
-    public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws ScmException
+    public Hashtable<String, Object> preparePersonalBuild(String token, String projectName) throws ScmException
     {
         User user = tokenManager.loginAndReturnUser(token);
         if (!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
@@ -3791,17 +3799,23 @@ public class RemoteApi
 
         try
         {
+            final Hashtable<String, Object> result = new Hashtable<String, Object>();
             final ProjectConfiguration projectConfig = internalGetProject(projectName, false).getConfig();
-            return withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Hashtable<String, String>>()
+            result.put(PersonalBuildInfo.SCM_TYPE, projectConfig.getScm().getType());
+
+            withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
             {
-                public Hashtable<String, String> process(ScmClient client, ScmContext context) throws ScmException
+                public Object process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    Hashtable<String, String> scmDetails = new Hashtable<String, String>();
-                    scmDetails.put(ScmLocation.TYPE, projectConfig.getScm().getType());
-                    scmDetails.put(ScmLocation.LOCATION, client.getLocation());
-                    return scmDetails;
+                    result.put(PersonalBuildInfo.SCM_LOCATION, client.getLocation());
+                    return null;
                 }
             });
+
+            List<Plugin> runningPlugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+            List<PluginInfo> coreInfos = CollectionUtils.filter(PluginList.toInfos(runningPlugins), new PluginScopePredicate(PluginRepository.Scope.CORE));
+            result.put(PersonalBuildInfo.PLUGINS, new Vector<Hashtable<String, Object>>(PluginList.infosToHashes(coreInfos)));
+            return result;
         }
         finally
         {
@@ -4241,5 +4255,10 @@ public class RemoteApi
     public void setBuildRequestRegistry(BuildRequestRegistry buildRequestRegistry)
     {
         this.buildRequestRegistry = buildRequestRegistry;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
     }
 }

@@ -33,19 +33,25 @@ public class PluginListTest extends PulseTestCase
         assertEquals(asList(INFO_CORE), PluginList.toInfos(asList(plugin)));
     }
     
-    public void testToHashes()
+    public void testPluginsToHashes()
     {
         Plugin plugin = makePluginWithDependencies();
         doReturn(INFO_CORE.getId()).when(plugin).getId();
         doReturn(new PluginVersion(INFO_CORE.getVersion())).when(plugin).getVersion();
         
-        List<Hashtable<String, Object>> hashes = PluginList.toHashes(asList(plugin));
+        List<Hashtable<String, Object>> hashes = PluginList.pluginsToHashes(asList(plugin));
         assertEquals(1, hashes.size());
         Hashtable<String, Object> expected = new Hashtable<String, Object>();
         expected.put("id", INFO_CORE.getId());
         expected.put("version", INFO_CORE.getVersion());
         expected.put("scope", INFO_CORE.getScope().toString());
         assertEquals(expected, hashes.get(0));
+    }
+    
+    public void testInfosToFromHashes()
+    {
+        List<PluginInfo> infos = asList(INFO_CORE, INFO_SERVER, INFO_MASTER);
+        assertEquals(infos, PluginList.infosFromHashes(PluginList.infosToHashes(infos)));
     }
     
     public void testGetScopeNoDependencies()

@@ -3,6 +3,8 @@ package com.zutubi.pulse.dev.personal;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
@@ -88,6 +90,8 @@ public class PersonalBuildCommand implements Command
         {
             PersonalBuildClient client = new PersonalBuildClientFactory().newInstance(argv);
             client.setPatchFormatFactory((PatchFormatFactory) SpringComponentContext.getBean("patchFormatFactory"));
+            client.setPluginManager((PluginManager) SpringComponentContext.getBean("pluginManager"));
+            client.setPluginSynchroniser((PluginSynchroniser) SpringComponentContext.getBean("pluginSynchroniser"));
             return execute(client);
         }
         finally

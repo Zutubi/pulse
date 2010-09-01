@@ -76,7 +76,9 @@ public abstract class AbstractClient<T extends DevConfig>
         try
         {
             int serverBuild = rpc.getVersion();
-            if (serverBuild != ourBuild)
+            // A negative server build indicates a development setup, in which
+            // case we assume the user knows what they are doing (hmmm...).
+            if (serverBuild >= 0 && serverBuild != ourBuild)
             {
                 ui.debug(String.format("Server build (%d) does not match local build (%d)", serverBuild, ourBuild));
                 if (serverBuild != confirmedBuild)

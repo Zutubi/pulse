@@ -14,6 +14,8 @@ public class PersonalBuildConfig extends DevConfig
 {
     public static final String PROPERTY_PROJECT = "project";
 
+    public static final String PROPERTY_SYNC_PLUGINS = "sync.plugins";
+    
     public static final String PROPERTY_CHECK_REPOSITORY = "check.repository";
 
     public static final String PROPERTY_REVISION = "revision";
@@ -44,6 +46,16 @@ public class PersonalBuildConfig extends DevConfig
     public boolean setCheckRepository(boolean check)
     {
         return setBooleanProperty(PROPERTY_CHECK_REPOSITORY, check);
+    }
+
+    public Boolean getSyncPlugins()
+    {
+        return getBooleanProperty(PROPERTY_SYNC_PLUGINS, null);
+    }
+
+    public boolean setSyncPlugins(boolean sync)
+    {
+        return setBooleanProperty(PROPERTY_SYNC_PLUGINS, sync);
     }
 
     public Boolean getUpdate()

@@ -359,4 +359,10 @@ public abstract class LocalPlugin implements Plugin
         pluginState = State.ERROR;
         addErrorMessage(errorMessage);
     }
+
+    @Override
+    public String toString()
+    {
+        return getId() + ":" + getVersion() + ":" + getState() + ":" + getErrorMessages();
+    }
 }

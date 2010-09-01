@@ -1,7 +1,11 @@
 package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.scm.ScmLocation;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.repository.PluginInfo;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
+import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
+import com.zutubi.pulse.core.scm.PersonalBuildInfo;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.*;
@@ -14,6 +18,7 @@ import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.pulse.dev.client.AbstractClient;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.client.UserAbortException;
+import com.zutubi.pulse.dev.sync.SynchronisePluginsClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
@@ -51,7 +56,11 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
     static final String REVISION_OPTION_GOOD     = "@good";
     static final String REVISION_OPTION_CUSTOM   = "@custom";
 
+    private static final int EXIT_REBOOT = 111;
+    
     private PatchFormatFactory patchFormatFactory;
+    private PluginManager pluginManager;
+    private PluginSynchroniser pluginSynchroniser;
 
     public PersonalBuildClient(PersonalBuildConfig config, UserInterface ui)
     {
@@ -109,17 +118,19 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
         try
         {
             ui.debug("Checking configuration and obtaining project SCM details...");
-            ScmLocation scmLocation = rpc.preparePersonalBuild(token, config.getProject());
+            PersonalBuildInfo personalBuildInfo = rpc.preparePersonalBuild(token, config.getProject());
             ui.debug("Configuration accepted.");
 
-            String scmType = scmLocation.getType();
+            checkPlugins(personalBuildInfo.getPlugins());
+            
+            String scmType = personalBuildInfo.getScmType();
             ui.debug("SCM type: " + scmType);
 
             WorkingCopyContext context = new WorkingCopyContextImpl(config.getBase(), config, ui);
             WorkingCopy wc = WorkingCopyFactory.create(scmType);
             if (config.getPatchFile() == null)
             {
-                checkRepositoryIfRequired(wc, context, scmLocation);
+                checkRepositoryIfRequired(wc, context, personalBuildInfo);
 
                 Pair<String, PatchFormat> typeAndFormat = patchFormatFactory.createByScmType(scmType);
                 if (typeAndFormat == null)
@@ -145,12 +156,66 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
         }
     }
 
-    private void checkRepositoryIfRequired(WorkingCopy wc, WorkingCopyContext context, ScmLocation scmLocation) throws ScmException, UserAbortException
+    private void checkPlugins(List<PluginInfo> plugins) throws ClientException
+    {
+        ui.debug("Checking if plugins are in sync with master...");
+        
+        SynchronisationActions requiredActions = pluginSynchroniser.determineRequiredActions(plugins);
+        if (requiredActions.isSyncRequired())
+        {
+            ui.debug("Sync is required.");
+            Boolean syncPreference = config.getSyncPlugins();
+            boolean sync;
+            if (syncPreference == null)
+            {
+                YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.sync.required"), true, true, YesNoResponse.YES);
+                if (response.isPersistent())
+                {
+                    config.setSyncPlugins(response.isAffirmative());
+                }
+                
+                sync = response.isAffirmative();
+            }
+            else
+            {
+                sync = syncPreference;
+                if (sync)
+                {
+                    ui.status(I18N.format("sync.required"));
+                }
+            }
+            
+            if (sync)
+            {
+                synchronisePlugins();
+            }
+        }
+        else
+        {
+            ui.debug("No sync required.");
+        }
+        
+        ui.debug("Plugin check complete.");
+    }
+
+    private void synchronisePlugins() throws ClientException
+    {
+        SynchronisePluginsClient syncClient = new SynchronisePluginsClient(config, ui);
+        syncClient.setPluginManager(pluginManager);
+        syncClient.setPluginSynchroniser(pluginSynchroniser);
+        if (syncClient.syncPlugins())
+        {
+            ui.status(I18N.format("restarting"));
+            System.exit(EXIT_REBOOT);
+        }
+    }
+
+    private void checkRepositoryIfRequired(WorkingCopy wc, WorkingCopyContext context, PersonalBuildInfo personalBuildInfo) throws ScmException, UserAbortException
     {
         if (config.getCheckRepository())
         {
             ui.debug("Checking working copy matches project SCM configuration");
-            if (!wc.matchesLocation(context, scmLocation.getLocation()))
+            if (!wc.matchesLocation(context, personalBuildInfo.getScmLocation()))
             {
                 YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.wc.mismatch", config.getProject()), true, false, YesNoResponse.NO);
                 if (response.isPersistent())
@@ -474,5 +539,15 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
     public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
     {
         this.patchFormatFactory = patchFormatFactory;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
+    }
+
+    public void setPluginSynchroniser(PluginSynchroniser pluginSynchroniser)
+    {
+        this.pluginSynchroniser = pluginSynchroniser;
     }
 }

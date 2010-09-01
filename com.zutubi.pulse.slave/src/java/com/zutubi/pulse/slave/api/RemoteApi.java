@@ -52,7 +52,7 @@ public class RemoteApi
     {
         checkToken(token);
         List<Plugin> plugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
-        return new Vector<Hashtable<String, Object>>(PluginList.toHashes(plugins));
+        return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
     
     private void checkToken(String token) throws AuthenticationException

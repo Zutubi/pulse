@@ -1,6 +1,7 @@
 package com.zutubi.pulse.dev.xmlrpc;
 
-import com.zutubi.pulse.core.scm.ScmLocation;
+import com.zutubi.pulse.core.plugins.repository.PluginList;
+import com.zutubi.pulse.core.scm.PersonalBuildInfo;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcClientException;
 import org.apache.xmlrpc.XmlRpcTransport;
@@ -77,10 +78,14 @@ public class PulseXmlRpcClient
         }
     }
 
-    public ScmLocation preparePersonalBuild(String token, String projectName)
+    public PersonalBuildInfo preparePersonalBuild(String token, String projectName)
     {
-        Hashtable<String, String> result = execute("RemoteApi.preparePersonalBuild", token, projectName);
-        return new ScmLocation(result.get(ScmLocation.TYPE), result.get(ScmLocation.LOCATION));
+        Hashtable<String, Object> result = execute("RemoteApi.preparePersonalBuild", token, projectName);
+        String scmType = (String) result.get(PersonalBuildInfo.SCM_TYPE);
+        String scmLocation = (String) result.get(PersonalBuildInfo.SCM_LOCATION);
+        @SuppressWarnings({"unchecked"})
+        Vector<Hashtable<String, Object>> hashes = (Vector<Hashtable<String, Object>>) result.get(PersonalBuildInfo.PLUGINS);
+        return new PersonalBuildInfo(scmType, scmLocation, PluginList.infosFromHashes(hashes));
     }
 
     @SuppressWarnings({"unchecked"})

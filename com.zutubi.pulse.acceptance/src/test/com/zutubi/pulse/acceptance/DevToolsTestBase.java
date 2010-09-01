@@ -36,10 +36,18 @@ public class DevToolsTestBase extends PulseTestCase
     
     protected static final String COMMAND_EXPAND = "expand";
     protected static final String COMMAND_LOCAL = "local";
+    protected static final String COMMAND_PERSONAL = "personal";
     protected static final String COMMAND_PROCESS = "process";
     protected static final String COMMAND_SYNCHRONISE = "synchronise";
-    
+
+    protected static final String FLAG_NO_UPDATE = "--no-update";
+    protected static final String FLAG_PASSWORD = "-p";
+    protected static final String FLAG_PATCH_FILE = "-f";
+    protected static final String FLAG_PATCH_TYPE = "-t";
+    protected static final String FLAG_PROJECT = "-r";
+    protected static final String FLAG_REVISION = "-e";
     protected static final String FLAG_SERVER = "-s";
+    protected static final String FLAG_USER = "-u";
     
     protected static final String PROMPT_NO_PLUGINS = "Synchronise plugins with a Pulse master now?";
     protected static final String OUTPUT_SYNC_COMPLETE = "Synchronisation complete.";

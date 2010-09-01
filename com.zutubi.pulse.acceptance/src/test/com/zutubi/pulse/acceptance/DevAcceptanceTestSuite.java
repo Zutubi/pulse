@@ -74,6 +74,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(SynchroniseCommandAcceptanceTest.class);
         suite.addTestSuite(ExpandCommandAcceptanceTest.class);
         suite.addTestSuite(LocalBuildAcceptanceTest.class);
+        suite.addTestSuite(PersonalBuildCommandAcceptanceTest.class);
         suite.addTestSuite(PostProcessCommandAcceptanceTest.class);
 
         suite.addTestSuite(LdapAcceptanceTest.class);

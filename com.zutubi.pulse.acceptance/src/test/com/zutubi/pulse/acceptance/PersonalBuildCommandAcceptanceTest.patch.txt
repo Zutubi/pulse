@@ -1,0 +1,13 @@
+Index: build.xml
+===================================================================
+--- build.xml	(revision 16)
++++ build.xml	(working copy)
+@@ -3,8 +3,5 @@
+     <target name="default">
+         <sleep seconds="1"/>
+     </target>
+-    <target name="slow">
+-        <sleep seconds="100"/>
+-    </target>
+ </project>
+ 

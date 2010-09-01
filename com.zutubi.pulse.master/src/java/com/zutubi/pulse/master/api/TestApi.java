@@ -115,7 +115,7 @@ public class TestApi
     {
         tokenManager.verifyAdmin(token);
         List<Plugin> plugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
-        return new Vector<Hashtable<String, Object>>(PluginList.toHashes(plugins));
+        return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
 
     private Agent internalGetAgent(String name) throws IllegalArgumentException

@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.patchformats.unified.UnifiedPatchFormat;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
+import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.git.GitClient;
 import com.zutubi.pulse.core.scm.git.GitPatchFormat;
@@ -19,11 +21,15 @@ import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.io.IOUtils;
+import org.mockito.Matchers;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 /**
  * The personal build runner is an acceptance test support class that
@@ -168,6 +174,10 @@ public class PersonalBuildRunner
         PersonalBuildConfig config = new PersonalBuildConfig(base, ui);
         PersonalBuildClient client = new PersonalBuildClient(config, ui);
         client.setPatchFormatFactory(patchFormatFactory);
+        
+        PluginSynchroniser pluginSynchroniser = mock(PluginSynchroniser.class);
+        doReturn(new SynchronisationActions()).when(pluginSynchroniser).determineRequiredActions(Matchers.anyList());
+        client.setPluginSynchroniser(pluginSynchroniser);
 
         PersonalBuildCommand command = new PersonalBuildCommand();
         int exitCode = command.execute(client);

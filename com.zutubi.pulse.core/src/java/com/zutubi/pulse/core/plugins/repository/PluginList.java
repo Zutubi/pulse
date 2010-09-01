@@ -26,6 +26,10 @@ public class PluginList
     public static final String ATTRIBUTE_VERSION = "version";
     public static final String ATTRIBUTE_SCOPE   = "scope";
 
+    private static final String KEY_ID      = "id";
+    private static final String KEY_VERSION = "version";
+    private static final String KEY_SCOPE   = "scope";
+    
     /**
      * Converts a list of plugins to corresponding plugins infos.
      * 
@@ -48,20 +52,92 @@ public class PluginList
      * 
      * @param plugins the plugins to convert
      * @return a list of hashstables corresponding to the input
+     * 
+     * @see #infosToHashes(List) 
+     * @see #infosFromHashes(List)
      */
-    public static List<Hashtable<String, Object>> toHashes(List<Plugin> plugins)
+    public static List<Hashtable<String, Object>> pluginsToHashes(List<Plugin> plugins)
     {
         return CollectionUtils.map(plugins, new Mapping<Plugin, Hashtable<String, Object>>()
         {
             public Hashtable<String, Object> map(Plugin plugin)
             {
                 Hashtable<String, Object> hash = new Hashtable<String, Object>();
-                hash.put("id", plugin.getId());
-                hash.put("version", plugin.getVersion().toString());
-                hash.put("scope", getScope(plugin).toString());
+                hash.put(KEY_ID, plugin.getId());
+                hash.put(KEY_VERSION, plugin.getVersion().toString());
+                hash.put(KEY_SCOPE, getScope(plugin).toString());
                 return hash;
             }
         });
+    }
+
+    /**
+     * Converts a list of plugin infos to corresponding hashtables.
+     * 
+     * @param pluginInfos the infos to convert
+     * @return a list of hashstables corresponding to the input
+     * 
+     * @see #pluginsToHashes(List) 
+     * @see #infosFromHashes(List)
+     */
+    public static List<Hashtable<String, Object>> infosToHashes(List<PluginInfo> pluginInfos)
+    {
+        return CollectionUtils.map(pluginInfos, new Mapping<PluginInfo, Hashtable<String, Object>>()
+        {
+            public Hashtable<String, Object> map(PluginInfo info)
+            {
+                Hashtable<String, Object> hash = new Hashtable<String, Object>();
+                hash.put(KEY_ID, info.getId());
+                hash.put(KEY_VERSION, info.getVersion());
+                hash.put(KEY_SCOPE, info.getScope().name());
+                return hash;
+            }
+        });
+    }
+    
+    /**
+     * Converts a list hashtables to corresponding plugin infos.
+     * 
+     * @param hashes the hashes to convert
+     * @return a list of plugin infors corresponding to the input
+     * 
+     * @see #infosToHashes(List) 
+     * @see #pluginsToHashes(List) 
+     */
+    public static List<PluginInfo> infosFromHashes(List<Hashtable<String, Object>> hashes)
+    {
+        List<PluginInfo> result = new LinkedList<PluginInfo>();
+        for (Hashtable<String, Object> hash: hashes)
+        {
+            if (keysValid(hash))
+            {
+                String id = (String) hash.get(KEY_ID);
+                String version = (String) hash.get(KEY_VERSION);
+                String scope = (String) hash.get(KEY_SCOPE);
+
+                try
+                {
+                    result.add(new PluginInfo(id, version, PluginRepository.Scope.valueOf(scope)));
+                }
+                catch (IllegalArgumentException e)
+                {
+                    LOG.warning("Ignoring hash with invalid scope '" + scope + "'");
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private static boolean keysValid(Hashtable<String, Object> hash)
+    {
+        return keyValid(hash, KEY_ID) && keyValid(hash, KEY_VERSION) && keyValid(hash, KEY_SCOPE);
+    }
+
+    private static boolean keyValid(Hashtable<String, Object> hash, String key)
+    {
+        Object value = hash.get(key);
+        return value != null && value instanceof String;
     }
 
     /**
