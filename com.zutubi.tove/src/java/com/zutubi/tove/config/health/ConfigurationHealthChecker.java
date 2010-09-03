@@ -7,15 +7,14 @@ import com.zutubi.tove.config.ConfigurationScopeInfo;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 
 /**
  * The health checker can be used to check the internal consistency of a tove
@@ -98,7 +97,7 @@ public class ConfigurationHealthChecker
                     CompositeType templatedItemType = (CompositeType) scope.getType().getTargetType();
                     Record templatedCollectionRecord = recordManager.select(scope.getScopeName());
                     String itemKey = elements[1];
-                    if (checkTemplatedCollectionItemStructure(scope.getScopeName(), templatedItemType, templatedCollectionRecord, itemKey, report))
+                    if (checkTemplatedCollectionItemStructure(scope.getScopeName(), templatedCollectionRecord, itemKey, report))
                     {
                         checkTemplatedCollectionItem(scope.getScopeName(), templatedItemType, itemKey, report);
                     }
@@ -147,8 +146,9 @@ public class ConfigurationHealthChecker
      * Finds and automatically heals configuration problems under the given
      * path, if possible.  Refer to {@link #healAll()} for more details. 
      * 
+     * @param path the path to heal
      * @return a health report giving the current state of the configuration
-     *         when this method returns
+     *         under the path when this method returns
      * 
      * @see #healAll()  
      */
@@ -237,7 +237,7 @@ public class ConfigurationHealthChecker
         {
             for (String item : templateCollectionRecord.nestedKeySet())
             {
-                checkTemplatedCollectionItemStructure(scopeName, type, templateCollectionRecord, item, report);
+                checkTemplatedCollectionItemStructure(scopeName, templateCollectionRecord, item, report);
             }
         }
         
@@ -282,7 +282,7 @@ public class ConfigurationHealthChecker
         return true;
     }
 
-    private boolean checkTemplatedCollectionItemStructure(String scopeName, CompositeType type, Record templateCollectionRecord, String itemKey, ConfigurationHealthReport report)
+    private boolean checkTemplatedCollectionItemStructure(String scopeName, Record templateCollectionRecord, String itemKey, ConfigurationHealthReport report)
     {
         int problemsBefore = report.getProblemCount();
 
@@ -575,14 +575,7 @@ public class ConfigurationHealthChecker
 
     private boolean isTypeSimple(Type type)
     {
-        if (type instanceof SimpleType)
-        {
-            return true;
-        }
-        else
-        {
-            return type instanceof CollectionType && type.getTargetType() instanceof SimpleType;
-        }
+        return type instanceof SimpleType || type instanceof CollectionType && type.getTargetType() instanceof SimpleType;
     }
 
     private void checkReferences(String path, CompositeType type, Record record, ConfigurationHealthReport report)
@@ -608,7 +601,14 @@ public class ConfigurationHealthChecker
                 {
                     for (String handleString : value)
                     {
-                        checkReference(path, record, property, referenceType, handleString, report);
+                        if (ReferenceType.NULL_REFERENCE.equals(handleString))
+                        {
+                            report.addProblem(new NullReferenceInCollectionProblem(path, I18N.format("collection.reference.handle.null", property.getName()), property.getName()));
+                        }
+                        else
+                        {
+                            checkReference(path, record, property, referenceType, handleString, report);
+                        }
                     }
                 }
             }

@@ -9,21 +9,18 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
+import com.zutubi.tove.type.ReferenceType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import static java.util.Arrays.asList;
+import java.util.*;
 
 public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemTestCase
 {
@@ -303,6 +300,24 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         recordManager.update(hookPath, hookRecord);
         
         checkAllTest(new InvalidReferenceProblem(hookPath, I18N.format("reference.handle.unknown", "stage"), "stage", "388765"));
+    }
+
+    public void testCheckAllCollectionReferenceHandleNull()
+    {
+        Artifact artifact = new Artifact("a");
+        Command command = new Command("c");
+        command.addArtifact(artifact);
+        Recipe recipe = new Recipe("r");
+        recipe.addCommand(command);
+        Project project = new Project("p");
+        project.addRecipe(recipe);
+        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, project);
+        String artifactPath = getPath(projectPath, "recipes", "r", "commands", "c", "artifacts", "a");
+        MutableRecord artifactRecord = recordManager.select(artifactPath).copy(false, true);
+        artifactRecord.put("processors", new String[]{ReferenceType.NULL_REFERENCE});
+        recordManager.update(artifactPath, artifactRecord);
+
+        checkAllTest(new NullReferenceInCollectionProblem(artifactPath, I18N.format("collection.reference.handle.null", "processors"), "processors"));
     }
 
     public void testCheckAllReferenceHandleInvalidInChild()
@@ -646,6 +661,8 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         private Options options;
         private Scm scm;
         private List<Label> labels = new LinkedList<Label>();
+        private Map<String, Processor> processors = new HashMap<String, Processor>();
+        private Map<String, Recipe> recipes = new HashMap<String, Recipe>();
         @Ordered
         private Map<String, Stage> stages = new HashMap<String, Stage>();
         private Map<String, Hook> hooks = new HashMap<String, Hook>();
@@ -704,6 +721,36 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
             labels.add(label);
         }
 
+        public Map<String, Processor> getProcessors()
+        {
+            return processors;
+        }
+
+        public void setProcessors(Map<String, Processor> processors)
+        {
+            this.processors = processors;
+        }
+
+        public void addProcessor(Processor processor)
+        {
+            processors.put(processor.getName(), processor);
+        }
+
+        public Map<String, Recipe> getRecipes()
+        {
+            return recipes;
+        }
+
+        public void setRecipes(Map<String, Recipe> recipes)
+        {
+            this.recipes = recipes;
+        }
+
+        public void addRecipe(Recipe recipe)
+        {
+            recipes.put(recipe.getName(), recipe);
+        }
+        
         public Map<String, Stage> getStages()
         {
             return stages;
@@ -798,7 +845,113 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
             this.client = client;
         }
     }
-    
+
+    @SymbolicName("processor")
+    public static class Processor extends AbstractNamedConfiguration
+    {
+        public Processor()
+        {
+        }
+
+        public Processor(String name)
+        {
+            super(name);
+        }
+    }
+
+    @SymbolicName("recipe")
+    public static class Recipe extends AbstractNamedConfiguration
+    {
+        @Ordered
+        private Map<String, Command> commands = new LinkedHashMap<String, Command>();
+
+        public Recipe()
+        {
+        }
+
+        public Recipe(String name)
+        {
+            super(name);
+        }
+
+        public Map<String, Command> getCommands()
+        {
+            return commands;
+        }
+
+        public void setCommands(Map<String, Command> commands)
+        {
+            this.commands = commands;
+        }
+
+        public void addCommand(Command command)
+        {
+            commands.put(command.getName(), command);
+        }
+    }
+
+    @SymbolicName("command")
+    public static class Command extends AbstractNamedConfiguration
+    {
+        @Ordered
+        private Map<String, Artifact> artifacts = new LinkedHashMap<String, Artifact>();
+
+        public Command()
+        {
+        }
+
+        public Command(String name)
+        {
+            super(name);
+        }
+
+        public Map<String, Artifact> getArtifacts()
+        {
+            return artifacts;
+        }
+
+        public void setArtifacts(Map<String, Artifact> artifacts)
+        {
+            this.artifacts = artifacts;
+        }
+
+        public void addArtifact(Artifact artifact)
+        {
+            artifacts.put(artifact.getName(), artifact);
+        }
+    }
+
+    @SymbolicName("artifact")
+    public static class Artifact extends AbstractNamedConfiguration
+    {
+        @Reference
+        private List<Processor> processors = new LinkedList<Processor>();
+
+        public Artifact()
+        {
+        }
+
+        public Artifact(String name)
+        {
+            super(name);
+        }
+
+        public List<Processor> getProcessors()
+        {
+            return processors;
+        }
+
+        public void setProcessors(List<Processor> processors)
+        {
+            this.processors = processors;
+        }
+
+        public void addProcessor(Processor processor)
+        {
+            processors.add(processor);
+        }
+    }
+
     @SymbolicName("label")
     public static class Label extends AbstractConfiguration
     {
