@@ -970,7 +970,25 @@ public class DefaultBuildController implements EventListener, BuildController
 
     public long getBuildResultId()
     {
-        return buildResult.getId();
+        if (buildResult != null)
+        {
+            return buildResult.getId();
+        }
+        return -1;
+    }
+
+    public long getBuildNumber()
+    {
+        if (buildResult != null)
+        {
+            return buildResult.getNumber();
+        }
+        return -1;
+    }
+
+    public boolean isBuildPersistent()
+    {
+        return buildResult != null && buildResult.isPersistent();
     }
 
     private void publishEvent(Event evt)

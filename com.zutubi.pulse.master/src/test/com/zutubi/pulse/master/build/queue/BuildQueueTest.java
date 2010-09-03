@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
@@ -369,6 +370,33 @@ public class BuildQueueTest extends BaseQueueTestCase
 
         assertActivated(r1.getRequest());
         assertQueued(r2.getRequest());
+    }
+
+    public void testExceptionInControllerStartBeforeResultIsPersistent()
+    {
+        QueuedRequest request = activeRequest("a");
+        BuildController controller = controllers.get(request.getRequest());
+        doThrow(new RuntimeException("Something bad this way comes.")).when(controller).start();
+        buildQueue.enqueue(request);
+
+        assertActivated();
+        assertQueued();
+        verify(buildRequestRegistry, times(1)).requestRejected((BuildRequestEvent) anyObject(), anyString());
+        verify(buildRequestRegistry, never()).requestActivated((BuildRequestEvent) anyObject(), anyLong());
+    }
+
+    public void testExceptionInControllerStartAfterResultIsPersistent()
+    {
+        QueuedRequest request = activeRequest("a");
+        BuildController controller = controllers.get(request.getRequest());
+        doReturn(true).when(controller).isBuildPersistent();
+        doThrow(new RuntimeException("Something bad that way goes.")).when(controller).start();
+        buildQueue.enqueue(request);
+
+        assertActivated();
+        assertQueued();
+        verify(buildRequestRegistry, never()).requestRejected(eq(request.getRequest()), anyString());
+        verify(buildRequestRegistry, times(1)).requestActivated((BuildRequestEvent) anyObject(), anyLong());
     }
 
     private void assertQueued(BuildRequestEvent... requests)
