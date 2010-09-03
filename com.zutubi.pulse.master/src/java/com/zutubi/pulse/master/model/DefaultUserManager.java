@@ -50,7 +50,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      */
     private LdapManager ldapManager;
     /**
-     * Do not access directly, always use getLdapManager().  This dependency
+     * Do not access directly, always use getProjectManager().  This dependency
      * is initialised on demand (not available when this manager is created).
      */
     private ProjectManager projectManager;
