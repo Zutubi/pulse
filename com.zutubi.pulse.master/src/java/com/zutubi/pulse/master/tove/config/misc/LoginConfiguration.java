@@ -11,7 +11,7 @@ import com.zutubi.validation.annotations.Required;
  * Transient configuration used for the login form.  The odd field names are
  * to match Acegi expectations.
  */
-@Form(fieldOrder = { "j_username", "j_password", "_acegi_security_remember_me" }, actions = { "login" })
+@Form(fieldOrder = { "j_username", "j_password", "_spring_security_remember_me" }, actions = { "login" })
 @SymbolicName("zutubi.transient.login")
 public class LoginConfiguration extends AbstractConfiguration
 {
@@ -19,7 +19,7 @@ public class LoginConfiguration extends AbstractConfiguration
     private String j_username;
     @Password(size = 200)
     private String j_password;
-    private boolean _acegi_security_remember_me;
+    private boolean _spring_security_remember_me;
 
     public String getJ_username()
     {
@@ -41,13 +41,13 @@ public class LoginConfiguration extends AbstractConfiguration
         this.j_password = j_password;
     }
 
-    public boolean is_acegi_security_remember_me()
+    public boolean is_spring_security_remember_me()
     {
-        return _acegi_security_remember_me;
+        return _spring_security_remember_me;
     }
 
-    public void set_acegi_security_remember_me(boolean _acegi_security_remember_me)
+    public void set_spring_security_remember_me(boolean _spring_security_remember_me)
     {
-        this._acegi_security_remember_me = _acegi_security_remember_me;
+        this._spring_security_remember_me = _spring_security_remember_me;
     }
 }

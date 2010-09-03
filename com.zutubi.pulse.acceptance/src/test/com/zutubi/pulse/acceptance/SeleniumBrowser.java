@@ -208,7 +208,7 @@ public class SeleniumBrowser
     }
 
     /**
-     * Create {@link #createPage(Class, Object...)} and open
+     * Create {@link #createPage(Class, Object[])} and open
      * {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#open()} a new selenium page.
      *
      * @param pageType      the type of page being opened.
@@ -224,7 +224,7 @@ public class SeleniumBrowser
     }
 
     /**
-     * Create {@link #createPage(Class, Object...)} and waitFor
+     * Create {@link #createPage(Class, Object[])} and waitFor
      * {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#waitFor()} a new selenium page.
      *
      * @param pageType      the type of page being opened.
@@ -240,7 +240,7 @@ public class SeleniumBrowser
     }
 
     /**
-     * Create {@link #createPage(Class, Object...)}, open {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#open()}
+     * Create {@link #createPage(Class, Object[])} open {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#open()}
      * and waitFor {@link com.zutubi.pulse.acceptance.pages.SeleniumPage#waitFor()} a new selenium page.
      *
      * @param pageType      the type of page being opened.
@@ -498,6 +498,16 @@ public class SeleniumBrowser
     public String getTitle()
     {
         return selenium.getTitle();
+    }
+
+    public String getCookie(String name)
+    {
+        return selenium.getCookieByName(name);
+    }
+
+    public String getCookie()
+    {
+        return selenium.getCookie();
     }
 
     public void waitForPageToLoad()
