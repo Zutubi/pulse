@@ -12,7 +12,7 @@ import java.io.IOException;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPort;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 
-public class AcceptanceTestSuiteSetupTeardown extends TestSetup
+public class StartPulseTestSetup extends TestSetup
 {
     public static final String WORK_DIR_MASTER = "master";
     public static final String WORK_DIR_AGENT = "agent";
@@ -20,7 +20,7 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
     private Pulse pulse;
     private Pulse agent;
 
-    public AcceptanceTestSuiteSetupTeardown(junit.framework.Test test)
+    public StartPulseTestSetup(junit.framework.Test test)
     {
         super(test);
     }

@@ -36,6 +36,9 @@ class UserStateCleanupTask extends DatabaseStateCleanupTaskSupport
             {
                 throw new ToveRuntimeException("Unable to delete user: the user has a personal build in progress.");
             }
+
+            // clean up any user responsibility
+            userManager.clearAllResponsibilities(user);
             userManager.delete(user);
         }
     }

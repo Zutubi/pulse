@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
  */
 public class AcceptanceTestSuite
 {
-    public static Test suite()
+    public static Test suite() throws Exception
     {
         //---( other acceptance tests )---
 
@@ -21,7 +21,7 @@ public class AcceptanceTestSuite
         main.addTestSuite(StartupShutdownAcceptanceTest.class);
         main.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
         main.addTestSuite(PostProcessorPluginAcceptanceTest.class);
-        main.addTest(new AcceptanceTestSuiteSetupTeardown(DevAcceptanceTestSuite.suite()));
+        main.addTest(new StartPulseTestSetup(DevAcceptanceTestSuite.suite()));
         main.addTestSuite(AgentUpgradeAcceptanceTest.class);
 
         return main;

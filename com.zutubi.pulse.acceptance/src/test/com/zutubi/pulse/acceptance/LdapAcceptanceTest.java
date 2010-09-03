@@ -175,53 +175,5 @@ public class LdapAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    public static TestSuite suite() throws Exception
-    {
-        TestSuite suite = new TestSuite();
-        suite.addTest(new EnableDisableLdap(new TestSuite(LdapAcceptanceTest.class)));
-        return suite;
-    }
-
-    private static class EnableDisableLdap extends TestSetup
-    {
-        private XmlRpcHelper xmlRpcHelper;
-
-        public EnableDisableLdap(Test test) throws Exception
-        {
-            super(test);
-
-            xmlRpcHelper = new XmlRpcHelper();
-            xmlRpcHelper.loginAsAdmin();
-        }
-
-        @Override
-        protected void setUp() throws Exception
-        {
-            super.setUp();
-
-            Hashtable<String, Object> ldapConfig = xmlRpcHelper.createDefaultConfig(LDAPConfiguration.class);
-            ldapConfig.put("enabled", Boolean.TRUE);
-            ldapConfig.put("ldapUrl", "ldap://localhost:10389/");
-            ldapConfig.put("baseDn", "dc=ldap-test,dc=zutubi,dc=com");
-            ldapConfig.put("managerDn", "uid=admin,ou=system");
-            ldapConfig.put("managerPassword", "secret");
-            ldapConfig.put("userFilter", "(uid=${login})");
-            ldapConfig.put("userBaseDn", "ou=Users");
-            ldapConfig.put("groupBaseDns", new Vector<String>(asList("ou=Groups")));
-
-            xmlRpcHelper.saveConfig(LDAP_CONFIG_PATH, ldapConfig, false);
-        }
-
-        @Override
-        protected void tearDown() throws Exception
-        {
-            Hashtable<String, Object> ldapConfig = xmlRpcHelper.getConfig(LDAP_CONFIG_PATH);
-            ldapConfig.put("enabled", Boolean.FALSE);
-
-            xmlRpcHelper.saveConfig(LDAP_CONFIG_PATH, ldapConfig, false);
-
-            super.tearDown();
-        }
-    }
 
 }

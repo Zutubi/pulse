@@ -3,7 +3,9 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 import java.util.Hashtable;
 
@@ -207,6 +209,13 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         runBuild(random, true);
 
         assertSelfResponsible(homePage);
+    }
+
+    public void testCanDeleteUserWithResponsibility() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+        takeResponsibility(random);
+        assertTrue(xmlRpcHelper.deleteConfig(getPath(USERS_SCOPE, TEST_USER)));
     }
 
     private void runBuild(String project, Boolean expectedSuccess) throws Exception

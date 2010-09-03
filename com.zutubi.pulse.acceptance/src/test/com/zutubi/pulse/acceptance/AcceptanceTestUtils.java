@@ -151,7 +151,7 @@ public class AcceptanceTestUtils
         File configDir;
         if (isAntBuild())
         {
-            File agentWork = new File(getWorkingDirectory(), AcceptanceTestSuiteSetupTeardown.WORK_DIR_AGENT);
+            File agentWork = new File(getWorkingDirectory(), StartPulseTestSetup.WORK_DIR_AGENT);
             File versionHome = new File(FileSystemUtils.findFirstChildMatching(agentWork, "pulse-agent-.*"), "versions");
             configDir = new File(FileSystemUtils.findFirstChildMatching(versionHome, "[0-9]+"), "system/config");
         }
