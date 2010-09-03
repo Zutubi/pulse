@@ -4,6 +4,71 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 public class PathUtilsTest extends ZutubiTestCase
 {
+    public void testIsUnderSamePath()
+    {
+        assertTrue(PathUtils.isUnder("same", "same"));
+    }
+
+    public void testIsUnderSameMultiElementPath()
+    {
+        assertTrue(PathUtils.isUnder("same/path", "same/path"));
+    }
+
+    public void testIsUnderSameTrailingSlash()
+    {
+        assertTrue(PathUtils.isUnder("same/path/", "same/path/"));
+    }
+
+    public void testIsUnderSameTrailingSlashOnPath()
+    {
+        assertTrue(PathUtils.isUnder("same/path/", "same/path"));
+    }
+
+    public void testIsUnderSameTrailingSlashOnPrefix()
+    {
+        assertTrue(PathUtils.isUnder("same/path", "same/path/"));
+    }
+
+    public void testIsUnderPrefixMatches()
+    {
+        assertTrue(PathUtils.isUnder("a/full/path", "a/full"));
+    }
+
+    public void testIsUnderPrefixMatchesTrailingSlash()
+    {
+        assertTrue(PathUtils.isUnder("a/full/path/", "a/full/"));
+    }
+
+    public void testIsUnderPrefixMatchesTrailingSlashOnPath()
+    {
+        assertTrue(PathUtils.isUnder("a/full/path/", "a/full"));
+    }
+
+    public void testIsUnderPrefixMatchesTrailingSlashOnPrefix()
+    {
+        assertTrue(PathUtils.isUnder("a/full/path", "a/full/"));
+    }
+
+    public void testIsUnderPrefixDoesntMatch()
+    {
+        assertFalse(PathUtils.isUnder("a/full/path", "another/full"));
+    }
+
+    public void testIsUnderPrefixDoesntMatchTrailingSlash()
+    {
+        assertFalse(PathUtils.isUnder("a/full/path/", "another/full/"));
+    }
+
+    public void testIsUnderStartsWithPrefixButNotFullPathElement()
+    {
+        assertFalse(PathUtils.isUnder("a/full/path", "a/fu"));
+    }
+
+    public void testIsUnderStartsWithPrefixButNotFullPathElementTrailingSlash()
+    {
+        assertFalse(PathUtils.isUnder("a/full/path/", "a/fu/"));
+    }
+    
     public void testPrefixMatchesSimpleMatch()
     {
         assertTrue(PathUtils.prefixMatchesPathPattern("simple", "simple"));
