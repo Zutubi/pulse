@@ -206,6 +206,14 @@ public interface ProjectManager extends EntityManager<Project>
     void clearResponsibility(Project project);
 
     /**
+     * Clear the specified users responsibilities.
+     *
+     * @param user  the user who is being releaved of the responsibilities.
+     */
+    @SecureParameter(parameterType = Project.class, action = ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY)
+    void clearResponsibilities(User user);
+
+    /**
      * Returns all projects that are immediate downstream dependents of the
      * given project.  That is, all returned projects depend directly on the
      * given project.

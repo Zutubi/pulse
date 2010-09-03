@@ -92,4 +92,11 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
      * @return the persistent version of the user parameter.
      */
     UserConfiguration insert(UserConfiguration user);
+
+    /**
+     * Clean the responsibilities for the specified user.
+     *
+     * @param user  whose responsibilities will be cleared.
+     */
+    void clearAllResponsibilities(User user);
 }

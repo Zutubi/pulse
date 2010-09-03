@@ -49,6 +49,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      * is initialised on demand (not available when this manager is created).
      */
     private LdapManager ldapManager;
+    /**
+     * Do not access directly, always use getLdapManager().  This dependency
+     * is initialised on demand (not available when this manager is created).
+     */
+    private ProjectManager projectManager;
     private ConfigurationProvider configurationProvider;
     private Map<UserConfiguration, List<UserGroupConfiguration>> groupsByUser;
     private Map<Long, UserConfiguration> userConfigsById = new HashMap<Long, UserConfiguration>();
@@ -224,6 +229,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return configurationProvider.get(insertedPath, UserConfiguration.class);
     }
 
+    public void clearAllResponsibilities(User user)
+    {
+        getProjectManager().clearResponsibilities(user);
+    }
+
     public UserGroupConfiguration getGroupConfig(String name)
     {
         return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, name), UserGroupConfiguration.class);
@@ -373,6 +383,16 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
+    }
+
+    public ProjectManager getProjectManager()
+    {
+        if (projectManager == null)
+        {
+            // Unfortunately, the user manager is created before the project manager.
+            projectManager = (ProjectManager) SpringComponentContext.getBean("projectManager");
+        }
+        return projectManager;
     }
 
     public BuildManager getBuildManager()
