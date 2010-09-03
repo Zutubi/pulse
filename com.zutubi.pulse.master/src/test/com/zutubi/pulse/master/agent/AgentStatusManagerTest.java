@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
@@ -17,18 +18,18 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.variables.GenericVariable;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
-
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
@@ -354,10 +355,15 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendBuilding(agent, 1000);
         waitForTimeout();
         sendPing(agent, new HostStatus(PingStatus.OFFLINE));
-        assertEvents(
-                new RecipeErrorEvent(this, 1000, "Connection to agent lost during recipe execution (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)"),
-                new AgentOfflineEvent(this, agent)
-        );
+
+        assertFalse(receivedEvents.isEmpty());
+        Event event = receivedEvents.remove(0);
+        assertTrue(event instanceof RecipeErrorEvent);
+        RecipeErrorEvent errorEvent = (RecipeErrorEvent) event;
+        assertEquals(1000, errorEvent.getRecipeId());
+        MatcherAssert.assertThat(errorEvent.getErrorMessage(), Matchers.startsWith("Connection to agent lost during recipe execution"));
+        
+        assertEvents(new AgentOfflineEvent(this, agent));
         assertStatusChanges(agent, BUILDING, OFFLINE);
         sendRecipeCollecting(agent, 1000);
         assertStatusChanges(agent, OFFLINE, POST_RECIPE);
