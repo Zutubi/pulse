@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
-import com.thoughtworks.selenium.SeleniumException;
 import static org.springframework.security.ui.rememberme.AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
 
 public class RememberMeAcceptanceTest extends SeleniumTestBase
@@ -38,16 +37,35 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
         assertFalse(isRememberMeCookieSet());
     }
 
+    public void testThatTheRememberMeCookieWorksAsAdvertised()
+    {
+        LoginPage loginPage = browser.createPage(LoginPage.class);
+
+        assertFalse(isRememberMeCookieSet());
+
+        // login to get outselves a valid remember me cookie.
+        browser.open("/");
+        loginPage.waitFor();
+        loginPage.login(USERNAME, PASSWORD, true);
+        assertTrue(isRememberMeCookieSet());
+
+        String cookie = browser.getCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
+
+        browser.newSession();
+
+        // open the browser at '/' and ensure we are asked to login.
+        browser.open("/");
+        browser.waitForPageToLoad();
+        assertTrue(loginPage.isPresent());
+        
+        browser.setCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, cookie);
+        browser.open("/");
+        browser.waitForPageToLoad();
+        assertFalse(loginPage.isPresent());
+    }
+
     private boolean isRememberMeCookieSet()
     {
-        try
-        {
-            browser.getCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
-            return true;
-        }
-        catch (SeleniumException e)
-        {
-            return false;
-        }
+        return browser.isCookiePresent(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
     }
 }

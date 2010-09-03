@@ -6,7 +6,6 @@ import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
@@ -505,9 +504,15 @@ public class SeleniumBrowser
         return selenium.getCookieByName(name);
     }
 
-    public String getCookie()
+    public boolean isCookiePresent(String name)
     {
-        return selenium.getCookie();
+        return selenium.isCookiePresent(name);
+    }
+
+    public void setCookie(String name, String value)
+    {
+        String cookieOptions = "";
+        selenium.createCookie(name + "=" + value, cookieOptions);    
     }
 
     public void waitForPageToLoad()
