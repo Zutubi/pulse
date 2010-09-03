@@ -69,7 +69,7 @@ public class LdapAcceptanceTest extends SeleniumTestBase
         assertTrue(browser.login("user3", "user3"));
         try
         {
-            xmlRpcHelper.getConfig(getPath(USERS_SCOPE, "user4", "preferences", "contacts", "LDAP email"));
+            xmlRpcHelper.getConfig(getPath(USERS_SCOPE, "user3", "preferences", "contacts", "LDAP email"));
         }
         catch (Exception e)
         {

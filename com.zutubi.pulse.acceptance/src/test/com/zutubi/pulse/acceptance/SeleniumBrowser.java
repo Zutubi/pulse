@@ -290,7 +290,7 @@ public class SeleniumBrowser
     public boolean login(String username, String password)
     {
         LoginPage page = this.openAndWaitFor(LoginPage.class);
-        return page.login(username, password) instanceof WelcomePage;
+        return page.login(username, password);
     }
 
     public void loginAsAdmin()

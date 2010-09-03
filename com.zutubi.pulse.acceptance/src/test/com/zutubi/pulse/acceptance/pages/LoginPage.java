@@ -29,28 +29,20 @@ public class LoginPage extends SeleniumPage
         return urls.login();
     }
 
-    public SeleniumPage login(String username, String password)
+    public boolean login(String username, String password)
     {
         return login(username, password, false);
     }
 
-    public SeleniumPage login(String username, String password, boolean rememberMe)
+    public boolean login(String username, String password, boolean rememberMe)
     {
         LoginForm form = browser.createForm(LoginForm.class);
         form.waitFor();
         form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password), asPair(FIELD_REMEMBERME, Boolean.toString(rememberMe)));
         try
         {
-            WelcomePage welcomePage = browser.createPage(WelcomePage.class);
             browser.waitForPageToLoad();
-            if (welcomePage.isPresent())
-            {
-                return welcomePage;
-            }
-            else
-            {
-                return this;
-            }
+            return !form.isFormPresent();
         }
         catch (Exception e)
         {
