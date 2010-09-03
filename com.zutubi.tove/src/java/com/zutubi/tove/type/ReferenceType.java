@@ -17,6 +17,8 @@ public class ReferenceType extends SimpleType implements Type
 {
     private static final Logger LOG = Logger.getLogger(ReferenceType.class);
 
+    public static final String NULL_REFERENCE = "0";
+    
     private CompositeType referencedType;
     private ConfigurationReferenceManager configurationReferenceManager;
     private String idProperty;
@@ -83,7 +85,7 @@ public class ReferenceType extends SimpleType implements Type
     {
         if (instance == null)
         {
-            return "0";
+            return NULL_REFERENCE;
         }
         else
         {
@@ -132,7 +134,7 @@ public class ReferenceType extends SimpleType implements Type
     {
         if(data == null)
         {
-            return "0";
+            return NULL_REFERENCE;
         }
         else
         {
