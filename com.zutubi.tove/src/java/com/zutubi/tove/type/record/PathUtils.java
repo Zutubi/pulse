@@ -145,6 +145,30 @@ public class PathUtils
         return true;
     }
 
+    /**
+     * Returns true if the given path is nested under the given prefix.  The
+     * prefix must be located at the start of the path, followed by a
+     * separator.
+     *
+     * @param path   the path to test
+     * @param prefix the prefix path to test for
+     * @return true if the given path is nested under the given prefix
+     */
+    public static boolean isUnder(String path, String prefix)
+    {
+        if (!path.endsWith(SEPARATOR))
+        {
+            path += SEPARATOR;
+        }
+        
+        if (!prefix.endsWith(SEPARATOR))
+        {
+            prefix += SEPARATOR;
+        }
+
+        return path.startsWith(prefix);
+    }
+
     public static boolean prefixMatchesPathPattern(String pattern, String prefix)
     {
         String[] patternParts = getPathElements(pattern);

@@ -9,25 +9,24 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.*;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
-import org.springframework.security.AccessDeniedException;
-
-import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.*;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import org.springframework.security.AccessDeniedException;
+
+import java.util.*;
+import static java.util.Arrays.asList;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -64,9 +63,12 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.markAsTemplate(root);
         rootPath = configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, root);
         rootHandle = configurationTemplateManager.getRecord(rootPath).getHandle();
-        
+
+        typeRegistry.register(ConfigOutputCommand.class);
         typeRegistry.register(ConfigAntCommand.class);
         typeRegistry.register(ConfigMavenCommand.class);
+        typeRegistry.register(ConfigAntPostProcessor.class);
+        typeRegistry.register(ConfigRegexPostProcessor.class);
         typeRegistry.register(ConfigGitScm.class);
         typeRegistry.register(ConfigSubversionScm.class);
     }
@@ -804,6 +806,37 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         TemplateRecord colbyRecord = (TemplateRecord) bmapRecord.get("colby");
         assertEquals("1", colbyRecord.get("y"));
         assertEquals("extracted", colbyRecord.getOwner("y"));
+    }
+
+    public void testSmartCloneWithInheritedReferenceExtractedParentNameHasOriginalNameAsPrefix()
+    {
+        ConfigA root = configurationTemplateManager.getRootInstance(TEMPLATE_SCOPE, ConfigA.class);
+        ConfigAntPostProcessor postProcessor = new ConfigAntPostProcessor("processor");
+        root.addPostProcessor(postProcessor);
+        configurationTemplateManager.save(root);
+        
+        String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA("child"), rootPath, false);
+        ConfigA child = configurationTemplateManager.getInstance(childPath, ConfigA.class);
+        ConfigArtifact artifact = new ConfigArtifact("artifact");
+        artifact.addPostProcessor(child.getPostProcessors().get(postProcessor.getName()));
+        ConfigAntCommand command = new ConfigAntCommand("command");
+        command.addArtifact(artifact);
+        ConfigRecipe recipe = new ConfigRecipe("recipe");
+        recipe.addCommand(command);
+        child.addRecipe(recipe);
+        configurationTemplateManager.save(child);
+
+
+        configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, child.getName(), "child template", asMap(asPair(child.getName(), "clone")));
+
+
+        ConfigA extractedParent = configurationTemplateManager.getInstance(getPath(TEMPLATE_SCOPE, "child template"), ConfigA.class);
+        command = (ConfigAntCommand) extractedParent.getRecipes().get(recipe.getName()).getCommands().get(command.getName());
+        List<ConfigPostProcessor> postProcessors = command.getArtifacts().get(artifact.getName()).getPostProcessors();
+        assertEquals(1, postProcessors.size());
+        ConfigPostProcessor referencedPostProcessor = postProcessors.get(0);
+        assertNotNull(referencedPostProcessor);
+        assertSame(extractedParent.getPostProcessors().get(postProcessor.getName()), referencedPostProcessor);
     }
 
     public void testGetPullUpAncestorsInvalidPath()
@@ -2631,6 +2664,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         private List<Referee> listOfRefs = new LinkedList<Referee>();
         private ConfigScm scm;
         private Map<String, ConfigRecipe> recipes = new LinkedHashMap<String, ConfigRecipe>();
+        private Map<String, ConfigPostProcessor> postProcessors = new LinkedHashMap<String,ConfigPostProcessor>();
 
         public ConfigA()
         {
@@ -2755,6 +2789,21 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         {
             recipes.put(recipe.getName(), recipe);
         }
+
+        public Map<String, ConfigPostProcessor> getPostProcessors()
+        {
+            return postProcessors;
+        }
+
+        public void setPostProcessors(Map<String, ConfigPostProcessor> postProcessors)
+        {
+            this.postProcessors = postProcessors;
+        }
+
+        public void addPostProcessor(ConfigPostProcessor processor)
+        {
+            postProcessors.put(processor.getName(), processor);
+        }
     }
 
     @SymbolicName("b")
@@ -2871,6 +2920,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     @SymbolicName("recipe")
     public static class ConfigRecipe extends AbstractNamedConfiguration
     {
+        @Ordered
         private Map<String, ConfigCommand> commands = new HashMap<String, ConfigCommand>();
 
         public ConfigRecipe()
@@ -2920,13 +2970,48 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     }
 
+    @SymbolicName("command.output")
+    public static abstract class ConfigOutputCommand extends AbstractNamedConfiguration implements ConfigCommand
+    {
+        private Map<String, ConfigArtifact> artifacts = new LinkedHashMap<String, ConfigArtifact>();
+
+        protected ConfigOutputCommand()
+        {
+        }
+
+        protected ConfigOutputCommand(String name)
+        {
+            super(name);
+        }
+
+        public Map<String, ConfigArtifact> getArtifacts()
+        {
+            return artifacts;
+        }
+
+        public void setArtifacts(Map<String, ConfigArtifact> artifacts)
+        {
+            this.artifacts = artifacts;
+        }
+
+        public void addArtifact(ConfigArtifact artifact)
+        {
+            artifacts.put(artifact.getName(), artifact);
+        }
+    }
+
     @SymbolicName("command.ant")
-    public static class ConfigAntCommand extends AbstractNamedConfiguration implements ConfigCommand
+    public static class ConfigAntCommand extends ConfigOutputCommand
     {
         private List<ConfigEnvironment> environments = new LinkedList<ConfigEnvironment>();
 
         public ConfigAntCommand()
         {
+        }
+
+        public ConfigAntCommand(String name)
+        {
+            super(name);
         }
 
         public ConfigAntCommand(String name, ConfigEnvironment environment)
@@ -2947,7 +3032,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     }
 
     @SymbolicName("command.maven")
-    public static class ConfigMavenCommand extends AbstractNamedConfiguration implements ConfigCommand
+    public static class ConfigMavenCommand extends ConfigOutputCommand
     {
         public ConfigMavenCommand()
         {
@@ -2956,6 +3041,37 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public ConfigMavenCommand(String name)
         {
             super(name);
+        }
+    }
+
+    @SymbolicName("artifact")
+    public static class ConfigArtifact extends AbstractNamedConfiguration
+    {
+        @Reference
+        private List<ConfigPostProcessor> postProcessors = new LinkedList<ConfigPostProcessor>();
+
+        public ConfigArtifact()
+        {
+        }
+
+        public ConfigArtifact(String name)
+        {
+            super(name);
+        }
+
+        public List<ConfigPostProcessor> getPostProcessors()
+        {
+            return postProcessors;
+        }
+
+        public void setPostProcessors(List<ConfigPostProcessor> postProcessors)
+        {
+            this.postProcessors = postProcessors;
+        }
+
+        public void addPostProcessor(ConfigPostProcessor processor)
+        {
+            postProcessors.add(processor);
         }
     }
     
@@ -2993,6 +3109,38 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setValue(String value)
         {
             this.value = value;
+        }
+    }
+
+    @SymbolicName("processor")
+    public static interface ConfigPostProcessor extends NamedConfiguration
+    {
+
+    }
+
+    @SymbolicName("processor.regex")
+    public static class ConfigRegexPostProcessor extends AbstractNamedConfiguration implements ConfigPostProcessor
+    {
+        public ConfigRegexPostProcessor()
+        {
+        }
+
+        public ConfigRegexPostProcessor(String name)
+        {
+            super(name);
+        }
+    }
+
+    @SymbolicName("processor.ant")
+    public static class ConfigAntPostProcessor extends AbstractNamedConfiguration implements ConfigPostProcessor
+    {
+        public ConfigAntPostProcessor()
+        {
+        }
+
+        public ConfigAntPostProcessor(String name)
+        {
+            super(name);
         }
     }
 }

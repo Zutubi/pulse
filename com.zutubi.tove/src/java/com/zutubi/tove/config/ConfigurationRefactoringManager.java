@@ -6,17 +6,15 @@ import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import static com.zutubi.tove.type.record.PathUtils.*;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.tove.type.record.PathUtils.getPathElements;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -1071,7 +1069,7 @@ public class ConfigurationRefactoringManager
 
         private boolean inCloneSet(String path, String parentPath, Set<String> oldKeys)
         {
-            if (path != null && path.startsWith(parentPath))
+            if (path != null && isUnder(path, parentPath))
             {
                 path = path.substring(parentPath.length());
                 String[] keyRest = StringUtils.getNextToken(path, PathUtils.SEPARATOR_CHAR, true);
@@ -1421,7 +1419,7 @@ public class ConfigurationRefactoringManager
             String path1 = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath1, l1);
             String path2 = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath2, l2);
 
-            if (path1.startsWith(templateOwnerPath1) && path2.startsWith(templateOwnerPath2))
+            if (isUnder(path1, templateOwnerPath1) && isUnder(path2, templateOwnerPath2))
             {
                 // Both are references within the owner - they are equal if
                 // they point to the same relative path within the owner, and
@@ -1716,7 +1714,7 @@ public class ConfigurationRefactoringManager
             else
             {
                 String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, originalHandle);
-                if (path.startsWith(fromOwnerPath))
+                if (isUnder(path, fromOwnerPath))
                 {
                     path = templateOwnerPath + path.substring(fromOwnerPath.length());
                 }
@@ -1985,7 +1983,7 @@ public class ConfigurationRefactoringManager
             for (Pair<String, String> pair: referencedPaths)
             {
                 String referencedPath = pair.second;
-                if (referencedPath.startsWith(templateOwnerPath) && !referencedPath.startsWith(path) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
+                if (isUnder(referencedPath, templateOwnerPath) && !isUnder(referencedPath, path) && !configurationTemplateManager.pathExists(pullUpPath(referencedPath)))
                 {
                     throw new IllegalArgumentException("Path contains reference to '" + referencedPath + "' which does not exist in ancestor '" + ancestorKey + "'");
                 }
@@ -2080,7 +2078,7 @@ public class ConfigurationRefactoringManager
                         else
                         {
                             String referencedPath = recordManager.getPathForHandle(handle);
-                            if (referencedPath.startsWith(PullUpAction.this.path))
+                            if (isUnder(referencedPath, PullUpAction.this.path))
                             {
                                 referencedPath = PathUtils.getPath(scope, ancestorKey, PathUtils.getSuffix(referencedPath, 2));
                                 handle = recordManager.select(referencedPath).getHandle();
@@ -2179,11 +2177,11 @@ public class ConfigurationRefactoringManager
             {
                 String fromPath = referencedPath.first;
                 String toPath = referencedPath.second;
-                if (toPath.startsWith(templateOwnerPath))
+                if (isUnder(toPath, templateOwnerPath))
                 {
-                    if (toPath.startsWith(path))
+                    if (isUnder(toPath, path))
                     {
-                        if (!fromPath.startsWith(path))
+                        if (!isUnder(fromPath, path))
                         {
                             throw new IllegalArgumentException("Reference from '" + fromPath + "' to within item to pull down that would become invalid");
                         }
@@ -2327,7 +2325,7 @@ public class ConfigurationRefactoringManager
                     else
                     {
                         String referencedPath = recordManager.getPathForHandle(handle);
-                        if (referencedPath.startsWith(PushDownAction.this.path))
+                        if (isUnder(referencedPath, PushDownAction.this.path))
                         {
                             referencedPath = PathUtils.getPath(scope, childKey, PathUtils.getSuffix(referencedPath, 2));
                             handle = recordManager.select(referencedPath).getHandle();
