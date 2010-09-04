@@ -660,17 +660,20 @@ public class ConfigurationHealthChecker
 
     private void checkScrubbed(String path, ComplexType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
     {
-        Record moi = templateRecord.getMoi();
         TemplateRecord templateParent = templateRecord.getParent();
-        TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
-
-        for (String key: moi.simpleKeySet())
+        if (templateParent != null)
         {
-            Object value = moi.get(key);
-            Object inheritedValue = emptyChild.get(key);
-            if (RecordUtils.valuesEqual(value, inheritedValue))
+            TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
+
+            Record moi = templateRecord.getMoi();
+            for (String key: moi.simpleKeySet())
             {
-                report.addProblem(new NonScrubbedSimpleValueProblem(path, I18N.format("simple.value.not.scrubbed", key), key, inheritedValue));
+                Object value = moi.get(key);
+                Object inheritedValue = emptyChild.get(key);
+                if (RecordUtils.valuesEqual(value, inheritedValue))
+                {
+                    report.addProblem(new NonScrubbedSimpleValueProblem(path, I18N.format("simple.value.not.scrubbed", key), key, inheritedValue));
+                }
             }
         }
     }
