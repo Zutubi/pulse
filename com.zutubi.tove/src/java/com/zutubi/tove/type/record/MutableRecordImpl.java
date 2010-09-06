@@ -1,9 +1,6 @@
 package com.zutubi.tove.type.record;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Simple record that holds key:value data, along with meta data.
@@ -173,7 +170,7 @@ public class MutableRecordImpl extends AbstractMutableRecord
     {
         if (data == null)
         {
-            data = new HashMap<String, Object>();
+            data = new LinkedHashMap<String, Object>();
         }
         return data;
     }
