@@ -10,12 +10,14 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
  */
 public class RootFileObject extends StaticMappingFileObject
 {
+    public static final String PREFIX_CONFIG        = "c";
+    
     public static final String NODE_ARTIFACTS       = "artifacts";
     public static final String NODE_BUILDS          = "builds";
     public static final String NODE_CONFIG          = "config";
     public static final String NODE_PLUGINS         = "plugins";
     public static final String NODE_PROJECTS        = "projects";
-    public static final String NODE_PROJECT_CONFIGS = "cprojects";
+    public static final String NODE_PROJECT_CONFIGS = PREFIX_CONFIG + "projects";
     public static final String NODE_REFERENCE       = "reference";
     public static final String NODE_TEMPLATES       = "templates";
     public static final String NODE_WIZARDS         = "wizards";

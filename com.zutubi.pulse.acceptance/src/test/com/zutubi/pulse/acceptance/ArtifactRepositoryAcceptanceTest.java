@@ -86,7 +86,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         command.setSettingsFile("settings.xml");
         command.setGoals(goals);
 
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         return xmlRpcHelper.runBuild(projectName);
     }
@@ -97,7 +97,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         AntCommandConfiguration command = (AntCommandConfiguration) project.getDefaultCommand();
         command.setTargets(target);
         
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         return xmlRpcHelper.runBuild(random);
     }

@@ -54,7 +54,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
     }
 
     public void testBuildDetailsReport() throws Exception

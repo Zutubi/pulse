@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
+
 import static com.zutubi.util.WebUtils.uriPathEncode;
 
 /**
@@ -27,7 +28,7 @@ public class ListPage extends ConfigPage
     public static final String ANNOTATION_OVERRIDDEN = "overridden";
     public static final String ANNOTATION_HIDDEN     = "hidden";
 
-    protected static final String ADD_LINK = "map:add";
+    public static final String ADD_LINK = "map:add";
     
     private String path;
 

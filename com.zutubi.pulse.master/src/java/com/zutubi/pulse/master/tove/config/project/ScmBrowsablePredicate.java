@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
+import com.zutubi.pulse.master.vfs.provider.pulse.RootFileObject;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -43,16 +44,16 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
         {
             if(StringUtils.stringSet(field.getBaseName()))
             {
-                projectPath = "c" + path;
+                projectPath = RootFileObject.PREFIX_CONFIG + path;
             }
             else
             {
-                projectPath = "wizards/" + path;
+                projectPath = RootFileObject.NODE_WIZARDS + "/" + path;
             }
         }
         else
         {
-            projectPath = PathUtils.getPath(0, 2, PathUtils.getPathElements(path));
+            projectPath = RootFileObject.PREFIX_CONFIG + PathUtils.getPath(0, 2, PathUtils.getPathElements(path));
         }
 
         try

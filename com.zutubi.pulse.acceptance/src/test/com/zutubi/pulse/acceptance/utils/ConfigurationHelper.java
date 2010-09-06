@@ -223,14 +223,16 @@ public class ConfigurationHelper
     /**
      * Convenience method for inserting a new ProjectConfiguration instance.
      *
-     * @param project the project to be inserted.
+     * @param project  the project to be inserted.
+     * @param template if true, a project template is created, otherwise a
+     *                 concrete project is created
      * @return the path at which the project was inserted.
      * @throws Exception thrown on error.
      */
-    public String insertProject(ProjectConfiguration project) throws Exception
+    public String insertProject(ProjectConfiguration project, boolean template) throws Exception
     {
         String globalTemplateProjectPath = PROJECTS_SCOPE + "/" + GLOBAL_PROJECT_NAME;
-        return insertTemplatedConfig(globalTemplateProjectPath, project);
+        return insertTemplatedConfig(globalTemplateProjectPath, project, template);
     }
 
 
@@ -266,21 +268,24 @@ public class ConfigurationHelper
     public String insertAgent(AgentConfiguration agent) throws Exception
     {
         String globalTemplateAgentPath = AGENTS_SCOPE + "/" + GLOBAL_AGENT_NAME;
-        return insertTemplatedConfig(globalTemplateAgentPath, agent);
+        return insertTemplatedConfig(globalTemplateAgentPath, agent, false);
     }
 
     /**
-     * Insert a concreate configuration instance into a templated scope.
+     * Insert a configuration instance into a templated scope.
      *
      * @param parentTemplatePath the path of the templated parent for the configuration instance
      * @param config             the configuration instance.
+     * @param template
+     * @param template           if true, the configuration should be marked as
+     *                           a template, if false it should be concrete
      * @return the path at which the configuration instance was inserted.
      * @throws Exception thrown on error.
      */
-    public String insertTemplatedConfig(String parentTemplatePath, Configuration config) throws Exception
+    public String insertTemplatedConfig(String parentTemplatePath, Configuration config, boolean template) throws Exception
     {
         Hashtable<String, Object> data = toXmlRpc(config);
-        String insertedPath = xmlRpcHelper.insertTemplatedConfig(parentTemplatePath, data, false);
+        String insertedPath = xmlRpcHelper.insertTemplatedConfig(parentTemplatePath, data, template);
 
         // This step updates the configuration with configuration path and handle details.
         updatePathsAndHandles(config, insertedPath, data);

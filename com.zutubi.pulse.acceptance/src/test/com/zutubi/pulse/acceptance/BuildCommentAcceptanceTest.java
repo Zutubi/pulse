@@ -48,7 +48,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         projects = new ProjectConfigurations(configurationHelper);
         if (!configurationHelper.isProjectExists(TEST_PROJECT))
         {
-            configurationHelper.insertProject(projects.createTrivialAntProject(TEST_PROJECT).getConfig());
+            configurationHelper.insertProject(projects.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
         }
 
         users = new UserConfigurations();
@@ -117,7 +117,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
     public void testAddCommentToInProgressBuild() throws Exception
     {
         WaitProject project = projects.createWaitAntProject(tempDir, random);
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         int buildNumber = buildRunner.triggerBuild(project);
         buildRunner.waitForBuildInProgress(project, buildNumber);
