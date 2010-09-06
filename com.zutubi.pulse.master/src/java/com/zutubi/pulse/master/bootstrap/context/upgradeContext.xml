@@ -145,6 +145,7 @@
                 <ref local="dropForceCleanAgents"/>
                 <ref local="renameCancelBuildPermission"/>
                 <ref local="cleanIvyCache"/>
+                <ref local="fixNullPostProcessors"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -738,4 +739,7 @@
         <property name="buildNumber" value="202004001"/>
     </bean>
 
+    <bean id="fixNullPostProcessors" class="com.zutubi.pulse.master.upgrade.tasks.FixNullPostProcessorReferencesUpgradeTask">
+        <property name="buildNumber" value="202008001"/>
+    </bean>
 </beans>
