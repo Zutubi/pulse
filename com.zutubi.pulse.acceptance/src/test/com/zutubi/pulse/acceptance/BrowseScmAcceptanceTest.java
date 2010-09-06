@@ -3,6 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
 import com.zutubi.pulse.acceptance.forms.admin.ConvertToVersionedForm;
+import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
+import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
@@ -10,6 +12,7 @@ import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
 
 /**
@@ -18,6 +21,8 @@ import com.zutubi.util.WebUtils;
  */
 public class BrowseScmAcceptanceTest extends SeleniumTestBase
 {
+    private static final long TIMEOUT = 30000;
+    
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
 
@@ -124,14 +129,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
-        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
-        browse.waitForNode("lib");
-        browse.doubleClickNode("lib");
-        browse.waitForNode("junit-3.8.1.jar");
-        browse.selectNode("junit-3.8.1.jar");
-        browse.clickOk();
-
-        assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
+        selectJUnitJarAndConfirm(antForm);
     }
 
     public void testBrowseSelectionOfScmDirectory() throws Exception
@@ -189,16 +187,35 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
-        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
-        browse.waitForNode("lib");
-        browse.doubleClickNode("lib");
-        browse.waitForNode("junit-3.8.1.jar");
-        browse.selectNode("junit-3.8.1.jar");
-        browse.clickOk();
-
-        assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
+        selectJUnitJarAndConfirm(antForm);
     }
-    
+
+    public void testBrowseAddingCommandToExistingProject() throws Exception
+    {
+        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), false);
+        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) + "/" +
+                Constants.Project.TYPE + "/" +
+                Constants.Project.MultiRecipeType.RECIPES + "/" +
+                Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME
+        );
+        browser.waitAndClick(ListPage.ADD_LINK);
+
+        SelectTypeState commandType = new SelectTypeState(browser);
+        commandType.waitFor();
+        commandType.nextFormElements("zutubi.antCommandConfig");
+        
+        final AntCommandForm antForm = browser.createForm(AntCommandForm.class);
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return antForm.isBrowseBuildFileLinkPresent(); 
+            }
+        }, TIMEOUT, "browse link to be shown");
+
+        selectJUnitJarAndConfirm(antForm);
+    }
+
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig(boolean template) throws Exception
     {
         configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), template);
@@ -212,5 +229,17 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         AntCommandForm antForm = browser.createForm(AntCommandForm.class);
         antForm.waitFor();
         return antForm;
+    }
+
+    private void selectJUnitJarAndConfirm(AntCommandForm antForm)
+    {
+        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
+        browse.waitForNode("lib");
+        browse.doubleClickNode("lib");
+        browse.waitForNode("junit-3.8.1.jar");
+        browse.selectNode("junit-3.8.1.jar");
+        browse.clickOk();
+
+        assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
     }
 }
