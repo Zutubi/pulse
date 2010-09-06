@@ -23,6 +23,8 @@ import java.util.Set;
 public class ProjectConfigFileObject extends AbstractPulseFileObject implements ProjectConfigProvider, AddressableFileObject
 {
     private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
+    
+    static
     {
         nodesDefinitions.put("scm", ScmRootFileObject.class);
     }

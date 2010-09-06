@@ -12,14 +12,15 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 /**
  * A set of acceptance tests focused on the dependency systems UI.
@@ -52,7 +53,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
     }
 
     public void testDependencyCanNotReferenceOwningProject() throws Exception

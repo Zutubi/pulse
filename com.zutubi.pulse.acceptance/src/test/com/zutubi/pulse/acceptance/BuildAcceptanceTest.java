@@ -641,7 +641,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         try
         {
             final WaitProject project = projects.createWaitAntProject(tempDir, random);
-            configurationHelper.insertProject(project.getConfig());
+            configurationHelper.insertProject(project.getConfig(), false);
             
             xmlRpcHelper.waitForProjectToInitialise(project.getName());
             xmlRpcHelper.triggerBuild(project.getName());
@@ -855,7 +855,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         FileArtifactConfiguration explicitArtifact = project.addArtifact("explicit", "build.xml");
         FileArtifactConfiguration featuredArtifact = project.addArtifact("featured", "build.xml");
         featuredArtifact.setFeatured(true);
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         long buildNumber = xmlRpcHelper.runBuild(projectName);
 
@@ -941,7 +941,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         FileArtifactConfiguration hashedArtifact = project.addArtifact(NAME_HASHED, BUILD_FILE);
         hashedArtifact.setCalculateHash(true);
         hashedArtifact.setHashAlgorithm(CommandContext.HashAlgorithm.MD5);
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         long buildNumber = xmlRpcHelper.runBuild(random);
 
@@ -1299,7 +1299,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             reportsArtifact = project.addDirArtifact("test reports", "reports/xml");
             reportsArtifact.addPostProcessor(junitProcessor);
             
-            configurationHelper.insertProject(project.getConfig());
+            configurationHelper.insertProject(project.getConfig(), false);
             
             xmlRpcHelper.waitForProjectToInitialise(project.getName());
             xmlRpcHelper.triggerBuild(project.getName());

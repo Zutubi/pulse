@@ -3,9 +3,12 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
 import com.zutubi.pulse.acceptance.forms.admin.ConvertToVersionedForm;
-import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
-import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
+import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
+import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.WebUtils;
 
@@ -82,15 +85,22 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseLinkAvailableForSubversionAntProjectConfiguration() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(false);
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
 
+    public void testBrowseLinkAvailableForTemplateSubversionAntProjectConfiguration() throws Exception
+    {
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(true);
+        assertTrue(antForm.isBrowseBuildFileLinkPresent());
+        assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
+    }
+    
     // --( test rendering browse link for project to versioned transformation )---
     public void testBrowseLinkAvailableForVersionedProjectConversion() throws Exception
     {
-        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig());
+        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), false);
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction("convertToVersioned");
 
@@ -110,7 +120,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseSelectionOfScmFile() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(false);
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
@@ -126,7 +136,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseSelectionOfScmDirectory() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(false);
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
 
         PulseFileSystemBrowserWindow browse = antForm.clickBrowseWorkingDirectory();
@@ -141,7 +151,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseAndCancelSelectionOfScmFile() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(false);
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
@@ -157,7 +167,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseFileUsesWorkingDirectory() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(false);
         antForm.setFieldValue("workingDir", "src");
 
         PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
@@ -173,9 +183,25 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertEquals("java/com/zutubi/testant/Unit.java", antForm.getBuildFileFieldValue());
     }
 
-    private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig() throws Exception
+    public void testBrowseTemplateProject() throws Exception
     {
-        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig());
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig(true);
+        assertEquals("build.xml", antForm.getBuildFileFieldValue());
+        assertTrue(antForm.isBrowseBuildFileLinkPresent());
+
+        PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
+        browse.waitForNode("lib");
+        browse.doubleClickNode("lib");
+        browse.waitForNode("junit-3.8.1.jar");
+        browse.selectNode("junit-3.8.1.jar");
+        browse.clickOk();
+
+        assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
+    }
+    
+    private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig(boolean template) throws Exception
+    {
+        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), template);
         browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +

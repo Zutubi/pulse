@@ -1,21 +1,22 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.agent.AgentStatus.DISABLED;
 import static com.zutubi.pulse.master.agent.AgentStatus.IDLE;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
  * Tests for the working copy functionality.
@@ -204,7 +205,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
 
         AntProjectHelper project = projects.createTrivialAntProject(projectName);
         project.getStage(DEFAULT_STAGE).setAgent(targetAgent);
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
         return project.getConfig();
     }
 

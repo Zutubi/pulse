@@ -7,15 +7,16 @@ import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.PersonalBuildSummaryPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
-import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 
 /**
  * Acceptance tests for the build navigation portion of the breadcrumbs.
@@ -66,7 +67,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         // create project.
         ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         browser.loginAsAdmin();
 
@@ -177,7 +178,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         projectName = randomName();
 
         ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         String userName = randomName();
         UserConfiguration user = users.createSimpleUser(userName);

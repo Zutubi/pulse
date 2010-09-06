@@ -12,7 +12,6 @@ ${form.name}.items.last().on('browse', function(field)
         {
             path = parentPath;
             parentPath = getParentPath(path);
-            start = '';
         }
 
         return start + path;

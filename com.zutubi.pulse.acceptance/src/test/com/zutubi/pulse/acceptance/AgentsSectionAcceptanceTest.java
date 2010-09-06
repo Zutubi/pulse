@@ -114,7 +114,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
         WaitProject project = projects.createWaitAntProject(tempDir, randomName());
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
 
         xmlRpcHelper.waitForProjectToInitialise(project.getName());
         xmlRpcHelper.triggerBuild(project.getName());
@@ -162,8 +162,8 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         WaitProject project2 = projects.createWaitAntProject(tempDir, random + "-2");
         project1.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent1));
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
-        configurationHelper.insertProject(project1.getConfig());
-        configurationHelper.insertProject(project2.getConfig());
+        configurationHelper.insertProject(project1.getConfig(), false);
+        configurationHelper.insertProject(project2.getConfig(), false);
         xmlRpcHelper.waitForProjectToInitialise(project1.getName());
         xmlRpcHelper.waitForProjectToInitialise(project2.getName());
         xmlRpcHelper.triggerBuild(project1.getName());
@@ -356,7 +356,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         WaitProject project = projects.createWaitAntProject(tempDir, projectName);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
-        configurationHelper.insertProject(project.getConfig());
+        configurationHelper.insertProject(project.getConfig(), false);
         xmlRpcHelper.waitForProjectToInitialise(project.getName());
         xmlRpcHelper.triggerBuild(project.getName());
         xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
