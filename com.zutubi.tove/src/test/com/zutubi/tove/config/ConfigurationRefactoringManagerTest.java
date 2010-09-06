@@ -7,16 +7,21 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
+import com.zutubi.tove.config.api.ToConfigurationNameMapping;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.*;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
+
+import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.*;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
@@ -24,9 +29,6 @@ import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import org.springframework.security.AccessDeniedException;
-
-import java.util.*;
-import static java.util.Arrays.asList;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -839,6 +841,47 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertSame(extractedParent.getPostProcessors().get(postProcessor.getName()), referencedPostProcessor);
     }
 
+    public void testSmartClonePreservesImplicitCollectionOrders()
+    {
+        final List<String> LIST_NAMES = asList("zingyl", "angryl", "snowyl", "jauntyl", "ickyl", "yuckyl");
+        final List<String> MAP_NAMES = asList("zingym", "angrym", "snowym", "jauntym", "ickym", "yuckym");
+
+        // We can't just add collection items to this list and unstantiate as
+        // then the collection records will have explicit orders set.
+        ConfigA instance = createAInstance("source");
+        String sourcePath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, instance, rootPath, false);
+
+        String listPath = getPath(sourcePath, "orderedBlist");
+        for (String name: LIST_NAMES)
+        {
+            configurationTemplateManager.insert(listPath, new ConfigB(name));
+        }
+
+        String mapPath = getPath(sourcePath, "orderedBmap");
+        for (String name: MAP_NAMES)
+        {
+            configurationTemplateManager.insert(mapPath, new ConfigB(name));
+        }
+
+        
+        String clonePath = configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, instance.getName(), "extracted", asMap(asPair(instance.getName(), "clone")));
+
+
+        Mapping<ConfigB, String> configToNameFn = new ToConfigurationNameMapping<ConfigB>();
+        
+        instance = configurationTemplateManager.getInstance(sourcePath, ConfigA.class);
+        assertEquals(LIST_NAMES, map(instance.getOrderedBlist(), configToNameFn));
+        assertEquals(MAP_NAMES, map(instance.getOrderedBmap().values(), configToNameFn));
+
+        ConfigA extracted = configurationTemplateManager.getInstance(getPath(TEMPLATE_SCOPE, "extracted"), ConfigA.class);
+        assertEquals(LIST_NAMES, map(extracted.getOrderedBlist(), configToNameFn));
+        assertEquals(MAP_NAMES, map(extracted.getOrderedBmap().values(), configToNameFn));
+
+        ConfigA clone = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
+        assertEquals(LIST_NAMES, map(clone.getOrderedBlist(), configToNameFn));
+        assertEquals(MAP_NAMES, map(clone.getOrderedBmap().values(), configToNameFn));
+    }
+    
     public void testGetPullUpAncestorsInvalidPath()
     {
         assertEquals(Collections.<String>emptyList(), configurationRefactoringManager.getPullUpAncestors("invalid/path/here"));

@@ -11,6 +11,7 @@ import com.zutubi.util.WebUtils;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -162,7 +163,7 @@ public class TemplateRecord extends AbstractRecord
 
     public Set<String> keySet()
     {
-        Set<String> result = new HashSet<String>(moi.keySet());
+        Set<String> result = new LinkedHashSet<String>(moi.keySet());
         if(parent != null)
         {
             result.addAll(parent.keySet());

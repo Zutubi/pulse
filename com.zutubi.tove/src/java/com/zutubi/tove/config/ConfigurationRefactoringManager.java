@@ -6,15 +6,16 @@ import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.*;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -684,6 +685,27 @@ public class ConfigurationRefactoringManager
         
         return result;
     }
+
+    private Collection<String> getOrderedNestedKeys(Record record, ComplexType type)
+    {
+        // We walk over all child records recursively to ensure collection
+        // items are inserted in the same order that they are in the
+        // original records.  This ensures implicit collection ordering is
+        // the preserved in the clone (CIB-2254, CIB-2564).
+        Collection<String> keys;
+        boolean collection = type instanceof CollectionType;
+        if (collection)
+        {
+            CollectionType collectionType = (CollectionType) type;
+            keys = collectionType.getOrder(record);
+        }
+        else
+        {
+            keys = record.nestedKeySet();
+        }
+        
+        return keys;
+    }
     
     public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)
     {
@@ -901,23 +923,7 @@ public class ConfigurationRefactoringManager
 
         private void cloneChildren(String path, Record record, ComplexType type)
         {
-            // We walk over all child records recursively to ensure collection
-            // items are inserted in the same order that they are in the
-            // original records.  This ensures implicit collection ordering is
-            // the preserved in the clone (CIB-2254).
-            Collection<String> keys;
-            boolean collection = type instanceof CollectionType;
-            if (collection)
-            {
-                CollectionType collectionType = (CollectionType) type;
-                keys = collectionType.getOrder(record);
-            }
-            else
-            {
-                keys = record.nestedKeySet();
-            }
-
-            for (String key: keys)
+            for (String key: getOrderedNestedKeys(record, type))
             {
                 Record child = (Record) record.get(key);
                 String insertPath = getPath(path, key);
@@ -1247,7 +1253,7 @@ public class ConfigurationRefactoringManager
         {
             Map<String, String> commonMeta = new HashMap<String, String>();
             Map<String, Object> commonSimple = new HashMap<String, Object>();
-            Set<String> commonNestedKeySet = new HashSet<String>();
+            Set<String> commonNestedKeySet = new LinkedHashSet<String>();
             boolean first = true;
             String firstTemplateOwnerPath = null;
             String symbolicName = null;
@@ -1268,7 +1274,7 @@ public class ConfigurationRefactoringManager
 
                     firstTemplateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(pair.first);
                     commonSimple.putAll(getSimple(r));
-                    commonNestedKeySet.addAll(r.nestedKeySet());
+                    commonNestedKeySet.addAll(getOrderedNestedKeys(r, type));
                 }
                 else
                 {
