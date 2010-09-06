@@ -67,7 +67,7 @@ public class XmlRecordSerialiser
         }
         catch (Exception e)
         {
-            throw new RecordSerialiseException("Unable to parse record file: " + e.getMessage(), e);
+            throw new RecordSerialiseException("Unable to parse record file '" + file.getAbsolutePath() + "': " + e.getMessage(), e);
         }
     }
 
