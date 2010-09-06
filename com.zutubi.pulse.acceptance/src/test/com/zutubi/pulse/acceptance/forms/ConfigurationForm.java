@@ -12,6 +12,7 @@ import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
+import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -90,7 +91,16 @@ public class ConfigurationForm extends SeleniumForm
     {
         try
         {
-            Form formAnnotation = configurationClass.getAnnotation(Form.class);
+            Form formAnnotation = null;
+            for (Class<?> clazz: ReflectionUtils.getSuperclasses(configurationClass, Configuration.class, false))
+            {
+                formAnnotation = clazz.getAnnotation(Form.class);
+                if (formAnnotation != null)
+                {
+                    break;
+                }
+            }
+            
             final String[] fieldNames = formAnnotation == null ? getFieldNames() : formAnnotation.fieldOrder();
             BeanInfo beanInfo = Introspector.getBeanInfo(configurationClass);
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();

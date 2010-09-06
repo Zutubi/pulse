@@ -13,8 +13,8 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeView
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.io.IOUtils;
 
 import java.util.Hashtable;
@@ -24,6 +24,7 @@ import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 import static java.util.Arrays.asList;
 
 /**
@@ -1021,7 +1022,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     
     public void testTemplateNavigation() throws Exception
     {
-        final String PROCESSOR_NAME = "ant output processor";
+        final String PROCESSOR_NAME = "xcodebuild output processor";
 
         String templateName = random + "-template";
         String concreteName = random + "-concrete";
@@ -1040,11 +1041,21 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertEquals(asList(templateName, GLOBAL_PROJECT_NAME), concretePage.getAncestorNavigationOptions());
         assertFalse(concretePage.isDescendantNavigationPresent());
         
-        CompositePage templatePage = concretePage.navigateToAncestorAndWait(templateName);
+        final CompositePage templatePage = concretePage.navigateToAncestorAndWait(templateName);
         assertTrue(templatePage.isAncestorNavigationPresent());
         assertEquals(asList(GLOBAL_PROJECT_NAME), templatePage.getAncestorNavigationOptions());
         assertTrue(templatePage.isDescendantNavigationPresent());
         assertEquals(asList(concreteName), templatePage.getDescendantNavigationOptions());
+
+        // Check the tree state is correct (CIB-2566).
+        templatePage.clickCollapseAll();
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !templatePage.isTreeLinkVisible("properties");
+            }
+        }, SeleniumBrowser.WAITFOR_TIMEOUT, "tree to collapse");
     }
     
     private void checkListedRecipes(String... expectedRecipes)

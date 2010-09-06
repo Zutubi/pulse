@@ -11,6 +11,8 @@ import com.zutubi.tove.type.record.PathUtils;
  */
 public abstract class ConfigPage extends ConfigurationPanePage
 {
+    private static final String ID_COLLAPSE_ALL = "toolbar.collapse.all";
+
     public ConfigPage(SeleniumBrowser browser, Urls urls, String id)
     {
         super(browser, urls, id);
@@ -50,6 +52,16 @@ public abstract class ConfigPage extends ConfigurationPanePage
     public boolean isTreeLinkPresent(String displayName)
     {
         return browser.isElementPresent(getTreeLinkLocator(displayName));
+    }
+
+    public boolean isTreeLinkVisible(String displayName)
+    {
+        return browser.isVisible(getTreeLinkLocator(displayName));
+    }
+    
+    public void clickCollapseAll()
+    {
+        browser.click(ID_COLLAPSE_ALL);
     }
 
     protected String getHierarchyLocator()
