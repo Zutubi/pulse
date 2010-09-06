@@ -87,6 +87,7 @@
                      if (nodeInfo)
                      {
                          createConfigTree(owner, nodeInfo.cls, nodeInfo.iconCls);
+                         visibleTree = configTree;
                          configTree.selectConfigPath(path, function() {
                              container.unmask();
                          });
@@ -244,11 +245,13 @@
                                         icon: '$base/images/expand.gif',
                                         cls: 'x-btn-text-icon',
                                         text: 'expand all',
+                                        id: 'toolbar.expand.all',
                                         onClick: expandAll
                                     }, {
                                         icon: '$base/images/collapse.gif',
                                         cls: 'x-btn-text-icon',
                                         text: 'collapse all',
+                                        id: 'toolbar.collapse.all',
                                         onClick: collapseAll
                                     }]
                             })

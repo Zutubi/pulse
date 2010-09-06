@@ -22,6 +22,13 @@ public abstract class SeleniumForm
     public static final int MULTI_SELECT    = 8;
     public static final int ITEM_PICKER     = 9;
 
+    public static final String BUTTON_APPLY = "apply";
+    public static final String BUTTON_NEXT = "next";
+    public static final String BUTTON_SAVE = "save";
+    public static final String BUTTON_FINISH = "finish";
+    public static final String BUTTON_CANCEL = "cancel";
+    public static final String BUTTON_RESET = "reset";
+    
     protected SeleniumBrowser browser;
     protected boolean inherited = false;
     protected boolean ajax = true;
@@ -143,57 +150,57 @@ public abstract class SeleniumForm
 
     public void nextNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitNamedFormElements("next", fieldValues);
+        submitNamedFormElements(BUTTON_NEXT, fieldValues);
     }
 
     public void nextFormElements(String... args)
     {
-        submitFormElements("next", args);
+        submitFormElements(BUTTON_NEXT, args);
     }
 
     public void applyNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitNamedFormElements("apply", fieldValues);
+        submitNamedFormElements(BUTTON_APPLY, fieldValues);
     }
 
     public void applyFormElements(String... args)
     {
-        submitFormElements("apply", args);
+        submitFormElements(BUTTON_APPLY, args);
     }
 
     public void saveNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitNamedFormElements("save", fieldValues);
+        submitNamedFormElements(BUTTON_SAVE, fieldValues);
     }
 
     public void saveFormElements(String... args)
     {
-        submitFormElements("save", args);
+        submitFormElements(BUTTON_SAVE, args);
     }
 
     public void finishNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitNamedFormElements("finish", fieldValues);
+        submitNamedFormElements(BUTTON_FINISH, fieldValues);
     }
 
     public void finishFormElements(String... args)
     {
-        submitFormElements("finish", args);
+        submitFormElements(BUTTON_FINISH, args);
     }
 
     public void cancelNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitNamedFormElements("cancel", fieldValues);
+        submitNamedFormElements(BUTTON_CANCEL, fieldValues);
     }
 
     public void cancelFormElements(String... args)
     {
-        submitFormElements("cancel", args);
+        submitFormElements(BUTTON_CANCEL, args);
     }
 
     public void resetFormElements(String... args)
     {
-        submitFormElements("reset", args);
+        submitFormElements(BUTTON_RESET, args);
     }
 
     private void submit(String id)
