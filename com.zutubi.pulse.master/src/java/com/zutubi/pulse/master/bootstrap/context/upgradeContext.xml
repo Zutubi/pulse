@@ -145,6 +145,7 @@
                 <ref local="dropForceCleanAgents"/>
                 <ref local="renameCancelBuildPermission"/>
                 <ref local="cleanIvyCache"/>
+                <ref local="fixNullPostProcessors"/>
                 <ref local="addAgentSynchTimestamp"/>
             </list>
         </property>
@@ -737,6 +738,10 @@
 
     <bean id="cleanIvyCache" class="com.zutubi.pulse.master.upgrade.tasks.CleanIvyCacheUpgradeTask">
         <property name="buildNumber" value="202004001"/>
+    </bean>
+
+    <bean id="fixNullPostProcessors" class="com.zutubi.pulse.master.upgrade.tasks.FixNullPostProcessorReferencesUpgradeTask">
+        <property name="buildNumber" value="202008001"/>
     </bean>
 
     <bean id="addAgentSynchTimestamp" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
