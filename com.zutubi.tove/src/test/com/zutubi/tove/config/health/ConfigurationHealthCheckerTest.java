@@ -420,6 +420,20 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         
         checkAllTest(new NonScrubbedSimpleValueProblem(childPath, I18N.format("simple.value.not.scrubbed", "description"), "description", "mundane"));
     }
+
+    public void testCheckAllEmptySimpleValueNotInParentNotMarkedForScrub()
+    {
+        Project rootProject = new Project("root");
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+
+        Project childProject = createChildProject(rootPath, "child");
+        Perforce scm = new Perforce();
+        scm.setClient("");
+        childProject.setScm(scm);
+        configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+
+        checkAllTest();
+    }
     
     public void testCheckAllTemplateParentInvalid()
     {
