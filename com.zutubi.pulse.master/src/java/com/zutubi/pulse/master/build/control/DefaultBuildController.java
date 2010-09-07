@@ -87,7 +87,6 @@ public class DefaultBuildController implements EventListener, BuildController
     private RecipeResultCollector collector;
     private BuildTree tree;
     private BuildResult buildResult;
-    private File buildDir;
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private int pendingRecipes = 0;
@@ -121,66 +120,73 @@ public class DefaultBuildController implements EventListener, BuildController
 
     public long start()
     {
-        project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
-
-        moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration(), configurationManager);
-
-        createBuildTree();
-
-        // Fail early if things are not as expected.
-        if (!buildResult.isPersistent())
+        try
         {
-            throw new RuntimeException("Build result must be a persistent instance.");
+            buildResult = request.createResult(projectManager, buildManager);
+            // Fail early if things are not as expected.
+            if (!buildResult.isPersistent())
+            {
+                throw new RuntimeException("Failed to persist build result.");
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.error(e);
+            return 0;
         }
 
-        buildResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), buildDir);
-        buildResult.queue();
-        buildManager.save(buildResult);
+        // now that we have a persistent build result, all errors will be reported against
+        // the result and a full cleanup is required.
+        try
+        {
+            project = projectManager.getProject(projectConfig.getProjectId(), false);
+            moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration(), configurationManager);
+            previousSuccessful = buildManager.getLatestSuccessfulBuildResult(project);
 
-        // We handle this event ourselves: this ensures that all processing of
-        // the build from this point forth is handled by the single thread in
-        // our async listener.  Basically, given events could be coming from
-        // anywhere, even for different builds, it is much safer to ensure we
-        // *only* use that thread after we have registered the listener.
-        eventManager.register(asyncListener);
-        // handle the event directly, there is no need to expose this event to the wider audience.
-        asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
+            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+            File buildDir = paths.getBuildDir(buildResult);
+            buildResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), buildDir);
 
+            buildLogger = new DefaultBuildLogger(new BuildLogFile(buildResult, paths));
+
+            buildContext = new PulseExecutionContext();
+            MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
+            MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
+            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig).getDescriptor());
+            buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
+            buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
+
+            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
+            for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
+            {
+                buildContext.add(requestProperty);
+            }
+
+            tree = new BuildTree();
+            configure(tree.getRoot(), buildResult.getRoot());
+
+            buildResult.queue();
+            buildManager.save(buildResult);
+
+            // We handle this event ourselves: this ensures that all processing of
+            // the build from this point forth is handled by the single thread in
+            // our async listener.  Basically, given events could be coming from
+            // anywhere, even for different builds, it is much safer to ensure we
+            // *only* use that thread after we have registered the listener.
+            eventManager.register(asyncListener);
+
+            activateBuildAuthenticationToken();
+
+            // handle the event directly, there is no need to expose this event to the wider audience.
+            asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
+        }
+        catch (Exception e)
+        {
+            // handle the event directly, there is no need to expose this event to the wider audience.
+            asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext, e));
+        }
         return buildResult.getNumber();
-    }
-
-    public BuildTree createBuildTree()
-    {
-        tree = new BuildTree();
-
-        TreeNode<RecipeController> root = tree.getRoot();
-        buildResult = request.createResult(projectManager, buildManager);
-        previousSuccessful = buildManager.getLatestSuccessfulBuildResult(project);
-
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        buildDir = paths.getBuildDir(buildResult);
-
-        buildLogger = new DefaultBuildLogger(new BuildLogFile(buildResult, paths));
-
-        buildContext = new PulseExecutionContext();
-        MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
-        MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig).getDescriptor());
-        buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
-        buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
-        
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
-        for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
-        {
-            buildContext.add(requestProperty);
-        }
-
-        activateBuildAuthenticationToken();
-
-        configure(root, buildResult.getRoot());
-
-        return tree;
     }
 
     /**
@@ -326,7 +332,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 BuildControllerBootstrapEvent e = (BuildControllerBootstrapEvent) evt;
                 if (e.getBuildResult() == buildResult)
                 {
-                    handleControllerBootstrap();
+                    handleControllerBootstrap(e);
                 }
             }
             else if (evt instanceof BuildStatusEvent)
@@ -368,7 +374,7 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private void handleControllerBootstrap()
+    private void handleControllerBootstrap(BuildControllerBootstrapEvent e)
     {
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
@@ -385,6 +391,13 @@ public class DefaultBuildController implements EventListener, BuildController
             throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
         }
 
+        // delay propogating this startup exception until after the build directory
+        // is avaiable to record the exception.
+        if (e.hasStartupException())
+        {
+            throw new BuildException(e.getStartupException());
+        }
+        
         buildLogger.prepare();
         buildLogger.preBuild();
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
@@ -975,20 +988,6 @@ public class DefaultBuildController implements EventListener, BuildController
             return buildResult.getId();
         }
         return -1;
-    }
-
-    public long getBuildNumber()
-    {
-        if (buildResult != null)
-        {
-            return buildResult.getNumber();
-        }
-        return -1;
-    }
-
-    public boolean isBuildPersistent()
-    {
-        return buildResult != null && buildResult.isPersistent();
     }
 
     private void publishEvent(Event evt)

@@ -18,6 +18,7 @@ public class LoginForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
+        //_acegi_security_remember_me
         return new String[]{"j_username", "j_password"};
     }
 

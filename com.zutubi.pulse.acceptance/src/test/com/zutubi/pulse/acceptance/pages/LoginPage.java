@@ -30,6 +30,11 @@ public class LoginPage extends SeleniumPage
 
     public WelcomePage login(String username, String password)
     {
+        return login(username, password, false);
+    }
+    
+    public WelcomePage login(String username, String password, boolean rememberMe)
+    {
         LoginForm form = browser.createForm(LoginForm.class);
         form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password));
         try

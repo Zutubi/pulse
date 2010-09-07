@@ -10,9 +10,27 @@ import com.zutubi.pulse.master.model.BuildResult;
  */
 public class BuildControllerBootstrapEvent extends BuildEvent
 {
+    private Exception startupException;
+
     public BuildControllerBootstrapEvent(Object source, BuildResult result, PulseExecutionContext context)
     {
         super(source, result, context);
+    }
+
+    public BuildControllerBootstrapEvent(Object source, BuildResult result, PulseExecutionContext context, Exception e)
+    {
+        super(source, result, context);
+        this.startupException = e;
+    }
+
+    public boolean hasStartupException()
+    {
+        return this.startupException != null;
+    }
+
+    public Exception getStartupException()
+    {
+        return startupException;
     }
 
     public String toString()
