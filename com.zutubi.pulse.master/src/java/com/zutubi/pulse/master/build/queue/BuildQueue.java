@@ -246,40 +246,23 @@ public class BuildQueue
             }
         }
 
-        List<ActivatedRequest> failedOnStart = new LinkedList<ActivatedRequest>();
-        
         // Now we go through and finish activating the newly activated requests.
         for (ActivatedRequest activatedRequest : toActivateRequests)
         {
             BuildController controller = buildControllerFactory.create(activatedRequest.getRequest());
-            try
+            long buildNumber = controller.start();
+            if (buildNumber != 0)
             {
-                long buildNumber = controller.start();
-
                 activatedRequest.setController(controller);
 
                 buildRequestRegistry.requestActivated(activatedRequest.getRequest(), buildNumber);
                 eventManager.publish(new BuildActivatedEvent(this, activatedRequest.getRequest()), PublishFlag.DEFERRED);
             }
-            catch (RuntimeException e)
+            else
             {
-                failedOnStart.add(activatedRequest);
-                // if the build is persistent, then we mark it as activated as the build result will then contain
-                // all of the necessary details.  If not, then reject it with an error message.
-                if (controller.isBuildPersistent())
-                {
-                    buildRequestRegistry.requestActivated(activatedRequest.getRequest(), controller.getBuildNumber());
-                }
-                else
-                {
-                    buildRequestRegistry.requestRejected(activatedRequest.getRequest(), I18N.format("rejected.with.failure", e.getMessage()));
-                }
+                activatedRequests.remove(activatedRequest);
+                buildRequestRegistry.requestRejected(activatedRequest.getRequest(), I18N.format("rejected.with.failure"));
             }
-        }
-
-        if (failedOnStart.size() > 0)
-        {
-            activatedRequests.removeAll(failedOnStart);
         }
     }
 
