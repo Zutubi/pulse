@@ -372,31 +372,57 @@ public class BuildQueueTest extends BaseQueueTestCase
         assertQueued(r2.getRequest());
     }
 
-    public void testExceptionInControllerStartBeforeResultIsPersistent()
+    public void testExceptionInControllerStart()
     {
-        QueuedRequest request = activeRequest("a");
-        BuildController controller = controllers.get(request.getRequest());
-        doThrow(new RuntimeException("Something bad this way comes.")).when(controller).start();
+        QueuedRequest request = exceptionRequest("a");
         buildQueue.enqueue(request);
 
         assertActivated();
         assertQueued();
-        verify(buildRequestRegistry, times(1)).requestRejected((BuildRequestEvent) anyObject(), anyString());
+        verify(buildRequestRegistry, times(1)).requestRejected(eq(request.getRequest()), anyString());
         verify(buildRequestRegistry, never()).requestActivated((BuildRequestEvent) anyObject(), anyLong());
     }
 
-    public void testExceptionInControllerStartAfterResultIsPersistent()
+    public void testBuildQueueWorksAfterControllerStartException()
     {
-        QueuedRequest request = activeRequest("a");
-        BuildController controller = controllers.get(request.getRequest());
-        doReturn(true).when(controller).isBuildPersistent();
-        doThrow(new RuntimeException("Something bad that way goes.")).when(controller).start();
+        String projectName = "a";
+        
+        QueuedRequest request = exceptionRequest(projectName);
         buildQueue.enqueue(request);
 
         assertActivated();
         assertQueued();
-        verify(buildRequestRegistry, never()).requestRejected(eq(request.getRequest()), anyString());
-        verify(buildRequestRegistry, times(1)).requestActivated((BuildRequestEvent) anyObject(), anyLong());
+
+        QueuedRequest requestB = activeRequest(projectName);
+        QueuedRequest requestC = queueRequest(projectName);
+
+        buildQueue.enqueue(requestB);
+        buildQueue.enqueue(requestC);
+        assertQueued(requestC.getRequest());
+        assertActivated(requestB.getRequest());
+
+        assertTrue(buildQueue.complete(requestB.getRequest().getId()));
+
+        assertActivated();
+        assertQueued(requestC.getRequest());
+
+        assertTrue(buildQueue.cancel(requestC.getRequest().getId()));
+
+        assertActivated();
+        assertQueued();
+
+        QueuedRequest requestD = activeRequest("other");
+        buildQueue.enqueue(requestD);
+
+        assertActivated(requestD.getRequest());
+    }
+
+    public QueuedRequest exceptionRequest(String projectName)
+    {
+        QueuedRequest request = activeRequest(projectName);
+        BuildController controller = controllers.get(request.getRequest());
+        doReturn(0).when(controller).start();
+        return request;
     }
 
     private void assertQueued(BuildRequestEvent... requests)
