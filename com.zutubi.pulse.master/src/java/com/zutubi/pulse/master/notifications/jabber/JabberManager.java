@@ -15,7 +15,8 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.filter.PacketFilter;
+import static org.jivesoftware.smack.packet.Message.Type.ERROR;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.XMPPError;
 
@@ -87,7 +88,7 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
     {
         connection = getConnection(config);
         lastFailureTime = -1;
-        connection.addPacketListener(this, new MessageTypeFilter(Message.Type.ERROR));
+        connection.addPacketListener(this, new MessageTypeFilter(ERROR));
     }
 
     private XMPPConnection getConnection(JabberConfiguration config) throws XMPPException
@@ -113,7 +114,7 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
         return connection;
     }
 
-    public void testConnection(JabberConfiguration config) throws XMPPException
+    public void testConnection(JabberConfiguration config, String account) throws XMPPException
     {
         XMPPConnection connection = null;
 
@@ -128,13 +129,41 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
                 // Second try to workaround SSL negotiation issues
                 connection = getConnection(config);
             }
+
+            // We need to pause to allow the connection time to establish fully.
+            // Without this we end up with random failures to send the message
+            // coupled with successful test results.  I would prefer to have
+            // some way of knowing fully whether or not
+            //      a) a connection is ready
+            //      b) a send message was successful
+            // but at the moment it appears not to be the case.
+            // Review this when we upgrade jive-smack-2.2.1
+            pause(150 * Constants.MILLISECOND);
+
+            if (StringUtils.trimmedStringSet(account))
+            {
+                Chat chat = connection.createChat(account);
+                chat.sendMessage("Test message from Pulse");
+            }
         }
         finally
         {
-            if(connection != null)
+            if (connection != null)
             {
                 connection.close();
             }
+        }
+    }
+
+    private void pause(long time)
+    {
+        try
+        {
+            Thread.sleep(time);
+        }
+        catch (Exception e)
+        {
+            // interrupted.
         }
     }
 
