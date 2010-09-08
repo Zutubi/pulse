@@ -625,6 +625,19 @@ public class PollingServiceTest extends ZutubiTestCase
         assertPolledForChanges(projectA, projectB);
     }
 
+    public void testPollingContinuesOnFailure() throws ScmException, ExecutionException, InterruptedException
+    {
+        Project util = createProject("util");
+        stub(scmClientsByProject.get(util).getLatestRevision((ScmContext) anyObject())).toThrow(
+                new RuntimeException("Exception during SCM Polling should not be blocking the queue.")
+        );
+
+        serviceHandle.init();
+        serviceHandle.pollAndWait();
+
+        // A failure to correctly handle this runtime exception will result in this test hanging.
+    }
+
     private void assertStatusEvents(ProjectStatusEvent... expectedEvents)
     {
         List<ProjectStatusEvent> actualEvents = eventListener.getEventsReceived(ProjectStatusEvent.class);

@@ -516,8 +516,14 @@ public class PollingService implements Stoppable
             {
                 public void run()
                 {
-                    poll(request.getProject(), scmChanges);
-                    requestQueue.complete(request);
+                    try
+                    {
+                        poll(request.getProject(), scmChanges);
+                    }
+                    finally
+                    {
+                        requestQueue.complete(request);
+                    }
                 }
             });
             synchronized (futures)
