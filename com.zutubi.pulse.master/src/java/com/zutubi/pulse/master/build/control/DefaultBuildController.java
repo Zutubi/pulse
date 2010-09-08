@@ -163,7 +163,7 @@ public class DefaultBuildController implements EventListener, BuildController
             {
                 buildContext.add(requestProperty);
             }
-
+            activateBuildAuthenticationToken();
             tree = new BuildTree();
             configure(tree.getRoot(), buildResult.getRoot());
 
@@ -176,8 +176,6 @@ public class DefaultBuildController implements EventListener, BuildController
             // anywhere, even for different builds, it is much safer to ensure we
             // *only* use that thread after we have registered the listener.
             eventManager.register(asyncListener);
-
-            activateBuildAuthenticationToken();
 
             // handle the event directly, there is no need to expose this event to the wider audience.
             asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
@@ -407,7 +405,7 @@ public class DefaultBuildController implements EventListener, BuildController
         {
             throw new BuildException(e.getStartupException());
         }
-        
+
         buildLogger.prepare();
         buildLogger.preBuild();
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
