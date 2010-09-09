@@ -302,6 +302,7 @@ public class SeleniumBrowser
      */
     public void logout()
     {
+        waitForElement("logout", 10000);
         click("//span[@id='logout']/a");
         waitForPageToLoad();
     }
