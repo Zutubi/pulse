@@ -21,18 +21,29 @@ unpack "$top/com.zutubi.pulse.acceptance/src/test/misc/apacheds-1.5.7.tar.gz" "$
 # update the server.xml configuration file with necessary paths.
 sed -i "s#\$UNPACK_DIR#$unpackDir#g" $unpackDir/conf/server.xml
 
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+CP_SEP=':'
+if $cygwin; then
+  CP_SEP=';'
+fi
+
 #
 # The following is taken directly from the apacheds.sh
 # start: apacheds.sh
 ADS_CP=
 for i in `ls $unpackDir/lib/`
 do
-  ADS_CP=${ADS_CP}:$unpackDir/lib/${i}
-done
-
-for i in `ls $unpackDir/lib/ext/`
-do
-  ADS_CP=${ADS_CP}:$unpackDir/lib/ext/${i}
+  _LIB="$unpackDir/lib/${i}"
+  if $cygwin; then
+    # Munge the path appropriately if we are running via cygwin.
+    _LIB=`cygpath --windows "$unpackDir/lib/${i}"`
+  fi
+  ADS_CP="${ADS_CP}${CP_SEP}${_LIB}"
 done
 
 java -Dlog4j.configuration=file:$unpackDir/conf/log4j.properties -Dapacheds.log.dir=$unpackDir/logs -cp $ADS_CP org.apache.directory.server.UberjarMain $unpackDir/conf/server.xml > "$working/apacheds-stdout.txt" 2> "$working/apacheds-stderr.txt" &
@@ -45,3 +56,4 @@ echo $! > "$pidfile"
 
 
 exit 0
+
