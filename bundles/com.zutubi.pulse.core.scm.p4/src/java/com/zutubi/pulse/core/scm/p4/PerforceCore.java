@@ -310,7 +310,15 @@ public class PerforceCore
 
     public void deleteWorkspace(String workspaceName) throws ScmException
     {
-        runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, FLAG_FORCE, workspaceName);
+        try
+        {
+            runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, workspaceName);
+        }
+        catch (ScmException e)
+        {
+            // Try to force the delete - CIB-2571
+            runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, FLAG_FORCE, workspaceName);
+        }
     }
 
     public File getClientRoot() throws ScmException
