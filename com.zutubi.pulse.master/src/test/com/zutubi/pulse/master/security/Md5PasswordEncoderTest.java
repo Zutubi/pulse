@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
+import org.springframework.security.providers.encoding.Md5PasswordEncoder;
 
 /**
  * <class-comment/>

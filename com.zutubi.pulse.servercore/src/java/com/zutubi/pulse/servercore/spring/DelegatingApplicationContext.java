@@ -234,4 +234,29 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
     {
         return delegate.getClassLoader();
     }
+
+    public void addApplicationListener(ApplicationListener applicationListener)
+    {
+        delegate.addApplicationListener(applicationListener);
+    }
+
+    public String getId()
+    {
+        return delegate.getId();
+    }
+
+    public Object getBean(String s, Object[] objects) throws BeansException
+    {
+        return delegate.getBean(s, objects);
+    }
+
+    public boolean isPrototype(String s) throws NoSuchBeanDefinitionException
+    {
+        return delegate.isPrototype(s);
+    }
+
+    public boolean isTypeMatch(String s, Class aClass) throws NoSuchBeanDefinitionException
+    {
+        return delegate.isTypeMatch(s, aClass);
+    }
 }

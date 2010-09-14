@@ -21,6 +21,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(LoggingAcceptanceTest.class);
         suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
+        suite.addTestSuite(PluginRepositoryAcceptanceTest.class);
 
         suite.addTestSuite(RssAcceptanceTest.class);
         suite.addTestSuite(HibernateStatisticsAcceptanceTest.class);
@@ -51,6 +52,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectReportsAcceptanceTest.class);
         suite.addTestSuite(ProjectWorkingCopyAcceptanceTest.class);
         suite.addTestSuite(UsersAcceptanceTest.class);
+        suite.addTestSuite(RememberMeAcceptanceTest.class);
         suite.addTestSuite(InternationalisationAcceptanceTest.class);
 
         //---( build tests )---
@@ -68,6 +70,15 @@ public class DevAcceptanceTestSuite
 
         suite.addTestSuite(CleanupAcceptanceTest.class);
         suite.addTestSuite(CleanupUIAcceptanceTest.class);
+
+        //--( dev tools tests)--
+        suite.addTestSuite(SynchroniseCommandAcceptanceTest.class);
+        suite.addTestSuite(ExpandCommandAcceptanceTest.class);
+        suite.addTestSuite(LocalBuildAcceptanceTest.class);
+        suite.addTestSuite(PersonalBuildCommandAcceptanceTest.class);
+        suite.addTestSuite(PostProcessCommandAcceptanceTest.class);
+
+        suite.addTest(new EnableLdapTestSetup(new TestSuite(LdapAcceptanceTest.class)));
 
         return suite;
     }

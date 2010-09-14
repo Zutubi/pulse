@@ -26,7 +26,9 @@ public interface AgentManager extends AgentPersistentStatusManager
     @SecureResult
     List<Agent> getOnlineAgents();
     @SecureResult
-    Agent getAgent(long handle);
+    Agent getAgentByHandle(long handle);
+    @SecureResult
+    Agent getAgentById(long agentId);
     @SecureResult
     Agent getAgent(AgentConfiguration agent);
     @SecureResult
@@ -96,21 +98,39 @@ public interface AgentManager extends AgentPersistentStatusManager
      * that they were enqueued.  Note that some messages may already be
      * complete.
      *
-     * @param agent agent to get the messages for
+     * @param agentId id of the agent to get the messages for
      * @return all synchronisation messages for the agent
      */
-    List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent);
+    List<AgentSynchronisationMessage> getSynchronisationMessages(long agentId);
 
+    /**
+     * Returns all synchronisation messages that are in the processing state.
+     * Messages for all agents are returned.
+     * 
+     * @return all processing synchronisation messages
+     */
+    List<AgentSynchronisationMessage> getProcessingSynchronisationMessages();
+
+    /**
+     * Returns the synchronisation message with the given id, if any.
+     * 
+     * @param messageId the database id of the message to find
+     * @return the message with the given id, or null if there is no such
+     *         message
+     */
+    AgentSynchronisationMessage getSynchronisationMessage(long messageId);
+    
     /**
      * Attempts to complete the synchronisation cycle for the given agent and
      * send out the relevant event.  This may fail if there are new messages
      * that should be processed now.
      *
-     * @param agent      agent to try to complete the cycle for
+     * @param agentId    id of the agent to complete the cycle for if possible
      * @param successful indicates if sending of the last batch of messages
      *                   succeeded (if not, the event is always sent indicating
      *                   the cycle should be retried later)
-     * @return true if the cycle is complete, false if it should re-run
+     * @return true if the cycle is complete, false if it should re-run because
+     *         new messages are available
      */
-    boolean completeSynchronisation(Agent agent, boolean successful);
+    boolean completeSynchronisation(long agentId, boolean successful);
 }

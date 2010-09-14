@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.pulse.master" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -11,12 +13,10 @@
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
-        <conf name="build" description="All of the packages required during the build."/>
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
-        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
@@ -26,47 +26,44 @@
     </publications>
 
     <dependencies>
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
 
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.7" conf="external,build,release->default"/>
+        <!-- External dependencies -->
+        <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="commons-fileupload" rev="1.1.1" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="commons-io" rev="1.1" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="commons-pool" rev="1.2" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="velocity" rev="1.3.1" conf="external,build,release->default;src->src"/>
+        <dependency org="ehcache" name="ehcache" rev="1.5.0" conf="external,build,release->default;src->src"/>
+        <dependency org="slf4j" name="slf4j" rev="1.5.8" conf="external,build,release->jdk14;src->src"/>
+        <dependency org="hibernate" name="hibernate" rev="3.5.3" conf="external,build,release->default;src->src"/>
+        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default;src->src"/>
+        <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default;src->src"/>
+        <dependency org="quartz" name="quartz" rev="1.6.6" conf="external,build,release->default;src->src"/>
 
-        <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-fileupload" rev="1.1.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-io" rev="1.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-pool" rev="1.2" conf="external,build,release->default"/>
-        <dependency org="apache" name="velocity" rev="1.3.1" conf="external,build,release->default"/>
-        
-        <dependency org="displaytag" name="displaytag" rev="1.0" conf="external,build,release->default"/>
-
-        <dependency org="ehcache" name="ehcache" rev="1.1" conf="external,build,release->default"/>
-
-        <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external,build,release->default"/>
-
-        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default"/>
-
-        <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default"/>
-
-        <dependency org="opensymphony" name="quartz" rev="20060404" conf="external,build,release->default"/>
-        <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default"/>
-        <dependency org="opensymphony" name="webwork" rev="2.2.6" conf="external,build,release->default"/>
+        <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default;src->src"/>
+        <dependency org="opensymphony" name="webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
 
         <!-- we need the portlet api at the moment since the IBM JDK on the power pc does not include it. -->
-        <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external,build,release->default"/>
+        <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external,build,release->default;src->src"/>
 
-        <dependency org="rife" name="jhighlight" rev="1.0" conf="external,build,release->default"/>
+        <dependency org="rife" name="jhighlight" rev="1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.aop" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.jdbc" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.orm" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.transaction" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.web" rev="2.5.6.SEC01" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.security.core" rev="2.0.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="sun" name="rome" rev="0.8" conf="external,build,release->default;src->src"/>
+        <dependency org="sun" name="rome-content" rev="20060508" conf="external,build,release->default;src->src"/>
+        <dependency org="sun" name="transaction" rev="1.1" conf="external,build,release->default;src->src"/>
+        <dependency org="json" name="json" rev="1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="flexjson" name="flexjson" rev="1.6" conf="external,build,release->default;src->src"/>
+        <dependency org="jfree" name="jfreechart" rev="1.0.0-rc1" conf="external,build,release->default;src->src"/>
 
-        <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-aop,spring-jdbc,spring-hibernate3,spring-support"/>
+        <!-- Test dependencies-->
+        <dependency org="org.apache.directory" name="org.apache.directory.server" rev="1.5.7"  conf="build->default;src->src"/>
 
-        <dependency org="sun" name="rome" rev="0.8" conf="external,build,release->default"/>
-        <dependency org="sun" name="rome-content" rev="20060508" conf="external,build,release->default"/>
-        <dependency org="sun" name="transaction" rev="1.0.1b" conf="external,build,release->default"/>
-
-        <dependency org="json" name="json" rev="1.0" conf="external,build,release->default"/>
-
-        <dependency org="flexjson" name="flexjson" rev="1.6" conf="external,build,release->default"/>
-
-        <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
-
-        <dependency org="jfree" name="jfreechart" rev="1.0.0-rc1" conf="external,build,release->default"/>
     </dependencies>
 </ivy-module>

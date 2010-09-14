@@ -46,7 +46,7 @@ public class DefaultHostManagerTest extends PulseTestCase
         hostManager.setSlaveProxyFactory(mock(SlaveProxyFactory.class));
 
         agentManager = mock(AgentManager.class);
-        stub(agentManager.getAgent(anyLong())).toAnswer(new Answer<Agent>()
+        stub(agentManager.getAgentByHandle(anyLong())).toAnswer(new Answer<Agent>()
         {
             public Agent answer(InvocationOnMock invocationOnMock) throws Throwable
             {

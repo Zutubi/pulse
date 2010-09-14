@@ -5,7 +5,6 @@ import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.unified.UnifiedHunk;
 import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.diff.unified.UnifiedPatchParser;
-import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -15,6 +14,7 @@ import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
@@ -108,7 +108,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/trunk"), base, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
         client = clientManager.getWCClient();
         wc = new SubversionWorkingCopy();
-        context = new WorkingCopyContextImpl(base, new PropertiesConfig(), new TestPersonalBuildUI());
+        context = new WorkingCopyContextImpl(base, new PropertiesConfig(), new TestUI());
     }
 
     private void createOtherWC() throws SVNException, IOException
@@ -129,16 +129,8 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         ProcessControl.destroyProcess(svnProcess);
         svnProcess.waitFor();
-        int retries = 0;
-        while (!FileSystemUtils.rmdir(tempDir))
-        {
-            if (retries++ > 5)
-            {
-                throw new RuntimeException("Can't ramve temp directory '" + tempDir.getAbsolutePath() + "'");
-            }
-
-            Thread.sleep(100);
-        }
+        removeDirectory(tempDir);
+        super.tearDown();
     }
 
     public void testMatchesLocationMatches() throws ScmException

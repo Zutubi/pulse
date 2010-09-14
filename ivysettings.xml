@@ -1,38 +1,63 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ivysettings>
     <typedef name="svn" classname="fm.last.ivy.plugins.svnresolver.SvnResolver"/>
 
-    <settings defaultResolver="public"/>
+    <properties file="local.properties"/>
+
+    <!-- initialise the required properties. -->
+    <property name="ivy.default.resolver" value="ivy.zutubi.com" override="false"/>
+    <property name="ivy.local.repository" value="${ivy.project.dir}/repository" override="false"/>
+
+    <settings defaultResolver="${ivy.default.resolver}"/>
 
     <resolvers>
-        <url name="public">
+
+        <!-- The primary artifact repository, which holds all of the artifacts required to run a build. -->
+        <url name="ivy.zutubi.com">
             <ivy pattern="http://ivy.zutubi.com/[organisation]/[module]/ivy-[revision].xml"/>
             <artifact pattern="http://ivy.zutubi.com/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
         </url>
 
+        <!-- This resolver chains between the springsource public artifact repository and our own.  -->
+        <chain name="public" returnFirst="true">
+            <url name="com.springsource.repository.bundles.release">
+                <ivy pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+                <artifact pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+            </url>
+            <url name="com.springsource.repository.bundles.external">
+                <ivy pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+                <artifact pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+            </url>
+            <url name="ivy.zutubi.com">
+                <ivy pattern="http://ivy.zutubi.com/[organisation]/[module]/ivy-[revision].xml"/>
+                <artifact pattern="http://ivy.zutubi.com/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+            </url>
+        </chain>
+
+        <!-- This resolver uses a local copy of the ivy repository and should be used when testing dependency changes. -->
+        <filesystem name="local" local="true" checkmodified="true" changingPattern="*">
+            <ivy pattern="${ivy.local.repository}/[organisation]/[module]/ivy-[revision].xml"/>
+            <artifact pattern="${ivy.local.repository}/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+        </filesystem>
+
+        <!--  The resolver used to locate artifacts during a build. -->
         <filesystem name="build" local="true" checkmodified="true" changingPattern="*">
             <ivy pattern="${ivy.settings.dir}/build/repository/[module]/ivy-[revision].xml"/>
-            <artifact pattern="${ivy.settings.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
+            <artifact pattern="${ivy.settings.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[ext]"/>
         </filesystem>
 
-        <!-- It would be nice while testing to be able to switch resolvers at
-             runtime (via -D option)
-        <filesystem name="local" local="true" checkmodified="true" changingPattern="*">
-            <ivy pattern="c:/projects/repository/[organisation]/[module]/ivy-[revision].xml"/>
-            <artifact pattern="c:/projects/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
-        </filesystem>
-        -->
-
+        <!-- This resolver is used by the build to automatically publish artifacts to svn -->
         <svn name="private" repositoryRoot="svn+ssh://zutubi.com/svnroot" binaryDiff="false"
              userName="${svn.user.name}" userPassword="${svn.user.password}">
             <ivy pattern="repository/[organisation]/[module]/ivy-[revision].xml"/>
-            <artifact pattern="repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+            <artifact pattern="repository/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
         </svn>
+
     </resolvers>
 
     <modules>
         <!-- We know where all of our own packages are located, no point searching through the others. -->
         <module organisation="zutubi" name="com.zutubi.*" resolver="build"/>
+        <!--<module organisation="org.springframework" name="org.springframework.*" resolver="com.springsource.repository.bundles.release"/>-->
     </modules>
 </ivysettings>

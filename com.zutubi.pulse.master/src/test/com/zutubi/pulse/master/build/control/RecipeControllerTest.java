@@ -113,7 +113,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(recipeDir);
+        removeDirectory(recipeDir);
         super.tearDown();
     }
 

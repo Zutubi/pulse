@@ -190,9 +190,9 @@ public class HibernateSearchQuery<T> implements Serializable
      *
      * @return the number of elements matched by this query.
      */
-    public int count()
+    public long count()
     {
-        return (Integer)getHibernateTemplate().execute(new HibernateCallback()
+        return (Long)getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {

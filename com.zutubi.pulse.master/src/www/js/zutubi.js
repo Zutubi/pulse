@@ -1,3 +1,7 @@
+// dependency: ext/package.js
+// dependency: ext/StatusBar.js
+// dependency: widget/treegrid/package.js
+
 // setup the namespace for the zutubi components.
 var ZUTUBI = window.ZUTUBI || {};
 
@@ -2307,6 +2311,15 @@ ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, 
     }
 });
 
+ZUTUBI.viewWorkingCopy = function (project)
+{
+    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
+        baseUrl : window.baseUrl,
+        basePath: 'projects/' + project + '/latest/wc',
+        title : 'browse working copy'
+    });
+    browser.show(this);
+};
 
 /**
  * Button used to select a node in a tree.
@@ -3144,7 +3157,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
         }, this);
 
         this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
-        this.addItem({xtype: 'xztblink', text:"pulse 2.2", url: window.baseUrl + '/default.action'});
+        this.addItem({xtype: 'xztblink', text:"pulse 2.3 [beta]", url: window.baseUrl + '/default.action'});
         this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
 
         if (this.projectName)
@@ -3353,7 +3366,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'next-successful',
-                image: 'health/ok.gif',
+                image: this.getImage(this.nextSuccessful),
                 title: 'next successful (build ' + this.nextSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextSuccessful)
             });
@@ -3362,7 +3375,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'next-broken',
-                image: 'health/broken.gif',
+                image: this.getImage(this.nextBroken),
                 title: 'next broken (build ' + this.nextBroken.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextBroken)
             });
@@ -3371,7 +3384,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'previous-successful',
-                image: 'health/ok.gif',
+                image: this.getImage(this.previousSuccessful),
                 title: 'previous successful (build ' + this.previousSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousSuccessful)
             });
@@ -3380,12 +3393,39 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             items.push({
                 id: 'previous-broken',
-                image: 'health/broken.gif',
+                image: this.getImage(this.previousBroken),
                 title: 'previous broken (build ' + this.previousBroken.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousBroken)
             });
         }
+
+        if (this.latest)
+        {
+            items.push({
+                id: 'latest',
+                image: this.getImage(this.latest),
+                title: 'latest (build ' + this.latest.number + ')',
+                url: this.getUrl(this.personalBuild, this.latest)
+            });
+        }
+
         return items;
+    },
+
+    getImage: function(build)
+    {
+        if (build.status == 'success')
+        {
+            return 'health/ok.gif';    
+        }
+        else if (build.status == 'failure')
+        {
+            return 'health/broken.gif';
+        }
+        else
+        {
+            return 'health/unknown.gif';
+        }
     },
 
     getUrl: function(isPersonalBuild, build)

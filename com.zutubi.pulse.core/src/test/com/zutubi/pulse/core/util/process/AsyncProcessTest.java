@@ -21,7 +21,8 @@ public class AsyncProcessTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
+        super.tearDown();
     }
 
     public void testSimpleLineBased() throws IOException, InterruptedException

@@ -26,7 +26,7 @@ public interface WorkingCopyStatusBuilder
      * of the returned data.
      * <p/>
      * As this operation may take some time, implementations should generally
-     * use a {@link com.zutubi.pulse.core.scm.api.PersonalBuildUI} to report
+     * use a {@link com.zutubi.pulse.core.ui.api.UserInterface} to report
      * feedback for an operation in progress.  The UI may also be used to query
      * for user input if necessary.  Implementations are encourage to report
      * feedback in the format used by the SCM tools themselves.

@@ -24,7 +24,7 @@ public class DefaultObjectFactoryTest extends ZutubiTestCase
         getClassInstanceFailureHelper(ParentType.class.getName(), ChildType.class);
     }
 
-    private void getClassInstanceFailureHelper(String className, Class<?> token)
+    private <T> void getClassInstanceFailureHelper(String className, Class<? super T> token)
     {
         try
         {

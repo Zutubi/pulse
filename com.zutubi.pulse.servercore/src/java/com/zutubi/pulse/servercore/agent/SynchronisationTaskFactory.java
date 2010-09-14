@@ -29,6 +29,7 @@ public class SynchronisationTaskFactory
         registerType(SynchronisationTask.Type.CLEANUP_DIRECTORY.name(), DeleteDirectoryTask.class);
         registerType(SynchronisationTask.Type.RENAME_DIRECTORY.name(), RenameDirectoryTask.class);
         registerType(SynchronisationTask.Type.TEST.name(), TestSynchronisationTask.class);
+        registerType(SynchronisationTask.Type.TEST_ASYNC.name(), TestAsyncSynchronisationTask.class);
     }
 
     /**

@@ -8,7 +8,7 @@ import javax.servlet.FilterConfig;
 /**
  * <class-comment/>
  */
-public class FilterToBeanProxy extends org.acegisecurity.util.FilterToBeanProxy
+public class FilterToBeanProxy extends org.springframework.security.util.FilterToBeanProxy
 {
     protected ApplicationContext getContext(FilterConfig filterConfig)
     {

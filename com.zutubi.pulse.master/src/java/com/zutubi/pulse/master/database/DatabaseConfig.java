@@ -170,6 +170,12 @@ public class DatabaseConfig
     public Properties getHibernateProperties()
     {
         Properties hibernateProperties = new Properties();
+
+        // Enable second level caching, required since by default it is disabled.
+        hibernateProperties.put("hibernate.cache.use_second_level_cache", "true");
+        hibernateProperties.put("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
+        hibernateProperties.put("hibernate.cache.use_query_cache", "false"); // enable/disable the query cache
+
         for (Object o : properties.keySet())
         {
             String propertyName = (String) o;

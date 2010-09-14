@@ -150,6 +150,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         assertTrue(toolbar.isNextSuccessfulBuildLinkPresent());
         assertTrue(toolbar.isPreviousSuccessfulBuildLinkPresent());
+        assertTrue(toolbar.isLatestBuildLinkPresent());
         assertFalse(toolbar.isNextBrokenBuildLinkPresent());
         assertFalse(toolbar.isPreviousBrokenBuildLinkPresent());
 
@@ -158,6 +159,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         toolbar.waitForBuildNav();
         toolbar.clickOnNavMenu();
         assertTrue(toolbar.isNextSuccessfulBuildLinkPresent());
+        assertTrue(toolbar.isLatestBuildLinkPresent());
         assertFalse(toolbar.isPreviousSuccessfulBuildLinkPresent());
 
         toolbar.clickNextSuccessfulBuildLink();
@@ -170,6 +172,15 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         toolbar.clickOnNavMenu();
         assertTrue(toolbar.isNextSuccessfulBuildLinkPresent());
         assertTrue(toolbar.isPreviousSuccessfulBuildLinkPresent());
+        assertTrue(toolbar.isLatestBuildLinkPresent());
+
+        toolbar.clickLatestBuildLink();
+
+        page = browser.createPage(BuildSummaryPage.class, projectName, 6L);
+        page.waitFor();
+
+        toolbar.waitForBuildNav();
+        assertFalse(toolbar.isLatestBuildLinkPresent());
     }
 
     public void testPersonalBuildNavigation() throws Exception

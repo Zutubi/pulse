@@ -81,10 +81,10 @@ public class AcegiUserTest extends PulseTestCase
         final Sort.StringComparator sc = new Sort.StringComparator();
         Collections.sort(actualExpected, sc);
 
-        org.acegisecurity.GrantedAuthority[] authorities = acegiUser.getAuthorities();
-        Arrays.sort(authorities, new Comparator<org.acegisecurity.GrantedAuthority>()
+        org.springframework.security.GrantedAuthority[] authorities = acegiUser.getAuthorities();
+        Arrays.sort(authorities, new Comparator<org.springframework.security.GrantedAuthority>()
         {
-            public int compare(org.acegisecurity.GrantedAuthority o1, org.acegisecurity.GrantedAuthority o2)
+            public int compare(org.springframework.security.GrantedAuthority o1, org.springframework.security.GrantedAuthority o2)
             {
                 return sc.compare(o1.getAuthority(), o2.getAuthority());
             }

@@ -7,7 +7,7 @@ import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -81,6 +81,7 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
     }
 
     /**
+     *
      * Checks if the calling thread has permission to perform the given action
      * on the given path.  If the path is in an owned scope (see
      * {@link #registerOwnedScope(String)}, then this amounts to checking if

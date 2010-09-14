@@ -59,8 +59,13 @@ public class MasterHostService implements HostService
 
     public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
     {
-        LOG.warning("Illegal request to update version of master agent.");
+        LOG.warning("Illegal request to update version of master host.");
         return true;
+    }
+
+    public boolean syncPlugins(String masterUrl, long hostId, String pluginRepositoryUrl)
+    {
+        return false;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

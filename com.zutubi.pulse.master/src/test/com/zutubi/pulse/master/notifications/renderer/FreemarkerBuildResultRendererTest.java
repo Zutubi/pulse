@@ -86,7 +86,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
     public void testBasicSuccess() throws Exception

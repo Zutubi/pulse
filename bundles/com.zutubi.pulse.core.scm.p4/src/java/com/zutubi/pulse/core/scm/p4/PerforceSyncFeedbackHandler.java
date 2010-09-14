@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.ui.api.UserInterface;
 
 /**
  * A handler for the p4 sync operation that just passes the output through to
@@ -10,11 +10,11 @@ import com.zutubi.pulse.core.scm.api.ScmException;
  */
 public class PerforceSyncFeedbackHandler implements PerforceFeedbackHandler
 {
-    private PersonalBuildUI ui;
+    private UserInterface ui;
     private boolean resolveRequired = false;
     private boolean errorEncountered = false;
 
-    public PerforceSyncFeedbackHandler(PersonalBuildUI ui)
+    public PerforceSyncFeedbackHandler(UserInterface ui)
     {
         this.ui = ui;
     }

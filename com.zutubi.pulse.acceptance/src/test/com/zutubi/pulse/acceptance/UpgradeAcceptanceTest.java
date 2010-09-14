@@ -54,10 +54,8 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.rmdir(work))
-        {
-            System.out.println("failed to remove tmp directory due to earlier error.");
-        }
+        removeDirectory(work);
+
         super.tearDown();
     }
 

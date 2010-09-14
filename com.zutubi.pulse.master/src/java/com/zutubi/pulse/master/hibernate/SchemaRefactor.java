@@ -166,7 +166,7 @@ public class SchemaRefactor
                 Table referencedTable = fk.getReferencedTable();
                 if (referencedTable != null && referencedTable == fromTable)
                 {
-                    TableMetadata tableInfo = meta.getTableMetadata(t.getName(), defaultSchema, defaultCatalog);
+                    TableMetadata tableInfo = meta.getTableMetadata(t.getName(), defaultSchema, defaultCatalog, false);
 
                     // verify that the fk is actually in the database.
                     if (tableInfo.getForeignKeyMetadata(fk.getName()) == null)
@@ -376,7 +376,7 @@ public class SchemaRefactor
     private void updateTableSchema(Table table, Connection connection) throws SQLException
     {
         DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
-        TableMetadata tableInfo = meta.getTableMetadata(table.getName(), defaultSchema, defaultCatalog);
+        TableMetadata tableInfo = meta.getTableMetadata(table.getName(), defaultSchema, defaultCatalog, false);
 
         Iterator alterSqls = table.sqlAlterStrings(dialect, config.getMapping(), tableInfo, defaultCatalog, defaultSchema);
         while (alterSqls.hasNext())

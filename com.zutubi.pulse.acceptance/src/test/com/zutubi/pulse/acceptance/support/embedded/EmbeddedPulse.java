@@ -207,7 +207,17 @@ public class EmbeddedPulse implements Pulse
         }
     }
 
+    public String getScript()
+    {
+        throw new RuntimeException("Not yet supported.");
+    }
+
     public String getPulseHome()
+    {
+        throw new RuntimeException("Not yet supported.");
+    }
+
+    public String getActiveVersionDirectory()
     {
         throw new RuntimeException("Not yet supported.");
     }

@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
@@ -48,6 +49,7 @@ public class UpdateCommand implements Runnable
     private ConfigurationManager configurationManager;
     private MasterProxyFactory masterProxyFactory;
     private ShutdownManager shutdownManager;
+    private JettyServerManager jettyServerManager;
 
     public UpdateCommand(String build, String master, String token, long hostId, String url)
     {
@@ -104,6 +106,7 @@ public class UpdateCommand implements Runnable
             sendMessage(masterService, UpgradeState.APPLYING);
             updateActiveVersion(pulseHome);
 
+            jettyServerManager.stop(false);
             sendMessage(masterService, UpgradeState.REBOOTING);
             shutdownManager.reboot();
         }
@@ -277,5 +280,10 @@ public class UpdateCommand implements Runnable
     public void setMasterProxyFactory(MasterProxyFactory masterProxyFactory)
     {
         this.masterProxyFactory = masterProxyFactory;
+    }
+
+    public void setJettyServerManager(JettyServerManager jettyServerManager)
+    {
+        this.jettyServerManager = jettyServerManager;
     }
 }

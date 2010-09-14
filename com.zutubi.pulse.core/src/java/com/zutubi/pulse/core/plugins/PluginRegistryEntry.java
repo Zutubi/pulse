@@ -8,13 +8,33 @@ import java.util.Map;
 
 public class PluginRegistryEntry
 {
-    public static final String PLUGIN_STATE_KEY = "plugin.state";
-    public static final String PLUGIN_TYPE_KEY = "plugin.type";
-    public static final String PLUGIN_VERSION_KEY = "plugin.version";
-    public static final String PLUGIN_SOURCE_KEY = "plugin.uri";
-    public static final String PLUGIN_PENDING_KEY = "plugin.pending.action";
-    public static final String UPGRADE_SOURCE_KEY = "plugin.upgrade.source";
+    // The mode key is named "state" for historical reasons.
+    private static final String KEY_PLUGIN_MODE = "plugin.state";
+    private static final String KEY_PLUGIN_SOURCE = "plugin.uri";
+    private static final String KEY_PLUGIN_PENDING = "plugin.pending.action";
+    private static final String KEY_UPGRADE_SOURCE = "plugin.upgrade.source";
 
+    /**
+     * Persistent plugin modes.  These are processed on startup to decide which
+     * state the plugin should be moved to.
+     */
+    public enum Mode
+    {
+        /**
+         * The normal situation: the plugin should be enabled on startup.
+         */
+        ENABLE,
+        /**
+         * The plugin exists but should not be deployed on startup.
+         */
+        DISABLE,
+        /**
+         * The plugin does not exist.  This mode is used to keep prepackaged
+         * plugins uninstalled (even across Pulse upgrades).
+         */
+        UNINSTALLED
+    }
+    
     private Map<String, String> entry;
 
     public PluginRegistryEntry()
@@ -39,12 +59,37 @@ public class PluginRegistryEntry
 
     public String getUpgradeSource()
     {
-        return get(UPGRADE_SOURCE_KEY);
+        return get(KEY_UPGRADE_SOURCE);
     }
 
+    public void setUpgradeSource(String source)
+    {
+        put(KEY_UPGRADE_SOURCE, source);
+    }
+    
+    public void removeUpgradeSource()
+    {
+        remove(KEY_UPGRADE_SOURCE);
+    }
+
+    public boolean hasPendingAction()
+    {
+        return StringUtils.stringSet(getPendingAction());
+    }
+    
     public String getPendingAction()
     {
-        return get(PLUGIN_PENDING_KEY);
+        return get(KEY_PLUGIN_PENDING);
+    }
+
+    public void setPendingAction(String action)
+    {
+        put(KEY_PLUGIN_PENDING, action);
+    }
+    
+    public void removePendingAction()
+    {
+        remove(KEY_PLUGIN_PENDING);
     }
 
     public boolean hasSource()
@@ -54,57 +99,40 @@ public class PluginRegistryEntry
 
     public String getSource()
     {
-        return get(PLUGIN_SOURCE_KEY);
+        return get(KEY_PLUGIN_SOURCE);
     }
 
     public void setSource(String str)
     {
-        put(PLUGIN_SOURCE_KEY, str);
+        put(KEY_PLUGIN_SOURCE, str);
     }
 
-    public PluginManager.State getState()
+    public void removeSource()
     {
-        String stateStr = get(PLUGIN_STATE_KEY);
+        remove(KEY_PLUGIN_SOURCE);
+    }
+    
+    public Mode getMode()
+    {
+        String stateStr = get(KEY_PLUGIN_MODE);
         if (StringUtils.stringSet(stateStr))
         {
-            return PluginManager.State.valueOf(stateStr);
+            try
+            {
+                return Mode.valueOf(stateStr);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // Fall through.
+            }
         }
-        return null;
+        
+        return Mode.ENABLE;
     }
 
-    public void setState(PluginManager.State state)
+    public void setMode(Mode mode)
     {
-        put(PLUGIN_STATE_KEY, state.toString());
-    }
-
-    public Plugin.Type getType()
-    {
-        String typeStr = get(PLUGIN_TYPE_KEY);
-        if (StringUtils.stringSet(typeStr))
-        {
-            return Plugin.Type.valueOf(typeStr);
-        }
-        return null;
-    }
-
-    public void setType(Plugin.Type type)
-    {
-        put(PLUGIN_TYPE_KEY, type.toString());
-    }
-
-    public PluginVersion getVersion()
-    {
-        String versionString = get(PLUGIN_VERSION_KEY);
-        if (!StringUtils.stringSet(versionString))
-        {
-            return null;
-        }
-        return new PluginVersion(versionString);
-    }
-
-    public void setVersion(PluginVersion version)
-    {
-        put(PLUGIN_VERSION_KEY, version.toString());
+        put(KEY_PLUGIN_MODE, mode.toString());
     }
 
     public Collection<String> keySet()
@@ -121,5 +149,4 @@ public class PluginRegistryEntry
     {
         entry.remove(key);
     }
-
 }

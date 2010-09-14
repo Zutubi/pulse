@@ -113,6 +113,11 @@ public class BuildViewport
         );
     }
 
+    public BuildResult getLatestBuild()
+    {
+        return buildResultDao.findByLatestBuild(buildId);
+    }
+
     private BuildResult uniqueResult(List<BuildResult> results)
     {
         if (results.size() > 1)

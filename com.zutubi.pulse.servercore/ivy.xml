@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.pulse.servercore" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -10,12 +12,10 @@
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
-        <conf name="build" description="All of the packages required during the build."/>
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
-        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
@@ -29,15 +29,13 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
 
         <!-- Library dependencies -->
-        <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-vfs" rev="20100409" conf="external,build,release->default"/>
-        <dependency org="apache" name="ivy" rev="2.0.0" conf="external,build,release->core"/>
+        <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="commons-vfs" rev="20100409" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="ivy" rev="2.0.0" conf="external,build,release->core;src->src"/>
+        <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default;src->src"/>
+        <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.14" conf="external,build,release->default;src->src"/>
+        <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default;src->src"/>
 
-        <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default"/>
-
-        <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.14" conf="external,build,release->default"/>
-
-        <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default"/>
     </dependencies>
 </ivy-module>

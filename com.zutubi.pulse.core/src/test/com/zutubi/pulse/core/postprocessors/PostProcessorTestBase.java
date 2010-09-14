@@ -32,9 +32,10 @@ public abstract class PostProcessorTestBase extends PulseTestCase
         tempDir = FileSystemUtils.createTempDir(getClass().getName(), "");
     }
 
-    public void tearDown()
+    public void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
+        super.tearDown();
     }
 
     protected CommandResult createAndProcessArtifact(String name, PostProcessor pp) throws Exception

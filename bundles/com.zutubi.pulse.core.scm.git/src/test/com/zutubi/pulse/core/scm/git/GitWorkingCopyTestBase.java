@@ -1,10 +1,9 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
@@ -16,6 +15,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 
 public abstract class GitWorkingCopyTestBase extends PulseTestCase
 {
@@ -44,14 +45,14 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
         otherDir = new File(tempDir, "other");
         runGit(tempDir, COMMAND_CLONE, upstreamDir.getName(), "other");
 
-        context = new WorkingCopyContextImpl(baseDir, new PropertiesConfig(), new TestPersonalBuildUI());
+        context = new WorkingCopyContextImpl(baseDir, new PropertiesConfig(), new TestUI());
         workingCopy = new GitWorkingCopy();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
         super.tearDown();
     }
 

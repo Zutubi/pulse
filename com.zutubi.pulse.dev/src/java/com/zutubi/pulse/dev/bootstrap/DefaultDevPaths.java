@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.bootstrap;
 
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.command.PulseCtl;
 
 import java.io.File;
@@ -25,6 +26,12 @@ public class DefaultDevPaths implements DevPaths
         versionHome = new File(v);
     }
 
+    public DefaultDevPaths(File userRoot, File versionHome)
+    {
+        this.userRoot = userRoot;
+        this.versionHome = versionHome;
+    }
+    
     public File getUserRoot()
     {
         if (userRoot == null)
@@ -40,10 +47,24 @@ public class DefaultDevPaths implements DevPaths
                 homeDir = new File(userHome);
             }
 
-            userRoot = new File(homeDir, ".pulse2-dev");
+            userRoot = new File(homeDir, ".pulse" + getMajorMinor() + "-dev");
         }
 
         return userRoot;
+    }
+
+    private String getMajorMinor()
+    {
+        String versionNumber = Version.getVersion().getVersionNumber();
+        String[] pieces = versionNumber.split("\\.");
+        if (pieces.length == 1)
+        {
+            return pieces[0];
+        }
+        else
+        {
+            return pieces[0] + pieces[1];
+        }
     }
 
     private File getSystemRoot()

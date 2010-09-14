@@ -66,7 +66,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private AgentSynchronisationMessageDao agentSynchronisationMessageDao;
     private AgentSynchronisationService agentSynchronisationService;
     private HostManager hostManager;
-    private HostPingService hostPingService;
 
     private LicenseManager licenseManager;
 
@@ -349,12 +348,13 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             agentSynchronisationMessageDao.save(message);
         }
+
         agentSynchronisationMessageDao.flush();
     }
 
-    public List<AgentSynchronisationMessage> getSynchronisationMessages(Agent agent)
+    public List<AgentSynchronisationMessage> getSynchronisationMessages(long agentId)
     {
-        AgentState agentState = agentStateDao.findById(agent.getId());
+        AgentState agentState = agentStateDao.findById(agentId);
         if (agentState != null)
         {
             return agentSynchronisationMessageDao.findByAgentState(agentState);
@@ -365,29 +365,48 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    public boolean completeSynchronisation(final Agent agent, final boolean successful)
+    public List<AgentSynchronisationMessage> getProcessingSynchronisationMessages()
+    {
+        return agentSynchronisationMessageDao.findByStatus(AgentSynchronisationMessage.Status.PROCESSING);
+    }
+
+    public AgentSynchronisationMessage getSynchronisationMessage(long messageId)
+    {
+        return agentSynchronisationMessageDao.findById(messageId);
+    }
+
+    public boolean completeSynchronisation(final long agentId, final boolean successful)
     {
         return agentStatusManager.withAgentsLock(new NullaryFunction<Boolean>()
         {
             public Boolean process()
             {
-                if (!successful || noPendingSynchronisationMessages(agent))
+                Agent agent = getAgentById(agentId);
+                if (agent != null)
                 {
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, agent, successful));
-                    return true;
+                    List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agentId);
+                    if (agent.getStatus() == AgentStatus.SYNCHRONISING)
+                    {
+                        // When a cycle is unsuccessful (unable to sent messages to the
+                        // agent), we declare it complete and let the status manager
+                        // move the agent offline.  When we get a successful ping, a
+                        // new cycle will start.
+                        if (!successful || !CollectionUtils.contains(messages, AgentSynchronisationService.INCOMPLETE_MESSAGES_PREDICATE))
+                        {
+                            eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgentById(agentId), successful));
+                            return true;
+                        }
+                    }
+                    
+                    return !CollectionUtils.contains(messages, AgentSynchronisationService.PENDING_MESSAGES_PREDICATE);
                 }
                 else
                 {
-                    return false;
+                    // We don't want a new cycle to start in this case.
+                    return true;
                 }
             }
         });
-    }
-
-    private boolean noPendingSynchronisationMessages(Agent agent)
-    {
-        List<AgentSynchronisationMessage> messages = getSynchronisationMessages(agent);
-        return !CollectionUtils.contains(messages, new AgentSynchronisationService.PendingMessagesPredicate());
     }
 
     public void setEnableState(Agent agent, AgentState.EnableState state)
@@ -457,7 +476,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         });
     }
 
-    public Agent getAgent(long handle)
+    public Agent getAgentByHandle(long handle)
     {
         lock.lock();
         try
@@ -470,9 +489,20 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
+    public Agent getAgentById(final long agentId)
+    {
+        return CollectionUtils.find(agents.values(), new Predicate<Agent>()
+        {
+            public boolean satisfied(Agent agent)
+            {
+                return agent.getId() == agentId;
+            }
+        });
+    }
+
     public Agent getAgent(AgentConfiguration agent)
     {
-        return getAgent(agent.getHandle());
+        return getAgentByHandle(agent.getHandle());
     }
 
     public void pingAgent(AgentConfiguration agent)
@@ -623,8 +653,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         this.agentSynchronisationService = agentSynchronisationService;
     }
 
-    public void setHostPingService(HostPingService hostPingService)
+    void setAgentStatusManager(AgentStatusManager agentStatusManager)
     {
-        this.hostPingService = hostPingService;
+        this.agentStatusManager = agentStatusManager;
     }
 }

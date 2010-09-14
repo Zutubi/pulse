@@ -70,7 +70,7 @@ public interface BuildManager
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
-    public int getBuildCount(Project project, ResultState[] states);
+    int getBuildCount(Project project, ResultState[] states);
 
     /**
      * Counts the number of builds that have happened between the given build numbers.

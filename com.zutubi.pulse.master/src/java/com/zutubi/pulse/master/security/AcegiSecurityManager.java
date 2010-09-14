@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.util.FilterChainProxy;
+import org.springframework.security.util.FilterChainProxy;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Dispatcher;
 import org.mortbay.jetty.servlet.FilterHolder;

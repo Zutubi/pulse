@@ -136,6 +136,7 @@ public class BuildActionBase extends ProjectActionBase
             }
         }));
 
+        // provide the details for the links.
         BuildResult nextBrokenBuild = buildViewport.getNextBrokenBuild();
         if (nextBrokenBuild != null)
         {
@@ -155,6 +156,11 @@ public class BuildActionBase extends ProjectActionBase
         if (previousSuccessfulBuild != null)
         {
             viewport.setPreviousSuccessful(new Viewport.Data(previousSuccessfulBuild));
+        }
+        BuildResult latestBuild = buildViewport.getLatestBuild();
+        if (latestBuild != null && latestBuild.getId() != getBuildId())
+        {
+            viewport.setLatest(new Viewport.Data(latestBuild));
         }
     }
 

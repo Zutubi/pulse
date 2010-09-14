@@ -14,7 +14,6 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -22,6 +21,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * Manages the transient status of agents.  Uses ping and recipe events to
@@ -146,6 +147,7 @@ public class AgentStatusManager implements EventListener
             case INVALID_MASTER:
             case TOKEN_MISMATCH:
             case VERSION_MISMATCH:
+            case PLUGIN_MISMATCH:
                 switch(oldStatus)
                 {
                     case BUILDING:

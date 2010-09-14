@@ -9,6 +9,8 @@ import org.osgi.framework.BundleException;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,10 +35,9 @@ public abstract class LocalPlugin implements Plugin
 
     private BundleDescription bundleDescription;
 
-    private String errorMessage;
+    private List<String> errorMessages = new LinkedList<String>();
 
     private State pluginState;
-    private Type pluginType;
 
     public LocalPlugin(File source)
     {
@@ -93,43 +94,54 @@ public abstract class LocalPlugin implements Plugin
         return this.pluginState;
     }
 
+    public boolean isRunning()
+    {
+        switch (pluginState)
+        {
+            case ENABLED:
+            case DISABLING:
+            case INSTALLING:
+            case UPGRADING:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     void setState(State pluginState)
     {
         this.pluginState = pluginState;
     }
 
-    public Type getType()
+    public List<String> getErrorMessages()
     {
-        return pluginType;
+        return Collections.unmodifiableList(errorMessages);
     }
 
-    void setType(Type type)
+    public void addErrorMessage(String errorMessage)
     {
-        this.pluginType = type;
+        errorMessages.add(errorMessage);
     }
 
-    public String getErrorMessage()
+    public void clearErrorMessages()
     {
-        return errorMessage;
+        errorMessages.clear();
     }
-
-    public void setErrorMessage(String errorMessage)
-    {
-        this.errorMessage = errorMessage;
-    }
-
+    
     public void enable() throws PluginException
     {
-        setErrorMessage(null);
+        clearErrorMessages();
         switch (pluginState)
         {
             case UNINSTALLING:
                 throw new PluginException("Unable to enable plugin: already marked for uninstall");
-            case UPDATING:
+            case UPGRADING:
                 throw new PluginException("Unable to enable plugin: already marked for update");
             case DISABLING:
+            case INSTALLING:
                 manager.enablePlugin(this);
             case DISABLED:
+            case ERROR:
                 manager.enablePlugin(this);
                 break;
             case ENABLED:
@@ -139,13 +151,7 @@ public abstract class LocalPlugin implements Plugin
 
     public void disable() throws PluginException
     {
-        disable(null);
-    }
-
-    public void disable(String reason) throws PluginException
-    {
-        setErrorMessage(reason);
-        
+        clearErrorMessages();
         switch (pluginState)
         {
             case DISABLED:
@@ -156,8 +162,8 @@ public abstract class LocalPlugin implements Plugin
                 break;
             case UNINSTALLING:
                 throw new PluginException("Unable to disable plugin: already marked for uninstall");
-            case UPDATING:
-                throw new PluginException("Unable to disable plugin: already marked for update");
+            case UPGRADING:
+                throw new PluginException("Unable to disable plugin: already marked for upgrade");
             default:
                 manager.disablePlugin(this);
         }
@@ -165,11 +171,7 @@ public abstract class LocalPlugin implements Plugin
 
     public void uninstall() throws PluginException
     {
-        if (pluginType == Type.INTERNAL)
-        {
-            throw new PluginException("Cannot uninstall plugin: this is an internal plugin.");
-        }
-        setErrorMessage(null);
+        clearErrorMessages();
         switch (pluginState)
         {
             case ENABLED:
@@ -177,8 +179,8 @@ public abstract class LocalPlugin implements Plugin
                 break;
             case UNINSTALLING:
                 throw new PluginException("Cannot uninstall plugin: already marked for uninstall");
-            case UPDATING:
-                throw new PluginException("Cannot uninstall plugin: already marked for update");
+            case UPGRADING:
+                throw new PluginException("Cannot uninstall plugin: already marked for upgrade");
             default:
                 manager.uninstallPlugin(this);
                 break;
@@ -187,13 +189,13 @@ public abstract class LocalPlugin implements Plugin
 
     public Plugin upgrade(URI newSource) throws PluginException
     {
-        setErrorMessage(null);
+        clearErrorMessages();
         switch (pluginState)
         {
             case ENABLED:
                 manager.requestUpgrade(this, newSource);
                 return this;
-            case UPDATING:
+            case UPGRADING:
                 manager.cancelUpgrade(this);
                 manager.requestUpgrade(this, newSource);
                 return this;
@@ -201,19 +203,6 @@ public abstract class LocalPlugin implements Plugin
                 throw new PluginException("Unable to update plugin: already marked for uninstall");
             default:
                 return manager.upgradePlugin(this, newSource);
-        }
-    }
-
-    public void resolve() throws PluginException
-    {
-        setErrorMessage(null);
-        switch (pluginState)
-        {
-            case VERSION_CHANGE:
-                manager.resolveVersionChange(this);
-                break;
-            default:
-                throw new PluginException("Unable to resolve plugin version: no version change detected.");
         }
     }
 
@@ -237,7 +226,7 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canEnable()
     {
-        return isDisabled() || isDisabling();
+        return isDisabled() || isDisabling() || isError();
     }
 
     public boolean isDisabled()
@@ -247,12 +236,22 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canDisable()
     {
-        return isEnabled();
+        return isEnabled() || isError();
     }
 
     public boolean isDisabling()
     {
         return pluginState == Plugin.State.DISABLING;
+    }
+
+    public boolean isError()
+    {
+        return pluginState == Plugin.State.ERROR;
+    }
+    
+    public boolean isInstalling()
+    {
+        return pluginState == Plugin.State.INSTALLING;
     }
 
     public boolean isUninstalling()
@@ -262,17 +261,17 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canUninstall()
     {
-        return (isEnabled() || isDisabled()) && pluginType != Type.INTERNAL;
+        return (isEnabled() || isDisabled());
     }
 
-    public boolean isUpdating()
+    public boolean isUpgrading()
     {
-        return pluginState == Plugin.State.UPDATING;
+        return pluginState == Plugin.State.UPGRADING;
     }
 
     public boolean canUpdate()
     {
-        return isEnabled() || isDisabled();
+        return isEnabled() || isDisabled() || isError();
     }
 
     public boolean equals(Object obj)
@@ -329,18 +328,41 @@ public abstract class LocalPlugin implements Plugin
         return bundle;
     }
 
-    public void setBundle(Bundle bundle)
-    {
-        this.bundle = bundle;
-    }
-
     public BundleDescription getBundleDescription()
     {
         return bundleDescription;
     }
 
-    public void setBundleDescription(BundleDescription bundleDescription)
+    /**
+     * Links this plugin with a successfully installed Equinox bundle and
+     * related description.
+     * 
+     * @param bundle            the bundle to link with
+     * @param bundleDescription information about the bundle from the framework
+     */
+    public void associateBundle(Bundle bundle, BundleDescription bundleDescription)
     {
+        this.bundle = bundle;
         this.bundleDescription = bundleDescription;
+    }
+
+    /**
+     * Removes all links to an Equinox bundle due to an error and moves this
+     * plugin to the error state.
+     * 
+     * @param errorMessage a message describing what went wrong
+     */
+    public void disassociateBundle(String errorMessage)
+    {
+        bundle = null;
+        bundleDescription = null;
+        pluginState = State.ERROR;
+        addErrorMessage(errorMessage);
+    }
+
+    @Override
+    public String toString()
+    {
+        return getId() + ":" + getVersion() + ":" + getState() + ":" + getErrorMessages();
     }
 }

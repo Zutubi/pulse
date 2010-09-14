@@ -25,7 +25,7 @@ public class XmlRecordSerialiserTest extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.rmdir(tmpDir));
+        removeDirectory(tmpDir);
 
         super.tearDown();
     }

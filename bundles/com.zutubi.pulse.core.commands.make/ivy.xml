@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
     <info organisation="zutubi" module="com.zutubi.pulse.core.commands.make" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
-        <description homepage="http://www.zutubi.com/">
-
-        </description>
     </info>
 
     <configurations>
-        <conf name="build"/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
         <conf name="bundle"/>
         <conf name="external"/>
         <conf name="bundled_3rd_party"/>
-        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
@@ -24,6 +21,7 @@
     </publications>
 
     <dependencies>
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,src->@"/>
     </dependencies>
 

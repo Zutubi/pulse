@@ -11,11 +11,11 @@ import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
+import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -66,7 +66,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
-        FileSystemUtils.rmdir(workingCopyDir);
+        removeDirectory(workingCopyDir);
 
         super.tearDown();
     }
@@ -271,7 +271,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(gitUrl), xmlRpcHelper.getAntConfig());
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
-        FileSystemUtils.rmdir(workingCopyDir);
+        removeDirectory(workingCopyDir);
         runGit(null, "clone", gitUrl, workingCopyDir.getAbsolutePath());
         createConfigFile(random);
 
@@ -488,7 +488,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(stagePath, stage, false);
     }
 
-    private long runPersonalBuild(ResultState expectedStatus) throws IOException, PersonalBuildException
+    private long runPersonalBuild(ResultState expectedStatus) throws IOException, ClientException
     {
         // Request the build and wait for it to complete
         AcceptancePersonalBuildUI ui = requestPersonalBuild();
@@ -510,7 +510,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         buildRunner.createConfigFile(browser.getBaseUrl(), ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), projectName, extraProperties);
     }
 
-    private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException, PersonalBuildException
+    private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException, ClientException
     {
         return buildRunner.triggerBuild();
     }

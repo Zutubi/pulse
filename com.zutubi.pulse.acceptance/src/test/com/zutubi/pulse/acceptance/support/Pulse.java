@@ -45,8 +45,12 @@ public interface Pulse
      */
     boolean ping();
 
+    String getScript();
+    
     String getPulseHome();
 
+    String getActiveVersionDirectory();
+    
     String getPluginRoot();
 
     String getServerUrl();

@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.patch;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
@@ -13,6 +12,7 @@ import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -68,7 +68,7 @@ public class PatchArchiveTest extends PulseTestCase
         targetTestFile = new File(targetDir, TEST_FILENAME);
         FileSystemUtils.createFile(targetTestFile, TEST_FILE_CONTENT);
 
-        context = new WorkingCopyContextImpl(wcDir, null, new TestPersonalBuildUI());
+        context = new WorkingCopyContextImpl(wcDir, null, new TestUI());
         statusBuilder = mock(WorkingCopyStatusBuilder.class);
         stub(statusBuilder.canDiff(eq(context), anyString())).toReturn(false);
     }
@@ -76,7 +76,7 @@ public class PatchArchiveTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
         super.tearDown();
     }
 

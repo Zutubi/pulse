@@ -19,7 +19,7 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 
 import java.util.*;
 

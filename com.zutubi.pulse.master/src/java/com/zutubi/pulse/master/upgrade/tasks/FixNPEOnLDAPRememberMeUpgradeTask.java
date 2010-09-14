@@ -5,7 +5,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.RandomUtils;
-import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
+import org.springframework.security.providers.encoding.Md5PasswordEncoder;
 
 import java.util.Map;
 

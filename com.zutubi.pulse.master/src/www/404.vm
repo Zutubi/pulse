@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>#wwtext("name=error")</title>
-    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="$base/css/main.css?#version()" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
     <div style="padding: 16px;">

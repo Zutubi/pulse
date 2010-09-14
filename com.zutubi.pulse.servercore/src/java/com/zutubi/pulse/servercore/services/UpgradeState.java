@@ -22,16 +22,24 @@ public enum UpgradeState
      */
     APPLYING,
     /**
+     * The plugins are being brought into line with the master.
+     */
+    SYNCHRONISING_PLUGINS,
+    /**
      * Rebooting.  Expect to be able to ping me in the morning!
      */
     REBOOTING,
+    /**
+     * The upgrade completed without the need for a reboot.
+     */
+    COMPLETE,
     /**
      * Upgrade failed because of changes detected to non-upgradeable
      * components.  Manual upgrade is required.
      */
     FAILED,
     /**
-     * Some unexpected error occured during the upgrade.
+     * Some unexpected error occurred during the upgrade.
      */
     ERROR
 }

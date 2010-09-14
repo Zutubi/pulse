@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.security;
 
-import org.acegisecurity.context.SecurityContextHolder;
+import org.springframework.security.context.SecurityContextHolder;
 
 import javax.servlet.*;
 import java.io.IOException;

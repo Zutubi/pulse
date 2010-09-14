@@ -5,16 +5,16 @@ import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.acceptance.support.SupportUtils;
 import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
+import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.NullUnaryProcedure;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import static com.zutubi.util.Constants.MINUTE;
 import static com.zutubi.util.Constants.SECOND;
@@ -113,6 +113,46 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
         agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
         assertFalse(200000000 == agentBuild);
+
+        checkPluginsMatch(masterXmlRpc, agentXmlRpc);
+    }
+
+    private void checkPluginsMatch(XmlRpcHelper masterXmlRpc, XmlRpcHelper agentXmlRpc) throws Exception
+    {
+        Vector<Hashtable<String, Object>> masterPlugins = masterXmlRpc.getRunningPlugins();
+        masterPlugins = new Vector<Hashtable<String, Object>>(CollectionUtils.filter(masterPlugins, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> plugin)
+            {
+                return PluginRepository.Scope.CORE.toString().equals(plugin.get("scope")) ||
+                        PluginRepository.Scope.SERVER.toString().equals(plugin.get("scope"));
+            }
+        }));
+
+        Vector<Hashtable<String, Object>> agentPlugins = agentXmlRpc.callWithoutToken("getRunningPlugins", agent.getAdminToken());
+        assertEquals(masterPlugins.size(), agentPlugins.size());
+        
+        for (final Hashtable<String, Object> masterPlugin: masterPlugins)
+        {
+            assertTrue("Cannot find plugin '" + getId(masterPlugin) + ":" + getVersion(masterPlugin) + "' on agent",
+                    CollectionUtils.contains(agentPlugins, new Predicate<Hashtable<String, Object>>()
+                    {
+                        public boolean satisfied(Hashtable<String, Object> agentPlugin)
+                        {
+                            return getId(masterPlugin).equals(getId(agentPlugin)) && getVersion(masterPlugin).equals(getVersion(agentPlugin));
+                        }
+                    }));
+        }
+    }
+
+    private String getId(Hashtable<String, Object> masterPlugin)
+    {
+        return (String) masterPlugin.get("id");
+    }
+
+    private String getVersion(Hashtable<String, Object> masterPlugin)
+    {
+        return (String) masterPlugin.get("version");
     }
 
     private void prepareMaster() throws Exception

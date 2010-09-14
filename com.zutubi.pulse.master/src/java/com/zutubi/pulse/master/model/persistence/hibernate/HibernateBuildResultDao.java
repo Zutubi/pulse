@@ -13,9 +13,9 @@ import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.*;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
@@ -100,9 +100,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, false);
-                criteria.add(Expression.lt("number", result.getNumber()));
-                criteria.add(Expression.eq("userRevision", false));
-                criteria.add(Expression.isNotNull("revisionString"));
+                criteria.add(Restrictions.lt("number", result.getNumber()));
+                criteria.add(Restrictions.eq("userRevision", false));
+                criteria.add(Restrictions.isNotNull("revisionString"));
                 criteria.setMaxResults(1);
                 criteria.addOrder(Order.desc("number"));
                 return criteria.uniqueResult();
@@ -163,7 +163,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
-                criteria.add(Expression.eq("metaBuildId", metaBuildId));
+                criteria.add(Restrictions.eq("metaBuildId", metaBuildId));
                 criteria.setMaxResults(1);
                 criteria.addOrder(Order.desc("number"));
                 return criteria.uniqueResult();
@@ -179,7 +179,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.number = :number");
                 queryObject.setEntity("project", project);
-                queryObject.setParameter("number", number, Hibernate.LONG);
+                queryObject.setParameter("number", number);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
@@ -207,7 +207,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.number = :number");
                 queryObject.setEntity("user", user);
-                queryObject.setParameter("number", number, Hibernate.LONG);
+                queryObject.setParameter("number", number);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
@@ -244,7 +244,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public int getBuildCount(final Project project, final ResultState[] states)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -252,12 +252,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
             }
-        });
+        }));
     }
 
     public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -266,22 +266,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
             }
-        });
+        }));
     }
 
     public int getBuildCount(final Project project, final long after, final long upTo)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, null, null, false);
-                criteria.add(Expression.gt("number", after));
-                criteria.add(Expression.le("number", upTo));
+                criteria.add(Restrictions.gt("number", after));
+                criteria.add(Restrictions.le("number", upTo));
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
             }
-        });
+        }));
     }
 
     public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
@@ -296,7 +296,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
-                criteria.add(Expression.isNull("user"));
+                criteria.add(Restrictions.isNull("user"));
                 addProjectsToCriteria(projects, criteria);
                 addStatesToCriteria(states, criteria);
                 addStatusesToCriteria(statuses, criteria);
@@ -333,8 +333,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
-                criteria.add(Expression.isNull("user"));
-                criteria.add(Expression.eq("project", project));
+                criteria.add(Restrictions.isNull("user"));
+                criteria.add(Restrictions.eq("project", project));
                 addStatesToCriteria(states, criteria);
                 addNumbersToCriteria(lowestNumber, highestNumber, criteria);
 
@@ -379,9 +379,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
-                criteria.add(Expression.isNull("user"));
+                criteria.add(Restrictions.isNull("user"));
                 addProjectsToCriteria(projects, criteria);
-                criteria.add(Expression.gt(level.toString().toLowerCase() + "FeatureCount", 0));
+                criteria.add(Restrictions.gt(level.toString().toLowerCase() + "FeatureCount", 0));
 
                 if (max >= 0)
                 {
@@ -406,11 +406,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
-                criteria.add(Expression.eq("user", user));
+                criteria.add(Restrictions.eq("user", user));
 
                 if (states != null)
                 {
-                    criteria.add(Expression.in("stateName", getStateNames(states)));
+                    criteria.add(Restrictions.in("stateName", getStateNames(states)));
                 }
 
                 if (max > 0)
@@ -427,7 +427,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public int getCompletedResultCount(final User user)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -437,7 +437,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();
             }
-        });
+        }));
     }
 
     public List<BuildResult> getOldestCompletedBuilds(final User user, final int offset)
@@ -559,10 +559,10 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, result.isPersonal());
-                criteria.add(Expression.lt("id", buildId));
+                criteria.add(Restrictions.lt("id", buildId));
                 if (result.isPersonal())
                 {
-                    criteria.add(Expression.eq("user", result.getUser()));
+                    criteria.add(Restrictions.eq("user", result.getUser()));
                 }
                 criteria.addOrder(Order.desc("id"));
                 criteria.setMaxResults(maxResults);
@@ -581,15 +581,35 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, result.isPersonal());
-                criteria.add(Expression.gt("id", buildId));
+                criteria.add(Restrictions.gt("id", buildId));
                 if (result.isPersonal())
                 {
-                    criteria.add(Expression.eq("user", result.getUser()));
+                    criteria.add(Restrictions.eq("user", result.getUser()));
                 }
                 criteria.addOrder(Order.asc("id"));
                 criteria.setMaxResults(maxResults);
                 SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
                 return criteria.list();
+            }
+        });
+    }
+
+    public BuildResult findByLatestBuild(final long buildId, final ResultState... states)
+    {
+        final BuildResult result = findById(buildId);
+        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, result.isPersonal());
+                if (result.isPersonal())
+                {
+                    criteria.add(Restrictions.eq("user", result.getUser()));
+                }
+                criteria.addOrder(Order.desc("id"));
+                criteria.setMaxResults(1);
+                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+                return criteria.uniqueResult();
             }
         });
     }
@@ -617,12 +637,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         Criteria criteria = session.createCriteria(BuildResult.class);
         if (!includePersonal)
         {
-            criteria.add(Expression.isNull("user"));
+            criteria.add(Restrictions.isNull("user"));
         }
 
         if (project != null)
         {
-            criteria.add(Expression.eq("project", project));
+            criteria.add(Restrictions.eq("project", project));
         }
 
         addStatesToCriteria(states, criteria);
@@ -635,7 +655,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         if (projects != null && projects.length > 0)
         {
-            criteria.add(Expression.in("project", projects));
+            criteria.add(Restrictions.in("project", projects));
         }
     }
 
@@ -643,7 +663,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         if (states != null && states.length > 0)
         {
-            criteria.add(Expression.in("stateName", getStateNames(states)));
+            criteria.add(Restrictions.in("stateName", getStateNames(states)));
         }
     }
 
@@ -651,7 +671,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         if (statuses != null && statuses.length > 0)
         {
-            criteria.add(Expression.in("status", statuses));
+            criteria.add(Restrictions.in("status", statuses));
         }
     }
 
@@ -669,14 +689,14 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         if (earliestStartTime > 0)
         {
-            criteria.add(Expression.ge("stamps.startTime", earliestStartTime));
+            criteria.add(Restrictions.ge("stamps.startTime", earliestStartTime));
         }
 
         if (latestStartTime > 0)
         {
             // CIB-446: Don't accept timestamps that are uninitialised
-            criteria.add(Expression.ge("stamps.startTime", 0L));
-            criteria.add(Expression.le("stamps.startTime", latestStartTime));
+            criteria.add(Restrictions.ge("stamps.startTime", 0L));
+            criteria.add(Restrictions.le("stamps.startTime", latestStartTime));
         }
     }
 
@@ -684,12 +704,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         if (lowestNumber > 0)
         {
-            criteria.add(Expression.ge("number", lowestNumber));
+            criteria.add(Restrictions.ge("number", lowestNumber));
         }
 
         if (highestNumber > 0)
         {
-            criteria.add(Expression.le("number", highestNumber));
+            criteria.add(Restrictions.le("number", highestNumber));
         }
     }
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
+import com.zutubi.pulse.core.ui.TestUI;
 
-public class AcceptancePersonalBuildUI extends TestPersonalBuildUI
+public class AcceptancePersonalBuildUI extends TestUI
 {
     private long buildNumber = -1;
 

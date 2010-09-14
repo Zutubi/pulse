@@ -19,6 +19,7 @@ public class PulseToolbar
     private static final String ID_PREVIOUS_SUCCESSFUL_LINK = "previous-successful-pulse-toolbar_actions";
     private static final String ID_NEXT_BROKEN_LINK = "next-broken-pulse-toolbar_actions";
     private static final String ID_PREVIOUS_BROKEN_LINK = "previous-broken-pulse-toolbar_actions";
+    private static final String ID_LATEST_LINK = "latest-pulse-toolbar_actions";
 
     private SeleniumBrowser browser;
 
@@ -75,6 +76,16 @@ public class PulseToolbar
     public void clickPreviousBrokenBuildLink()
     {
         browser.click(ID_PREVIOUS_BROKEN_LINK);
+    }
+
+    public boolean isLatestBuildLinkPresent()
+    {
+        return this.browser.isElementIdPresent(ID_LATEST_LINK);
+    }
+
+    public void clickLatestBuildLink()
+    {
+        browser.click(ID_LATEST_LINK);
     }
 
     public void clickOnNavMenu()

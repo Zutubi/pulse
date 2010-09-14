@@ -46,21 +46,21 @@ public class PluginFileObject extends AbstractPulseFileObject
     @Override
     public String getIconCls()
     {
-        switch(plugin.getState())
+        if (!plugin.getErrorMessages().isEmpty())
         {
-            case DISABLED:
-            case DISABLING:
-            case UNINSTALLING:
-                if(plugin.getErrorMessage() != null)
-                {
-                    return "plugin-error-icon";
-                }
-                else
-                {
+            return "plugin-error-icon";
+        }
+        else
+        {
+            switch(plugin.getState())
+            {
+                case DISABLED:
+                case DISABLING:
+                case UNINSTALLING:
                     return "plugin-disabled-icon";
-                }
-            default:
-                return "plugin-icon";
+                default:
+                    return "plugin-icon";
+            }
         }
     }
 }

@@ -1417,14 +1417,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         projectDao.save(project);
     }
 
-    public void clearResponsibilities(User user)
-    {
-        for (Project project : projectDao.findByResponsible(user))
-        {
-            clearResponsibility(project);
-        }
-    }
-
     public List<ProjectConfiguration> getDownstreamDependencies(ProjectConfiguration projectConfig)
     {
         cacheLock.readLock().lock();
@@ -1552,6 +1544,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             results.put(project.getId(), buildManager.getPreviousRevision(project));
         }
         return results;
+    }
+
+    public void clearResponsibilities(User user)
+    {
+        for (Project project : projectDao.findByResponsible(user))
+        {
+            clearResponsibility(project);
+        }
     }
 
     public void setLicenseManager(LicenseManager licenseManager)

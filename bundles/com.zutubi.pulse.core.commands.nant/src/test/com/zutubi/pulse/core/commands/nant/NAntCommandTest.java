@@ -20,7 +20,7 @@ public class NAntCommandTest extends OutputProducingCommandTestCase
         if (SystemUtils.IS_WINDOWS)
         {
             File destinationFile = new File(baseDir, "default.build");
-            IOUtils.joinStreams(getInput(getName(), EXTENSION_XML), new FileOutputStream(destinationFile));
+            IOUtils.joinStreams(getInput(getName(), EXTENSION_XML), new FileOutputStream(destinationFile), true);
 
             TestCommandContext context = runCommand(new NamedArgumentCommand(new NAntCommandConfiguration()));
             assertEquals(ResultState.SUCCESS, context.getResultState());

@@ -26,7 +26,7 @@ public class ResultCustomFieldsTest extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tmpDir);
+        removeDirectory(tmpDir);
         super.tearDown();
     }
 

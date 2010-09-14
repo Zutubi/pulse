@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.security.Actor;
-import org.acegisecurity.userdetails.UserDetails;
+import org.springframework.security.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -80,7 +80,7 @@ public class AcegiUser implements Actor, UserDetails
         authoritySet.addAll(Arrays.asList(g.getGrantedAuthorities()));
     }
 
-    public synchronized org.acegisecurity.GrantedAuthority[] getAuthorities()
+    public synchronized org.springframework.security.GrantedAuthority[] getAuthorities()
     {
         if(authorities == null)
         {

@@ -9,34 +9,40 @@ import com.zutubi.pulse.master.events.AgentSynchronisationCompleteEvent;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.HostState;
+import com.zutubi.pulse.master.model.persistence.AgentStateDao;
+import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
-import com.zutubi.util.Constants;
+import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
+import com.zutubi.util.*;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.*;
 
 public class AgentSynchronisationServiceTest extends PulseTestCase
 {
     private static final long EVENT_TIMEOUT = 30 * Constants.SECOND;
 
-    private List<AgentSynchronisationMessage> messages = new LinkedList<AgentSynchronisationMessage>();
     private List<SynchronisationMessageResult> results = new LinkedList<SynchronisationMessageResult>();
     private EventManager eventManager;
     private RecordingEventListener listener;
@@ -44,110 +50,75 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     private AgentState agentState;
     private AgentService agentService;
     private DefaultAgent agent;
-    private AgentManager agentManager;
+    private AgentSynchronisationMessageDao messageDao;
+    private Semaphore serviceSyncFlag = new Semaphore(0);
     private SynchronisationTaskFactory synchronisationTaskFactory;
+    private AgentSynchronisationService agentSynchronisationService;
+    private DefaultAgentManager agentManager;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        agentState = new AgentState();
-        agentState.setId(nextId.getAndIncrement());
-
-        agentService = mock(AgentService.class);
-        doReturn(results).when(agentService).synchronise(Matchers.<List<SynchronisationMessage>>anyObject());
-
-        agent = new DefaultAgent(new AgentConfiguration("test"), agentState, agentService, new DefaultHost(new HostState()));
-
-        agentManager = mock(AgentManager.class);
-        doAnswer(new Answer<List<AgentSynchronisationMessage>>()
-        {
-            public List<AgentSynchronisationMessage> answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                // Return a copy to enforce the fact that messages need to be
-                // saved to affect the "persistent" list.
-                return copy(messages);
-            }
-        }).when(agentManager).getSynchronisationMessages(Matchers.<Agent>anyObject());
-
-        doAnswer(new Answer<Object>()
-        {
-            @SuppressWarnings({"unchecked"})
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                List<AgentSynchronisationMessage> toSave = (List<AgentSynchronisationMessage>) invocationOnMock.getArguments()[0];
-                for (AgentSynchronisationMessage message: toSave)
-                {
-                    int index = messages.indexOf(message);
-                    messages.remove(index);
-                    messages.add(index, message);
-                }
-                return null;
-            }
-        }).when(agentManager).saveSynchronisationMessages(Matchers.<List<AgentSynchronisationMessage>>anyObject());
-
-        doAnswer(new Answer()
-        {
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                List<AgentSynchronisationMessage> toRemove = (List<AgentSynchronisationMessage>) invocationOnMock.getArguments()[0];
-                for (AgentSynchronisationMessage message: toRemove)
-                {
-                    messages.remove(message);
-                }
-                return null;
-            }
-        }).when(agentManager).dequeueSynchronisationMessages(Matchers.<List<AgentSynchronisationMessage>>anyObject());
-
-        doAnswer(new Answer<Boolean>()
-        {
-            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Object[] args = invocationOnMock.getArguments();
-                eventManager.publish(new AgentSynchronisationCompleteEvent(this, (Agent) args[0], (Boolean) args[1]));
-                return true;
-            }
-        }).when(agentManager).completeSynchronisation(Matchers.<Agent>anyObject(), anyBoolean());
-        
         eventManager = new DefaultEventManager();
         listener = new RecordingEventListener(AgentSynchronisationCompleteEvent.class);
         eventManager.register(listener);
 
+        agentState = new AgentState();
+        agentState.setId(nextId.getAndIncrement());
+
+        agentService = mock(AgentService.class);
+        doAnswer(new Answer<List<SynchronisationMessageResult>>()
+        {
+            public List<SynchronisationMessageResult> answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                serviceSyncFlag.release();
+                return results;
+            }
+        }).when(agentService).synchronise(Matchers.<List<SynchronisationMessage>>anyObject());
+
+        agent = new DefaultAgent(new AgentConfiguration("test"), agentState, agentService, new DefaultHost(new HostState()));
+
+        AgentStateDao agentStateDao = mock(AgentStateDao.class);
+        doReturn(agentState).when(agentStateDao).findById(anyLong());
+
+        messageDao = new InMemoryAgentSynchronisationMessageDao();
+        
+        AgentStatusManager agentStatusManager = mock(AgentStatusManager.class);
+        doAnswer(new Answer<Object>()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                @SuppressWarnings({"unchecked"})
+                NullaryFunction<Object> fn = (NullaryFunction<Object>) invocationOnMock.getArguments()[0];
+                return fn.process();
+            }
+        }).when(agentStatusManager).withAgentsLock(Matchers.<NullaryFunction<Object>>anyObject());
+
+        agentManager = new DefaultAgentManager()
+        {
+            @Override
+            public Agent getAgentById(long id)
+            {
+                return agent;
+            }
+        };
+        
+        agentManager.setAgentStateDao(agentStateDao);
+        agentManager.setAgentSynchronisationMessageDao(messageDao);
+        agentManager.setEventManager(eventManager);
+        agentManager.setAgentStatusManager(agentStatusManager);
+        
         synchronisationTaskFactory = new SynchronisationTaskFactory();
         synchronisationTaskFactory.setObjectFactory(new DefaultObjectFactory());
-        
-        AgentSynchronisationService service = new AgentSynchronisationService();
-        service.setEventManager(eventManager);
-        service.setThreadFactory(new PulseThreadFactory());
-        service.init(agentManager);
-    }
 
-    private List<AgentSynchronisationMessage> copy(List<AgentSynchronisationMessage> messages)
-    {
-        List<AgentSynchronisationMessage> copy = new LinkedList<AgentSynchronisationMessage>();
-        for (AgentSynchronisationMessage message: messages)
-        {
-            copy.add(copy(message));
-        }
-
-        return copy;
-    }
-
-    private AgentSynchronisationMessage copy(AgentSynchronisationMessage message)
-    {
-        AgentSynchronisationMessage copy = new AgentSynchronisationMessage(message.getAgentState(), copy(message.getMessage()), message.getDescription());
-        copy.setId(message.getId());
-        copy.setStatus(message.getStatus());
-        copy.setStatusMessage(message.getStatusMessage());
-        return copy;
-    }
-
-    private SynchronisationMessage copy(SynchronisationMessage message)
-    {
-        Properties arguments = new Properties();
-        arguments.putAll(message.getArguments());
-        return new SynchronisationMessage(message.getTypeName(), arguments);
+        agentSynchronisationService = new AgentSynchronisationService();
+        agentSynchronisationService.setEventManager(eventManager);
+        agentSynchronisationService.setThreadFactory(new PulseThreadFactory());
+        agentSynchronisationService.setCallbackService(mock(CallbackService.class));
+        agentManager.setAgentSynchronisationService(agentSynchronisationService);
+        agentSynchronisationService.init(agentManager);
     }
 
     public void testNoMessages()
@@ -167,8 +138,8 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
 
         awaitEvent();
-        assertEquals(1, messages.size());
-        AgentSynchronisationMessage savedMessage = messages.get(0);
+        assertEquals(1, messageDao.count());
+        AgentSynchronisationMessage savedMessage = messageDao.findAll().get(0);
         assertNotSame(message, savedMessage);
         assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, savedMessage.getStatus());
         assertNull(savedMessage.getStatusMessage());
@@ -183,8 +154,8 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
 
         awaitEvent();
-        assertEquals(1, messages.size());
-        AgentSynchronisationMessage savedMessage = messages.get(0);
+        assertEquals(1, messageDao.count());
+        AgentSynchronisationMessage savedMessage =  messageDao.findAll().get(0);
         assertEquals(AgentSynchronisationMessage.Status.FAILED_PERMANENTLY, savedMessage.getStatus());
         assertEquals(STATUS_MESSAGE, savedMessage.getStatusMessage());
     }
@@ -198,8 +169,8 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
 
         awaitEvent();
-        assertEquals(3, messages.size());
-        for (AgentSynchronisationMessage message: messages)
+        assertEquals(3, messageDao.count());
+        for (AgentSynchronisationMessage message: messageDao.findAll())
         {
             assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, message.getStatus());
         }
@@ -227,7 +198,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         AgentSynchronisationMessage message1 = enqueueSuccessfulMessage();
         publishStatusChange();
         awaitEvent();
-        inOrder.verify(agentService).synchronise(asList(message1.getMessage()));
+        inOrder.verify(agentService).synchronise(asList(getMessageThatWouldBeSent(message1)));
         results.clear();
 
         AgentSynchronisationMessage message2 = enqueueSuccessfulMessage();
@@ -235,7 +206,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
 
         awaitEvent();
-        inOrder.verify(agentService).synchronise(asList(message2.getMessage()));
+        inOrder.verify(agentService).synchronise(asList(getMessageThatWouldBeSent(message2)));
     }
 
     public void testSendingFailure()
@@ -246,8 +217,8 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
         
         awaitEvent();
-        assertEquals(1, messages.size());
-        AgentSynchronisationMessage message = messages.get(0);
+        assertEquals(1, messageDao.count());
+        AgentSynchronisationMessage message =  messageDao.findAll().get(0);
         assertEquals(AgentSynchronisationMessage.Status.SENDING_FAILED, message.getStatus());
         assertThat(message.getStatusMessage(), containsString("badness"));
     }
@@ -261,8 +232,8 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
 
         awaitEvent();
-        assertEquals(1, messages.size());
-        AgentSynchronisationMessage savedMessage = messages.get(0);
+        assertEquals(1, messageDao.count());
+        AgentSynchronisationMessage savedMessage =  messageDao.findAll().get(0);
         assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, savedMessage.getStatus());
         assertNull(savedMessage.getStatusMessage());
     }
@@ -278,57 +249,187 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         publishStatusChange();
 
         awaitEvent();
-        assertEquals(10, messages.size());
-        assertEquals(firstId + 2, messages.get(0).getId());
+        assertEquals(10, messageDao.count());
+        assertEquals(firstId + 2,  messageDao.findAll().get(0).getId());
     }
 
     public void testCompletionFails()
     {
         final boolean[] first = new boolean[]{true};
-        doAnswer(new Answer<Boolean>()
+        doAnswer(new Answer<List<SynchronisationMessageResult>>()
         {
-            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
+            public List<SynchronisationMessageResult> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                // First time through, reject because there is a new message.
+                serviceSyncFlag.release();
+
+                // First time through, add a new message.
                 if (first[0])
                 {
                     first[0] = false;
-                    results.clear();
                     enqueueSuccessfulMessage();
-                    return false;
                 }
-                else
-                {
-                    Object[] args = invocationOnMock.getArguments();
-                    eventManager.publish(new AgentSynchronisationCompleteEvent(this, (Agent) args[0], (Boolean) args[1]));
-                    return true;
-                }
+                
+                return results;
             }
-        }).when(agentManager).completeSynchronisation(Matchers.<Agent>anyObject(), anyBoolean());
+        }).when(agentService).synchronise(Matchers.<List<SynchronisationMessage>>anyObject());
 
         enqueueSuccessfulMessage();
 
         publishStatusChange();
 
         awaitEvent();
+        List<AgentSynchronisationMessage> messages = messageDao.findAll();
         assertEquals(2, messages.size());
         AgentSynchronisationMessage savedMessage = messages.get(0);
         assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, savedMessage.getStatus());
         savedMessage = messages.get(1);
         assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, savedMessage.getStatus());
     }
+    
+    public void testAsynchronousMessage() throws InterruptedException
+    {
+        AgentSynchronisationMessage message = enqueueNewMessage();
+        publishStatusChange();
+        
+        awaitServiceSync();
+        
+        assertEquals(0, listener.getReceivedCount());
+        assertEquals(1, messageDao.count());
+        message = messageDao.findById(message.getId());
+        assertEquals(AgentSynchronisationMessage.Status.PROCESSING, message.getStatus());
 
+        publishSuccessfulResult(message.getId());
+        
+        AgentSynchronisationCompleteEvent synchronisationCompleteEvent = awaitEvent();
+        assertTrue(synchronisationCompleteEvent.isSuccessful());
+        assertEquals(1, messageDao.count());
+        message = messageDao.findById(message.getId());
+        assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, message.getStatus());
+    }
+
+    public void testAsynchronousMessageFailure() throws InterruptedException
+    {
+        AgentSynchronisationMessage message = enqueueNewMessage();
+        publishStatusChange();
+        
+        awaitServiceSync();
+        
+        assertEquals(0, listener.getReceivedCount());
+        assertEquals(1, messageDao.count());
+        message = messageDao.findById(message.getId());
+        assertEquals(AgentSynchronisationMessage.Status.PROCESSING, message.getStatus());
+
+        publishFailedResult(message.getId());
+        
+        AgentSynchronisationCompleteEvent synchronisationCompleteEvent = awaitEvent();
+        assertTrue(synchronisationCompleteEvent.isSuccessful());
+        assertEquals(1, messageDao.count());
+        message = messageDao.findById(message.getId());
+        assertEquals(AgentSynchronisationMessage.Status.FAILED_PERMANENTLY, message.getStatus());
+    }
+
+    public void testMultipleAsynchronousMessages() throws InterruptedException
+    {
+        AgentSynchronisationMessage message1 = enqueueNewMessage();
+        AgentSynchronisationMessage message2 = enqueueNewMessage();
+        AgentSynchronisationMessage message3 = enqueueNewMessage();
+        
+        publishStatusChange();
+        
+        awaitServiceSync();
+        
+        assertEquals(0, listener.getReceivedCount());
+        assertEquals(3, messageDao.count());
+        for (AgentSynchronisationMessage message: messageDao.findAll())
+        {
+            assertEquals(AgentSynchronisationMessage.Status.PROCESSING, message.getStatus());
+        }
+
+        publishSuccessfulResult(message1.getId());
+        publishSuccessfulResult(message3.getId());
+
+        Thread.sleep(500);
+        
+        assertEquals(0, listener.getReceivedCount());
+
+        publishSuccessfulResult(message2.getId());
+        
+        AgentSynchronisationCompleteEvent synchronisationCompleteEvent = awaitEvent();
+        assertTrue(synchronisationCompleteEvent.isSuccessful());
+        assertEquals(3, messageDao.count());
+        for (AgentSynchronisationMessage message: messageDao.findAll())
+        {
+            assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, message.getStatus());
+        }
+    }
+
+    public void testSynchronousAndAsynchronousMessages() throws InterruptedException
+    {
+        AgentSynchronisationMessage asyncMessage = enqueueNewMessage();
+        enqueueSuccessfulMessage();
+        
+        publishStatusChange();
+        
+        awaitServiceSync();
+        
+        assertEquals(0, listener.getReceivedCount());
+
+        publishSuccessfulResult(asyncMessage.getId());
+        
+        AgentSynchronisationCompleteEvent synchronisationCompleteEvent = awaitEvent();
+        assertTrue(synchronisationCompleteEvent.isSuccessful());
+        assertEquals(2, messageDao.count());
+        for (AgentSynchronisationMessage message: messageDao.findAll())
+        {
+            assertEquals(AgentSynchronisationMessage.Status.SUCCEEDED, message.getStatus());
+        }
+    }
+
+    public void testAsynchronousMessageTimeout() throws InterruptedException
+    {
+        TestClock clock = new TestClock(0);
+        agentSynchronisationService.setClock(clock);
+        
+        AgentSynchronisationMessage message = enqueueNewMessage();
+        
+        publishStatusChange();
+        
+        awaitServiceSync();
+        
+        assertEquals(0, listener.getReceivedCount());
+        clock.setTime(Long.MAX_VALUE);
+        agentSynchronisationService.checkTimeouts();
+        
+        AgentSynchronisationCompleteEvent synchronisationCompleteEvent = awaitEvent();
+        assertTrue(synchronisationCompleteEvent.isSuccessful());
+        assertEquals(AgentSynchronisationMessage.Status.TIMED_OUT, messageDao.findById(message.getId()).getStatus());
+    }
+
+    public void testRestartWhileAsynchronousMessageProcessing() throws InterruptedException
+    {
+        AgentSynchronisationMessage message = enqueueNewMessage();
+        
+        publishStatusChange();
+        
+        awaitServiceSync();
+
+        agentSynchronisationService.init(agentManager);
+        
+        assertEquals(0, listener.getReceivedCount());
+        assertEquals(AgentSynchronisationMessage.Status.SENDING_FAILED, messageDao.findById(message.getId()).getStatus());
+    }
+    
     private AgentSynchronisationMessage enqueueSuccessfulMessage()
     {
         AgentSynchronisationMessage message = enqueueNewMessage();
-        results.add(new SynchronisationMessageResult());
+        results.add(new SynchronisationMessageResult(message.getId()));
         return message;
     }
 
     private void enqueueFailedMessage(String statusMessage)
     {
-        enqueueNewMessage();
-        results.add(new SynchronisationMessageResult(false, statusMessage));
+        AgentSynchronisationMessage message = enqueueNewMessage();
+        results.add(new SynchronisationMessageResult(message.getId(), false, statusMessage));
     }
 
     private AgentSynchronisationMessage enqueueNewMessage()
@@ -336,15 +437,34 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         SynchronisationMessage message = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("blah", "baz", Collections.<String, String>emptyMap()));
         AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, "desc");
         agentMessage.setId(nextId.getAndIncrement());
-        messages.add(agentMessage);
+        messageDao.save(agentMessage);
+        messageDao.flush();
         return agentMessage;
     }
 
+    private SynchronisationMessage getMessageThatWouldBeSent(AgentSynchronisationMessage agentSynchronisationMessage)
+    {
+        SynchronisationMessage message = agentSynchronisationMessage.getMessage();
+        message.setId(agentSynchronisationMessage.getId());
+        return message;
+    }
+    
     private void publishStatusChange()
     {
+        agent.updateStatus(AgentStatus.SYNCHRONISING);
         eventManager.publish(new AgentStatusChangeEvent(this, agent, AgentStatus.OFFLINE, AgentStatus.SYNCHRONISING));
     }
 
+    private void publishSuccessfulResult(long messageId)
+    {
+        eventManager.publish(new SynchronisationMessageProcessedEvent(this, agent.getId(), new SynchronisationMessageResult(messageId)));
+    }
+    
+    private void publishFailedResult(long messageId)
+    {
+        eventManager.publish(new SynchronisationMessageProcessedEvent(this, agent.getId(), new SynchronisationMessageResult(messageId, false, "nasty")));
+    }
+    
     private AgentSynchronisationCompleteEvent awaitEvent()
     {
         long startTime = System.currentTimeMillis();
@@ -365,6 +485,147 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             }
         }
 
+        agent.updateStatus(AgentStatus.SYNCHRONISED);
         return (AgentSynchronisationCompleteEvent) listener.getEventsReceived().remove(0);
     }
+
+    private void awaitServiceSync()
+    {
+        try
+        {
+            serviceSyncFlag.tryAcquire(30, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e)
+        {
+            fail("Timed out waiting for sync call on agent service");
+        }
+    }
+    
+    private static class InMemoryAgentSynchronisationMessageDao implements AgentSynchronisationMessageDao
+    {
+        private List<AgentSynchronisationMessage> messages = new LinkedList<AgentSynchronisationMessage>();
+        private List<AgentSynchronisationMessage> unflushed = null;
+        
+        public AgentSynchronisationMessage findById(final long id)
+        {
+            return copy(CollectionUtils.find(messages, new Predicate<AgentSynchronisationMessage>()
+            {
+                public boolean satisfied(AgentSynchronisationMessage agentSynchronisationMessage)
+                {
+                    return agentSynchronisationMessage.getId() == id;
+                }
+            }));
+        }
+
+        public void flush()
+        {
+            if (unflushed != null)
+            {
+                messages = unflushed;
+                unflushed = null;
+            }
+        }
+
+        public List<AgentSynchronisationMessage> findAll()
+        {
+            return copy(messages);
+        }
+
+        public void save(AgentSynchronisationMessage entity)
+        {
+            List<AgentSynchronisationMessage> messages = getUnflushed();
+            int index = messages.indexOf(entity);
+            if (index < 0)
+            {
+                messages.add(entity);
+            }
+            else
+            {
+                messages.remove(index);
+                messages.add(index, entity);
+            }
+        }
+
+        public void delete(AgentSynchronisationMessage entity)
+        {
+            List<AgentSynchronisationMessage> messages = getUnflushed();
+            messages.remove(entity);
+        }
+
+        public void refresh(AgentSynchronisationMessage entity)
+        {
+        }
+
+        public int count()
+        {
+            return messages.size();
+        }
+
+        public List<AgentSynchronisationMessage> findByAgentState(AgentState agentState)
+        {
+            return findAll();
+        }
+
+        public List<AgentSynchronisationMessage> findByStatus(final AgentSynchronisationMessage.Status status)
+        {
+            return copy(CollectionUtils.filter(messages, new Predicate<AgentSynchronisationMessage>()
+            {
+                public boolean satisfied(AgentSynchronisationMessage agentSynchronisationMessage)
+                {
+                    return agentSynchronisationMessage.getStatus() == status;
+                }
+            }));
+        }
+
+        public int deleteByAgentState(AgentState agentState)
+        {
+            List<AgentSynchronisationMessage> messages = getUnflushed();
+            int count = messages.size();
+            messages.clear();
+            return count;
+        }
+
+        private List<AgentSynchronisationMessage> copy(List<AgentSynchronisationMessage> messages)
+        {
+            List<AgentSynchronisationMessage> copy = new LinkedList<AgentSynchronisationMessage>();
+            for (AgentSynchronisationMessage message: messages)
+            {
+                copy.add(copy(message));
+            }
+
+            return copy;
+        }
+
+        private AgentSynchronisationMessage copy(AgentSynchronisationMessage message)
+        {
+            if (message == null)
+            {
+                return null;
+            }
+        
+            AgentSynchronisationMessage copy = new AgentSynchronisationMessage(message.getAgentState(), copy(message.getMessage()), message.getDescription());
+            copy.setId(message.getId());
+            copy.setStatus(message.getStatus());
+            copy.setProcessingTimestamp(message.getProcessingTimestamp());
+            copy.setStatusMessage(message.getStatusMessage());
+            return copy;
+        }
+
+        private SynchronisationMessage copy(SynchronisationMessage message)
+        {
+            Properties arguments = new Properties();
+            arguments.putAll(message.getArguments());
+            return new SynchronisationMessage(message.getTypeName(), arguments);
+        }
+
+        private List<AgentSynchronisationMessage> getUnflushed()
+        {
+            if (unflushed == null)
+            {
+                unflushed = copy(messages);
+            }
+            
+            return unflushed;
+        }
+    }    
 }

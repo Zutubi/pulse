@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
 import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
+import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
@@ -71,6 +72,32 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
         assertEquals(asList(message21, message22), agentSynchronisationMessageDao.findByAgentState(agentState2));
     }
 
+    public void testFindByStatus()
+    {
+        AgentState agentState = new AgentState();
+        agentStateDao.save(agentState);
+
+        SynchronisationMessage dummyMessage = synchronisationTaskFactory.toMessage(newTask());
+
+        AgentSynchronisationMessage queuedMessage = new AgentSynchronisationMessage(agentState, dummyMessage, "desc");
+        AgentSynchronisationMessage processingMessage1 = new AgentSynchronisationMessage(agentState, dummyMessage, "desc");
+        AgentSynchronisationMessage processingMessage2 = new AgentSynchronisationMessage(agentState, dummyMessage, "desc");
+        processingMessage1.startProcessing(0);
+        processingMessage2.startProcessing(0);
+        AgentSynchronisationMessage completeMessage = new AgentSynchronisationMessage(agentState, dummyMessage, "desc");
+        completeMessage.applyResult(new SynchronisationMessageResult(0));
+
+        agentSynchronisationMessageDao.save(queuedMessage);
+        agentSynchronisationMessageDao.save(processingMessage1);
+        agentSynchronisationMessageDao.save(processingMessage2);
+        agentSynchronisationMessageDao.save(completeMessage);
+
+        commitAndRefreshTransaction();
+
+        assertEquals(asList(queuedMessage), agentSynchronisationMessageDao.findByStatus(AgentSynchronisationMessage.Status.QUEUED));
+        assertEquals(asList(processingMessage1, processingMessage2), agentSynchronisationMessageDao.findByStatus(AgentSynchronisationMessage.Status.PROCESSING));
+    }
+    
     public void testDeleteByAgentState()
     {
         AgentState agentState1 = new AgentState();

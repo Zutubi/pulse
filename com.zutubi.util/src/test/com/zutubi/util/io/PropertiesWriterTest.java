@@ -39,13 +39,7 @@ public class PropertiesWriterTest extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.rmdir(tmpDir))
-        {
-            throw new IOException("Failed to remove " + tmpDir);
-        }
-
-        tmpDir = null;
-
+        removeDirectory(tmpDir);
         super.tearDown();
     }
 

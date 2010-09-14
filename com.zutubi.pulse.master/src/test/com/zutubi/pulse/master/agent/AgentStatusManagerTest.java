@@ -22,6 +22,8 @@ import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
@@ -353,10 +355,15 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendBuilding(agent, 1000);
         waitForTimeout();
         sendPing(agent, new HostStatus(PingStatus.OFFLINE));
-        assertEvents(
-                new RecipeErrorEvent(this, 1000, "Connection to agent lost during recipe execution (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)"),
-                new AgentOfflineEvent(this, agent)
-        );
+
+        assertFalse(receivedEvents.isEmpty());
+        Event event = receivedEvents.remove(0);
+        assertTrue(event instanceof RecipeErrorEvent);
+        RecipeErrorEvent errorEvent = (RecipeErrorEvent) event;
+        assertEquals(1000, errorEvent.getRecipeId());
+        MatcherAssert.assertThat(errorEvent.getErrorMessage(), Matchers.startsWith("Connection to agent lost during recipe execution"));
+        
+        assertEvents(new AgentOfflineEvent(this, agent));
         assertStatusChanges(agent, BUILDING, OFFLINE);
         sendRecipeCollecting(agent, 1000);
         assertStatusChanges(agent, OFFLINE, POST_RECIPE);
@@ -873,6 +880,35 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
+    public void testPluginMismatch()
+    {
+        Agent agent = addAgent(DEFAULT_AGENT_ID);
+        sendPing(agent, new HostStatus(PingStatus.PLUGIN_MISMATCH));
+
+        assertEquals(PLUGIN_MISMATCH, agent.getStatus());
+        assertStatusChanges(agent, INITIAL, PLUGIN_MISMATCH);
+
+        onComplete();
+    }
+
+    public void testPluginMismatchBuilding()
+    {
+        Agent agent = addAgentAndAssignRecipe(DEFAULT_AGENT_ID, 1000);
+        sendBuilding(agent, 1000);
+        clearEvents();
+        sendPing(agent, new HostStatus(PingStatus.PLUGIN_MISMATCH));
+
+        assertEquals(PLUGIN_MISMATCH, agent.getStatus());
+        assertEvents(
+                new RecipeErrorEvent(this, 1000, "Agent status changed to 'plugin mismatch' while recipe in progress"),
+                new AgentOfflineEvent(this, agent)
+        );
+        assertStatusChanges(agent, BUILDING, PLUGIN_MISMATCH);
+
+        sendRecipeCollecting(agent, 1000);
+        onComplete();
+    }
+    
     public void testTokenMismatch()
     {
         Agent agent = addAgent(DEFAULT_AGENT_ID);

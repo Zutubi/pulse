@@ -1,14 +1,15 @@
 package com.zutubi.pulse.dev.personal;
 
-import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.ui.api.MenuChoice;
+import com.zutubi.pulse.core.ui.api.MenuOption;
+import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.ui.api.YesNoResponse;
+import com.zutubi.pulse.dev.client.ClientException;
+import com.zutubi.pulse.dev.util.AbstractDevTestCase;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -16,12 +17,17 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 
-public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+
+public class PersonalBuildClientTest extends AbstractDevTestCase
 {
     private static final String TEST_REVISION = "my-rev";
 
     private PersonalBuildConfig config;
-    private PersonalBuildUI ui;
+    private UserInterface ui;
     private PersonalBuildContext context;
     private PersonalBuildClient client;
 
@@ -32,9 +38,9 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
     {
         super.setUp();
         // Use a separate UI for the config to just ignore its interactions.
-        config = new PersonalBuildConfig(baseDir, mock(PersonalBuildUI.class));
+        config = new PersonalBuildConfig(baseDir, mock(UserInterface.class));
         
-        ui = mock(PersonalBuildUI.class);
+        ui = mock(UserInterface.class);
         WorkingCopy workingCopy = mock(WorkingCopy.class);
         stub(workingCopy.getCapabilities()).toReturn(EnumSet.allOf(WorkingCopyCapability.class));
         WorkingCopyContext wcContext = new WorkingCopyContextImpl(baseDir, config, ui);
@@ -42,7 +48,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         client = new PersonalBuildClient(config, ui);
     }
 
-    public void testChooseRevision() throws IOException, PersonalBuildException
+    public void testChooseRevision() throws IOException, ClientException
     {
         setRevisionChoice(PersonalBuildClient.REVISION_OPTION_FLOATING, false);
 
@@ -52,7 +58,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertFalse(buildRevision.isUpdateSupported());
     }
 
-    public void testChooseRevisionAlreadyInConfig() throws IOException, PersonalBuildException
+    public void testChooseRevisionAlreadyInConfig() throws IOException, ClientException
     {
         config.setRevision(PersonalBuildClient.REVISION_OPTION_GOOD);
 
@@ -63,7 +69,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertFalse(buildRevision.isUpdateSupported());
     }
 
-    public void testChooseRevisionPersist() throws IOException, PersonalBuildException
+    public void testChooseRevisionPersist() throws IOException, ClientException
     {
         assertNull(config.getRevision());
         setRevisionChoice(PersonalBuildClient.REVISION_OPTION_FLOATING, true);
@@ -73,7 +79,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertEquals(PersonalBuildClient.REVISION_OPTION_FLOATING, config.getRevision());
     }
 
-    public void testChooseRevisionCustom() throws IOException, PersonalBuildException
+    public void testChooseRevisionCustom() throws IOException, ClientException
     {
         setRevisionChoice(PersonalBuildClient.REVISION_OPTION_CUSTOM, false);
         stub(ui.inputPrompt(anyString())).toReturn(TEST_REVISION);
@@ -83,7 +89,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertEquals(TEST_REVISION, buildRevision.getRevision().getRevisionString());
     }
 
-    public void testChooseRevisionCustomAlreadyInConfig() throws IOException, PersonalBuildException
+    public void testChooseRevisionCustomAlreadyInConfig() throws IOException, ClientException
     {
         config.setRevision(PersonalBuildClient.REVISION_OPTION_CUSTOM);
         stub(ui.inputPrompt(anyString())).toReturn(TEST_REVISION);
@@ -95,7 +101,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertEquals(TEST_REVISION, buildRevision.getRevision().getRevisionString());
     }
 
-    public void testChooseRevisionSetInConfig() throws IOException, PersonalBuildException
+    public void testChooseRevisionSetInConfig() throws IOException, ClientException
     {
         config.setRevision(TEST_REVISION);
 
@@ -105,7 +111,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertEquals(TEST_REVISION, buildRevision.getRevision().getRevisionString());
     }
 
-    public void testChooseRevisionLatestRemote() throws IOException, PersonalBuildException, ScmException
+    public void testChooseRevisionLatestRemote() throws IOException, ClientException, ScmException
     {
         setRevisionChoice(PersonalBuildClient.REVISION_OPTION_LATEST, false);
         stub(context.getWorkingCopy().getLatestRemoteRevision(context.getWorkingCopyContext())).toReturn(new Revision(TEST_REVISION));
@@ -116,7 +122,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertTrue(buildRevision.isUpdateSupported());
     }
 
-    public void testChooseRevisionLocal() throws IOException, PersonalBuildException, ScmException
+    public void testChooseRevisionLocal() throws IOException, ClientException, ScmException
     {
         setRevisionChoice(PersonalBuildClient.REVISION_OPTION_LOCAL, false);
         stub(context.getWorkingCopy().guessLocalRevision(context.getWorkingCopyContext())).toReturn(new Revision(TEST_REVISION));
@@ -127,7 +133,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertTrue(buildRevision.isUpdateSupported());
     }
 
-    public void testCapabilitiesRespectedByRevisionPrompt() throws PersonalBuildException
+    public void testCapabilitiesRespectedByRevisionPrompt() throws ClientException
     {
         stub(context.getWorkingCopy().getCapabilities()).toReturn(EnumSet.complementOf(EnumSet.of(WorkingCopyCapability.LOCAL_REVISION, WorkingCopyCapability.REMOTE_REVISION)));
         setRevisionChoice(PersonalBuildClient.REVISION_OPTION_FLOATING, false);
@@ -143,7 +149,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertTrue(floatingOption.isDefaultOption());
     }
     
-    public void testUpdateIfDesiredPromptYes() throws PersonalBuildException, ScmException
+    public void testUpdateIfDesiredPromptYes() throws ClientException, ScmException
     {
         Revision revision = new Revision(TEST_REVISION);
         setUpdateChoice(YesNoResponse.YES);
@@ -154,7 +160,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertNull(config.getUpdate());
     }
 
-    public void testUpdateIfDesiredPromptNo() throws PersonalBuildException, ScmException
+    public void testUpdateIfDesiredPromptNo() throws ClientException, ScmException
     {
         setUpdateChoice(YesNoResponse.NO);
 
@@ -166,7 +172,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertNull(config.getUpdate());
     }
 
-    public void testUpdateIfDesiredDisabledInConfig() throws PersonalBuildException, ScmException
+    public void testUpdateIfDesiredDisabledInConfig() throws ClientException, ScmException
     {
         config.setUpdate(false);
         Revision revision = new Revision(TEST_REVISION);
@@ -179,7 +185,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         verifyNoMoreInteractions(workingCopy);
     }
 
-    public void testUpdateIfDesiredPersistence() throws PersonalBuildException, ScmException
+    public void testUpdateIfDesiredPersistence() throws ClientException, ScmException
     {
         assertNull(config.getUpdate());
         setUpdateChoice(YesNoResponse.NEVER);
@@ -189,7 +195,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertFalse(config.getUpdate());
     }
 
-    public void testUpdateRespectsCapabilities() throws PersonalBuildException, ScmException
+    public void testUpdateRespectsCapabilities() throws ClientException, ScmException
     {
         stub(context.getWorkingCopy().getCapabilities()).toReturn(EnumSet.complementOf(EnumSet.of(WorkingCopyCapability.UPDATE)));
         Revision revision = new Revision(TEST_REVISION);

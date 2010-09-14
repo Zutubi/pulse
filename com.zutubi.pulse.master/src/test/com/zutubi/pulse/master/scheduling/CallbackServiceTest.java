@@ -104,7 +104,7 @@ public class CallbackServiceTest extends ZutubiTestCase
         public void run()
         {
             super.run();
-            throw new RuntimeException("boo");
+            throw new RuntimeException("We made this.");
         }
     }
 

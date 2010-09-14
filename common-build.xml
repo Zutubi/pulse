@@ -355,7 +355,7 @@
 
         <copy todir="${project.root.dir}/plugins/prepackaged/${ivy.module}">
             <fileset dir="${3rd.party.extracted}">
-                <exclude name="META-INF/MANIFEST.MF"/>
+                <exclude name="META-INF/**"/>
             </fileset>
             <!-- include license text files. -->
             <fileset dir="${3rd.party.jars}">

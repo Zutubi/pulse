@@ -8,19 +8,22 @@ import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.Condition;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 
 public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 {
-    private static final String JAR_NAME = "com.zutubi.pulse.core.postprocessors.test";
-
     private PostProcessorExtensionManager extensionManager;
 
     private PulseFileLoaderFactory loaderFactory;
@@ -44,7 +47,8 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");
         }
 
-        samplePostProcessorPlugin = copyInputToDirectory(JAR_NAME, "jar", tmpDir);
+        String random = RandomUtils.randomString(10);
+        samplePostProcessorPlugin = AcceptanceTestUtils.createTestPlugin(tmpDir, getName() + "." + random, getName() + " " + random);
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         pluginSystem.startup();
@@ -80,24 +84,31 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testPostProcessorPlugin() throws PulseException, InterruptedException
+    public void testPostProcessorPlugin() throws PulseException, InterruptedException, IOException
     {
-        // install test plugin.
         Plugin plugin = pluginSystem.install(samplePostProcessorPlugin);
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
+        final String processorTag = plugin.getId() + ".pp";
         // ensure that we are picking up the expected post processors from the installed plugin.
         waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return extensionManager.getPostProcessor("test.pp") != null;
+                return extensionManager.getPostProcessor(processorTag) != null;
             }
         }, 30000, "test processor to be ready");
-
-        ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
-
+        
         PulseFileLoader loader = loaderFactory.createLoader();
-        loader.load(getInput("xml"), prc, new ImportingNotSupportedFileResolver());
+        loader.load(createPulseFile(processorTag), new ProjectRecipesConfiguration(), new ImportingNotSupportedFileResolver());
+    }
+
+    private File createPulseFile(String processorTag) throws IOException
+    {
+        File pulseFile = copyInputToDirectory("xml", tmpDir);
+        String pulseXml = IOUtils.fileToString(pulseFile);
+        pulseXml = pulseXml.replaceAll("test\\.pp", processorTag);
+        FileSystemUtils.createFile(pulseFile, pulseXml);
+        return pulseFile;
     }
 }

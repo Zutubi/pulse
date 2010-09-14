@@ -3,14 +3,10 @@ package com.zutubi.pulse.core.plugins;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public abstract class BasePluginSystemTestCase extends PulseTestCase
 {
@@ -96,15 +92,6 @@ public abstract class BasePluginSystemTestCase extends PulseTestCase
 
     protected void shutdownPluginCore() throws Exception
     {
-        try
-        {
-            OSGIUtilsAccessor.reset();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        
         if (manager != null)
         {
             try
@@ -118,41 +105,4 @@ public abstract class BasePluginSystemTestCase extends PulseTestCase
             manager = null;
         }
     }
-
-    public static class OSGIUtilsAccessor
-    {
-        public static void reset() throws IllegalAccessException, NoSuchFieldException
-        {
-            Field f = OSGIUtils.class.getDeclaredField("singleton");
-            f.setAccessible(true);
-            f.set(OSGIUtils.getDefault(), null);
-        }
-
-        public static void nullifyFields() throws NoSuchFieldException, IllegalAccessException
-        {
-            String[] fieldNames = new String[]{"bundleTracker", "debugTracker", "configurationLocationTracker"};
-
-            for (String fieldName : fieldNames)
-            {
-                Field f = OSGIUtils.class.getDeclaredField(fieldName);
-                f.setAccessible(true);
-                f.set(OSGIUtils.getDefault(), null);
-            }
-        }
-
-        public static void initServices() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-        {
-            Method m = OSGIUtils.class.getDeclaredMethod("initServices");
-            m.setAccessible(true);
-            m.invoke(OSGIUtils.getDefault());
-        }
-
-        public static void closeServices() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-        {
-            Method m = OSGIUtils.class.getDeclaredMethod("closeServices");
-            m.setAccessible(true);
-            m.invoke(OSGIUtils.getDefault());
-        }
-    }
-
 }

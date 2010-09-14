@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.hibernate;
 
 import org.hibernate.MappingException;
+import org.hibernate.id.factory.IdentifierGeneratorFactory;
+import org.hibernate.id.factory.DefaultIdentifierGeneratorFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.engine.Mapping;
@@ -32,6 +34,7 @@ public class MutableConfiguration extends Configuration
     private List<Resource> resources = new LinkedList<Resource>();
     private Properties properties = new Properties();
     private List<Table> tabs = new LinkedList<Table>();
+    private IdentifierGeneratorFactory identifierGeneratorFactory = new DefaultIdentifierGeneratorFactory();
 
     public void addTable(Table table)
     {
@@ -99,6 +102,11 @@ public class MutableConfiguration extends Configuration
                     throw new MappingException(I18N.format("unknown.persistent.class.property", persistentClass + '.' + propertyName));
                 }
                 return prop.getType();
+            }
+
+            public IdentifierGeneratorFactory getIdentifierGeneratorFactory()
+            {
+                return identifierGeneratorFactory;
             }
         };
     }

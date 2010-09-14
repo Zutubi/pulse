@@ -26,7 +26,7 @@ import java.util.logging.LogRecord;
 
 public abstract class PersistenceTestCase extends PulseTestCase
 {
-    protected ApplicationContext context = null;
+    protected ApplicationContext context;
 
     private PlatformTransactionManager transactionManager;
     private TransactionStatus transactionStatus;
@@ -71,7 +71,6 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        sessionFactory.close();
         try
         {
             transactionManager.commit(transactionStatus);
@@ -81,6 +80,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
             // catch the exception and continue.
             e.printStackTrace();
         }
+        sessionFactory.close();
 
         console.stop(false);
         SpringComponentContext.closeAll();

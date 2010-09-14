@@ -3,10 +3,14 @@ package com.zutubi.pulse.dev.personal;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.pulse.dev.client.AbstractClientFactory;
+import com.zutubi.pulse.dev.client.ClientException;
+import com.zutubi.pulse.dev.client.UserAbortException;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
@@ -70,7 +74,7 @@ public class PersonalBuildCommand implements Command
         {
             return 2;
         }
-        catch (PersonalBuildException e)
+        catch (ClientException e)
         {
             client.getUI().error(e.getMessage(), e);
             return 1;
@@ -84,8 +88,10 @@ public class PersonalBuildCommand implements Command
         DevBootstrapManager.startup("com/zutubi/pulse/dev/personal/bootstrap/context/applicationContext.xml");
         try
         {
-            PersonalBuildClient client = PersonalBuildClientFactory.newInstance(argv);
+            PersonalBuildClient client = new PersonalBuildClientFactory().newInstance(argv);
             client.setPatchFormatFactory((PatchFormatFactory) SpringComponentContext.getBean("patchFormatFactory"));
+            client.setPluginManager((PluginManager) SpringComponentContext.getBean("pluginManager"));
+            client.setPluginSynchroniser((PluginSynchroniser) SpringComponentContext.getBean("pluginSynchroniser"));
             return execute(client);
         }
         finally
@@ -122,16 +128,10 @@ public class PersonalBuildCommand implements Command
     public Map<String, String> getOptions()
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
+        options.putAll(AbstractClientFactory.getOptions());
         options.put("-r [--project] project", I18N.format("flag.project"));
-        options.put("-s [--server] url", I18N.format("flag.server"));
-        options.put("-u [--user] name", I18N.format("flag.user"));
-        options.put("-p [--password] password", I18N.format("flag.password"));
-        options.put("-b [--base-dir] dir", I18N.format("flag.base.dir"));
         options.put("-f [--file] filename", I18N.format("flag.file"));
         options.put("-t [--patch-type] type", I18N.format("flag.patch.type"));
-        options.put("-d [--define] name=value", I18N.format("flag.define"));
-        options.put("-q [--quiet]", I18N.format("flag.quiet"));
-        options.put("-v [--verbose]", I18N.format("flag.verbose"));
         options.put("-e [--revision] rev", I18N.format("flag.revision"));
         options.put("--no-send-request", I18N.format("flag.no.request"));
         options.put("--send-request", I18N.format("flag.request"));

@@ -75,11 +75,11 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
     /**
      * Task implementation that generates a RuntimeException.
      */
-    private class GenerateExceptionTask implements Task
+    public static class GenerateExceptionTask implements Task
     {
         public void execute(TaskExecutionContext context)
         {
-            throw new RuntimeException();
+            throw new RuntimeException("We made this.");
         }
     }
 }

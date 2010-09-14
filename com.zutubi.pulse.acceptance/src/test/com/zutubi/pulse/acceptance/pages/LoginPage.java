@@ -14,6 +14,7 @@ public class LoginPage extends SeleniumPage
 {
     public static final String FIELD_USERNAME = "j_username";
     public static final String FIELD_PASSWORD = "j_password";
+    public static final String FIELD_REMEMBERME = "_spring_security_remember_me";
 
     private static final String SIGNUP_ID = "signup";
     private static final String TITLE = "login";
@@ -28,16 +29,20 @@ public class LoginPage extends SeleniumPage
         return urls.login();
     }
 
-    public WelcomePage login(String username, String password)
+    public boolean login(String username, String password)
+    {
+        return login(username, password, false);
+    }
+
+    public boolean login(String username, String password, boolean rememberMe)
     {
         LoginForm form = browser.createForm(LoginForm.class);
         form.waitFor();
-        form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password));
+        form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password), asPair(FIELD_REMEMBERME, Boolean.toString(rememberMe)));
         try
         {
-            WelcomePage welcomePage = browser.createPage(WelcomePage.class);
-            welcomePage.waitFor();
-            return welcomePage;
+            browser.waitForPageToLoad();
+            return !form.isFormPresent();
         }
         catch (Exception e)
         {

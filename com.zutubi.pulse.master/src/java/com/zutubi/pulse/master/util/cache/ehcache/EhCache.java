@@ -5,7 +5,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Element;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -76,14 +75,7 @@ public class EhCache implements com.zutubi.pulse.master.util.cache.Cache
 
     public void removeAll()
     {
-        try
-        {
-            delegate.removeAll();
-        }
-        catch (IOException e)
-        {
-            LOG.error("Error removing all elements from the cache("+getName()+"). Reason: " + e.getMessage(), e);
-        }
+        delegate.removeAll();
     }
 
     Cache getDelegate()

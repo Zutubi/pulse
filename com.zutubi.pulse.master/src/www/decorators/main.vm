@@ -51,26 +51,26 @@
 		<title>:: pulse :: #if ($title) $title #end</title>
         <link rel="shortcut icon" href="$base/favicon.ico"/>
         <link rel="icon" type="image/png" href="$base/favicon.png"/>
-        <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css"/>
-        <link rel="stylesheet" type="text/css" href="$base/css/xtheme-pagan.css"/>
-        <link rel="stylesheet" type="text/css" href="$base/css/main.css" media="screen"/>
-        <link rel="stylesheet" type="text/css" href="$base/css/form.css" media="screen"/>
-        <link rel="stylesheet" type="text/css" href="$base/css/statusbar.css" media="screen"/>
-        <link rel="stylesheet" type="text/css" href="$base/css/treegrid.css"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css?#version()"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/xtheme-pagan.css?#version()"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/main.css?#version()" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/form.css?#version()" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/statusbar.css?#version()" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/treegrid.css?#version()"/>
 #if ($rssEnabled && $projectId && "$projectId" != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
-        <script type="text/javascript" src="$base/js/ext-base.js"></script>
-        <script type="text/javascript" src="$base/js/ext-all.js"></script>
-        <script type="text/javascript" src="$base/js/StatusBar.js"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridSorter.js"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridColumnResizer.js"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridNodeUI.js"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridLoader.js"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGridColumns.js"></script>
-        <script type="text/javascript" src="$base/js/widget/treegrid/TreeGrid.js"></script>
-        <script type="text/javascript" src="$base/js/main.js"></script>
-        <script type="text/javascript" src="$base/js/zutubi.js"></script>
+        #javascript()
+#if($page.getProperty("page.header.javascript"))
+            $page.getProperty("page.header.javascript")
+#end
+            ext/package.js
+            ext/StatusBar.js
+            widget/treegrid/package.js
+            main.js
+            zutubi.js
+        #end
+        
         <script type="text/javascript">
             Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
             Ext.MessageBox.buttonText.yes = 'yes';

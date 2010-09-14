@@ -588,6 +588,17 @@ public class PulseScopeTest extends PulseTestCase
         assertEquals("3", scope.getVariableValue("env." + name, String.class));
     }
 
+    // CIB-2572
+    public void testAddNullValue()
+    {
+        // this check is purely here to ensure that if we do pass a null
+        // variable value through that the scope does not explode.
+        PulseScope scope = new PulseScope();
+        scope.addEnvironmentProperty("a", null);
+        scope.add(new GenericVariable<String>("a", null));
+        scope.add(new ResourceProperty("a", null, true, true, true));
+    }
+
     private String getValue(String name)
     {
         Variable variable = scope.getVariable(name);

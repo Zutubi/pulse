@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.security;
 
-import org.acegisecurity.ui.WebAuthenticationDetails;
+import org.springframework.security.ui.WebAuthenticationDetails;
 
 import javax.servlet.http.HttpServletRequest;
 

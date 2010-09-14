@@ -22,9 +22,9 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
-import org.acegisecurity.providers.encoding.PasswordEncoder;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.providers.encoding.PasswordEncoder;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;
 
 import java.util.*;
@@ -50,10 +50,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      */
     private LdapManager ldapManager;
     /**
-     * Do not access directly, always use getLdapManager().  This dependency
+     * Do not access directly, always use getProjectManager().  This dependency
      * is initialised on demand (not available when this manager is created).
      */
     private ProjectManager projectManager;
+
     private ConfigurationProvider configurationProvider;
     private Map<UserConfiguration, List<UserGroupConfiguration>> groupsByUser;
     private Map<Long, UserConfiguration> userConfigsById = new HashMap<Long, UserConfiguration>();
@@ -212,6 +213,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         licenseManager.refreshAuthorisations();
     }
 
+    public void clearAllResponsibilities(User user)
+    {
+        getProjectManager().clearResponsibilities(user);
+    }
+
     public long updateAndGetNextBuildNumber(User user)
     {
         user = getUser(user.getId());
@@ -227,11 +233,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         // created separately via a call to {@link UserManager#createState}
         String insertedPath = configurationProvider.insert(MasterConfigurationRegistry.USERS_SCOPE, user);
         return configurationProvider.get(insertedPath, UserConfiguration.class);
-    }
-
-    public void clearAllResponsibilities(User user)
-    {
-        getProjectManager().clearResponsibilities(user);
     }
 
     public UserGroupConfiguration getGroupConfig(String name)

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
+import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.util.config.Config;
 
 import java.io.File;
@@ -42,5 +43,5 @@ public interface WorkingCopyContext
      * 
      * @return interface with the user running the operation
      */
-    PersonalBuildUI getUI();
+    UserInterface getUI();
 }

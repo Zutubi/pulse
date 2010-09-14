@@ -6,11 +6,12 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.pulse.dev.client.UserAbortException;
+import com.zutubi.pulse.dev.sync.SynchronisePluginsClientFactory;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -20,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -33,15 +36,22 @@ public class LocalBuild
     public static void main(String argv[])
     {
         LocalBuild b = bootstrap();
+        LocalBuildOptions options = null;
         try
         {
-            LocalBuildOptions options = new LocalBuildOptions(argv);
-            File baseDir = new File(System.getProperty("user.dir"));
-            b.runBuild(baseDir, options);
+            options =  new LocalBuildOptions(argv);
+
+            new SynchronisePluginsClientFactory().newInstance().syncIfBare();
+
+            b.runBuild(new File(System.getProperty("user.dir")), options);
+        }
+        catch (UserAbortException e)
+        {
+            System.exit(2);
         }
         catch (Exception e)
         {
-            fatal(e);
+            fatal(e, options != null && options.isVerbose());
         }
         finally
         {
@@ -173,9 +183,16 @@ public class LocalBuild
         System.out.println("Build report saved to '" + logFile.getPath() + "'.");
     }
 
-    private static void fatal(Throwable throwable)
+    private static void fatal(Throwable throwable, boolean verbose)
     {
-        System.err.println(throwable.getMessage());
+        if (verbose)
+        {
+            throwable.printStackTrace(System.err);
+        }
+        else
+        {
+            System.err.println(throwable.getMessage());            
+        }
         System.exit(1);
     }
 

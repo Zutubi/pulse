@@ -1,20 +1,21 @@
 #helpTag("Browse+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">projects</content>
+<content tag="header.javascript">
+    ext/StatusBar.js
+    projects.js    
+</content>
 <html>
 <head>
     <title>#wwtext("name=projects")</title>
-    <script type="text/javascript" src="$base/js/StatusBar.js"></script>
-    <script type="text/javascript" src="$base/js/projects.js"></script>
     <script type="text/javascript">
         #if($refreshInterval)
-            var refreshInterval = $refreshInterval;
+        var refreshInterval = $refreshInterval;
         #elseif($principle.preferences.refreshingEnabled)
-            var refreshInterval = $principle.preferences.refreshInterval;
+        var refreshInterval = $principle.preferences.refreshInterval;
         #else
-            var refreshInterval = 0;
+        var refreshInterval = 0;
         #end
-
         var invalidEl;
         var projectsTable;
         var view;

@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>#wwtext("name=build") $buildResult.number</title>
-    <link href="$base/css/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="$base/css/highlight.css?#version()" rel="stylesheet" type="text/css" media="screen"/>
 
     <script type="text/javascript">
         Ext.onReady(function() {

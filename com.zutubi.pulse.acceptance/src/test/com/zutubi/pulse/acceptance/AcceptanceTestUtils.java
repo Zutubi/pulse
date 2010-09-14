@@ -1,11 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
+import com.sun.org.apache.bcel.internal.classfile.*;
+import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Condition;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
@@ -14,15 +14,22 @@ import freemarker.template.utility.StringUtil;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 public class AcceptanceTestUtils
 {
+    /**
+     * The host portion of the master URL.
+     */
+    public static final String MASTER_HOST = "localhost";
+    
     /**
      * The acceptance test system property for the built pulse package.
      */
@@ -34,6 +41,11 @@ public class AcceptanceTestUtils
     protected static final String PROPERTY_AGENT_PACKAGE = "agent.package";
 
     /**
+     * The acceptance test system property for the built dev package.
+     */
+    protected static final String PROPERTY_DEV_PACKAGE = "dev.package";
+    
+    /**
      * The acceptance test system property for the pulse startup port.
      */
     public static final String PROPERTY_PULSE_PORT = "pulse.port";
@@ -43,6 +55,14 @@ public class AcceptanceTestUtils
      */
     public static final String PROPERTY_AGENT_PORT = "agent.port";
 
+    public static final String PROPERTY_WORK_DIR = "work.dir";
+
+    /**
+     * Id of the plugin which can be used to make test-specific plugins with
+     * {@link #createTestPlugin(java.io.File, String, String)}. 
+     */
+    public static final String PLUGIN_ID_TEST = "com.zutubi.pulse.core.postprocessors.test";
+    
     private static final long STATUS_TIMEOUT = 30000;
     /**
      * The credentials for the admin user.
@@ -53,7 +73,7 @@ public class AcceptanceTestUtils
     {
         return Integer.getInteger(PROPERTY_PULSE_PORT, 8080);
     }
-
+    
     public static void setPulsePort(int port)
     {
         System.setProperty(PROPERTY_PULSE_PORT, Integer.toString(port));
@@ -63,17 +83,32 @@ public class AcceptanceTestUtils
     {
         return Integer.getInteger(PROPERTY_AGENT_PORT, 8890);
     }
+    
+    public static String getPulseUrl()
+    {
+        return getPulseUrl(getPulsePort());
+    }
+
+    public static String getPulseUrl(int port)
+    {
+        return "http://" + MASTER_HOST + ":" + port;
+    }
 
     public static File getWorkingDirectory()
     {
         // from IDEA, the working directory is located in the same directory as where the projects are run.
         File workingDir = new File("./working");
-        if (System.getProperties().contains("work.dir"))
+        if (isAntBuild())
         {
             // from the acceptance test suite, the work.dir system property is specified
-            workingDir = new File(System.getProperty("work.dir"));
+            workingDir = new File(System.getProperty(PROPERTY_WORK_DIR));
         }
         return workingDir;
+    }
+
+    private static boolean isAntBuild()
+    {
+        return System.getProperties().containsKey(PROPERTY_WORK_DIR);
     }
 
     public static File getDataDirectory() throws IOException
@@ -103,6 +138,30 @@ public class AcceptanceTestUtils
         }
 
         return null;
+    }
+
+    /**
+     * Returns the admin token for the testing agent.
+     * 
+     * @return the admin token for the testing agent
+     * @throws IOException on error reading the token file
+     */
+    public static String getAgentAdminToken() throws IOException
+    {
+        File configDir;
+        if (isAntBuild())
+        {
+            File agentWork = new File(getWorkingDirectory(), StartPulseTestSetup.WORK_DIR_AGENT);
+            File versionHome = new File(FileSystemUtils.findFirstChildMatching(agentWork, "pulse-agent-.*"), "versions");
+            configDir = new File(FileSystemUtils.findFirstChildMatching(versionHome, "[0-9]+"), "system/config");
+        }
+        else
+        {
+            configDir = new File("com.zutubi.pulse.slave/etc");
+        }
+        
+        File tokenFile = new File(configDir, "admin.token");
+        return IOUtils.fileToString(tokenFile);
     }
 
     /**
@@ -169,7 +228,7 @@ public class AcceptanceTestUtils
     }
 
     /**
-     * Returns the location of the Pulse agent pacakge, based on the agent.package
+     * Returns the location of the Pulse agent package, based on the agent.package
      * system property.
      *
      * @return file reference to the pulse agent package.
@@ -179,6 +238,17 @@ public class AcceptanceTestUtils
         return getPackage(PROPERTY_AGENT_PACKAGE);
     }
 
+    /**
+     * Returns the location of the Pulse dev package, based on the dev.package
+     * system property.
+     *
+     * @return file reference to the pulse agent package.
+     */
+    public static File getDevPackage()
+    {
+        return getPackage(PROPERTY_DEV_PACKAGE);
+    }
+    
     private static File getPackage(String packageProperty)
     {
         String pkgProperty = System.getProperty(packageProperty);
@@ -289,17 +359,22 @@ public class AcceptanceTestUtils
      * to Pulse.
      *
      * @param uri         uri to GET
-     * @param credentials credentials of a Pulse user to log in as
+     * @param credentials credentials of a Pulse user to log in as, or null if
+     *                    no credentials should be specified
      * @return the {@link org.apache.commons.httpclient.methods.GetMethod}
      *         instance used to access the URI
      * @throws IOException on error
      */
-    private static GetMethod httpGet(String uri, Credentials credentials) throws IOException
+    public static GetMethod httpGet(String uri, Credentials credentials) throws IOException
     {
         HttpClient client = new HttpClient();
 
-        client.getState().setCredentials(AuthScope.ANY, credentials);
-        client.getParams().setAuthenticationPreemptive(true); // our Basic authentication does not challenge.
+
+        if (credentials != null)
+        {
+            client.getState().setCredentials(AuthScope.ANY, credentials);
+            client.getParams().setAuthenticationPreemptive(true); // our Basic authentication does not challenge.
+        }
 
         GetMethod get = new GetMethod(uri);
         int status = client.executeMethod(get);
@@ -406,5 +481,85 @@ public class AcceptanceTestUtils
                     "}(); " +
                     "result";
         return browser.evalExpression(js).split(",");
+    }
+
+    /**
+     * Creates a test plugin jar with the given id and name in the given
+     * directory.
+     * 
+     * @param tmpDir temporary directory within which to create the plugin jar
+     * @param id     id of the plugin to create (should be unique to the test)
+     * @param name   name of the plugin to create (should be unique to the test)
+     * @return the location of the plugin jar file
+     * @throws IOException on error reading from the prototype plugin or
+     *                     writing to the new plugin
+     */
+    public static File createTestPlugin(File tmpDir, String id, String name) throws IOException
+    {
+        File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "misc", PLUGIN_ID_TEST + ".jar"));
+        File unzipDir = new File(tmpDir, "unzip");
+        PulseZipUtils.extractZip(testPlugin, unzipDir);
+
+        rewritePluginManifest(id, name, unzipDir);
+        rewritePluginXml(id, unzipDir);
+        rewritePluginSymbolicName(id, unzipDir);
+
+        File pluginJarFile = new File(tmpDir, id + ".jar");
+        PulseZipUtils.createZip(pluginJarFile, unzipDir, null);
+        return pluginJarFile;
+    }
+
+    private static void rewritePluginManifest(String id, String name, File unzipDir) throws IOException
+    {
+        File manifestFile = new File(unzipDir, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF"));
+        String manifest = IOUtils.fileToString(manifestFile);
+        manifest = manifest.replaceAll(PLUGIN_ID_TEST, id);
+        manifest = manifest.replaceAll("Test Post-Processor", name);
+        FileSystemUtils.createFile(manifestFile, manifest);
+    }
+
+    private static void rewritePluginXml(String id, File unzipDir) throws IOException
+    {
+        File pluginXmlFile = new File(unzipDir, "plugin.xml");
+        String xml = IOUtils.fileToString(pluginXmlFile);
+        xml = xml.replaceAll("test\\.pp", id + ".pp");
+        FileSystemUtils.createFile(pluginXmlFile, xml);
+    }
+
+    private static void rewritePluginSymbolicName(String id, File unzipDir) throws IOException
+    {
+        File configClassFile = new File(unzipDir, FileSystemUtils.composeFilename("com", "zutubi", "pulse", "core", "postprocessors", "test", "TestPostProcessorConfiguration.class"));
+        JavaClass javaClass = parseClass(configClassFile);
+        ConstantPool constantPool = javaClass.getConstantPool();
+        for (int i = 0; i < constantPool.getLength(); i++)
+        {
+            Constant constant = constantPool.getConstant(i);
+            if (constant instanceof ConstantUtf8)
+            {
+                ConstantUtf8 utf8 = (ConstantUtf8) constant;
+                String value = utf8.getBytes();
+                if (value.equals("zutubi.testPostProcessorConfig"))
+                {
+                    utf8.setBytes(id);
+                }
+            }
+        }
+
+        javaClass.dump(configClassFile);
+    }
+
+    private static JavaClass parseClass(File configClassFile) throws IOException
+    {
+        FileInputStream is = null;
+        try
+        {
+            is = new FileInputStream(configClassFile);
+            ClassParser classParser = new ClassParser(is, configClassFile.getName());
+            return classParser.parse();
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
     }
 }

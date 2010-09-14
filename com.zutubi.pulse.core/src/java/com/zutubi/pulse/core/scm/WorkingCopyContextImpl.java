@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.util.config.Config;
 
 import java.io.File;
@@ -13,9 +13,9 @@ public class WorkingCopyContextImpl implements WorkingCopyContext
 {
     private File base;
     private Config config;
-    private PersonalBuildUI ui;
+    private UserInterface ui;
 
-    public WorkingCopyContextImpl(File base, Config config, PersonalBuildUI ui)
+    public WorkingCopyContextImpl(File base, Config config, UserInterface ui)
     {
         this.base = base;
         this.config = config;
@@ -32,7 +32,7 @@ public class WorkingCopyContextImpl implements WorkingCopyContext
         return config;
     }
 
-    public PersonalBuildUI getUI()
+    public UserInterface getUI()
     {
         return ui;
     }

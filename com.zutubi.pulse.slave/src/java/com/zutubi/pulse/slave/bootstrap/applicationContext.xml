@@ -64,7 +64,7 @@
 
     <bean id="synchronisationTaskFactory" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory"/>
     
-    <bean id="synchronisationTaskRunner" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner"/>
+    <bean id="synchronisationTaskRunnerService" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService" init-method="init"/>
 
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 
@@ -117,4 +117,6 @@
     <alias name="dependencyManager" alias="ivyManager"/>
 
     <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init"/>
+    
+    <bean id="forwardingEventListener" class="com.zutubi.pulse.slave.ForwardingEventListener"/>
 </beans>

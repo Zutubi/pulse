@@ -19,12 +19,6 @@ public class AntPostProcessorTest extends PostProcessorTestBase
         super.setUp();
     }
 
-    public void tearDown()
-    {
-        super.tearDown();
-        pp = null;
-    }
-
     public void testSuccess() throws Exception
     {
         CommandResult result = createAndProcessArtifact("success", pp);

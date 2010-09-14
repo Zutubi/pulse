@@ -163,7 +163,6 @@ public class DefaultBuildController implements EventListener, BuildController
             {
                 buildContext.add(requestProperty);
             }
-
             activateBuildAuthenticationToken();
             tree = new BuildTree();
             configure(tree.getRoot(), buildResult.getRoot());
@@ -406,7 +405,7 @@ public class DefaultBuildController implements EventListener, BuildController
         {
             throw new BuildException(e.getStartupException());
         }
-        
+
         buildLogger.prepare();
         buildLogger.preBuild();
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));

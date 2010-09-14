@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.pulse.acceptance" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -9,9 +11,8 @@
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
-        <conf name="build" description="All of the packages required during the build."/>
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
     </configurations>
@@ -21,6 +22,8 @@
     </publications>
 
     <dependencies>
+
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.pulse.dev" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.slave" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="*->@"/>
@@ -45,12 +48,13 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.gcc" rev="latest.integration" conf="*->@"/>
 
+        <!-- Test dependencies -->
         <dependency org="openqa" name="selenium" rev="2.0.a5" conf="external,build->default"/>
         <dependency org="quintanasoft" name="dumbster" rev="20090217" conf="external,build->default"/>
-        <dependency org="jython" name="jython" rev="20080715" conf="external,build->default"/>
-        <dependency org="testng" name="testng" rev="5.8" conf="external,build->default"/>
-        <dependency org="javax" name="script-api" rev="1.0" conf="external,build->default"/>
-        <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
         <dependency org="svnkit" name="svnkit" rev="1.2.0" conf="external,build->default"/>
+
+        <dependency org="jython" name="jython" rev="20080715" conf="external,build->default"/>
+        <dependency org="javax" name="script-api" rev="1.0" conf="external,build->default"/>
+
     </dependencies>
 </ivy-module>

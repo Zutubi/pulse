@@ -22,7 +22,7 @@
 
     <filter>
         <filter-name>access</filter-name>
-        <filter-class>com.zutubi.pulse.servercore.spring.FilterWrapper</filter-class>
+        <filter-class>com.zutubi.pulse.servercore.servlet.FilterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.security.LastAccessFilter</param-value>
@@ -110,7 +110,7 @@
 
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</param-value>
@@ -128,7 +128,7 @@
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</param-value>
@@ -137,7 +137,7 @@
 
     <servlet>
         <servlet-name>display</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.servlet.DisplayServlet</param-value>
@@ -146,7 +146,7 @@
 
     <servlet>
         <servlet-name>file</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.servlet.FileServlet</param-value>
@@ -155,7 +155,7 @@
 
     <servlet>
         <servlet-name>package</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.servlet.DownloadPackageServlet</param-value>
@@ -163,8 +163,17 @@
     </servlet>
 
     <servlet>
+        <servlet-name>plugin</servlet-name>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.PluginRepositoryServlet</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet>
         <servlet-name>patch</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.servlet.DownloadPatchServlet</param-value>
@@ -174,7 +183,7 @@
     <!-- Entry point for xmlrpc services. -->
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.xmlrpc.MasterXmlRpcServlet</param-value>
@@ -195,7 +204,7 @@
 
     <servlet>
         <servlet-name>ViewFileServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.ServletWrapper</servlet-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.servlet.ViewFileServlet</param-value>
@@ -285,6 +294,11 @@
     <servlet-mapping>
         <servlet-name>package</servlet-name>
         <url-pattern>/packages/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>plugin</servlet-name>
+        <url-pattern>/pluginrepository/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

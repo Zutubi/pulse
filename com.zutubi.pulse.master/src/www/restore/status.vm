@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta http-equiv="refresh" content='5;url=#wwurl("includeParams=all")'/>
-    <link rel="stylesheet" type="text/css" href="$base/css/setup.css"></link>
+    <link rel="stylesheet" type="text/css" href="$base/css/setup.css?#version()"/>
 </head>
 <body>
 <div id="rightcolumn">

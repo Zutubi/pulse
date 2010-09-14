@@ -1892,11 +1892,13 @@
 #macro(pluginStateImage $plugin)
     #if($plugin.disabled || $plugin.disabling)
         #set($image = "exclamation-bw.gif")
+    #elseif($plugin.error)
+        #set($image = "exclamation.gif")
     #elseif($plugin.enabled)
         #set($image = "accept.gif")
     #elseif($plugin.uninstalling)
         #set($image = "delete.gif")
-    #elseif($plugin.upgrading)
+    #elseif($plugin.installing || $plugin.upgrading)
         #set($image = "arrow-refresh.gif")
     #end
 

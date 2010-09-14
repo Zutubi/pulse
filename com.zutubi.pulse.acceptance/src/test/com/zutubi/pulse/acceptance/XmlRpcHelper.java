@@ -29,7 +29,9 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Pair;
 import org.apache.xmlrpc.XmlRpcClient;
+import org.apache.xmlrpc.XmlRpcException;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -57,7 +59,7 @@ public class XmlRpcHelper
 
     public XmlRpcHelper() throws MalformedURLException
     {
-        this(new URL("http", "localhost", AcceptanceTestUtils.getPulsePort(), "/xmlrpc"));
+        this(new URL("http", AcceptanceTestUtils.MASTER_HOST, AcceptanceTestUtils.getPulsePort(), "/xmlrpc"));
     }
 
     public XmlRpcHelper(String url) throws MalformedURLException
@@ -113,16 +115,26 @@ public class XmlRpcHelper
         return (T) xmlRpcClient.execute("RemoteApi." + function, getVector(args));
     }
 
-    @SuppressWarnings({ "unchecked" })
     public <T> T call(String function, Object... args) throws Exception
+    {
+        return (T)callApi("RemoteApi", function, args);
+    }
+
+    public <T> T callTest(String function, Object... args) throws Exception
+    {
+        return (T)callApi("TestApi", function, args);
+    }
+    
+    @SuppressWarnings({ "unchecked" })
+    private <T> T callApi(String api, String function, Object... args) throws XmlRpcException, IOException
     {
         verifyLoggedIn();
         Vector<Object> argVector = new Vector<Object>(args.length + 1);
         argVector.add(token);
         argVector.addAll(Arrays.asList(args));
-        return (T) xmlRpcClient.execute("RemoteApi." + function, argVector);
+        return (T) xmlRpcClient.execute(api + "." + function, argVector);
     }
-
+    
     public Hashtable<String, String> getServerInfo() throws Exception
     {
         return call("getServerInfo");
@@ -769,17 +781,17 @@ public class XmlRpcHelper
 
     public void logError(String message) throws Exception
     {
-        call("logError", message);
+        callTest("logError", message);
     }
 
     public void logWarning(String message) throws Exception
     {
-        call("logWarning", message);
+        callTest("logWarning", message);
     }
 
-    public void enqueueSynchronisationMessage(String agent, String description, boolean succeed) throws Exception
+    public void enqueueSynchronisationMessage(String agent, boolean synchronous, String description, boolean succeed) throws Exception
     {
-        call("enqueueSynchronisationMessage", agent, description, succeed);
+        callTest("enqueueSynchronisationMessage", agent, synchronous, description, succeed);
     }
 
     public int getNextBuildNumber(String projectName) throws Exception
@@ -1196,6 +1208,16 @@ public class XmlRpcHelper
         callWithoutToken("ping");
     }
 
+    public void installPlugin(String path) throws Exception
+    {
+        callTest("installPlugin", path);
+    }
+    
+    public Vector<Hashtable<String, Object>> getRunningPlugins() throws Exception
+    {
+        return callTest("getRunningPlugins");
+    }
+    
     private static class BuildHolder
     {
         Hashtable<String, Object> build = null;
@@ -1203,7 +1225,7 @@ public class XmlRpcHelper
 
     public static void main(String[] argv) throws Exception
     {
-        XmlRpcHelper helper = new XmlRpcHelper("http://localhost:8080/xmlrpc");
+        XmlRpcHelper helper = new XmlRpcHelper();
         helper.loginAsAdmin();
         try
         {

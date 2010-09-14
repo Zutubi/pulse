@@ -27,7 +27,7 @@ import com.zutubi.util.TimeStamps;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

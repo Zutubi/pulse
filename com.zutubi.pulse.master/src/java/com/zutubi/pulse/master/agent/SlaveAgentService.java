@@ -161,7 +161,7 @@ public class SlaveAgentService implements AgentService
 
     public List<SynchronisationMessageResult> synchronise(List<SynchronisationMessage> messages)
     {
-        return service.synchronise(serviceTokenManager.getToken(), messages);
+        return service.synchronise(serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), agentConfig.getAgentStateId(), messages);
     }
 
     public List<FileInfo> getFileListing(AgentRecipeDetails recipeDetails, String path)

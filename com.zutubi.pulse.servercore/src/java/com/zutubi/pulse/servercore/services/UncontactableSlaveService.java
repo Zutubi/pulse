@@ -34,12 +34,17 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
+    public boolean syncPlugins(String token, String master, long hostId, String pluginRepositoryUrl)
+    {
+        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
+    }
+
     public HostStatus getStatus(String token, String master)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public List<SynchronisationMessageResult> synchronise(String token, List<SynchronisationMessage> messages)
+    public List<SynchronisationMessageResult> synchronise(String token, String master, long agentId, List<SynchronisationMessage> messages)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

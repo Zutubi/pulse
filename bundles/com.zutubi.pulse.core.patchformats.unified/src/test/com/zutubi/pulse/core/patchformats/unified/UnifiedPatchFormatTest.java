@@ -42,7 +42,7 @@ public class UnifiedPatchFormatTest extends PulseTestCase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            removeDirectory(tempDir);
         }
     }
 

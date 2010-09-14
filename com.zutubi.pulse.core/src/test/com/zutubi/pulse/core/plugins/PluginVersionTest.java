@@ -2,8 +2,6 @@ package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
-/**
- */
 public class PluginVersionTest extends PulseTestCase
 {
     public void testSimpleVersion()
@@ -35,22 +33,24 @@ public class PluginVersionTest extends PulseTestCase
 
     public void testMissingService()
     {
-        try
-        {
-            PluginVersion v = new PluginVersion("1.2");
-            fail();
-        }
-        catch (IllegalArgumentException e)
-        {
-            assertEquals("Version contains less than three segments", e.getMessage());
-        }
+        shortVersionHelper("1.2");
     }
 
     public void testMissingMinor()
     {
+        shortVersionHelper("1");
+    }
+    
+    public void testEmpty()
+    {
+        shortVersionHelper("");
+    }
+
+    private void shortVersionHelper(String version)
+    {
         try
         {
-            PluginVersion v = new PluginVersion("1");
+            new PluginVersion(version);
             fail();
         }
         catch (IllegalArgumentException e)
@@ -59,19 +59,6 @@ public class PluginVersionTest extends PulseTestCase
         }
     }
     
-    public void testEmpty()
-    {
-        try
-        {
-            PluginVersion v = new PluginVersion("");
-            fail();
-        }
-        catch (IllegalArgumentException e)
-        {
-            assertEquals("Version contains less than three segments", e.getMessage());
-        }
-    }
-
     public void testCompareIdentical()
     {
         PluginVersion v1 = new PluginVersion("1.2.3.v20070111");

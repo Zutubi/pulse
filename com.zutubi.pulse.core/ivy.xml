@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
     <info organisation="zutubi" module="com.zutubi.pulse.core" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -10,10 +12,8 @@
     </info>
 
     <configurations>
-        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
-        <conf name="build" description="All of the packages required during the build."/>
-        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
@@ -31,27 +31,32 @@
         <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="release,external,build,src->@"/>
 
         <!-- Library dependencies -->
-        <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default"/>
+        <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default;src->src"/>
 
-        <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
-        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
-        <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="ivy" rev="2.0.0" conf="external,build,release->core"/>
-        <dependency org="apache" name="commons-httpclient" rev="3.1" conf="external,build,release->default"/>
+        <!-- External dependencies -->
+        <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner;src->src"/>
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default;src->src"/>
+        <dependency org="apache" name="ivy" rev="2.0.0" conf="external,build,release->core;src->src"/>
+        <dependency org="apache" name="commons-httpclient" rev="3.1" conf="external,build,release->default;src->src"/>
+        <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default;src->src"/>
+        <dependency org="opensymphony" name="xwork" rev="1.2.3" conf="build,release->minimal;src->src"/>
+        <dependency org="sun" name="javamail" rev="1.3.2" conf="build,release->default;src->src"/>
+        <dependency org="sun" name="sjsxp" rev="1.0.1" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.core" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.beans" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.context" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.context.support" rev="2.5.6.SEC01"  conf="external,build,release->default;src->src"/>
+        <dependency org="cglib" name="cglib" rev="2.1.3"  conf="external,build,release->default;src->src"/>
+        <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default;src->src"/>
+        <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default;src->src"/>
+        <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default;src->src"/>
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3_2" conf="build->default;src->src"/>
 
-        <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default"/>
-        <dependency org="opensymphony" name="xwork" rev="1.2.3" conf="external,build,release->minimal"/>
-        <dependency org="sun" name="javamail" rev="1.3.2" conf="external,build,release->default"/>
-        <dependency org="sun" name="sjsxp" rev="1.0.1" conf="external,build,release->default"/>
-        <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>
-        <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default"/>
-        <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
-
-        <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default"/>
-        <dependency org="eclipse" name="equinox-bundles" rev="3.3_1" conf="build->default"/>
-
-        <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
-        <dependency org="mockito" name="mockito" rev="1.5" conf="external,build->default"/>
+        <!-- Test dependencies -->
+        <dependency org="junit" name="junit" rev="4.8.2"  conf="external,build->default;src->src"/>
+        <dependency org="mockito" name="mockito" rev="1.5" conf="external,build->default;src->src"/>
+        
     </dependencies>
 </ivy-module>
 

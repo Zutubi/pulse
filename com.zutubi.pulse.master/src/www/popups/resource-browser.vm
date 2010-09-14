@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>#wwtext("name=resource.browser")</title>
-    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="$base/css/main.css?#version()" rel="stylesheet" type="text/css" media="screen"/>
     <script type="text/javascript">
         function select(resource, version, defaultValue)
         {

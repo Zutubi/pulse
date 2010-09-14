@@ -3,6 +3,12 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.repository.PluginInfo;
+import com.zutubi.pulse.core.plugins.repository.PluginRepository;
+import com.zutubi.pulse.core.plugins.repository.PluginScopePredicate;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
+import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
@@ -12,7 +18,7 @@ import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunner;
+import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
@@ -20,6 +26,8 @@ import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
+import com.zutubi.pulse.slave.command.InstallPluginsCommand;
+import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -44,7 +52,10 @@ public class SlaveServiceImpl implements SlaveService
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
     private ObjectFactory objectFactory;
-    private SynchronisationTaskRunner synchronisationTaskRunner;
+    private SynchronisationTaskRunnerService synchronisationTaskRunnerService;
+    private ForwardingEventListener forwardingEventListener;
+    private PluginManager pluginManager;
+    private PluginSynchroniser pluginSynchroniser;
 
     private boolean firstStatus = true;
 
@@ -61,6 +72,15 @@ public class SlaveServiceImpl implements SlaveService
 
         // Currently we always accept the request
         UpdateCommand command = new UpdateCommand(build, master, token, hostId, packageUrl);
+        SpringComponentContext.autowire(command);
+        threadPool.execute(command);
+        return true;
+    }
+
+    public boolean syncPlugins(String token, String master, long hostId, String pluginRepositoryUrl)
+    {
+        serviceTokenManager.validateToken(token);
+        SyncPluginsCommand command = new SyncPluginsCommand(master, token, hostId, pluginRepositoryUrl);
         SpringComponentContext.autowire(command);
         threadPool.execute(command);
         return true;
@@ -91,18 +111,24 @@ public class SlaveServiceImpl implements SlaveService
         }
 
         // Pong the master (CIB-825)
+        List<PluginInfo> masterPlugins;
         try
         {
-            pongMaster(master);
+            masterPlugins = pongMaster(master);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             LOG.severe(e);
             return new HostStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
+        
+        if (pluginManager.getPlugins().isEmpty() || checkForPluginSync(master, masterPlugins))
+        {
+            return new HostStatus(PingStatus.PLUGIN_MISMATCH);
+        }
 
         boolean first = false;
-        if(firstStatus)
+        if (firstStatus)
         {
             first = true;
             firstStatus = false;
@@ -111,16 +137,45 @@ public class SlaveServiceImpl implements SlaveService
         return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
     }
 
-    public List<SynchronisationMessageResult> synchronise(String token, List<SynchronisationMessage> messages)
+    private boolean checkForPluginSync(String masterUrl, List<PluginInfo> masterPlugins)
     {
-        serviceTokenManager.validateToken(token);
-        return synchronisationTaskRunner.synchronise(messages);
+        List<PluginInfo> serverPlugins = CollectionUtils.filter(masterPlugins, new PluginScopePredicate(PluginRepository.Scope.SERVER));
+        SynchronisationActions requiredActions = pluginSynchroniser.determineRequiredActions(serverPlugins);
+        if (requiredActions.isRebootRequired())
+        {
+            return true;
+        }
+        else if (requiredActions.isSyncRequired())
+        {
+            // Simple case: new plugins are available.  Just install them in
+            // the background.
+            InstallPluginsCommand command = new InstallPluginsCommand(masterUrl);
+            SpringComponentContext.autowire(command);
+            threadPool.execute(command);
+        }
+        
+        return false;
     }
 
-    private void pongMaster(String master) throws MalformedURLException
+    public List<SynchronisationMessageResult> synchronise(String token, String master, long agentId, List<SynchronisationMessage> messages)
+    {
+        serviceTokenManager.validateToken(token);
+        try
+        {
+            MasterService masterService = masterProxyFactory.createProxy(master);
+            forwardingEventListener.setMaster(master, masterService);
+            return synchronisationTaskRunnerService.synchronise(agentId, messages);
+        }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<PluginInfo> pongMaster(String master) throws MalformedURLException
     {
         MasterService service = masterProxyFactory.createProxy(master);
-        service.pong();
+        return service.pong();
     }
 
     //---( Build API )---
@@ -131,8 +186,10 @@ public class SlaveServiceImpl implements SlaveService
 
         try
         {
+            MasterService masterService = masterProxyFactory.createProxy(master);
+            forwardingEventListener.setMaster(master, masterService);
             SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, new Class[]{String.class}, new Object[]{master});
-            ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), delegateRunner);
+            ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getId(), delegateRunner);
             serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
             return true;
         }
@@ -244,8 +301,23 @@ public class SlaveServiceImpl implements SlaveService
         this.serverRecipeService = serverRecipeService;
     }
 
-    public void setSynchronisationTaskRunner(SynchronisationTaskRunner synchronisationTaskRunner)
+    public void setSynchronisationTaskRunnerService(SynchronisationTaskRunnerService synchronisationTaskRunnerService)
     {
-        this.synchronisationTaskRunner = synchronisationTaskRunner;
+        this.synchronisationTaskRunnerService = synchronisationTaskRunnerService;
+    }
+
+    public void setForwardingEventListener(ForwardingEventListener forwardingEventListener)
+    {
+        this.forwardingEventListener = forwardingEventListener;
+    }
+
+    public void setPluginManager(PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
+    }
+
+    public void setPluginSynchroniser(PluginSynchroniser pluginSynchroniser)
+    {
+        this.pluginSynchroniser = pluginSynchroniser;
     }
 }

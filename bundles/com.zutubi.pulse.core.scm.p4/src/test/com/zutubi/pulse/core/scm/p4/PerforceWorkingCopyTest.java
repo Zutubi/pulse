@@ -6,7 +6,6 @@ import com.zutubi.diff.PatchParseException;
 import com.zutubi.diff.unified.UnifiedHunk;
 import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.diff.unified.UnifiedPatchParser;
-import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -14,6 +13,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
+import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 
@@ -41,7 +41,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     private WorkingCopyContext context;
 
     private PerforceWorkingCopy wc;
-    private TestPersonalBuildUI ui;
+    private TestUI ui;
 
     protected void setUp() throws Exception
     {
@@ -58,7 +58,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         config.setProperty(PerforceWorkingCopy.PROPERTY_PORT, getP4Port());
         config.setProperty(PerforceWorkingCopy.PROPERTY_USER, "test-user");
 
-        ui = new TestPersonalBuildUI();
+        ui = new TestUI();
         context = new WorkingCopyContextImpl(clientRoot, config, ui);
     }
 

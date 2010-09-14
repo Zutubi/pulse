@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
+import static com.zutubi.util.FileSystemUtils.relativePath;
 
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
@@ -1304,6 +1305,14 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertTrue(f.createNewFile());
         List<File> files = FileSystemUtils.filter(f, new TruePredicate<File>());
         assertEquals(0, files.size());
+    }
+
+    public void testRelativePath()
+    {
+        assertEquals(".", relativePath(new File("./a"), new File("./a")));
+        assertEquals("..", relativePath(new File("./a/b"), new File("./a")));
+        assertEquals(".." + File.separator + "a", relativePath(new File("./b"), new File("./a")));
+        assertEquals("b", relativePath(new File("./a"), new File("./a/b")));
     }
 
     private void assertCreateFiles(String... paths) throws IOException

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.master.scheduling.quartz.TriggerAdapter;
+import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_NAME;
+import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_GROUP;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
@@ -55,19 +57,18 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
                 // we need to ensure that the quartz threads have had a chance to trigger
                 // the job, so register a callback and then yeild until it is received.
                 final boolean[] triggered = new boolean[]{false};
-                quartzScheduler.addGlobalTriggerListener(new TriggerAdapter()
+                TriggerAdapter globalTriggerListener = new TriggerAdapter()
                 {
                     public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, int triggerInstructionCode)
                     {
                         triggered[0] = true;
                     }
-                });
+                };
+                
+                quartzScheduler.addGlobalTriggerListener(globalTriggerListener);
 
-                // manually trigger the quartz callback job.
-                JobDataMap map = quartzScheduler.getJobDetail(QuartzSchedulerStrategy.CALLBACK_JOB_NAME, QuartzSchedulerStrategy.CALLBACK_JOB_GROUP).getJobDataMap();
-                map.clear();
-                map.putAll(t.getJobDataMap());
-                quartzScheduler.triggerJob("cron.trigger.job.name", "cron.trigger.job.group");
+                // manually trigger the quartz callback job with the triggers details.
+                quartzScheduler.triggerJob(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP, t.getJobDataMap());
 
                 while (!triggered[0])
                 {
@@ -87,6 +88,6 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
         // create a new quartz trigger. Ideally, this trigger would not possibly trigger
         // during the course of this test case since we are 'manually' handling the triggering
         // via the activateTrigger method.
-        return new CronTrigger("0 0 12 ? * WED", getName());
+        return new CronTrigger("0 0 0 ? * WED", getName());
     }
 }

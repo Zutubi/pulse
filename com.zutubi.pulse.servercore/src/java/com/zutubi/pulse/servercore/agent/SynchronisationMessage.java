@@ -9,6 +9,7 @@ import java.util.Properties;
  */
 public class SynchronisationMessage
 {
+    private long id;
     private String typeName;
     private Properties arguments = new Properties();
 
@@ -36,6 +37,24 @@ public class SynchronisationMessage
     }
 
     /**
+     * @return a unique id for this message
+     */
+    public long getId()
+    {
+        return id;
+    }
+
+    /**
+     * Sets the identifier for this message.
+     * 
+     * @param id a unique identifier for the message
+     */
+    public void setId(long id)
+    {
+        this.id = id;
+    }
+
+    /**
      * @return the type of task this message represents
      */
     public SynchronisationTask.Type getType()
@@ -53,7 +72,7 @@ public class SynchronisationMessage
         return typeName;
     }
 
-    public void setTypeName(String typeName)
+    private void setTypeName(String typeName)
     {
         this.typeName = typeName;
     }
@@ -66,7 +85,7 @@ public class SynchronisationMessage
         return arguments;
     }
 
-    public void setArguments(Properties arguments)
+    private void setArguments(Properties arguments)
     {
         this.arguments = arguments;
     }
@@ -85,11 +104,15 @@ public class SynchronisationMessage
 
         SynchronisationMessage that = (SynchronisationMessage) o;
 
+        if (id != that.id)
+        {
+            return false;
+        }
         if (arguments != null ? !arguments.equals(that.arguments) : that.arguments != null)
         {
             return false;
         }
-        if (!typeName.equals(that.typeName))
+        if (typeName != null ? !typeName.equals(that.typeName) : that.typeName != null)
         {
             return false;
         }
@@ -100,7 +123,8 @@ public class SynchronisationMessage
     @Override
     public int hashCode()
     {
-        int result = typeName != null ? typeName.hashCode() : 0;
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (typeName != null ? typeName.hashCode() : 0);
         result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
         return result;
     }

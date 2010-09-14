@@ -9,12 +9,12 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.BadCredentialsException;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
-import org.acegisecurity.userdetails.UserDetails;
+import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.BadCredentialsException;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.providers.dao.DaoAuthenticationProvider;
+import org.springframework.security.userdetails.UserDetails;
 
 /**
  * A custom implementation of {@link DaoAuthenticationProvider}.
@@ -36,7 +36,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     private LdapManager ldapManager;
 
     /**
-     * Implementation of the {@link org.acegisecurity.providers.AuthenticationProvider#authenticate(org.acegisecurity.Authentication)}
+     * Implementation of the {@link org.springframework.security.providers.AuthenticationProvider#authenticate(org.springframework.security.Authentication)}
      * method.
      *
      * This implementation will attempt to add an unknown user to the system if they are

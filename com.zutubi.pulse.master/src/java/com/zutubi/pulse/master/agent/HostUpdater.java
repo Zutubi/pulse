@@ -5,6 +5,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.HostUpgradeCompleteEvent;
 import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
+import com.zutubi.pulse.master.servlet.PluginRepositoryServlet;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.util.logging.Logger;
@@ -20,7 +21,7 @@ import java.util.concurrent.*;
 public class HostUpdater implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(HostUpdater.class);
-    
+
     private DefaultHost host;
     private HostService hostService;
     private ExecutorService executor;
@@ -62,81 +63,27 @@ public class HostUpdater implements Runnable
 
     public void run()
     {
-        String masterUrl = masterLocationProvider.getMasterUrl();
-        File packageFile = DownloadPackageServlet.getAgentZip(configurationManager.getSystemPaths());
-        String packageUrl = DownloadPackageServlet.getPackagesUrl(masterUrl) + "/" + packageFile.getName();
-        String masterBuild = Version.getVersion().getBuildNumber();
-
         try
         {
-            boolean accepted = hostService.updateVersion(masterBuild, masterUrl, host.getId(), packageUrl, packageFile.length());
-
-            if(!accepted)
+            int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
+            int hostBuildNumber = hostService.ping();
+            if (hostBuildNumber != masterBuildNumber)
             {
-                host.upgradeStatus(UpgradeState.FAILED, -1, "Host rejected upgrade, manual upgrade required.");
+                if (!updateVersion())
+                {
+                    completed(false);
+                    return;
+                }
+            }
+
+            if (!syncPlugins())
+            {
                 completed(false);
                 return;
             }
 
-            boolean rebooting = false;
-            while (!rebooting)
-            {
-                UpgradeStatus status = statuses.poll(statusTimeout, TimeUnit.SECONDS);
-                if(status == null)
-                {
-                    host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for message from host.");
-                    completed(false);
-                    return;
-                }
-
-                host.upgradeStatus(status.getState(), status.getProgress(), status.getMessage());
-                switch(status.getState())
-                {
-                    case ERROR:
-                    case FAILED:
-                        completed(false);
-                        return;
-                    case REBOOTING:
-                        rebooting = true;
-                        break;
-                }
-            }
-
-            // Now the agent is rebooting, ping it until it is back up.
-            long endTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(rebootTimeout);
-            int expectedBuild = Version.getVersion().getBuildNumberAsInt();
-            int foundBuild = 0;
-            while(System.currentTimeMillis() < endTime)
-            {
-                try
-                {
-                    foundBuild = hostService.ping();
-                    if(foundBuild == expectedBuild)
-                    {
-                        // We did it!
-                        host.upgradeStatus(UpgradeState.INITIAL, -1, null);
-                        completed(true);
-                        return;
-                    }
-                }
-                catch(Exception e)
-                {
-                    // We expect some pings to fail, so can't read too much into it
-                    Thread.sleep(pingInterval);
-                }
-            }
-
-            if (foundBuild != 0)
-            {
-                // ping returned but the build was not the expected build.
-                host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.  Expected build " + expectedBuild + " but found " + foundBuild);
-                completed(false);
-            }
-            else
-            {
-                host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for host to reboot.");
-                completed(false);
-            }
+            host.upgradeStatus(UpgradeState.INITIAL, -1, null);
+            completed(true);
         }
         catch (Exception e)
         {
@@ -144,6 +91,97 @@ public class HostUpdater implements Runnable
             LOG.warning(e);
             host.upgradeStatus(UpgradeState.ERROR, -1, e.getMessage());
             completed(false);
+        }
+    }
+
+    private boolean updateVersion() throws InterruptedException
+    {
+        String masterUrl = masterLocationProvider.getMasterUrl();
+        File packageFile = DownloadPackageServlet.getAgentZip(configurationManager.getSystemPaths());
+        String packageUrl = DownloadPackageServlet.getPackagesUrl(masterUrl) + "/" + packageFile.getName();
+        String masterBuild = Version.getVersion().getBuildNumber();
+
+        if (hostService.updateVersion(masterBuild, masterUrl, host.getId(), packageUrl, packageFile.length()))
+        {
+            return monitorUpdate();
+        }
+        else
+        {
+            host.upgradeStatus(UpgradeState.FAILED, -1, "Host rejected upgrade, manual upgrade required.");
+            return false;
+        }
+    }
+
+    private boolean syncPlugins() throws InterruptedException
+    {
+        String masterUrl = masterLocationProvider.getMasterUrl();
+        if (hostService.syncPlugins(masterUrl, host.getId(), masterUrl + "/" + PluginRepositoryServlet.PATH_REPOSITORY))
+        {
+            host.upgradeStatus(UpgradeState.SYNCHRONISING_PLUGINS, -1, null);
+            return monitorUpdate();
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private boolean monitorUpdate() throws InterruptedException
+    {
+        boolean rebooting = false;
+        while (!rebooting)
+        {
+            UpgradeStatus status = statuses.poll(statusTimeout, TimeUnit.SECONDS);
+            if (status == null)
+            {
+                host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for message from host.");
+                return false;
+            }
+
+            host.upgradeStatus(status.getState(), status.getProgress(), status.getMessage());
+            switch (status.getState())
+            {
+                case COMPLETE:
+                    return true;
+                case ERROR:
+                case FAILED:
+                    return false;
+                case REBOOTING:
+                    rebooting = true;
+                    break;
+            }
+        }
+
+        // Now the agent is rebooting, ping it until it is back up.
+        long endTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(rebootTimeout);
+        int foundBuild = 0;
+        int expectedBuild = Version.getVersion().getBuildNumberAsInt();
+        while (System.currentTimeMillis() < endTime)
+        {
+            try
+            {
+                foundBuild = hostService.ping();
+                if (foundBuild == expectedBuild)
+                {
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                // We expect some pings to fail, so can't read too much into it
+                Thread.sleep(pingInterval);
+            }
+        }
+
+        if (foundBuild != 0)
+        {
+            host.upgradeStatus(UpgradeState.FAILED, -1, "Host failed to upgrade to expected build.  Expected build " + expectedBuild + " but found " + foundBuild);
+            return false;
+        }
+        else
+        {
+            host.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for host to reboot.");
+            return false;
         }
     }
 
@@ -156,7 +194,7 @@ public class HostUpdater implements Runnable
     {
         if (executor != null)
         {
-            if(force)
+            if (force)
             {
                 executor.shutdownNow();
             }
@@ -170,7 +208,7 @@ public class HostUpdater implements Runnable
     /**
      * Notify the host updater of a upgrade status event.
      *
-     * @param upgradeStatus     the new upgrade status from the agent being upgraded.
+     * @param upgradeStatus the new upgrade status from the agent being upgraded.
      */
     public void upgradeStatus(UpgradeStatus upgradeStatus)
     {
@@ -186,7 +224,7 @@ public class HostUpdater implements Runnable
      * The time in seconds that the updater will wait between receiving status updates
      * from the agent.
      *
-     * @param seconds   time in seconds
+     * @param seconds time in seconds
      */
     public void setStatusTimeout(long seconds)
     {
@@ -196,7 +234,7 @@ public class HostUpdater implements Runnable
     /**
      * The time in seconds that the updater will wait for the remote agent to reboot.
      *
-     * @param seconds   time in seconds
+     * @param seconds time in seconds
      */
     public void setRebootTimeout(long seconds)
     {
@@ -206,7 +244,7 @@ public class HostUpdater implements Runnable
     /**
      * The approximate interval in milliseconds between successive pings.
      *
-     * @param milliseconds  time in milliseconds
+     * @param milliseconds time in milliseconds
      */
     public void setPingInterval(long milliseconds)
     {

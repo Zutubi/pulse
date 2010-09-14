@@ -1,3 +1,5 @@
+// dependency: ext/package.js
+
 /*!
  * Ext JS Library 3.1.1
  * Copyright(c) 2006-2010 Ext JS, LLC

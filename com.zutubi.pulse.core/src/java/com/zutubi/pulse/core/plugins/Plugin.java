@@ -14,15 +14,6 @@ public interface Plugin
     public enum State
     {
         /**
-         * An installed plugin has been registered with the plugin registry and is available
-         * for startup.  All plugins must be installed before they can be enabled.
-         *
-         * The installed state differs from the Equinox installed state in that an installed
-         * plugin is not necessarily known to equinox. 
-         */
-        INSTALLED,
-
-        /**
          * The plugin is loaded and available for use.
          */
         ENABLED,
@@ -34,18 +25,16 @@ public interface Plugin
         DISABLED,
 
         /**
-         * The plugin has been uninstalled, and is no longer available for use.
-         *
-         * The primary purpose of this state is to remember which plugins have been
-         * uninstalled in the past
+         * Loading the plugin failed for some reason, explained in the error
+         * message where possible.
          */
-        UNINSTALLED,
+        ERROR,
 
         /**
-         * Indicates that there was a plugin version change since the last time the plugin
-         * system was initialised and the plugin may require an upgrading.
+         * The plugin is available but will not be installed until the next
+         * restart.
          */
-        VERSION_CHANGE,
+        INSTALLING,
         
         /**
          * The plugin will be uninstalled on restart, and is no longer valid.
@@ -61,21 +50,7 @@ public interface Plugin
          * A new version of the plugin is ready to install, the current
          * version should be removed.
          */
-        UPDATING
-    }
-
-    public enum Type
-    {
-        /**
-         * Internal plugins are required plugins that are shipped and located within the
-         * pulse distribution and can not be uninstalled.
-         */
-        INTERNAL,
-        
-        /**
-         * User plugins are optional plugins that can be configured by the user.
-         */
-        USER
+        UPGRADING
     }
 
     /**
@@ -119,19 +94,26 @@ public interface Plugin
     State getState();
 
     /**
-     * @see com.zutubi.pulse.core.plugins.Plugin.Type
-     * @return the type of this plugin.
+     * Indicates if this plugin is currently running in the system.  This
+     * includes all plugins that are enabled, or have been enabled but are
+     * marked to be otherwise on the next restart.
+     * 
+     * @return true if this plugin is or was enabled since the last restart 
      */
-    Type getType();
+    boolean isRunning();
 
     /**
-     * @return the error message associated with this plugin.  Only valid
-     *         when state is DISABLED.  If DISABLED and this message is non-null, the
-     *         message indicates a problem with the plugin that caused it to be
-     *         automatically disabled.
+     * @return error messages associated with this plugin.
      */
-    String getErrorMessage();
+    List<String> getErrorMessages();
 
+    /**
+     * Records a new error message against this plugin.
+     * 
+     * @param message the message to record
+     */
+    void addErrorMessage(String message);
+    
     /**
      * Enable the plugin.  This will start the plugin and make it available to other
      * plugins that may depend on it.
@@ -147,13 +129,9 @@ public interface Plugin
 
     void disable() throws PluginException;
 
-    void disable(String reason) throws PluginException;
-
     void uninstall() throws PluginException;
 
     Plugin upgrade(URI newSource) throws PluginException;
-
-    void resolve() throws PluginException;
 
     /**
      * @return the list of plugins that this plugin depends upon.

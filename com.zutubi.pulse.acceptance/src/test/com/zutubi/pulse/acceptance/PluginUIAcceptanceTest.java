@@ -3,13 +3,16 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
-import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 
 /**
  * Tests for the plugin management UI.
@@ -21,12 +24,13 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     private static final String STATE_UNINSTALLING = "uninstalling";
 
     private static final String ID_COMMANDS_CORE = "com.zutubi.pulse.core.commands.core";
-    private static final String ID_TEST = "com.zutubi.pulse.core.postprocessors.test";
 
     private static final String ACTION_ENABLE    = "enable";
     private static final String ACTION_DISABLE   = "disable";
     private static final String ACTION_UNINSTALL = "uninstall";
 
+    private static final long AGENT_SYNC_TIMEOUT = 120000;
+    
     private File tmpDir = null;
 
     protected void tearDown() throws Exception
@@ -53,11 +57,52 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     public void testInstallPlugin() throws Exception
     {
-        String id = getRandomId();
-        PluginsPage pluginsPage = installPlugin(id);
+        final String AGENT_NAME = "localhost";
+        
+        xmlRpcHelper.loginAsAdmin();
+        try
+        {
+            ensureAgent(AGENT_NAME);
 
-        assertTrue(pluginsPage.isPluginPresent(id));
-        assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
+            final String id = getRandomId();
+            PluginsPage pluginsPage = installPlugin(id);
+
+            assertTrue(pluginsPage.isPluginPresent(id));
+            assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
+
+            xmlRpcHelper.doConfigAction(PathUtils.getPath(AGENTS_SCOPE, AGENT_NAME), ACTION_PING);
+            AcceptanceTestUtils.waitForCondition(new Condition()
+            {
+                public boolean satisfied()
+                {
+                    return agentHasPlugin(id);
+                }
+            }, AGENT_SYNC_TIMEOUT, "agent to sync plugin");
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
+    }
+
+    private boolean agentHasPlugin(final String id)
+    {
+        try
+        {
+            XmlRpcHelper agentXmlRpcHelper = new XmlRpcHelper("http://localhost:" + AcceptanceTestUtils.getAgentPort() + "/xmlrpc");
+            Vector<Hashtable<String, Object>> plugins = agentXmlRpcHelper.callWithoutToken("getRunningPlugins", AcceptanceTestUtils.getAgentAdminToken());
+            return CollectionUtils.contains(plugins, new Predicate<Hashtable<String, Object>>()
+            {
+                public boolean satisfied(Hashtable<String, Object> pluginInfo)
+                {
+                    return id.equals(pluginInfo.get("id"));
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void testCancelInstallPlugin() throws Exception
@@ -146,24 +191,12 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private String getRandomId()
     {
-        return ID_TEST + "." + random;
+        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + RandomUtils.randomString(10);
     }
 
     private File makeTestPlugin(String id, String name) throws IOException
     {
-        File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "misc", ID_TEST + ".jar"));
         tmpDir = FileSystemUtils.createTempDir("PluginUIAcceptanceTest", "");
-        File unzipDir = new File(tmpDir, "unzip");
-        PulseZipUtils.extractZip(testPlugin, unzipDir);
-
-        File manifestFile = new File(unzipDir, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF"));
-        String manifest = IOUtils.fileToString(manifestFile);
-        manifest = manifest.replaceAll(ID_TEST, id);
-        manifest = manifest.replaceAll("Test Post-Processor", name);
-        FileSystemUtils.createFile(manifestFile, manifest);
-
-        File pluginFile = new File(tmpDir, id + ".jar");
-        PulseZipUtils.createZip(pluginFile, unzipDir, null);
-        return pluginFile;
+        return AcceptanceTestUtils.createTestPlugin(tmpDir, id, name);
     }
 }

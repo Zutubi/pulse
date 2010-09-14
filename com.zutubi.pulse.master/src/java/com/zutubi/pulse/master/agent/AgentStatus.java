@@ -25,6 +25,11 @@ public enum AgentStatus
      */
     VERSION_MISMATCH(false, false, false, false),
     /**
+     * The agent's host either has no plugins (new install) or has different
+     * plugins that require a reboot to get in sync with the master.
+     */
+    PLUGIN_MISMATCH(false, false, false, false),
+    /**
      * The agent's security token does not match the master's token.
      */
     TOKEN_MISMATCH(false, false, false, false),

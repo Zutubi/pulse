@@ -2,7 +2,8 @@ package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.patchformats.unified.UnifiedPatchFormat;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
+import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.git.GitClient;
 import com.zutubi.pulse.core.scm.git.GitPatchFormat;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy;
 import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
+import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
@@ -19,11 +21,15 @@ import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.io.IOUtils;
+import org.mockito.Matchers;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 /**
  * The personal build runner is an acceptance test support class that
@@ -87,9 +93,9 @@ public class PersonalBuildRunner
      * @return  the personal build ui instance
      *
      * @throws IOException  on error
-     * @throws PersonalBuildException on error
+     * @throws com.zutubi.pulse.dev.client.ClientException on error
      */
-    public AcceptancePersonalBuildUI triggerAndWaitForBuild() throws IOException, PersonalBuildException
+    public AcceptancePersonalBuildUI triggerAndWaitForBuild() throws IOException, ClientException
     {
         AcceptancePersonalBuildUI ui = triggerBuild();
 
@@ -102,9 +108,9 @@ public class PersonalBuildRunner
      * Trigger a personal build and return immediately.
      * @return the personal build ui instance.
      * @throws IOException on error
-     * @throws PersonalBuildException on error
+     * @throws com.zutubi.pulse.dev.client.ClientException on error
      */
-    public AcceptancePersonalBuildUI triggerBuild() throws IOException, PersonalBuildException
+    public AcceptancePersonalBuildUI triggerBuild() throws IOException, ClientException
     {
         File configFile = new File(base, PersonalBuildConfig.PROPERTIES_FILENAME);
         if (!configFile.isFile())
@@ -116,12 +122,12 @@ public class PersonalBuildRunner
         if (ui.getErrorMessages().size() > 0)
         {
             String details = StringUtils.join("\n", ui.getErrorMessages());
-            throw new PersonalBuildException("Errors have occured during the personal build.\n" + details);
+            throw new ClientException("Errors have occured during the personal build.\n" + details);
         }
         if (ui.getWarningMessages().size() > 0)
         {
             String details = StringUtils.join("\n", ui.getErrorMessages());
-            throw new PersonalBuildException("Warnings have occured during the personal build.\n" + details);
+            throw new ClientException("Warnings have occured during the personal build.\n" + details);
         }
         return ui;
     }
@@ -168,6 +174,10 @@ public class PersonalBuildRunner
         PersonalBuildConfig config = new PersonalBuildConfig(base, ui);
         PersonalBuildClient client = new PersonalBuildClient(config, ui);
         client.setPatchFormatFactory(patchFormatFactory);
+        
+        PluginSynchroniser pluginSynchroniser = mock(PluginSynchroniser.class);
+        doReturn(new SynchronisationActions()).when(pluginSynchroniser).determineRequiredActions(Matchers.anyList());
+        client.setPluginSynchroniser(pluginSynchroniser);
 
         PersonalBuildCommand command = new PersonalBuildCommand();
         int exitCode = command.execute(client);

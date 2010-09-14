@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.tove.security.Actor;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.GrantedAuthority;
+import org.springframework.security.Authentication;
+import org.springframework.security.GrantedAuthority;
 
 import java.util.HashSet;
 import java.util.Set;

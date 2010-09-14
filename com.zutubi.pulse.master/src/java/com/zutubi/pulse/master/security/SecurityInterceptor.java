@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.security;
 
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 

@@ -18,6 +18,7 @@ public class Viewport
     private Data nextBroken;
     private Data previousSuccessful;
     private Data previousBroken;
+    private Data latest;
 
     public void addAll(List<Data> builds)
     {
@@ -54,6 +55,11 @@ public class Viewport
         return previousBroken;
     }
 
+    public Data getLatest()
+    {
+        return latest;
+    }
+
     public void setNextSuccessful(Data nextSuccessful)
     {
         this.nextSuccessful = nextSuccessful;
@@ -72,6 +78,11 @@ public class Viewport
     public void setPreviousBroken(Data previousBroken)
     {
         this.previousBroken = previousBroken;
+    }
+
+    public void setLatest(Data latest)
+    {
+        this.latest = latest;
     }
 
     public static class Data

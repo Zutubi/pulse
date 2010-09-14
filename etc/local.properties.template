@@ -1,0 +1,14 @@
+#
+# The default repository resolver used by the build.  Alternatives are:
+#
+#    public:    a chained resolver that includes public ivy repsoitories and falls back on ivy.zutubi.com
+#    local:      uses a local ivy repository, good for testing
+#    ivy.zutubi.com:    the default ivy artifact repository, used for our builds
+#
+# ivy.default.resolver=ivy.zutubi.com
+
+#
+#
+#
+#
+# ivy.local.repository=

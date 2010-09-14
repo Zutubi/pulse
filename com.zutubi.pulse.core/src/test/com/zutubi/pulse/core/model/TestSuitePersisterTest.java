@@ -22,7 +22,8 @@ public class TestSuitePersisterTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tempDir);
+        removeDirectory(tempDir);
+        super.tearDown();
     }
 
     public void testEmptySuite() throws Exception

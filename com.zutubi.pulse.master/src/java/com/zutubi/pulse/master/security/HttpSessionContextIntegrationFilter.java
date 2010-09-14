@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
  * (which makes them within sitemesh, meaning the security context is cleaned
  * out of the session and sitemesh does not see the logged in user).
  */
-public class HttpSessionContextIntegrationFilter extends org.acegisecurity.context.HttpSessionContextIntegrationFilter
+public class HttpSessionContextIntegrationFilter extends org.springframework.security.context.HttpSessionContextIntegrationFilter
 {
     public HttpSessionContextIntegrationFilter() throws ServletException
     {

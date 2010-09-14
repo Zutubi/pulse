@@ -4,8 +4,8 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.webwork.TransientAction;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.ui.AbstractProcessingFilter;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.ui.AbstractProcessingFilter;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class LoginAction extends TransientAction<LoginConfiguration>
         Map session = ActionContext.getContext().getSession();
         if (authenticationError)
         {
-            AuthenticationException ae = (AuthenticationException) session.get(AbstractProcessingFilter.ACEGI_SECURITY_LAST_EXCEPTION_KEY);
+            AuthenticationException ae = (AuthenticationException) session.get(AbstractProcessingFilter.SPRING_SECURITY_LAST_EXCEPTION_KEY);
             if (ae != null)
             {
                 String username = (String)ae.getAuthentication().getPrincipal();

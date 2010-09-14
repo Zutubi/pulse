@@ -1,3 +1,6 @@
+// dependency: ext/package.js
+// dependency: yahoo/utilities.js
+
 var keyToText = {
         'actions': 'actions',
         'elapsed': 'elapsed',

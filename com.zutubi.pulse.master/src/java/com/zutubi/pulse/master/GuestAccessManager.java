@@ -17,9 +17,9 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.providers.anonymous.AnonymousProcessingFilter;
-import org.acegisecurity.userdetails.memory.UserAttribute;
+import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.providers.anonymous.AnonymousProcessingFilter;
+import org.springframework.security.userdetails.memory.UserAttribute;
 
 /**
  */

@@ -21,7 +21,7 @@ public class VariableResolver
      * extended reference syntax $(...).
      */
     public static Set<Character> EXTENDED_SPECIAL_CHARS = asSet(')', '?', '|', '!', '%', '#', '&', '/', ':', ';');
-    
+
     private static final Map<String, UnaryFunction<String, String>> FILTER_FUNCTIONS = new HashMap<String, UnaryFunction<String, String>>();
 
     static
@@ -142,209 +142,212 @@ public class VariableResolver
         boolean quoted = false;
         boolean haveData = false;
 
-        for (int i = 0; i < input.length(); i++)
+        if (input != null)
         {
-            char inputChar = input.charAt(i);
-
-            switch (state)
+            for (int i = 0; i < input.length(); i++)
             {
-                case INITIAL:
+                char inputChar = input.charAt(i);
+
+                switch (state)
                 {
-                    switch (inputChar)
+                    case INITIAL:
                     {
-                        case '\\':
+                        switch (inputChar)
                         {
-                            state = LexerState.ESCAPED;
-                            break;
-                        }
-                        case '"':
-                        {
-                            if(split)
+                            case '\\':
                             {
-                                if(quoted)
+                                state = LexerState.ESCAPED;
+                                break;
+                            }
+                            case '"':
+                            {
+                                if (split)
                                 {
-                                    quoted = false;
+                                    if (quoted)
+                                    {
+                                        quoted = false;
+                                    }
+                                    else
+                                    {
+                                        quoted = true;
+                                        haveData = true;
+                                    }
                                 }
                                 else
-                                {
-                                    quoted = true;
-                                    haveData = true;
-                                }
-                            }
-                            else
-                            {
-                                current.append(inputChar);
-                                haveData = true;
-                            }
-                            break;
-                        }
-                        case ' ':
-                        {
-                            if(split)
-                            {
-                                if(quoted)
                                 {
                                     current.append(inputChar);
                                     haveData = true;
                                 }
+                                break;
+                            }
+                            case ' ':
+                            {
+                                if (split)
+                                {
+                                    if (quoted)
+                                    {
+                                        current.append(inputChar);
+                                        haveData = true;
+                                    }
+                                    else
+                                    {
+                                        addCurrent(current, haveData, result);
+                                        haveData = false;
+                                        result.add(new Token(TokenType.SPACE, " "));
+                                    }
+                                }
                                 else
                                 {
-                                    addCurrent(current, haveData, result);
-                                    haveData = false;
-                                    result.add(new Token(TokenType.SPACE, " "));
+                                    current.append(inputChar);
+                                    haveData = true;
                                 }
+                                break;
                             }
-                            else
+                            case '$':
+                            {
+                                state = LexerState.DOLLAR;
+                                // only add a token if there is something to add.
+                                addCurrent(current, haveData, result);
+                                haveData = false;
+                                break;
+                            }
+                            default:
                             {
                                 current.append(inputChar);
                                 haveData = true;
+                                break;
                             }
-                            break;
                         }
-                        case '$':
-                        {
-                            state = LexerState.DOLLAR;
-                            // only add a token if there is something to add.
-                            addCurrent(current, haveData, result);
-                            haveData = false;
-                            break;
-                        }
-                        default:
-                        {
-                            current.append(inputChar);
-                            haveData = true;
-                            break;
-                        }
+                        break;
                     }
-                    break;
-                }
-                case ESCAPED:
-                {
-                    current.append(inputChar);
-                    haveData = true;
-                    state = LexerState.INITIAL;
-                    break;
-                }
-                case DOLLAR:
-                {
-                    switch (inputChar)
+                    case ESCAPED:
                     {
-                        case '{':
-                        {
-                            state = LexerState.VARIABLE_NAME;
-                            break;
-                        }
-                        case '(':
-                        {
-                            state = LexerState.EXTENDED_VARIABLE_NAME;
-                            break;
-                        }
-                        default:
-                        {
-                            throw new ResolutionException("Syntax error: expecting '{' or '(', got '" + inputChar + "'");
-                        }
+                        current.append(inputChar);
+                        haveData = true;
+                        state = LexerState.INITIAL;
+                        break;
                     }
-                    break;
-                }
-                case VARIABLE_NAME:
-                {
-                    switch (inputChar)
+                    case DOLLAR:
                     {
-                        case '}':
+                        switch (inputChar)
                         {
-                            if (current.length() == 0)
+                            case '{':
                             {
-                                throw new ResolutionException("Syntax error: empty variable");
+                                state = LexerState.VARIABLE_NAME;
+                                break;
                             }
-
-                            result.add(new Token(TokenType.VARIABLE, current.toString()));
-                            state = LexerState.INITIAL;
-                            current.delete(0, current.length());
-                            break;
-                        }
-                        default:
-                        {
-                            current.append(inputChar);
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case EXTENDED_VARIABLE_NAME:
-                {
-                    switch (inputChar)
-                    {
-                        case ')':
-                        case '?':
-                        case '|':
-                        {
-                            if (current.length() == 0)
+                            case '(':
                             {
-                                throw new ResolutionException("Syntax error: empty variable");
+                                state = LexerState.EXTENDED_VARIABLE_NAME;
+                                break;
                             }
+                            default:
+                            {
+                                throw new ResolutionException("Syntax error: expecting '{' or '(', got '" + inputChar + "'");
+                            }
+                        }
+                        break;
+                    }
+                    case VARIABLE_NAME:
+                    {
+                        switch (inputChar)
+                        {
+                            case '}':
+                            {
+                                if (current.length() == 0)
+                                {
+                                    throw new ResolutionException("Syntax error: empty variable");
+                                }
 
-                            result.add(new Token(TokenType.VARIABLE, current.toString()));
-                            current.delete(0, current.length());
-                            state = chooseExtendedState(inputChar);
-                            break;
+                                result.add(new Token(TokenType.VARIABLE, current.toString()));
+                                state = LexerState.INITIAL;
+                                current.delete(0, current.length());
+                                break;
+                            }
+                            default:
+                            {
+                                current.append(inputChar);
+                                break;
+                            }
                         }
-                        case '!':
-                        case '%':
-                        case '#':
-                        case '&':
-                        case '/':
-                        case ':':
-                        case ';':
-                        {
-                            throw new ResolutionException("Syntax error: '" + inputChar + "' is reserved and may not be used in an extended variable name");
-                        }
-                        default:
-                        {
-                            current.append(inputChar);
-                            break;
-                        }
+                        break;
                     }
-                    break;
-                }
-                case DEFAULT_VALUE:
-                {
-                    switch (inputChar)
+                    case EXTENDED_VARIABLE_NAME:
                     {
-                        case ')':
+                        switch (inputChar)
                         {
-                            result.add(new Token(TokenType.DEFAULT_VALUE, current.toString()));
-                            state = LexerState.INITIAL;
-                            current.delete(0, current.length());
-                            break;
+                            case ')':
+                            case '?':
+                            case '|':
+                            {
+                                if (current.length() == 0)
+                                {
+                                    throw new ResolutionException("Syntax error: empty variable");
+                                }
+
+                                result.add(new Token(TokenType.VARIABLE, current.toString()));
+                                current.delete(0, current.length());
+                                state = chooseExtendedState(inputChar);
+                                break;
+                            }
+                            case '!':
+                            case '%':
+                            case '#':
+                            case '&':
+                            case '/':
+                            case ':':
+                            case ';':
+                            {
+                                throw new ResolutionException("Syntax error: '" + inputChar + "' is reserved and may not be used in an extended variable name");
+                            }
+                            default:
+                            {
+                                current.append(inputChar);
+                                break;
+                            }
                         }
-                        default:
-                        {
-                            current.append(inputChar);
-                            break;
-                        }
+                        break;
                     }
-                    break;
-                }
-                case FILTER_NAME:
-                {
-                    switch (inputChar)
+                    case DEFAULT_VALUE:
                     {
-                        case '?':
-                        case ')':
-                        case '|':
+                        switch (inputChar)
                         {
-                            result.add(new Token(TokenType.FILTER, current.toString()));
-                            current.delete(0, current.length());
-                            state = chooseExtendedState(inputChar);
-                            break;
+                            case ')':
+                            {
+                                result.add(new Token(TokenType.DEFAULT_VALUE, current.toString()));
+                                state = LexerState.INITIAL;
+                                current.delete(0, current.length());
+                                break;
+                            }
+                            default:
+                            {
+                                current.append(inputChar);
+                                break;
+                            }
                         }
-                        default:
-                        {
-                            current.append(inputChar);
-                            break;
-                        }
+                        break;
                     }
-                    break;
+                    case FILTER_NAME:
+                    {
+                        switch (inputChar)
+                        {
+                            case '?':
+                            case ')':
+                            case '|':
+                            {
+                                result.add(new Token(TokenType.FILTER, current.toString()));
+                                current.delete(0, current.length());
+                                state = chooseExtendedState(inputChar);
+                                break;
+                            }
+                            default:
+                            {
+                                current.append(inputChar);
+                                break;
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -353,11 +356,11 @@ public class VariableResolver
         {
             case INITIAL:
             {
-                if(quoted)
+                if (quoted)
                 {
                     throw new ResolutionException("Syntax error: unexpected end of input looking for closing quotes (\")");
                 }
-                
+
                 addCurrent(current, haveData, result);
                 break;
             }
@@ -471,7 +474,7 @@ public class VariableResolver
     {
         List<ParseElement> parseElements = new LinkedList<ParseElement>();
         List<Token> tokens = tokenise(input, split);
-        for (Token token: tokens)
+        for (Token token : tokens)
         {
             switch (token.type)
             {
@@ -592,7 +595,7 @@ public class VariableResolver
             {
                 case SPACE:
                 {
-                    if(haveData)
+                    if (haveData)
                     {
                         result.add(current.toString());
                         current.delete(0, current.length());
@@ -609,7 +612,7 @@ public class VariableResolver
                 case VARIABLE:
                 {
                     String value = resolveVariable(variables, (VariableElement) element, resolutionStrategy);
-                    if(value.length() > 0)
+                    if (value.length() > 0)
                     {
                         current.append(value);
                         haveData = true;
@@ -619,7 +622,7 @@ public class VariableResolver
             }
         }
 
-        if(haveData)
+        if (haveData)
         {
             result.add(current.toString());
         }
@@ -640,7 +643,7 @@ public class VariableResolver
             {
                 return element.defaultValue;
             }
-            else if(resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
+            else if (resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
             {
                 throw new ResolutionException("Unknown variable '" + element.name + "'");
             }
@@ -651,7 +654,7 @@ public class VariableResolver
 
     private static String filter(String value, List<String> filters, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
-        for (String filter: filters)
+        for (String filter : filters)
         {
             UnaryFunction<String, String> fn = FILTER_FUNCTIONS.get(filter);
             if (fn == null)

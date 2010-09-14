@@ -58,24 +58,26 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
             catch (Throwable e)
             {
                 LOG.severe("Error while adding extension at point '" + getExtensionPointId() + "' for plugin '" + extension.getContributor().getName() + "': " + e.getMessage(), e);
-                handleExtensionError(extension, e);
             }
         }
     }
 
     public void addExtension(IExtensionTracker tracker, IExtension extension)
     {
-        IConfigurationElement[] configs = extension.getConfigurationElements();
-        for (IConfigurationElement config : configs)
+        synchronized (pluginManager)
         {
-            try
+            IConfigurationElement[] configs = extension.getConfigurationElements();
+            for (IConfigurationElement config : configs)
             {
-                handleConfigurationElement(extension, tracker, config);
-            }
-            catch (InvalidRegistryObjectException e)
-            {
-                // what causes this?
-                LOG.error(e);
+                try
+                {
+                    handleConfigurationElement(extension, tracker, config);
+                }
+                catch (InvalidRegistryObjectException e)
+                {
+                    // what causes this?
+                    LOG.error(e);
+                }
             }
         }
     }
@@ -94,19 +96,16 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         {
             LOG.warning("Failed to add extension class: " + cls + " due to ClassNotFoundException. Cause: " + e.getMessage());
             LOG.info(e);
-            handleExtensionError(extension, e);
         }
         catch (NoClassDefFoundError e)
         {
             LOG.warning("Failed to add extension class: " + cls + " due to NoClassDefFoundError. Cause: " + e.getMessage());
             LOG.info(e);
-            handleExtensionError(extension, e);
         }
         catch (Throwable t)
         {
             LOG.warning("Failed to load extension class: " + cls + " due to " + t.getClass().getName() + ". Cause: " + t.getMessage());
             LOG.info(t);
-            handleExtensionError(extension, t);
         }
 
         return clazz;
@@ -121,11 +120,10 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
     {
         try
         {
-            // Record the error for the UI.
             Plugin plugin = getPlugin(extension);
             if (plugin != null)
             {
-                plugin.disable(message);
+                plugin.addErrorMessage(message);
             }
         }
         catch (Throwable e)
