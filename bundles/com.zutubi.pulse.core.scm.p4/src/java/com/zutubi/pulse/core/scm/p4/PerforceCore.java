@@ -314,10 +314,21 @@ public class PerforceCore
         {
             runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, workspaceName);
         }
-        catch (ScmException e)
+        catch (ScmException e1)
         {
             // Try to force the delete - CIB-2571
-            runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, FLAG_FORCE, workspaceName);
+            try
+            {
+                runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, FLAG_FORCE, workspaceName);
+            }
+            catch (ScmException e2)
+            {
+                LOG.info(e1);
+                LOG.info(e2);
+                
+                // throw the original exception.
+                throw e1;
+            }
         }
     }
 
