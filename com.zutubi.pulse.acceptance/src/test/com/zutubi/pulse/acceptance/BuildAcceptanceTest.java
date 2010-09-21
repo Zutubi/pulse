@@ -152,10 +152,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         // Check some properties
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_RECIPE_STATUS, "success"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_RECIPE_STATUS, "success"));
     }
     
     public void testNoChangesBetweenBuilds() throws Exception
@@ -1608,14 +1608,61 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c1");
-        assertTrue(envPage.isPropertyPresentWithValue("outerp", "original-value"));
-        assertTrue(envPage.isPropertyPresentWithValue("p1", "original-value"));
-        assertFalse(envPage.isPropertyPresent("p2"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("outerp", "original-value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("p1", "original-value"));
+        assertFalse(envPage.isPulsePropertyPresent("p2"));
         
         envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c2");
-        assertTrue(envPage.isPropertyPresentWithValue("outerp", "new-value"));
-        assertTrue(envPage.isPropertyPresentWithValue("p1", "new-value"));
-        assertTrue(envPage.isPropertyPresentWithValue("p2", "value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("outerp", "new-value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("p1", "new-value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("p2", "value"));
+    }
+
+    public void testTriggerBuildWithNewProperties() throws Exception
+    {
+        AntProjectHelper project = projects.createTrivialAntProject(random);
+        project.addProperty("env", "value").setAddToEnvironment(true);
+        project.addProperty("notenv", "value").setAddToEnvironment(false);
+        configurationHelper.insertProject(project.getConfig(), false);
+
+        Hashtable<String, String> properties = new Hashtable<String, String>();
+        properties.put("new", "newvalue");
+        Hashtable<String, Object> options = new Hashtable<String, Object>();
+        options.put("properties", properties);
+        xmlRpcHelper.triggerBuild(random, options);
+        xmlRpcHelper.waitForBuildToComplete(random, 1);
+
+        browser.loginAsAdmin();
+        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
+
+        assertTrue(envPage.isPropertyPresentWithValue("env", "value"));
+        assertFalse(envPage.isPropertyPresent("notenv"));
+        assertFalse(envPage.isPropertyPresent("new"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("env", "value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("notenv", "value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("new", "newvalue"));
+    }
+
+    public void testTriggerBuildWithExistingProperties() throws Exception
+    {
+        AntProjectHelper project = projects.createTrivialAntProject(random);
+        project.addProperty("env", "value").setAddToEnvironment(true);
+        project.addProperty("notenv", "value").setAddToEnvironment(false);
+        configurationHelper.insertProject(project.getConfig(), false);
+
+        Hashtable<String, String> properties = new Hashtable<String, String>();
+        properties.put("env", "newvalue");
+        Hashtable<String, Object> options = new Hashtable<String, Object>();
+        options.put("properties", properties);
+        xmlRpcHelper.triggerBuild(random, options);
+        xmlRpcHelper.waitForBuildToComplete(random, 1);
+
+        browser.loginAsAdmin();
+        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
+        assertTrue(envPage.isPropertyPresentWithValue("env", "newvalue"));
+        assertFalse(envPage.isPropertyPresent("notenv"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("env", "newvalue"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("notenv", "value"));
     }
     
     private String createProjectWithTwoAntStages(String projectName, String buildFile, String secondStageName) throws Exception
