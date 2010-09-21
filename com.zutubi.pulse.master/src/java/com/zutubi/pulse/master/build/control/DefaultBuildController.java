@@ -238,8 +238,8 @@ public class DefaultBuildController implements EventListener, BuildController
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
             recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
-            recipeRequest.addAllProperties(asResourceProperties(request.getOptions().getProperties()));
             recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
+            recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
 
             RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));

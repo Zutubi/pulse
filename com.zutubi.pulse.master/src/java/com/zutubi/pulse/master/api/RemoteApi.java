@@ -3556,6 +3556,7 @@ public class RemoteApi
         try
         {
             final Project project = internalGetProject(projectName, false);
+            final ProjectConfiguration projectConfig = project.getConfig();
 
             Revision revision = null;
 
@@ -3577,14 +3578,9 @@ public class RemoteApi
             }
             if (triggerOptions.containsKey("properties"))
             {
-                List<ResourcePropertyConfiguration> resourceProperties = new LinkedList<ResourcePropertyConfiguration>();
                 @SuppressWarnings({"unchecked"})
                 Hashtable<String, String> properties = (Hashtable<String, String>) triggerOptions.get("properties");
-                for (Map.Entry<String, String> property : properties.entrySet())
-                {
-                    resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
-                }
-                options.setProperties(resourceProperties);
+                options.setProperties(mapProperties(properties, projectConfig));
             }
             if (triggerOptions.containsKey("status"))
             {
@@ -3603,7 +3599,7 @@ public class RemoteApi
                 options.setRebuild(Boolean.valueOf((String) triggerOptions.get("rebuild")));
             }
 
-            List<Long> requestIds = projectManager.triggerBuild(project.getConfig(), options, revision);
+            List<Long> requestIds = projectManager.triggerBuild(projectConfig, options, revision);
             Vector<String> result = new Vector<String>(requestIds.size());
             for (Long id: requestIds)
             {
@@ -3616,6 +3612,29 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    private List<ResourcePropertyConfiguration> mapProperties(Hashtable<String, String> properties, ProjectConfiguration projectConfig)
+    {
+        List<ResourcePropertyConfiguration> result = new LinkedList<ResourcePropertyConfiguration>();
+
+        for (String propertyName : properties.keySet())
+        {
+            String propertyValue = properties.get(propertyName);
+            
+            ResourcePropertyConfiguration property = projectConfig.getProperty(propertyName);
+            if(property != null)
+            {
+                property = property.copy();
+                property.setValue(propertyValue);
+            }
+            else
+            {
+                property = new ResourcePropertyConfiguration(propertyName, propertyValue);
+            }
+            result.add(property);
+        }
+        return result;
     }
 
     private Revision parseRevision(final String revision, final Project project)

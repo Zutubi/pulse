@@ -188,6 +188,13 @@ public abstract class ProjectConfigurationHelper
         getConfig().setOrganisation(org);
     }
 
+    public ResourcePropertyConfiguration addProperty(String name, String value)
+    {
+        ResourcePropertyConfiguration property = new ResourcePropertyConfiguration(name, value);
+        config.getProperties().put(name, property);
+        return property;
+    }
+
     public abstract CommandConfiguration createDefaultCommand();
     public abstract List<String> getPostProcessorNames();
     public abstract List<Class> getPostProcessorTypes();

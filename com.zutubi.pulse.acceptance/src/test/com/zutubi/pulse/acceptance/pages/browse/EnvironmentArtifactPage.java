@@ -17,10 +17,20 @@ public class EnvironmentArtifactPage extends CommandArtifactPage
 
     public boolean isPropertyPresent(String property)
     {
-        return browser.isTextPresent(getPropertyPrefix(property));
+        return browser.isTextPresent(property + "=");
     }
 
     public boolean isPropertyPresentWithValue(String property, String value)
+    {
+        return browser.isTextPresent(property + "=" + value);
+    }
+
+    public boolean isPulsePropertyPresent(String property)
+    {
+        return browser.isTextPresent(getPropertyPrefix(property));
+    }
+
+    public boolean isPulsePropertyPresentWithValue(String property, String value)
     {
         return browser.isTextPresent(getPropertyPrefix(property) + value);
     }
