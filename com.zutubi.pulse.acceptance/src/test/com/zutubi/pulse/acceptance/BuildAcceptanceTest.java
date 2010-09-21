@@ -121,9 +121,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         // Check some properties
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
     }
 
     public void testChangesBetweenBuilds() throws Exception
@@ -956,16 +956,16 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c1");
-        assertTrue(envPage.isPropertyPresentWithValue("outerp", "original-value"));
-        assertTrue(envPage.isPropertyPresentWithValue("p1", "original-value"));
-        assertFalse(envPage.isPropertyPresent("p2"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("outerp", "original-value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("p1", "original-value"));
+        assertFalse(envPage.isPulsePropertyPresent("p2"));
         
         envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c2");
-        assertTrue(envPage.isPropertyPresentWithValue("outerp", "new-value"));
-        assertTrue(envPage.isPropertyPresentWithValue("p1", "new-value"));
-        assertTrue(envPage.isPropertyPresentWithValue("p2", "value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("outerp", "new-value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("p1", "new-value"));
+        assertTrue(envPage.isPulsePropertyPresentWithValue("p2", "value"));
     }
-    
+
     private String createProjectWithTwoAntStages(String projectName, String buildFile, String secondStageName) throws Exception
     {
         String projectPath = xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
