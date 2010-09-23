@@ -327,7 +327,7 @@ public class PerforceCore
                 LOG.info(e2);
                 
                 // throw the original exception.
-                throw e1;
+                throw new ScmException(e1);
             }
         }
     }
