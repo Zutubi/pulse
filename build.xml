@@ -681,6 +681,12 @@
         <delete dir="plugins"/>
     </target>
 
+    <target name="clean.agent.plugins" depends="init"
+            description="Removes all agent plugins, and cached plugins for agent syncing.">
+        <delete dir="plugins/agent"/>
+        <delete dir="com.zutubi.pulse.master/system/tmp" includes="*.jar"/>
+    </target>
+
     <target name="refresh.plugins" description="Removes current plugins, reloads the jars for internal plugins and explodes third party dependencies of plugins.">
         <antcall target="build.refresh.plugins">
             <param name="skip.tests" value="true"/>

@@ -39,6 +39,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="clean.agent.plugins" />
       </method>
     </configuration>
     <configuration default="false" name="Pulse Slave 8891" type="Application" factoryName="Application" enabled="false" merge="false">
@@ -60,6 +61,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="clean.agent.plugins" />
       </method>
     </configuration>
     <configuration default="false" name="Pulse Slave 8892" type="Application" factoryName="Application" enabled="false" merge="false">
@@ -81,6 +83,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="clean.agent.plugins" />
       </method>
     </configuration>
     <configuration default="false" name="Pulse Slave 8893" type="Application" factoryName="Application" enabled="false" merge="false">
@@ -102,6 +105,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="clean.agent.plugins" />
       </method>
     </configuration>
     <configuration default="false" name="Pulse Slave 8894" type="Application" factoryName="Application" enabled="false" merge="false">
@@ -123,6 +127,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="clean.agent.plugins" />
       </method>
     </configuration>
     <configuration default="false" name="Pulse Slave 8895" type="Application" factoryName="Application" enabled="false" merge="false">
@@ -144,6 +149,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="clean.agent.plugins" />
       </method>
     </configuration>
     <configuration default="false" name="SetPassword" type="Application" factoryName="Application" enabled="false" merge="false">
