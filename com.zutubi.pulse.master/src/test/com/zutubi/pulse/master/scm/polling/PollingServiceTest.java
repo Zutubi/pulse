@@ -30,10 +30,8 @@ import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import static java.util.Arrays.*;
 import java.util.concurrent.*;
 
 public class PollingServiceTest extends ZutubiTestCase
@@ -625,7 +623,7 @@ public class PollingServiceTest extends ZutubiTestCase
         assertPolledForChanges(projectA, projectB);
     }
 
-    public void testPollingContinuesOnFailure() throws ScmException, ExecutionException, InterruptedException
+    public void testPollingContinuesOnFailure() throws ScmException, ExecutionException, InterruptedException, TimeoutException
     {
         Project util = createProject("util");
         stub(scmClientsByProject.get(util).getLatestRevision((ScmContext) anyObject())).toThrow(
@@ -633,9 +631,19 @@ public class PollingServiceTest extends ZutubiTestCase
         );
 
         serviceHandle.init();
-        serviceHandle.pollAndWait();
 
-        // A failure to correctly handle this runtime exception will result in this test hanging.
+        List<Callable> callables = new LinkedList<Callable>();
+        callables.add(new Callable<Object>()
+        {
+            public Object call() throws Exception
+            {
+                service.pollForChanges();
+                return true;
+            }
+        });
+
+        ExecutorService executor = Executors.newFixedThreadPool(1, threadFactory);
+        executor.invokeAny((Collection)callables, 2, TimeUnit.SECONDS);
     }
 
     private void assertStatusEvents(ProjectStatusEvent... expectedEvents)
@@ -654,7 +662,7 @@ public class PollingServiceTest extends ZutubiTestCase
 
     private void releasePollingProcess(Project... projects)
     {
-        List<Project> pollingProjects = Arrays.asList(projects);
+        List<Project> pollingProjects = asList(projects);
         for (Project project : pollingProjects)
         {
             ScmServer scmServer = scmServerByProject.get(project);
@@ -668,7 +676,7 @@ public class PollingServiceTest extends ZutubiTestCase
     private void assertPollingInProgress(Project... projects)
     {
         List<Project> allProjects = projectManager.getProjects(true);
-        List<Project> pollingProjects = Arrays.asList(projects);
+        List<Project> pollingProjects = asList(projects);
         for (Project project : allProjects)
         {
             ScmServer scmServer = scmServerByProject.get(project);
@@ -691,7 +699,7 @@ public class PollingServiceTest extends ZutubiTestCase
     private void waitForPollingInProgress(Project... projects)
     {
         List<Project> allProjects = projectManager.getProjects(true);
-        List<Project> pollingProjects = Arrays.asList(projects);
+        List<Project> pollingProjects = asList(projects);
         for (Project project : allProjects)
         {
             ScmServer scmServer = scmServerByProject.get(project);
@@ -723,7 +731,7 @@ public class PollingServiceTest extends ZutubiTestCase
 
     private void assertPolledForChanges(Project... projects) throws ScmException
     {
-        List<Project> polledProjects = Arrays.asList(projects);
+        List<Project> polledProjects = asList(projects);
         List<Project> allProjects = projectManager.getProjects(true);
         for (Project project : allProjects)
         {
@@ -1010,17 +1018,17 @@ public class PollingServiceTest extends ZutubiTestCase
 
                     if (latestRevision == null)
                     {
-                        return Arrays.asList();
+                        return asList();
                     }
                     if (from == null)
                     {
-                        return Arrays.asList(latestRevision);
+                        return asList(latestRevision);
                     }
                     if (Integer.valueOf(from.getRevisionString()) < Integer.valueOf(latestRevision.getRevisionString()))
                     {
-                        return Arrays.asList(latestRevision);
+                        return asList(latestRevision);
                     }
-                    return Arrays.asList();
+                    return asList();
                 }
             }, project);
         }
