@@ -12,7 +12,7 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 
 /**
- * Fixes null post-processor references that may hve been created by a bug in
+ * Fixes null post-processor references that may have been created by a bug in
  * smart clone.  See CIB-2562.
  */
 public class FixNullPostProcessorReferencesUpgradeTask extends AbstractRecordPropertiesUpgradeTask
