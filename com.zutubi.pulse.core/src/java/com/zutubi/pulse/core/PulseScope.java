@@ -229,6 +229,7 @@ public class PulseScope implements Scope
 
     public void add(Variable variable)
     {
+        ensureNotNull(variable.getValue());
         variables.put(variable.getName(), new VariableInfo(variable));
     }
 
@@ -360,6 +361,8 @@ public class PulseScope implements Scope
     public void add(ResourceProperty resourceProperty)
     {
         String value = resourceProperty.getValue();
+        ensureNotNull(value);
+
         if(resourceProperty.getResolveVariables())
         {
             try
@@ -386,6 +389,7 @@ public class PulseScope implements Scope
      */
     public void addEnvironmentProperty(String name, String value)
     {
+        ensureNotNull(value);
         if (!RETAIN_ENVIRONMENT_CASE)
         {
             name = name.toUpperCase();
@@ -411,6 +415,14 @@ public class PulseScope implements Scope
     public PulseScope copy()
     {
         return copyTo(null);
+    }
+
+    private void ensureNotNull(Object value)
+    {
+        if (value == null)
+        {
+            throw new IllegalArgumentException("null values are not allowed");
+        }
     }
 
     private static class VariableInfo

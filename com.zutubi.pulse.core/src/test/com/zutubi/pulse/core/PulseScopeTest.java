@@ -591,12 +591,35 @@ public class PulseScopeTest extends PulseTestCase
     // CIB-2572
     public void testAddNullValue()
     {
-        // this check is purely here to ensure that if we do pass a null
-        // variable value through that the scope does not explode.
+        // ensure that null values fail early.
         PulseScope scope = new PulseScope();
-        scope.addEnvironmentProperty("a", null);
-        scope.add(new GenericVariable<String>("a", null));
-        scope.add(new ResourceProperty("a", null, true, true, true));
+        try
+        {
+            scope.addEnvironmentProperty("a", null);
+            fail("Expected illegal argument exception for null value.");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("null values are not allowed", e.getMessage());
+        }
+        try
+        {
+            scope.add(new ResourceProperty("a", null, true, true, true));
+            fail("Expected illegal argument exception for null value.");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("null values are not allowed", e.getMessage());
+        }
+        try
+        {
+            scope.add(new GenericVariable<String>("a", null));
+            fail("Expected illegal argument exception for null value.");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("null values are not allowed", e.getMessage());
+        }
     }
 
     private String getValue(String name)
