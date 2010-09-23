@@ -588,40 +588,6 @@ public class PulseScopeTest extends PulseTestCase
         assertEquals("3", scope.getVariableValue("env." + name, String.class));
     }
 
-    // CIB-2572
-    public void testAddNullValue()
-    {
-        // ensure that null values fail early.
-        PulseScope scope = new PulseScope();
-        try
-        {
-            scope.addEnvironmentProperty("a", null);
-            fail("Expected illegal argument exception for null value.");
-        }
-        catch (IllegalArgumentException e)
-        {
-            assertEquals("null values are not allowed", e.getMessage());
-        }
-        try
-        {
-            scope.add(new ResourceProperty("a", null, true, true, true));
-            fail("Expected illegal argument exception for null value.");
-        }
-        catch (IllegalArgumentException e)
-        {
-            assertEquals("null values are not allowed", e.getMessage());
-        }
-        try
-        {
-            scope.add(new GenericVariable<String>("a", null));
-            fail("Expected illegal argument exception for null value.");
-        }
-        catch (IllegalArgumentException e)
-        {
-            assertEquals("null values are not allowed", e.getMessage());
-        }
-    }
-
     private String getValue(String name)
     {
         Variable variable = scope.getVariable(name);
