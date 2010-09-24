@@ -9,6 +9,8 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -21,8 +23,9 @@ import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.actions.ActionManager;
+import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
@@ -34,11 +37,6 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
-import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
-import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 
 public class EditBuildPropertiesAction extends ProjectActionBase
 {
@@ -151,7 +149,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     {
         Project project = getRequiredProject();
         properties = new ArrayList<ResourcePropertyConfiguration>(project.getConfig().getProperties().values());
-        Collections.sort(properties, new NamedConfigurationComparator());
 
         Form form = new Form("form", "edit.build.properties", (ajax ? "aaction/" : "") + "editBuildProperties.action", SUBMIT_TRIGGER);
         form.setAjax(ajax);
