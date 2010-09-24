@@ -237,8 +237,17 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     public void testAgentStatusExecutingBuild() throws Exception
     {
         browser.loginAsAdmin();
-        AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
-        assertFalse(statusPage.isExecutingBuildPresent());
+        final AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
+        if (statusPage.isExecutingBuildPresent())
+        {
+            browser.refreshUntil(SeleniumBrowser.REFRESH_TIMEOUT, new Condition()
+            {
+                public boolean satisfied()
+                {
+                    return !statusPage.isExecutingBuildPresent();
+                }
+            }, "executing build to stop on master agent");
+        }
 
         WaitProject project = startBuildOnAgent(random, AgentManager.MASTER_AGENT_NAME);
 
