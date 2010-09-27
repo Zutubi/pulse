@@ -17,12 +17,12 @@ public class EnvironmentArtifactPage extends CommandArtifactPage
 
     public boolean isPropertyPresent(String property)
     {
-        return browser.isTextPresent(property + "=");
+        return browser.isTextPresent(processProperty(property) + "=");
     }
 
     public boolean isPropertyPresentWithValue(String property, String value)
     {
-        return browser.isTextPresent(property + "=" + value);
+        return browser.isTextPresent(processProperty(property) + "=" + value);
     }
 
     public boolean isPulsePropertyPresent(String property)
@@ -37,6 +37,11 @@ public class EnvironmentArtifactPage extends CommandArtifactPage
 
     private String getPropertyPrefix(String property)
     {
-        return "PULSE_" + property.toUpperCase().replace('.', '_') + "=";
+        return "PULSE_" + processProperty(property) + "=";
+    }
+
+    private String processProperty(String property)
+    {
+        return property.toUpperCase().replace('.', '_');
     }
 }
