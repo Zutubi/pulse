@@ -4,7 +4,7 @@ width of its contents.  Floating it works, but hurts other things.
 -->
 <table class="eform">
     <tr>
-        <td id="${form.name}.status">
+        <td id="${form.name}-status">
 <#if actionErrors?exists && actionErrors?size &gt; 0>
             <ul class="validation-error">
     <#list actionErrors as error>
@@ -23,7 +23,7 @@ width of its contents.  Floating it works, but hurts other things.
 <script type="text/javascript">
     Ext.form.Field.prototype.msgTarget = 'under';
 
-    var ${form.name} = new ZUTUBI.FormPanel({
+    var ${form.name} = new ZUTUBI.form.FormPanel({
         method: 'POST',
 <#if form.fileUpload>
         fileUpload: true,

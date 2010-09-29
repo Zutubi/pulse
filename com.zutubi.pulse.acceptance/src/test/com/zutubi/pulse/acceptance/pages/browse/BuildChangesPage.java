@@ -23,7 +23,7 @@ public class BuildChangesPage extends SeleniumPage
 {
     private static final String ID_CHANGELIST_TABLES = "changelist-tables";
     private static final String ID_COMPARE_TO_POPUP = "compare-to";
-    private static final String ID_COMPARE_TO_POPUP_BUTTON = "compare-to_button";
+    private static final String ID_COMPARE_TO_POPUP_BUTTON = "compare-to-button";
 
     private static final String FORMAT_ID_CHANGELIST = "change.%d";
     private static final String FORMAT_ID_CHANGELIST_COMMENT = "change.%d.comment";

@@ -40,7 +40,7 @@
 
     ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
 
-    var select = new ZUTUBI.Select(fc);
+    var select = new ZUTUBI.form.Select(fc);
     ${form.name}.add(select);
     select.on('change', updateButtons);
 }());

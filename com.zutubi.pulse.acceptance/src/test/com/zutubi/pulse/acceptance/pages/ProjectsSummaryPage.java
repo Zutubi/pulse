@@ -33,7 +33,7 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public String getProjectMenuId(String group, String project)
     {
-        return getProjectRowId(group, project) + "_actions";
+        return getProjectRowId(group, project) + "-actions";
     }
 
     public String getProjectActionId(String group, String project, String action)
@@ -43,7 +43,7 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public void clickProjectAction(String group, String project, String action)
     {
-        browser.click(getProjectMenuId(group, project) + "_link");
+        browser.click(getProjectMenuId(group, project) + "-link");
         browser.waitAndClick(getProjectActionId(group, project, action));
     }
 

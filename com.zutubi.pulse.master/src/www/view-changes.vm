@@ -80,7 +80,7 @@
                                 <tr>
                                     <th class="heading">
                                         <span class="action">
-                                            <a href="#" onclick="showHideFloat('comments', '$commentId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                                            <a href="#" onclick="ZUTUBI.FloatManager.showHideFloat('comments', '$commentId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                                         </span>
                                         #wwtext("name=change.comment")
                                     </th>
@@ -134,7 +134,7 @@
             <tr>
                 <th class="heading" colspan="3">
                     <span class="action">
-                        <a href="#" onclick="showHideFloat('compare-to', 'compare-to'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        <a href="#" onclick="ZUTUBI.FloatManager.showHideFloat('compare-to', 'compare-to'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                     </span>
                     #wwtext("name=changes.compare.to")
                 </th>

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.master.webwork.Urls;
 
 /**
  * The Pulse toolbar is the toolbar at the very top of the Pulse page,
@@ -14,12 +13,12 @@ public class PulseToolbar
     private static final String ID_BUILD_LINK = "pulse-toolbar-build-link";
     private static final String PREFIX_ID_BUILD_ITEM = "pulse-toolbar-build-item-";
     private static final String ID_AGENT_LINK = "pulse-toolbar-agent-link";
-    private static final String ID_BUILD_MENU = "pulse-toolbar_actions_button";
-    private static final String ID_NEXT_SUCCESSFUL_LINK = "next-successful-pulse-toolbar_actions";
-    private static final String ID_PREVIOUS_SUCCESSFUL_LINK = "previous-successful-pulse-toolbar_actions";
-    private static final String ID_NEXT_BROKEN_LINK = "next-broken-pulse-toolbar_actions";
-    private static final String ID_PREVIOUS_BROKEN_LINK = "previous-broken-pulse-toolbar_actions";
-    private static final String ID_LATEST_LINK = "latest-pulse-toolbar_actions";
+    private static final String ID_BUILD_MENU = "pulse-toolbar-actions-button";
+    private static final String ID_NEXT_SUCCESSFUL_LINK = "next-successful-pulse-toolbar-actions";
+    private static final String ID_PREVIOUS_SUCCESSFUL_LINK = "previous-successful-pulse-toolbar-actions";
+    private static final String ID_NEXT_BROKEN_LINK = "next-broken-pulse-toolbar-actions";
+    private static final String ID_PREVIOUS_BROKEN_LINK = "previous-broken-pulse-toolbar-actions";
+    private static final String ID_LATEST_LINK = "latest-pulse-toolbar-actions";
 
     private SeleniumBrowser browser;
 

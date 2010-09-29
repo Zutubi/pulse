@@ -734,7 +734,7 @@
 #end
 
 #macro(showHideButton $category $id $align)
-    <a href="#" class="unadorned" id="${id}_link" onclick="showHideFloat('$category', '$id', '$align'); return false"><img alt="actions" id="${id}_button" class="popdown floating-widget" src="$base/images/default/s.gif"/></a>
+    <a href="#" class="unadorned" id="${id}-link" onclick="ZUTUBI.FloatManager.showHideFloat('$category', '$id', '$align'); return false"><img alt="actions" id="${id}-button" class="popdown floating-widget" src="$base/images/default/s.gif"/></a>
 #end
 
 ##
@@ -754,7 +754,7 @@
                 <tr>
                     <th class="heading" colspan="5">
                         <span class="action">
-                            <a href="#" onclick="showHideFloat('comments', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                            <a href="#" onclick="ZUTUBI.FloatManager.showHideFloat('comments', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                         </span>
                         #wwtext("name=change.comment")
                     </th>

@@ -1,7 +1,7 @@
 <#if form?exists>
-<table class="eform"><tr><td id="${form.name}.status"></td></tr><tr><td id="${form.id}"><td></tr></table>
+<table class="eform"><tr><td id="${form.name}-status"></td></tr><tr><td id="${form.id}"><td></tr></table>
 <script type="text/javascript">
-    var ${form.name} = new ZUTUBI.CheckFormPanel(${mainFormName}, {
+    var ${form.name} = new ZUTUBI.form.CheckFormPanel(${mainFormName}, {
         method: 'POST',
         formName: '${form.name?js_string}',
         labelAlign: 'right',

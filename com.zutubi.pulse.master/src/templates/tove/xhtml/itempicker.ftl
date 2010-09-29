@@ -56,7 +56,7 @@
     ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
 </#if>
 
-    var picker = new ZUTUBI.ItemPicker(fc);
+    var picker = new ZUTUBI.form.ItemPicker(fc);
     ${form.name}.add(picker);
     picker.on('change', updateButtons);
 

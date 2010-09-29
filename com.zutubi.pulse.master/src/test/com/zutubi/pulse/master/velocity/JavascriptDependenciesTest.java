@@ -3,15 +3,13 @@ package com.zutubi.pulse.master.velocity;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import static com.zutubi.pulse.master.velocity.JavascriptDependencies.expandAndSortPaths;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Mapping;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 public class JavascriptDependenciesTest extends PulseTestCase
 {
@@ -25,6 +23,16 @@ public class JavascriptDependenciesTest extends PulseTestCase
         jsRoot = new File(JavascriptDependenciesTest.class.getResource("js").toURI());
     }
 
+    public void testEmptyFile() throws IOException
+    {
+        assertExpected(asList("empty.js"), asList("empty.js"));
+    }
+
+    public void testOnlyDependencies() throws IOException
+    {
+        assertExpected(asList("a.js", "b.js", "onlyDependencies.js"), asList("onlyDependencies.js"));
+    }
+    
     public void testNoDependencyHeader() throws IOException
     {
         assertExpected(asList("noDependency.js"), asList("noDependency.js"));
@@ -70,7 +78,7 @@ public class JavascriptDependenciesTest extends PulseTestCase
 
     private void assertExpected(List<String> expected, List<String> paths) throws IOException
     {
-        Assert.assertEquals(normalise(expected), normalise(expandAndSortPaths(jsRoot, paths)));
+        assertEquals(normalise(expected), normalise(expandAndSortPaths(jsRoot, paths)));
     }
 
     private List<String> normalise(List<String> paths)

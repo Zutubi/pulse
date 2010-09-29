@@ -19,7 +19,7 @@ public class AgentStatusPage extends SeleniumPage
     public static final String ID_SYNCH_TABLE = "synchronisation.messages";
     public static final String ID_PATTERN_SYNCH_MESSAGE = "synchronisation.message.%d";
     public static final String ID_PATTERN_STATUS_MESSAGE = "status.message.%d";
-    public static final String ID_PATTERN_STATUS_POPUP_BUTTON = "status.popup.%d_link";
+    public static final String ID_PATTERN_STATUS_POPUP_BUTTON = "status.popup.%d-link";
     
     private static final long TIMEOUT = 30000;
 

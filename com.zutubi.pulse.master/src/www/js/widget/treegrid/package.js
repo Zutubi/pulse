@@ -4,7 +4,7 @@
 // dependency: ./TreeGridColumns.js
 // dependency: ./TreeGridLoader.js
 // dependency: ./TreeGridNodeUI.js
-// dependnecy: ./TreeGridSorter.js
+// dependency: ./TreeGridSorter.js
 
 /**
  * A blank javascript file used as a transitive dependency

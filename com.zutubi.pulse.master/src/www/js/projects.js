@@ -15,8 +15,8 @@ ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</
                            '</tpl>' +
                        '</td>' +
                        '<td class="actions-menu project-actions" rowspan="{rowspan}">' +
-                           '<span id="{id}_actions_link">' +
-                               '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}_actions_button" alt="project menu"/>' +
+                           '<span id="{id}-actions-link">' +
+                               '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}-actions-button" alt="project menu"/>' +
                            '</span>' +
                        '</td>';
 
@@ -24,8 +24,8 @@ ZUTUBI.BUILD_CELLS = '<td class="build-id fit-width">' +
                          '<a href="{buildLink}">build {buildNumber}</a>' +
                      '</td>' +
                      '<td class="actions-menu">' +
-                         '<span id="{buildId}_bactions_link">' +
-                             '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{buildId}_bactions_button" alt="build menu"/>' +
+                         '<span id="{buildId}-bactions-link">' +
+                             '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{buildId}-bactions-button" alt="build menu"/>' +
                          '</span>' +
                      '</td>' +
                      '<td class="build-status fit-width">' +
@@ -96,8 +96,8 @@ ZUTUBI.ConcreteProject.prototype = {
                     this.rows.push(this.noProjectTemplate.insertAfter(this.rows[this.rows.length - 1], templateData, true));
                 }
 
-                var buildButton = Ext.get(templateData.buildId + '_bactions_link');
-                buildButton.on('click', this.toggleMenu.createDelegate(this, ['bactions', templateData.buildNumber, templateData.buildId + '_bactions']));
+                var buildButton = Ext.get(templateData.buildId + '-bactions-link');
+                buildButton.on('click', this.toggleMenu.createDelegate(this, ['bactions', templateData.buildNumber, templateData.buildId + '-bactions']));
             }
         }
         else
@@ -106,15 +106,15 @@ ZUTUBI.ConcreteProject.prototype = {
             this.rows.push(this.el);
         }
 
-        var projectButton = Ext.get(this.data.id + '_actions_link');
-        projectButton.on('click', this.toggleMenu.createDelegate(this, ['actions', '', this.data.id + '_actions']));
+        var projectButton = Ext.get(this.data.id + '-actions-link');
+        projectButton.on('click', this.toggleMenu.createDelegate(this, ['actions', '', this.data.id + '-actions']));
 
         return this.rows[this.rows.length - 1];
     },
 
     toggleMenu: function(menuType, menuArg, id) {
         renderMenu(this, this.getMenuItems(menuType, menuArg, id), id);
-        showHideFloat('actions', id, 'tl-bl?');
+        ZUTUBI.FloatManager.showHideFloat('actions', id, 'tl-bl?');
     },
 
     setRowDisplay: function(display) {
@@ -198,7 +198,7 @@ ZUTUBI.ConcreteProject.prototype = {
                 }
                 else
                 {
-                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false, false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
+                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false, false); ZUTUBI.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
                 }
 
                 items.push(item);
@@ -209,7 +209,7 @@ ZUTUBI.ConcreteProject.prototype = {
                 items.push({
                     id: 'with dependencies',
                     image: 'lightning.gif',
-                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false, false); showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
+                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false, false); ZUTUBI.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
                 });
             }
 
@@ -771,8 +771,8 @@ ZUTUBI.ChangesTable.prototype = {
                                           '<td class="content" id="${id}_{idSuffix}_cell">' +
                                               '<tpl if="shortComment">' +
                                                   '{shortComment} ' +
-                                                  '<span id="{id}_{idSuffix}_comment_link">' +
-                                                      '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}_{idSuffix}_comment_button" alt="show full comment"/>' +
+                                                  '<span id="{id}-{idSuffix}-comment-link">' +
+                                                      '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}-{idSuffix}-comment-button" alt="show full comment"/>' +
                                                   '</span>' +
                                               '</tpl>' +
                                               '<tpl if="!shortComment">{comment}</tpl>' +
@@ -790,20 +790,20 @@ ZUTUBI.ChangesTable.prototype = {
                                               '</tpl>' +
                                               '<tpl if="buildCount &gt; 1">' +
                                                   '{buildCount} builds ' +
-                                                  '<span id="{id}_{idSuffix}_builds_link">' +
-                                                      '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}_{idSuffix}_builds_button" alt="show all builds"/>' +
+                                                  '<span id="{id}-{idSuffix}-builds-link">' +
+                                                      '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}-{idSuffix}-builds-button" alt="show all builds"/>' +
                                                   '</span>' +
                                               '</tpl>' +
                                           '</td>' +
                                           '<td class="content rightmost"><a href="{base}/dashboard/changes/{id}/">view</a></td>' +
                                       '</tr>').compile(),
 
-    commentTemplate: new Ext.Template('<div id="{id}_{idSuffix}_comment" style="display: none">' +
+    commentTemplate: new Ext.Template('<div id="{id}-{idSuffix}-comment" style="display: none">' +
                                           '<table class="content" style="margin: 0">' +
                                               '<tr>' +
                                                   '<th class="heading" colspan="5">' +
                                                        '<span class="action">' +
-                                                           '<a href="#" onclick="showHideFloat(\'comments\', \'{id}_{idSuffix}_comment\'); return false;">' +
+                                                           '<a href="#" onclick="ZUTUBI.FloatManager.showHideFloat(\'comments\', \'{id}-{idSuffix}-comment\'); return false;">' +
                                                                '<img alt="close" src="{base}/images/delete.gif"/> close' +
                                                            '</a>' +
                                                        '</span>' +
@@ -814,12 +814,12 @@ ZUTUBI.ChangesTable.prototype = {
                                            '</table>' +
                                        '</div>').compile(),
 
-    buildsTemplate: new Ext.XTemplate('<div id="{id}_{idSuffix}_builds" style="display: none">' +
+    buildsTemplate: new Ext.XTemplate('<div id="{id}-{idSuffix}-builds" style="display: none">' +
                                           '<table class="content" style="margin: 0">' +
                                               '<tr>' +
                                                   '<th class="heading" colspan="4">' +
                                                       '<span class="action">' +
-                                                          '<a href="#" onclick="showHideFloat(\'builds\', \'{id}_{idSuffix}_builds\'); return false;">' +
+                                                          '<a href="#" onclick="ZUTUBI.FloatManager.showHideFloat(\'builds\', \'{id}-{idSuffix}-builds\'); return false;">' +
                                                               '<img alt="close" src="{base}/images/delete.gif"/> close' +
                                                           '</a>' +
                                                       '</span>' +
@@ -860,11 +860,11 @@ ZUTUBI.ChangesTable.prototype = {
                 this.changeTemplate.append(tbodyEl, change);
                 if (change.shortComment)
                 {
-                    var commentButton = Ext.get(change.id + '_' + this.idSuffix + '_comment_link');
+                    var commentButton = Ext.get(change.id + '-' + this.idSuffix + '-comment-link');
                     commentButton.on('click', this.toggleComment.createDelegate(this, [change]));
                 }
 
-                var buildsButton = Ext.get(change.id + '_' + this.idSuffix + '_builds_link');
+                var buildsButton = Ext.get(change.id + '-' + this.idSuffix + '-builds-link');
                 if (buildsButton)
                 {
                     buildsButton.on('click', this.toggleBuilds.createDelegate(this, [change]));
@@ -879,7 +879,7 @@ ZUTUBI.ChangesTable.prototype = {
 
     toggleComment: function(change) {
         this.renderComment(change);
-        showHideFloat('comments', change.id + '_' + this.idSuffix + '_comment');
+        ZUTUBI.FloatManager.showHideFloat('comments', change.id + '-' + this.idSuffix + '-comment');
     },
 
     renderComment: function(change) {
@@ -893,7 +893,7 @@ ZUTUBI.ChangesTable.prototype = {
 
     toggleBuilds: function(change) {
         this.renderBuilds(change);
-        showHideFloat('builds', change.id + '_' + this.idSuffix + '_builds');
+        ZUTUBI.FloatManager.showHideFloat('builds', change.id + '-' + this.idSuffix + '-builds');
     },
 
     renderBuilds: function(change) {

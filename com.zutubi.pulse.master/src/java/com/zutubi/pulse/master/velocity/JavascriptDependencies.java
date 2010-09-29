@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.velocity;
 
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Sort;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSuffixFilter;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -196,19 +196,26 @@ public class JavascriptDependencies
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         try
         {
-            String line = reader.readLine();
-            Matcher matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
-            while (matcher.matches())
+            while (true)
             {
+                String line = reader.readLine();
+                if (line == null)
+                {
+                    break;
+                }
+                
+                Matcher matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
+                if (!matcher.matches())
+                {
+                    break;
+                }
+                
                 line = line.substring(line.indexOf(":") + 1);
                 StringTokenizer tokens = new StringTokenizer(line, ",", false);
                 while (tokens.hasMoreTokens())
                 {
                     dependencies.add(tokens.nextToken().trim());
                 }
-
-                line = reader.readLine();
-                matcher = PATTERN_DEPENDENCY_HEADER.matcher(line);
             }
         }
         finally
