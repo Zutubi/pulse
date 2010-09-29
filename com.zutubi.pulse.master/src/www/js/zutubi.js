@@ -3,6 +3,7 @@
 // dependency: widget/treegrid/package.js
 // dependency: zutubi/FloatManager.js
 // dependency: zutubi/form/package.js
+// dependency: zutubi/tree/package.js
 
 function renderMenu(owner, items, id)
 {
@@ -53,427 +54,6 @@ function appendMenuItem(el, menuId, item) {
     el.createChild({tag: 'li', children: [child]});
 }
 
-ZUTUBI.ConfigTreeLoader = function(base)
-{
-    ZUTUBI.ConfigTreeLoader.superclass.constructor.call(this, {
-        dataUrl: base,
-        requestMethod: 'get'
-    });
-};
-
-Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
-    getNodeURL: function(node)
-    {
-        var tree = node.getOwnerTree();
-        var path = tree.toConfigPathPrefix(node.getPath('baseName'));
-        return this.dataUrl + '/' + encodeURIPath(path);
-    },
-
-    requestData: function(node, callback)
-    {
-        if(this.fireEvent("beforeload", this, node, callback))
-        {
-            var params = this.getParams(node);
-            var cb = {
-                success: this.handleResponse,
-                failure: this.handleFailure,
-                scope: this,
-                argument: {callback: callback, node: node}
-            };
-
-            this.transId = Ext.lib.Ajax.request(this.requestMethod, this.getNodeURL(node) + '?ls', cb, params);
-        }
-        else
-        {
-            // if the load is cancelled, make sure we notify
-            // the node that we are done
-            if(typeof callback == "function")
-            {
-                callback();
-            }
-        }
-    }
-});
-
-
-ZUTUBI.ConfigTree = function(config)
-{
-    ZUTUBI.ConfigTree.superclass.constructor.call(this, config);
-    this.dead = false;
-};
-
-Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
-
-    getSelectedConfigPath: function()
-    {
-        var treePath = this.getSelectedTreePath();
-        return treePath == null ? null : this.toConfigPathPrefix(treePath);
-    },
-
-    getSelectedTreePath: function()
-    {
-        var node = this.getSelectionModel().getSelectedNode();
-        if (node)
-        {
-            return node.getPath('baseName');
-        }
-        return null;
-    },
-
-    toTreePathPrefix: function(configPath)
-    {
-        var treePath = configPath;
-
-        if (this.pathPrefix && treePath.indexOf(this.pathPrefix) == 0)
-        {
-            treePath = treePath.substring(this.pathPrefix.length);
-        }
-
-        if(treePath.length > 0 && treePath.substring(0, 1) != '/')
-        {
-            treePath = '/' + treePath;
-        }
-
-        if (!this.rootVisible)
-        {
-            treePath = this.pathSeparator + this.root.attributes.baseName + treePath;
-        }
-
-        if (treePath.substring(0, 1) == '/')
-        {
-            treePath = treePath.substring(1);
-        }
-
-        return treePath;
-    },
-
-    toConfigPathPrefix: function(treePath)
-    {
-        var configPath = treePath;
-
-        if (!this.rootVisible)
-        {
-            configPath = configPath.substring(this.root.attributes.baseName.length + 1);
-        }
-
-        if(configPath.length > 0 && configPath.substring(0, 1) == '/')
-        {
-            configPath = configPath.substring(1);
-        }
-
-        if (this.pathPrefix)
-        {
-            configPath = this.pathPrefix + this.pathSeparator + configPath;
-        }
-
-        return configPath;
-    },
-
-    selectConfigPath: function(configPath, callback)
-    {
-        this.getSelectionModel().clearSelections();
-        this.expandToPath(configPath, function(found, node) {
-            if (found)
-            {
-                node.select();
-            }
-            
-            if (callback)
-            {
-                callback();
-            }
-        });
-    },
-
-    expandToPath: function(path, callback)
-    {
-        path = this.toTreePathPrefix(path);
-        var keys = path.split(this.pathSeparator);
-        var current = this.root;
-        if (current.attributes['baseName'] != keys[0])
-        {
-            if(callback)
-            {
-                callback(false, null);
-            }
-            return;
-        }
-
-        var index = 0;
-        var skippedLast = false;
-        var f = function() {
-            if (++index == keys.length)
-            {
-                if (callback)
-                {
-                    callback(true, current);
-                }
-                return;
-            }
-
-            if (!skippedLast && current.attributes.extraAttributes && current.attributes.extraAttributes.collapsedCollection)
-            {
-                skippedLast = true;
-                f();
-            }
-            else
-            {
-                skippedLast = false;
-                current.expand(false, false, function() {
-                    var c = current.findChild('baseName', keys[index]);
-                    if (!c)
-                    {
-                        if(callback)
-                        {
-                            callback(false, current);
-                        }
-                        return;
-                    }
-
-                    current = c;
-                    f();
-                });
-            }
-        };
-
-        f();
-    },
-
-    getNodeConfigPath: function(node)
-    {
-        var p = node.parentNode;
-        var b = [node.attributes['baseName']];
-        while (p)
-        {
-            if (p.attributes.extraAttributes && p.attributes.extraAttributes.collapsedCollection)
-            {
-                b.unshift(p.attributes.extraAttributes.collapsedCollection);
-            }
-            b.unshift(p.attributes['baseName']);
-            p = p.parentNode;
-        }
-
-        return this.toConfigPathPrefix('/' + b.join('/'));
-    },
-
-    getNodeByConfigPath: function(configPath)
-    {
-        var path = this.toTreePathPrefix(configPath);
-        var keys = path.split(this.pathSeparator);
-        var current = this.root;
-        if (current.attributes['baseName'] != keys[0])
-        {
-            return null;
-        }
-
-        var skippedLast = false;
-        for(var i = 1; current && i < keys.length; i++)
-        {
-            if (!skippedLast && current.attributes.extraAttributes && current.attributes.extraAttributes.collapsedCollection)
-            {
-                skippedLast = true;
-            }
-            else
-            {
-                skippedLast = false;
-                current = current.findChild('baseName', keys[i]);
-            }
-        }
-        return current;
-    },
-
-    handleResponse: function(response)
-    {
-        var tree = this;
-
-        if(response.addedFiles)
-        {
-            each(response.addedFiles, function(addition) { tree.addNode(addition.parentPath, {baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.leaf, extraAttributes: {collapsedCollection: addition.collapsedCollection}}); });
-        }
-
-        if(response.renamedPaths)
-        {
-            each(response.renamedPaths, function(rename) { tree.renameNode(rename.oldPath, rename.newName, rename.newDisplayName, rename.collapsedCollection); });
-        }
-
-        if(response.removedPaths)
-        {
-            each(response.removedPaths, function(path) { tree.removeNode(path); });
-        }
-    },
-
-    redirectToNewPath: function(response)
-    {
-        if (response.newPath)
-        {
-            this.selectConfigPath(response.newPath);
-        }
-    },
-
-    addNode: function(parentPath, config)
-    {
-        if (parentPath)
-        {
-            var parentNode = this.getNodeByConfigPath(parentPath);
-            if (parentNode)
-            {
-                var newNode = this.getLoader().createNode(config);
-                parentNode.leaf = false;
-                parentNode.appendChild(newNode);
-            }
-        }
-    },
-
-    renameNode: function(oldPath, newName, newDisplayName, collapsedCollection)
-    {
-        if(oldPath)
-        {
-            var node = this.getNodeByConfigPath(oldPath);
-            if(node)
-            {
-                node.attributes.baseName = newName;
-                node.setText(newDisplayName);
-                if (!node.attributes.extraAttributes)
-                {
-                    node.attributes.extraAttributes = {};
-                }
-
-                node.attributes.extraAttributes.collapsedCollection = collapsedCollection;
-            }
-        }
-    },
-
-    removeNode: function(path)
-    {
-        if (path)
-        {
-            var node = this.getNodeByConfigPath(path);
-            if (node)
-            {
-                if(node.isRoot)
-                {
-                    this.dead = true;
-                }
-                else
-                {
-                    node.parentNode.removeChild(node);
-                }
-            }
-        }
-    }
-});
-
-
-ZUTUBI.TemplateTree = function(scope, config)
-{
-    this.scope = scope;
-    this.dead = false;
-    ZUTUBI.TemplateTree.superclass.constructor.call(this, config);
-};
-
-Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
-    handleResponse: function(response)
-    {
-        var tree = this;
-
-        if (response.addedFiles)
-        {
-            each(response.addedFiles, function(addition) {
-                if (addition.parentTemplatePath && addition.parentPath == tree.scope)
-                {
-                    tree.addNode(addition.parentTemplatePath, { baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.templateLeaf});
-                }
-            });
-        }
-
-        if (response.renamedPaths)
-        {
-            each(response.renamedPaths, function(rename) { tree.renameNode(tree.translatePath(rename.oldPath), rename.newName, rename.newDisplayName); });
-        }
-
-        if (response.removedPaths)
-        {
-            each(response.removedPaths, function(path) { tree.removeNode(tree.translatePath(path)); } );
-        }
-    },
-
-    redirectToNewPath: function(response)
-    {
-        if (response.newTemplatePath)
-        {
-            this.selectConfigPath(response.newTemplatePath);
-        }
-    },
-
-    findNodeByAttribute: function(attribute, value, node)
-    {
-        node = node || this.root;
-        if (node.attributes[attribute] == value)
-        {
-            return node;
-        }
-
-        var cs = node.childNodes;
-        for(var i = 0, len = cs.length; i < len; i++)
-        {
-            var found = this.findNodeByAttribute(attribute, value, cs[i]);
-            if (found)
-            {
-                return found;
-            }
-        }
-
-        return null;
-    },
-
-    translatePath: function(path)
-    {
-        var pieces = path.split(this.pathSeparator);
-        if (pieces.length == 2 && pieces[0] == this.scope)
-        {
-            var baseName = pieces[1];
-            var node = this.findNodeByAttribute('baseName', baseName);
-            if (node)
-            {
-                return this.getNodeConfigPath(node);
-            }
-        }
-
-        return null;
-    }
-});
-
-ZUTUBI.FSTreeLoader = function(config)
-{
-    var baseUrl = config.baseUrl;
-    this.preloadDepth = config.preloadDepth || 0;
-
-    ZUTUBI.FSTreeLoader.superclass.constructor.call(this, {
-        dataUrl: baseUrl + '/ajax/xls.action',
-        baseParams: config
-    });
-};
-
-Ext.extend(ZUTUBI.FSTreeLoader, Ext.tree.TreeLoader, {
-    getParams: function(node)
-    {
-        var buf = [];
-        var bp = this.baseParams;
-        for (var key in bp)
-        {
-            if (typeof bp[key] != "function")
-            {
-                buf.push(encodeURIComponent(key), "=", encodeURIComponent(bp[key]), "&");
-            }
-        }
-        buf.push("path=", encodeURIComponent(node.getPath("baseName")));
-        if (this.preloadDepth && node.getDepth() == 0)
-        {
-            buf.push("&depth=", this.preloadDepth);
-        }
-        return buf.join("");
-    }
-});
 
 ZUTUBI.DetailPanel = function(config)
 {
@@ -850,7 +430,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             useDefaults: true
         });
 
-        this.loader = new ZUTUBI.FSTreeLoader({
+        this.loader = new ZUTUBI.tree.FSTreeLoader({
             baseUrl: this.baseUrl,
             fs: this.fs,
             basePath: this.basePath,
@@ -890,7 +470,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             this.loading = false;
         }, this);
 
-        this.tree = new ZUTUBI.ConfigTree(Ext.apply({
+        this.tree = new ZUTUBI.tree.ConfigTree(Ext.apply({
             loader: this.loader,
             layout: 'fit',
             border: false,
@@ -1476,7 +1056,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
     {
         var tree = this;
         var config = {
-            loader: new ZUTUBI.FSTreeLoader({
+            loader: new ZUTUBI.tree.FSTreeLoader({
                 baseUrl: window.baseUrl,
                 fs: 'pulse',
                 basePath: 'projects/' + this.initialConfig.projectId + '/builds/' + this.initialConfig.buildId + '/artifacts',
@@ -1799,7 +1379,7 @@ ZUTUBI.PluginsTree = function(config)
     ZUTUBI.PluginsTree.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.ConfigTree,
+Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.tree.ConfigTree,
 {
     layout: 'fit',
     border: false,
@@ -1810,7 +1390,7 @@ Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.ConfigTree,
     initComponent: function()
     {
         var config = {
-            loader: new ZUTUBI.FSTreeLoader({
+            loader: new ZUTUBI.tree.FSTreeLoader({
                 baseUrl: window.baseUrl
             }),
 

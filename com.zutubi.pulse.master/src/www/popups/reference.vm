@@ -50,7 +50,7 @@
         var Layout = function() {
             return {
                 init : function() {
-                    var loader = new ZUTUBI.FSTreeLoader({baseUrl:'$base', showFiles:true, fs:'pulse', basePath:''});
+                    var loader = new ZUTUBI.tree.FSTreeLoader({baseUrl:'$base', showFiles:true, fs:'pulse', basePath:''});
                     tree = new Ext.tree.TreePanel({
                         loader: loader,
                         layout: 'fit',
