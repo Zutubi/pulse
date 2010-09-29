@@ -17,30 +17,30 @@ public class EnvironmentArtifactPage extends CommandArtifactPage
 
     public boolean isPropertyPresent(String property)
     {
-        return browser.isTextPresent(processProperty(property) + "=");
+        return browser.isRegexPresent("(\\d)+" + property + "=");
     }
 
     public boolean isPropertyPresentWithValue(String property, String value)
     {
-        return browser.isTextPresent(processProperty(property) + "=" + value);
+        return browser.isRegexPresent("(\\d)+" + property + "=" + value);
     }
 
     public boolean isPulsePropertyPresent(String property)
     {
-        return browser.isTextPresent(getPropertyPrefix(property));
+        return browser.isRegexPresent("(\\d)+" + prefixedProperty(property));
     }
 
     public boolean isPulsePropertyPresentWithValue(String property, String value)
     {
-        return browser.isTextPresent(getPropertyPrefix(property) + value);
+        return browser.isRegexPresent("(\\d)+" + prefixedProperty(property) + value);
     }
 
-    private String getPropertyPrefix(String property)
+    private String prefixedProperty(String property)
     {
-        return "PULSE_" + processProperty(property) + "=";
+        return "PULSE_" + normaliseProperty(property) + "=";
     }
 
-    private String processProperty(String property)
+    private String normaliseProperty(String property)
     {
         return property.toUpperCase().replace('.', '_');
     }

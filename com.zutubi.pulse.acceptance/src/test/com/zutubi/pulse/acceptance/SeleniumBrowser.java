@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -369,6 +371,15 @@ public class SeleniumBrowser
     public boolean isTextPresent(String text)
     {
         return selenium.isTextPresent(text);
+    }
+
+    public boolean isRegexPresent(String regex)
+    {
+        String bodyText = selenium.getBodyText();
+
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(bodyText);
+        return m.find();
     }
 
     /**
