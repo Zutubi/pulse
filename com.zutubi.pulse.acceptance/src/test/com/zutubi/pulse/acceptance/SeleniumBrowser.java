@@ -16,6 +16,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
@@ -370,6 +372,15 @@ public class SeleniumBrowser
     public boolean isTextPresent(String text)
     {
         return selenium.isTextPresent(text);
+    }
+
+    public boolean isRegexPresent(String regex)
+    {
+        String bodyText = selenium.getBodyText();
+
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(bodyText);
+        return m.find();
     }
 
     /**
