@@ -521,6 +521,16 @@ public class SeleniumBrowser
         return selenium.isCookiePresent(name);
     }
 
+    public void deleteAllCookies()
+    {
+        selenium.deleteAllVisibleCookies();
+    }
+
+    public String getCookie()
+    {
+        return selenium.getCookie();
+    }
+
     public void setCookie(String name, String value)
     {
         String cookieOptions = "";

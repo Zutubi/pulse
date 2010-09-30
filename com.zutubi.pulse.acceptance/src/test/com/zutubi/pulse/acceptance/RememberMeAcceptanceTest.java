@@ -9,6 +9,13 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
     private static final String USERNAME = ADMIN_CREDENTIALS.getUserName();
     private static final String PASSWORD = ADMIN_CREDENTIALS.getPassword();
 
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        browser.deleteAllCookies();
+    }
+
     public void testLoginWithRememberMe()
     {
         assertFalse(isRememberMeCookieSet());
@@ -52,6 +59,7 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
         String cookie = browser.getCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
 
         browser.newSession();
+        browser.deleteAllCookies();
 
         // open the browser at '/' and ensure we are asked to login.
         browser.open("/");
