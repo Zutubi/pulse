@@ -1,16 +1,16 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 
-ZUTUBI.form.ItemPicker = function(config)
+Zutubi.form.ItemPicker = function(config)
 {
-    ZUTUBI.form.ItemPicker.superclass.constructor.call(this, config);
+    Zutubi.form.ItemPicker.superclass.constructor.call(this, config);
     this.addEvents({
         'change': true
     });
     this.hiddenName = config.name;
 };
 
-Ext.extend(ZUTUBI.form.ItemPicker, Ext.form.Field, {
+Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     width: 100,
     height: 130,
     displayField: 'text',
@@ -24,7 +24,7 @@ Ext.extend(ZUTUBI.form.ItemPicker, Ext.form.Field, {
 
     onRender: function(ct, position)
     {
-        ZUTUBI.form.ItemPicker.superclass.onRender.call(this, ct, position);
+        Zutubi.form.ItemPicker.superclass.onRender.call(this, ct, position);
         this.el.on('click', this.onClick, this);
 
         if(this.optionStore)
@@ -176,7 +176,7 @@ Ext.extend(ZUTUBI.form.ItemPicker, Ext.form.Field, {
 
     afterRender: function()
     {
-        ZUTUBI.form.ItemPicker.superclass.afterRender.call(this);
+        Zutubi.form.ItemPicker.superclass.afterRender.call(this);
         if(this.value)
         {
             this.setValue(this.value);
@@ -449,7 +449,7 @@ Ext.extend(ZUTUBI.form.ItemPicker, Ext.form.Field, {
 
     onDisable: function()
     {
-        ZUTUBI.form.ItemPicker.superclass.onDisable.call(this);
+        Zutubi.form.ItemPicker.superclass.onDisable.call(this);
         if(this.input)
         {
             this.input.disable();
@@ -468,7 +468,7 @@ Ext.extend(ZUTUBI.form.ItemPicker, Ext.form.Field, {
 
     onEnable: function()
     {
-        ZUTUBI.form.ItemPicker.superclass.onEnable.call(this);
+        Zutubi.form.ItemPicker.superclass.onEnable.call(this);
         if(this.input)
         {
             this.input.enable();

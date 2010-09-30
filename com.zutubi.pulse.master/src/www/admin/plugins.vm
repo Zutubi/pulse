@@ -6,7 +6,7 @@
     <title>#wwtext("name=plugins")</title>
     <script type="text/javascript">
         var pluginsTree;
-        var detailPanel = new ZUTUBI.DetailPanel();
+        var detailPanel = new Zutubi.DetailPanel();
 
         Ext.onReady(function() {
     #if($path)
@@ -17,7 +17,7 @@
             var center = Ext.getCmp('nested-center');
             center.add(detailPanel);
 
-            pluginsTree = new ZUTUBI.PluginsTree({
+            pluginsTree = new Zutubi.PluginsTree({
                 el: 'plugin-tree',
                 detailPanel: detailPanel
             });

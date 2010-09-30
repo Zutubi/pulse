@@ -12,7 +12,7 @@
         var templateTree;
         var visibleTree;
         var treesInitialised = false;
-        var detailPanel = new ZUTUBI.DetailPanel();
+        var detailPanel = new Zutubi.DetailPanel();
         
         // ------------------------------------------------------------------
 	    // Shared tree functions
@@ -117,9 +117,9 @@
             }
 
             tabPanel.el.createChild({tag: 'div', id: 'config-tree'});
-            var loader = new ZUTUBI.tree.ConfigTreeLoader('$base/aconfig');
+            var loader = new Zutubi.tree.ConfigTreeLoader('$base/aconfig');
 
-            configTree = new ZUTUBI.tree.ConfigTree({
+            configTree = new Zutubi.tree.ConfigTree({
                 el: 'config-tree',
                 pathPrefix: '${scope}',
                 animate: false,
@@ -198,9 +198,9 @@
                     var center = Ext.getCmp('nested-center');
                     center.add(detailPanel);
 
-                    var templateLoader = new ZUTUBI.tree.ConfigTreeLoader('$base/atemplate/$scope');
+                    var templateLoader = new Zutubi.tree.ConfigTreeLoader('$base/atemplate/$scope');
 
-                    templateTree = new ZUTUBI.tree.TemplateTree('$scope', {
+                    templateTree = new Zutubi.tree.TemplateTree('$scope', {
                         el: 'template-tree',
                         id: 'template-tree',
                         animate: false,

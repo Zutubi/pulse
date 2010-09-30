@@ -2,14 +2,14 @@
 // dependency: ext/package.js
 // dependency: ./ConfigTree.js
 
-ZUTUBI.tree.TemplateTree = function(scope, config)
+Zutubi.tree.TemplateTree = function(scope, config)
 {
     this.scope = scope;
     this.dead = false;
-    ZUTUBI.tree.TemplateTree.superclass.constructor.call(this, config);
+    Zutubi.tree.TemplateTree.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.tree.TemplateTree, ZUTUBI.tree.ConfigTree, {
+Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
     handleResponse: function(response)
     {
         var tree = this;

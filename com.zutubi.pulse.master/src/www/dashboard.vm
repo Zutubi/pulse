@@ -55,14 +55,14 @@
         }
 
         Ext.onReady(function() {
-            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $dashboardConfig.columns.size(), $rssEnabled, true);
+            projectsTable = new Zutubi.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $dashboardConfig.columns.size(), $rssEnabled, true);
 #if($dashboardConfig.showMyChanges)
-            myChangesTable = new ZUTUBI.ChangesTable(Ext.get('my.changes'), 'my', '#wwtext("name=my.latest.changes")', false);
+            myChangesTable = new Zutubi.ChangesTable(Ext.get('my.changes'), 'my', '#wwtext("name=my.latest.changes")', false);
 #end
 #if($dashboardConfig.showProjectChanges)
-            myProjectsChangesTable = new ZUTUBI.ChangesTable(Ext.get('project.changes'), 'project', '#wwtext("name=my.project.changes")', true);
+            myProjectsChangesTable = new Zutubi.ChangesTable(Ext.get('project.changes'), 'project', '#wwtext("name=my.project.changes")', true);
 #end
-            view = new ZUTUBI.ActiveView(window.baseUrl + '/ajax/dashboardData.action', refreshInterval, update, window, Ext.get('dashboard-content'), 'Unable to load data.');
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/dashboardData.action', refreshInterval, update, window, Ext.get('dashboard-content'), 'Unable to load data.');
             view.init();
         });
     </script>

@@ -1,7 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 
-ZUTUBI.form.FormLayout = function(config)
+Zutubi.form.FormLayout = function(config)
 {
     if(!config.fieldTpl)
     {
@@ -17,10 +17,10 @@ ZUTUBI.form.FormLayout = function(config)
     }
 
     config.labelAlign = 'right';
-    ZUTUBI.form.FormLayout.superclass.constructor.call(this, config);
+    Zutubi.form.FormLayout.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.form.FormLayout, Ext.layout.FormLayout, {
+Ext.extend(Zutubi.form.FormLayout, Ext.layout.FormLayout, {
     renderItem: function(c, position, target)
     {
         if(c && !c.rendered && c.isFormField && c.inputType == 'hidden')
@@ -28,12 +28,12 @@ Ext.extend(ZUTUBI.form.FormLayout, Ext.layout.FormLayout, {
             target = target.up('form');
         }
 
-        ZUTUBI.form.FormLayout.superclass.renderItem.call(this, c, position, target);
+        Zutubi.form.FormLayout.superclass.renderItem.call(this, c, position, target);
     },
 
     setContainer: function(ct)
     {
-        ZUTUBI.form.FormLayout.superclass.setContainer.call(this, ct);
+        Zutubi.form.FormLayout.superclass.setContainer.call(this, ct);
         // Forcibly override the behaviour of the default layout (adds
         // padding to the element).
         this.elementStyle = '';

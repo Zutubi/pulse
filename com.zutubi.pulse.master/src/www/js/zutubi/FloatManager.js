@@ -1,7 +1,7 @@
 //dependency: ext/package.js
 //dependency: ./namespace.js
 
-ZUTUBI.FloatManager = function() {
+Zutubi.FloatManager = function() {
     var ID_SUFFIX_BUTTON = '-button';
     var ID_SUFFIX_LINK = '-link';
     var ID_SUFFIX_WINDOW = '-window';

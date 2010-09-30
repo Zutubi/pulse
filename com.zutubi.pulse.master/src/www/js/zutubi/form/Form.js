@@ -1,17 +1,17 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 
-ZUTUBI.form.Form = function(config)
+Zutubi.form.Form = function(config)
 {
-    ZUTUBI.form.Form.superclass.constructor.call(this, null, config);
+    Zutubi.form.Form.superclass.constructor.call(this, null, config);
 };
 
-Ext.extend(ZUTUBI.form.Form, Ext.form.BasicForm, {
+Ext.extend(Zutubi.form.Form, Ext.form.BasicForm, {
     ID_SUFFIX_STATUS: '-status',
     
     clearInvalid: function()
     {
-        ZUTUBI.form.Form.superclass.clearInvalid.call(this);
+        Zutubi.form.Form.superclass.clearInvalid.call(this);
         var statusEl = Ext.get(this.formName + this.ID_SUFFIX_STATUS);
         statusEl.update('');
     },

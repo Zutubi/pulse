@@ -1,3 +1,3 @@
 // dependency: zutubi/namespace.js
 
-window.ZUTUBI.form = window.ZUTUBI.form || {};
+window.Zutubi.form = window.Zutubi.form || {};

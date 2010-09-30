@@ -1,13 +1,13 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 
-ZUTUBI.tree.ConfigTree = function(config)
+Zutubi.tree.ConfigTree = function(config)
 {
-    ZUTUBI.tree.ConfigTree.superclass.constructor.call(this, config);
+    Zutubi.tree.ConfigTree.superclass.constructor.call(this, config);
     this.dead = false;
 };
 
-Ext.extend(ZUTUBI.tree.ConfigTree, Ext.tree.TreePanel, {
+Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     getSelectedConfigPath: function()
     {

@@ -7,7 +7,7 @@
 	    var actionInProgress = false;
         var configTree;
         var treesInitialised = false;
-        var detailPanel = new ZUTUBI.DetailPanel();
+        var detailPanel = new Zutubi.DetailPanel();
 
         function handleSuccessfulConfigurationResponse(result)
         {
@@ -29,9 +29,9 @@
                     var center = Ext.getCmp('nested-center');
                     center.add(detailPanel);
 
-                    var loader = new ZUTUBI.tree.ConfigTreeLoader('#jss($base)/aconfig');
+                    var loader = new Zutubi.tree.ConfigTreeLoader('#jss($base)/aconfig');
 
-                    configTree = new ZUTUBI.tree.ConfigTree({
+                    configTree = new Zutubi.tree.ConfigTree({
 #if($prefixPath)
                         pathPrefix: '#jss($prefixPath)',
 #end

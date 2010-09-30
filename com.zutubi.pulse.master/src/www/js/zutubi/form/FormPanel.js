@@ -3,25 +3,25 @@
 // dependency: ./Form.js
 // dependency: ./FormLayout.js
 
-ZUTUBI.form.FormPanel = function(config)
+Zutubi.form.FormPanel = function(config)
 {
-    config.layout = new ZUTUBI.form.FormLayout({});
-    ZUTUBI.form.FormPanel.superclass.constructor.call(this, config);
+    config.layout = new Zutubi.form.FormLayout({});
+    Zutubi.form.FormPanel.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.form.FormPanel, Ext.form.FormPanel, {
+Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
     displayMode: false,
     buttonAlign: 'center',
 
     createForm: function()
     {
         delete this.initialConfig.listeners;
-        return new ZUTUBI.form.Form(this.initialConfig);
+        return new Zutubi.form.Form(this.initialConfig);
     },
 
     onRender: function(ct, position)
     {
-        ZUTUBI.form.FormPanel.superclass.onRender.call(this, ct, position);
+        Zutubi.form.FormPanel.superclass.onRender.call(this, ct, position);
         this.form.el.update('<table><tbody></tbody></table>');
         this.layoutTarget = this.form.el.first().first();
     },
@@ -39,7 +39,7 @@ Ext.extend(ZUTUBI.form.FormPanel, Ext.form.FormPanel, {
             a[i].form = this;
         }
 
-        ZUTUBI.form.FormPanel.superclass.add.apply(this, a);
+        Zutubi.form.FormPanel.superclass.add.apply(this, a);
         return this;
     },
 

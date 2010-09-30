@@ -23,7 +23,7 @@ width of its contents.  Floating it works, but hurts other things.
 <script type="text/javascript">
     Ext.form.Field.prototype.msgTarget = 'under';
 
-    var ${form.name} = new ZUTUBI.form.FormPanel({
+    var ${form.name} = new Zutubi.form.FormPanel({
         method: 'POST',
 <#if form.fileUpload>
         fileUpload: true,

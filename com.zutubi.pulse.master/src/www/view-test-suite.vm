@@ -27,7 +27,7 @@
         }
 
         Ext.onReady(function() {
-            new ZUTUBI.Toolbar({
+            new Zutubi.Toolbar({
                 id: 'build-toolbar',
                 renderTo: 'build-toolbar-holder',
                 enableOverflow: true,

@@ -1,15 +1,15 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 
-ZUTUBI.tree.ConfigTreeLoader = function(base)
+Zutubi.tree.ConfigTreeLoader = function(base)
 {
-    ZUTUBI.tree.ConfigTreeLoader.superclass.constructor.call(this, {
+    Zutubi.tree.ConfigTreeLoader.superclass.constructor.call(this, {
         dataUrl: base,
         requestMethod: 'get'
     });
 };
 
-Ext.extend(ZUTUBI.tree.ConfigTreeLoader, Ext.tree.TreeLoader, {
+Ext.extend(Zutubi.tree.ConfigTreeLoader, Ext.tree.TreeLoader, {
     getNodeURL: function(node)
     {
         var tree = node.getOwnerTree();

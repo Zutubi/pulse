@@ -25,7 +25,7 @@ ${form.name}.items.last().on('browse', function(field)
     prefix += dirField.getValue();
 </#if>
 <#assign title = "${field.name}" + ".popup.title"/>
-    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
+    var browser = new Zutubi.WorkingCopyFileSystemBrowser({
         baseUrl : '${base}',
         showFiles: true,
         prefix:prefix,

@@ -1,18 +1,18 @@
 // dependency: ./namespace.js
 // dependency: ./Form.js
 
-ZUTUBI.form.CheckForm = function(mainForm, options)
+Zutubi.form.CheckForm = function(mainForm, options)
 {
-    ZUTUBI.form.CheckForm.superclass.constructor.call(this, options);
+    Zutubi.form.CheckForm.superclass.constructor.call(this, options);
     this.mainForm = mainForm;
 };
 
-Ext.extend(ZUTUBI.form.CheckForm, ZUTUBI.form.Form, {
+Ext.extend(Zutubi.form.CheckForm, Zutubi.form.Form, {
     isValid: function()
     {
         // Call both, they have side-effects.
         var mainValid = this.mainForm.isValid();
-        var valid = ZUTUBI.form.CheckForm.superclass.isValid.call(this);
+        var valid = Zutubi.form.CheckForm.superclass.isValid.call(this);
         return mainValid && valid;
     },
 
@@ -51,6 +51,6 @@ Ext.extend(ZUTUBI.form.CheckForm, ZUTUBI.form.Form, {
         }
 
         options.params = params;
-        ZUTUBI.form.CheckForm.superclass.submit.call(this, options);
+        Zutubi.form.CheckForm.superclass.submit.call(this, options);
     }
 });

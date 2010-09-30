@@ -5,7 +5,7 @@
 <head>
     <title>#wwtext("name=build.properties.specify")</title>
 	<script type="text/javascript">
-        var detailPanel = new ZUTUBI.DetailPanel();
+        var detailPanel = new Zutubi.DetailPanel();
         detailPanel.setHelp('#jss(${project.config.configurationPath})', 'manualTrigger');
 
         var Layout = function()

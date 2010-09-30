@@ -55,12 +55,12 @@ function appendMenuItem(el, menuId, item) {
 }
 
 
-ZUTUBI.DetailPanel = function(config)
+Zutubi.DetailPanel = function(config)
 {
-    ZUTUBI.DetailPanel.superclass.constructor.call(this, config);
+    Zutubi.DetailPanel.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
+Ext.extend(Zutubi.DetailPanel, Ext.Panel, {
     helpPath: "",
     helpType: "",
 
@@ -75,7 +75,7 @@ Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
             bodyStyle: 'padding: 10px'
         });
 
-        ZUTUBI.DetailPanel.superclass.initComponent.call(this);
+        Zutubi.DetailPanel.superclass.initComponent.call(this);
     },
 
     clearHelp: function()
@@ -108,12 +108,12 @@ Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
     }
 });
 
-ZUTUBI.HelpPanel = function(config)
+Zutubi.HelpPanel = function(config)
 {
-    ZUTUBI.HelpPanel.superclass.constructor.call(this, config);
+    Zutubi.HelpPanel.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
+Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
     shownPath: "",
     shownType: "",
     syncOnExpand: true,
@@ -144,7 +144,7 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
             }]
         });
 
-        ZUTUBI.HelpPanel.superclass.initComponent.call(this);
+        Zutubi.HelpPanel.superclass.initComponent.call(this);
 
         this.on('expand', this.expanded.createDelegate(this));
     },
@@ -276,19 +276,19 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
     }
 });
 
-Ext.reg('xzhelppanel', ZUTUBI.HelpPanel);
+Ext.reg('xzhelppanel', Zutubi.HelpPanel);
 
 Ext.form.Checkbox.prototype.onResize = function()
 {
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
 };
 
-ZUTUBI.TailSettingsWindow = function(config)
+Zutubi.TailSettingsWindow = function(config)
 {
-    ZUTUBI.TailSettingsWindow.superclass.constructor.call(this, config);
+    Zutubi.TailSettingsWindow.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.TailSettingsWindow, Ext.Window, {
+Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
     modal: true,
     title: 'tail view settings',
     closeAction: 'close',
@@ -353,7 +353,7 @@ Ext.extend(ZUTUBI.TailSettingsWindow, Ext.Window, {
             }
         });
 
-        ZUTUBI.TailSettingsWindow.superclass.initComponent.call(this);
+        Zutubi.TailSettingsWindow.superclass.initComponent.call(this);
     },
 
     apply: function()
@@ -397,7 +397,7 @@ Ext.extend(ZUTUBI.TailSettingsWindow, Ext.Window, {
  * @cfg prefix          the prefix path is applied after the base path, and is used to filter
  *                      any nodes that do not contain that prefix
  */
-ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
+Zutubi.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
     // window configuration defaults.
     id: 'pulse-file-system-browser',
@@ -421,7 +421,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
-        ZUTUBI.PulseFileSystemBrowser.superclass.initComponent.apply(this, arguments);
+        Zutubi.PulseFileSystemBrowser.superclass.initComponent.apply(this, arguments);
 
         this.target = Ext.getCmp(this.target);
 
@@ -430,7 +430,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             useDefaults: true
         });
 
-        this.loader = new ZUTUBI.tree.FSTreeLoader({
+        this.loader = new Zutubi.tree.FSTreeLoader({
             baseUrl: this.baseUrl,
             fs: this.fs,
             basePath: this.basePath,
@@ -470,7 +470,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             this.loading = false;
         }, this);
 
-        this.tree = new ZUTUBI.tree.ConfigTree(Ext.apply({
+        this.tree = new Zutubi.tree.ConfigTree(Ext.apply({
             loader: this.loader,
             layout: 'fit',
             border: false,
@@ -557,7 +557,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
     },
 
     show: function() {
-        ZUTUBI.PulseFileSystemBrowser.superclass.show.apply(this, arguments);
+        Zutubi.PulseFileSystemBrowser.superclass.show.apply(this, arguments);
 
         if (this.target)
         {
@@ -573,7 +573,7 @@ ZUTUBI.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 /**
  * A PulseFileSystemBrowser with a toolbar and some buttons.
  */
-ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
+Zutubi.LocalFileSystemBrowser = Ext.extend(Zutubi.PulseFileSystemBrowser, {
 
     isWindows: false,
 
@@ -585,22 +585,22 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
             tbar: new Ext.Toolbar()
         };
 
-        ZUTUBI.LocalFileSystemBrowser.superclass.initComponent.apply(this, arguments);
+        Zutubi.LocalFileSystemBrowser.superclass.initComponent.apply(this, arguments);
 
         var toolbar = this.tree.getTopToolbar();
         var statusBar = this.tree.getBottomToolbar();
 
-        var userHomeButton = new ZUTUBI.SelectNodeButton({
+        var userHomeButton = new Zutubi.SelectNodeButton({
             icon: this.baseUrl + '/images/house.gif',
             tooltip: 'go to user home',
             tree: this.tree
         });
-        var reloadButton = new ZUTUBI.ReloadSelectedNodeButton({
+        var reloadButton = new Zutubi.ReloadSelectedNodeButton({
             icon: this.baseUrl + '/images/arrow_refresh.gif',
             tooltip: 'refresh folder',
             tree: this.tree
         });
-        var createFolderButton = new ZUTUBI.CreateFolderButton({
+        var createFolderButton = new Zutubi.CreateFolderButton({
             icon: this.baseUrl + '/images/folder_add.gif',
             tooltip: 'create new folder',
             baseUrl:this.baseUrl,
@@ -608,7 +608,7 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
             tree: this.tree,
             sbar: statusBar
         });
-        var deleteFolderButton = new ZUTUBI.DeleteFolderButton({
+        var deleteFolderButton = new Zutubi.DeleteFolderButton({
             icon: this.baseUrl + '/images/folder_delete.gif',
             cls: 'x-btn-icon',
             tooltip: 'delete folder',
@@ -664,7 +664,7 @@ ZUTUBI.LocalFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
     }
 });
 
-ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, {
+Zutubi.WorkingCopyFileSystemBrowser = Ext.extend(Zutubi.PulseFileSystemBrowser, {
 
     initComponent: function() {
 
@@ -672,11 +672,11 @@ ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, 
             tbar: new Ext.Toolbar()
         };
 
-        ZUTUBI.WorkingCopyFileSystemBrowser.superclass.initComponent.apply(this, arguments);
+        Zutubi.WorkingCopyFileSystemBrowser.superclass.initComponent.apply(this, arguments);
 
         var toolbar = this.tree.getTopToolbar();
 
-        var reloadButton = new ZUTUBI.ReloadSelectedNodeButton({
+        var reloadButton = new Zutubi.ReloadSelectedNodeButton({
             icon: this.baseUrl + '/images/arrow_refresh.gif',
             tooltip: 'refresh',
             disabled: false,
@@ -687,9 +687,9 @@ ZUTUBI.WorkingCopyFileSystemBrowser = Ext.extend(ZUTUBI.PulseFileSystemBrowser, 
     }
 });
 
-ZUTUBI.viewWorkingCopy = function (project)
+Zutubi.viewWorkingCopy = function (project)
 {
-    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
+    var browser = new Zutubi.WorkingCopyFileSystemBrowser({
         baseUrl : window.baseUrl,
         basePath: 'projects/' + project + '/latest/wc',
         title : 'browse working copy'
@@ -703,7 +703,7 @@ ZUTUBI.viewWorkingCopy = function (project)
  * @cfg path        the tree path to be selected when this button is clicked.
  * @cfg tree        the tree in which the path will be selected.
  */
-ZUTUBI.SelectNodeButton = Ext.extend(Ext.Button, {
+Zutubi.SelectNodeButton = Ext.extend(Ext.Button, {
 
     cls: 'x-btn-icon',
 
@@ -714,7 +714,7 @@ ZUTUBI.SelectNodeButton = Ext.extend(Ext.Button, {
             this.disabled = true;
         }
 
-        ZUTUBI.SelectNodeButton.superclass.initComponent.apply(this, arguments);
+        Zutubi.SelectNodeButton.superclass.initComponent.apply(this, arguments);
     },
 
     onClick: function()
@@ -740,7 +740,7 @@ ZUTUBI.SelectNodeButton = Ext.extend(Ext.Button, {
  * @cfg tree    the tree in which the selected node (or root if no node is selected)
  *              will be reloaded.
  */
-ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
+Zutubi.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
 
     cls: 'x-btn-icon',
     disabled: true,
@@ -748,7 +748,7 @@ ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
     initComponent: function()
     {
 
-        ZUTUBI.ReloadSelectedNodeButton.superclass.initComponent.apply(this, arguments);
+        Zutubi.ReloadSelectedNodeButton.superclass.initComponent.apply(this, arguments);
 
         this.tree.getSelectionModel().on('selectionchange', this.onNodeSelectionChange.createDelegate(this));
     },
@@ -784,7 +784,7 @@ ZUTUBI.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
     }
 });
 
-ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
+Zutubi.DeleteFolderButton = Ext.extend(Ext.Button, {
 
     initComponent: function()
     {
@@ -793,7 +793,7 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
             this.disabled = true;
         }
 
-        ZUTUBI.DeleteFolderButton.superclass.initComponent.apply(this, arguments);
+        Zutubi.DeleteFolderButton.superclass.initComponent.apply(this, arguments);
 
         this.tree.getSelectionModel().on('selectionchange', this.onNodeSelectionChange.createDelegate(this));
     },
@@ -897,7 +897,7 @@ ZUTUBI.DeleteFolderButton = Ext.extend(Ext.Button, {
 /**
  * @cfg tree    the tree to which the new folder will be added.
  */
-ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
+Zutubi.CreateFolderButton = Ext.extend(Ext.Button, {
 
     win: undefined,
 
@@ -908,7 +908,7 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
             this.disabled = true;
         }
 
-        ZUTUBI.CreateFolderButton.superclass.initComponent.apply(this, arguments);
+        Zutubi.CreateFolderButton.superclass.initComponent.apply(this, arguments);
 
         this.tree.getSelectionModel().on('selectionchange', this.onNodeSelectionChange.createDelegate(this));
     },
@@ -1015,12 +1015,12 @@ ZUTUBI.CreateFolderButton = Ext.extend(Ext.Button, {
  * Displays a content panel on a build page, with a heading and scrollable
  * content.
  */
-ZUTUBI.ContentPanel = function(config)
+Zutubi.ContentPanel = function(config)
 {
-    ZUTUBI.ContentPanel.superclass.constructor.call(this, config);
+    Zutubi.ContentPanel.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.ContentPanel, Ext.Panel,
+Ext.extend(Zutubi.ContentPanel, Ext.Panel,
 {
     layout: 'fit',
     border: false,
@@ -1030,13 +1030,13 @@ Ext.extend(ZUTUBI.ContentPanel, Ext.Panel,
 
     initComponent: function()
     {
-        ZUTUBI.ContentPanel.superclass.initComponent.apply(this, arguments);
+        Zutubi.ContentPanel.superclass.initComponent.apply(this, arguments);
     }
 });
-Ext.reg('xzcontentpanel', ZUTUBI.ContentPanel);
+Ext.reg('xzcontentpanel', Zutubi.ContentPanel);
 
 
-if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
+if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 {
     MAX_COLUMN_WIDTH: 600,
 
@@ -1056,7 +1056,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
     {
         var tree = this;
         var config = {
-            loader: new ZUTUBI.tree.FSTreeLoader({
+            loader: new Zutubi.tree.FSTreeLoader({
                 baseUrl: window.baseUrl,
                 fs: 'pulse',
                 basePath: 'projects/' + this.initialConfig.projectId + '/builds/' + this.initialConfig.buildId + '/artifacts',
@@ -1169,7 +1169,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 tpl: '<tpl if="extraAttributes.actions">' +
                          '<tpl for="extraAttributes.actions">' +
                              '&nbsp;<a href="{url}">' +
-                                 '<img alt="{type}" src="'+ window.baseUrl + '/images/artifacts/{type}.gif" ext:qtip="{[ZUTUBI.ArtifactsTree.prototype.tooltips[values.type]]}"/>' +
+                                 '<img alt="{type}" src="'+ window.baseUrl + '/images/artifacts/{type}.gif" ext:qtip="{[Zutubi.ArtifactsTree.prototype.tooltips[values.type]]}"/>' +
                              '</a>' +
                          '</tpl>' +
                      '</tpl>'
@@ -1179,7 +1179,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         Ext.apply(this, config);
         Ext.apply(this.initialConfig, config);
 
-        ZUTUBI.ArtifactsTree.superclass.initComponent.apply(this, arguments);
+        Zutubi.ArtifactsTree.superclass.initComponent.apply(this, arguments);
 
         this.loading = true;
         this.on('beforerender', this.setInitialColumnWidths, this, {single: true});
@@ -1263,7 +1263,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
     }
 }); }
 
-ZUTUBI.Toolbar = Ext.extend(Ext.Toolbar, {
+Zutubi.Toolbar = Ext.extend(Ext.Toolbar, {
     initComponent: function()
     {
         var config = {
@@ -1272,27 +1272,27 @@ ZUTUBI.Toolbar = Ext.extend(Ext.Toolbar, {
         Ext.apply(this, config);
         Ext.apply(this.initialConfig, config);
 
-        ZUTUBI.Toolbar.superclass.initComponent.call(this);
+        Zutubi.Toolbar.superclass.initComponent.call(this);
     }
 });
-Ext.reg('xztoolbar', ZUTUBI.Toolbar);
+Ext.reg('xztoolbar', Zutubi.Toolbar);
 
-ZUTUBI.Toolbar.ToolbarLayout = Ext.extend(Ext.layout.ToolbarLayout, {
+Zutubi.Toolbar.ToolbarLayout = Ext.extend(Ext.layout.ToolbarLayout, {
     addComponentToMenu : function(m, c)
     {
-        if (c instanceof ZUTUBI.Toolbar.LinkItem)
+        if (c instanceof Zutubi.Toolbar.LinkItem)
         {
             m.add(this.createMenuConfig(c, true));
         }
         else
         {
-            ZUTUBI.Toolbar.ToolbarLayout.superclass.addComponentToMenu.call(this, m, c);
+            Zutubi.Toolbar.ToolbarLayout.superclass.addComponentToMenu.call(this, m, c);
         }
     }
 });
-Ext.Container.LAYOUTS.xztoolbar = ZUTUBI.Toolbar.ToolbarLayout;
+Ext.Container.LAYOUTS.xztoolbar = Zutubi.Toolbar.ToolbarLayout;
 
-ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
+Zutubi.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
     /**
      * @cfg {String} icon  URL of the image to show beside the link.
      * @cfg {String} text  The text to be shown in the link.
@@ -1301,7 +1301,7 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
 
     initComponent: function()
     {
-        ZUTUBI.Toolbar.LinkItem.superclass.initComponent.call(this);
+        Zutubi.Toolbar.LinkItem.superclass.initComponent.call(this);
 
         this.addEvents(
             /**
@@ -1344,7 +1344,7 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
                 html: this.text || ''
             });
         }
-        ZUTUBI.Toolbar.LinkItem.superclass.onRender.call(this, ct, position);
+        Zutubi.Toolbar.LinkItem.superclass.onRender.call(this, ct, position);
         this.mon(this.el, {scope: this, click: this.onClick});
     },
 
@@ -1366,7 +1366,7 @@ ZUTUBI.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
         this.fireEvent('click', this, e);
     }
 });
-Ext.reg('xztblink', ZUTUBI.Toolbar.LinkItem);
+Ext.reg('xztblink', Zutubi.Toolbar.LinkItem);
 
 /**
  * Displays all plugins in a tree, handling selection and actions performed on
@@ -1374,12 +1374,12 @@ Ext.reg('xztblink', ZUTUBI.Toolbar.LinkItem);
  *
  * @cfg detailPanel panel to load plugin details into
  */
-ZUTUBI.PluginsTree = function(config)
+Zutubi.PluginsTree = function(config)
 {
-    ZUTUBI.PluginsTree.superclass.constructor.call(this, config);
+    Zutubi.PluginsTree.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.tree.ConfigTree,
+Ext.extend(Zutubi.PluginsTree, Zutubi.tree.ConfigTree,
 {
     layout: 'fit',
     border: false,
@@ -1390,7 +1390,7 @@ Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.tree.ConfigTree,
     initComponent: function()
     {
         var config = {
-            loader: new ZUTUBI.tree.FSTreeLoader({
+            loader: new Zutubi.tree.FSTreeLoader({
                 baseUrl: window.baseUrl
             }),
 
@@ -1407,7 +1407,7 @@ Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.tree.ConfigTree,
 
         this.getSelectionModel().on('selectionchange', this.onPluginSelect);
 
-        ZUTUBI.PluginsTree.superclass.initComponent.apply(this, arguments);
+        Zutubi.PluginsTree.superclass.initComponent.apply(this, arguments);
     },
 
     selectPlugin: function(id)
@@ -1497,13 +1497,13 @@ Ext.extend(ZUTUBI.PluginsTree, ZUTUBI.tree.ConfigTree,
  * Note that the project and agent portions of the breadcrumbs are mutually exclusive, with
  * the project taking precedence.
  */
-ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
+Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
 
     id: 'pulse-toolbar',
     
     initComponent: function()
     {
-        ZUTUBI.PulseHeader.superclass.initComponent.apply(this, arguments);
+        Zutubi.PulseHeader.superclass.initComponent.apply(this, arguments);
 
         this.builds = new Ext.util.MixedCollection();
         if (this.data)
@@ -1514,7 +1514,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
 
     afterRender: function()
     {
-        ZUTUBI.PulseHeader.superclass.afterRender.apply(this, arguments);
+        Zutubi.PulseHeader.superclass.afterRender.apply(this, arguments);
 
         // Remove the x-toolbar class to avoid clashing with the default
         // toolbar styling.
@@ -1523,7 +1523,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
 
     onRender: function()
     {
-        ZUTUBI.PulseHeader.superclass.onRender.apply(this, arguments);
+        Zutubi.PulseHeader.superclass.onRender.apply(this, arguments);
 
         // clear the existing items.
         var currentItems = (this.items) ? this.items.clone() : new Ext.util.MixedCollection();
@@ -1580,7 +1580,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                     {
                         tooltip = 'step forward to build ' + build.number;
                     }
-                    this.addItem(new ZUTUBI.BuildNavToolbarItem({
+                    this.addItem(new Zutubi.BuildNavToolbarItem({
                         id: 'pulse-toolbar-build-item-' + build.number,
                         build: build,
                         tooltip: tooltip,
@@ -1601,7 +1601,7 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
                     imgcls: 'popdown-small'
                 });
 
-                this.addItem(new ZUTUBI.BuildNavToolbarMenu(menuConfig));
+                this.addItem(new Zutubi.BuildNavToolbarMenu(menuConfig));
             }
             this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
         }
@@ -1648,16 +1648,16 @@ ZUTUBI.PulseHeader = Ext.extend(Ext.Toolbar, {
         return this.data && (this.data.nextSuccessful || this.data.nextBroken || this.data.previousSuccessful || this.data.previousBroken);
     }
 });
-Ext.reg('xztbtoolbar', ZUTUBI.PulseHeader);
+Ext.reg('xztbtoolbar', Zutubi.PulseHeader);
 
 
-ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
+Zutubi.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
 
     cls: 'x-build-nav-item',
 
     initComponent: function()
     {
-        ZUTUBI.BuildNavToolbarItem.superclass.initComponent.apply(this, arguments);
+        Zutubi.BuildNavToolbarItem.superclass.initComponent.apply(this, arguments);
 
         this.addClass('x-build-nav-item-' + this.build.status);
         this.autoEl = {
@@ -1668,7 +1668,7 @@ ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
 
     afterRender: function()
     {
-        ZUTUBI.BuildNavToolbarItem.superclass.afterRender.apply(this, arguments);
+        Zutubi.BuildNavToolbarItem.superclass.afterRender.apply(this, arguments);
 
         Ext.QuickTips.register({
             target: this.getEl(),
@@ -1693,14 +1693,14 @@ ZUTUBI.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
     }
 });
 
-ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
+Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     cls: 'popdown',
     imgcls: 'popdown',
     renderedMenus: {},
 
     initComponent: function()
     {
-        ZUTUBI.BuildNavToolbarMenu.superclass.initComponent.apply(this, arguments);
+        Zutubi.BuildNavToolbarMenu.superclass.initComponent.apply(this, arguments);
 
         this.autoEl = {
             id: this.id + "-actions-link",
@@ -1717,7 +1717,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
     afterRender: function()
     {
-        ZUTUBI.BuildNavToolbarMenu.superclass.afterRender.apply(this, arguments);
+        Zutubi.BuildNavToolbarMenu.superclass.afterRender.apply(this, arguments);
 
         this.mon(this.getEl(),
         {
@@ -1728,7 +1728,7 @@ ZUTUBI.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     onClick: function()
     {
         renderMenu(this, this.getMenuItems(), this.id + '-actions');
-        ZUTUBI.FloatManager.showHideFloat('buildnav', this.id + "-actions", 'tl-bl?', this.imgcls);
+        Zutubi.FloatManager.showHideFloat('buildnav', this.id + "-actions", 'tl-bl?', this.imgcls);
     },
 
     getMenuItems: function()

@@ -25,7 +25,7 @@
 
         function configureSettings()
         {
-            var popup = new ZUTUBI.TailSettingsWindow({
+            var popup = new Zutubi.TailSettingsWindow({
                 initialMaxLines: '$maxLines',
                 initialRefreshInterval: '$refreshInterval',
             });

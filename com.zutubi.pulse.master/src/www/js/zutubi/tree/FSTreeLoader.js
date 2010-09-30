@@ -1,18 +1,18 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 
-ZUTUBI.tree.FSTreeLoader = function(config)
+Zutubi.tree.FSTreeLoader = function(config)
 {
     var baseUrl = config.baseUrl;
     this.preloadDepth = config.preloadDepth || 0;
 
-    ZUTUBI.tree.FSTreeLoader.superclass.constructor.call(this, {
+    Zutubi.tree.FSTreeLoader.superclass.constructor.call(this, {
         dataUrl: baseUrl + '/ajax/xls.action',
         baseParams: config
     });
 };
 
-Ext.extend(ZUTUBI.tree.FSTreeLoader, Ext.tree.TreeLoader, {
+Ext.extend(Zutubi.tree.FSTreeLoader, Ext.tree.TreeLoader, {
     getParams: function(node)
     {
         var buf = [];

@@ -7,7 +7,7 @@
 
     <script type="text/javascript">
         Ext.onReady(function() {
-            var tree = new ZUTUBI.ArtifactsTree({
+            var tree = new Zutubi.ArtifactsTree({
                 projectId: '$project.id',
                 buildId: '$buildResult.id',
                 id: 'artifacts-tree',

@@ -1,16 +1,16 @@
 // dependency: ./namespace.js
 // dependency: ./FormPanel.js
 
-ZUTUBI.form.CheckFormPanel = function(mainFormPanel, options)
+Zutubi.form.CheckFormPanel = function(mainFormPanel, options)
 {
     this.mainFormPanel = mainFormPanel;
-    ZUTUBI.form.CheckFormPanel.superclass.constructor.call(this, options);
+    Zutubi.form.CheckFormPanel.superclass.constructor.call(this, options);
 };
 
-Ext.extend(ZUTUBI.form.CheckFormPanel, ZUTUBI.form.FormPanel, {
+Ext.extend(Zutubi.form.CheckFormPanel, Zutubi.form.FormPanel, {
     createForm: function() {
         delete this.initialConfig.listeners;
-        return new ZUTUBI.form.CheckForm(this.mainFormPanel.getForm(), this.initialConfig);
+        return new Zutubi.form.CheckForm(this.mainFormPanel.getForm(), this.initialConfig);
     },
 
     defaultSubmit: function()

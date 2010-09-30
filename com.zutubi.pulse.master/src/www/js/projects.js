@@ -2,7 +2,7 @@
 // dependency: ext/StatusBar.js
 // dependency: zutubi.js
 
-ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</td>' +
+Zutubi.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</td>' +
                        '<td class="fit-width" rowspan="{rowspan}">' +
                            '<img alt="-" src="{base}/images/default/s.gif" class="project-name" style="width: {indent}px; height: 16px;"/> ' +
                            '<span class="nowrap"><a href="{homeLink}">{name:htmlEncode}</a></span>' +
@@ -20,7 +20,7 @@ ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</
                            '</span>' +
                        '</td>';
 
-ZUTUBI.BUILD_CELLS = '<td class="build-id fit-width">' +
+Zutubi.BUILD_CELLS = '<td class="build-id fit-width">' +
                          '<a href="{buildLink}">build {buildNumber}</a>' +
                      '</td>' +
                      '<td class="actions-menu">' +
@@ -33,9 +33,9 @@ ZUTUBI.BUILD_CELLS = '<td class="build-id fit-width">' +
                      '</td>' +
                      '<tpl for="columns"><td class="build-column">{.} <tpl if="xindex &lt; xcount"></tpl></td></tpl>';
 
-ZUTUBI.NO_BUILD_CELLS = '<td colspan="{noBuildSpan}" class="understated">this project has never been built</td>';
+Zutubi.NO_BUILD_CELLS = '<td colspan="{noBuildSpan}" class="understated">this project has never been built</td>';
 
-ZUTUBI.ConcreteProject = function(data, columnCount, showHideLinks) {
+Zutubi.ConcreteProject = function(data, columnCount, showHideLinks) {
     this.data = data;
     this.columnCount = columnCount;
     this.showHideLinks = showHideLinks;
@@ -44,12 +44,12 @@ ZUTUBI.ConcreteProject = function(data, columnCount, showHideLinks) {
     this.renderedMenus = {};
 };
 
-ZUTUBI.ConcreteProject.prototype = {
-    buildTemplate: new Ext.XTemplate('<tr class="project-row" id="{id}">' + ZUTUBI.PROJECT_CELLS + ZUTUBI.BUILD_CELLS + '</tr>').compile(),
+Zutubi.ConcreteProject.prototype = {
+    buildTemplate: new Ext.XTemplate('<tr class="project-row" id="{id}">' + Zutubi.PROJECT_CELLS + Zutubi.BUILD_CELLS + '</tr>').compile(),
 
-    noBuildTemplate: new Ext.XTemplate('<tr class="project-row" id="{id}">' + ZUTUBI.PROJECT_CELLS + ZUTUBI.NO_BUILD_CELLS + '</tr>').compile(),
+    noBuildTemplate: new Ext.XTemplate('<tr class="project-row" id="{id}">' + Zutubi.PROJECT_CELLS + Zutubi.NO_BUILD_CELLS + '</tr>').compile(),
 
-    noProjectTemplate: new Ext.XTemplate('<tr class="project-row" id="{buildId}">' + ZUTUBI.BUILD_CELLS + '</tr>').compile(),
+    noProjectTemplate: new Ext.XTemplate('<tr class="project-row" id="{buildId}">' + Zutubi.BUILD_CELLS + '</tr>').compile(),
 
     addBuildData: function(templateData, build, index) {
         templateData.buildId = 'b' + (index + 1) + '.' + templateData.id;
@@ -114,7 +114,7 @@ ZUTUBI.ConcreteProject.prototype = {
 
     toggleMenu: function(menuType, menuArg, id) {
         renderMenu(this, this.getMenuItems(menuType, menuArg, id), id);
-        ZUTUBI.FloatManager.showHideFloat('actions', id, 'tl-bl?');
+        Zutubi.FloatManager.showHideFloat('actions', id, 'tl-bl?');
     },
 
     setRowDisplay: function(display) {
@@ -198,7 +198,7 @@ ZUTUBI.ConcreteProject.prototype = {
                 }
                 else
                 {
-                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false, false); ZUTUBI.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
+                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false, false); Zutubi.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
                 }
 
                 items.push(item);
@@ -209,7 +209,7 @@ ZUTUBI.ConcreteProject.prototype = {
                 items.push({
                     id: 'with dependencies',
                     image: 'lightning.gif',
-                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false, false); ZUTUBI.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
+                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false, false); Zutubi.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
                 });
             }
 
@@ -250,7 +250,7 @@ ZUTUBI.ConcreteProject.prototype = {
     }
 };
 
-ZUTUBI.ProjectContainer = function(model, columnCount, showHideLinks) {
+Zutubi.ProjectContainer = function(model, columnCount, showHideLinks) {
     this.model = model;
     this.children = [];
     this.hidden = false;
@@ -259,7 +259,7 @@ ZUTUBI.ProjectContainer = function(model, columnCount, showHideLinks) {
     this.showHideLinks = showHideLinks;
 };
 
-ZUTUBI.ProjectContainer.prototype = {
+Zutubi.ProjectContainer.prototype = {
     renderChildren: function() {
         this.childrenRendered = true;
 
@@ -273,11 +273,11 @@ ZUTUBI.ProjectContainer.prototype = {
                 var child;
                 if (childData.concrete)
                 {
-                    child = new ZUTUBI.ConcreteProject(childData, this.columnCount, this.showHideLinks);
+                    child = new Zutubi.ConcreteProject(childData, this.columnCount, this.showHideLinks);
                 }
                 else
                 {
-                    child = new ZUTUBI.TemplateProject(childData, this.columnCount, this.showHideLinks);
+                    child = new Zutubi.TemplateProject(childData, this.columnCount, this.showHideLinks);
                 }
 
                 previousRowEl = child.render(previousRowEl);
@@ -402,12 +402,12 @@ ZUTUBI.ProjectContainer.prototype = {
     }
 };
 
-ZUTUBI.TemplateProject = function(data, columnCount, showHideLinks) {
-    ZUTUBI.TemplateProject.superclass.constructor.call(this, data, columnCount, showHideLinks);
+Zutubi.TemplateProject = function(data, columnCount, showHideLinks) {
+    Zutubi.TemplateProject.superclass.constructor.call(this, data, columnCount, showHideLinks);
     this.data = data;
 };
 
-Ext.extend(ZUTUBI.TemplateProject, ZUTUBI.ProjectContainer, {
+Ext.extend(Zutubi.TemplateProject, Zutubi.ProjectContainer, {
     template: new Ext.Template(
         '<tr class="project-row {expandable}" id="{id}">' +
             '<td class="health-{health}">&nbsp;</td>' +
@@ -465,14 +465,14 @@ Ext.extend(ZUTUBI.TemplateProject, ZUTUBI.ProjectContainer, {
     }
 });
 
-ZUTUBI.ProjectGroup = function(data, columnCount, rssEnabled, showHideLinks, last) {
-    ZUTUBI.ProjectGroup.superclass.constructor.call(this, data.root, columnCount, showHideLinks);
+Zutubi.ProjectGroup = function(data, columnCount, rssEnabled, showHideLinks, last) {
+    Zutubi.ProjectGroup.superclass.constructor.call(this, data.root, columnCount, showHideLinks);
     this.data = data;
     this.rssEnabled = rssEnabled;
     this.last = last;
 };
 
-Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
+Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
     template: new Ext.XTemplate('<tr class="project-row project-expandable {collapsed}" id="{id}">' +
             '<td class="group-header health-{health}">&nbsp;</td>' +
             '<td class="group-header fit-width" colspan="5"><img src="{base}/images/default/s.gif" alt="-" class="group-name"/> {name:htmlEncode}</td>' +
@@ -527,13 +527,13 @@ Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
 
     destroy: function()
     {
-        ZUTUBI.ProjectGroup.superclass.destroy.call(this);
+        Zutubi.ProjectGroup.superclass.destroy.call(this);
         this.cleanupHandler('rss.builds.');
         this.cleanupHandler('hide.');
     }
 });
 
-ZUTUBI.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled, isDashboard) {
+Zutubi.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled, isDashboard) {
     this.toolbarEl = toolbarEl;
     this.containerEl = containerEl;
     this.columnCount = columnCount;
@@ -543,7 +543,7 @@ ZUTUBI.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled,
     this.toolbarRendered = false;
 };
 
-ZUTUBI.ProjectsTable.prototype = {
+Zutubi.ProjectsTable.prototype = {
     renderToolbar: function() {
         this.toolbar = new Ext.ux.StatusBar({
             defaultText: 'Layout Controls:',
@@ -660,7 +660,7 @@ ZUTUBI.ProjectsTable.prototype = {
                 var groupName = this.getGroupName(groupData);
                 this.applyPreviousState(groupData, previousGroups[groupName]);
 
-                var group = new ZUTUBI.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
+                var group = new Zutubi.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
                 group.render(tableEl);
                 this.groups[groupName] = group;
             }
@@ -725,7 +725,7 @@ ZUTUBI.ProjectsTable.prototype = {
     }
 };
 
-ZUTUBI.ChangesTable = function(containerEl, idSuffix, title, showWho) {
+Zutubi.ChangesTable = function(containerEl, idSuffix, title, showWho) {
     this.containerEl = containerEl;
     this.idSuffix = idSuffix;
     this.title = title;
@@ -734,7 +734,7 @@ ZUTUBI.ChangesTable = function(containerEl, idSuffix, title, showWho) {
     this.renderedBuilds = {};
 };
 
-ZUTUBI.ChangesTable.prototype = {
+Zutubi.ChangesTable.prototype = {
     tableTemplate: new Ext.XTemplate('<table id="{idSuffix}-changes-table" class="two-content"><tbody>' +
                                          '<tr><th class="two-heading" colspan="7">{title}</th></tr>' +
                                          '<tr>' +
@@ -803,7 +803,7 @@ ZUTUBI.ChangesTable.prototype = {
                                               '<tr>' +
                                                   '<th class="heading" colspan="5">' +
                                                        '<span class="action">' +
-                                                           '<a href="#" onclick="ZUTUBI.FloatManager.showHideFloat(\'comments\', \'{id}-{idSuffix}-comment\'); return false;">' +
+                                                           '<a href="#" onclick="Zutubi.FloatManager.showHideFloat(\'comments\', \'{id}-{idSuffix}-comment\'); return false;">' +
                                                                '<img alt="close" src="{base}/images/delete.gif"/> close' +
                                                            '</a>' +
                                                        '</span>' +
@@ -819,7 +819,7 @@ ZUTUBI.ChangesTable.prototype = {
                                               '<tr>' +
                                                   '<th class="heading" colspan="4">' +
                                                       '<span class="action">' +
-                                                          '<a href="#" onclick="ZUTUBI.FloatManager.showHideFloat(\'builds\', \'{id}-{idSuffix}-builds\'); return false;">' +
+                                                          '<a href="#" onclick="Zutubi.FloatManager.showHideFloat(\'builds\', \'{id}-{idSuffix}-builds\'); return false;">' +
                                                               '<img alt="close" src="{base}/images/delete.gif"/> close' +
                                                           '</a>' +
                                                       '</span>' +
@@ -879,7 +879,7 @@ ZUTUBI.ChangesTable.prototype = {
 
     toggleComment: function(change) {
         this.renderComment(change);
-        ZUTUBI.FloatManager.showHideFloat('comments', change.id + '-' + this.idSuffix + '-comment');
+        Zutubi.FloatManager.showHideFloat('comments', change.id + '-' + this.idSuffix + '-comment');
     },
 
     renderComment: function(change) {
@@ -893,7 +893,7 @@ ZUTUBI.ChangesTable.prototype = {
 
     toggleBuilds: function(change) {
         this.renderBuilds(change);
-        ZUTUBI.FloatManager.showHideFloat('builds', change.id + '-' + this.idSuffix + '-builds');
+        Zutubi.FloatManager.showHideFloat('builds', change.id + '-' + this.idSuffix + '-builds');
     },
 
     renderBuilds: function(change) {
@@ -922,7 +922,7 @@ ZUTUBI.ChangesTable.prototype = {
 };
 
 
-ZUTUBI.ActiveView = function(url, refreshInterval, updateFn, updateScope, el, failureMessage) {
+Zutubi.ActiveView = function(url, refreshInterval, updateFn, updateScope, el, failureMessage) {
     this.url = url;
     this.refreshInterval = refreshInterval;
     this.updateFn = updateFn;
@@ -932,7 +932,7 @@ ZUTUBI.ActiveView = function(url, refreshInterval, updateFn, updateScope, el, fa
     this.initialised = false;
 };
 
-ZUTUBI.ActiveView.prototype = {
+Zutubi.ActiveView.prototype = {
     init: function() {
         if (this.refreshInterval > 0)
         {

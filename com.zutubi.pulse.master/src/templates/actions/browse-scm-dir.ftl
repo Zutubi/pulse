@@ -21,7 +21,7 @@ ${form.name}.items.last().on('browse', function(field)
     var projectPath = findProjectPath('${field.parameters.path?js_string}');
 
 <#assign title = "${field.name}" + ".popup.title"/>
-    var browser = new ZUTUBI.WorkingCopyFileSystemBrowser({
+    var browser = new Zutubi.WorkingCopyFileSystemBrowser({
         baseUrl : '${base}',
         showFiles: false,
         prefix:'scm',

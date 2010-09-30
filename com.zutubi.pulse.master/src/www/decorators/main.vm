@@ -130,7 +130,7 @@
 #else
 #set($helpPage = "Home")
 #end
-                        var toolbar = new ZUTUBI.PulseHeader(toolbarConfig);
+                        var toolbar = new Zutubi.PulseHeader(toolbarConfig);
                         toolbar.render('header');
 
                         // If there is a tab bar, drop it in to the north div.

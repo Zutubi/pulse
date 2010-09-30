@@ -83,7 +83,7 @@
                                     <tr>
                                         <th class="heading">
                                             <span class="action">
-                                                <a href="#" onclick="ZUTUBI.FloatManager.showHideFloat('synch', 'status.popup.${velocityCount}'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                                                <a href="#" onclick="Zutubi.FloatManager.showHideFloat('synch', 'status.popup.${velocityCount}'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                                             </span>
                                             #wwtext("name=message.status.message")
                                         </th>

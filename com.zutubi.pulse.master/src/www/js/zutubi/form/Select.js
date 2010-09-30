@@ -2,7 +2,7 @@
 // dependency: ext/package.js
 
 /**
- * @class ZUTUBI.form.Select
+ * @class Zutubi.form.Select
  * @extends Ext.form.Field
  * Basic select box.  Supports multi-select, which is not available in Ext
  * currently.
@@ -10,16 +10,16 @@
  * Creates a new TextField
  * @param {Object} config Configuration options
  */
-ZUTUBI.form.Select = function(config)
+Zutubi.form.Select = function(config)
 {
-    ZUTUBI.form.Select.superclass.constructor.call(this, config);
+    Zutubi.form.Select.superclass.constructor.call(this, config);
     this.addEvents({
         'change': true
     });
     this.hiddenName = config.name;
 };
 
-Ext.extend(ZUTUBI.form.Select, Ext.form.Field, {
+Ext.extend(Zutubi.form.Select, Ext.form.Field, {
     /**
      * @cfg {Ext.data.Store} store The data defining select items.
      * selections.
@@ -189,13 +189,13 @@ Ext.extend(ZUTUBI.form.Select, Ext.form.Field, {
 
     onDisable: function()
     {
-        ZUTUBI.form.Select.superclass.onDisable.call(this);
+        Zutubi.form.Select.superclass.onDisable.call(this);
         this.view.disabled = true;
     },
 
     onEnable: function()
     {
-        ZUTUBI.form.Select.superclass.onEnable.call(this);
+        Zutubi.form.Select.superclass.onEnable.call(this);
         this.view.disabled = false;
     }
 });

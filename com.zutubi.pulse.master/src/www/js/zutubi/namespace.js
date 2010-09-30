@@ -1,1 +1,1 @@
-window.ZUTUBI = window.ZUTUBI || {};
+window.Zutubi = window.Zutubi || {};
