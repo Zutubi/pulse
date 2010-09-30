@@ -64,6 +64,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(PerforceAcceptanceTest.class);
         suite.addTestSuite(BuildHookAcceptanceTest.class);
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);
+        suite.addTestSuite(BuildCommandEnableDisableAcceptanceTest.class);
 
         //--( 2.1: dependency tests)--
         suite.addTest(DependenciesTestSuite.suite());

@@ -4,9 +4,8 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.TimeStamps;
-import com.zutubi.util.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import java.util.List;
  */
 public abstract class Result extends Entity
 {
-    private static final String EXCEPTION_FILE = "exception";
     protected static final int UNDEFINED = -1;
 
     // NOTE: if you add a field here, check the update() method in
@@ -194,25 +192,6 @@ public abstract class Result extends Entity
     public void error(BuildException e)
     {
         error(e.getMessage());
-
-        if (outputDir != null)
-        {
-
-            FileOutputStream fos = null;
-            try
-            {
-                fos = new FileOutputStream(new File(outputDir, EXCEPTION_FILE));
-                e.printStackTrace(new PrintStream(fos, true));
-            }
-            catch (FileNotFoundException ignored)
-            {
-                // no need to handle this, we did our level best
-            }
-            finally
-            {
-                IOUtils.close(fos);
-            }
-        }
     }
 
     public ResultState getState()
@@ -243,25 +222,6 @@ public abstract class Result extends Entity
     private void setStamps(TimeStamps stamps)
     {
         this.stamps = stamps;
-    }
-
-    public String getExceptionTrace()
-    {
-        String result = null;
-        if (outputDir != null)
-        {
-            try
-            {
-                File exceptionFile = new File(outputDir, EXCEPTION_FILE);
-                result = IOUtils.fileToString(exceptionFile);
-            }
-            catch (IOException e)
-            {
-                // Empty
-            }
-        }
-
-        return result;
     }
 
     /**

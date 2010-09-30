@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
@@ -36,6 +35,46 @@ public abstract class ProjectConfigurationHelper
     public String getName()
     {
         return config.getName();
+    }
+
+    /**
+     * Add a command to the default recipe.
+     *
+     * @param command the command to add to the default recipe.
+     *
+     * @return the added command.
+     */
+    public CommandConfiguration addCommand(CommandConfiguration command)
+    {
+        return addCommand(DEFAULT_RECIPE, command);
+    }
+
+    /**
+     * Add a command to the named recipe.
+     *
+     * @param recipeName    the name of the recipe
+     * @param command       the command to add to the recipe.
+     *
+     * @return the added command.
+     */
+    public CommandConfiguration addCommand(String recipeName, CommandConfiguration command)
+    {
+        RecipeConfigurationHelper recipe = getRecipe(recipeName);
+        recipe.addCommand(command);
+        return command;
+    }
+
+    /**
+     * Get the named command from the default recipe.
+     *
+     * @param name  the name of the command to be retrieved.
+     *
+     * @return the command if it exists, otherwise return null.
+     */
+    public CommandConfiguration getCommand(String name)
+    {
+        RecipeConfiguration recipe = getDefaultRecipe();
+        return recipe.getCommands().get(name);         
     }
 
     /**

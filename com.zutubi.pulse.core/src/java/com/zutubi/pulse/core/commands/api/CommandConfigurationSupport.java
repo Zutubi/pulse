@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 import java.util.LinkedHashMap;
@@ -20,6 +21,7 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
 {
     private Class<? extends Command> commandType;
     private boolean force = false;
+    private boolean enabled = true;
     private Map<String, ArtifactConfiguration> artifacts = new LinkedHashMap<String, ArtifactConfiguration>();
 
     @Transient
@@ -67,6 +69,16 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
     public void setForce(boolean force)
     {
         this.force = force;
+    }
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean disabled)
+    {
+        this.enabled = disabled;
     }
 
     public Map<String, ArtifactConfiguration> getArtifacts()

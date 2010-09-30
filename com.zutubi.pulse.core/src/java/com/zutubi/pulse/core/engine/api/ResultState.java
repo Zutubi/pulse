@@ -71,6 +71,21 @@ public enum ResultState
                 }
             },
     /**
+     * The result indicates that the component was skipped.
+     */
+    SKIPPED
+            {
+                public boolean isBroken()
+                {
+                    return false;
+                }
+
+                public boolean isCompleted()
+                {
+                    return true;
+                }
+            },
+    /**
      * The result has completed and has failed due to a build problem.
      */
     FAILURE

@@ -56,6 +56,23 @@ public interface CommandConfiguration extends NamedConfiguration
     void setForce(boolean force);
 
     /**
+     * Indicates if the command is enabled. An enabled command will be executed
+     * during recipe execution.
+     *
+     * @return  true if the command is enabled, false otherwise.
+     */
+    @Wizard.Ignore
+    boolean isEnabled();
+    
+    /**
+     * Set to true to enable this command.  An enabled command will be executed
+     * during recipe execution.
+     *
+     * @param enabled the new value of the enabled flag.
+     */
+    void setEnabled(boolean enabled);
+
+    /**
      * The artifacts that should be captured when this command completes.  These
      * are typically files or reports created by running the command.
      *

@@ -994,6 +994,12 @@ Build tabs
     width: 20px;
 }
 
+.x-tree-node-collapsed .status-skipped, .x-tree-node-expanded .status-skipped, .x-tree-node-leaf .status-skipped
+{
+    background-image: url(../images/accept.gif);
+    width: 20px;
+}
+
 .x-tree-node-collapsed .status-failure, .x-tree-node-expanded .status-failure, .x-tree-node-leaf .status-failure,
     .x-tree-node-collapsed .status-error, .x-tree-node-expanded .status-error, .x-tree-node-leaf .status-error
 {

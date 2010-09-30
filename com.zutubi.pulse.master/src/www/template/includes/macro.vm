@@ -705,6 +705,8 @@
         #else
             <img alt="success" src="$base/images/accept.gif"/>
         #end
+    #elseif($result.skipped())
+        <img alt="skipped" src="$base/images/accept.gif"/>
     #elseif($result.inProgress())
         #if($showAnimated)
             <img alt="in progress" src="$base/images/inprogress.gif"/>

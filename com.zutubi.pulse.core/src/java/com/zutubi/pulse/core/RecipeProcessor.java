@@ -93,7 +93,7 @@ public class RecipeProcessor
         catch (Exception e)
         {
             LOG.severe(e);
-            recipeResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+            recipeResult.error("Unexpected error: " + e.getMessage());
         }
         finally
         {
@@ -361,6 +361,7 @@ public class RecipeProcessor
         {
             throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
         }
+        result.setOutputDir(commandOutput.getPath());
 
         context.setLabel(LABEL_EXECUTE);
         context.push();
@@ -371,14 +372,15 @@ public class RecipeProcessor
         {
             context.getScope().add((PulseScope) scope);
         }
-        
-        boolean recipeTerminated = !executeCommand(context, commandOutput, result, commandConfig);
+
+        boolean recipeTerminated = !executeCommand(context, result, commandConfig);
         status.commandCompleted(result.getState());
+
         context.popTo(LABEL_EXECUTE);
         return recipeTerminated;
     }
 
-    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, CommandConfiguration commandConfig)
+    private boolean executeCommand(ExecutionContext context, CommandResult commandResult, CommandConfiguration commandConfig)
     {
         runningLock.lock();
         if (terminating)
@@ -392,14 +394,20 @@ public class RecipeProcessor
         runningLock.unlock();
 
         commandResult.commence();
-        commandResult.setOutputDir(commandOutput.getPath());
         long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
         DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, postProcessorFactory);
         try
         {
-            executeAndProcess(commandContext, command, commandConfig);
+            if (commandConfig.isEnabled())
+            {
+                executeAndProcess(commandContext, command, commandConfig);
+            }
+            else
+            {
+                commandResult.skip();
+            }
         }
         catch (BuildException e)
         {
@@ -408,7 +416,7 @@ public class RecipeProcessor
         catch (Exception e)
         {
             LOG.severe(e);
-            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+            commandResult.error("Unexpected error: " + e.getMessage());
         }
         finally
         {
@@ -538,6 +546,9 @@ public class RecipeProcessor
         this.artifactFactory = artifactFactory;
     }
 
+    /**
+     * The state of the recipe being processed.
+     */
     private static class RecipeStatus
     {
         private ResultState state = ResultState.SUCCESS;
@@ -560,18 +571,7 @@ public class RecipeProcessor
 
         public void commandCompleted(ResultState commandState)
         {
-            switch (commandState)
-            {
-                case FAILURE:
-                    if (state != ResultState.ERROR)
-                    {
-                        state = ResultState.FAILURE;
-                    }
-                    break;
-                case ERROR:
-                    state = ResultState.ERROR;
-                    break;
-            }
+            state = ResultState.getWorseState(state, commandState);
         }
     }
 }

@@ -7,11 +7,16 @@ import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
 import com.zutubi.pulse.core.plugins.repository.PluginList;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -34,7 +39,10 @@ public class TestApi
     private SynchronisationTaskFactory synchronisationTaskFactory;
     private TokenManager tokenManager;
     private PluginManager pluginManager;
-    
+    private BuildManager buildManager;
+    private ProjectManager projectManager;
+    private TransactionContext transactionContext;
+
     public TestApi()
     {
     }
@@ -81,7 +89,7 @@ public class TestApi
         tokenManager.loginUser(token);
         try
         {
-            SynchronisationTask task = synchronous ? new TestSynchronisationTask(succeed): new TestAsyncSynchronisationTask(succeed);
+            SynchronisationTask task = synchronous ? new TestSynchronisationTask(succeed) : new TestAsyncSynchronisationTask(succeed);
             SynchronisationMessage message = synchronisationTaskFactory.toMessage(task);
             agentManager.enqueueSynchronisationMessages(internalGetAgent(agent), asList(asPair(message, description)));
             return true;
@@ -118,6 +126,42 @@ public class TestApi
         return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
 
+    public Vector<Hashtable<String, Object>> getCommands(String token, final String projectName, final int id)
+    {
+        tokenManager.verifyAdmin(token);
+        try
+        {
+            tokenManager.loginUser(token);
+
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+            {
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Vector<Hashtable<String, Object>> commands = new Vector<Hashtable<String, Object>>();
+                    Project project = projectManager.getProject(projectName, false);
+                    BuildResult build = buildManager.getByProjectAndNumber(project, id);
+
+                    for (RecipeResultNode node : build.getRoot().getChildren())
+                    {
+                        for (CommandResult commandResult : node.getResult().getCommandResults())
+                        {
+                            Hashtable<String, Object> command = new Hashtable<String, Object>();
+                            command.put("name", commandResult.getCommandName());
+                            command.put("state", commandResult.getState().getPrettyString());
+                            commands.add(command);
+                        }
+                    }
+
+                    return commands;
+                }
+            });
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     private Agent internalGetAgent(String name) throws IllegalArgumentException
     {
         Agent agent = agentManager.getAgent(name);
@@ -147,6 +191,16 @@ public class TestApi
         this.agentManager = agentManager;
     }
 
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
     public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
     {
         this.synchronisationTaskFactory = synchronisationTaskFactory;
@@ -160,5 +214,10 @@ public class TestApi
     public void setPluginManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
+    }
+
+    public void setTransactionContext(TransactionContext transactionContext)
+    {
+        this.transactionContext = transactionContext;
     }
 }
