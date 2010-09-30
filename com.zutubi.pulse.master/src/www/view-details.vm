@@ -85,7 +85,7 @@
             var center = Ext.getCmp('nested-center');
             center.add(detailPanel);
 
-            var loader = new Zutubi.tree.FSTreeLoader({
+            var loader = new Zutubi.fs.FSTreeLoader({
                 baseUrl: '$base',
                 basePath: 'builds/$result.id',
                 preloadDepth: 2,

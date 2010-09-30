@@ -160,7 +160,7 @@
                 #elseif($act.action == "clean")
                         href="#" onclick="markForClean('#jss($u_projectName)'); return false;"
                 #elseif($act.action == "viewSource")
-                        href="#" onclick="Zutubi.viewWorkingCopy('$project.id'); return false;"
+                        href="#" onclick="Zutubi.fs.viewWorkingCopy('$project.id'); return false;"
                 #else
                         href="$urls.projectAction($project, $act.action)"
                 #end

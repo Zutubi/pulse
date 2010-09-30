@@ -1,6 +1,6 @@
 ${form.name}.items.last().on('browse', function(field)
 {
-    var browser = new Zutubi.LocalFileSystemBrowser({
+    var browser = new Zutubi.fs.LocalFileSystemBrowser({
         baseUrl : '${base}',
         showFiles: false,
         isWindows: ${isWindows},
