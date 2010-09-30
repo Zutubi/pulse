@@ -4,6 +4,7 @@
 // dependency: zutubi/FloatManager.js
 // dependency: zutubi/form/package.js
 // dependency: zutubi/fs/package.js
+// dependency: zutubi/toolbar/package.js
 // dependency: zutubi/tree/package.js
 
 function renderMenu(owner, items, id)
@@ -637,111 +638,6 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
     }
 }); }
 
-Zutubi.Toolbar = Ext.extend(Ext.Toolbar, {
-    initComponent: function()
-    {
-        var config = {
-            layout: 'xztoolbar'
-        };
-        Ext.apply(this, config);
-        Ext.apply(this.initialConfig, config);
-
-        Zutubi.Toolbar.superclass.initComponent.call(this);
-    }
-});
-Ext.reg('xztoolbar', Zutubi.Toolbar);
-
-Zutubi.Toolbar.ToolbarLayout = Ext.extend(Ext.layout.ToolbarLayout, {
-    addComponentToMenu : function(m, c)
-    {
-        if (c instanceof Zutubi.Toolbar.LinkItem)
-        {
-            m.add(this.createMenuConfig(c, true));
-        }
-        else
-        {
-            Zutubi.Toolbar.ToolbarLayout.superclass.addComponentToMenu.call(this, m, c);
-        }
-    }
-});
-Ext.Container.LAYOUTS.xztoolbar = Zutubi.Toolbar.ToolbarLayout;
-
-Zutubi.Toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
-    /**
-     * @cfg {String} icon  URL of the image to show beside the link.
-     * @cfg {String} text  The text to be shown in the link.
-     * @cfg {String} url   The URL to link to.
-     */
-
-    initComponent: function()
-    {
-        Zutubi.Toolbar.LinkItem.superclass.initComponent.call(this);
-
-        this.addEvents(
-            /**
-             * @event click
-             * Fires when this button is clicked
-             * @param {LinkItem} this
-             * @param {EventObject} e The click event
-             */
-            'click'
-        );
-    },
-
-    // private
-    onRender: function(ct, position)
-    {
-        this.autoEl = {
-            tag: 'span',
-            cls: 'xz-tblink',
-            children: []
-        };
-
-        if (this.icon)
-        {
-            this.autoEl.children.push({
-                tag: 'a',
-                cls: 'unadorned',
-                href: this.url || '#',
-                children: [{
-                    tag: 'img',
-                    src: this.icon
-                }]
-            });
-        }
-        
-        if (this.text)
-        {
-            this.autoEl.children.push({
-                tag: 'a',
-                href: this.url || '#',
-                html: this.text || ''
-            });
-        }
-        Zutubi.Toolbar.LinkItem.superclass.onRender.call(this, ct, position);
-        this.mon(this.el, {scope: this, click: this.onClick});
-    },
-
-    handler: function(e)
-    {
-        if (this.url)
-        {
-            window.location.href = this.url;
-        }
-    },
-
-    onClick: function(e)
-    {
-        if (e && !this.url)
-        {
-            e.preventDefault();
-        }
-
-        this.fireEvent('click', this, e);
-    }
-});
-Ext.reg('xztblink', Zutubi.Toolbar.LinkItem);
-
 /**
  * Displays all plugins in a tree, handling selection and actions performed on
  * them.
@@ -1022,7 +918,6 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
         return this.data && (this.data.nextSuccessful || this.data.nextBroken || this.data.previousSuccessful || this.data.previousBroken);
     }
 });
-Ext.reg('xztbtoolbar', Zutubi.PulseHeader);
 
 
 Zutubi.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
