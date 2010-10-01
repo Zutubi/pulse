@@ -210,7 +210,6 @@ public interface ProjectManager extends EntityManager<Project>
      *
      * @param user  the user who is being releaved of the responsibilities.
      */
-    @SecureParameter(parameterType = Project.class, action = ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY)
     void clearResponsibilities(User user);
 
     /**

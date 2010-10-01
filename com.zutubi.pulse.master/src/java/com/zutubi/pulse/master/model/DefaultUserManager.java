@@ -16,16 +16,17 @@ import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.providers.encoding.PasswordEncoder;
 import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.springframework.dao.DataAccessException;
 
 import java.util.*;
 
@@ -39,20 +40,8 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     private PasswordEncoder passwordEncoder;
 
     private LicenseManager licenseManager;
-    /**
-     * Do not access directly, always use getBuildManager().  This dependency
-     * is initialised on demand (not available when this manager is created).
-     */
     private BuildManager buildManager;
-    /**
-     * Do not access directly, always use getLdapManager().  This dependency
-     * is initialised on demand (not available when this manager is created).
-     */
     private LdapManager ldapManager;
-    /**
-     * Do not access directly, always use getProjectManager().  This dependency
-     * is initialised on demand (not available when this manager is created).
-     */
     private ProjectManager projectManager;
 
     private ConfigurationProvider configurationProvider;
@@ -208,14 +197,14 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public void delete(User user)
     {
-        getBuildManager().deleteAllBuilds(user);
+        buildManager.deleteAllBuilds(user);
         userDao.delete(user);
         licenseManager.refreshAuthorisations();
     }
 
     public void clearAllResponsibilities(User user)
     {
-        getProjectManager().clearResponsibilities(user);
+        projectManager.clearResponsibilities(user);
     }
 
     public long updateAndGetNextBuildNumber(User user)
@@ -306,7 +295,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));
         principle.addGroup(allUsersGroup);
-        getLdapManager().addLdapRoles(principle);
+        ldapManager.addLdapRoles(principle);
         return principle;
     }
 
@@ -386,39 +375,14 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         this.licenseManager = licenseManager;
     }
 
-    public ProjectManager getProjectManager()
+    public void setProjectManager(ProjectManager projectManager)
     {
-        if (projectManager == null)
-        {
-            // Unfortunately, the user manager is created before the project manager.
-            projectManager = (ProjectManager) SpringComponentContext.getBean("projectManager");
-        }
-        return projectManager;
-    }
-
-    public BuildManager getBuildManager()
-    {
-        if(buildManager == null)
-        {
-            // Unfortunately, the user manager is created before the buildManager.
-            buildManager = (BuildManager) SpringComponentContext.getBean("buildManager");
-        }
-        return buildManager;
+        this.projectManager = projectManager;
     }
 
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public LdapManager getLdapManager()
-    {
-        if(ldapManager == null)
-        {
-            // Unfortunately, the user manager is created before the security context is loaded.
-            ldapManager = (LdapManager) SpringComponentContext.getBean("ldapManager");
-        }
-        return ldapManager;
     }
 
     public void setLdapManager(LdapManager ldapManager)
@@ -443,6 +407,13 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public void setEventManager(EventManager eventManager)
     {
+        eventManager.register(new SystemStartedListener()
+        {
+            public void systemStarted()
+            {
+                SpringComponentContext.autowire(DefaultUserManager.this);
+            }
+        });
         eventManager.register(this);
     }
 }
