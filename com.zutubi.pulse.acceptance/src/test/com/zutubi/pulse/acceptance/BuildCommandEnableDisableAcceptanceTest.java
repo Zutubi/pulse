@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.commands.api.CommandConfigurationSupportActions;
 import com.zutubi.pulse.core.engine.api.ResultState;
 
 import java.util.Hashtable;
@@ -67,7 +68,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         ProjectConfigurationHelper project = projects.createFailAntProject(randomName());
         project.addCommand(newCommand("sleep", true)).setEnabled(false);
         project.getDefaultCommand().setForce(true);
-        
+
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
@@ -75,7 +76,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         assertCommandState(commands, "sleep", "skipped");
         assertCommandState(commands, "build", "failure");
 
-        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(project.getName(), 1));         
+        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableMultipleCommands() throws Exception
@@ -83,7 +84,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
         project.addCommand(newCommand("sleep")).setEnabled(false);
         project.getDefaultCommand().setEnabled(false);
-        
+
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
@@ -93,6 +94,25 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         assertCommandState(commands, "build", "skipped");
 
         assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+    }
+
+    public void testEnableDisableViaRemoteApi() throws Exception
+    {
+        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        project.getDefaultCommand().setEnabled(false);
+
+        configurationHelper.insertProject(project.getConfig(), false);
+        String commandPath = "projects/" + project.getName() + "/type/recipes/" + project.getDefaultRecipe().getName() + "/commands/" + project.getDefaultCommand().getName();
+
+        Vector<String> actions = xmlRpcHelper.getConfigActions(commandPath);
+        assertTrue(actions.contains(CommandConfigurationSupportActions.ACTION_ENABLE));
+        assertFalse(actions.contains(CommandConfigurationSupportActions.ACTION_DISABLE));
+
+        xmlRpcHelper.doConfigAction(commandPath, CommandConfigurationSupportActions.ACTION_ENABLE);
+
+        actions = xmlRpcHelper.getConfigActions(commandPath);
+        assertFalse(actions.contains(CommandConfigurationSupportActions.ACTION_ENABLE));
+        assertTrue(actions.contains(CommandConfigurationSupportActions.ACTION_DISABLE));
     }
 
     private CommandConfiguration newCommand(String name)
