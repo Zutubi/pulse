@@ -82,17 +82,4 @@ public interface Type
      * @throws TypeException in the event of an error
      */
     Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException;
-
-    /**
-     * Determines if the class or interface represented by this
-     * <code>Type</code> object is either the same as, or is a superclass or
-     * superinterface of, the class or interface represented by the specified
-     * <code>Type</code> parameter. It returns <code>true</code> if so;
-     * otherwise it returns <code>false</code>.
-     *
-     * @param t the <code>Type</code> object to be checked
-     * @return the <code>boolean</code> value indicating whether objects of the
-     * type <code>t</code> can be assigned to objects of this type
-     */
-    boolean isAssignableFrom(Type t);
 }

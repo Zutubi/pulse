@@ -2012,27 +2012,29 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        a.setConfigurationPath(configurationTemplateManager.insert(SCOPE_SAMPLE, a));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a", "composite"));
-        assertNotNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class));
+        ConfigA ancestor = configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class);
+        assertEquals(configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a")), ancestor);
     }
 
     public void testGetAncestorOfType_GrandParent()
     {
         ConfigA a = new ConfigA("a");
         a.getCs().put("cee", new ConfigC("cee"));
-        a.setConfigurationPath(configurationTemplateManager.insert(SCOPE_SAMPLE, a));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a", "cs", "cee"));
-        assertNotNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class));
+        ConfigA ancestor = configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class);
+        assertEquals(configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a")), ancestor);
     }
 
     public void testGetAncestorOfType_NoMatch()
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        a.setConfigurationPath(configurationTemplateManager.insert(SCOPE_SAMPLE, a));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a", "composite"));
         assertNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigC.class));
@@ -2056,6 +2058,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         BaseConfig ancestor = configurationTemplateManager.getAncestorOfType(loaded, BaseConfig.class);
         assertTrue(ancestor instanceof ExtensionConfig);
+        assertEquals(configurationTemplateManager.getInstance("base/extended"), ancestor);
     }
 
     private Pair<String, String> insertParentAndChildA(ConfigA parent, ConfigA child) throws TypeException

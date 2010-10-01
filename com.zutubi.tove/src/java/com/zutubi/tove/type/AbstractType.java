@@ -68,9 +68,4 @@ public abstract class AbstractType implements Type
     {
         this.typeRegistry = typeRegistry;
     }
-
-    public boolean isAssignableFrom(Type t)
-    {
-        return getClazz().isAssignableFrom(t.getClazz());
-    }
 }
