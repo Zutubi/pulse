@@ -29,16 +29,6 @@ public class CommandResult extends Result
 
     }
 
-    public void skip()
-    {
-        state = ResultState.SKIPPED;
-    }
-
-    public boolean skipped()
-    {
-        return state == ResultState.SKIPPED;
-    }
-
     public CommandResult(String name)
     {
         commandName = name;

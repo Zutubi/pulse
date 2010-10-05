@@ -32,6 +32,8 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     private List<ResourceRequirementConfiguration> requirements = new LinkedList<ResourceRequirementConfiguration>();
     private boolean terminateBuildOnFailure;
 
+    private boolean enabled = true;
+
     @Transient
     private ObjectFactory objectFactory;
 
@@ -97,6 +99,16 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     public void setTerminateBuildOnFailure(boolean terminateBuildOnFailure)
     {
         this.terminateBuildOnFailure = terminateBuildOnFailure;
+    }
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 
     @Transient

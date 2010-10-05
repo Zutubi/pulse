@@ -513,6 +513,11 @@ td.success, td.success-right
     color: #383;
 }
 
+td.skipped, td.skipped-right
+{
+    color: #888;
+}
+
 td.warning, td.warning-right
 {
     color: #d08000;
@@ -996,7 +1001,7 @@ Build tabs
 
 .x-tree-node-collapsed .status-skipped, .x-tree-node-expanded .status-skipped, .x-tree-node-leaf .status-skipped
 {
-    background-image: url(../images/accept.gif);
+    background-image: url(../images/none_blue.gif);
     width: 20px;
 }
 

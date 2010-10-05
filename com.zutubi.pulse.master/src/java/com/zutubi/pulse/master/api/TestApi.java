@@ -126,42 +126,6 @@ public class TestApi
         return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
 
-    public Vector<Hashtable<String, Object>> getCommands(String token, final String projectName, final int id)
-    {
-        tokenManager.verifyAdmin(token);
-        try
-        {
-            tokenManager.loginUser(token);
-
-            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
-            {
-                public Vector<Hashtable<String, Object>> process()
-                {
-                    Vector<Hashtable<String, Object>> commands = new Vector<Hashtable<String, Object>>();
-                    Project project = projectManager.getProject(projectName, false);
-                    BuildResult build = buildManager.getByProjectAndNumber(project, id);
-
-                    for (RecipeResultNode node : build.getRoot().getChildren())
-                    {
-                        for (CommandResult commandResult : node.getResult().getCommandResults())
-                        {
-                            Hashtable<String, Object> command = new Hashtable<String, Object>();
-                            command.put("name", commandResult.getCommandName());
-                            command.put("state", commandResult.getState().getPrettyString());
-                            commands.add(command);
-                        }
-                    }
-
-                    return commands;
-                }
-            });
-        }
-        finally
-        {
-            tokenManager.logoutUser();
-        }
-    }
-
     private Agent internalGetAgent(String name) throws IllegalArgumentException
     {
         Agent agent = agentManager.getAgent(name);

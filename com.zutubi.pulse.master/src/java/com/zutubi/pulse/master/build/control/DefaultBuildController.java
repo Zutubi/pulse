@@ -222,40 +222,49 @@ public class DefaultBuildController implements EventListener, BuildController
             buildManager.save(resultNode);
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
-            recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
-
-            PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
-            recipeContext.push();
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
-            recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
-
-            RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
-            recipeRequest.setPulseFileSource(pulseFileProvider);
-            List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
-            recipeRequest.addAllResourceRequirements(resourceRequirements);
-            recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
-            recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
-            recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
-
-            RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
-            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
-            RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
-            rc.setRecipeQueue(recipeQueue);
-            rc.setBuildManager(buildManager);
-            rc.setEventManager(eventManager);
-            rc.setBuildHookManager(buildHookManager);
-            rc.setConfigurationManager(configurationManager);
-            rc.setResourceManager(resourceManager);
-            rc.setRecipeDispatchService(recipeDispatchService);
-            rc.setScmManager(scmManager);
 
-            TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
-            rcNode.add(child);
-            pendingRecipes++;
+            if (stageConfig.isEnabled())
+            {
+                File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
+                recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
+
+                PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
+                recipeContext.push();
+                recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
+                recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
+                recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
+                recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
+
+                RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
+                recipeRequest.setPulseFileSource(pulseFileProvider);
+                List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
+                recipeRequest.addAllResourceRequirements(resourceRequirements);
+                recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
+                recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
+                recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
+
+                RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+                RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
+                RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
+                rc.setRecipeQueue(recipeQueue);
+                rc.setBuildManager(buildManager);
+                rc.setEventManager(eventManager);
+                rc.setBuildHookManager(buildHookManager);
+                rc.setConfigurationManager(configurationManager);
+                rc.setResourceManager(resourceManager);
+                rc.setRecipeDispatchService(recipeDispatchService);
+                rc.setScmManager(scmManager);
+
+                TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
+                rcNode.add(child);
+                pendingRecipes++;
+            }
+            else
+            {
+                recipeResult.skip();
+                buildManager.save(recipeResult);
+            }
         }
     }
 
@@ -413,7 +422,6 @@ public class DefaultBuildController implements EventListener, BuildController
 
         tree.prepare(buildResult);
 
-        // execute the first level of recipe controllers...
         initialiseNodes(new BootstrapperCreator()
         {
             public Bootstrapper create()
@@ -434,6 +442,14 @@ public class DefaultBuildController implements EventListener, BuildController
                 return initialBootstrapper;
             }
         }, tree.getRoot().getChildren());
+
+        // If there are no executing controllers, then there is nothing more to be done.
+        // Complete the build now as we will not be receiving event triggered callbacks
+        // to complete the build.
+        if (executingControllers.size() == 0)
+        {
+            completeBuild();
+        }
     }
 
     private Revision getLatestRevision()

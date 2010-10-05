@@ -70,6 +70,16 @@ public abstract class Result extends Entity
         return ResultState.ERROR == getState();
     }
 
+    public void skip()
+    {
+        state = ResultState.SKIPPED;
+    }
+
+    public boolean skipped()
+    {
+        return state == ResultState.SKIPPED;
+    }
+
     /**
      * A result is marked as commenced if it is 'inProcess|terminating|completed'. 
      *

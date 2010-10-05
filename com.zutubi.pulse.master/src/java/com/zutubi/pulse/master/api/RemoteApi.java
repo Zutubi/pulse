@@ -2519,30 +2519,56 @@ public class RemoteApi
         stage.put("recipe", recipeResultNode.getResult().getRecipeNameSafe());
         stage.put("agent", recipeResultNode.getHostSafe());
         stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
+        stage.put("commands", convertCommands(recipeResultNode));
+
         addResultFields(recipeResultNode.getResult(), stage);
+
         return stage;
     }
 
-    private void addResultFields(Result result, Hashtable<String, Object> buildDetails)
+    private Vector<Hashtable<String, Object>> convertCommands(final RecipeResultNode node)
     {
-        buildDetails.put("status", result.getState().getPrettyString());
-        buildDetails.put("completed", result.completed());
-        buildDetails.put("succeeded", result.succeeded());
-        buildDetails.put("errorCount", result.getErrorFeatureCount());
-        buildDetails.put("warningCount", result.getWarningFeatureCount());
+        return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+        {
+            public Vector<Hashtable<String, Object>> process()
+            {
+                // recipe result needs to be reloaded as the recipeResult.getCommands relation
+                // is currently marked as lazy loaded.
+                RecipeResult result = buildManager.getRecipeResult(node.getResult().getId());
+
+                Vector<Hashtable<String, Object>> commands = new Vector<Hashtable<String, Object>>();
+                for (CommandResult command : result.getCommandResults())
+                {
+                    Hashtable<String, Object> detail = new Hashtable<String, Object>();
+                    detail.put("name", command.getCommandName());
+                    addResultFields(command, detail);
+                    commands.add(detail);
+                }
+                return commands;
+            }
+        });
+    }
+
+    private void addResultFields(Result result, Hashtable<String, Object> details)
+    {
+        details.put("status", result.getState().getPrettyString());
+        details.put("completed", result.completed());
+        details.put("succeeded", result.succeeded());
+        details.put("errorCount", result.getErrorFeatureCount());
+        details.put("warningCount", result.getWarningFeatureCount());
 
         TimeStamps timeStamps = result.getStamps();
-        buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
-        buildDetails.put("startTimeMillis", Long.toString(timeStamps.getStartTime()));
-        buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
-        buildDetails.put("endTimeMillis", Long.toString(timeStamps.getEndTime()));
+        details.put("startTime", new Date(timeStamps.getStartTime()));
+        details.put("startTimeMillis", Long.toString(timeStamps.getStartTime()));
+        details.put("endTime", new Date(timeStamps.getEndTime()));
+        details.put("endTimeMillis", Long.toString(timeStamps.getEndTime()));
         if (timeStamps.hasEstimatedTimeRemaining())
         {
-            buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
+            details.put("progress", timeStamps.getEstimatedPercentComplete());
         }
         else
         {
-            buildDetails.put("progress", -1);
+            details.put("progress", -1);
         }
     }
 

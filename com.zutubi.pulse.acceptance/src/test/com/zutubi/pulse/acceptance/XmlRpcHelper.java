@@ -794,11 +794,6 @@ public class XmlRpcHelper
         callTest("enqueueSynchronisationMessage", agent, synchronous, description, succeed);
     }
 
-    public Vector<Hashtable<String, Object>> getCommands(String projectName, int id) throws Exception
-    {
-        return callTest("getCommands", projectName, id);
-    }
-
     public int getNextBuildNumber(String projectName) throws Exception
     {
         return (Integer) call("getNextBuildNumber", projectName);

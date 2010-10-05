@@ -1,10 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.commands.api.CommandConfigurationSupportActions;
+import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -39,12 +42,12 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
-        Vector<Hashtable<String, Object>> commands = xmlRpcHelper.getCommands(project.getName(), 1);
-        assertCommandState(commands, "sleep1", "success");
-        assertCommandState(commands, "sleep2", "success");
-        assertCommandState(commands, "build", "success");
+        Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
+        assertCommandState(commands, "sleep1", SUCCESS);
+        assertCommandState(commands, "sleep2", SUCCESS);
+        assertCommandState(commands, DEFAULT_COMMAND, SUCCESS);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableCommand() throws Exception
@@ -56,11 +59,11 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
-        Vector<Hashtable<String, Object>> commands = xmlRpcHelper.getCommands(project.getName(), 1);
-        assertCommandState(commands, "sleep", "skipped");
-        assertCommandState(commands, "build", "success");
+        Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
+        assertCommandState(commands, "sleep", SKIPPED);
+        assertCommandState(commands, DEFAULT_COMMAND, SUCCESS);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableCommandInFailingBuild() throws Exception
@@ -72,11 +75,11 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
-        Vector<Hashtable<String, Object>> commands = xmlRpcHelper.getCommands(project.getName(), 1);
-        assertCommandState(commands, "sleep", "skipped");
-        assertCommandState(commands, "build", "failure");
+        Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
+        assertCommandState(commands, "sleep", SKIPPED);
+        assertCommandState(commands, DEFAULT_COMMAND, FAILURE);
 
-        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(FAILURE, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableMultipleCommands() throws Exception
@@ -89,30 +92,53 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
-        Vector<Hashtable<String, Object>> commands = xmlRpcHelper.getCommands(project.getName(), 1);
-        assertCommandState(commands, "sleep", "skipped");
-        assertCommandState(commands, "build", "skipped");
+        Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
+        assertCommandState(commands, "sleep", SKIPPED);
+        assertCommandState(commands, DEFAULT_COMMAND, SKIPPED);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
-    public void testEnableDisableViaRemoteApi() throws Exception
+    public void testToggleEnableDisable() throws Exception
     {
         ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
-        project.getDefaultCommand().setEnabled(false);
-
         configurationHelper.insertProject(project.getConfig(), false);
-        String commandPath = "projects/" + project.getName() + "/type/recipes/" + project.getDefaultRecipe().getName() + "/commands/" + project.getDefaultCommand().getName();
+        buildRunner.triggerAndWaitForBuild(project);
 
-        Vector<String> actions = xmlRpcHelper.getConfigActions(commandPath);
-        assertTrue(actions.contains(CommandConfigurationSupportActions.ACTION_ENABLE));
-        assertFalse(actions.contains(CommandConfigurationSupportActions.ACTION_DISABLE));
+        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
 
-        xmlRpcHelper.doConfigAction(commandPath, CommandConfigurationSupportActions.ACTION_ENABLE);
+        Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
+        assertCommandState(commands, DEFAULT_COMMAND, SUCCESS);
 
-        actions = xmlRpcHelper.getConfigActions(commandPath);
-        assertFalse(actions.contains(CommandConfigurationSupportActions.ACTION_ENABLE));
-        assertTrue(actions.contains(CommandConfigurationSupportActions.ACTION_DISABLE));
+        toggle(project.getName(), DEFAULT_RECIPE, DEFAULT_COMMAND);
+
+        buildRunner.triggerAndWaitForBuild(project);
+
+        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 2));
+        commands = getCommands(project.getName(), DEFAULT_STAGE, 2);
+        assertCommandState(commands, DEFAULT_COMMAND, SKIPPED);
+    }
+
+    private void toggle(String project, String recipe, String command) throws Exception
+    {
+        String path = "projects/" + project + "/type/recipes/" + recipe + "/commands/" + command;
+        Hashtable<String, Object> config = xmlRpcHelper.getConfig(path);
+        config.put("enabled", !(Boolean)config.get("enabled"));
+        xmlRpcHelper.saveConfig(path, config, false);
+    }
+
+    private Vector<Hashtable<String, Object>> getCommands(String project, final String stage, int build) throws Exception
+    {
+        Hashtable<String, Object> buildDetails = xmlRpcHelper.getBuild(project, build);
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) buildDetails.get("stages");
+        Hashtable<String, Object> stageDetails = CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> details)
+            {
+                return details.get("name").equals(stage);
+            }
+        });
+        return (Vector<Hashtable<String, Object>>) stageDetails.get("commands");
     }
 
     private CommandConfiguration newCommand(String name)
@@ -127,14 +153,14 @@ public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanc
         return command;
     }
 
-    private void assertCommandState(Vector<Hashtable<String, Object>> commands, String name, String state)
+    private void assertCommandState(Vector<Hashtable<String, Object>> commands, String name, ResultState state)
     {
         boolean asserted = false;
         for (Hashtable<String, Object> command : commands)
         {
             if (command.get("name").equals(name))
             {
-                assertEquals(state, command.get("state"));
+                assertEquals(state, ResultState.fromPrettyString((String) command.get("status")));
                 asserted = true;
             }
         }
