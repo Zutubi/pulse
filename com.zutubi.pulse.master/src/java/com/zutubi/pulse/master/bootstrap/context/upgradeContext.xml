@@ -752,4 +752,9 @@
             </list>
         </property>
     </bean>
+
+    <bean id="addEnableDisableToCommandAndStage" class="com.zutubi.pulse.master.upgrade.tasks.AddEnableDisableToProjectCommandsAndStagesUpgradeTask">
+        <property name="buildNumber" value="202999002"/>
+    </bean>
+
 </beans>
