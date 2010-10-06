@@ -37,13 +37,11 @@ public class PulseFileSystemBrowserWindow
 
     public void clickOk()
     {
-        // would be quicker if we add an id to the field?
         browser.click(buttonLocator("ok"));
     }
 
     public void clickCancel()
     {
-        // would be quicker if we add an id to the field? 
         browser.click(buttonLocator("cancel"));
     }
 

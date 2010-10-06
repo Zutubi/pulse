@@ -139,6 +139,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         assertEquals("No build available", window.getStatus());
 
         window.clickCancel();
+        window.waitForClose();
         assertFalse(window.isWindowPresent());
     }
 
