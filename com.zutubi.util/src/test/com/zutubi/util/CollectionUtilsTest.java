@@ -318,4 +318,13 @@ public class CollectionUtilsTest extends ZutubiTestCase
     {
         assertEquals(asList("a", "b", "c"), CollectionUtils.concatenate(asList("a"), asList("b", "c")));
     }
+
+    public void testIndexOf()
+    {
+        assertEquals(0, CollectionUtils.indexOf("A", "A", "B", "C"));
+        assertEquals(1, CollectionUtils.indexOf("B", "A", "B", "C"));
+        assertEquals(2, CollectionUtils.indexOf("C", "A", "B", "C"));
+        assertEquals(-1, CollectionUtils.indexOf("D", "A", "B", "C"));
+        assertEquals(-1, CollectionUtils.indexOf("E"));
+    }
 }

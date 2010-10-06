@@ -626,6 +626,7 @@ public class ToveUtils
                 }
             case ERROR:
             case FAILURE:
+            case TERMINATED:
                 return "exclamation.gif";
             case IN_PROGRESS:
                 return "inprogress.gif";

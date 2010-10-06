@@ -93,6 +93,7 @@ public class ChangedByMeSinceSuccessNotificationConditionTest extends PulseTestC
     {
         BuildResult build = new BuildResult(new UnknownBuildReason(), null, number, false);
         build.setId(number);
+        build.commence();
         build.complete();
         return build;
     }

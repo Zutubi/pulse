@@ -29,6 +29,11 @@ public class ChangelistModel
     private List<ChangelistBuildModel> builds;
     private CommitMessageSupport commitMessageSupport;
 
+    /**
+     * The build result aggregation order
+     */
+    private static final ResultState[] AGGREGATION_ORDER = new ResultState[]{ResultState.SUCCESS, ResultState.IN_PROGRESS, ResultState.FAILURE, ResultState.ERROR, ResultState.TERMINATED};
+
     public ChangelistModel(PersistentChangelist changelist, String url, List<BuildResult> buildResults, CommitMessageSupport commitMessageSupport)
     {
         this.changelist = changelist;
@@ -48,25 +53,7 @@ public class ChangelistModel
         int warningCount = 0;
         for (BuildResult build: buildResults)
         {
-            if (build.completed())
-            {
-                if (!build.succeeded())
-                {
-                    aggregrateState = build.getState();
-                    if (aggregrateState == ResultState.ERROR)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                if (!aggregrateState.isBroken())
-                {
-                    aggregrateState = ResultState.IN_PROGRESS;
-                }
-            }
-
+            aggregrateState = ResultState.getAggregate(aggregrateState, build.getState(), AGGREGATION_ORDER);
             warningCount += build.getWarningFeatureCount();
         }
 

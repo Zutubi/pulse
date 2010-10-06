@@ -55,6 +55,11 @@ public abstract class Result extends Entity
         return ResultState.TERMINATING == getState();
     }
 
+    public boolean terminated()
+    {
+        return ResultState.TERMINATED == getState();
+    }
+
     public boolean succeeded()
     {
         return ResultState.SUCCESS == getState();
@@ -134,7 +139,7 @@ public abstract class Result extends Entity
         }
         else if (state == ResultState.TERMINATING)
         {
-            state = ResultState.ERROR;
+            state = ResultState.TERMINATED;
         }
 
         if (!stamps.started())

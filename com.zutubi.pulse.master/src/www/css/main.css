@@ -525,7 +525,7 @@ td.warning, td.warning-right
     background-color: #ffffce;
 }
 
-td.failure, td.error, td.failure-right, td.error-right
+td.failure, td.error, td.terminated, td.failure-right, td.error-right, td.terminated-right
 {
     color: #b22;
     font-weight: bold;
@@ -1006,7 +1006,8 @@ Build tabs
 }
 
 .x-tree-node-collapsed .status-failure, .x-tree-node-expanded .status-failure, .x-tree-node-leaf .status-failure,
-    .x-tree-node-collapsed .status-error, .x-tree-node-expanded .status-error, .x-tree-node-leaf .status-error
+    .x-tree-node-collapsed .status-error, .x-tree-node-expanded .status-error, .x-tree-node-leaf .status-error,
+    .x-tree-node-collapsed .status-terminated, .x-tree-node-expanded .status-terminated, .x-tree-node-leaf .status-terminated
 {
     background-image: url(../images/exclamation.gif);
     width: 20px;

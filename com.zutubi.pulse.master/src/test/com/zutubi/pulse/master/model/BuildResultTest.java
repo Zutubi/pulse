@@ -58,7 +58,7 @@ public class BuildResultTest extends PulseTestCase
         buildResult.commence();
         buildResult.terminate("term");
         buildResult.complete();
-        assertEquals(ResultState.ERROR, buildResult.getState());
+        assertEquals(ResultState.TERMINATED, buildResult.getState());
     }
     
     public void testFailureWhenTerminating()
@@ -68,7 +68,7 @@ public class BuildResultTest extends PulseTestCase
         buildResult.terminate("term");
         buildResult.failure("fail");
         buildResult.complete();
-        assertEquals(ResultState.ERROR, buildResult.getState());
+        assertEquals(ResultState.TERMINATED, buildResult.getState());
     }
 
     public void testErrorWhenTerminating()
@@ -78,7 +78,7 @@ public class BuildResultTest extends PulseTestCase
         buildResult.terminate("term");
         buildResult.error("err");
         buildResult.complete();
-        assertEquals(ResultState.ERROR, buildResult.getState());
+        assertEquals(ResultState.TERMINATED, buildResult.getState());
     }
 
     public void testChooseWorstRecipe()

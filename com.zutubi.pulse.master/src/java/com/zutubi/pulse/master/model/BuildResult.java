@@ -80,8 +80,8 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.user = null;
         this.number = number;
         this.userRevision = userRevision;
-        state = ResultState.PENDING;
-        root = new RecipeResultNode(null, 0, null);
+        this.state = ResultState.PENDING;
+        this.root = new RecipeResultNode(null, 0, null);
     }
 
     public BuildResult(BuildReason reason, User user, Project project, long number)

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.engine.api;
 
+import static com.zutubi.util.CollectionUtils.indexOf;
 import com.zutubi.util.EnumUtils;
 
 /**
@@ -12,113 +13,50 @@ public enum ResultState
     /**
      * The result has not yet commenced.
      */
-    PENDING
-            {
-                public boolean isBroken()
-                {
-                    return false;
-                }
-
-                public boolean isCompleted()
-                {
-                    return false;
-                }
-            },
+    PENDING(false, false),
+    
     /**
      * The result has commenced and is in progress (not yet completed).
      */
-    IN_PROGRESS
-            {
-                public boolean isBroken()
-                {
-                    return false;
-                }
+    IN_PROGRESS(false, false),
 
-                public boolean isCompleted()
-                {
-                    return false;
-                }
-            },
     /**
      * The result has been asked forcefully to complete, and will do so as soon
      * as possible.
      */
-    TERMINATING
-            {
-                public boolean isBroken()
-                {
-                    return false;
-                }
+    TERMINATING(false, false),
 
-                public boolean isCompleted()
-                {
-                    return false;
-                }
-            },
-    /**
-     * The result completed successfully.
-     */
-    SUCCESS
-            {
-                public boolean isBroken()
-                {
-                    return false;
-                }
-
-                public boolean isCompleted()
-                {
-                    return true;
-                }
-            },
     /**
      * The result indicates that the component was skipped.
      */
-    SKIPPED
-            {
-                public boolean isBroken()
-                {
-                    return false;
-                }
+    SKIPPED(true, false),
 
-                public boolean isCompleted()
-                {
-                    return true;
-                }
-            },
+    /**
+     * The result completed successfully.
+     */
+    SUCCESS(true, false),
+
     /**
      * The result has completed and has failed due to a build problem.
      */
-    FAILURE
-            {
-                public boolean isBroken()
-                {
-                    return true;
-                }
+    FAILURE(true, true),
 
-                public boolean isCompleted()
-                {
-                    return true;
-                }
-            },
     /**
      * The result has completed and has failed due to an external problem.
      */
-    ERROR
-            {
-                public boolean isBroken()
-                {
-                    return true;
-                }
+    ERROR(true, true),
 
-                public boolean isCompleted()
-                {
-                    return true;
-                }
-            };
+    /**
+     * The result has completed but has failed because it was intentionally terminated.
+     */
+    TERMINATED(true, true);
 
     private static final ResultState[] BROKEN_STATES;
     private static final ResultState[] COMPLETED_STATES;
     private static final ResultState[] INCOMPLETE_STATES;
+    
+    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{SKIPPED, SUCCESS, FAILURE, ERROR, TERMINATED};
+
     static
     {
         int broken = 0;
@@ -200,17 +138,33 @@ public enum ResultState
      */
     public static ResultState getWorseState(ResultState s1, ResultState s2)
     {
-        if (s1 == ERROR || s2 == ERROR)
+        assertCompleted(s1);
+        assertCompleted(s2);
+
+        return getAggregate(s1, s2, WORSE_STATE_ORDER);
+    }
+
+    /**
+     * Aggregate the two specified results according to the order specified.  That is, return
+     * whichever of the two states appears later in the specified order.
+     *
+     * @param s1    a state to be aggregated
+     * @param s2    a state to be aggregated
+     * @param order the order of aggregation.  States of higher importance should appear
+     * later in the list.
+     *
+     * @return the state that appears earlier in the specified order.
+     */
+    public static ResultState getAggregate(ResultState s1, ResultState s2, ResultState[] order)
+    {
+        return (indexOf(s1, order) < indexOf(s2, order)) ? s2 : s1;
+    }
+
+    private static void assertCompleted(ResultState state)
+    {
+        if (state != null && !state.isCompleted())
         {
-            return ERROR;
-        }
-        else if (s1 == FAILURE || s2 == FAILURE)
-        {
-            return FAILURE;
-        }
-        else
-        {
-            return SUCCESS;
+            throw new IllegalArgumentException("Completed result state expected.  Instead found " + state);
         }
     }
 
@@ -227,15 +181,37 @@ public enum ResultState
     }
 
     /**
+     * True if this state indicates a result that is unsuccessful.
+     */
+    private boolean broken;
+
+    /**
+     * True if this state indicates a result that is complete.
+     */
+    private boolean completed;
+
+    private ResultState(boolean completed, boolean broken)
+    {
+        this.broken = broken;
+        this.completed = completed;
+    }
+
+    /**
      * @return true if this state indicates a result that is complete but
      *         unsuccessful
      */
-    public abstract boolean isBroken();
+    public boolean isBroken()
+    {
+        return broken;
+    }
 
     /**
      * @return true if this state indicates a result that is complete
      */
-    public abstract boolean isCompleted();
+    public boolean isCompleted()
+    {
+        return completed;
+    }
 
     /**
      * @return a human-readable string for this state

@@ -717,7 +717,7 @@
         <img alt="terminating" src="$base/images/stop.gif"/>
     #elseif($result.pending())
         <img alt="pending" src="$base/images/hourglass.gif"/>
-    #elseif($result.errored() || $result.failed())
+    #elseif($result.errored() || $result.failed() || $result.terminated())
         <img alt="failure" src="$base/images/exclamation.gif"/>
     #else
         &nbsp;

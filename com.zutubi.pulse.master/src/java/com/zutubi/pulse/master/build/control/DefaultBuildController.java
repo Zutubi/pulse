@@ -881,7 +881,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
-            if (buildResult.getRoot().getWorstState(null) == ResultState.SUCCESS && !buildResult.isPersonal())
+            if (buildResult.getRoot().getWorstState(ResultState.SUCCESS) == ResultState.SUCCESS && !buildResult.isPersonal())
             {
                 try
                 {

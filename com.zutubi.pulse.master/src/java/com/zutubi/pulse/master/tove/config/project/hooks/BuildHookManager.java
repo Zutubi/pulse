@@ -158,7 +158,7 @@ public class BuildHookManager
                     result.addFeature(Feature.Level.ERROR, "Error executing task for hook '" + hook.getName() + "': " + e.getMessage());
                     if (hook.failOnError())
                     {
-                        result.setState(ResultState.ERROR);
+                        result.error();
                     }
                 }
             }
