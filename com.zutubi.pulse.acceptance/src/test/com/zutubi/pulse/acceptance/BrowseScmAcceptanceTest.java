@@ -117,6 +117,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.waitForNode("src");
         browse.selectNode("src");
         browse.clickOk();
+        browse.waitForClose();
 
         assertEquals("src", form.getPulseFileNameFieldValue());
     }
@@ -143,6 +144,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertFalse(browse.isNodePresent("junit-3.8.1.jar"));
         browse.selectNode("lib");
         browse.clickOk();
+        browse.waitForClose();
 
         assertEquals("lib", antForm.getWorkingDirectoryFieldValue());
     }
@@ -159,6 +161,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.waitForNode("junit-3.8.1.jar");
         browse.selectNode("junit-3.8.1.jar");
         browse.clickCancel();
+        browse.waitForClose();
 
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
     }
@@ -177,6 +180,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.waitForNode("Unit.java");
         browse.selectNode("Unit.java");
         browse.clickOk();
+        browse.waitForClose();
 
         assertEquals("java/com/zutubi/testant/Unit.java", antForm.getBuildFileFieldValue());
     }
@@ -239,7 +243,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.waitForNode("junit-3.8.1.jar");
         browse.selectNode("junit-3.8.1.jar");
         browse.clickOk();
-
+        browse.waitForClose();
+        
         assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
     }
 }
