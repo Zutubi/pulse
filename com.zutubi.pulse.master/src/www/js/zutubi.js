@@ -2749,7 +2749,19 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
             columns: [{
                 header: 'name',
                 tpl: '{text}',
-                width: 400
+                width: 400,
+                sortType: function(node) {
+                    if (node.getDepth() > 2)
+                    {
+                        // Artifacts and below are sorted by name.
+                        return node.attributes.text;
+                    }
+                    else
+                    {
+                        // Stages and commands are not sorted.
+                        return 0;
+                    }
+                }
             }, {
                 header: 'size',
                 width: 100,
@@ -2772,7 +2784,18 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 cls: 'artifact-hash',
                 width: 300,
                 tpl: '<tpl if="extraAttributes.hash">{values.extraAttributes.hash}</tpl>',
-                align: 'right'
+                align: 'right',
+                sortType: function(node) {
+                    var extraAttributes = node.attributes.extraAttributes;
+                    if (extraAttributes && extraAttributes.hash)
+                    {
+                        return extraAttributes.hash;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
             }, {
                 header: 'actions',
                 width: 120,
