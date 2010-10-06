@@ -62,7 +62,7 @@ public class PulseFileExpander
         try
         {
             is = new FileInputStream(pulseFile);
-            pulseFileLoader.load(is, recipes, createScope(options), new LocalFileResolver(pulseFile.getParentFile()), getLoadPredicate(recipes, recipe));
+            pulseFileLoader.load(is, recipes, createScope(options), new LocalFileResolver(options.getBaseDir()), getLoadPredicate(recipes, recipe));
         }
         finally
         {

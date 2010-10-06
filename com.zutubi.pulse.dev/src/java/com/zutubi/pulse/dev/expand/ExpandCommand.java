@@ -84,6 +84,7 @@ public class ExpandCommand implements Command
         options.put("-d [--define] name=value", I18N.format("flag.define"));
         options.put("-q [--require] name[/ver]", I18N.format("flag.require"));
         options.put("-e [--resources-file] file", I18N.format("flag.resources"));
+        options.put("-b [--base-dir] dir", I18N.format("flag.base.dir"));
         return options;
     }
 

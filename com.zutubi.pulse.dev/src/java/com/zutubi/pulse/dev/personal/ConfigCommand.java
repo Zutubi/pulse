@@ -8,10 +8,10 @@ import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.YesNoResponse;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -44,7 +44,7 @@ public class ConfigCommand implements Command
         }
 
         ConsoleUI ui = new ConsoleUI();
-        PersonalBuildConfig config = new PersonalBuildConfig(new File(System.getProperty("user.dir")), new PropertiesConfig(), ui);
+        PersonalBuildConfig config = new PersonalBuildConfig(FileSystemUtils.getWorkingDirectory(), new PropertiesConfig(), ui);
         if(!projectOnly)
         {
             setupPulseConfig(ui, config);

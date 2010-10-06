@@ -3,13 +3,14 @@ package com.zutubi.pulse.dev.expand;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-
-import java.util.List;
-import java.util.Properties;
-
+import com.zutubi.util.FileSystemUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
+
+import java.io.File;
+import java.util.List;
+import java.util.Properties;
 
 public class PulseFileExpanderOptionsTest extends PulseTestCase
 {
@@ -18,12 +19,14 @@ public class PulseFileExpanderOptionsTest extends PulseTestCase
         PulseFileExpanderOptions options = new PulseFileExpanderOptions(
                 "-r", "test.recipe",
                 "-e", "test.resources",
+                "-b", "test.base",
                 "test.file"
         );
         
         assertEquals("test.file", options.getPulseFile());
         assertEquals("test.recipe", options.getRecipe());
         assertEquals("test.resources", options.getResourcesFile());
+        assertEquals(new File("test.base"), options.getBaseDir());
     }
 
     public void testStandardLongOptions() throws PulseException
@@ -31,12 +34,14 @@ public class PulseFileExpanderOptionsTest extends PulseTestCase
         PulseFileExpanderOptions options = new PulseFileExpanderOptions(
                 "--recipe", "test.recipe",
                 "--resources-file", "test.resources",
+                "--base-dir", "test.base",
                 "test.file"
         );
         
         assertEquals("test.file", options.getPulseFile());
         assertEquals("test.recipe", options.getRecipe());
         assertEquals("test.resources", options.getResourcesFile());
+        assertEquals(new File("test.base"), options.getBaseDir());
     }
 
     public void testRequirements() throws PulseException
@@ -78,5 +83,11 @@ public class PulseFileExpanderOptionsTest extends PulseTestCase
         {
             assertThat(e.getMessage(), containsString("No pulse file specified."));
         }
+    }
+    
+    public void testDefaultBaseDir() throws PulseException
+    {
+        PulseFileExpanderOptions options = new PulseFileExpanderOptions("test.file");
+        assertEquals(FileSystemUtils.getWorkingDirectory(), options.getBaseDir());
     }
 }

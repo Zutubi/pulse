@@ -265,6 +265,24 @@ public class FileSystemUtils
     }
 
     /**
+     * Gets the location of the JVM's working directory.
+     * 
+     * @return the working directory
+     */
+    public static File getWorkingDirectory()
+    {
+        String userDir = System.getProperty("user.dir");
+        if (StringUtils.stringSet(userDir))
+        {
+            return new File(userDir);
+        }
+        else
+        {
+            return new File("dummy").getParentFile();
+        }
+    }
+    
+    /**
      * Gets the location to use for storing temporary files, controlled by a
      * standard system property.
      *

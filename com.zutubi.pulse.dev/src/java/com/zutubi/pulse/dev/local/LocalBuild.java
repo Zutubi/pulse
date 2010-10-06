@@ -36,8 +36,7 @@ public class LocalBuild
         try
         {
             LocalBuildOptions options = new LocalBuildOptions(argv);
-            File baseDir = new File(System.getProperty("user.dir"));
-            b.runBuild(baseDir, options);
+            b.runBuild(FileSystemUtils.getWorkingDirectory(), options);
         }
         catch (Exception e)
         {

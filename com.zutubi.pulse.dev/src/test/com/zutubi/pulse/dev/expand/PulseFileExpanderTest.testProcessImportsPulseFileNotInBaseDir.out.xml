@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <noop name="com"/>
+    </recipe>
+</project>

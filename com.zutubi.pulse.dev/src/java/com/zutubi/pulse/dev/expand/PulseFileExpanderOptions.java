@@ -3,8 +3,10 @@ package com.zutubi.pulse.dev.expand;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.dev.util.OptionUtils;
+import com.zutubi.util.FileSystemUtils;
 import org.apache.commons.cli.*;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +21,7 @@ public class PulseFileExpanderOptions
     private String recipe;
     private Properties defines = new Properties();
     private String resourcesFile;
+    private File baseDir;
     private OutputStream outputStream = System.out;
     private List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>();
 
@@ -57,6 +60,10 @@ public class PulseFileExpanderOptions
                 .hasArg()
                 .create('e'));
 
+        options.addOption(OptionBuilder.withLongOpt("base-dir")
+                .hasArg()
+                .create('b'));
+        
         CommandLineParser parser = new GnuParser();
         CommandLine commandLine;
         try
@@ -88,6 +95,15 @@ public class PulseFileExpanderOptions
             if (commandLine.hasOption('e'))
             {
                 resourcesFile = commandLine.getOptionValue('e');
+            }
+    
+            if (commandLine.hasOption('b'))
+            {
+                baseDir = new File(commandLine.getOptionValue('b'));
+            }
+            else
+            {
+                baseDir = FileSystemUtils.getWorkingDirectory();
             }
         }
         catch (ParseException e)
@@ -164,6 +180,22 @@ public class PulseFileExpanderOptions
     public void setResourcesFile(String resourcesFile)
     {
         this.resourcesFile = resourcesFile;
+    }
+
+    /**
+     * Gives the base directory to be used for resolving file paths (e.g. in
+     * imports).
+     * 
+     * @return the base directory to use
+     */
+    public File getBaseDir()
+    {
+        return baseDir;
+    }
+
+    public void setBaseDir(File baseDir)
+    {
+        this.baseDir = baseDir;
     }
 
     /**

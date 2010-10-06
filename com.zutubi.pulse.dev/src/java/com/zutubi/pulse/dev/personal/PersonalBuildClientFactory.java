@@ -2,6 +2,7 @@ package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.dev.util.OptionUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
@@ -115,7 +116,7 @@ public class PersonalBuildClientFactory
         }
         else
         {
-            base = new File(System.getProperty("user.dir"));
+            base = FileSystemUtils.getWorkingDirectory();
         }
         return base;
     }
