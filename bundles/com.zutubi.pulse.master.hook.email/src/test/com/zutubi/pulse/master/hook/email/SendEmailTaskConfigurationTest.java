@@ -135,6 +135,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
     private BuildResult createCompleteResult()
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), null, 1, false);
+        result.commence();
         result.complete();
         return result;
     }
