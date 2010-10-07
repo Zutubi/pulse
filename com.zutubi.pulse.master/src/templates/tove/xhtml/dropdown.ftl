@@ -33,6 +33,7 @@
     fc.name = 'combo.' + fc.hiddenName;
     fc.displayField = 'text';
     fc.valueField = 'value';
+    fc.tpl = '<tpl for="."><div class="x-combo-list-item">{text:htmlEncode}</div></tpl>';
     fc.editable = false;
     fc.forceSelection = true;
     fc.triggerAction = 'all';

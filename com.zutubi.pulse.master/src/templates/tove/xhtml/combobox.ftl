@@ -37,6 +37,7 @@
 
     fc.displayField = 'text';
     fc.valueField = 'text';
+    fc.tpl = '<tpl for="."><div class="x-combo-list-item">{text:htmlEncode}</div></tpl>';
 <#else>
     var data = [];
 
@@ -46,6 +47,7 @@
 
     fc.mode = 'local';
     fc.store = data;
+    fc.tpl = '<tpl for="."><div class="x-combo-list-item">{field1:htmlEncode}</div></tpl>';
 </#if>
     fc.triggerAction = 'all';
     fc.editable = true;
