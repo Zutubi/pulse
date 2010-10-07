@@ -98,16 +98,32 @@ public class PulseFileExpanderTest extends PulseTestCase
         expandAndCompare(options);
     }
 
-    public void testProcessImportsPulseFileNotInBaseDir() throws IOException, PulseException
+    public void testRelativeImportPulseFileNotInBaseDir() throws IOException, PulseException
     {
-        File baseDir = new File(tempDir, "base");
-        assertTrue(baseDir.mkdirs());
-        copyInputToDirectory("fragment.xml", baseDir);
+        multiDirectoryHelper();
+    }
+
+    public void testAbsoluteImportPulseFileNotInBaseDir() throws IOException, PulseException
+    {
+        multiDirectoryHelper();
+    }
+
+    private void multiDirectoryHelper() throws IOException, PulseException
+    {
+        File pulseFileDir = new File(tempDir, "pulse");
+        File includeDir = new File(tempDir, "include");
+        assertTrue(pulseFileDir.mkdirs());
+        assertTrue(includeDir.mkdirs());
+        File pulseFile = copyInputToDirectory("xml", pulseFileDir);
+        copyInputToDirectory("fragment.xml", includeDir);
+
         PulseFileExpanderOptions options = new PulseFileExpanderOptions();
-        options.setBaseDir(baseDir);
+        options.setBaseDir(tempDir);
+        options.setPulseFile(pulseFileDir.getName() + "/" + pulseFile.getName());
+
         expandAndCompare(options);
     }
-    
+
     public void testIsolateRecipe() throws IOException, PulseException
     {
         PulseFileExpanderOptions options = new PulseFileExpanderOptions();
@@ -148,10 +164,17 @@ public class PulseFileExpanderTest extends PulseTestCase
 
     private void expandAndCompare(PulseFileExpanderOptions options) throws IOException, PulseException
     {
-        File input = copyInputToDirectory("xml", tempDir);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        options.setPulseFile(input.getAbsolutePath());
+        if (options.getBaseDir() == null)
+        {
+            options.setBaseDir(tempDir);
+        }
+        if (options.getPulseFile() == null)
+        {
+            File input = copyInputToDirectory("xml", tempDir);
+            options.setPulseFile(input.getName());
+        }
         options.setOutputStream(os);
         expander.expand(options);
 
