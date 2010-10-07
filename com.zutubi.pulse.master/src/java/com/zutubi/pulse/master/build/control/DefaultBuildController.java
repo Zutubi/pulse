@@ -448,6 +448,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // to complete the build.
         if (executingControllers.size() == 0)
         {
+            handleBuildCommenced();
             completeBuild();
         }
     }
@@ -611,7 +612,7 @@ public class DefaultBuildController implements EventListener, BuildController
             {
                 if (!buildResult.commenced())
                 {
-                    handleFirstAssignment();
+                    handleBuildCommenced();
                 }
             }
             else if (e instanceof RecipeCompletedEvent || e instanceof RecipeErrorEvent)
@@ -666,7 +667,7 @@ public class DefaultBuildController implements EventListener, BuildController
      * Called when the first recipe for this build is dispatched.  It is at
      * this point that the build is said to have commenced.
      */
-    private void handleFirstAssignment()
+    private void handleBuildCommenced()
     {
         BuildRevision buildRevision = request.getRevision();
 

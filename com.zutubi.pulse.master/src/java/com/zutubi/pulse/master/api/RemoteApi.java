@@ -2446,25 +2446,36 @@ public class RemoteApi
         return getLatestPersonalBuilds(token, completedOnly, 1);
     }
 
-    private Hashtable<String, Object> convertResult(BuildResult build)
+    private Hashtable<String, Object> convertResult(final BuildResult build)
     {
-        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-        buildDetails.put("id", (int) build.getNumber());
-        buildDetails.put("project", build.getProject().getName());
-        buildDetails.put("revision", getBuildRevision(build));
-        buildDetails.put("tests", convertTests(build.getTestSummary()));
-        buildDetails.put("version", getBuildVersion(build));
-        buildDetails.put("reason", build.getReason().getSummary());
-        addResultFields(build, buildDetails);
-
-        Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
-        for (RecipeResultNode rrn : build.getRoot().getChildren())
+        return transactionContext.executeInsideTransaction(new NullaryFunction<Hashtable<String, Object>>()
         {
-            stages.add(convertStage(rrn));
-        }
-        buildDetails.put("stages", stages);
+            public Hashtable<String, Object> process()
+            {
+                // The Result needs to be reloaded to ensure any lazy loaded collections can be loaded.
+                // - in particular, the recipeResult.getCommands
+                
+                BuildResult result = buildManager.getBuildResult(build.getId());
 
-        return buildDetails;
+                Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
+                buildDetails.put("id", (int) result.getNumber());
+                buildDetails.put("project", result.getProject().getName());
+                buildDetails.put("revision", getBuildRevision(result));
+                buildDetails.put("tests", convertTests(result.getTestSummary()));
+                buildDetails.put("version", getBuildVersion(result));
+                buildDetails.put("reason", result.getReason().getSummary());
+                addResultFields(result, buildDetails);
+
+                Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
+                for (RecipeResultNode rrn : result.getRoot().getChildren())
+                {
+                    stages.add(convertStage(rrn));
+                }
+                buildDetails.put("stages", stages);
+
+                return buildDetails;
+            }
+        });
     }
 
     private Hashtable<String, Object> convertProject(Project project)
@@ -2528,25 +2539,15 @@ public class RemoteApi
 
     private Vector<Hashtable<String, Object>> convertCommands(final RecipeResultNode node)
     {
-        return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+        Vector<Hashtable<String, Object>> commands = new Vector<Hashtable<String, Object>>();
+        for (CommandResult command : node.getResult().getCommandResults())
         {
-            public Vector<Hashtable<String, Object>> process()
-            {
-                // recipe result needs to be reloaded as the recipeResult.getCommands relation
-                // is currently marked as lazy loaded.
-                RecipeResult result = buildManager.getRecipeResult(node.getResult().getId());
-
-                Vector<Hashtable<String, Object>> commands = new Vector<Hashtable<String, Object>>();
-                for (CommandResult command : result.getCommandResults())
-                {
-                    Hashtable<String, Object> detail = new Hashtable<String, Object>();
-                    detail.put("name", command.getCommandName());
-                    addResultFields(command, detail);
-                    commands.add(detail);
-                }
-                return commands;
-            }
-        });
+            Hashtable<String, Object> detail = new Hashtable<String, Object>();
+            detail.put("name", command.getCommandName());
+            addResultFields(command, detail);
+            commands.add(detail);
+        }
+        return commands;
     }
 
     private void addResultFields(Result result, Hashtable<String, Object> details)
