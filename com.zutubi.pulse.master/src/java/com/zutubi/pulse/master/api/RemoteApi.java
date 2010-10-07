@@ -1798,21 +1798,26 @@ public class RemoteApi
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      * @see #getPersonalBuild(String, int)
      */
-    public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id)
+    public Vector<Hashtable<String, Object>> getBuild(String token, final String projectName, final int id)
     {
         tokenManager.loginUser(token);
         try
         {
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
-            Project project = internalGetProject(projectName, true);
-            BuildResult build = buildManager.getByProjectAndNumber(project, id);
-            if (build == null)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                return result;
-            }
-
-            result.add(convertResult(build));
-            return result;
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
+                    Project project = internalGetProject(projectName, true);
+                    BuildResult build = buildManager.getByProjectAndNumber(project, id);
+                    if (build == null)
+                    {
+                        return result;
+                    }
+                    result.add(convertResult(build));
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -1994,22 +1999,28 @@ public class RemoteApi
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      */
-    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst)
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, final String projectName, final Vector<String> resultStates, final int firstResult, final int maxResults, final boolean mostRecentFirst)
     {
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
-
-            List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, firstResult, maxResults, mostRecentFirst);
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-            for (BuildResult build : builds)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                Hashtable<String, Object> buildDetails = convertResult(build);
-                result.add(buildDetails);
-            }
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Project[] projects = internalGetProjectSet(projectName, true);
 
-            return result;
+                    List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, firstResult, maxResults, mostRecentFirst);
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+                    for (BuildResult build : builds)
+                    {
+                        Hashtable<String, Object> buildDetails = convertResult(build);
+                        result.add(buildDetails);
+                    }
+
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -2036,20 +2047,25 @@ public class RemoteApi
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
-    public Vector<Hashtable<String, Object>> getBuildRange(String token, String projectName, int afterBuild, int toBuild)
+    public Vector<Hashtable<String, Object>> getBuildRange(String token, final String projectName, final int afterBuild, final int toBuild)
     {
         tokenManager.loginUser(token);
         try
         {
-            Project project = internalGetProject(projectName, true);
-            List<BuildResult> buildRange = buildManager.queryBuilds(project, ResultState.getCompletedStates(), afterBuild + 1, toBuild, 0, -1, false, false);
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(buildRange.size());
-            for (BuildResult r : buildRange)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                result.add(convertResult(r));
-            }
-
-            return result;
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Project project = internalGetProject(projectName, true);
+                    List<BuildResult> buildRange = buildManager.queryBuilds(project, ResultState.getCompletedStates(), afterBuild + 1, toBuild, 0, -1, false, false);
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(buildRange.size());
+                    for (BuildResult r : buildRange)
+                    {
+                        result.add(convertResult(r));
+                    }
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -2077,21 +2093,26 @@ public class RemoteApi
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
-    public Vector<Hashtable<String, Object>> getPreviousBuild(String token, String projectName, int id)
+    public Vector<Hashtable<String, Object>> getPreviousBuild(String token, final String projectName, final int id)
     {
         tokenManager.loginUser(token);
         try
         {
-            Project project = internalGetProject(projectName, true);
-            BuildResult buildResult = internalGetBuild(project, id);
-            buildResult = buildManager.getPreviousBuildResult(buildResult);
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-            if (buildResult != null)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                result.add(convertResult(buildResult));
-            }
-
-            return result;
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Project project = internalGetProject(projectName, true);
+                    BuildResult buildResult = internalGetBuild(project, id);
+                    buildResult = buildManager.getPreviousBuildResult(buildResult);
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+                    if (buildResult != null)
+                    {
+                        result.add(convertResult(buildResult));
+                    }
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -2216,28 +2237,34 @@ public class RemoteApi
      * @see #getPreviousBuild(String, String, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
-    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, boolean completedOnly, int maxResults)
+    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, final String projectName, final boolean completedOnly, final int maxResults)
     {
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
-
-            ResultState[] states = null;
-            if (completedOnly)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                states = ResultState.getCompletedStates();
-            }
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Project[] projects = internalGetProjectSet(projectName, true);
 
-            List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true);
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-            for (BuildResult build : builds)
-            {
-                Hashtable<String, Object> buildDetails = convertResult(build);
-                result.add(buildDetails);
-            }
+                    ResultState[] states = null;
+                    if (completedOnly)
+                    {
+                        states = ResultState.getCompletedStates();
+                    }
 
-            return result;
+                    List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true);
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+                    for (BuildResult build : builds)
+                    {
+                        Hashtable<String, Object> buildDetails = convertResult(build);
+                        result.add(buildDetails);
+                    }
+
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -2291,21 +2318,27 @@ public class RemoteApi
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      */
-    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, int maxResults)
+    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, final String projectName, final int maxResults)
     {
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
-            List<BuildResult> builds = buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults);
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-            for (BuildResult build : builds)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                Hashtable<String, Object> buildDetails = convertResult(build);
-                result.add(buildDetails);
-            }
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Project[] projects = internalGetProjectSet(projectName, true);
+                    List<BuildResult> builds = buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults);
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+                    for (BuildResult build : builds)
+                    {
+                        Hashtable<String, Object> buildDetails = convertResult(build);
+                        result.add(buildDetails);
+                    }
 
-            return result;
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -2351,21 +2384,26 @@ public class RemoteApi
      * @access available to all users (users can only access their own personal builds)
      * @see #getLatestPersonalBuilds(String, boolean, int)
      */
-    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id)
+    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, final int id)
     {
-        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
-
-        User user = tokenManager.loginAndReturnUser(token);
+        final User user = tokenManager.loginAndReturnUser(token);
         try
         {
-            BuildResult build = buildManager.getByUserAndNumber(user, id);
-            if (build == null)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                return result;
-            }
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
+                    BuildResult build = buildManager.getByUserAndNumber(user, id);
+                    if (build == null)
+                    {
+                        return result;
+                    }
 
-            result.add(convertResult(build));
-            return result;
+                    result.add(convertResult(build));
+                    return result;
+                }
+            });
         }
         finally
         {
@@ -2386,38 +2424,44 @@ public class RemoteApi
      * @access available to all users (users can only access their own personal builds)
      * @see #getPersonalBuild(String, int)
      */
-    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults)
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, final boolean completedOnly, final int maxResults)
     {
-        User user = tokenManager.loginAndReturnUser(token);
+        final User user = tokenManager.loginAndReturnUser(token);
         try
         {
-            List<BuildResult> builds = buildManager.getPersonalBuilds(user);
-            if (completedOnly)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                Iterator<BuildResult> it = builds.iterator();
-                while (it.hasNext())
+                public Vector<Hashtable<String, Object>> process()
                 {
-                    BuildResult b = it.next();
-                    if (!b.completed())
+                    List<BuildResult> builds = buildManager.getPersonalBuilds(user);
+                    if (completedOnly)
                     {
-                        it.remove();
+                        Iterator<BuildResult> it = builds.iterator();
+                        while (it.hasNext())
+                        {
+                            BuildResult b = it.next();
+                            if (!b.completed())
+                            {
+                                it.remove();
+                            }
+                        }
                     }
+
+                    if (maxResults >= 0 && builds.size() > maxResults)
+                    {
+                        builds = builds.subList(0, maxResults);
+                    }
+
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+                    for (BuildResult build : builds)
+                    {
+                        Hashtable<String, Object> buildDetails = convertResult(build);
+                        result.add(buildDetails);
+                    }
+
+                    return result;
                 }
-            }
-
-            if (maxResults >= 0 && builds.size() > maxResults)
-            {
-                builds = builds.subList(0, maxResults);
-            }
-
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-            for (BuildResult build : builds)
-            {
-                Hashtable<String, Object> buildDetails = convertResult(build);
-                result.add(buildDetails);
-            }
-
-            return result;
+            });
         }
         finally
         {
@@ -2446,36 +2490,25 @@ public class RemoteApi
         return getLatestPersonalBuilds(token, completedOnly, 1);
     }
 
-    private Hashtable<String, Object> convertResult(final BuildResult build)
+    private Hashtable<String, Object> convertResult(BuildResult build)
     {
-        return transactionContext.executeInsideTransaction(new NullaryFunction<Hashtable<String, Object>>()
+        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
+        buildDetails.put("id", (int) build.getNumber());
+        buildDetails.put("project", build.getProject().getName());
+        buildDetails.put("revision", getBuildRevision(build));
+        buildDetails.put("tests", convertTests(build.getTestSummary()));
+        buildDetails.put("version", getBuildVersion(build));
+        buildDetails.put("reason", build.getReason().getSummary());
+        addResultFields(build, buildDetails);
+
+        Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
+        for (RecipeResultNode rrn : build.getRoot().getChildren())
         {
-            public Hashtable<String, Object> process()
-            {
-                // The Result needs to be reloaded to ensure any lazy loaded collections can be loaded.
-                // - in particular, the recipeResult.getCommands
-                
-                BuildResult result = buildManager.getBuildResult(build.getId());
+            stages.add(convertStage(rrn));
+        }
+        buildDetails.put("stages", stages);
 
-                Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-                buildDetails.put("id", (int) result.getNumber());
-                buildDetails.put("project", result.getProject().getName());
-                buildDetails.put("revision", getBuildRevision(result));
-                buildDetails.put("tests", convertTests(result.getTestSummary()));
-                buildDetails.put("version", getBuildVersion(result));
-                buildDetails.put("reason", result.getReason().getSummary());
-                addResultFields(result, buildDetails);
-
-                Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
-                for (RecipeResultNode rrn : result.getRoot().getChildren())
-                {
-                    stages.add(convertStage(rrn));
-                }
-                buildDetails.put("stages", stages);
-
-                return buildDetails;
-            }
-        });
+        return buildDetails;
     }
 
     private Hashtable<String, Object> convertProject(Project project)
