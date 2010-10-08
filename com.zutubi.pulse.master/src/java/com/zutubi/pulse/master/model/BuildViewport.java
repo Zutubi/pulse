@@ -14,7 +14,7 @@ import java.util.LinkedList;
  *
  * The viewport size defines the maximum number of builds 'visible' in the
  * viewport {@link #getVisibleBuilds}, and {@link #getNextBrokenBuild()} etc
- * allow access to nearby builds that may not be visible within the viewport. 
+ * allow access to nearby builds that may not be visible within the viewport.
  */
 public class BuildViewport
 {
@@ -24,11 +24,16 @@ public class BuildViewport
 
     private int viewportSize = DEFAULT_VIEWPORT_SIZE;
 
+    /**
+     * The build id relative to which this build viewport
+     * opperates.  That is, {@link #getNextSuccessfulBuild()} will return
+     * the first successful build with a build id higher than this id.
+     */
     private long buildId;
 
-    public BuildViewport(long buildId)
+    public BuildViewport(long focalBuildId)
     {
-        this.buildId = buildId;
+        this.buildId = focalBuildId;
     }
 
     /**
@@ -36,13 +41,20 @@ public class BuildViewport
      *
      * @param viewportSize  the viewport size.
      *
-     * @see #getVisibleBuilds() 
+     * @see #getVisibleBuilds()
      */
     public void setViewportSize(int viewportSize)
     {
         this.viewportSize = viewportSize;
     }
 
+    /**
+     * Get the builds visible in this viewport.  These builds are relative to the build id
+     * used to create this view port.  The number of builds returned is defined by the
+     * viewport size.
+     *
+     * @return the visible builds.
+     */
     public List<BuildResult> getVisibleBuilds()
     {
         List<BuildResult> viewport = new LinkedList<BuildResult>();
@@ -52,7 +64,7 @@ public class BuildViewport
         {
             return viewport;
         }
-        
+
         List<BuildResult> resultsBefore = buildResultDao.findByBeforeBuild(buildId, viewportSize);
         List<BuildResult> resultsAfter = buildResultDao.findByAfterBuild(buildId, viewportSize);
 
@@ -85,6 +97,12 @@ public class BuildViewport
         return viewport;
     }
 
+    /**
+     * Get the previous successful build, relative to the focal build
+     * id for this view port.
+     *
+     * @return the previous successful build result, or null if non exists.
+     */
     public BuildResult getPreviousSuccessfulBuild()
     {
         return uniqueResult(
@@ -92,6 +110,12 @@ public class BuildViewport
         );
     }
 
+    /**
+     * Get the previous broken build, relative to the focal build
+     * id for this view port.
+     *
+     * @return the previous broken build result, or null if non exists.
+     */
     public BuildResult getPreviousBrokenBuild()
     {
         return uniqueResult(
@@ -99,6 +123,12 @@ public class BuildViewport
         );
     }
 
+    /**
+     * Get the next successful build, relative to the focal build
+     * id for this view port.
+     *
+     * @return the next successful build result, or null if non exists.
+     */
     public BuildResult getNextSuccessfulBuild()
     {
         return uniqueResult(
@@ -106,6 +136,12 @@ public class BuildViewport
         );
     }
 
+    /**
+     * Get the next broken build, relative to the focal build
+     * id for this view port.
+     *
+     * @return the next broken build result, or null if non exists.
+     */
     public BuildResult getNextBrokenBuild()
     {
         return uniqueResult(
@@ -113,6 +149,12 @@ public class BuildViewport
         );
     }
 
+    /**
+     * Get the latest build, relative to the focal build
+     * id for this view port.
+     *
+     * @return the latest build result.
+     */
     public BuildResult getLatestBuild()
     {
         return buildResultDao.findByLatestBuild(buildId);
