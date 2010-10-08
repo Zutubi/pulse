@@ -326,5 +326,8 @@ public class CollectionUtilsTest extends ZutubiTestCase
         assertEquals(2, CollectionUtils.indexOf("C", "A", "B", "C"));
         assertEquals(-1, CollectionUtils.indexOf("D", "A", "B", "C"));
         assertEquals(-1, CollectionUtils.indexOf("E"));
+        assertEquals(-1, CollectionUtils.indexOf(null, "A", "B"));
+        assertEquals(-1, CollectionUtils.indexOf("A", null, "B"));
+        assertEquals(1, CollectionUtils.indexOf("B", null, "B"));
     }
 }

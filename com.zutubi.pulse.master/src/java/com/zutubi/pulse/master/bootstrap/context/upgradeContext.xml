@@ -147,6 +147,9 @@
                 <ref local="cleanIvyCache"/>
                 <ref local="fixNullPostProcessors"/>
                 <ref local="addAgentSynchTimestamp"/>
+                <ref local="addEnableDisableToCommandAndStage"/>
+                <ref local="addTerminatedResultStateToBuildHooks"/>
+                <ref local="addTerminatedResultStateToConfigurations"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -755,6 +758,14 @@
 
     <bean id="addEnableDisableToCommandAndStage" class="com.zutubi.pulse.master.upgrade.tasks.AddEnableDisableToProjectCommandsAndStagesUpgradeTask">
         <property name="buildNumber" value="202999002"/>
+    </bean>
+
+    <bean id="addTerminatedResultStateToBuildHooks" class="com.zutubi.pulse.master.upgrade.tasks.AddTerminatedResultStateToHookConfigurationsUpgradeTask">
+        <property name="buildNumber" value="202999003"/>
+    </bean>
+
+    <bean id="addTerminatedResultStateToConfigurations" class="com.zutubi.pulse.master.upgrade.tasks.AddTerminatedResultStateToConfigurationsUpgradeTask">
+        <property name="buildNumber" value="202999004"/>
     </bean>
 
 </beans>

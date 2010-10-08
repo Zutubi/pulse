@@ -89,7 +89,6 @@ import static org.hamcrest.Matchers.hasItem;
  * An acceptance test that adds a very simple project and runs a build as a
  * sanity test.
  */
-@SuppressWarnings({"unchecked"})
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
     private static final int BUILD_TIMEOUT = 90000;
@@ -1177,6 +1176,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         testsPage.waitFor();
         
         checkApiTestSummary(expectedSummary, build);
+        @SuppressWarnings({"unchecked"})
         Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
         checkApiTestSummary(expectedSummary, stages.get(0));
 
@@ -1185,6 +1185,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void checkApiTestSummary(TestResultSummary expectedSummary, Hashtable<String, Object> result)
     {
+        @SuppressWarnings({"unchecked"})
         Hashtable<String, Object> tests = (Hashtable<String, Object>) result.get("tests");
         assertNotNull(tests);
         assertEquals(expectedSummary.getTotal(), tests.get("total"));
@@ -1353,6 +1354,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private boolean stageIsComplete(Hashtable<String, Object> build, String stageName)
     {
+        @SuppressWarnings({"unchecked"})
         Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
         for (Hashtable<String, Object> stage: stages)
         {
@@ -1437,12 +1439,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
-        assertEquals(ResultState.TERMINATED, ResultState.fromPrettyString((String) build.get("status")));
-
-        // assert stage status
-        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
-        assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, stages);
-        assertStageState(ResultState.TERMINATED, "another-stage", stages);
+        assertResultState(ResultState.TERMINATED, build);
+        assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
+        assertStageState(ResultState.TERMINATED, "another-stage", build.get("stages"));
     }
 
     public void testTerminateOnStageFailureStageSucceeds() throws Exception
@@ -1457,11 +1456,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextNotPresent("terminated");
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
-        assertEquals(ResultState.SUCCESS, ResultState.fromPrettyString((String) build.get("status")));
+        assertResultState(ResultState.SUCCESS, build);
 
-        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
-        assertStageState(ResultState.SUCCESS, ProjectConfigurationWizard.DEFAULT_STAGE, stages);
-        assertStageState(ResultState.SUCCESS, "another-stage", stages);
+        assertStageState(ResultState.SUCCESS, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
+        assertStageState(ResultState.SUCCESS, "another-stage", build.get("stages"));
     }
 
     public void testTerminateOnStageFailureLimit() throws Exception
@@ -1479,16 +1477,21 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("Build terminated due to the stage failure limit (1) being reached");
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
-        assertEquals(ResultState.TERMINATED, ResultState.fromPrettyString((String) build.get("status")));
-
-        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
-        assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, stages);
-        assertStageState(ResultState.TERMINATED, "another-stage", stages);
+        assertResultState(ResultState.TERMINATED, build);
+        assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
+        assertStageState(ResultState.TERMINATED, "another-stage", build.get("stages"));
     }
 
-    private void assertStageState(ResultState expectedState, final String stageName, Vector<Hashtable<String, Object>> stages)
+    private void assertResultState(ResultState expectedState, Hashtable<String, Object> result)
     {
-        Hashtable<String, Object> stage = CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
+        assertEquals(expectedState, ResultState.fromPrettyString((String) result.get("status")));
+    }
+
+    private void assertStageState(ResultState expectedState, final String stageName, Object stages)
+    {
+        @SuppressWarnings({"unchecked"})
+        Vector<Hashtable<String, Object>> stagesVector = (Vector<Hashtable<String, Object>>) stages;
+        Hashtable<String, Object> stage = CollectionUtils.find(stagesVector, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> detail)
             {

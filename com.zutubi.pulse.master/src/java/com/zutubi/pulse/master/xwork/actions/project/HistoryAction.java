@@ -17,10 +17,11 @@ public class HistoryAction extends ProjectActionBase implements Preparable
     private static final int SURROUNDING_PAGES = 10;
 
     private static final String STATE_ANY = "[any]";
-    private static final String STATE_FAILURE_OR_ERROR = "failure or error";
+    private static final String STATE_BROKEN = "failure / error / terminated";
     private static final String STATE_FAILURE = "failure";
     private static final String STATE_ERROR = "error";
     private static final String STATE_SUCCESS = "success";
+    private static final String STATE_TERMINATED = "terminated";
 
     private List<BuildResult> history;
     private PagingSupport pagingSupport = new PagingSupport(SURROUNDING_PAGES);
@@ -68,9 +69,10 @@ public class HistoryAction extends ProjectActionBase implements Preparable
     {
         nameToStates = new TreeMap<String, ResultState[]>();
         nameToStates.put(STATE_ANY, ResultState.getCompletedStates());
-        nameToStates.put(STATE_FAILURE_OR_ERROR, ResultState.getBrokenStates());
+        nameToStates.put(STATE_BROKEN, ResultState.getBrokenStates());
         nameToStates.put(STATE_FAILURE, new ResultState[]{ResultState.FAILURE});
         nameToStates.put(STATE_ERROR, new ResultState[]{ResultState.ERROR});
+        nameToStates.put(STATE_TERMINATED, new ResultState[]{ResultState.TERMINATED});
         nameToStates.put(STATE_SUCCESS, new ResultState[]{ResultState.SUCCESS});
     }
 

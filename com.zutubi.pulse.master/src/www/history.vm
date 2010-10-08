@@ -34,7 +34,7 @@
                             editable: false,
                             forceSelection: true,
                             triggerAction: 'all',
-                            store: ['[any]', 'failure or error', 'failure', 'error', 'success'],
+                            store: ['[any]', 'failure / error / terminated', 'failure', 'error', 'terminated', 'success'],
                             value: '$stateFilter',
                             anchor: '95%',
                             listeners: {
