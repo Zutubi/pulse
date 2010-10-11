@@ -4,6 +4,7 @@
 // dependency: zutubi/FloatManager.js
 // dependency: zutubi/form/package.js
 // dependency: zutubi/fs/package.js
+// dependency: zutubi/table/package.js
 // dependency: zutubi/toolbar/package.js
 // dependency: zutubi/tree/package.js
 
