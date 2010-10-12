@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
@@ -11,19 +12,17 @@ import com.zutubi.pulse.dev.bootstrap.DefaultDevPaths;
 import com.zutubi.pulse.dev.bootstrap.DevPaths;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 
 /**
  * Base helper class for tests the work with dev tools packages/commands.
@@ -106,6 +105,7 @@ public class DevToolsTestBase extends PulseTestCase
         fullCommand.addAll(asList(command));
         ProcessBuilder builder = new ProcessBuilder(fullCommand);
         builder.directory(tmpDir);
+        builder.environment().put("PULSE_HOME", pulse.getPulseHome());
         Process child = builder.start();
                 
         if (input != null)
