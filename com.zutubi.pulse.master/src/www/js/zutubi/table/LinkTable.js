@@ -7,17 +7,19 @@
  * Links may trigger client-side (i.e. JavaScript) actions, or may navigate to other
  * pages.
  *
- * @cfg {String}         cls          Class to use for the table (defaults to 'two-content')
- * @cfg {String}         handlers     Mapping of link actions to either URLs (strings) or callback
- *                                    functions.  If not specified, the actions themselves will be
- *                                    used as URLs.
- * @cfg {String}         iconTemplate Template used to turn icon names into img src attributes.
- *                                    Need not include the base url.  Defaults to a template that
- *                                    uses config action icons.
- * @cfg {String}         id           Id to use for the table.
- * @cfg {Ext.data.Store} store        The store used to populate the table.  Records in the store
- *                                    should contain the properties icon, label and action.
- * @cfg {String}         title        Title for the table heading row.
+ * @cfg {String} cls          Class to use for the table (defaults to 'content-table')
+ * @cfg {Object} handlers     Mapping of link actions to either URLs (strings) or callback
+ *                            functions.  If not specified, the actions themselves will be used as
+ *                            URLs.
+ * @cfg {String} iconTemplate Template used to turn icon names into img src attributes.  Need not
+ *                            include the base url.  Defaults to a template that uses config action
+ *                            icons.
+ * @cfg {String} id           Id to use for the table.
+ * @cfg {Array}  data         An array of instances to populate the table.  Each instance should
+ *                            contain the properties icon, label and action.
+ * @cfg {String} title        Title for the table heading row.
+ * @cfg {String} emptyMessage Message to show when the table has no rows to display (if not
+ *                            specified, the table is hidden in this case).
  */
 Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
     initComponent: function() {
@@ -31,8 +33,8 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             this.iconTemplate = new Ext.XTemplate('images/config/actions/{icon}.gif');
         }
         
-        this.rowTemplate = new Ext.XTemplate('<tr>' +
-                '<td class="content leftmost rightmost">' +
+        this.rowTemplate = new Ext.XTemplate('<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
+                '<td class="leftmost rightmost">' +
                     '<img alt="{label}" src="{iconSrc}"/> ' +
                     '<tpl if="client">' +
                         '<a href="#" onclick="{onclick}">{label}</a>' +
@@ -47,10 +49,11 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         Zutubi.table.LinkTable.superclass.initComponent.apply(this, arguments);
     },
 
-    renderRows: function() {
+    renderData: function() {
         var previousRow = this.el.child('tr');
-        this.store.each(function(r) {
-            var args = Ext.apply({}, r.data);
+        for (var i = 0, l = this.data.length; i < l; i++)
+        {
+            var args = Ext.apply({}, this.data[i]);
             args['iconSrc'] = window.baseUrl + '/' + this.iconTemplate.apply(args);
             
             var action = args['action'];
@@ -76,10 +79,12 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             }
             
             previousRow = this.rowTemplate.insertAfter(previousRow, args, true);
-        }, this);
+        };
     },
     
     doAction: function(action) {
         this.handlers[action]();
     }
 });
+
+Ext.reg('xzlinktable', Zutubi.table.LinkTable);

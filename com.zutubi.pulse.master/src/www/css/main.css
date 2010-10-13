@@ -326,6 +326,16 @@ hr
     font-size: 80%;
 }
 
+.hpad
+{
+    padding: 0 15px;
+}
+
+.vpad
+{
+    padding: 15px 0;
+}
+
 img
 {
     vertical-align: text-top;
@@ -622,22 +632,33 @@ Browse view
     border-collapse: collapse;
 }
 
+.content-table
+{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.content-table th, .content-table td
+{
+    padding: 4px;
+}
+
 table.spaced, ul.spaced
 {
     margin-top: 20px;
 }
 
-.two-content .content, .two-content .content-right, .two-content td
+.two-content .content, .two-content .content-right, .two-content td, .content-table th, .content-table td
 {
     border: dotted 1px #bbb;
 }
 
-.two-content .leftmost
+.two-content .leftmost, .content-table .leftmost
 {
     border-left: none;
 }
 
-.two-content .rightmost
+.two-content .rightmost, .content-table .rightmost
 {
     border-right: none;
 }
@@ -647,10 +668,12 @@ table.spaced, ul.spaced
     padding: 4px;
 }
 
-td.group-header, th.two-heading, h3.two-heading
+td.group-header, th.two-heading, h3.two-heading, .content-table .heading
 {
     border-top: solid 1px #bbb;
     border-bottom: dotted 1px #bbb;
+    border-left: none;
+    border-right: none;
     padding: 6px 4px;
     background-color: #f2f2ff;
     font-weight: bold;
@@ -1577,6 +1600,11 @@ table.template-actions
 .x-btn button
 {
     color: #000;
+}
+
+.x-table-layout-cell
+{
+    vertical-align: top;
 }
 
 /*

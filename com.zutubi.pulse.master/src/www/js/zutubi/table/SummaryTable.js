@@ -6,17 +6,19 @@
  * A table that summarises a collection of items, one item per row.  Multiple fields
  * from each item are shown across multiple columns.
  *
- * @cfg {String}         cls      Class to use for the table (defaults to 'two-content')
- * @cfg {Array}          columns  An array of {Zutubi.table.SummaryColumn} configs.
- * @cfg {String}         id       Id to use for the table.
- * @cfg {Ext.data.Store} store    The store used to populate the table.  Should contain
- *                                a record for each row, with fields matching the columns.
- * @cfg {String}         title    Title for the table heading row.
+ * @cfg {String} cls          Class to use for the table (defaults to 'content-table')
+ * @cfg {Array}  columns      An array of {Zutubi.table.SummaryColumn} configs.
+ * @cfg {String} id           Id to use for the table.
+ * @cfg {Array}  data         Array of objects used to populate the table.  Should contain an entry
+ *                            for each row, with fields matching the columns.
+ * @cfg {String} title        Title for the table heading row.
+ * @cfg {String} emptyMessage Message to show when the table has no rows to display (if not
+ *                            specified, the table is hidden in this case).
  */
 Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     initComponent: function() {
         this.columnCount = this.columns.length;
-        this.cellTemplate = new Ext.XTemplate('<{tag} class="content <tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>">{value}</{tag}>');
+        this.cellTemplate = new Ext.XTemplate('<{tag} class="<tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>">{value}</{tag}>');
         
         var columnConfigs = this.columns;
         this.columns = [];
@@ -27,28 +29,34 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
 
         Zutubi.table.SummaryTable.superclass.initComponent.apply(this, arguments);
     },
-     
-    renderRows: function() {
-        var previousRow = this.el.child('tr');
-        previousRow = previousRow.insertHtml('afterEnd', this.generateHeader(), true);
-        this.store.each(function(r) {
-            previousRow = previousRow.insertHtml('afterEnd', this.generateRow('td', r.data), true);
-        }, this);
-    },
     
-    generateHeader: function() {
+    renderFixed: function() {
         var data = {};
         for (var i = 0; i < this.columns.length; i++)
         {
             var column = this.columns[i];
             data[column.name] = column.key;
         }
-
-        return this.generateRow('th', data, function(v) { return v; })
+        
+        this.tbodyEl.insertHtml('beforeEnd', this.generateRow('th', false, data, function(v) { return v; }))
     },
     
-    generateRow: function(tag, data, renderer) {
-        var html = '<tr>';
+    renderData: function() {
+        for (var i = 0, l = this.data.length; i < l; i++)
+        {
+            this.tbodyEl.insertHtml('beforeEnd', this.generateRow('td', true, this.data[i]), true);
+        };
+    },
+    
+    generateRow: function(tag, dynamic, data, renderer) {
+        var html = '<tr';
+        if (dynamic)
+        {
+            html += ' class="' + Zutubi.table.CLASS_DYNAMIC + '"'; 
+        }
+        
+        html += '>';
+        
         var columnCount = this.columns.length;
         for (var i = 0; i < columnCount; i++)
         {
@@ -76,6 +84,11 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
  *                        cells (defaults to a simple HTML encode)
  */
 Zutubi.table.SummaryColumn = function(config) {
+    if (typeof config == 'string')
+    {
+        config = {name: config};
+    }
+
     Ext.apply(this, config, {
         renderer: Ext.util.Format.htmlEncode
     });
@@ -85,3 +98,5 @@ Zutubi.table.SummaryColumn = function(config) {
         this.key = this.name;
     }
 };
+
+Ext.reg('xzsummarytable', Zutubi.table.SummaryTable);
