@@ -18,7 +18,12 @@
 Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
     initComponent: function() {
         this.columnCount = 2;
-        this.rowTemplate = new Ext.Template('<tr class="' + Zutubi.table.CLASS_DYNAMIC + '"><th class="fit-width right leftmost">{key}</th><td id="{id}" class="rightmost">{value}</td></tr>');
+        this.rowTemplate = new Ext.Template(
+            '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
+                '<th class="fit-width right leftmost">{key}</th>' +
+                '<td id="{id}" class="rightmost">{value}</td>' +
+            '</tr>'
+        );
         
         var rowConfigs = this.rows;
         this.rows = [];

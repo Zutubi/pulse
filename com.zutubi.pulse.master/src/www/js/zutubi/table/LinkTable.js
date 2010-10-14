@@ -33,7 +33,8 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             this.iconTemplate = new Ext.XTemplate('images/config/actions/{icon}.gif');
         }
         
-        this.rowTemplate = new Ext.XTemplate('<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
+        this.rowTemplate = new Ext.XTemplate(
+            '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
                 '<td class="leftmost rightmost">' +
                     '<img alt="{label}" src="{iconSrc}"/> ' +
                     '<tpl if="client">' +
