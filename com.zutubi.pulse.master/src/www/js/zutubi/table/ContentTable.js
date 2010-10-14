@@ -2,7 +2,8 @@
 // dependency: ext/package.js
 
 /**
- * Base class for tables that use applies consistent styling for the title and borders.
+ * Base class for tables that contain dynamic content.  Applies consistent styling for the title and
+ * borders.
  *
  * @cfg {String} cls          Class to use for the table (defaults to 'content-table')
  * @cfg {String} id           Id to use for the table.
@@ -14,7 +15,13 @@
 Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     cls: 'content-table',
     columnCount: 1,
-    emptyTemplate: new Ext.XTemplate('<tr><td colspan="{columnCount}" class="understated leftmost rightmost ' + Zutubi.table.CLASS_DYNAMIC + '">{emptyMessage:htmlEncode}</td></tr>'),
+    emptyTemplate: new Ext.XTemplate(
+        '<tr>' +
+            '<td colspan="{columnCount}" class="understated leftmost rightmost ' + Zutubi.table.CLASS_DYNAMIC + '">' +
+                '{emptyMessage:htmlEncode}' +
+            '</td>' +
+        '</tr>'
+    ),
 
     onRender: function(container, position) {
         if (!this.template)
