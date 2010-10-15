@@ -63,7 +63,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         insertLabel(projectName, label);
 
         String userPath = xmlRpcHelper.insertTrivialUser(userLogin);
-        browser.login(userLogin, "");
+        assertTrue(browser.login(userLogin, ""));
 
         // Default is group by label
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);

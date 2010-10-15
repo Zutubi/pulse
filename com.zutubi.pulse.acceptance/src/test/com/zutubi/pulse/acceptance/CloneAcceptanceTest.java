@@ -64,14 +64,14 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String propertyPath = xmlRpcHelper.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
         String userPath = xmlRpcHelper.insertTrivialUser(user);
 
-        browser.login(user, "");
+        assertTrue(browser.login(user, ""));
         assertCloneAvailability(propertyPath, false);
 
         String groupPath = xmlRpcHelper.insertGroup(random + "-group", asList(userPath));
         xmlRpcHelper.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
 
         browser.logout();
-        browser.login(user, "");
+        assertTrue(browser.login(user, ""));
         assertCloneAvailability(propertyPath, true);
     }
 
@@ -89,14 +89,14 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(project, false);
         String userPath = xmlRpcHelper.insertTrivialUser(user);
 
-        browser.login(user, "");
+        assertTrue(browser.login(user, ""));
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, project, false);
         assertFalse(hierarchyPage.isClonePresent());
 
         xmlRpcHelper.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
 
         browser.logout();
-        browser.login(user, "");
+        assertTrue(browser.login(user, ""));
         hierarchyPage.openAndWaitFor();
         assertTrue(hierarchyPage.isClonePresent());
     }

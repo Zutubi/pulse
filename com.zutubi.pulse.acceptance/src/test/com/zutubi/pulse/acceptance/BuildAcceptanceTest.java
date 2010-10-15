@@ -311,7 +311,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEquals("2 builds", change.builds);
 
         browser.logout();
-        browser.login(regularUser, "");
+        assertTrue(browser.login(regularUser, ""));
         
         // Regular user should only see the visible project.
         changelistPage.openAndWaitFor();
@@ -858,7 +858,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildNumber = xmlRpcHelper.runBuild(projectName);
 
-        browser.login(userLogin, "");
+        assertTrue(browser.login(userLogin, ""));
 
         BuildArtifactsPage page = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
         assertEquals(User.DEFAULT_ARTIFACTS_FILTER, page.getCurrentFilter());

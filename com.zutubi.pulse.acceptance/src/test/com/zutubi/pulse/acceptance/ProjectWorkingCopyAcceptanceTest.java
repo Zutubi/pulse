@@ -81,7 +81,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
 
         // create user without view source permissions for the project and log in.
         UserConfiguration user = createUser(randomName());
-        browser.login(user.getName(), "");
+        assertTrue(browser.login(user.getName(), ""));
 
         homePage.openAndWaitFor();
         assertFalse(homePage.isViewWorkingCopyPresent());

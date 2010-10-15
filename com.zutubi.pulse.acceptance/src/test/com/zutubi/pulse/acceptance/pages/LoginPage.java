@@ -4,11 +4,11 @@ import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
+import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 import java.io.File;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 public class LoginPage extends SeleniumPage
 {
@@ -38,13 +38,16 @@ public class LoginPage extends SeleniumPage
     {
         LoginForm form = browser.createForm(LoginForm.class);
         form.waitFor();
-        form.submitNamedFormElements(TITLE, asPair(FIELD_USERNAME, username), asPair(FIELD_PASSWORD, password), asPair(FIELD_REMEMBERME, Boolean.toString(rememberMe)));
         try
         {
-            browser.waitForPageToLoad();
+            form.submitNamedFormElements(TITLE,
+                    asPair(FIELD_USERNAME, username),
+                    asPair(FIELD_PASSWORD, password),
+                    asPair(FIELD_REMEMBERME, Boolean.toString(rememberMe))
+            );
             return !form.isFormPresent();
         }
-        catch (Exception e)
+        catch (TimeoutException e)
         {
             File failureFile = browser.captureFailure();
             throw new SeleniumException("Failure while waiting to login (see: " + failureFile.getName() + "): " + e.getMessage(), e);

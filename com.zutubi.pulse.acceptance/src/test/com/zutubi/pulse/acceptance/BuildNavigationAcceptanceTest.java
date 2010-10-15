@@ -198,7 +198,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         // user needs 'run personal build' permissions.
         ensureUserCanRunPersonalBuild(userName);
 
-        browser.login(userName, "");
+        assertTrue(browser.login(userName, ""));
         xmlRpcHelper.login(userName, "");
 
         File workingCopy = createTempDirectory();

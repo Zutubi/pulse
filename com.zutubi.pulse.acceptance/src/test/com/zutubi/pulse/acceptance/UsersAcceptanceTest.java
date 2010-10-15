@@ -54,7 +54,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         assertEquals("1 of 2 users have been active in the last 10 minutes", usersPage.getActiveCount());
 
         browser.logout();
-        browser.login(random, "");
+        assertTrue(browser.login(random, ""));
         browser.logout();
 
         browser.loginAsAdmin();
@@ -73,7 +73,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         assertEquals(ACCESS_NEVER, userPage.getStateField(STATE_LAST_ACCESS));
 
         browser.logout();
-        browser.login(random, "");
+        assertTrue(browser.login(random, ""));
         browser.logout();
 
         browser.loginAsAdmin();
@@ -141,7 +141,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertTrivialUser(random);
         
-        browser.login(random, "");
+        assertTrue(browser.login(random, ""));
         
         PreferencesPage preferencesPage = browser.openAndWaitFor(PreferencesPage.class, random);
         preferencesPage.clickAction(UserPreferencesConfigurationActions.ACTION_CHANGE_PASSWORD);
@@ -167,7 +167,7 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         loginForm.waitFor();
         
         loginPage.openAndWaitFor();
-        loginPage.login(random, NEW_PASSWORD);
+        assertTrue(loginPage.login(random, NEW_PASSWORD));
     }
 
     private String createUserWithContact(String name)

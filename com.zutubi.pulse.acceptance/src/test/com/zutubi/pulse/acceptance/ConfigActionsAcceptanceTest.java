@@ -61,7 +61,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         browser.logout();
 
         // Login with the new password
-        browser.login(random, "testpw");
+        assertTrue(browser.login(random, "testpw"));
     }
 
     public void testCustomActionWithArgumentValidation() throws Exception
@@ -87,7 +87,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         browser.logout();
 
         // Check the password is unchanged
-        browser.login(random, "");
+        assertTrue(browser.login(random, ""));
     }
 
     private ListPage customActionWithArgumentPrelude() throws Exception

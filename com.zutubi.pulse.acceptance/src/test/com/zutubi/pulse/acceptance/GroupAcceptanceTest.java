@@ -61,7 +61,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        browser.login(login, "");
+        assertTrue(browser.login(login, ""));
         ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
         browser.logout();
@@ -77,7 +77,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         browser.logout();
 
-        browser.login(login, "");
+        assertTrue(browser.login(login, ""));
         globalPage.openAndWaitFor();
         browser.waitForElement(HierarchyPage.LINK_ADD);
         browser.logout();
@@ -107,7 +107,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         browser.waitForElement(getGroupPath(random));
         browser.logout();
 
-        browser.login(login, "");
+        assertTrue(browser.login(login, ""));
         ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
         browser.logout();
@@ -119,7 +119,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         browser.logout();
 
-        browser.login(login, "");
+        assertTrue(browser.login(login, ""));
         globalPage.openAndWaitFor();
         assertTrue(globalPage.isAddPresent());
         browser.logout();

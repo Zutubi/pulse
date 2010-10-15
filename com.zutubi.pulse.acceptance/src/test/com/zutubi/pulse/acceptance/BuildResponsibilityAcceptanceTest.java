@@ -25,7 +25,6 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     private static final String TEST_COMMENT = "a comment here";
 
     private static final int BUILD_NUMBER = 1;
-    private static final long LOAD_TIMEOUT = 30000;
 
     @Override
     protected void setUp() throws Exception
@@ -72,7 +71,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     private void takeResponsibilityHelper(ResponsibilityPage page)
     {
-        browser.login(TEST_USER, "");
+        assertTrue(browser.login(TEST_USER, ""));
         page.openAndWaitFor();
         assertNobodyResponsible(page);
 
@@ -91,7 +90,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     {
         takeResponsibility(TEST_PROJECT);
 
-        browser.login(TEST_USER, "");
+        assertTrue(browser.login(TEST_USER, ""));
 
         // Clear on the project home tab
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
@@ -125,7 +124,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         takeResponsibility(TEST_PROJECT);
 
         xmlRpcHelper.insertTrivialUser(random);
-        browser.login(random, "");
+        assertTrue(browser.login(random, ""));
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
         assertOtherResponsible(homePage);
@@ -169,7 +168,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
         takeResponsibility(random);
 
-        browser.login(TEST_USER, "");
+        assertTrue(browser.login(TEST_USER, ""));
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertSelfResponsible(homePage);
 
@@ -202,7 +201,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         optionsConfig.put(Constants.Project.Options.AUTO_CLEAR_RESPONSIBILITY, false);
         xmlRpcHelper.saveConfig(optionsPath, optionsConfig, false);
 
-        browser.login(TEST_USER, "");
+        assertTrue(browser.login(TEST_USER, ""));
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertSelfResponsible(homePage);
 

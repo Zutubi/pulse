@@ -23,7 +23,6 @@ public class AcceptanceTestSuite
         main.addTestSuite(PostProcessorPluginAcceptanceTest.class);
         main.addTest(new StartPulseTestSetup(DevAcceptanceTestSuite.suite()));
         main.addTestSuite(AgentUpgradeAcceptanceTest.class);
-
         return main;
     }
 

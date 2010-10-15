@@ -8,7 +8,7 @@ public class LoginForm extends SeleniumForm
 {
     public LoginForm(SeleniumBrowser browser)
     {
-        super(browser);
+        super(browser, false);
     }
 
     public String getFormName()

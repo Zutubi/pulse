@@ -454,7 +454,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String path = orderPrelude();
 
         xmlRpcHelper.insertTrivialUser(random);
-        browser.login(random, "");
+        assertTrue(browser.login(random, ""));
         ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertFalse(listPage.isOrderColumnPresent(2));
         assertItemPresent(listPage, "p1", null);
@@ -960,7 +960,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTrue(concretePage.isMovePresent());
 
         browser.logout();
-        browser.login(user, "");
+        assertTrue(browser.login(user, ""));
 
         templatePage.openAndWaitFor();
         assertFalse(templatePage.isMovePresent());

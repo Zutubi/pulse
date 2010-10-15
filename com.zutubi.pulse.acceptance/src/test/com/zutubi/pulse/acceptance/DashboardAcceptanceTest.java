@@ -32,7 +32,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         String user = RandomUtils.randomString(10);
         userPath = xmlRpcHelper.insertTrivialUser(user);
-        browser.login(user, "");
+        assertTrue(browser.login(user, ""));
     }
 
     protected void tearDown() throws Exception

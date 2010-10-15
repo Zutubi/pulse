@@ -79,7 +79,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         browser.logout();
 
         loginPage = browser.openAndWaitFor(LoginPage.class);
-        loginPage.login(login, password);
+        assertTrue(loginPage.login(login, password));
 
         welcomePage.waitFor();
         assertTitle(welcomePage);

@@ -20,7 +20,7 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
     {
         assertFalse(isRememberMeCookieSet());
         LoginPage page = browser.openAndWaitFor(LoginPage.class);
-        page.login(USERNAME, PASSWORD, true);
+        assertTrue(page.login(USERNAME, PASSWORD, true));
         assertTrue(isRememberMeCookieSet());
     }
 
@@ -28,7 +28,7 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
     {
         assertFalse(isRememberMeCookieSet());
         LoginPage page = browser.openAndWaitFor(LoginPage.class);
-        page.login(USERNAME, PASSWORD, false);
+        assertTrue(page.login(USERNAME, PASSWORD, false));
         assertFalse(isRememberMeCookieSet());
     }
 
@@ -37,7 +37,7 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
         assertFalse(isRememberMeCookieSet());
 
         LoginPage page = browser.openAndWaitFor(LoginPage.class);
-        page.login(USERNAME, PASSWORD, true);
+        assertTrue(page.login(USERNAME, PASSWORD, true));
         assertTrue(isRememberMeCookieSet());
 
         browser.logout();
@@ -46,14 +46,11 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
 
     public void testThatTheRememberMeCookieWorksAsAdvertised()
     {
-        LoginPage loginPage = browser.createPage(LoginPage.class);
-
         assertFalse(isRememberMeCookieSet());
 
         // login to get outselves a valid remember me cookie.
-        browser.open("/");
-        loginPage.waitFor();
-        loginPage.login(USERNAME, PASSWORD, true);
+        LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
+        assertTrue(loginPage.login(USERNAME, PASSWORD, true));
         assertTrue(isRememberMeCookieSet());
 
         String cookie = browser.getCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);

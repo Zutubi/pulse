@@ -249,7 +249,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         dashboard.put("shownProjects", new Vector<String>(Arrays.asList(projectPath)));
         xmlRpcHelper.saveConfig(dashboardPath, dashboard, false);
 
-        browser.login(authLogin, "");
+        assertTrue(browser.login(authLogin, ""));
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -259,7 +259,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         hierarchyPage.waitFor();
         browser.logout();
 
-        browser.login(noAuthLogin, "");
+        assertTrue(browser.login(noAuthLogin, ""));
         hierarchyPage.openAndWaitFor();
         confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
