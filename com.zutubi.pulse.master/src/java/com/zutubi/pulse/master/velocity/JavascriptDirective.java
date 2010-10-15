@@ -4,7 +4,10 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.util.io.FileSuffixPredicate;
+import com.zutubi.jsdeps.JavascriptDependencies;
+import com.zutubi.jsdeps.JavascriptDependenciesException;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -47,6 +50,8 @@ import java.util.*;
  */
 public class JavascriptDirective extends AbstractDirective
 {
+    private static final Logger LOG = Logger.getLogger(JavascriptDirective.class);
+
     /**
      * A system flag that is true when we are running in development, false otherwise.
      */
@@ -157,7 +162,16 @@ public class JavascriptDirective extends AbstractDirective
     {
         StringBuffer content = new StringBuffer();
 
-        List<String> sortedPaths = JavascriptDependencies.expandAndSortPaths(jsRoot, jsPaths);
+        List<String> sortedPaths;
+        try
+        {
+            sortedPaths = JavascriptDependencies.expandAndSortPaths(jsRoot, jsPaths);
+        }
+        catch (JavascriptDependenciesException e)
+        {
+            LOG.severe(e);
+            throw new JavascriptDependenciesException(e);
+        }
 
         // ensure that the requested paths exist and are files.
         for (String requestedPath : sortedPaths)
