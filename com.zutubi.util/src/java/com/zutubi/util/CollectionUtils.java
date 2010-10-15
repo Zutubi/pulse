@@ -664,14 +664,7 @@ public class CollectionUtils
         {
             for (int index = 0; index < array.length; index++)
             {
-                if (array[index] == null)
-                {
-                    if (o == null)
-                    {
-                        return index;
-                    }
-                }
-                else if (array[index].equals(o))
+                if (ObjectUtils.equals(array[index], o))
                 {
                     return index;
                 }
