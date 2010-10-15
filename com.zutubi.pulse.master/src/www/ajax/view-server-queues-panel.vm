@@ -121,15 +121,16 @@
     <table id="server.activity.recipe.queue" class="fill-content">
 
 #if($recipeQueueRunning)
-        #restrictedHeadingRow("recipe.queue" 6 "ADMINISTER" "queue.pause" "$base/admin/actions?toggleRecipeQueue" "control_pause_blue.gif" false)
+        #restrictedHeadingRow("recipe.queue" 7 "ADMINISTER" "queue.pause" "$base/admin/actions?toggleRecipeQueue" "control_pause_blue.gif" false)
 #else
-        #restrictedHeadingRow("recipe.queue" 6 "ADMINISTER" "queue.resume" "$base/admin/actions?toggleRecipeQueue" "control_play_blue.gif" false)
-        #noteRow("queue.paused" 6)
+        #restrictedHeadingRow("recipe.queue" 7 "ADMINISTER" "queue.resume" "$base/admin/actions?toggleRecipeQueue" "control_play_blue.gif" false)
+        #noteRow("queue.paused" 7)
 #end
         <tr>
             #contentHeading("queue.owner" 1)
             #contentHeading("build.id" 1)
             #contentHeading("project" 1)
+            #contentHeading("queue.stage" 1)
             #contentHeading("queue.recipe" 1)
             #contentHeading("queue.host" 1)
             #contentHeading("queue.when" 1)
@@ -143,6 +144,7 @@
             #ownerCell($build "content")
             #rightCell($build.number)
             #dynamicLinkCell($project.name "$urls.projectHome($project)")
+            #dynamicCell($assignmentRequest.request.stageName)
             #dynamicCell($assignmentRequest.request.recipeNameSafe)
             #dynamicCell($assignmentRequest.hostRequirements.summary)
             #contentCell($assignmentRequest.prettyQueueTime)
@@ -154,7 +156,7 @@
     #end
 #else
     <tr>
-        <td class="content" colspan="6">#wwtext("name=recipe.queue.empty")</td>
+        <td class="content" colspan="7">#wwtext("name=recipe.queue.empty")</td>
     </tr>
 #end
     </table>

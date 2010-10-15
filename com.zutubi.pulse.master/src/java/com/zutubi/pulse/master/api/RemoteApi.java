@@ -3611,6 +3611,10 @@ public class RemoteApi
             {
                 options.setRebuild(Boolean.valueOf((String) triggerOptions.get("rebuild")));
             }
+            if (triggerOptions.containsKey("priority"))
+            {
+                options.setPriority(Integer.valueOf(triggerOptions.get("priority").toString()));
+            }
 
             List<Long> requestIds = projectManager.triggerBuild(projectConfig, options, revision);
             Vector<String> result = new Vector<String>(requestIds.size());

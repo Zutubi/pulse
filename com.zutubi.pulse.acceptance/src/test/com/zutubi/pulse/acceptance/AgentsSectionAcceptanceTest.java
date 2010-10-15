@@ -112,7 +112,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
 
-        WaitProject project = projects.createWaitAntProject(tempDir, randomName());
+        WaitProject project = projects.createWaitAntProject(randomName(), tempDir);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
         configurationHelper.insertProject(project.getConfig(), false);
 
@@ -158,8 +158,8 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         configurationHelper.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
 
         String random = randomName();
-        WaitProject project1 = projects.createWaitAntProject(tempDir, random + "-1");
-        WaitProject project2 = projects.createWaitAntProject(tempDir, random + "-2");
+        WaitProject project1 = projects.createWaitAntProject(random + "-1", tempDir);
+        WaitProject project2 = projects.createWaitAntProject(random + "-2", tempDir);
         project1.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent1));
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
         configurationHelper.insertProject(project1.getConfig(), false);
@@ -390,7 +390,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
 
     private WaitProject startBuildOnAgent(String projectName, String agentName) throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(tempDir, projectName);
+        WaitProject project = projects.createWaitAntProject(projectName, tempDir);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
         configurationHelper.insertProject(project.getConfig(), false);
         xmlRpcHelper.waitForProjectToInitialise(project.getName());

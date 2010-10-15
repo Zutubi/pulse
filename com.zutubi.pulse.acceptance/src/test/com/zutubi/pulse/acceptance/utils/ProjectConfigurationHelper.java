@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -13,10 +14,7 @@ import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWi
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The project configuration helper is the base class for the various types
@@ -153,6 +151,11 @@ public abstract class ProjectConfigurationHelper
         return getConfig().getStage(stageName);
     }
 
+    public List<BuildStageConfiguration> getStages()
+    {
+        return new LinkedList<BuildStageConfiguration>(getConfig().getStages().values());
+    }
+
     public DependencyConfiguration addDependency(ProjectConfigurationHelper project)
     {
         return addDependency(project.getConfig());
@@ -225,6 +228,11 @@ public abstract class ProjectConfigurationHelper
     public void setOrganisation(String org)
     {
         getConfig().setOrganisation(org);
+    }
+
+    public BuildOptionsConfiguration getOptions()
+    {
+        return getConfig().getOptions();
     }
 
     public ResourcePropertyConfiguration addProperty(String name, String value)

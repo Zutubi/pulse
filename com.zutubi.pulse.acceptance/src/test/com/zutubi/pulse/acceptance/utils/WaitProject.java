@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -16,22 +17,48 @@ import static java.util.Arrays.asList;
 
 /**
  * A project configuration setup for working with the wait ant projects.
+ *
+ * This project will block until released. See {@link #releaseBuild()} and
+ * {@link #releaseStage(String)}. 
  */
 public class WaitProject extends ProjectConfigurationHelper
 {
+    private static final String WAIT_FILE_PROPERTY = "waitfile";
     private static final String JAR = "awaitfile.jar";
     private static final String WAIT_TIMEOUT = "300";
 
-    private File waitFile;
+    private File waitBaseDir;
 
     public WaitProject(ProjectConfiguration config, File tmpDir)
     {
         super(config);
-        waitFile =  new File(tmpDir, getConfig().getName());
-        if (waitFile.exists() && !waitFile.delete())
+        waitBaseDir = tmpDir;
+
+        File[] files = waitBaseDir.listFiles();
+        if (files != null)
         {
-            throw new RuntimeException("Unable to clean up wait file '" + waitFile.getAbsolutePath() + "'");
+            for (File f : files)
+            {
+                try
+                {
+                    FileSystemUtils.delete(f);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+    }
+
+    public List<String> getPostProcessorNames()
+    {
+        return asList("junit xml report processor");
+    }
+
+    public List<Class> getPostProcessorTypes()
+    {
+        return Arrays.<Class>asList(JUnitReportPostProcessorConfiguration.class);
     }
 
     @Override
@@ -40,22 +67,39 @@ public class WaitProject extends ProjectConfigurationHelper
         ExecutableCommandConfiguration command = new ExecutableCommandConfiguration();
         command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
         command.setExe("java");
-        command.setExtraArguments(asList("-jar", JAR, waitFile.getAbsolutePath().replace("\\", "/"), WAIT_TIMEOUT));
+        command.setExtraArguments(asList("-jar", JAR, "$(" + WAIT_FILE_PROPERTY + ")", WAIT_TIMEOUT));
         return command;
     }
 
-    public List<String> getPostProcessorNames()
+    @Override
+    public BuildStageConfiguration addStage(String stageName)
     {
-        return asList("junit xml report processor");
+        BuildStageConfiguration stage = super.addStage(stageName);
+        addStageProperty(stage, WAIT_FILE_PROPERTY, getWaitFile(stageName).getAbsolutePath().replace("\\", "/"));
+        return stage;
     }
 
     public void releaseBuild() throws IOException
     {
+        for (String stageName : getConfig().getStages().keySet())
+        {
+            releaseStage(stageName);
+        }
+    }
+
+    public void releaseStage(String stageName) throws IOException
+    {
+        File waitFile = getWaitFile(stageName);
+        File dir = waitFile.getParentFile();
+        if (!dir.isDirectory() && !dir.mkdirs())
+        {
+            throw new IOException("Failed to create directory " + dir.getAbsolutePath());
+        }
         FileSystemUtils.createFile(waitFile, "test");
     }
 
-    public List<Class> getPostProcessorTypes()
+    private File getWaitFile(String stageName)
     {
-        return Arrays.<Class>asList(JUnitReportPostProcessorConfiguration.class);
+        return new File(waitBaseDir, stageName);
     }
 }

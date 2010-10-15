@@ -42,21 +42,4 @@ public class HeadOfOwnerQueuePredicate implements QueuedRequestPredicate
         );
         return headOfQueue.equals(request);
     }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        HeadOfOwnerQueuePredicate that = (HeadOfOwnerQueuePredicate) o;
-
-        return buildQueue == that.buildQueue;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return buildQueue.hashCode();
-    }
 }

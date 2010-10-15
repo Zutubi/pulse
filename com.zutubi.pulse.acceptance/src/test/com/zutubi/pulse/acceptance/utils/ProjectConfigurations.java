@@ -3,12 +3,12 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
-import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
+import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
@@ -99,14 +99,14 @@ public class ProjectConfigurations
      * Create a project configuration that allows for the execution of the build to be synchronised
      * with the acceptance tests.  When executing, the build will wait until explicitly 'released'
      *
-     * @param dir           a temporary directory that will be used to communicate with the build process.
      * @param projectName   the name of the project.
+     * @param dir           a temporary directory that will be used to communicate with the build process.
      * @return the project configuration helper instance to allow further configuration
      * of this project.
      * 
      * @throws Exception thrown on error.
      */
-    public WaitProject createWaitAntProject(File dir, String projectName) throws Exception
+    public WaitProject createWaitAntProject(String projectName, File dir) throws Exception
     {
         WaitProject project = new WaitProject(new ProjectConfiguration(projectName), dir);
         configureBaseProject(project, true);
@@ -176,18 +176,18 @@ public class ProjectConfigurations
         // setup the defaults:
         if (addDefaultStage)
         {
-            BuildStageConfiguration stage = helper.addStage(ProjectConfigurationWizard.DEFAULT_STAGE);
+            BuildStageConfiguration stage = helper.addStage(DEFAULT_STAGE);
             stage.setAgent(master);
         }
 
         MultiRecipeTypeConfiguration type = new MultiRecipeTypeConfiguration();
-        type.setDefaultRecipe(ProjectConfigurationWizard.DEFAULT_RECIPE);
+        type.setDefaultRecipe(DEFAULT_RECIPE);
         helper.getConfig().setType(type);
 
-        helper.addRecipe(ProjectConfigurationWizard.DEFAULT_RECIPE);
+        helper.addRecipe(DEFAULT_RECIPE);
 
         DependentBuildTriggerConfiguration trigger = new DependentBuildTriggerConfiguration();
-        trigger.setName(ProjectConfigurationWizard.DEPENDENCY_TRIGGER);
+        trigger.setName(DEPENDENCY_TRIGGER);
         helper.addTrigger(trigger);
     }
 

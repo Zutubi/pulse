@@ -150,6 +150,7 @@
                 <ref local="addEnableDisableToCommandAndStage"/>
                 <ref local="addTerminatedResultStateToBuildHooks"/>
                 <ref local="addTerminatedResultStateToConfigurations"/>
+                <ref local="addPriorityToBuildConfigurations"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -766,6 +767,10 @@
 
     <bean id="addTerminatedResultStateToConfigurations" class="com.zutubi.pulse.master.upgrade.tasks.AddTerminatedResultStateToConfigurationsUpgradeTask">
         <property name="buildNumber" value="202999004"/>
+    </bean>
+
+    <bean id="addPriorityToBuildConfigurations" class="com.zutubi.pulse.master.upgrade.tasks.AddPriorityToConfigurationUpgradeTask">
+        <property name="buildNumber" value="202999005"/>
     </bean>
 
 </beans>

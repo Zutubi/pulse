@@ -639,7 +639,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         File tempDir = createTempDirectory();
         try
         {
-            final WaitProject project = projects.createWaitAntProject(tempDir, random);
+            final WaitProject project = projects.createWaitAntProject(random, tempDir);
             configurationHelper.insertProject(project.getConfig(), false);
             
             xmlRpcHelper.waitForProjectToInitialise(project.getName());
@@ -1277,7 +1277,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             //   - default: runs a recipe that completes quickly, with tests
             //   - second:  runs the default waiting recipe, which we can
             //              release when we choose (also with tests)
-            final WaitProject project = projects.createWaitAntProject(tempDir, random);
+            final WaitProject project = projects.createWaitAntProject(random, tempDir);
 
             DirectoryArtifactConfiguration reportsArtifact = new DirectoryArtifactConfiguration("test reports", "reports/xml");
             PostProcessorConfiguration junitProcessor = project.getConfig().getPostProcessors().get(JUNIT_PROCESSOR);

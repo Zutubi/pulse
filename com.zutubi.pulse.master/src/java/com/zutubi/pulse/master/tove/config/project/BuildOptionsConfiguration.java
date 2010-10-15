@@ -26,6 +26,9 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     private String persistentWorkDir = "$(agent.data.dir)/work/$(project.handle)/$(stage.handle)";
     private boolean logCompressionEnabled = true;
 
+    private static final int UNDEFINED = 0;
+    private int priority = UNDEFINED;
+
     public BuildOptionsConfiguration()
     {
         setPermanent(true);
@@ -109,5 +112,20 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setLogCompressionEnabled(boolean logCompressionEnabled)
     {
         this.logCompressionEnabled = logCompressionEnabled;
+    }
+
+    public boolean hasPriority()
+    {
+        return priority != UNDEFINED;
+    }
+
+    public int getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
     }
 }

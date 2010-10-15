@@ -34,6 +34,9 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 
     private boolean enabled = true;
 
+    private static final int UNDEFINED = 0;
+    private int priority = UNDEFINED;
+
     @Transient
     private ObjectFactory objectFactory;
 
@@ -109,6 +112,21 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public boolean hasPriority()
+    {
+        return priority != UNDEFINED;
+    }
+
+    public int getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
     }
 
     @Transient

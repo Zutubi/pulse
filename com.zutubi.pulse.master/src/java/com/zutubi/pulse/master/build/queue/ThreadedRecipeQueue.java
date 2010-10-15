@@ -19,14 +19,11 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.util.Constants;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.i18n.Messages;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -40,27 +37,32 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener, Stoppable, ConfigurationEventListener
 {
+    private static final Messages I18N = Messages.getInstance(ThreadedRecipeQueue.class);
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
     private final ReentrantLock lock = new ReentrantLock();
 
     private final Condition lockCondition = lock.newCondition();
+    
+    private Clock clock = new SystemClock();
 
     /**
      * The internal queue of assignment requests.
      */
     private final RequestQueue requestQueue = new RequestQueue();
-    
+
     private ExecutorService executor;
 
     private boolean stopRequested = false;
     private boolean isRunning = false;
+
     /**
      * Maximum number of milliseconds between checks of the queue.  Usually
      * checks occur due to the condition being flagged, but we need to
      * wake up periodically to enforce timeouts.
      */
     private long sleepInterval = 60 * Constants.SECOND;
+
     /**
      * Maximum number of milliseconds to leave a request that cannot be satisfied
      * in the queue.  This is based on how long there has been no capable
@@ -101,7 +103,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             if (isRunning())
             {
-                throw new IllegalStateException("The queue is already running.");
+                throw new IllegalStateException(I18N.format("illegal.state.running"));
             }
 
             isRunning = true;
@@ -140,15 +142,15 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 }
                 else
                 {
-                    if(unsatisfiableTimeout == 0)
+                    if (unsatisfiableTimeout == 0)
                     {
-                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), "No online agent is capable of executing the build stage");
+                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("satisfy.requirements.none"));
                     }
                     else
                     {
-                        if(unsatisfiableTimeout > 0)
+                        if (unsatisfiableTimeout > 0)
                         {
-                            assignmentRequest.setTimeout(System.currentTimeMillis() + unsatisfiableTimeout);
+                            assignmentRequest.setTimeout(clock.getCurrentTimeMillis() + unsatisfiableTimeout);
                         }
 
                         addToQueue(assignmentRequest);
@@ -163,9 +165,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         catch (Exception e)
         {
             LOG.error(e);
-            error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), "Unable to determine revision to build: " + e.getMessage());
+            error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("error.enqueue.failed", e.getMessage()));
         }
-
 
         if (error != null)
         {
@@ -186,23 +187,27 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return requestQueue.snapshot();
     }
 
-    public boolean cancelRequest(long id)
+    /**
+     * Cancelled the queued recipe request.
+     *
+     * @param recipeId the unique identifier for the recipe to be cancelled.
+     * @return true if the recipe was found in the queue and cancelled, false
+     *         otherwise.
+     */
+    public boolean cancelRequest(final long recipeId)
     {
         boolean removed = false;
 
         try
         {
             lock.lock();
-            RecipeAssignmentRequest removeRequest = null;
-
-            for (RecipeAssignmentRequest request : requestQueue)
+            RecipeAssignmentRequest removeRequest = CollectionUtils.find(requestQueue, new Predicate<RecipeAssignmentRequest>()
             {
-                if (request.getRequest().getId() == id)
+                public boolean satisfied(RecipeAssignmentRequest request)
                 {
-                    removeRequest = request;
-                    break;
+                    return request.getRequest().getId() == recipeId;
                 }
-            }
+            });
 
             if (removeRequest != null)
             {
@@ -218,14 +223,21 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return removed;
     }
 
+    /**
+     * The specified agent is now online, so reset the recipe assignment
+     * request unsatisfiable timeout for any requests that can be satisfied
+     * by this agent.
+     *
+     * @param agent the agent that is available for builds.
+     */
     private void resetTimeoutsForAgent(Agent agent)
     {
         lock.lock();
         try
         {
-            for(RecipeAssignmentRequest request: requestQueue)
+            for (RecipeAssignmentRequest request : requestQueue)
             {
-                if(request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getService()))
+                if (request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getService()))
                 {
                     request.clearTimeout();
                 }
@@ -238,6 +250,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
+    /**
+     * An agent has gone offline, so check the unsatisfiable timeout, updating
+     * timeouts or removing requests as necessary.
+     */
     void offline()
     {
         List<RecipeAssignmentRequest> removedRequests = null;
@@ -246,13 +262,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
 
-            if(unsatisfiableTimeout == 0)
+            if (unsatisfiableTimeout == 0)
             {
                 removedRequests = removeUnfulfillable();
             }
-            else if(unsatisfiableTimeout > 0)
+            else if (unsatisfiableTimeout > 0)
             {
-                checkQueuedTimeouts(System.currentTimeMillis() + unsatisfiableTimeout);
+                checkQueuedTimeouts(clock.getCurrentTimeMillis() + unsatisfiableTimeout);
             }
 
             lockCondition.signal();
@@ -262,7 +278,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             lock.unlock();
         }
 
-        if(removedRequests != null)
+        // Publish the events outside of the locking.
+        if (removedRequests != null)
         {
             publishUnfulfillable(removedRequests);
         }
@@ -270,7 +287,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void checkQueuedTimeouts(long timeout)
     {
-        assert(lock.isHeldByCurrentThread());
+        assert (lock.isHeldByCurrentThread());
 
         for (RecipeAssignmentRequest request : requestQueue)
         {
@@ -283,7 +300,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private List<RecipeAssignmentRequest> removeUnfulfillable()
     {
-        assert(lock.isHeldByCurrentThread());
+        assert (lock.isHeldByCurrentThread());
 
         List<RecipeAssignmentRequest> unfulfillable = new LinkedList<RecipeAssignmentRequest>();
         for (RecipeAssignmentRequest request : requestQueue)
@@ -300,17 +317,17 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private boolean requestMayBeFulfilled(RecipeAssignmentRequest request)
     {
-        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Checking recipe agent requirements..."));
+        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.check")));
         for (Agent a : agentManager.getOnlineAgents())
         {
             if (request.getHostRequirements().fulfilledBy(request, a.getService()))
             {
-                eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Requirements satisfied by at least one online agent."));
+                eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.some")));
                 return true;
             }
         }
 
-        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "No online agents satisfy requirements."));
+        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none")));
         return false;
     }
 
@@ -327,25 +344,50 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             while (!stopRequested)
             {
                 final List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
-                long currentTime = System.currentTimeMillis();
+                long currentTime = clock.getCurrentTimeMillis();
 
+                // Notes on the agent pool:
+                // With the introduction of priority ordering to the request queue, we need provide
+                // better control over the agents available for recipe assignment.  In short, the
+                // set of agents available to any particular recipe request needs to be a subset of
+                // what was available to earlier requests.  Otherwise, an agent becoming available
+                // half way through the processing of the request queue can 'activate' a low priority
+                // request when it should have been used for a higher priority request.
+                final List<Agent> agentPool = new LinkedList<Agent>();
+                agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
+                {
+                    public void run(List<Agent> agents)
+                    {
+                        agentPool.addAll(agents);
+                    }
+                });
+                
                 for (final RecipeAssignmentRequest request : requestQueue)
                 {
-                    if(request.hasTimedOut(currentTime))
+                    if (request.hasTimedOut(currentTime))
                     {
                         doneRequests.add(request);
-                        eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Recipe request timed out waiting for a capable agent to become available"));
+                        eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("recipe.assignment.timeout")));
                     }
                     else
                     {
                         agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
                         {
-                            public void run(List<Agent> agents)
+                            public void run(final List<Agent> agents)
                             {
+                                // The agent pool can only contain agents that are currently available.  
+                                CollectionUtils.filterInPlace(agentPool, new Predicate<Agent>()
+                                {
+                                    public boolean satisfied(Agent agent)
+                                    {
+                                        return !agents.contains(agent);
+                                    }
+                                });
+
                                 // Note that this method must be fast - we are locking agents.
                                 // The lock is require to prevent the agent state changing
                                 // before we assign the recipe to it.
-                                Iterable<Agent> agentList = agentSorter.sort(agents, request);
+                                Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
                                 for (Agent agent : agentList)
                                 {
                                     AgentService service = agent.getService();
@@ -399,6 +441,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
+    /**
+     * Returns true if the recipe queue is not running.
+     *
+     * @return true if the queue is not running.
+     * @see #isRunning()
+     */
     public boolean isStopped()
     {
         return !isRunning();
@@ -446,7 +494,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
         else if (evt instanceof ConfigurationEventSystemStartedEvent)
         {
-            ConfigurationProvider configurationProvider = ((ConfigurationEventSystemStartedEvent)evt).getConfigurationProvider();
+            ConfigurationProvider configurationProvider = ((ConfigurationEventSystemStartedEvent) evt).getConfigurationProvider();
             configurationProvider.registerEventListener(this, false, false, GlobalConfiguration.class);
             updateTimeout(configurationProvider.get(GlobalConfiguration.class));
         }
@@ -485,7 +533,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         for (RecipeAssignmentRequest request : unfulfillable)
         {
-            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "No online agent is capable of executing the build stage"));
+            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none")));
         }
     }
 
@@ -502,7 +550,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void handleConfigurationEvent(ConfigurationEvent event)
     {
-        if(event instanceof PostSaveEvent)
+        if (event instanceof PostSaveEvent)
         {
             updateTimeout((GlobalConfiguration) event.getInstance());
         }
@@ -510,13 +558,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void updateTimeout(GlobalConfiguration globalConfiguration)
     {
-        long timeout = globalConfiguration.getRecipeTimeout();
-        if(timeout > 0)
-        {
-            timeout *= Constants.MINUTE;
-        }
-
-        this.unsatisfiableTimeout = timeout;
+        this.unsatisfiableTimeout = globalConfiguration.getRecipeTimeout() * Constants.MINUTE;
     }
 
     public void setUnsatisfiableTimeout(int milliseconds)
@@ -550,21 +592,40 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.agentSorter = agentSorter;
     }
 
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
+    }
+
     /**
      * Allow easy / safe access to a snapshot of the list of recipe dispatch requests.  Changes
      * to the list itself are synchronised so that the snapshot is not taken in the middle of a
      * change.  However, and importantly, the snapshot is not bound to the synchronisation
      * taking place within the ThreadedRecipeQueue.
-     *
+     * <p/>
      * See CIB-1401.
      */
     private class RequestQueue implements Iterable<RecipeAssignmentRequest>
     {
-        private final List<RecipeAssignmentRequest> list = new LinkedList<RecipeAssignmentRequest>();
+        private final LinkedList<RecipeAssignmentRequest> list = new LinkedList<RecipeAssignmentRequest>();
 
-        public synchronized void add(RecipeAssignmentRequest item)
+        public synchronized void add(final RecipeAssignmentRequest item)
         {
-            list.add(item);
+            RecipeAssignmentRequest request = CollectionUtils.find(list, new Predicate<RecipeAssignmentRequest>()
+            {
+                public boolean satisfied(RecipeAssignmentRequest r)
+                {
+                    return r.getPriority() < item.getPriority();
+                }
+            });
+            if (request != null)
+            {
+                list.add(list.indexOf(request), item);
+            }
+            else
+            {
+                list.add(item);
+            }
         }
 
         public synchronized void remove(RecipeAssignmentRequest item)
@@ -574,7 +635,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         public synchronized void addAll(Collection<RecipeAssignmentRequest> items)
         {
-            list.addAll(items);
+            for (RecipeAssignmentRequest item : items)
+            {
+                add(item);
+            }
         }
 
         public synchronized void removeAll(Collection<RecipeAssignmentRequest> items)

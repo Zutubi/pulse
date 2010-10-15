@@ -51,6 +51,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private List<ResourcePropertyConfiguration> properties;
     private String status;
     private String version;
+    private String priority;
     private boolean rebuild;
     private boolean ajax;
     private ConfigurationPanel newPanel;
@@ -114,6 +115,16 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setRebuild(boolean rebuild)
     {
         this.rebuild = rebuild;
+    }
+
+    public String getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(String priority)
+    {
+        this.priority = priority;
     }
 
     public void setPath(String path)
@@ -183,6 +194,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         field.setLabel("revision");
         field.setValue(revision);
         addLatestAction(field, project, project.getConfig());
+        form.add(field);
+
+        field = new Field(FieldType.TEXT, "priority");
+        field.setLabel("priority");
+        field.setValue(priority);
         form.add(field);
 
         for(ResourcePropertyConfiguration property: properties)
@@ -291,6 +307,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             options.setStatus(status);
             options.setVersion(version);
             options.setRebuild(rebuild);
+            if (StringUtils.stringSet(priority))
+            {
+                options.setPriority(Integer.valueOf(priority));
+            }
             
             projectManager.triggerBuild(project.getConfig(), options, r);
         }

@@ -138,9 +138,6 @@ public enum ResultState
      */
     public static ResultState getWorseState(ResultState s1, ResultState s2)
     {
-        assertCompleted(s1);
-        assertCompleted(s2);
-
         return getAggregate(s1, s2, WORSE_STATE_ORDER);
     }
 
@@ -158,14 +155,6 @@ public enum ResultState
     public static ResultState getAggregate(ResultState s1, ResultState s2, ResultState[] order)
     {
         return (indexOf(s1, order) < indexOf(s2, order)) ? s2 : s1;
-    }
-
-    private static void assertCompleted(ResultState state)
-    {
-        if (state != null && !state.isCompleted())
-        {
-            throw new IllegalArgumentException("Completed result state expected.  Instead found " + state);
-        }
     }
 
     /**

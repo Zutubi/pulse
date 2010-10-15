@@ -7,6 +7,8 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.AgentRequirements;
 import com.zutubi.util.TimeStamps;
+import com.zutubi.util.Clock;
+import com.zutubi.util.SystemClock;
 
 import java.util.List;
 
@@ -15,6 +17,11 @@ import java.util.List;
  */
 public class RecipeAssignmentRequest
 {
+    private static final int UNDEFINED = -1;
+    private static final int DEFAULT_PRIORITY = 0;
+
+    private Clock clock = new SystemClock();
+    
     private Project project;
     private AgentRequirements hostRequirements;
     private List<ResourceRequirement> resourceRequirements;
@@ -22,11 +29,14 @@ public class RecipeAssignmentRequest
     private RecipeRequest request;
     private BuildResult build;
     private long queueTime;
+    
+    private int priority = DEFAULT_PRIORITY;
+
     /**
      * Time at which the request should be timed out as no capable agent has
      * become available.  If negative, no timeout is currently in place.
      */
-    private long timeout = -1;
+    private long timeout = UNDEFINED;
 
     public RecipeAssignmentRequest(Project project, AgentRequirements hostRequirements, List<ResourceRequirement> resourceRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
     {
@@ -70,7 +80,7 @@ public class RecipeAssignmentRequest
 
     public void queued()
     {
-        queueTime = System.currentTimeMillis();
+        queueTime = clock.getCurrentTimeMillis();
     }
 
     public long getQueueTime()
@@ -105,11 +115,26 @@ public class RecipeAssignmentRequest
 
     public void clearTimeout()
     {
-        timeout = -1;
+        timeout = UNDEFINED;
     }
 
     public boolean isPersonal()
     {
         return build.isPersonal();
+    }
+
+    public int getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
+    }
+
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
     }
 }

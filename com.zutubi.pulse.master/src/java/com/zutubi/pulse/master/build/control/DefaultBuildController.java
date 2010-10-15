@@ -245,6 +245,19 @@ public class DefaultBuildController implements EventListener, BuildController
                 recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
 
                 RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+                if (request.getOptions().hasPriority())
+                {
+                    assignmentRequest.setPriority(request.getOptions().getPriority());
+                }
+                else if (stageConfig.hasPriority())
+                {
+                    assignmentRequest.setPriority(stageConfig.getPriority());
+                }
+                else if (request.getProjectConfig().getOptions().hasPriority())
+                {
+                    assignmentRequest.setPriority(request.getProjectConfig().getOptions().getPriority());
+                }
+
                 RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
                 RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
                 rc.setRecipeQueue(recipeQueue);

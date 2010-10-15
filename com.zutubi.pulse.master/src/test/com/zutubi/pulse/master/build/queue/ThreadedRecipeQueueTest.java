@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.*;
@@ -41,8 +42,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
@@ -366,7 +365,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
         takeOffline(slave1000);
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1001, "No online agent is capable of executing the build stage");
+        assertRecipeError(1001, "No online agents satisfy requirements.");
     }
 
     public void testNoOnlineAgent() throws Exception
@@ -374,7 +373,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         queue.setUnsatisfiableTimeout(0);
         queue.enqueue(createAssignmentRequest(0, 1000));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1000, "No online agent is capable of executing the build stage");
+        assertRecipeError(1000, "No online agents satisfy requirements.");
     }
 
     public void testAgentErrorOnBuild() throws Exception
@@ -426,7 +425,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         queue.setUnsatisfiableTimeout(1);
         queue.enqueue(createAssignmentRequest(0, 111));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(111, "Recipe request timed out waiting for a capable agent to become available");
+        assertRecipeError(111, "Recipe request timed out waiting for a capable agent to become available.");
     }
 
     public void testNoTimeout() throws Exception
@@ -447,7 +446,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
         takeOffline(slave1000);
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
+        assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available.");
     }
 
     public void testNoTimeoutAgentOffline() throws Exception
@@ -461,6 +460,81 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         takeOffline(slave1000);
         assertFalse(errorSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
         assertNoError(1001);
+    }
+
+    public void testDefaultPriorityOrderIsOrderOfEnqueue() throws InterruptedException
+    {
+        int agentId = 0;
+
+        queue.enqueue(createAssignmentRequest(agentId, 1));
+        queue.enqueue(createAssignmentRequest(agentId, 2));
+        queue.enqueue(createAssignmentRequest(agentId, 3));
+
+        Agent agent = createAvailableAgent(agentId);
+
+        assertFirstDispatched(1);
+        assertNextDispatched(2, agent);
+        assertNextDispatched(3, agent);
+    }
+
+    public void testRecipiesAssignedInPriorityOrder() throws InterruptedException
+    {
+        int agentId = 0;
+
+        queue.enqueue(createAssignmentRequest(agentId, 1, 1));
+        queue.enqueue(createAssignmentRequest(agentId, 2, 5));
+        queue.enqueue(createAssignmentRequest(agentId, 3, 3));
+
+        Agent agent = createAvailableAgent(agentId);
+
+        assertFirstDispatched(2);
+        assertNextDispatched(3, agent);
+        assertNextDispatched(1, agent);
+    }
+
+    public void testNegativePriorityIsLowerThanDefault() throws InterruptedException
+    {
+        int agentId = 0;
+
+        queue.enqueue(createAssignmentRequest(agentId, 1));
+        queue.enqueue(createAssignmentRequest(agentId, 2,-5));
+        queue.enqueue(createAssignmentRequest(agentId, 3));
+
+        Agent agent = createAvailableAgent(agentId);
+
+        assertFirstDispatched(1);
+        assertNextDispatched(3, agent);
+        assertNextDispatched(2, agent);
+    }
+
+    public void testNewlyEnqueuedRequestWithHighPriorityMovesToHeadOfQueue() throws InterruptedException
+    {
+        int agentId = 0;
+
+        queue.enqueue(createAssignmentRequest(agentId, 1));
+        queue.enqueue(createAssignmentRequest(agentId, 2));
+
+        Agent agent = createAvailableAgent(agentId);
+
+        assertFirstDispatched(1);
+
+        queue.enqueue(createAssignmentRequest(agentId, 3, 5));
+
+        assertNextDispatched(3, agent);
+        assertNextDispatched(2, agent);
+    }
+
+    private void assertFirstDispatched(int id) throws InterruptedException
+    {
+        awaitBuild();
+        assertEquals(id, assignedEvent.getRequest().getId());
+    }
+
+    private void assertNextDispatched(int id, Agent agent) throws InterruptedException
+    {
+        sendAvailable(agent);
+        awaitBuild();
+        assertEquals(id, assignedEvent.getRequest().getId());
     }
 
     //-----------------------------------------------------------------------
@@ -549,17 +623,29 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         return createAssignmentRequest(type, id, createProjectConfig());
     }
 
+    private RecipeAssignmentRequest createAssignmentRequest(int type, long id, int priority)
+    {
+        RecipeAssignmentRequest request = createAssignmentRequest(type, id, createProjectConfig());
+        request.setPriority(priority);
+        return request;
+    }
+
     private RecipeAssignmentRequest createAssignmentRequest(int type, long id, ProjectConfiguration projectConfig)
     {
         Project project = new Project();
         project.setConfig(projectConfig);
+
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
+
         AgentRequirements requirements = new TypeMatchingAgentRequirements(type);
+
         PulseExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, "project");
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
+
         RecipeRequest request = new RecipeRequest(context);
         request.setBootstrapper(new ChainBootstrapper());
+
         BuildRevision revision = new BuildRevision(new Revision("1"), false);
 
         return new RecipeAssignmentRequest(project, requirements, null, revision, request, result);
@@ -580,6 +666,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         else
         {
             assignedEvent = (RecipeAssignedEvent)evt;
+            System.out.println("a"+assignedEvent.getRequest().getId());
             agentManager.unavailable(assignedEvent.getAgent());
             dispatchedSemaphore.release();
             recipeDispatchService.dispatch(assignedEvent);

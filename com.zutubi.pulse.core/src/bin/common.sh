@@ -5,7 +5,7 @@ case "`uname`" in
 CYGWIN*) cygwin=true;;
 esac
 
-# Determine pulses data directory if it has not been specified.
+# Determine pulses home directory if it has not been specified.
 if [ -z "$PULSE_HOME" -o ! -d "$PULSE_HOME" ] ; then
   PRG="$0"
   PULSE_HOME=`dirname "$PRG"`/..

@@ -116,7 +116,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
     // Checks that the build controller updating a build does not result in comments being lost.
     public void testAddCommentToInProgressBuild() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(tempDir, random);
+        WaitProject project = projects.createWaitAntProject(random, tempDir);
         configurationHelper.insertProject(project.getConfig(), false);
 
         int buildNumber = buildRunner.triggerBuild(project);

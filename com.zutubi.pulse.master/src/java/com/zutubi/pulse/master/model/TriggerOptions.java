@@ -11,6 +11,8 @@ import java.util.LinkedList;
  */
 public class TriggerOptions
 {
+    private static final int UNDEFINED = Integer.MIN_VALUE;
+
     /**
      * Additional properties introduced into the build context just
      * after the project properties.
@@ -70,6 +72,8 @@ public class TriggerOptions
      */
     private boolean jumpQueueAllowed = true;
 
+    private int priority = UNDEFINED;
+
     public TriggerOptions(TriggerOptions other)
     {
         this.properties.addAll(other.properties);
@@ -82,6 +86,7 @@ public class TriggerOptions
         this.resolveVersion = other.resolveVersion;
         this.rebuild = other.rebuild;
         this.jumpQueueAllowed = other.jumpQueueAllowed;
+        this.priority = other.priority;
     }
 
     public TriggerOptions(BuildReason reason, String source)
@@ -198,5 +203,20 @@ public class TriggerOptions
     public void setJumpQueueAllowed(boolean b)
     {
         this.jumpQueueAllowed = b;
+    }
+
+    public boolean hasPriority()
+    {
+        return this.priority != UNDEFINED;
+    }
+
+    public int getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
     }
 }

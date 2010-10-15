@@ -24,12 +24,12 @@ public class CollectionUtils
         return filteredList;
     }
 
-    public static <T> List<T> filter(Collection<T> l, Predicate<T> p)
+    public static <T> List<T> filter(Iterable<T> l, Predicate<T> p)
     {
         return filter(l, p, (List<T>) new LinkedList<T>());
     }
 
-    public static <T, U extends Collection<? super T>> U filter(Collection<T> in, Predicate<T> p, U out)
+    public static <T, U extends Collection<? super T>> U filter(Iterable<T> in, Predicate<T> p, U out)
     {
         for(T t: in)
         {

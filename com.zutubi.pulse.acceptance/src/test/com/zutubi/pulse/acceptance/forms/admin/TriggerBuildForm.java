@@ -45,6 +45,7 @@ public class TriggerBuildForm extends SeleniumForm
         List<String> fieldNames = new LinkedList<String>();
         fieldNames.add("revision");
         fieldNames.add("version");
+        fieldNames.add("priority");
         fieldNames.add("status");
         if (expectRebuildField)
         {
@@ -60,14 +61,15 @@ public class TriggerBuildForm extends SeleniumForm
 
     public int[] getFieldTypes()
     {
-        int nonPropertyFields = (expectRebuildField) ? 4 : 3;
+        int nonPropertyFields = (expectRebuildField) ? 5 : 4;
         int[] types = new int[propertyNames.size() + nonPropertyFields];
         types[0] = TEXTFIELD;
         types[1] = TEXTFIELD;
-        types[2] = ITEM_PICKER;
+        types[2] = TEXTFIELD;
+        types[3] = ITEM_PICKER;
         if (expectRebuildField)
         {
-            types[3] = CHECKBOX;
+            types[4] = CHECKBOX;
         }
         for (int i = nonPropertyFields; i < types.length; i++)
         {
