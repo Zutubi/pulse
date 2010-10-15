@@ -106,32 +106,45 @@ public class DevToolsTestBase extends PulseTestCase
         ProcessBuilder builder = new ProcessBuilder(fullCommand);
         builder.directory(tmpDir);
         builder.environment().put("PULSE_HOME", pulse.getPulseHome());
-        Process child = builder.start();
-                
-        if (input != null)
+
+        AsyncProcess process = null;
+        try
         {
-            try
+            BufferingCharHandler handler = new BufferingCharHandler();
+            
+            Process child = builder.start();
+            process = new AsyncProcess(child, handler, true);
+
+            if (input != null)
             {
-                OutputStream stdinStream = child.getOutputStream();
-                stdinStream.write(input.getBytes());
-                stdinStream.close();
+                try
+                {
+                    OutputStream stdinStream = child.getOutputStream();
+                    stdinStream.write(input.getBytes());
+                    stdinStream.close();
+                }
+                catch (IOException e)
+                {
+                    throw new Exception("Error writing to input of dev tools process", e);
+                }
             }
-            catch (IOException e)
+
+            int exitCode = process.waitForOrThrow(COMMAND_TIMEOUT_SECS, TimeUnit.SECONDS);
+            assertEquals("Non-zero exit code from command: " + exitCode +
+                    "\n[stdout]\n" + handler.getStdout() + "\n[/stdout]" +
+                    "\n[stderr]\n" + handler.getStderr() + "[/stderr]\n",
+                    0, exitCode);
+
+            assertEquals("", handler.getStderr());
+            return handler.getStdout();
+        }
+        finally
+        {
+            if (process != null)
             {
-                throw new Exception("Error writing to input of dev tools process", e);
+                process.destroy();
             }
         }
-        
-        BufferingCharHandler handler = new BufferingCharHandler();
-        AsyncProcess process = new AsyncProcess(child, handler, true);
-        int exitCode = process.waitForOrThrow(COMMAND_TIMEOUT_SECS, TimeUnit.SECONDS);
-        assertEquals("Non-zero exit code from command: " + exitCode +
-                "\n[stdout]\n" + handler.getStdout() + "\n[/stdout]" +
-                "\n[stderr]\n" + handler.getStderr() + "[/stderr]\n",
-                0, exitCode);
-        
-        assertEquals("", handler.getStderr());
-        return handler.getStdout();
     }
 
     protected String runPluginSync() throws Exception
