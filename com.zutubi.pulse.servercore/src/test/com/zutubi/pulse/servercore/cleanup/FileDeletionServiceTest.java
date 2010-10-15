@@ -59,6 +59,8 @@ public class FileDeletionServiceTest extends PulseTestCase
     {
         deletionService.stop(true);
 
+        removeDirectory(tmp);
+
         super.tearDown();
     }
 

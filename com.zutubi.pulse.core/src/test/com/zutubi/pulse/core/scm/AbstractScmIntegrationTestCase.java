@@ -42,7 +42,7 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
 
     protected void tearDown() throws Exception
     {
-        removeDirectory(workingDir);
+        removeDirectory(tmp);
 
         super.tearDown();
     }
