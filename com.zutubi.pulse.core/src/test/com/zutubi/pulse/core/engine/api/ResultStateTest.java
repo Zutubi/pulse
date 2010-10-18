@@ -33,4 +33,12 @@ public class ResultStateTest extends PulseTestCase
         assertEquals(FAILURE, getAggregate(null, FAILURE, order));
         assertEquals(null, getAggregate(null, null, order));
     }
+
+    public void testWorseStateOrderingContainsAllCompletedStates()
+    {
+        for (ResultState completed : ResultState.getCompletedStates())
+        {
+            assertNotNull(getWorseState(null, completed));
+        }
+    }
 }

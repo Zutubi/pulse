@@ -150,7 +150,7 @@ public enum ResultState
      * @param order the order of aggregation.  States of higher importance should appear
      * later in the list.
      *
-     * @return the state that appears earlier in the specified order.
+     * @return the state that appears later in the specified order.
      */
     public static ResultState getAggregate(ResultState s1, ResultState s2, ResultState[] order)
     {
