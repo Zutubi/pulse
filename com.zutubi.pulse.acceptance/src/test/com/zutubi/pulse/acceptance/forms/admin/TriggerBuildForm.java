@@ -61,21 +61,27 @@ public class TriggerBuildForm extends SeleniumForm
 
     public int[] getFieldTypes()
     {
-        int nonPropertyFields = (expectRebuildField) ? 5 : 4;
-        int[] types = new int[propertyNames.size() + nonPropertyFields];
-        types[0] = TEXTFIELD;
-        types[1] = TEXTFIELD;
-        types[2] = TEXTFIELD;
-        types[3] = ITEM_PICKER;
+        List<Integer> types = new LinkedList<Integer>();
+        types.add(TEXTFIELD);
+        types.add(TEXTFIELD);
+        types.add(TEXTFIELD);
+        types.add(ITEM_PICKER);
         if (expectRebuildField)
         {
-            types[4] = CHECKBOX;
+            types.add(CHECKBOX);
         }
-        for (int i = nonPropertyFields; i < types.length; i++)
+        //noinspection UnusedDeclaration
+        for (String propertyName : propertyNames)
         {
-            types[i] = TEXTFIELD;
+            types.add(TEXTFIELD);
         }
-        return types;
+
+        int[] result = new int[types.size()];
+        for (int i = 0; i < result.length; i++)
+        {
+            result[i] = types.get(i);
+        }
+        return result;
     }
 
     /**

@@ -158,6 +158,6 @@ public abstract class AbstractConfiguration implements Configuration
         }
 
         AbstractConfiguration otherConfig = (AbstractConfiguration) obj;
-        return otherConfig.getHandle() != 0 && otherConfig.getHandle() == getHandle();
+        return otherConfig.getHandle() != UNDEFINED && otherConfig.getHandle() == getHandle();
     }
 }

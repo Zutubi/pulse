@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.util.StringUtils;
+import com.zutubi.tove.config.Undefined;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,8 +12,6 @@ import java.util.LinkedList;
  */
 public class TriggerOptions
 {
-    private static final int UNDEFINED = Integer.MIN_VALUE;
-
     /**
      * Additional properties introduced into the build context just
      * after the project properties.
@@ -72,7 +71,7 @@ public class TriggerOptions
      */
     private boolean jumpQueueAllowed = true;
 
-    private int priority = UNDEFINED;
+    private int priority = Undefined.INTEGER;
 
     public TriggerOptions(TriggerOptions other)
     {
@@ -207,7 +206,7 @@ public class TriggerOptions
 
     public boolean hasPriority()
     {
-        return this.priority != UNDEFINED;
+        return this.priority != Undefined.INTEGER;
     }
 
     public int getPriority()

@@ -3,8 +3,9 @@ package com.zutubi.util;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Implementation of {@link Clock} that every request for the
- * time results in a unique time.
+ * Implementation of {@link Clock} where every request for the
+ * time results in a unique constantly increasing time value being
+ * returned.
  */
 public class AtomicClock implements Clock
 {

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.config.Undefined;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.LinkedHashMap;
@@ -34,8 +35,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 
     private boolean enabled = true;
 
-    private static final int UNDEFINED = 0;
-    private int priority = UNDEFINED;
+    private int priority = Undefined.INTEGER;
 
     @Transient
     private ObjectFactory objectFactory;
@@ -116,7 +116,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 
     public boolean hasPriority()
     {
-        return priority != UNDEFINED;
+        return priority != Undefined.INTEGER;
     }
 
     public int getPriority()

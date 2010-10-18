@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.engine.api.ResultState.IN_PROGRESS;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -25,9 +26,7 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Condition;
-import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Pair;
+import com.zutubi.util.*;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -520,25 +519,79 @@ public class XmlRpcHelper
         versionedConfig.put("pulseFileName", pulseFilePath);
         return versionedConfig;
     }
-    
-    public void waitForProjectToInitialise(String name) throws Exception
-    {
-        long startTime = System.currentTimeMillis();
-        Project.State state;
-        while (true)
-        {
-            state = getProjectState(name);
-            if (state.isInitialised())
-            {
-                break;
-            }
 
-            Thread.sleep(50);
-            if (System.currentTimeMillis() - startTime > INTIALISATION_TIMEOUT)
+    /**
+     * Wait for the named project to be in an initialised state.
+     *
+     * @param projectName   the name of the project being monitored.
+     *
+     * @throws Exception if the wait times out or a problem is encountered determining
+     * the state of the project.
+     */
+    public void waitForProjectToInitialise(final String projectName) throws Exception
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
             {
-                throw new RuntimeException("Timed out waiting for project '" + name + "' to init (state is '" + state + "')");
+                try
+                {
+                    return getProjectState(projectName).isInitialised();
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
-        }
+        }, INTIALISATION_TIMEOUT, "project '" + projectName + "' to become 'initialised'");
+    }
+
+    /**
+     * Wait for the named projects status to be IDLE.
+     *
+     * @param projectName name of the project being monitored.
+     */
+    public void waitForProjectToBeIdle(final String projectName)
+    {
+        waitForProjectToBeIdle(projectName, BUILD_TIMEOUT);
+    }
+
+    /**
+     * Wait for the named projects status to be IDLE.
+     * 
+     * @param projectName   name of the project being monitored
+     * @param timeout timeout after which the method will return an
+     * exception if the project is not yet IDLE.
+     */
+    public void waitForProjectToBeIdle(final String projectName, final long timeout)
+    {
+        waitForProjectState(projectName, Project.State.IDLE, timeout);
+    }
+
+    /**
+     * Wait for the named agent to be in the given state.
+     *
+     * @param projectName   name of the project being monitored
+     * @param state         state we are monitoring for
+     * @param timeout       timeout after which the method will return an exception
+     *                      if the project is not yet in the expected state.
+     */
+    public void waitForProjectState(final String projectName, final Project.State state, final long timeout)
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    return getProjectState(projectName)  == state;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, timeout, "project '" + projectName + "' to become '" + state + "'");
     }
 
     /**
@@ -570,6 +623,7 @@ public class XmlRpcHelper
      * @param agentName name of the agent being monitored
      * @param timeout   timeout after which the method will return an exception
      *                  if the agent is not yet in the right state
+     *@param status     status being monitored for
      *
      * @throws RuntimeException on timeout.
      */
@@ -1051,21 +1105,128 @@ public class XmlRpcHelper
      */
     public void waitForBuildInProgress(final String projectName, final int number, long timeout) throws Exception
     {
+        waitForBuildInState(projectName, number, ResultState.IN_PROGRESS, timeout);
+    }
+
+    /**
+     * Wait for the specified builds status to be PENDING.
+     *
+     * @param projectName   name of the project being monitored
+     * @param number        the build number identifying the build.
+     * 
+     * @throws Exception if the build is not yet PENDING.
+     */
+    public void watiForBuildInPending(final String projectName, final int number) throws Exception
+    {
+        waitForBuildInState(projectName, number, ResultState.PENDING, BUILD_TIMEOUT);
+    }
+
+    /**
+     * Wait for the specified builds status to be PENDING.
+     *
+     * @param projectName   name of the project being monitored
+     * @param number        the build number identifying the build.
+     * @param timeout       the time after which an exception is thrown if the build
+     * is not in the PENDING state.
+     *
+     * @throws Exception if the build is not yet PENDING.
+     */
+    public void watiForBuildInPending(final String projectName, final int number, long timeout) throws Exception
+    {
+        waitForBuildInState(projectName, number, ResultState.PENDING, timeout);
+    }
+
+    /**
+     * Wait for the specified builds status to be the specified state.
+     *
+     * @param projectName   name of the project being monitored
+     * @param number        the build number identifying the build.
+     * @param state         the state being monitored for.
+     * @param timeout       the time after which an exception is thrown if the build
+     * is not in the expected state.
+     *
+     * @throws Exception if the build is not yet the expected state.
+     */
+    public void waitForBuildInState(final String projectName, final int number, final ResultState state, long timeout) throws Exception
+    {
         waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
                 try
                 {
-                    Hashtable<String, Object> build = getBuild(projectName, number);
-                    return build != null && build.get("status").equals(ResultState.IN_PROGRESS.getPrettyString());
+                    ResultState currentState = getBuildStatus(projectName, number);
+                    return currentState != null && currentState == state;
                 }
                 catch (Exception e)
                 {
                     throw new RuntimeException(e);
                 }
             }
-        }, timeout, "build " + number + " of project " + projectName + " to become in progress");
+        }, timeout, "build " + number + " of project " + projectName + " to become '"+state+"'");
+    }
+
+    public void waitForBuildStageInProgress(final String projectName, final String stageName, final int number, long timeout) throws Exception
+    {
+        waitForBuildStageInState(projectName, stageName, number, ResultState.IN_PROGRESS, timeout);
+    }
+
+    /**
+     * Wait for the specified build stages status to be the specified state.
+     *
+     * @param projectName   name of the project being monitored
+     * @param stageName     name of the build stage being monitored
+     * @param number        the build number identifying the build.
+     * @param state         the state being monitored for.
+     * @param timeout       the time after which an exception is thrown if the build
+     * is not in the expected state.
+     *
+     * @throws Exception if the build stage is not yet the expected state.
+     */
+    public void waitForBuildStageInState(final String projectName, final String stageName, final int number, final ResultState state, long timeout) throws Exception
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    ResultState currentState = getBuildStageStatus(projectName, stageName, number);
+                    return currentState != null && currentState == state;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, timeout, "stage " + stageName + " of project " + projectName + " to become '"+state+"'");
+    }
+
+    public ResultState getBuildStageStatus(String projectName, String stageName, int buildNumber) throws Exception
+    {
+        Hashtable<String, Object> stage = getBuildStage(projectName, stageName, buildNumber);
+        if (stage != null)
+        {
+            return ResultState.fromPrettyString((String) stage.get("status"));
+        }
+        return null;
+    }
+
+    public Hashtable<String, Object> getBuildStage(String projectName, final String stageName, int buildNumber) throws Exception
+    {
+        Hashtable<String, Object> build = getBuild(projectName, buildNumber);
+        if (build != null)
+        {
+            Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+            return CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
+            {
+                public boolean satisfied(Hashtable<String, Object> stage)
+                {
+                    return stage.get("name").equals(stageName);
+                }
+            });
+        }
+        return null;
     }
 
     public void waitForBuildToComplete(final String projectName, final int number) throws Exception
@@ -1217,7 +1378,7 @@ public class XmlRpcHelper
     {
         return callTest("getRunningPlugins");
     }
-    
+
     private static class BuildHolder
     {
         Hashtable<String, Object> build = null;

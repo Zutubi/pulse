@@ -7,8 +7,6 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.AgentRequirements;
 import com.zutubi.util.TimeStamps;
-import com.zutubi.util.Clock;
-import com.zutubi.util.SystemClock;
 
 import java.util.List;
 
@@ -18,10 +16,12 @@ import java.util.List;
 public class RecipeAssignmentRequest
 {
     private static final int UNDEFINED = -1;
+
+    /**
+     * The default recipe assignment priority.
+     */
     private static final int DEFAULT_PRIORITY = 0;
 
-    private Clock clock = new SystemClock();
-    
     private Project project;
     private AgentRequirements hostRequirements;
     private List<ResourceRequirement> resourceRequirements;
@@ -29,7 +29,15 @@ public class RecipeAssignmentRequest
     private RecipeRequest request;
     private BuildResult build;
     private long queueTime;
-    
+
+    /**
+     * The priority defines the order in which the recipe assignment process
+     * will review requests.
+     *
+     * Given that an agent fulfills the requirements for two recipes, the request
+     * with the higher priority will be assigned first.  If both priorities are
+     * the same, then the request that was created first will be assigned.
+     */
     private int priority = DEFAULT_PRIORITY;
 
     /**
@@ -78,9 +86,9 @@ public class RecipeAssignmentRequest
         return build;
     }
 
-    public void queued()
+    public void queued(long time)
     {
-        queueTime = clock.getCurrentTimeMillis();
+        queueTime = time;
     }
 
     public long getQueueTime()
@@ -131,10 +139,5 @@ public class RecipeAssignmentRequest
     public void setPriority(int priority)
     {
         this.priority = priority;
-    }
-
-    public void setClock(Clock clock)
-    {
-        this.clock = clock;
     }
 }

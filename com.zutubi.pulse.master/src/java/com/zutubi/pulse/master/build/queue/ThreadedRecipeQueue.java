@@ -178,7 +178,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private void addToQueue(RecipeAssignmentRequest assignmentRequest)
     {
         requestQueue.add(assignmentRequest);
-        assignmentRequest.queued();
+        assignmentRequest.queued(clock.getCurrentTimeMillis());
         lockCondition.signal();
     }
 
@@ -327,6 +327,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
+        request.getHostRequirements();
+        request.getResourceRequirements();
+
         eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none")));
         return false;
     }
@@ -373,6 +376,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     {
                         agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
                         {
+                            // Note that this method must be fast - we are locking agents.
+                            // The lock is require to prevent the agent state changing
+                            // before we assign the recipe to it.
                             public void run(final List<Agent> agents)
                             {
                                 // The agent pool can only contain agents that are currently available.  
@@ -384,9 +390,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                                     }
                                 });
 
-                                // Note that this method must be fast - we are locking agents.
-                                // The lock is require to prevent the agent state changing
-                                // before we assign the recipe to it.
                                 Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
                                 for (Agent agent : agentList)
                                 {

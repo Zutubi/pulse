@@ -4,6 +4,7 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.config.Undefined;
 import com.zutubi.validation.annotations.Numeric;
 
 /**
@@ -26,8 +27,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     private String persistentWorkDir = "$(agent.data.dir)/work/$(project.handle)/$(stage.handle)";
     private boolean logCompressionEnabled = true;
 
-    private static final int UNDEFINED = 0;
-    private int priority = UNDEFINED;
+    private int priority = Undefined.INTEGER;
 
     public BuildOptionsConfiguration()
     {
@@ -116,7 +116,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
 
     public boolean hasPriority()
     {
-        return priority != UNDEFINED;
+        return priority != Undefined.INTEGER;
     }
 
     public int getPriority()

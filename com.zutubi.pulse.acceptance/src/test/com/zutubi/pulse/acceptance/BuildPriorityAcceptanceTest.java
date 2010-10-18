@@ -3,21 +3,17 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.engine.api.ResultState.PENDING;
-import static com.zutubi.pulse.core.engine.api.ResultState.IN_PROGRESS;
-import static com.zutubi.pulse.core.engine.api.ResultState.SUCCESS;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Predicate;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Set of acceptance tests that work on testing builds priorities.
@@ -62,7 +58,11 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         for (String projectName : createdProjects)
         {
-            xmlRpcHelper.cancelBuild(projectName, 1);
+            if (xmlRpcHelper.getProjectState(projectName).isBuilding())
+            {
+                xmlRpcHelper.cancelBuild(projectName, 1);
+                xmlRpcHelper.waitForProjectToBeIdle(projectName);
+            }
         }
 
         xmlRpcHelper.logout();
@@ -136,30 +136,30 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        waitForStageInProgress(project, project.getDefaultStage().getName());
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, 10000);
 
-        assertEquals(IN_PROGRESS, getStageStatus(project, project.getDefaultStage().getName()));
-        assertEquals(PENDING, getStageStatus(project, "C"));
-        assertEquals(PENDING, getStageStatus(project, "B"));
-        assertEquals(PENDING, getStageStatus(project, "D"));
+        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "C", 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage(project.getDefaultStage().getName());
-        waitForStageInProgress(project, "C");
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "C", 1, 10000);
 
-        assertEquals(IN_PROGRESS, getStageStatus(project, "C"));
-        assertEquals(PENDING, getStageStatus(project, "B"));
-        assertEquals(PENDING, getStageStatus(project, "D"));
+        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "C", 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("C");
 
-        waitForStageInProgress(project, "B");
-        assertEquals(IN_PROGRESS, getStageStatus(project, "B"));
-        assertEquals(PENDING, getStageStatus(project, "D"));
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "B", 1, 10000);
+        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("B");
 
-        waitForStageInProgress(project, "D");
-        assertEquals(IN_PROGRESS, getStageStatus(project, "D"));
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "D", 1, 10000);
+        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("D");
 
@@ -198,14 +198,12 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         buildRunner.triggerBuild(projectB);
 
-        // trigger build c via the manual prompt
         SeleniumBrowser browser = new SeleniumBrowser();
         try
         {
             browser.start();
             browser.loginAsAdmin();
 
-            // trigger a build
             ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectC.getName());
             home.triggerBuild();
 
@@ -240,9 +238,9 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildRunner.triggerBuild(projectC);
         buildRunner.triggerBuild(projectD, asPair("priority", (Object)10));
 
-        waitForBuildPending(projectB);
-        waitForBuildPending(projectC);
-        waitForBuildPending(projectD);
+        xmlRpcHelper.watiForBuildInPending(projectB.getName(), 1);
+        xmlRpcHelper.watiForBuildInPending(projectC.getName(), 1);
+        xmlRpcHelper.watiForBuildInPending(projectD.getName(), 1);
 
         projectA.releaseBuild();
 
@@ -256,7 +254,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // still in the build queue.
         buildRunner.waitForBuildInProgress(projectB, 1);
         assertEquals(PENDING, buildRunner.getBuildStatus(projectC, 1));
-        waitForBuildPending(projectE);
+        xmlRpcHelper.watiForBuildInPending(projectE.getName(), 1);
 
         projectB.releaseBuild();
 
@@ -281,7 +279,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
                 buildRunner.waitForBuildInProgress(current, 1);
                 for (WaitProject project : remaining)
                 {
-                    waitForBuildPending(project);
+                    xmlRpcHelper.watiForBuildInPending(project.getName(), 1);
                 }
                 current.releaseBuild();
                 buildRunner.waitForBuildToComplete(current, 1);
@@ -293,8 +291,8 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private WaitProject createProject(String suffix) throws Exception
     {
-        // projects can only be built on the master to ensure that we get expected queing behaviour.
         WaitProject project = projects.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix));
+        // projects can only be built on the master to ensure that we get expected queing behaviour.
         bindStagesToMaster(project);
         return project;
     }
@@ -316,71 +314,5 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
             configurationHelper.insertProject(project.getConfig(), false);
             createdProjects.add(project.getConfig().getName());
         }
-    }
-
-    private ResultState getStageStatus(WaitProject project, String stageName) throws Exception
-    {
-        Hashtable<String, Object> stage = getStage(project, stageName);
-        if (stage != null)
-        {
-            return ResultState.fromPrettyString((String) stage.get("status"));
-        }
-        return null;
-    }
-
-    private Hashtable<String, Object> getStage(WaitProject project, final String stageName) throws Exception
-    {
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
-        if (build != null)
-        {
-            Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
-            return CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
-            {
-                public boolean satisfied(Hashtable<String, Object> stage)
-                {
-                    return stage.get("name").equals(stageName);
-                }
-            });
-        }
-        return null;
-    }
-
-    private void waitForBuildPending(final WaitProject project)
-    {
-        waitForCondition(new Condition()
-        {
-            public boolean satisfied()
-            {
-                try
-                {
-                    Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
-                    return build != null && build.get("status").equals(PENDING.getPrettyString());
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }, 10000, "build of project " + project.getName() + " to be pending");
-
-    }
-
-    private void waitForStageInProgress(final WaitProject project, final String stageName)
-    {
-        waitForCondition(new Condition()
-        {
-            public boolean satisfied()
-            {
-                try
-                {
-                    Hashtable<String, Object> stage = getStage(project, stageName);
-                    return stage != null && stage.get("status").equals(IN_PROGRESS.getPrettyString());
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }, 10000, "stage " + stageName + " of project " + project.getName() + " to become in progress");
     }
 }
