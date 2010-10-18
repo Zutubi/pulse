@@ -1,29 +1,30 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
-import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
-import com.zutubi.pulse.core.engine.api.FieldScope;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
+import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
+import com.zutubi.pulse.core.engine.api.FieldScope;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 {
@@ -97,6 +98,11 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(capturesPath, capture);
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
+        Hashtable<String, Object> customFields = xmlRpcHelper.getCustomFieldsInBuild(random, (int) buildId);
+        assertEquals(new HashSet<String>(asList("", DEFAULT_STAGE)), customFields.keySet());
+        assertFields(customFields, "");
+        assertFields(customFields, DEFAULT_STAGE, METRIC1, Double.toString(value1), METRIC2, Double.toString(value2));
+
         browser.loginAsAdmin();
 
         BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
@@ -128,6 +134,11 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(commandsPath, command);
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
+        Hashtable<String, Object> customFields = xmlRpcHelper.getCustomFieldsInBuild(random, (int) buildId);
+        assertEquals(new HashSet<String>(asList("", DEFAULT_STAGE)), customFields.keySet());
+        assertFields(customFields, "", FIELD_NAME, FIELD_VALUE);
+        assertFields(customFields, DEFAULT_STAGE);
+        
         browser.loginAsAdmin();
 
         BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
@@ -176,6 +187,21 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         // Check that clicking apply preserves the visible group.
         reportsPage.clickApply();
         reportsPage.waitFor();
+    }
+
+    private void assertFields(Hashtable<String, Object> allFields, String stageName, String... expected)
+    {
+        assertEquals("Expected an even number of varargs", 0, expected.length % 2);
+
+        Object fields = allFields.get(stageName);
+        assertNotNull("No fields for stage '" + stageName + "'", fields);
+        Hashtable<String, String> expectedMap = new Hashtable<String, String>(expected.length / 2);
+        for (int i = 0; i < expected.length; i+= 2)
+        {
+            expectedMap.put(expected[i], expected[i + 1]);
+        }
+
+        assertEquals(expectedMap, fields);
     }
 
     @SuppressWarnings({"unchecked"})

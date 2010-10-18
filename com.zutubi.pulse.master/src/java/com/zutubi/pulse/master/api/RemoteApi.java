@@ -28,6 +28,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -51,16 +52,15 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 import org.acegisecurity.AccessDeniedException;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3117,6 +3117,50 @@ public class RemoteApi
         result.put("level", feature.getLevel().getPrettyString());
         result.put("message", feature.getSummary());
         return result;
+    }
+
+    /**
+     * Returns a structure with all custom fields in a build.  The structure keys are
+     * stage names, and the values are themselves structures that map from field name
+     * to field value.  Fields recorded on the build itself (i.e. not a specific stage)
+     * are stored under a key of the empty string.  Note that all property values are
+     * strings.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param buildId     ID of the build to get the fields for
+     * @return {@xtype array<[RemoteApi.Feature]>} all custom fields for the given build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     */
+    public Hashtable<String, Object> getCustomFieldsInBuild(String token, String projectName, int buildId)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
+            final File dataDir = configurationManager.getDataDirectory();
+
+            final Hashtable<String, Object> result = new Hashtable<String, Object>();
+            result.put("", loadCustomFields(buildResult.getAbsoluteOutputDir(dataDir)));
+            
+            for (RecipeResultNode node: buildResult.getRoot().getChildren())
+            {
+                result.put(node.getStageName(), loadCustomFields(node.getResult().getAbsoluteOutputDir(dataDir)));
+            }
+            
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }        
+    }
+
+    private Hashtable<String, String> loadCustomFields(File outputDir)
+    {
+        ResultCustomFields customFields = new ResultCustomFields(outputDir);
+        return new Hashtable<String, String>(customFields.load());
     }
 
     /**
