@@ -81,14 +81,14 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectA.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectA, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
 
         // expect projectB to be building.
         xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
         projectB.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
     }
 
     public void testRebuildMultipleDependencies() throws Exception
@@ -114,7 +114,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 try
                 {
-                    return buildRunner.getBuildStatus(projectA, 1) == ResultState.IN_PROGRESS || buildRunner.getBuildStatus(projectB, 1) == ResultState.IN_PROGRESS;
+                    return xmlRpcHelper.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS || xmlRpcHelper.getBuildStatus(projectB.getName(), 1) == ResultState.IN_PROGRESS;
                 }
                 catch (Exception e)
                 {
@@ -123,7 +123,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             }
         }, XmlRpcHelper.BUILD_TIMEOUT, "a dependency to start building");
 
-        if (buildRunner.getBuildStatus(projectA, 1) == ResultState.IN_PROGRESS)
+        if (xmlRpcHelper.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS)
         {
             firstDependency = projectA;
             secondDependency = projectB;
@@ -134,22 +134,22 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             secondDependency = projectA;
         }
 
-        assertEquals(ResultState.PENDING, buildRunner.getBuildStatus(secondDependency, 1));
+        assertEquals(ResultState.PENDING, xmlRpcHelper.getBuildStatus(secondDependency.getName(), 1));
         assertBuildQueued(projectC);
         firstDependency.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(firstDependency.getName(), 1);
 
         xmlRpcHelper.waitForBuildInProgress(secondDependency.getName(), 1);
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(firstDependency, 1));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(secondDependency, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(firstDependency.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(secondDependency.getName(), 1));
         assertBuildQueued(projectC);
         secondDependency.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(secondDependency.getName(), 1);
 
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectA, 1));
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectC, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
         projectC.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
     }
@@ -171,7 +171,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
 
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectA, 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
         assertBuildQueued(projectB);
         assertBuildQueued(projectC);
 
@@ -179,17 +179,17 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
         xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectA, 1));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectB, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
         assertBuildQueued(projectC);
 
         projectB.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectA, 1));
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectC, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
 
         projectC.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
@@ -216,17 +216,17 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
 
         assertEquals(IDLE, xmlRpcHelper.getProjectState(projectA.getName()));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectB, 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
         assertBuildQueued(projectC);
 
         projectB.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
 
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectC, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
 
         projectC.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
@@ -256,28 +256,28 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
 
         assertEquals(IDLE, xmlRpcHelper.getProjectState(projectA.getName()));
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectB, 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
         assertBuildQueued(projectC);
         assertBuildQueued(projectD);
 
         projectB.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectB, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
 
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectC, 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
         assertBuildQueued(projectD);
 
         projectC.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectC, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
 
         xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
-        assertEquals(ResultState.IN_PROGRESS, buildRunner.getBuildStatus(projectD, 1));
+        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectD.getName(), 1));
 
         projectD.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectD.getName(), 1);
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectD, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectD.getName(), 1));
     }
 
     public void testRebuildStopsOnFailure() throws Exception
@@ -292,10 +292,9 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildRunner.triggerRebuild(projectB.getConfig());
 
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
-        assertEquals(ResultState.FAILURE, buildRunner.getBuildStatus(projectA, 1));
+        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
 
-//        assertBuildNotQueued(projectB);
-        assertNull(buildRunner.getBuildStatus(projectB, 1));
+        assertNull(xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
 
         // We would normally have to release projectBs' build.  However, it did not run,
         // because projectA failed. 
@@ -343,17 +342,12 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
 
         // ensure that project C uses project A build 1 artifacts.
-        assertEquals(ResultState.SUCCESS, buildRunner.getBuildStatus(projectC, 1));
+        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
     }
 
     private void assertBuildQueued(final ProjectConfigurationHelper project) throws Exception
     {
         assertNotNull(getQueuedBuild(project));
-    }
-
-    private void assertBuildNotQueued(ProjectConfigurationHelper project) throws Exception
-    {
-        assertNull(getQueuedBuild(project));
     }
 
     private Hashtable<String, Object> getQueuedBuild(final ProjectConfigurationHelper project)

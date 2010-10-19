@@ -120,13 +120,13 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         configurationHelper.insertProject(project.getConfig(), false);
 
         int buildNumber = buildRunner.triggerBuild(project);
-        buildRunner.waitForBuildInProgress(project, buildNumber);
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
 
         BuildSummaryPage page = addCommentToBuild(random, buildNumber);
 
         project.releaseBuild();
 
-        buildRunner.waitForBuildToComplete(project, buildNumber);
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
 
         page.openAndWaitFor();
         assertTextPresent(TEST_COMMENT);

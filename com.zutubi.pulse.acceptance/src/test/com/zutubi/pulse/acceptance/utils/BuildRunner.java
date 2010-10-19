@@ -55,7 +55,7 @@ public class BuildRunner
     {
         int buildNumber = triggerAndWaitForBuild(project, options);
 
-        ResultState buildStatus = getBuildStatus(project, buildNumber);
+        ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
         if (!ResultState.SUCCESS.equals(buildStatus))
         {
             throw new RuntimeException("Expected success, had " + buildStatus + " instead.");
@@ -69,7 +69,7 @@ public class BuildRunner
         xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
         project.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
-        ResultState buildStatus = getBuildStatus(project, buildNumber);
+        ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
         if (!ResultState.SUCCESS.equals(buildStatus))
         {
             throw new RuntimeException("Expected success, had " + buildStatus + " instead.");
@@ -104,7 +104,7 @@ public class BuildRunner
     {
         int buildNumber = triggerAndWaitForBuild(project, options);
 
-        ResultState buildStatus = getBuildStatus(project, buildNumber);
+        ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
         if (!ResultState.FAILURE.equals(buildStatus))
         {
             throw new RuntimeException("Expected failure, had " + buildStatus + " instead.");
@@ -215,43 +215,4 @@ public class BuildRunner
         args[args.length - 1] = asPair("rebuild", (Object)"true");
         return triggerBuild(project, args);
     }
-
-    public void waitForBuildInProgress(ProjectConfigurationHelper project, int buildNumber) throws Exception
-    {
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
-    }
-
-    public void waitForBuildToComplete(ProjectConfigurationHelper project, int buildNumber) throws Exception
-    {
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
-    }
-
-    /**
-     * Get the status of the specific build.
-     *
-     * @param project       the project that the build belongs to.
-     * @param buildNumber   the build number uniquely identifying the build.
-     * @return  the result state of the build or null if the build was not found.
-     *
-     * @throws Exception thrown on error.
-     */
-    public ResultState getBuildStatus(ProjectConfigurationHelper project, int buildNumber) throws Exception
-    {
-        return getBuildStatus(project.getConfig(), buildNumber);
-    }
-
-    /**
-     * Get the status of the specific build.
-     *
-     * @param project       the project that the build belongs to.
-     * @param buildNumber   the build number uniquely identifying the build.
-     * @return the result state of the build, or null if the build was not found.
-     *
-     * @throws Exception thrown on error.
-     */
-    public ResultState getBuildStatus(ProjectConfiguration project, int buildNumber) throws Exception
-    {
-        return xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
-    }
-
 }

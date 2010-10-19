@@ -144,7 +144,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(project);
 
         int buildNumber = buildRunner.triggerAndWaitForBuild(project.getConfig());
-        assertEquals(ResultState.ERROR, buildRunner.getBuildStatus(project.getConfig(), buildNumber));
+        assertEquals(ResultState.ERROR, xmlRpcHelper.getBuildStatus(project.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(project, buildNumber);
@@ -809,7 +809,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = buildRunner.triggerBuild(projectA);
 
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), buildNumber, XmlRpcHelper.BUILD_TIMEOUT * 2);
-        ResultState buildStatus = buildRunner.getBuildStatus(projectA, buildNumber);
+        ResultState buildStatus = xmlRpcHelper.getBuildStatus(projectA.getName(), buildNumber);
         assertEquals(ResultState.SUCCESS, buildStatus);
 
         // The completion of project A's build will trigger a build of project B.

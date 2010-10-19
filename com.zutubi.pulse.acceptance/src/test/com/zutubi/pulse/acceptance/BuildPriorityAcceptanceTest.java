@@ -80,7 +80,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        buildRunner.waitForBuildInProgress(projectA, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
         
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -99,7 +99,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        buildRunner.waitForBuildInProgress(projectA, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -117,7 +117,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        buildRunner.waitForBuildInProgress(projectA, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -163,8 +163,8 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         project.releaseStage("D");
 
-        buildRunner.waitForBuildToComplete(project, 1);
-        assertEquals(SUCCESS, buildRunner.getBuildStatus(project, 1));
+        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
     public void testPriorityViaRemoteApi() throws Exception
@@ -176,7 +176,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        buildRunner.waitForBuildInProgress(projectA, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB, asPair("priority", (Object) 2));
         buildRunner.triggerBuild(projectC, asPair("priority", (Object) 3));
@@ -194,7 +194,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        buildRunner.waitForBuildInProgress(projectA, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
 
@@ -232,7 +232,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(projectA, projectB, projectC, projectD, projectE);
 
         buildRunner.triggerBuild(projectA);
-        buildRunner.waitForBuildInProgress(projectA, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -244,25 +244,25 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         projectA.releaseBuild();
 
-        buildRunner.waitForBuildInProgress(projectD, 1);
-        assertEquals(PENDING, buildRunner.getBuildStatus(projectB, 1));
-        assertEquals(PENDING, buildRunner.getBuildStatus(projectC, 1));
+        xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
+        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
 
         projectD.releaseBuild();
 
         // due to timing issues, project B ends up being triggered next because project D is
         // still in the build queue.
-        buildRunner.waitForBuildInProgress(projectB, 1);
-        assertEquals(PENDING, buildRunner.getBuildStatus(projectC, 1));
+        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
         xmlRpcHelper.watiForBuildInPending(projectE.getName(), 1);
 
         projectB.releaseBuild();
 
-        buildRunner.waitForBuildInProgress(projectE, 1);
-        assertEquals(PENDING, buildRunner.getBuildStatus(projectC, 1));
+        xmlRpcHelper.waitForBuildInProgress(projectE.getName(), 1);
+        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
         projectE.releaseBuild();
 
-        buildRunner.waitForBuildInProgress(projectC, 1);
+        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
         projectC.releaseBuild();
     }
 
@@ -276,14 +276,14 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
             do
             {
                 WaitProject current = remaining.remove(0);
-                buildRunner.waitForBuildInProgress(current, 1);
+                xmlRpcHelper.waitForBuildInProgress(current.getName(), 1);
                 for (WaitProject project : remaining)
                 {
                     xmlRpcHelper.watiForBuildInPending(project.getName(), 1);
                 }
                 current.releaseBuild();
-                buildRunner.waitForBuildToComplete(current, 1);
-                assertEquals(SUCCESS, buildRunner.getBuildStatus(current, 1));
+                xmlRpcHelper.waitForBuildToComplete(current.getName(), 1);
+                assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(current.getName(), 1));
             }
             while (remaining.size() > 0);
         }
