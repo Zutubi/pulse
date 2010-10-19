@@ -2,8 +2,8 @@ package com.zutubi.util;
 
 import com.zutubi.util.logging.Logger;
 
-import java.util.concurrent.*;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * Utilities built on top of java.util.concurrent classes.
@@ -26,10 +26,13 @@ public class ConcurrentUtils
      */
     public static <T> T runWithTimeout(Callable<T> callable, long timeout, TimeUnit timeUnit, T defaultValue)
     {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<T> future = executor.submit(callable);
+        ExecutorService executor = null;
+        Future<T> future = null;
         try
         {
+            executor = Executors.newSingleThreadExecutor();
+            future = executor.submit(callable);
+            
             return future.get(timeout, timeUnit);
         }
         catch (InterruptedException e)
@@ -44,6 +47,13 @@ public class ConcurrentUtils
         {
             future.cancel(true);
             return defaultValue;
+        }
+        finally
+        {
+            if (executor != null)
+            {
+                executor.shutdown();
+            }
         }
     }
 
