@@ -117,6 +117,11 @@ public class PulseToolbar
         return browser.isElementIdPresent(ID_PROJECT_LINK);
     }
 
+    public void waitFor()
+    {
+        browser.waitForElement(ID_TOOLBAR);
+    }
+
     public void waitForBuildNav()
     {
         browser.waitForElement(ID_BUILD_LINK);

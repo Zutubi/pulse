@@ -711,7 +711,7 @@ public class SeleniumBrowser
             selenium.refresh();
             try
             {
-                selenium.waitForPageToLoad("10000");
+                selenium.waitForPageToLoad(String.valueOf(REFRESH_TIMEOUT));
             }
             catch (Exception e)
             {

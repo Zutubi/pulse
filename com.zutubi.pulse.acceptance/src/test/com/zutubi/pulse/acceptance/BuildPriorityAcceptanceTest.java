@@ -20,6 +20,8 @@ import java.util.List;
  */
 public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    private static final int WAIT_FOR_TIMEOUT = 20000;
+
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
     private BuildRunner buildRunner;
@@ -136,7 +138,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, 10000);
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, WAIT_FOR_TIMEOUT);
 
         assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
         assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "C", 1));
@@ -144,7 +146,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage(project.getDefaultStage().getName());
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "C", 1, 10000);
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "C", 1, WAIT_FOR_TIMEOUT);
 
         assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "C", 1));
         assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
@@ -152,13 +154,13 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         project.releaseStage("C");
 
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "B", 1, 10000);
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "B", 1, WAIT_FOR_TIMEOUT);
         assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
         assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("B");
 
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "D", 1, 10000);
+        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "D", 1, WAIT_FOR_TIMEOUT);
         assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("D");

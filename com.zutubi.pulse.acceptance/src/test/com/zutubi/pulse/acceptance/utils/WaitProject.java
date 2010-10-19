@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class WaitProject extends ProjectConfigurationHelper
     public WaitProject(ProjectConfiguration config, File tmpDir)
     {
         super(config);
-        waitBaseDir = tmpDir;
+        waitBaseDir = new File(tmpDir, config.getName());
 
         File[] files = waitBaseDir.listFiles();
         if (files != null)

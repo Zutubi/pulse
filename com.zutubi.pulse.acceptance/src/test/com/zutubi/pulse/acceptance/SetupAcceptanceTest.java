@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.setup.*;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import com.zutubi.pulse.acceptance.pages.PulseToolbar;
 import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import org.xml.sax.SAXException;
@@ -71,6 +72,11 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
+
+        // wait for the toolbar to be rendered before continuing with checking.
+        PulseToolbar toolbar = new PulseToolbar(browser);
+        toolbar.waitFor();
+
         assertTextPresent("A. D. Ministrator");
         assertTrue(browser.isElementIdPresent("logout"));
     }
