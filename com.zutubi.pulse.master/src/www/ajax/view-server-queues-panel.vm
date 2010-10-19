@@ -118,12 +118,12 @@
 
     </td></tr><tr><td>
 
-    <table id="server.activity.recipe.queue" class="fill-content">
+    <table id="server.activity.stage.queue" class="fill-content">
 
 #if($recipeQueueRunning)
-        #restrictedHeadingRow("recipe.queue" 7 "ADMINISTER" "queue.pause" "$base/admin/actions?toggleRecipeQueue" "control_pause_blue.gif" false)
+        #restrictedHeadingRow("stage.queue" 7 "ADMINISTER" "queue.pause" "$base/admin/actions?toggleRecipeQueue" "control_pause_blue.gif" false)
 #else
-        #restrictedHeadingRow("recipe.queue" 7 "ADMINISTER" "queue.resume" "$base/admin/actions?toggleRecipeQueue" "control_play_blue.gif" false)
+        #restrictedHeadingRow("stage.queue" 7 "ADMINISTER" "queue.resume" "$base/admin/actions?toggleRecipeQueue" "control_play_blue.gif" false)
         #noteRow("queue.paused" 7)
 #end
         <tr>
@@ -156,7 +156,7 @@
     #end
 #else
     <tr>
-        <td class="content" colspan="7">#wwtext("name=recipe.queue.empty")</td>
+        <td class="content" colspan="7">#wwtext("name=stage.queue.empty")</td>
     </tr>
 #end
     </table>

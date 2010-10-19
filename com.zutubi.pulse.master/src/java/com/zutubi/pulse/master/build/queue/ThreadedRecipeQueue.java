@@ -327,9 +327,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
-        request.getHostRequirements();
-        request.getResourceRequirements();
-
         eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none")));
         return false;
     }

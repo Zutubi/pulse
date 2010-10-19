@@ -19,7 +19,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 {
     private static final String ID_BUILD_QUEUE_TABLE = "server.activity.build.queue";
     private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
-    private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.recipe.queue";
+    private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.stage.queue";
     private static final String REVISION_WAIT_ANT = "28";
 
     private static final int TIMEOUT = 90000;
@@ -59,7 +59,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         browser.openAndWaitFor(ServerActivityPage.class);
         assertEmptyTable(ID_BUILD_QUEUE_TABLE, "build queue", BuildQueueTable.EMPTY_MESSAGE);
         assertEmptyTable(ID_ACTIVITY_TABLE, "active builds", ActiveBuildsTable.EMPTY_MESSAGE);
-        assertEmptyTable(ID_RECIPE_QUEUE_TABLE, "recipe queue", "no recipe requests queued");
+        assertEmptyTable(ID_RECIPE_QUEUE_TABLE, "stage queue", "no stages queued");
     }
 
     private void assertEmptyTable(String id, String header, String message)
