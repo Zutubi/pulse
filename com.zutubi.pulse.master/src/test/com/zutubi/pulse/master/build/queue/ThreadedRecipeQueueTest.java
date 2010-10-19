@@ -365,7 +365,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
         takeOffline(slave1000);
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1001, "No online agents satisfy requirements.");
+        assertRecipeError(1001, "No online agents satisfy the request requirements. Expected type 1000 not matched by agents.");
     }
 
     public void testNoOnlineAgent() throws Exception
@@ -373,7 +373,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         queue.setUnsatisfiableTimeout(0);
         queue.enqueue(createAssignmentRequest(0, 1000));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertRecipeError(1000, "No online agents satisfy requirements.");
+        assertRecipeError(1000, "No online agents satisfy the request requirements. Expected type 0 not matched by agents.");
     }
 
     public void testAgentErrorOnBuild() throws Exception
@@ -666,7 +666,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         else
         {
             assignedEvent = (RecipeAssignedEvent)evt;
-            System.out.println("a"+assignedEvent.getRequest().getId());
             agentManager.unavailable(assignedEvent.getAgent());
             dispatchedSemaphore.release();
             recipeDispatchService.dispatch(assignedEvent);
@@ -901,7 +900,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             this.type = type;
         }
 
-        public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
+        public boolean isFulfilledBy(RecipeAssignmentRequest request, AgentService service)
         {
             return (((FakeAgentService) service).getType() == type) &&
                     Long.valueOf(request.getRevision().getRevision().getRevisionString()) >= 0;
@@ -910,6 +909,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public String getSummary()
         {
             return "type matching";
+        }
+
+        public String getUnfulFilledReason(RecipeAssignmentRequest request)
+        {
+            return "Expected type " + type + " not matched by agents.";
         }
     }
 }

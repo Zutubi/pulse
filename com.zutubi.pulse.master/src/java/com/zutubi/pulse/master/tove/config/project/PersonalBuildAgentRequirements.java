@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.agent.AgentService;
+import com.zutubi.i18n.Messages;
 
 /**
  * Ensures that personal build assignment requests are only fulfilled by agents
@@ -9,6 +10,8 @@ import com.zutubi.pulse.master.agent.AgentService;
  */
 public class PersonalBuildAgentRequirements implements AgentRequirements
 {
+    private static final Messages I18N = Messages.getInstance(PersonalBuildAgentRequirements.class);
+    
     private AgentRequirements agentRequirements;
 
     public PersonalBuildAgentRequirements(AgentRequirements agentRequirements)
@@ -23,11 +26,16 @@ public class PersonalBuildAgentRequirements implements AgentRequirements
 
     public String getSummary()
     {
-        return agentRequirements.getSummary() + " (personal build)";
+        return I18N.format("summary", agentRequirements.getSummary());
     }
 
-    public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
+    public String getUnfulFilledReason(RecipeAssignmentRequest request)
     {
-        return agentRequirements.fulfilledBy(request, service) && verifyPersonalBuilds(request, service);
+        return I18N.format("unfulfilled.reason", agentRequirements.getUnfulFilledReason(request));
+    }
+
+    public boolean isFulfilledBy(RecipeAssignmentRequest request, AgentService service)
+    {
+        return agentRequirements.isFulfilledBy(request, service) && verifyPersonalBuilds(request, service);
     }
 }

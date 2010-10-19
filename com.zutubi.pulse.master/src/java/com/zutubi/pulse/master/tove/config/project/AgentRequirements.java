@@ -13,5 +13,21 @@ public interface AgentRequirements
 {
     @Transient
     public String getSummary();
-    public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service);
+    public boolean isFulfilledBy(RecipeAssignmentRequest request, AgentService service);
+
+    /**
+     * Get a human readable reason why the specified request could not be
+     * fulfilled.  This assumed that {@link #isFulfilledBy(RecipeAssignmentRequest, AgentService)}
+     * has returned false.
+     *
+     * The format of the reason should be a concise to the point statement.
+     *
+     * @param request   the recipe request providing the context for the
+     *                  isFulfillable check.
+     *
+     * @return a human readable message for why the requirements are not
+     * fulfilled in the context of the request.
+     */
+    @Transient
+    String getUnfulFilledReason(RecipeAssignmentRequest request);
 }

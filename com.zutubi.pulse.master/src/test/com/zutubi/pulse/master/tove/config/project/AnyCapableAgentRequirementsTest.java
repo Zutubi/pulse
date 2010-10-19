@@ -36,17 +36,33 @@ public class AnyCapableAgentRequirementsTest extends PulseTestCase
 
     public void testNoResources()
     {
-        assertTrue(requirements.fulfilledBy(createRequest(), mockAgentService));
+        assertTrue(requirements.isFulfilledBy(createRequest(), mockAgentService));
     }
 
     public void testNonExistantResource()
     {
-        assertFalse(requirements.fulfilledBy(createRequest(new ResourceRequirement("doesnt exist", false)), mockAgentService));
+        assertFalse(requirements.isFulfilledBy(createRequest(new ResourceRequirement("doesnt exist", false)), mockAgentService));
     }
 
     public void testExistingResource()
     {
-        assertTrue(requirements.fulfilledBy(createRequest(new ResourceRequirement(RESOURCE_NAME, false)), mockAgentService));
+        assertTrue(requirements.isFulfilledBy(createRequest(new ResourceRequirement(RESOURCE_NAME, false)), mockAgentService));
+    }
+
+    public void testUnfulfillableReason()
+    {
+        assertEquals(
+                "Missing one or more of the following resource. ant:[default]",
+                requirements.getUnfulFilledReason(createRequest(new ResourceRequirement("ant", false)))
+        );
+        assertEquals(
+                "Missing one or more of the following resource. ant:1.0",
+                requirements.getUnfulFilledReason(createRequest(new ResourceRequirement("ant", "1.0", false)))
+        );
+        assertEquals(
+                "Missing one or more of the following resource. ant:1.0, make:2.0",
+                requirements.getUnfulFilledReason(createRequest(new ResourceRequirement("ant", "1.0", false), new ResourceRequirement("make", "2.0", false)))
+        );
     }
 
     private RecipeAssignmentRequest createRequest(ResourceRequirement... resourceRequirements)

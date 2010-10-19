@@ -144,7 +144,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 {
                     if (unsatisfiableTimeout == 0)
                     {
-                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("satisfy.requirements.none"));
+                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("satisfy.requirements.none", assignmentRequest.getUnfulfilledReason()));
                     }
                     else
                     {
@@ -237,7 +237,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             for (RecipeAssignmentRequest request : requestQueue)
             {
-                if (request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getService()))
+                if (request.hasTimeout() && request.isFulfilledBy(agent))
                 {
                     request.clearTimeout();
                 }
@@ -318,16 +318,16 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private boolean requestMayBeFulfilled(RecipeAssignmentRequest request)
     {
         eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.check")));
-        for (Agent a : agentManager.getOnlineAgents())
+        for (Agent agent : agentManager.getOnlineAgents())
         {
-            if (request.getHostRequirements().fulfilledBy(request, a.getService()))
+            if (request.isFulfilledBy(agent))
             {
                 eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.some")));
                 return true;
             }
         }
 
-        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none")));
+        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none", request.getUnfulfilledReason())));
         return false;
     }
 
@@ -390,10 +390,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                                 Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
                                 for (Agent agent : agentList)
                                 {
-                                    AgentService service = agent.getService();
-
                                     // can the request be sent to this service?
-                                    if (request.getHostRequirements().fulfilledBy(request, service))
+                                    if (request.isFulfilledBy(agent))
                                     {
                                         eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
                                         doneRequests.add(request);
@@ -533,7 +531,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         for (RecipeAssignmentRequest request : unfulfillable)
         {
-            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none")));
+            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none", request.getUnfulfilledReason())));
         }
     }
 

@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.i18n.Messages;
 
 /**
  * Requirements that allow a stage to be dispatched to any agent that has the
@@ -10,16 +12,35 @@ import com.zutubi.pulse.master.model.ResourceManager;
  */
 public class AnyCapableAgentRequirements implements AgentRequirements
 {
+    private static final Messages I18N = Messages.getInstance(AnyCapableAgentRequirements.class);
+
     private ResourceManager resourceManager;
 
     public String getSummary()
     {
-        return "[any]";
+        return I18N.format("summary");
     }
 
-    public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
+    public boolean isFulfilledBy(RecipeAssignmentRequest request, AgentService service)
     {
         return resourceManager.getAgentRepository(service.getAgentConfig()).satisfies(request.getResourceRequirements());
+    }
+
+    public String getUnfulFilledReason(RecipeAssignmentRequest request)
+    {
+        StringBuffer message = new StringBuffer();
+        message.append(I18N.format("unfulfilled.reason"));
+        String sep = " ";
+        for (ResourceRequirement requirement : request.getResourceRequirements())
+        {
+            if (!requirement.isOptional())
+            {
+                message.append(sep);
+                message.append(requirement);
+                sep = ", ";
+            }
+        }
+        return message.toString();
     }
 
     public void setResourceManager(ResourceManager resourceManager)
