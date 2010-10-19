@@ -386,8 +386,6 @@ public class RecipeProcessor
         if (terminating)
         {
             runningLock.unlock();
-            commandResult.terminate("Recipe termination requested.");
-            commandResult.complete();
             return false;
         }
 
