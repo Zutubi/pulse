@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 // dependency: ./ContentTable.js
+// dependency: zutubi/KeyValue.js
 
 /**
  * A table that shows a set of properties related to one "entity".  The property names
@@ -8,7 +9,7 @@
  *
  * @cfg {String} cls          Class to use for the table (defaults to 'content-table').
  * @cfg {String} id           Id to use for the table.
- * @cfg {Array}  rows         An array of {Zutubi.table.PropertyRow} configs.
+ * @cfg {Array}  rows         An array of {Zutubi.KeyValue} configs.
  * @cfg {Object} data         Data object used to populate the table, should contain keys that match
  *                            the rows of this table.
  * @cfg {String} title        Title for the table heading row.
@@ -29,7 +30,7 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
         this.rows = [];
         for (var i = 0; i < rowConfigs.length; i++)
         {
-            this.rows.push(new Zutubi.table.PropertyRow(rowConfigs[i]));
+            this.rows.push(new Zutubi.KeyValue(rowConfigs[i]));
         }
 
         Zutubi.table.PropertyTable.superclass.initComponent.apply(this, arguments);
@@ -41,42 +42,15 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
         for (var i = 0, l = this.rows.length; i < l; i++)
         {
             var row = this.rows[i];
-            var args = row.getTemplateArgs(this.data);
-            args['id'] = this.id + '-' + row.name;
+            var args = {
+                id: this.id + '-' + row.name,
+                key: row.key,
+                value: row.getRenderedValue(this.data)
+            }
             previousRow = this.rowTemplate.insertAfter(previousRow, args, true);
         }
     }
 });
-
-/**
- * A single row in a PropertyTable.
- *
- * @cfg {String} name     The name of this row, used to look up the value in the data object.
- * @cfg {String} key      The key text to display in the left cell (defaults to the name).
- * @cfg {String} renderer Function to turn the raw string value into HTML to populate the
- *                        right cell (defaults to a simple HTML encode)
- */
-Zutubi.table.PropertyRow = function(config) {
-    if (typeof config == 'string')
-    {
-        config = {name: config};
-    }
-    
-    Ext.apply(this, config, {
-        renderer: Ext.util.Format.htmlEncode
-    });
-    
-    if (!this.key)
-    {
-        this.key = this.name;
-    }
-};
-
-Zutubi.table.PropertyRow.prototype = {
-    getTemplateArgs: function(data) {
-        return {key: this.key, value: this.renderer(data[this.name])};
-    }
-};
 
 Ext.reg('xzpropertytable', Zutubi.table.PropertyTable);
 

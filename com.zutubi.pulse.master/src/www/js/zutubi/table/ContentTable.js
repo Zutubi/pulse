@@ -64,6 +64,7 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
         if (this.data)
         {
             this.renderData();
+            this.el.setDisplayed(true);
         }
         else
         {

@@ -1,13 +1,14 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 // dependency: ./ContentTable.js
+// dependency: zutubi/KeyValue.js
 
 /**
  * A table that summarises a collection of items, one item per row.  Multiple fields
  * from each item are shown across multiple columns.
  *
  * @cfg {String} cls          Class to use for the table (defaults to 'content-table')
- * @cfg {Array}  columns      An array of {Zutubi.table.SummaryColumn} configs.
+ * @cfg {Array}  columns      An array of {Zutubi.KeyValue} configs.
  * @cfg {String} id           Id to use for the table.
  * @cfg {Array}  data         Array of objects used to populate the table.  Should contain an entry
  *                            for each row, with fields matching the columns.
@@ -24,7 +25,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         this.columns = [];
         for (var i = 0; i < columnConfigs.length; i++)
         {
-            this.columns.push(new Zutubi.table.SummaryColumn(columnConfigs[i]));
+            this.columns.push(new Zutubi.KeyValue(columnConfigs[i]));
         }
 
         Zutubi.table.SummaryTable.superclass.initComponent.apply(this, arguments);
@@ -61,7 +62,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         for (var i = 0; i < columnCount; i++)
         {
             var column = this.columns[i];
-            var rawValue = data[column.name];
+            var rawValue = column.getRawValue(data);
             html += this.cellTemplate.apply({
                 tag: tag,
                 first: i == 0,
@@ -74,29 +75,5 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return html;
     }
 });
-
-/**
- * A single column in a SummaryTable.
- *
- * @cfg {String} name     The name of this column, used to look up the value in the record.
- * @cfg {String} key      The key text to display in the header (defaults to the name).
- * @cfg {String} renderer Function to turn the raw string value into HTML to populate value
- *                        cells (defaults to a simple HTML encode)
- */
-Zutubi.table.SummaryColumn = function(config) {
-    if (typeof config == 'string')
-    {
-        config = {name: config};
-    }
-
-    Ext.apply(this, config, {
-        renderer: Ext.util.Format.htmlEncode
-    });
-    
-    if (!this.key)
-    {
-        this.key = this.name;
-    }
-};
 
 Ext.reg('xzsummarytable', Zutubi.table.SummaryTable);

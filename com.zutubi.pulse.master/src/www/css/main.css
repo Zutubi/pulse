@@ -328,12 +328,12 @@ hr
 
 .hpad
 {
-    padding: 0 15px;
+    padding: 0 17px;
 }
 
 .vpad
 {
-    padding: 15px 0;
+    padding: 17px 0;
 }
 
 img
@@ -870,6 +870,98 @@ img.popdown-small-pressed
 /*------------------------------
 Build tabs
 */
+
+.status-box
+{
+    width: 100%;
+    border: solid 2px;
+}
+
+.status-box td
+{
+    padding: 3px 5px;
+}
+
+.status-box th
+{
+    font-size: 1.3em;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+}
+
+td.status-key
+{
+    text-align: right;
+    vertical-align: top;
+    font-weight: bold;
+    padding-left: 8px;
+}
+
+td.status-value
+{
+    padding-right: 8px;
+}
+
+td.status-last
+{
+    padding-bottom: 8px;
+}
+
+.broken-box
+{
+    background: #fee;
+    border-color: #c04040;
+}
+
+.broken-box th
+{
+    color: #700000;
+}
+
+.inprogress-box
+{
+    background: #eaefff;
+    border-color: #5070a0;
+}
+
+.inprogress-box th
+{
+    color: #000060;
+}
+
+.ok-box
+{
+    background: #efe;
+    border-color: #90c090;
+}
+
+.ok-box th
+{
+    color: #006000;
+}
+
+.unknown-box
+{
+    background: #f2f2f2;
+    border-color: #a0a0a0;
+}
+
+.unknown-box th
+{
+    color: #333;
+}
+
+.warnings-box
+{
+    background: #ffc;
+    border-color: #f0c000;
+}
+
+.warnings-box th
+{
+    color: #750;
+}
 
 .build-page-header, #build-toolbar
 {

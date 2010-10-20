@@ -7,26 +7,60 @@
  * container.
  */
 Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
-    defaultTableAttrs: {
-        style: {
-            'width': '100%',
-            'border-collapse': 'separate',
-            'border-spacing': '0 15px'
-        }    
-    },
+    width: '100%',
+    spacing: 17,
     
     onLayout: function(container, target) {
         this.columns = 1;
+
         if (!this.tableAttrs)
         {
-            this.tableAttrs = this.defaultTableAttrs;
+            this.tableAttrs = {style: {}};
         }
-        else
-        {
-            Ext.apply(this.tableAttrs, this.defaultTableAttrs);
-        }
+
+        Ext.apply(this.tableAttrs.style, {
+            'width': this.width,
+            'border-collapse': 'separate',
+            'border-spacing': '0 ' + this.spacing + 'px'
+        });
         
         Zutubi.layout.VerticalTableLayout.superclass.onLayout.apply(this, arguments);        
+    },
+    
+    checkRows: function() {
+        var rows = this.table.tBodies[0].childNodes;
+        for (var i = 0, l = rows.length; i < l; i++)
+        {
+            var display = false;
+            var row = rows[i];
+            var cells = row.childNodes;
+            for (var j = 0, m = cells.length; j < m; j++)
+            {
+                var cell = cells[j];
+                if (this.hasDisplayedChild(cell))
+                {
+                    display = true;
+                    break;
+                }
+            }
+            
+            row.style.display = display ? '' : 'none';
+        }
+    },
+    
+    hasDisplayedChild: function(node)
+    {
+        var children = node.childNodes;
+        for (var i = 0, l = children.length; i < l; i++)
+        {
+            var d = children[i].style.display;
+            if (d != 'none')
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 });
 

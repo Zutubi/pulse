@@ -7,24 +7,22 @@
  * container.
  */
 Zutubi.layout.HorizontalTableLayout = Ext.extend(Ext.layout.TableLayout, {
-    defaultTableAttrs: {
-        style: {
-            'width': '100%',
-            'border-collapse': 'separate',
-            'border-spacing': '15px 0'
-        }
-    },
+    width: '100%',
+    spacing: 17,
     
     onLayout: function(container, target) {
         this.columns = container.items.length;
+        
         if (!this.tableAttrs)
         {
-            this.tableAttrs = this.defaultTableAttrs;
+            this.tableAttrs = {style: {}};
         }
-        else
-        {
-            Ext.apply(this.tableAttrs, this.defaultTableAttrs);
-        }
+
+        Ext.apply(this.tableAttrs.style, {
+            'width': this.width,
+            'border-collapse': 'separate',
+            'border-spacing': '' + this.spacing + 'px 0'
+        });
         
         Zutubi.layout.HorizontalTableLayout.superclass.onLayout.apply(this, arguments);        
     }
