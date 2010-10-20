@@ -201,7 +201,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
             {
                 return !buildDirectory.isDirectory();
             }
-        }, 30000, "agent persistent directory for project to be cleaned up");
+        }, 60000, "agent persistent directory for project to be cleaned up");
     }
 
     public void testDeleteProjectWithReference() throws Exception

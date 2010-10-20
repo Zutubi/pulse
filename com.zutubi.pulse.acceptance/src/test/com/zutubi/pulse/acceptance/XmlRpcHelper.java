@@ -1,11 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.engine.api.ResultState.IN_PROGRESS;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -13,6 +14,7 @@ import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -26,6 +28,7 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
@@ -37,11 +40,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  */
@@ -1185,21 +1183,40 @@ public class XmlRpcHelper
      */
     public void waitForBuildStageInState(final String projectName, final String stageName, final int number, final ResultState state, long timeout) throws Exception
     {
-        waitForCondition(new Condition()
+        final ResultState[] stateHolder = new ResultState[1];
+        try
         {
-            public boolean satisfied()
+            waitForCondition(new Condition()
             {
-                try
+                public boolean satisfied()
                 {
-                    ResultState currentState = getBuildStageStatus(projectName, stageName, number);
-                    return currentState != null && currentState == state;
+                    try
+                    {
+                        ResultState currentState = getBuildStageStatus(projectName, stageName, number);
+                        stateHolder[0] = currentState;
+                        return currentState != null && currentState == state;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RuntimeException(e);
+                    }
                 }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
+            }, timeout, "stage " + stageName + " of project " + projectName + " to become '"+state+"'");
+        }
+        catch (TimeoutException e)
+        {
+            String message = e.getMessage();
+            ResultState lastState = stateHolder[0];
+            if (lastState == null)
+            {
+                message += ": stage state is unknown.";
             }
-        }, timeout, "stage " + stageName + " of project " + projectName + " to become '"+state+"'");
+            else
+            {
+                message += ": stage state is '" + lastState + "'";
+            }
+            throw new TimeoutException(message, e);
+        }
     }
 
     public ResultState getBuildStageStatus(String projectName, String stageName, int buildNumber) throws Exception
