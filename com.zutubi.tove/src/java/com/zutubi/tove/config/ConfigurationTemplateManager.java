@@ -2541,7 +2541,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             while (path != null)
             {
                 Type pathType = configurationPersistenceManager.getType(path);
-                if (pathType.equals(type))
+                if (type.isAssignableFrom(pathType))
                 {
                     return clazz.cast(getInstance(path));
                 }
