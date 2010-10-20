@@ -1758,6 +1758,68 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals(CHILD_NAME, results.get(0).getName());
     }
 
+    public void testGetAncestorOfType_Self()
+    {
+        ConfigA a = new ConfigA("a");
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+
+        Configuration loaded = configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_SAMPLE, "a"));
+        assertNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class));
+    }
+
+    public void testGetAncestorOfType_Parent()
+    {
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+
+        Configuration loaded = configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_SAMPLE, "a", "composite"));
+        ConfigA ancestor = configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class);
+        assertEquals(configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_SAMPLE, "a")), ancestor);
+    }
+
+    public void testGetAncestorOfType_GrandParent()
+    {
+        ConfigA a = new ConfigA("a");
+        a.getCs().put("cee", new ConfigC("cee"));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+
+        Configuration loaded = configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_SAMPLE, "a", "cs", "cee"));
+        ConfigA ancestor = configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class);
+        assertEquals(configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_SAMPLE, "a")), ancestor);
+    }
+
+    public void testGetAncestorOfType_NoMatch()
+    {
+        ConfigA a = new ConfigA("a");
+        a.setComposite(new ConfigB("b"));
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+
+        Configuration loaded = configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_SAMPLE, "a", "composite"));
+        assertNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigC.class));
+    }
+
+    public void testGetAncestorOfType_ExtensionType() throws TypeException
+    {
+        String scope = "base";
+
+        CompositeType base = typeRegistry.register(BaseConfig.class);
+        typeRegistry.register(ExtensionConfig.class);
+
+        configurationPersistenceManager.register(scope, new MapType(base, typeRegistry));
+
+        ExtensionConfig extended = new ExtensionConfig("extended");
+        extended.setComposite(new ConfigA("a"));
+        configurationTemplateManager.insert(scope, extended);
+
+        ConfigA loaded = (ConfigA) configurationTemplateManager.getInstance("base/extended/composite");
+        assertNotNull(loaded);
+
+        BaseConfig ancestor = configurationTemplateManager.getAncestorOfType(loaded, BaseConfig.class);
+        assertTrue(ancestor instanceof ExtensionConfig);
+        assertEquals(configurationTemplateManager.getInstance("base/extended"), ancestor);
+    }
+
     private Pair<String, String> insertParentAndChildA(ConfigA parent, ConfigA child) throws TypeException
     {
         MutableRecord record = unstantiate(parent);
@@ -2055,6 +2117,44 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         public String getId()
         {
             return id;
+        }
+    }
+
+    @SymbolicName("baseConfig")
+    public abstract static class BaseConfig extends AbstractNamedConfiguration
+    {
+        public BaseConfig()
+        {
+        }
+
+        public BaseConfig(String name)
+        {
+            super(name);
+        }
+    }
+
+    @SymbolicName("extensionConfig")
+    public static class ExtensionConfig extends BaseConfig
+    {
+        private ConfigA composite;
+
+        public ExtensionConfig()
+        {
+        }
+
+        public ExtensionConfig(String name)
+        {
+            super(name);
+        }
+
+        public ConfigA getComposite()
+        {
+            return composite;
+        }
+
+        public void setComposite(ConfigA composite)
+        {
+            this.composite = composite;
         }
     }
 
