@@ -12,15 +12,6 @@ public class PropertiesWriterTest extends ZutubiTestCase
     private File tmpDir = null;
     private File config;
 
-    public PropertiesWriterTest()
-    {
-    }
-
-    public PropertiesWriterTest(String name)
-    {
-        super(name);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();

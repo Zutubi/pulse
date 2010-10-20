@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.RandomUtils;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
@@ -21,15 +20,6 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
 
     protected XmlRpcHelper xmlRpcHelper;
     protected String baseUrl;
-
-    public BaseXmlRpcAcceptanceTest()
-    {
-    }
-
-    public BaseXmlRpcAcceptanceTest(String testName)
-    {
-        super(testName);
-    }
 
     protected void setUp() throws Exception
     {

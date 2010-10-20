@@ -8,23 +8,11 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * <class-comment/>
- */
 public class DataTest extends PulseTestCase
 {
     private File dataDir;
     private DefaultSystemPaths systemPaths;
     private File tempDir;
-
-    public DataTest()
-    {
-    }
-
-    public DataTest(String name)
-    {
-        super(name);
-    }
 
     protected void setUp() throws Exception
     {

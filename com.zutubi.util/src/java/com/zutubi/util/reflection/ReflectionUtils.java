@@ -358,9 +358,29 @@ public class ReflectionUtils
 
     public static Object getFieldValue(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException
     {
-        Field f = getRequiredDeclaredField(target.getClass(), null, fieldName);
-        f.setAccessible(true);
-        return f.get(target);
+        Field field = getRequiredDeclaredField(target.getClass(), null, fieldName);
+        return getFieldValue(target, field);
+    }
+
+    public static Object getFieldValue(Object target, Field field) throws IllegalAccessException
+    {
+        boolean clearAccessible = false;
+        if (!field.isAccessible())
+        {
+            field.setAccessible(true);
+            clearAccessible = true;
+        }
+        try
+        {
+            return field.get(target);
+        }
+        finally
+        {
+            if (clearAccessible)
+            {
+                field.setAccessible(false);
+            }
+        }
     }
 
     /**

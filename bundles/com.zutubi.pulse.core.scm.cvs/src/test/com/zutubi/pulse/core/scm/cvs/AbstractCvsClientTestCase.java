@@ -21,15 +21,6 @@ public class AbstractCvsClientTestCase extends PulseTestCase
     protected File exeBaseDir;
     protected File scmBaseDir;
 
-    public AbstractCvsClientTestCase()
-    {
-    }
-
-    public AbstractCvsClientTestCase(String name)
-    {
-        super(name);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();

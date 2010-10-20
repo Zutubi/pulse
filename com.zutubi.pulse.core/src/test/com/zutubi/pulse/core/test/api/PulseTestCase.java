@@ -16,15 +16,6 @@ import java.util.zip.ZipInputStream;
  */
 public abstract class PulseTestCase extends ZutubiTestCase
 {
-    public PulseTestCase()
-    {
-    }
-
-    public PulseTestCase(String name)
-    {
-        super(name);
-    }
-
     /**
      * Unzips an archive named after the current class and test method to the
      * given directory.  Equivalent to unzipInput(getName(), toDir).

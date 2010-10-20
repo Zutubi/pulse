@@ -5,15 +5,6 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 public class CompositeConfigTest extends ZutubiTestCase
 {
-    public CompositeConfigTest()
-    {
-    }
-
-    public CompositeConfigTest(String name)
-    {
-        super(name);
-    }
-
     public void testNoDelegates()
     {
         // check that all methods behave as expected.

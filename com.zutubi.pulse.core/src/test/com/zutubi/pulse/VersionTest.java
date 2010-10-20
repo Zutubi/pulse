@@ -10,25 +10,6 @@ import java.io.IOException;
  */
 public class VersionTest extends PulseTestCase
 {
-    public VersionTest(String testName)
-    {
-        super(testName);
-    }
-
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        // add setup code here.
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-
-        super.tearDown();
-    }
-
     public void testDefaultVersion()
     {
         Version v = Version.getVersion();

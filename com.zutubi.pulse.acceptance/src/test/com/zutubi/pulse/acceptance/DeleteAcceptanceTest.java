@@ -383,9 +383,9 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
 
         browser.loginAsAdmin();
-        String cleanupssPath = getPath(projectPath, "cleanup");
+        String cleanupsPath = getPath(projectPath, "cleanup");
 
-        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupssPath);
+        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, ConfigurationRefactoringManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");

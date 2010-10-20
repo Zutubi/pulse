@@ -5,17 +5,9 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
-/**
- * <class-comment/>
- */
 public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private EventManager eventManager;
-
-    public EventSchedulerStrategyTest(String testName)
-    {
-        super(testName);
-    }
 
     public void setUp() throws Exception
     {

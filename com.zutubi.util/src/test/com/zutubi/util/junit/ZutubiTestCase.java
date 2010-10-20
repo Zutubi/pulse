@@ -20,16 +20,6 @@ import java.util.Set;
  */
 public abstract class ZutubiTestCase extends TestCase
 {
-    public ZutubiTestCase()
-    {
-        super();
-    }
-
-    public ZutubiTestCase(String name)
-    {
-        super(name);
-    }
-
     protected void tearDown() throws Exception
     {
         Set<Field> fields = ReflectionUtils.getDeclaredFields(getClass(), ZutubiTestCase.class);
@@ -37,6 +27,19 @@ public abstract class ZutubiTestCase extends TestCase
         {
             if (!ReflectionUtils.isFinal(field) && !field.getType().isPrimitive())
             {
+                // before nulling out a field, check its type.
+                Object value = ReflectionUtils.getFieldValue(this, field);
+                if (value != null)
+                {
+                    if (File.class.isAssignableFrom(field.getType()))
+                    {
+                        File file = (File) value;
+                        if (file.exists() && file.isDirectory())
+                        {
+                            removeDirectory(file);
+                        }
+                    }
+                }
                 ReflectionUtils.setFieldValue(this, field, null);
             }
         }

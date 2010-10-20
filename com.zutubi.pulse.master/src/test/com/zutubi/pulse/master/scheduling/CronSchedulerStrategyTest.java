@@ -13,11 +13,6 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private org.quartz.Scheduler quartzScheduler = null;
 
-    public CronSchedulerStrategyTest(String testName)
-    {
-        super(testName);
-    }
-
     public void setUp() throws Exception
     {
         super.setUp();

@@ -4,20 +4,8 @@ import com.zutubi.pulse.master.license.LicenseHolder;
 
 import java.util.Arrays;
 
-/**
- * <class-comment/>
- */
 public class LicensedDirectiveTest extends VelocityDirectiveTestCase
 {
-    public LicensedDirectiveTest()
-    {
-    }
-
-    public LicensedDirectiveTest(String name)
-    {
-        super(name);
-    }
-
     public String[] getUserDirectives()
     {
         return new String[]{"com.zutubi.pulse.master.velocity.LicensedDirective"};

@@ -15,11 +15,6 @@ public class CvsClientTest extends AbstractCvsClientTestCase
 
     private String password;
 
-    public CvsClientTest(String testName)
-    {
-        super(testName);
-    }
-
     public void setUp() throws Exception
     {
         super.setUp();

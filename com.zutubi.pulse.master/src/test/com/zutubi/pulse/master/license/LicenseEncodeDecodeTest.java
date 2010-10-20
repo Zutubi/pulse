@@ -21,29 +21,12 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
             "y7aPiuzxTEuQ/1216+Y+M1n8kQEfZsSSB4dfB/qIynqHdl0EJsvozdORIALcRrAXByhcBKIQE3KfJ" +
             "g/fPhm4Nmfy6Hic9gMeioXjpf6meDSOfnP1F9sOnIh2E1B70Ou3zP0";
 
-    public LicenseEncodeDecodeTest()
-    {
-    }
-
-    public LicenseEncodeDecodeTest(String name)
-    {
-        super(name);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
 
         encoder = new LicenseEncoder();
         decoder = new LicenseDecoder();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        encoder = null;
-        decoder = null;
-
-        super.tearDown();
     }
 
     public void testSimpleLicenseEncoding() throws Exception

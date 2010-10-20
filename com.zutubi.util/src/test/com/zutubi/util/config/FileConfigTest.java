@@ -13,11 +13,6 @@ public class FileConfigTest extends ZutubiTestCase
     private Config config = null;
     private File testProperties;
 
-    public FileConfigTest(String testName)
-    {
-        super(testName);
-    }
-
     public void setUp() throws Exception
     {
         super.setUp();
@@ -40,8 +35,6 @@ public class FileConfigTest extends ZutubiTestCase
         {
             throw new IOException("");
         }
-
-        config = null;
 
         super.tearDown();
     }

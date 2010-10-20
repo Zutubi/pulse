@@ -7,11 +7,6 @@ public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
     protected SchedulerStrategy scheduler = null;
     protected TestTriggerHandler triggerHandler = null;
 
-    public SchedulerStrategyTestBase(String testName)
-    {
-        super(testName);
-    }
-
     public void setUp() throws Exception
     {
         super.setUp();

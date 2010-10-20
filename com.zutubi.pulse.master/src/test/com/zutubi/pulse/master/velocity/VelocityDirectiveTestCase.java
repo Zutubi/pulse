@@ -6,21 +6,9 @@ import org.apache.velocity.app.VelocityEngine;
 
 import java.io.StringWriter;
 
-/**
- * <class-comment/>
- */
 public abstract class VelocityDirectiveTestCase extends ZutubiTestCase
 {
     private VelocityEngine velocity;
-
-    protected VelocityDirectiveTestCase()
-    {
-    }
-
-    protected VelocityDirectiveTestCase(String name)
-    {
-        super(name);
-    }
 
     public void setUp() throws Exception
     {

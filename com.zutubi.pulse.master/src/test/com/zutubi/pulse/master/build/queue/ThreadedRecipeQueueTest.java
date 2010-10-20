@@ -56,9 +56,8 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     private RecipeAssignedEvent assignedEvent;
     private RecipeDispatchService recipeDispatchService;
 
-    public ThreadedRecipeQueueTest(String testName)
+    public ThreadedRecipeQueueTest()
     {
-        super(testName);
         buildSemaphore = new Semaphore(0);
         errorSemaphore = new Semaphore(0);
         dispatchedSemaphore = new Semaphore(0);

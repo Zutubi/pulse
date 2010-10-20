@@ -7,21 +7,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
 
-/**
- * <class-comment/>
- */
 public class LicenseAnnotationAttributesTest extends PulseTestCase
 {
     private LicenseAnnotationAttributes attributes;
-
-    public LicenseAnnotationAttributesTest()
-    {
-    }
-
-    public LicenseAnnotationAttributesTest(String name)
-    {
-        super(name);
-    }
 
     protected void setUp() throws Exception
     {
@@ -29,13 +17,6 @@ public class LicenseAnnotationAttributesTest extends PulseTestCase
 
         attributes = new LicenseAnnotationAttributes();
 
-    }
-
-    protected void tearDown() throws Exception
-    {
-        attributes = null;
-
-        super.tearDown();
     }
 
     public void testClassLevelAnnotations()

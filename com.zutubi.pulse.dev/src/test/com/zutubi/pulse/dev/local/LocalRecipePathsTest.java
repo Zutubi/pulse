@@ -4,31 +4,8 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 
-/**
- * <class-comment/>
- */
 public class LocalRecipePathsTest extends ZutubiTestCase
 {
-
-    public LocalRecipePathsTest(String testName)
-    {
-        super(testName);
-    }
-
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        // add setup code here.
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-
-        super.tearDown();
-    }
-
     public void testAbsoluteOutputPath()
     {
         File base = getAbsolute("/c/tmp");
