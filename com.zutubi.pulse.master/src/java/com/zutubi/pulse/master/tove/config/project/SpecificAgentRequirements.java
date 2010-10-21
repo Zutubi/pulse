@@ -29,7 +29,7 @@ public class SpecificAgentRequirements implements AgentRequirements
         return service.getAgentConfig().equals(agent);
     }
 
-    public String getUnfulFilledReason(RecipeAssignmentRequest request)
+    public String getUnfulfilledReason(RecipeAssignmentRequest request)
     {
         return I18N.format("unfulfilled.reason", agent.getName());
     }

@@ -910,7 +910,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             return "type matching";
         }
 
-        public String getUnfulFilledReason(RecipeAssignmentRequest request)
+        public String getUnfulfilledReason(RecipeAssignmentRequest request)
         {
             return "Expected type " + type + " not matched by agents.";
         }

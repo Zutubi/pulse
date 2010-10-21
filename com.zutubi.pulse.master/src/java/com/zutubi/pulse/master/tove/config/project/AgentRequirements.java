@@ -29,5 +29,5 @@ public interface AgentRequirements
      * fulfilled in the context of the request.
      */
     @Transient
-    String getUnfulFilledReason(RecipeAssignmentRequest request);
+    String getUnfulfilledReason(RecipeAssignmentRequest request);
 }

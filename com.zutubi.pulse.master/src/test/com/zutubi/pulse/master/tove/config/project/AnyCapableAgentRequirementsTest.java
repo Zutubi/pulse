@@ -52,16 +52,16 @@ public class AnyCapableAgentRequirementsTest extends PulseTestCase
     public void testUnfulfillableReason()
     {
         assertEquals(
-                "Missing one or more of the following resource. ant:[default]",
-                requirements.getUnfulFilledReason(createRequest(new ResourceRequirement("ant", false)))
+                "Missing one or more of the following resources. ant:[default].",
+                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", false)))
         );
         assertEquals(
-                "Missing one or more of the following resource. ant:1.0",
-                requirements.getUnfulFilledReason(createRequest(new ResourceRequirement("ant", "1.0", false)))
+                "Missing one or more of the following resources. ant:1.0.",
+                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", "1.0", false)))
         );
         assertEquals(
-                "Missing one or more of the following resource. ant:1.0, make:2.0",
-                requirements.getUnfulFilledReason(createRequest(new ResourceRequirement("ant", "1.0", false), new ResourceRequirement("make", "2.0", false)))
+                "Missing one or more of the following resources. ant:1.0, make:2.0.",
+                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", "1.0", false), new ResourceRequirement("make", "2.0", false)))
         );
     }
 

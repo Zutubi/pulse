@@ -64,7 +64,7 @@ public class RecipeAssignmentRequest
 
     public String getUnfulfilledReason()
     {
-        return getHostRequirements().getUnfulFilledReason(this);
+        return getHostRequirements().getUnfulfilledReason(this);
     }
 
     public Project getProject()

@@ -29,9 +29,9 @@ public class PersonalBuildAgentRequirements implements AgentRequirements
         return I18N.format("summary", agentRequirements.getSummary());
     }
 
-    public String getUnfulFilledReason(RecipeAssignmentRequest request)
+    public String getUnfulfilledReason(RecipeAssignmentRequest request)
     {
-        return I18N.format("unfulfilled.reason", agentRequirements.getUnfulFilledReason(request));
+        return I18N.format("unfulfilled.reason", agentRequirements.getUnfulfilledReason(request));
     }
 
     public boolean isFulfilledBy(RecipeAssignmentRequest request, AgentService service)

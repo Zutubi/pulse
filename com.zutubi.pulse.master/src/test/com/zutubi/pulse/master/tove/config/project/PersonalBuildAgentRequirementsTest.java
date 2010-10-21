@@ -23,7 +23,7 @@ public class PersonalBuildAgentRequirementsTest extends PulseTestCase
         RecipeAssignmentRequest request = mock(RecipeAssignmentRequest.class);
         stub(request.isPersonal()).toReturn(true);
 
-        assertEquals("No agents that allow personal builds meet the request requirements. test", personalBuildAgentRequirements.getUnfulFilledReason(request));
+        assertEquals("Only considering agents that allow personal builds. test", personalBuildAgentRequirements.getUnfulfilledReason(request));
     }
 
     public void testVerifyPersonalBuilds()
@@ -63,7 +63,7 @@ public class PersonalBuildAgentRequirementsTest extends PulseTestCase
             return "test";
         }
 
-        public String getUnfulFilledReason(RecipeAssignmentRequest request)
+        public String getUnfulfilledReason(RecipeAssignmentRequest request)
         {
             return "test";
         }

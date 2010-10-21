@@ -26,7 +26,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
         return resourceManager.getAgentRepository(service.getAgentConfig()).satisfies(request.getResourceRequirements());
     }
 
-    public String getUnfulFilledReason(RecipeAssignmentRequest request)
+    public String getUnfulfilledReason(RecipeAssignmentRequest request)
     {
         StringBuffer message = new StringBuffer();
         message.append(I18N.format("unfulfilled.reason"));
@@ -40,6 +40,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
                 sep = ", ";
             }
         }
+        message.append(".");
         return message.toString();
     }
 
