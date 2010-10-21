@@ -30,7 +30,9 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
         this.rows = [];
         for (var i = 0; i < rowConfigs.length; i++)
         {
-            this.rows.push(new Zutubi.KeyValue(rowConfigs[i]));
+            var keyValue = new Zutubi.KeyValue(rowConfigs[i]);
+            keyValue.component = this;
+            this.rows.push(keyValue);
         }
 
         Zutubi.table.PropertyTable.superclass.initComponent.apply(this, arguments);
@@ -53,4 +55,3 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
 });
 
 Ext.reg('xzpropertytable', Zutubi.table.PropertyTable);
-

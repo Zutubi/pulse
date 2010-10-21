@@ -45,9 +45,9 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         titleTemplate: '{name:htmlEncode}',
                         fields: [
                             {name: 'health'},
-                            {name: 'state', renderer: function(state) { return state + ' [<a href="#">pause</a>]'; }},
+                            {name: 'state', renderer: Zutubi.pulse.project.renderers.projectState},
                             {name: 'successRate', key: 'success rate'},
-                            {name: 'statistics', renderer: function() { return '<img class="centre" title="7 (88%) successful" src="/images/box-success.gif" height="10" width="88"><img class="centre" title="1 (13%) failed" src="/images/box-failure.gif" height="10" width="13"><img class="centre" title="0 (0%) errors" src="/images/box-error.gif" height="10" width="0"><br/>8 builds (s: 7, f: 1, e: 0)'; }}
+                            {name: 'statistics', renderer: Zutubi.pulse.project.renderers.projectStatistics}
                         ],
                         data: this.data.status
                     }, {
@@ -58,10 +58,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         id: 'project-activity',
                         title: 'current activity',
                         columns: [
-                            'id',
-                            {name: 'status', renderer: Zutubi.pulse.project.cells.status},
+                            Zutubi.pulse.project.configs.build.id,
+                            Zutubi.pulse.project.configs.build.status,
                             'reason',
-                            'revision'
+                            Zutubi.pulse.project.configs.build.rev
                         ],
                         data: this.data.activity,
                         emptyMessage: 'no current build activity'
@@ -77,8 +77,15 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         id: 'project-latest',
                         title: 'latest completed build',
                         rows: [
-                            'id',
-                            {name: 'status', renderer: Zutubi.pulse.project.cells.status}
+                            Zutubi.pulse.project.configs.build.id,
+                            Zutubi.pulse.project.configs.build.status,
+                            'reason',
+                            Zutubi.pulse.project.configs.build.rev,
+                            Zutubi.pulse.project.configs.build.tests,
+                            Zutubi.pulse.project.configs.build.errors,
+                            Zutubi.pulse.project.configs.build.warnings,
+                            Zutubi.pulse.project.configs.build.when,
+                            Zutubi.pulse.project.configs.build.elapsed
                         ],
                         data: this.data.latest,
                         emptyMessage: 'no completed builds found'
@@ -89,10 +96,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         id: 'project-recent',
                         title: 'recently completed builds',
                         columns: [
-                            'id',
-                            {name: 'status', renderer: Zutubi.pulse.project.cells.status},
+                            Zutubi.pulse.project.configs.build.id,
+                            Zutubi.pulse.project.configs.build.status,
                             'reason',
-                            'revision'
+                            Zutubi.pulse.project.configs.build.rev
                         ],
                         data: this.data.recent,
                         emptyMessage: 'no historic builds found'

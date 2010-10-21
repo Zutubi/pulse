@@ -28,11 +28,7 @@ Zutubi.KeyValue = function(config) {
 };
 
 Zutubi.KeyValue.prototype = {
-    getRawValue: function(data) {
-        return data[this.name];
-    },
-
     getRenderedValue: function(data) {
-        return this.renderer(data[this.name]);
+        return this.renderer(data[this.name], data, this.component);
     }
 };

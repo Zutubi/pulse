@@ -7,25 +7,24 @@
 Zutubi.pulse.project.ResponsibilityBox = Ext.extend(Ext.BoxComponent, {
     template: new Ext.XTemplate(
         '<div class="note" id="responsible-panel">' +
-            '<img alt="fixing" src="{baseUrl}/images/config/actions/takeResponsibility.gif" style="padding: 0 6px 0 6px"/> ' +
+            '<img alt="fixing" src="{[window.baseUrl]}/images/config/actions/takeResponsibility.gif" style="padding: 0 6px 0 6px"/> ' +
             '<span id="responsible-message"></span> ' +
             '<span id="responsible-clear-container">' +
                 '[<a href="#" id="responsible-clear" onclick="clearResponsibility(\'{projectId}\'); return false">clear</a>]' +
             '</span>' +
             '<span id="responsible-comment-container">' +
-                ' : <img alt="comment" src="{baseUrl}/images/comment.gif" style="padding: 0 6px 0 6px"/> <span id="responsible-comment" class="comment"></span>' +
+                ' : <img alt="comment" src="{[window.baseUrl]}/images/comment.gif" style="padding: 0 6px 0 6px"/> <span id="responsible-comment" class="comment"></span>' +
             '</span>' +
         '</div>'),
     
     onRender: function(container, position) {
-        var args = this.getTemplateArgs();
         if (position)
         {
-            this.el = this.template.insertBefore(position, args, true);    
+            this.el = this.template.insertBefore(position, this, true);    
         }
         else
         {
-            this.el = this.template.append(container, args, true);
+            this.el = this.template.append(container, this, true);
         }
         
         this.messageEl = Ext.get('responsible-message');
@@ -62,13 +61,6 @@ Zutubi.pulse.project.ResponsibilityBox = Ext.extend(Ext.BoxComponent, {
         else
         {
             this.el.setDisplayed(false);
-        }
-    },
-    
-    getTemplateArgs: function() {
-        return {
-            baseUrl: window.baseUrl,
-            projectId: this.projectId
         }
     }
 });

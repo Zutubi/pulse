@@ -19,13 +19,15 @@
 Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     initComponent: function() {
         this.columnCount = this.columns.length;
-        this.cellTemplate = new Ext.XTemplate('<{tag} class="<tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>">{value}</{tag}>');
+        this.cellTemplate = new Ext.XTemplate('<{tag} class="<tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>{cls}">{value}</{tag}>');
         
         var columnConfigs = this.columns;
         this.columns = [];
         for (var i = 0; i < columnConfigs.length; i++)
         {
-            this.columns.push(new Zutubi.KeyValue(columnConfigs[i]));
+            var keyValue = new Zutubi.KeyValue(columnConfigs[i]);
+            keyValue.component = this;
+            this.columns.push(keyValue);
         }
 
         Zutubi.table.SummaryTable.superclass.initComponent.apply(this, arguments);
@@ -39,17 +41,17 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
             data[column.name] = column.key;
         }
         
-        this.tbodyEl.insertHtml('beforeEnd', this.generateRow('th', false, data, function(v) { return v; }))
+        this.tbodyEl.insertHtml('beforeEnd', this.generateRow('th', false, data, false))
     },
     
     renderData: function() {
         for (var i = 0, l = this.data.length; i < l; i++)
         {
-            this.tbodyEl.insertHtml('beforeEnd', this.generateRow('td', true, this.data[i]), true);
+            this.tbodyEl.insertHtml('beforeEnd', this.generateRow('td', true, this.data[i], true), true);
         };
     },
     
-    generateRow: function(tag, dynamic, data, renderer) {
+    generateRow: function(tag, dynamic, data, useRenderer) {
         var html = '<tr';
         if (dynamic)
         {
@@ -62,12 +64,12 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         for (var i = 0; i < columnCount; i++)
         {
             var column = this.columns[i];
-            var rawValue = column.getRawValue(data);
             html += this.cellTemplate.apply({
                 tag: tag,
+                cls: column.cls,
                 first: i == 0,
                 last: i == columnCount - 1,
-                value: renderer ? renderer(rawValue) : column.renderer(rawValue)
+                value: useRenderer ? column.getRenderedValue(data) : data[column.name]
             });
         }
         
