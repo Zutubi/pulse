@@ -2,6 +2,7 @@
 // dependency: ext/StatusBar.js
 // dependency: widget/treegrid/package.js
 // dependency: zutubi/FloatManager.js
+// dependency: zutubi/MenuManager.js
 // dependency: zutubi/form/package.js
 // dependency: zutubi/fs/package.js
 // dependency: zutubi/layout/package.js
@@ -9,55 +10,25 @@
 // dependency: zutubi/toolbar/package.js
 // dependency: zutubi/tree/package.js
 
-function renderMenu(owner, items, id)
+function getBuildMenuItem(buildLink, itemId, image)
 {
-    if (owner.renderedMenus[id])
-    {
-        return;
-    }
-
-    var menuEl = Ext.getBody().createChild({tag: 'div',  id: id, style: 'display: none'});
-    var listEl = menuEl.createChild({tag: 'ul', cls: 'actions'});
-    for (var i = 0; i < items.length; i++)
-    {
-        appendMenuItem(listEl, id, items[i]);
-    }
-
-    owner.renderedMenus[id] = menuEl;
-}
-
-/**
- * Function for appending a menu item to the dom tree.
- */
-function appendMenuItem(el, menuId, item) {
-    if (!item.title)
-    {
-        item.title = item.id;
-    }
-
-    var child = {
-        tag: 'a',
-        id: item.id + '-' + menuId,
-        cls: 'unadorned',
-        href: '#',
-        title: item.title,
-        children: [{
-            tag: 'img',
-            src: window.baseUrl + '/images/' + item.image
-        }, ' ' + item.title]
+    return {
+        id: itemId,
+        url: buildLink + itemId + '/',
+        image: image
     };
-
-    if (item.url !== undefined)
-    {
-        child.href = window.baseUrl + '/' + item.url;
-    }
-    if (item.onclick !== undefined)
-    {
-        child.onclick = item.onclick;
-    }
-    el.createChild({tag: 'li', children: [child]});
 }
 
+function getBuildMenuItems(buildLink)
+{
+    return [
+        getBuildMenuItem(buildLink, 'summary', 'information.gif'),
+        getBuildMenuItem(buildLink, 'logs', 'script.gif'),
+        getBuildMenuItem(buildLink, 'details', 'magnifier.gif', 'details'),
+        getBuildMenuItem(buildLink, 'changes', 'page_code.gif'),
+        getBuildMenuItem(buildLink, 'artifacts', 'folder_page.gif')
+    ];
+}
 
 Zutubi.DetailPanel = function(config)
 {
@@ -967,7 +938,6 @@ Zutubi.BuildNavToolbarItem = Ext.extend(Ext.Toolbar.Item, {
 Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     cls: 'popdown',
     imgcls: 'popdown',
-    renderedMenus: {},
 
     initComponent: function()
     {
@@ -975,8 +945,10 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
         this.autoEl = {
             id: this.id + "-actions-link",
-            tag: 'div',
+            tag: 'a',
+            cls: 'unadorned',
             style: 'position:relative; top:2px;line-height:11px;font-size:11px',
+            onclick: 'Zutubi.MenuManager.toggleMenu(this); return false',
             children: [{
                 tag: 'img',
                 cls: this.imgcls + ' floating-widget',
@@ -989,17 +961,7 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     afterRender: function()
     {
         Zutubi.BuildNavToolbarMenu.superclass.afterRender.apply(this, arguments);
-
-        this.mon(this.getEl(),
-        {
-           "click": this.onClick.createDelegate(this)
-        });
-    },
-
-    onClick: function()
-    {
-        renderMenu(this, this.getMenuItems(), this.id + '-actions');
-        Zutubi.FloatManager.showHideFloat('buildnav', this.id + "-actions", 'tl-bl?', this.imgcls);
+        Zutubi.MenuManager.registerMenu(this.id + '-actions', this.getMenuItems.createDelegate(this));
     },
 
     getMenuItems: function()

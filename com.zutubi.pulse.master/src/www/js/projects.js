@@ -15,18 +15,18 @@ Zutubi.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</
                            '</tpl>' +
                        '</td>' +
                        '<td class="actions-menu project-actions" rowspan="{rowspan}">' +
-                           '<span id="{id}-actions-link">' +
+                           '<a class="unadorned" id="{id}-actions-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
                                '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{id}-actions-button" alt="project menu"/>' +
-                           '</span>' +
+                           '</a>' +
                        '</td>';
 
 Zutubi.BUILD_CELLS = '<td class="build-id fit-width">' +
                          '<a href="{buildLink}">build {buildNumber}</a>' +
                      '</td>' +
                      '<td class="actions-menu">' +
-                         '<span id="{buildId}-bactions-link">' +
+                         '<a class="unadorned" id="{buildId}-bactions-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
                              '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{buildId}-bactions-button" alt="build menu"/>' +
-                         '</span>' +
+                         '</a>' +
                      '</td>' +
                      '<td class="build-status fit-width">' +
                          ':: <span id="{buildId}.status"><img alt="status" src="{base}/images/{statusIcon}"/> {status}</span>' +
@@ -41,7 +41,6 @@ Zutubi.ConcreteProject = function(data, columnCount, showHideLinks) {
     this.showHideLinks = showHideLinks;
     this.hidden = false;
     this.rows = [];
-    this.renderedMenus = {};
 };
 
 Zutubi.ConcreteProject.prototype = {
@@ -96,8 +95,7 @@ Zutubi.ConcreteProject.prototype = {
                     this.rows.push(this.noProjectTemplate.insertAfter(this.rows[this.rows.length - 1], templateData, true));
                 }
 
-                var buildButton = Ext.get(templateData.buildId + '-bactions-link');
-                buildButton.on('click', this.toggleMenu.createDelegate(this, ['bactions', templateData.buildNumber, templateData.buildId + '-bactions']));
+                Zutubi.MenuManager.registerMenu(templateData.buildId + '-bactions', this.getMenuItems.createDelegate(this, ['bactions', templateData.buildNumber, templateData.buildId + '-bactions']));
             }
         }
         else
@@ -106,15 +104,8 @@ Zutubi.ConcreteProject.prototype = {
             this.rows.push(this.el);
         }
 
-        var projectButton = Ext.get(this.data.id + '-actions-link');
-        projectButton.on('click', this.toggleMenu.createDelegate(this, ['actions', '', this.data.id + '-actions']));
-
+        Zutubi.MenuManager.registerMenu(this.data.id + '-actions', this.getMenuItems.createDelegate(this, ['actions', '', this.data.id + '-actions']));
         return this.rows[this.rows.length - 1];
-    },
-
-    toggleMenu: function(menuType, menuArg, id) {
-        renderMenu(this, this.getMenuItems(menuType, menuArg, id), id);
-        Zutubi.FloatManager.showHideFloat('actions', id, 'tl-bl?');
     },
 
     setRowDisplay: function(display) {
@@ -142,15 +133,6 @@ Zutubi.ConcreteProject.prototype = {
 
     getProjectTabLink: function(tab) {
         return 'browse/projects/' + encodeURIComponent(this.data.name) + '/' + tab + '/';
-    },
-
-    getBuildMenuItem: function(build, id, image, title) {
-        return {
-            id: id,
-            image: image,
-            title: title,
-            url: 'browse/projects/' + encodeURIComponent(this.data.name) + '/builds/' + build + '/' + id + '/'
-        };
     },
 
     getMenuItems: function(menuType, menuArg, id) {
@@ -224,13 +206,7 @@ Zutubi.ConcreteProject.prototype = {
         }
         else
         {
-            items = [
-                this.getBuildMenuItem(menuArg, 'summary', 'information.gif'),
-                this.getBuildMenuItem(menuArg, 'logs', 'script.gif'),
-                this.getBuildMenuItem(menuArg, 'details', 'magnifier.gif', 'details'),
-                this.getBuildMenuItem(menuArg, 'changes', 'page_code.gif'),
-                this.getBuildMenuItem(menuArg, 'artifacts', 'folder_page.gif')
-            ];
+            items = getBuildMenuItems('browse/projects/' + encodeURIComponent(this.data.name) + '/builds/' + menuArg + '/');
         }
 
         return items;

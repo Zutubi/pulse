@@ -94,15 +94,17 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         },
 
         ID_TEMPLATE: new Ext.XTemplate(
-            '<a href="{link}">build {id}</a> ' +
-            '<span id="build-{id}-bactions-link">' +
-                '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="build-{id}-bactions-button" alt="build menu"/>' +
-            '</span>'
+            '<a href="{link}">build {number}</a> ' +
+            '<a class="unadorned" id="bactions-{id}-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
+                '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="bactions-{id}-button" alt="build menu"/>' +
+            '</a>'
         ),
         
-        buildId: function(id, build) {
+        buildId: function(number, build) {
+            Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
             return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
-                id: id,
+                number: number,
+                id: build.id,
                 link: build.link
             });
         },
@@ -205,7 +207,8 @@ Ext.apply(Zutubi.pulse.project, {
     configs: {
         build: {
             id: {
-                name: 'id',
+                name: 'number',
+                key: 'build id',
                 cls: 'right',
                 renderer: Zutubi.pulse.project.renderers.buildId
             },
