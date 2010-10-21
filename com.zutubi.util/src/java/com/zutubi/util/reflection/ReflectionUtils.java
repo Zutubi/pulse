@@ -356,13 +356,33 @@ public class ReflectionUtils
         return Modifier.isStatic(member.getModifiers());
     }
 
-    public static Object getFieldValue(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException
+    /**
+     * Returns the value of the named field, ensuring that the accessibility
+     * of the field is maintained.
+     *
+     * @param target    the target object on which the field is being accessed
+     * @param fieldName the name of the field being accessed
+     * 
+     * @return  the value of the named field
+     *
+     * @throws NoSuchFieldException     is thrown if the specified field is not available
+     */
+    public static Object getFieldValue(Object target, String fieldName) throws NoSuchFieldException
     {
         Field field = getRequiredDeclaredField(target.getClass(), null, fieldName);
         return getFieldValue(target, field);
     }
 
-    public static Object getFieldValue(Object target, Field field) throws IllegalAccessException
+    /**
+     * Returns the value of the specified field, ensuring that the accessibility
+     * of the field is maintained.
+     *
+     * @param target    the target object on which the field is being accessed
+     * @param field     the field being accessed
+     *
+     * @return  the value of the field
+     */
+    public static Object getFieldValue(Object target, Field field)
     {
         boolean clearAccessible = false;
         if (!field.isAccessible())
@@ -373,6 +393,12 @@ public class ReflectionUtils
         try
         {
             return field.get(target);
+        }
+        catch (IllegalAccessException e)
+        {
+            // we do not expect this exception since we ensure the field
+            // is accessible.
+            throw new RuntimeException(e);
         }
         finally
         {

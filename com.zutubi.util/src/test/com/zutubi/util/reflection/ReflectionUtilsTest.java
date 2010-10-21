@@ -583,22 +583,22 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     public void testGetDeclaredFields()
     {
         declaredFieldsHelper(Fields.class, null,
-                             "inheritedPrivateField",
-                             "inheritedProtectedField",
-                             "inheritedPublicField",
-                             "privateField",
-                             "protectedField",
-                             "publicField",
-                             "publicFinalField");
+                "inheritedPrivateField",
+                "inheritedProtectedField",
+                "inheritedPublicField",
+                "privateField",
+                "protectedField",
+                "publicField",
+                "publicFinalField");
     }
 
     public void testGetDeclaredFieldsStopClass()
     {
         declaredFieldsHelper(Fields.class, SuperFields.class,
-                             "privateField",
-                             "protectedField",
-                             "publicField",
-                             "publicFinalField");
+                "privateField",
+                "protectedField",
+                "publicField",
+                "publicFinalField");
     }
 
     private void declaredFieldsHelper(Class clazz, Class stopClazz, String... expected)
@@ -873,6 +873,26 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         assertEquals(BeanImplementsGetterAndSetter.class, properties[0].getWriteMethod().getDeclaringClass());
     }
 
+    public void testGetFieldValue() throws NoSuchFieldException
+    {
+        BeanSimple bean = new BeanSimple();
+        bean.setSimpleProperty(1);
+        assertEquals(1, ReflectionUtils.getFieldValue(bean, "simpleProperty"));
+    }
+
+    public void testGetFieldValueForNonExistentField()
+    {
+        try
+        {
+            ReflectionUtils.getFieldValue(new BeanSimple(), "nonExistentField");
+            fail();
+        }
+        catch (NoSuchFieldException e)
+        {
+            // expected
+        }
+    }
+
     private void beanPropertiesHelper(final Class<?> clazz, String... expectedNames) throws IntrospectionException
     {
         PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(clazz);
@@ -944,6 +964,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     public static interface BeanInterface
     {
         int getInterfaceProperty();
+
         void setInterfaceProperty(int i);
     }
 
@@ -995,6 +1016,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     public static interface BeanSubInterface extends BeanInterface
     {
         int getSubInterfaceProperty();
+
         void setSubInterfaceProperty(int i);
     }
 

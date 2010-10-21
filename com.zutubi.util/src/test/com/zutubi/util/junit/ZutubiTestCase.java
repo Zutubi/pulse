@@ -36,7 +36,7 @@ public abstract class ZutubiTestCase extends TestCase
                         File file = (File) value;
                         if (file.exists() && file.isDirectory())
                         {
-                            removeDirectory(file);
+                            throw new RuntimeException("Test directory " + file.getAbsolutePath() + " has not been cleaned up."); 
                         }
                     }
                 }
