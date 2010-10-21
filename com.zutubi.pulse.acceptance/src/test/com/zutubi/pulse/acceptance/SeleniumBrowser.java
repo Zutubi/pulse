@@ -720,6 +720,29 @@ public class SeleniumBrowser
         }
     }
 
+    public File captureScreenshot()
+    {
+        int i = 1;
+        File screenshotFile;
+        do
+        {
+            screenshotFile = new File("working", "screenshot-" + i + ".png");
+            i++;
+        }
+        while(screenshotFile.exists());
+
+        try
+        {
+            selenium.captureScreenshot(screenshotFile.getCanonicalPath());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return screenshotFile;
+    }
+
     public File captureFailure()
     {
         int i = 1;
@@ -752,7 +775,6 @@ public class SeleniumBrowser
         }
         catch (IOException e)
         {
-            // You have to be kidding me.
             throw new RuntimeException(e);
         }
 

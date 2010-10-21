@@ -61,6 +61,7 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
         // open the browser at '/' and ensure we are asked to login.
         browser.open("/");
         browser.waitForPageToLoad();
+        browser.captureScreenshot();
         assertTrue(loginPage.isPresent());
         
         browser.setCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, cookie);
