@@ -248,11 +248,27 @@ public class CollectionUtilsTest extends ZutubiTestCase
         List<Object> list = new LinkedList<Object>(Arrays.asList((Object)"a", 1, "b", 2));
         List<Object> filtered = CollectionUtils.filterInPlace(list, new InstanceOfPredicate(String.class));
         assertEquals(2, list.size());
-        assertEquals(1, list.get(0));
-        assertEquals(2, list.get(1));
+        assertEquals("a", list.get(0));
+        assertEquals("b", list.get(1));
         assertEquals(2, filtered.size());
-        assertEquals("a", filtered.get(0));
-        assertEquals("b", filtered.get(1));
+        assertEquals(1, filtered.get(0));
+        assertEquals(2, filtered.get(1));
+    }
+
+    public void testFilterInPlaceRejectingAll()
+    {
+        List<Object> list = new LinkedList<Object>(Arrays.asList("a", "b", "c"));
+        List<Object> removed = CollectionUtils.filterInPlace(list, new FalsePredicate());
+        assertEquals(0, list.size());
+        assertEquals(3, removed.size());
+    }
+
+    public void testFilterInPlaceAcceptingAll()
+    {
+        List<Object> list = new LinkedList<Object>(Arrays.asList("a", "b", "c"));
+        List<Object> removed = CollectionUtils.filterInPlace(list, new TruePredicate());
+        assertEquals(3, list.size());
+        assertEquals(0, removed.size());
     }
 
     public void testReverse()

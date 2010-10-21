@@ -9,19 +9,26 @@ import java.util.*;
 public class CollectionUtils
 {
     /**
-     * Similar to {@link #filter(Object[], Predicate)}  except that the elements that are accepted by the
-     * predicate are also removed from the original collection.
+     * Similar to {@link #filter(Object[], Predicate)}  items not matching the predicate
+     * are removed from the original collection and returned.
      *
      * @param l     the list that will be filtered inplace
-     * @param p     the predicate identifying the items to be filtered
+     * @param p     the predicate identifying the items to be accepted.
      * @param <T>   the type of the item contained by the collection
      * @return  a list of the items that were filtered.
      */
     public static <T> List<T> filterInPlace(Collection<T> l, Predicate<T> p)
     {
-        List<T> filteredList = filter(l, p);
-        l.removeAll(filteredList);
-        return filteredList;
+        final List<T> keepItems = filter(l, p);
+        List<T> removeItems = filter(l, new Predicate<T>()
+        {
+            public boolean satisfied(T t)
+            {
+                return !keepItems.contains(t);
+            }
+        });
+        l.removeAll(removeItems);
+        return removeItems;
     }
 
     public static <T> List<T> filter(Iterable<T> l, Predicate<T> p)

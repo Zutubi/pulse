@@ -383,7 +383,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                                 {
                                     public boolean satisfied(Agent agent)
                                     {
-                                        return !agents.contains(agent);
+                                        return agents.contains(agent);
                                     }
                                 });
 
