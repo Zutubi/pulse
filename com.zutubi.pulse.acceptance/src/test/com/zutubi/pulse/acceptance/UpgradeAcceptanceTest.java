@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.embedded.EmbeddedPulse;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
@@ -154,7 +153,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         browser.click("continue");
 
-        waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

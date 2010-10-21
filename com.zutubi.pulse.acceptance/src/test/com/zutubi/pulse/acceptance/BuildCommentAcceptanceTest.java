@@ -110,7 +110,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         confirmDialog.waitFor();
         confirmDialog.clickOk();
         page.waitForReload();
-        assertTextNotPresent(TEST_COMMENT);
+        assertFalse(browser.isTextPresent(TEST_COMMENT));
     }
 
     // Checks that the build controller updating a build does not result in comments being lost.
@@ -129,7 +129,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
 
         page.openAndWaitFor();
-        assertTextPresent(TEST_COMMENT);
+        assertTrue(browser.isTextPresent(TEST_COMMENT));
     }
     
     public void testRemoteApi() throws Exception
@@ -234,8 +234,8 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
 
         page.waitForReload();
         assertTrue(page.isCommentsPresent());
-        assertTextPresent(TEST_COMMENT);
-        assertTextPresent("by " + TEST_USER);
+        assertTrue(browser.isTextPresent(TEST_COMMENT));
+        assertTrue(browser.isTextPresent("by " + TEST_USER));
         return page;
     }
 }

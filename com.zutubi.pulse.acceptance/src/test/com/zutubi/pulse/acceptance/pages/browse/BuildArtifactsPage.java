@@ -78,7 +78,7 @@ public class BuildArtifactsPage extends SeleniumPage
     public void clickSaveFilterAndWait()
     {
         browser.click("save-filter-link");
-        AcceptanceTestUtils.waitForStatus(browser, "Filter saved.");
+        browser.waitForStatus("Filter saved.");
     }
 
     /**

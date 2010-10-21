@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.agents;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
@@ -123,7 +123,7 @@ public class AgentStatusPage extends SeleniumPage
         String linkId = String.format(ID_PATTERN_STATUS_POPUP_BUTTON, index + 1);
         browser.click(linkId);
         final String popupId = String.format(ID_PATTERN_STATUS_MESSAGE, index + 1);
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

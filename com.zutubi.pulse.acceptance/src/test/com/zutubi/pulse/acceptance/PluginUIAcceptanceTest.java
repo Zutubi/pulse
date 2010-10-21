@@ -13,6 +13,7 @@ import java.util.Vector;
 
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
+import com.zutubi.pulse.core.test.TestUtils;
 
 /**
  * Tests for the plugin management UI.
@@ -71,7 +72,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
             assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
 
             xmlRpcHelper.doConfigAction(PathUtils.getPath(AGENTS_SCOPE, AGENT_NAME), ACTION_PING);
-            AcceptanceTestUtils.waitForCondition(new Condition()
+            TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
                 {

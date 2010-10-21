@@ -14,6 +14,7 @@ import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.BootstrapCommand;
 import com.zutubi.pulse.core.BootstrapCommandConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
@@ -147,7 +148,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, 1L);
         assertFalse(changesPage.hasChanges());
         assertFalse(changesPage.isCompareToPopDownPresent());
-        assertTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none"));
+        assertTrue(browser.isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
 
         // Check some properties
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
@@ -170,7 +171,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // Unlike where there are no previous builds, in this case we expect
         // the compare-to popdown.
         assertTrue(changesPage.isCompareToPopDownPresent());
-        assertTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none"));
+        assertTrue(browser.isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
     }
 
     public void testChangesBetweenBuilds() throws Exception
@@ -188,7 +189,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // Check the changes tab.
         browser.loginAsAdmin();
         BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTextPresent(BuildChangesPage.formatChangesSince(buildNumber));
+        assertTrue(browser.isTextPresent(BuildChangesPage.formatChangesSince(buildNumber)));
 
         List<Changelist> changelists = changesPage.getChangelists();
         assertEquals(1, changelists.size());
@@ -249,7 +250,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTextPresent(String.format("%d more files", CHANGE_COUNT - 5));
+        assertTrue(browser.isTextPresent(String.format("%d more files", CHANGE_COUNT - 5)));
 
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
@@ -499,7 +500,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         try
         {
             summaryPage.openAndWaitFor();
-            AcceptanceTestUtils.waitForCondition(new Condition()
+            TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
                 {
@@ -592,11 +593,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
-        assertTextPresent("error feature");
-        assertTextPresent("warning feature");
-        assertTextPresent("info feature");
-        assertTextPresent("context line 1");
-        assertTextPresent("info context line 2");
+        assertTrue(browser.isTextPresent("error feature"));
+        assertTrue(browser.isTextPresent("warning feature"));
+        assertTrue(browser.isTextPresent("info feature"));
+        assertTrue(browser.isTextPresent("context line 1"));
+        assertTrue(browser.isTextPresent("info context line 2"));
     }
 
     private void insertFeaturesProcessor(String projectName, String processorName) throws Exception
@@ -648,7 +649,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             
             browser.loginAsAdmin();
             final BuildDetailsPage detailsPage = browser.createPage(BuildDetailsPage.class, project.getName(), 1L);
-            AcceptanceTestUtils.waitForCondition(new Condition()
+            TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
                 {
@@ -777,8 +778,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.loginAsAdmin();
         triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
         goToEnv(projectName, 1);
-        assertTextPresent(suppressedName);
-        assertTextNotPresent(suppressedValue);
+        assertTrue(browser.isTextPresent(suppressedName));
+        assertFalse(browser.isTextPresent(suppressedValue));
     }
 
     public void testScmPropertiesAvailableInPulseFile() throws Exception
@@ -791,7 +792,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         goToArtifact(random, 1, OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
-        assertTextPresent(TRIVIAL_ANT_REPOSITORY);
+        assertTrue(browser.isTextPresent(TRIVIAL_ANT_REPOSITORY));
     }
 
     public void testBuildLogs() throws Exception
@@ -804,19 +805,19 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // The logs tab, which should show us the first stage.
         BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
         assertTrue(logsPage.isLogAvailable());
-        assertTextPresent(MESSAGE_RECIPE_COMPLETED);
+        assertTrue(browser.isTextPresent(MESSAGE_RECIPE_COMPLETED));
 
         if (browser.isFirefox())
         {
             logsPage.clickDownloadLink();
             browser.waitForPageToLoad();
-            assertTextPresent(MESSAGE_CHECKING_REQUIREMENTS);
+            assertTrue(browser.isTextPresent(MESSAGE_CHECKING_REQUIREMENTS));
         }
 
         // Direct to the build log (high-level build messages).
         BuildLogPage logPage = browser.openAndWaitFor(BuildLogPage.class, random, 1L);
         assertTrue(logPage.isLogAvailable());
-        assertTextPresent(MESSAGE_BUILD_COMPLETED);
+        assertTrue(browser.isTextPresent(MESSAGE_BUILD_COMPLETED));
 
         StageLogPage stageLogPage = browser.createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
         if (browser.isFirefox())
@@ -832,7 +833,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             stageLogPage.waitFor();
         }
         assertTrue(stageLogPage.isLogAvailable());
-        assertTextPresent(MESSAGE_RECIPE_COMPLETED);
+        assertTrue(browser.isTextPresent(MESSAGE_RECIPE_COMPLETED));
 
         // Change the settings via the popup
         int maxLines = stageLogPage.getMaxLines();
@@ -1305,7 +1306,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
             
             final String defaultStageName = project.getDefaultStage().getName();
-            AcceptanceTestUtils.waitForCondition(new Condition()
+            TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
                 {
@@ -1436,7 +1437,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE));
+        assertTrue(browser.isTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE)));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
         assertResultState(ResultState.TERMINATED, build);
@@ -1453,7 +1454,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTextNotPresent("terminated");
+        assertFalse(browser.isTextPresent("terminated"));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
         assertResultState(ResultState.SUCCESS, build);
@@ -1474,7 +1475,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTextPresent("Build terminated due to the stage failure limit (1) being reached");
+        assertTrue(browser.isTextPresent("Build terminated due to the stage failure limit (1) being reached"));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
         assertResultState(ResultState.TERMINATED, build);
@@ -1530,7 +1531,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         BuildFilePage buildFilePage = browser.openAndWaitFor(BuildFilePage.class, random, buildId);
         assertTrue(buildFilePage.isDownloadLinkPresent());
         assertTrue(buildFilePage.isHighlightedFilePresent());
-        assertTextPresent("default-recipe=\"default\"");
+        assertTrue(browser.isTextPresent("default-recipe=\"default\""));
     }
     
     public void testCleanBuild() throws Exception
@@ -1557,7 +1558,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             browser.loginAsAdmin();
 
             browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
-            assertTextPresent("build.xml");
+            assertTrue(browser.isTextPresent("build.xml"));
 
             AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
             AgentStatusPage.SynchronisationMessage synchronisationMessage = statusPage.getSynchronisationMessage(0);
@@ -1606,7 +1607,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             browser.loginAsAdmin();
 
             browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, SECOND_STAGE_NAME, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
-            assertTextPresent("build.xml");
+            assertTrue(browser.isTextPresent("build.xml"));
         }
         finally
         {
@@ -1736,7 +1737,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         goToEnv(projectName, buildId);
         for (String env : envs)
         {
-            assertTextPresent(env);
+            assertTrue(browser.isTextPresent(env));
         }
     }
 

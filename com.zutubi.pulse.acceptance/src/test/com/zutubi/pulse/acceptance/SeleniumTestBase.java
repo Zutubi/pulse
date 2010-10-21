@@ -17,7 +17,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.WebUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -87,47 +86,10 @@ public class SeleniumTestBase extends PulseTestCase
         return getName() + "-" + RandomUtils.randomString(10);
     }
 
-    private void assertElementPresent(String id)
-    {
-        assertTrue("No element with id '" + id + "' found", browser.isElementIdPresent(id));
-    }
-
-    protected void assertElementNotPresent(String id)
-    {
-        assertFalse("Unexpected element with id '" + id + "' found", browser.isElementIdPresent(id));
-    }
-
-    protected void assertTextPresent(String text)
-    {
-        assertTrue(browser.isTextPresent(text));
-    }
-
-    protected void assertTextNotPresent(String text)
-    {
-        assertFalse(browser.isTextPresent(text));
-    }
-
-    protected void assertLinkPresent(String id)
-    {
-        assertTrue(browser.isLinkPresent(id));
-    }
-
-    protected void assertFormFieldNotEmpty(String id)
-    {
-        String value = browser.getValue(WebUtils.toValidHtmlName(id));
-        assertNotNull(value);
-        assertTrue(value.length() > 0);
-    }
-
     protected void assertGenericError(String message)
     {
-        assertElementPresent("generic-error");
-        assertTextPresent(message);
-    }
-
-    protected void waitForStatus(String message)
-    {
-        AcceptanceTestUtils.waitForStatus(browser, message);
+        assertTrue("No element with id 'generic-error' found", browser.isElementIdPresent("generic-error"));
+        assertTrue(browser.isTextPresent(message));
     }
 
     protected String addProject(String name, boolean useAPI)

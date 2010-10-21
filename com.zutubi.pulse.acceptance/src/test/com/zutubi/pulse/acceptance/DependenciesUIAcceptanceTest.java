@@ -8,7 +8,8 @@ import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
+import com.zutubi.pulse.core.test.TestUtils;
+
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -149,7 +150,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             log.clickDownloadLink();
             // check for a reference to the artifact retrieval in the log.
-            waitForCondition(new Condition()
+            TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
                 {

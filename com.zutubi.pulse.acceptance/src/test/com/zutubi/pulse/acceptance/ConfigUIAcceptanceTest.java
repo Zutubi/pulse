@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -172,7 +173,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         checkForm.checkFormElementsAndWait();
         assertFalse(checkForm.isResultOk());
         assertEquals("unable to check configuration due to validation errors", checkForm.getResultMessage());
-        assertTextPresent("url requires a value");
+        assertTrue(browser.isTextPresent("url requires a value"));
     }
 
     public void testCheckFormCheckFieldValidationFailure() throws Exception
@@ -185,7 +186,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         checkForm.checkFormElementsAndWait("");
         assertFalse(checkForm.isResultOk());
         assertEquals("unable to check configuration due to validation errors", checkForm.getResultMessage());
-        assertTextPresent("recipient address requires a value");
+        assertTrue(browser.isTextPresent("recipient address requires a value"));
     }
 
     public void testCheckFormInWizard() throws Exception
@@ -267,7 +268,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use, please select another name");
+        assertTrue(browser.isTextPresent("name is already in use, please select another name"));
     }
 
     public void testNameValidationDuplicateInherited() throws Exception
@@ -285,7 +286,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use, please select another name");
+        assertTrue(browser.isTextPresent("name is already in use, please select another name"));
     }
 
     public void testNameValidationDuplicateInDescendant() throws Exception
@@ -305,7 +306,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use in descendant \"" + childName + "\", please select another name");
+        assertTrue(browser.isTextPresent("name is already in use in descendant \"" + childName + "\", please select another name"));
     }
 
     public void testNameValidationDuplicateInDescendants() throws Exception
@@ -328,7 +329,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use in descendants [" + child1Name + ", " + child2Name + "], please select another name");
+        assertTrue(browser.isTextPresent("name is already in use in descendants [" + child1Name + ", " + child2Name + "], please select another name"));
     }
 
     public void testNameValidationDuplicateInAncestor() throws Exception
@@ -351,7 +352,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
-        assertTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
+        assertTrue(browser.isTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name"));
     }
 
     public void testCannotConfigureOverriddenPath() throws Exception
@@ -701,7 +702,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         subversionState.waitFor();
         subversionState.nextFormElements("", null, null, null, null, null);
         assertTrue(subversionState.isFormPresent());
-        assertTextPresent("url requires a value");
+        assertTrue(browser.isTextPresent("url requires a value"));
     }
 
     public void testDefaultProjectConfigCreated()
@@ -740,8 +741,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
         projectState.waitFor();
-        assertTextPresent("add new project");
-        assertTextNotPresent("add new project template");
+        assertTrue(browser.isTextPresent("add new project"));
+        assertFalse(browser.isTextPresent("add new project template"));
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements(random, "", "");
 
@@ -755,7 +756,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTrue(subversionState.isMarkedRequired("url"));
         subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
         assertTrue(subversionState.isFormPresent());
-        assertTextPresent("url requires a value");
+        assertTrue(browser.isTextPresent("url requires a value"));
         subversionState.cancelFormElements(null, null, null, null, null, "CLEAN_CHECKOUT");
     }
 
@@ -769,11 +770,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // name.
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
         projectState.waitFor();
-        assertTextPresent("add new project template");
+        assertTrue(browser.isTextPresent("add new project template"));
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
         assertTrue(projectState.isFormPresent());
-        assertTextPresent("name is a required field");
+        assertTrue(browser.isTextPresent("name is a required field"));
         projectState.nextFormElements(random, "", "");
 
         SelectTypeState scmTypeState = new SelectTypeState(browser);
@@ -814,7 +815,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTrue(subversionForm.isMarkedRequired("url"));
         subversionForm.applyNamedFormElements(asPair("url", ""));
         subversionForm.waitFor();
-        assertTextPresent("url requires a value");
+        assertTrue(browser.isTextPresent("url requires a value"));
     }
 
     public void testTemplateValidationOnSave() throws Exception
@@ -835,7 +836,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         subversionForm.applyNamedFormElements(asPair("url", ""));
         subversionForm.waitFor();
         assertFalse(subversionForm.isMarkedRequired("url"));
-        assertTextNotPresent("url requires a value");
+        assertFalse(browser.isTextPresent("url requires a value"));
     }
 
     public void testInvalidPathNonExistantScope() throws Exception
@@ -878,7 +879,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
         browser.loginAsAdmin();
         browser.openAndWaitFor(CompositePage.class, projectPath);
-        assertTextPresent("An SCM must be configured to complete this project.");
+        assertTrue(browser.isTextPresent("An SCM must be configured to complete this project."));
     }
 
     public void testSaveNoParentPath() throws Exception
@@ -931,7 +932,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         // Check the hierarchy, config and such.
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, punctuatedName, false);
-        assertTextNotPresent("invalid");
+        assertFalse(browser.isTextPresent("invalid"));
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         configPage.waitFor();
         configPage.clickBuildOptionsAndWait();
@@ -1049,7 +1050,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         // Check the tree state is correct (CIB-2566).
         templatePage.clickCollapseAll();
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

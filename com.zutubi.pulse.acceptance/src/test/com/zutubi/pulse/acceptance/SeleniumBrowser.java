@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -654,6 +656,26 @@ public class SeleniumBrowser
                 return isWindowPresent(windowName);
             }
         }, WAITFOR_TIMEOUT, "Timeout waiting for " + windowName + " window.");
+    }
+
+    /**
+     * Waits for the pop-down status pane to appear with the given message.
+     *
+     * @param message message to wait for
+     */
+    public void waitForStatus(String message)
+    {
+        waitForElement(IDs.STATUS_MESSAGE, WAITFOR_TIMEOUT);
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return StringUtils.stringSet(getText(IDs.STATUS_MESSAGE));
+            }
+        }, WAITFOR_TIMEOUT, "status message to be set.");
+
+        String text = getText(IDs.STATUS_MESSAGE);
+        assertThat(text, containsString(message));
     }
 
     public void refreshUntilElement(String id)

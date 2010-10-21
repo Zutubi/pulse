@@ -46,7 +46,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         browser.loginAsAdmin();
         ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
-        waitForStatus(Messages.getInstance(ProjectConfiguration.class).format("clean.feedback"));
+        browser.waitForStatus(Messages.getInstance(ProjectConfiguration.class).format("clean.feedback"));
     }
 
     public void testCustomActionWithArgument() throws Exception
@@ -71,7 +71,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.saveFormElements("one", "two");
         form.waitFor();
-        assertTextPresent("passwords do not match");
+        assertTrue(browser.isTextPresent("passwords do not match"));
     }
 
     public void testCustomActionWithArgumentCancel() throws Exception
@@ -148,7 +148,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.saveFormElements("<?xml version=\"1.0\"?><project><nosuchtag/></project>");
         form.waitFor();
 
-        assertTextPresent("Unknown child element 'nosuchtag'");
+        assertTrue(browser.isTextPresent("Unknown child element 'nosuchtag'"));
     }
 
     private ProjectConfigPage prepareActionPrelude() throws Exception
@@ -253,7 +253,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertDefaultAndComplexActionsNotShown(projectPage);
 
         projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_PAUSE);
-        assertTextPresent("action 'pause' triggered on 2 descendants");
+        assertTrue(browser.isTextPresent("action 'pause' triggered on 2 descendants"));
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
@@ -266,7 +266,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
         projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_RESUME);
-        assertTextPresent("action 'resume' triggered on 1 descendant");
+        assertTrue(browser.isTextPresent("action 'resume' triggered on 1 descendant"));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
     }

@@ -83,8 +83,8 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
         browser.open(urls.base());
         browser.waitForElement("license-expired");
-        assertTextPresent("Your license has expired.");
-        assertElementNotPresent("support-expired");
+        assertTrue(browser.isTextPresent("Your license has expired."));
+        assertFalse(browser.isElementIdPresent("support-expired"));
 
         // Build triggers should be ignored
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -114,8 +114,8 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         }
 
         assertTrue(condition.satisfied());
-        assertTextPresent("support/upgrades have expired");
-        assertElementNotPresent("license-expired");
+        assertTrue(browser.isTextPresent("support/upgrades have expired"));
+        assertFalse(browser.isElementIdPresent("license-expired"));
 
         // Build triggers should behave normally
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -129,9 +129,9 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
         browser.open(urls.base());
         browser.waitForElement("license-cannot-run");
-        assertTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date.");
-        assertElementNotPresent("license-expired");
-        assertElementNotPresent("support-expired");
+        assertTrue(browser.isTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date."));
+        assertFalse(browser.isElementIdPresent("license-expired"));
+        assertFalse(browser.isElementIdPresent("support-expired"));
 
         // Build triggers should behave normally
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -150,7 +150,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         // Adding a project should fail
         AddProjectWizard.CommandState state = runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
         state.waitFor();
-        assertTextPresent("Unable to add project: license limit exceeded");
+        assertTrue(browser.isTextPresent("Unable to add project: license limit exceeded"));
     }
 
     public void testAgentsExceeded() throws Exception
@@ -168,7 +168,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishNamedFormElements(asPair("name", random), asPair("host", "localhost"));
         form.waitFor();
-        assertTextPresent("Unable to add agent: license limit exceeded");
+        assertTrue(browser.isTextPresent("Unable to add agent: license limit exceeded"));
     }
 
     public void testUsersExceeded() throws Exception
@@ -186,7 +186,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishNamedFormElements(asPair("login", random), asPair("name", random), asPair("emailAddress", random + "@example.com"));
         form.waitFor();
-        assertTextPresent("Unable to add user: license limit exceeded");
+        assertTrue(browser.isTextPresent("Unable to add user: license limit exceeded"));
     }
 
     public void testEnforcedViaRemoteApi() throws Exception
@@ -217,7 +217,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + "clone");
         cloneForm.waitFor();
-        assertTextPresent("Unable to add project: license limit exceeded");
+        assertTrue(browser.isTextPresent("Unable to add project: license limit exceeded"));
     }
 
     private Date tomorrow()
@@ -254,7 +254,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
     {
         browser.open(urls.base());
         browser.refreshUntilElement("license-exceeded");
-        assertTextPresent("Your license limits have been exceeded.");
+        assertTrue(browser.isTextPresent("Your license limits have been exceeded."));
 
         // No builds for you!
         assertTriggersIgnored();
@@ -279,7 +279,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         if(ignored)
         {
             Thread.sleep(1000);
-            assertElementNotPresent(statusId);
+            assertFalse(browser.isElementIdPresent(statusId));
         }
         else
         {

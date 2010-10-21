@@ -90,7 +90,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, ADMIN_CREDENTIALS.getUserName()));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_USER, ADMIN_CREDENTIALS.getUserName()));
         // Make sure this view is not decorated (CIB-1711).
-        assertTextNotPresent("logout");
+        assertFalse(browser.isTextPresent("logout"));
         
         verifyPersonalBuildArtifacts(buildNumber);
     }
@@ -152,7 +152,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTextPresent("Unknown child element 'notrecognised'");
+        assertTrue(browser.isTextPresent("Unknown child element 'notrecognised'"));
     }
 
     public void testPersonalBuildOnAgent() throws Exception
@@ -227,7 +227,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         page.clickHook(HOOK_NAME);
 
         browser.waitForVisible("status-message");
-        assertTextPresent("triggered hook '" + HOOK_NAME + "'");
+        assertTrue(browser.isTextPresent("triggered hook '" + HOOK_NAME + "'"));
     }
 
     public void testPersonalBuildFloatingRevision() throws Exception
@@ -262,7 +262,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = runPersonalBuild(ResultState.ERROR);
 
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTextPresent("Patch does not apply cleanly");
+        assertTrue(browser.isTextPresent("Patch does not apply cleanly"));
     }
 
     public void testGitPersonalBuild() throws Exception
@@ -289,7 +289,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.loginAsAdmin();
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTextPresent("Force build failure");
+        assertTrue(browser.isTextPresent("Force build failure"));
         
         PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals("0f267c3c48939fd51dacbbddcf15f530f82f1523", changesPage.getCheckedOutRevision());
@@ -404,7 +404,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTextPresent("unified diffs will sink you");
+        assertTrue(browser.isTextPresent("unified diffs will sink you"));
 
         PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
@@ -422,10 +422,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTextPresent("nosuchrecipe");
+        assertTrue(browser.isTextPresent("nosuchrecipe"));
         
         browser.openAndWaitFor(PersonalBuildFilePage.class, buildNumber);
-        assertTextPresent("default-recipe=\"nosuchrecipe\"");
+        assertTrue(browser.isTextPresent("default-recipe=\"nosuchrecipe\""));
     }
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
@@ -500,7 +500,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = ui.getBuildNumber();
         browser.openAndWaitFor(MyBuildsPage.class);
         browser.refreshUntilElement(MyBuildsPage.getBuildNumberId(buildNumber));
-        assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
+        assertFalse(browser.isElementIdPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1)));
         browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), BUILD_TIMEOUT, expectedStatus.getPrettyString());
         return buildNumber;
     }
@@ -519,18 +519,18 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         // Verify each tab in turn
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTextPresent("nosuchcommand");
+        assertTrue(browser.isTextPresent("nosuchcommand"));
 
         browser.click(IDs.buildLogsTab());
         BuildLogsPage logsPage = browser.createPage(BuildLogsPage.class, projectName, buildNumber, "default");
         logsPage.waitFor();
-        assertTextPresent("Recipe '[default]' completed with status failure");
+        assertTrue(browser.isTextPresent("Recipe '[default]' completed with status failure"));
         
         browser.click(IDs.buildDetailsTab());
         PersonalBuildDetailsPage detailsPage = browser.createPage(PersonalBuildDetailsPage.class, buildNumber);
         detailsPage.waitFor();
         detailsPage.clickCommandAndWait("default", "build");
-        assertTextPresent("nosuchcommand");
+        assertTrue(browser.isTextPresent("nosuchcommand"));
 
         browser.click(IDs.buildChangesTab());
         PersonalBuildChangesPage changesPage = browser.createPage(PersonalBuildChangesPage.class, buildNumber);
@@ -549,7 +549,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         PersonalBuildFilePage filePage = browser.createPage(PersonalBuildFilePage.class, buildNumber);
         filePage.waitFor();
         assertTrue(filePage.isHighlightedFilePresent());
-        assertTextPresent("<ant");
+        assertTrue(browser.isTextPresent("<ant"));
 
         PersonalBuildArtifactsPage artifactsPage = browser.openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
         artifactsPage.setFilterAndWait("");

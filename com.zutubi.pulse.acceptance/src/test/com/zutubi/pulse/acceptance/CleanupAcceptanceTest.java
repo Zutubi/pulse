@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
 
@@ -274,7 +275,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
             for (Condition c : conditions)
             {
                 i++;
-                AcceptanceTestUtils.waitForCondition(c, CLEANUP_TIMEOUT, "condition("+i+") to be satisfied.");
+                TestUtils.waitForCondition(c, CLEANUP_TIMEOUT, "condition("+i+") to be satisfied.");
             }
         }
         else

@@ -132,11 +132,11 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTextPresent("name is required");
+        assertTrue(browser.isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTextPresent("name is already in use");
+        assertTrue(browser.isTextPresent("name is already in use"));
     }
 
     public void testCloneMapItemCancel() throws Exception
@@ -191,11 +191,11 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTextPresent("name is required");
+        assertTrue(browser.isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(random);
         cloneForm.waitFor();
-        assertTextPresent("name is already in use");
+        assertTrue(browser.isTextPresent("name is already in use"));
     }
 
     public void testCloneProjectHierarchyNoChild() throws Exception
@@ -254,15 +254,15 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", "");
         cloneForm.waitFor();
-        assertTextPresent("name is required");
+        assertTrue(browser.isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(parentCloneName, "true", parentName);
         cloneForm.waitFor();
-        assertTextPresent("name is already in use");
+        assertTrue(browser.isTextPresent("name is already in use"));
 
         cloneForm.cloneFormElements(random, "true", random);
         cloneForm.waitFor();
-        assertTextPresent("duplicate name, all names must be unique");
+        assertTrue(browser.isTextPresent("duplicate name, all names must be unique"));
     }
 
     public void testSmartCloneProject() throws Exception
@@ -287,19 +287,19 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cloneFormElements("", random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTextPresent("name is required");
+        assertTrue(browser.isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, "");
         cloneForm.waitFor();
-        assertTextPresent("name is required");
+        assertTrue(browser.isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(random, random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTextPresent("name is already in use");
+        assertTrue(browser.isTextPresent("name is already in use"));
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random);
         cloneForm.waitFor();
-        assertTextPresent("name is already in use");
+        assertTrue(browser.isTextPresent("name is already in use"));
     }
 
     public void testSmartCloneProjectHierarchyWithChild() throws Exception

@@ -272,7 +272,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, PROJECT_NAME, buildNumber);
         summaryPage.clickHook(random);
         browser.waitForVisible("status-message");
-        assertTextPresent("triggered hook '" + random + "'");
+        assertTrue(browser.isTextPresent("triggered hook '" + random + "'"));
 
         waitForTask();
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");

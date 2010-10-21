@@ -151,14 +151,14 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
         changePasswordForm.saveFormElements("nope", NEW_PASSWORD, NEW_PASSWORD);
         changePasswordForm.waitFor();
-        assertTextPresent("password is incorrect");
-        
+        assertTrue(browser.isTextPresent("password is incorrect"));
+
         changePasswordForm.saveFormElements("", NEW_PASSWORD, "wrong");
         changePasswordForm.waitFor();
-        assertTextPresent("new passwords do not match");
-        
+        assertTrue(browser.isTextPresent("new passwords do not match"));
+
         changePasswordForm.saveFormElements("", NEW_PASSWORD, NEW_PASSWORD);
-        waitForStatus("password changed");
+        browser.waitForStatus("password changed");
         browser.logout();
 
         LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.setup.*;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.acceptance.pages.PulseToolbar;
 import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
@@ -67,17 +67,17 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         // step five. configuring the server essentials.
         checkServerSettings();
 
-        assertTextPresent("system setup");
+        assertTrue(browser.isTextPresent("system setup"));
         browser.waitForElement("welcome.heading", 60000);
 
         // one complete, we should see the home page, and it should contain the following:
-        assertTextPresent(":: welcome ::");
+        assertTrue(browser.isTextPresent(":: welcome ::"));
 
         // wait for the toolbar to be rendered before continuing with checking.
         PulseToolbar toolbar = new PulseToolbar(browser);
         toolbar.waitFor();
 
-        assertTextPresent("A. D. Ministrator");
+        assertTrue(browser.isTextPresent("A. D. Ministrator"));
         assertTrue(browser.isElementIdPresent("logout"));
     }
 
@@ -88,21 +88,22 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         SetPulseDataForm form = browser.createForm(SetPulseDataForm.class);
         assertTrue(form.isFormPresent());
         assertTrue(form.isBrowseDataLinkPresent());
-        assertFormFieldNotEmpty("zfid.data");
+        assertTrue(form.isFieldNotEmpty("zfid.data"));
 
         form.nextFormElements("");
         form.waitFor();
-        assertTextPresent("pulse data directory requires a value");
+        assertTrue(browser.isTextPresent("pulse data directory requires a value"));
 
         form.nextFormElements("data");
     }
 
     private void assertPulseTabsNotVisible()
     {
-        assertElementNotPresent("tab.projects");
-        assertElementNotPresent("tab.queues");
-        assertElementNotPresent("tab.agents");
-        assertElementNotPresent("tab.administration");
+        assertFalse(browser.isElementIdPresent("tab.projects"));
+        assertFalse(browser.isElementIdPresent("tab.projects"));
+        assertFalse(browser.isElementIdPresent("tab.queues"));
+        assertFalse(browser.isElementIdPresent("tab.agents"));
+        assertFalse(browser.isElementIdPresent("tab.administration"));
     }
 
     private void checkSetupDatabase()
@@ -127,19 +128,19 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         licenseForm.nextFormElements("");
         assertTrue(licenseForm.isFormPresent());
         assertFormElements(licenseForm, "");
-        assertTextPresent("license key requires a value");
+        assertTrue(browser.isTextPresent("license key requires a value"));
 
         // check that license validation works.
         licenseForm.nextFormElements(invalidLicenseKey);
         assertTrue(licenseForm.isFormPresent());
         assertFormElements(licenseForm, invalidLicenseKey);
-        assertTextPresent("invalid");
+        assertTrue(browser.isTextPresent("invalid"));
 
         // check that an expired license is not accepted.
         licenseForm.nextFormElements(expiredLicenseKey);
         assertTrue(licenseForm.isFormPresent());
         assertFormElements(licenseForm, expiredLicenseKey);
-        assertTextPresent("expired");
+        assertTrue(browser.isTextPresent("expired"));
 
         // enter a valid license.
         licenseForm.nextFormElements(licenseKey);

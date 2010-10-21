@@ -108,7 +108,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.waitForBuildToComplete(random, 1);
         browser.openAndWaitFor(BuildSummaryPage.class, random, 1L);
-        assertTextPresent("Forceful termination requested by 'admin'");
+        assertTrue(browser.isTextPresent("Forceful termination requested by 'admin'"));
     }
 
     /**

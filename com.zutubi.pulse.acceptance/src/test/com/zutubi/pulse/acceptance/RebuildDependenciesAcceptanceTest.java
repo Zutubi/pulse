@@ -13,6 +13,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
+import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -108,7 +109,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         WaitProject firstDependency;
         WaitProject secondDependency;
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

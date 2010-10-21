@@ -31,6 +31,22 @@ public class ConfigurationCheckAction extends ActionSupport
         return SUCCESS;
     }
 
+    public String healAll() throws Exception
+    {
+        ConfigurationHealthReport report = configurationHealthChecker.healAll();
+        if (report.isHealthy())
+        {
+            LOG.info("Configuration heal: All clear.");
+        }
+        else
+        {
+            LOG.warning("Configuration heal: Errors detected.");
+            LOG.warning(report.toString());
+        }
+
+        return SUCCESS;
+    }
+
     public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)
     {
         this.configurationHealthChecker = configurationHealthChecker;

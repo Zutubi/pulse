@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -109,7 +110,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         confirmPage.clickDelete();
         ProjectHierarchyPage global = browser.createPage(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         global.waitFor();
-        assertElementNotPresent("link=" + random);
+        assertFalse(browser.isElementIdPresent("link=" + random));
 
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertFalse(browsePage.isProjectPresent(null, random));
@@ -195,7 +196,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     private void waitForDirectoryToBeCleaned(final File buildDirectory)
     {
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
@@ -254,7 +255,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS, getPath(dashboardPath, "shownProjects", "0"), "remove reference");
-        assertTextNotPresent("A further");
+        assertFalse(browser.isTextPresent("A further"));
         confirmPage.clickCancel();
         hierarchyPage.waitFor();
         browser.logout();
@@ -264,7 +265,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS);
-        assertTextPresent("A further task is required that is not visible to you with your current permissions");
+        assertTrue(browser.isTextPresent("A further task is required that is not visible to you with your current permissions"));
         confirmPage.clickDelete();
 
         ProjectHierarchyPage globalPage = browser.createPage(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
@@ -366,7 +367,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
-        assertTextPresent("Are you sure you wish to hide this record?");
+        assertTrue(browser.isTextPresent("Are you sure you wish to hide this record?"));
         assertTasks(confirmPage, cleanupPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
@@ -425,7 +426,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
-        assertTextPresent("Are you sure you wish to hide this record?");
+        assertTrue(browser.isTextPresent("Are you sure you wish to hide this record?"));
         assertTasks(confirmPage, parentCleanupPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
@@ -458,7 +459,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
-        assertTextPresent("Are you sure you wish to hide this record?");
+        assertTrue(browser.isTextPresent("Are you sure you wish to hide this record?"));
         assertTasks(confirmPage, parentCleanupPath, ACTION_HIDE_RECORD, childCleanupPath, ACTION_DELETE_RECORD);
         confirmPage.clickDelete();
 

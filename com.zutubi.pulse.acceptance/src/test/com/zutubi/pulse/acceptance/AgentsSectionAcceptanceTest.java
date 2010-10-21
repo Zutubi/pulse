@@ -278,7 +278,7 @@ public class AgentsSectionAcceptanceTest extends SeleniumTestBase
         AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, random);
         assertTrue(statusPage.isSynchronisationTablePresent());
         assertEquals(0, statusPage.getSynchronisationMessageCount());
-        assertTextPresent("no synchronisation messages found");
+        assertTrue(browser.isTextPresent("no synchronisation messages found"));
     }
 
     public void testSimpleSynchronisationMessage() throws Exception

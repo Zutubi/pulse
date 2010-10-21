@@ -2,9 +2,7 @@ package com.zutubi.pulse.acceptance.forms;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
+import com.zutubi.util.*;
 import junit.framework.Assert;
 
 import java.util.List;
@@ -307,6 +305,12 @@ public abstract class SeleniumForm
         // not testing the widgets themselves, just go direct to
         // the setValue method.
         browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
+    }
+
+    public boolean isFieldNotEmpty(String id)
+    {
+        String value = browser.getValue(WebUtils.toValidHtmlName(id));
+        return StringUtils.stringSet(value);
     }
 
     private int getFieldType(String name)

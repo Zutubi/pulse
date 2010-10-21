@@ -135,7 +135,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
         form.applyFormElements(null, ServerPermission.PERSONAL_BUILD.toString());
         form.waitFor();
-        assertTextNotPresent("name requires a value");
+        assertFalse(browser.isTextPresent("name requires a value"));
     }
 
     public void testAllUsersGroupNameIsReadOnly()

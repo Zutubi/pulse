@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.HibernateStatisticsPage;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.Condition;
 
 /**
@@ -25,7 +26,7 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
         assertFalse(statsPage.isEnabled());
 
         statsPage.clickToggleAndWait();
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
@@ -34,7 +35,7 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
         }, TIMEOUT, "statistics to be enabled");
 
         statsPage.clickToggleAndWait();
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

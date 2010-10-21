@@ -90,6 +90,6 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
 
         browser.loginAsAdmin();
         browser.openAndWaitFor(ProjectLogPage.class, project);
-        assertTextPresent("Reinitialising");
+        assertTrue(browser.isTextPresent("Reinitialising"));
     }
 }

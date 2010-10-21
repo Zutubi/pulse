@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.FieldScope;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -148,7 +147,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 
         // Check no groups.
         ProjectReportsPage reportsPage = browser.openAndWaitFor(ProjectReportsPage.class, random);
-        assertTextPresent(MESSAGE_NO_GROUPS);
+        assertTrue(browser.isTextPresent(MESSAGE_NO_GROUPS));
 
         xmlRpcHelper.restoreConfig(buildTrendsPath);
         xmlRpcHelper.restoreConfig(testTrendsPath);
@@ -162,12 +161,12 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         // no builds.
         browser.open(urls.base());
         reportsPage.openAndWaitFor();
-        assertTextPresent(MESSAGE_NO_BUILDS);
+        assertTrue(browser.isTextPresent(MESSAGE_NO_BUILDS));
 
         // Check that a build gives some data to report.
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
         reportsPage.openAndWaitFor();
-        assertTextNotPresent(MESSAGE_NO_BUILDS);
+        assertFalse(browser.isTextPresent(MESSAGE_NO_BUILDS));
 
         checkReportData();
 

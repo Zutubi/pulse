@@ -69,7 +69,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         WelcomePage welcomePage = browser.createPage(WelcomePage.class);
         welcomePage.waitFor();
         assertTitle(welcomePage);
-        assertTextPresent("name_" + random);
+        assertTrue(browser.isTextPresent("name_" + random));
         assertTrue(welcomePage.isElementIdPresent(IDs.ID_DASHBOARD_TAB));
         assertTrue(welcomePage.isElementIdPresent(IDs.ID_PREFERENCES));
         assertTrue(welcomePage.isElementIdPresent(IDs.ID_LOGOUT));
@@ -97,7 +97,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "", "");
-        assertTextPresent("Anonymous signup is not enabled");
+        assertTrue(browser.isTextPresent("Anonymous signup is not enabled"));
     }
 
     public void testAnonymousSingupPasswordMismatch() throws Exception
@@ -109,7 +109,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.saveFormElements(random, random, "p1", "p2");
         assertTrue(form.isFormPresent());
-        assertTextPresent("passwords do not match");
+        assertTrue(browser.isTextPresent("passwords do not match"));
     }
 
     public void testAnonymousSingupExistingUser() throws Exception
@@ -121,7 +121,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.saveFormElements(ADMIN_CREDENTIALS.getUserName(), "name", "p", "p");
         assertTrue(form.isFormPresent());
-        assertTextPresent("login 'admin' is already in use");
+        assertTrue(browser.isTextPresent("login 'admin' is already in use"));
     }
 
     public void testAnonymousAccess() throws Exception

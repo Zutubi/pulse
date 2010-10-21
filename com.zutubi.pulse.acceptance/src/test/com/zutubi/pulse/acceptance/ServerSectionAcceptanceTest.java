@@ -13,7 +13,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
     {
         browser.loginAsAdmin();
         browser.openAndWaitFor(ServerMessagesPage.class);
-        assertTextPresent("messages found");
+        assertTrue(browser.isTextPresent("messages found"));
     }
 
     public void testServerMessagesPaging() throws Exception
@@ -39,26 +39,26 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         page = page.clickPage(5);
         page.waitFor();
         assertPagingLinks(page, 10);
-        assertTextPresent("Test error message 59");
+        assertTrue(browser.isTextPresent("Test error message 59"));
     }
 
     public void testServerInfo() throws Exception
     {
         browser.loginAsAdmin();
         browser.openAndWaitFor(ServerInfoPage.class);
-        assertTextPresent("system information");
-        assertTextPresent("java vm");
-        assertTextPresent("version information");
-        assertTextPresent("version number");
-        assertTextPresent("pulse configuration");
-        assertTextPresent("data directory");
-        assertTextPresent("all system properties");
-        assertTextPresent("path.separator");
+        assertTrue(browser.isTextPresent("system information"));
+        assertTrue(browser.isTextPresent("java vm"));
+        assertTrue(browser.isTextPresent("version information"));
+        assertTrue(browser.isTextPresent("version number"));
+        assertTrue(browser.isTextPresent("pulse configuration"));
+        assertTrue(browser.isTextPresent("data directory"));
+        assertTrue(browser.isTextPresent("all system properties"));
+        assertTrue(browser.isTextPresent("path.separator"));
 
-        assertTextPresent("all environment variables");
+        assertTrue(browser.isTextPresent("all environment variables"));
         if (SystemUtils.IS_LINUX)
         {
-            assertTextPresent("PATH");
+            assertTrue(browser.isTextPresent("PATH"));
         }
     }
 

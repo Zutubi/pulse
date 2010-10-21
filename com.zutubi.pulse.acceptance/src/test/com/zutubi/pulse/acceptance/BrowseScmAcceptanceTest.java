@@ -11,8 +11,8 @@ import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
 
@@ -210,7 +210,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         commandType.nextFormElements("zutubi.antCommandConfig");
         
         final AntCommandForm antForm = browser.createForm(AntCommandForm.class);
-        waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
@@ -246,7 +246,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.clickOk();
         browse.waitForClose();
 
-        waitForCondition(new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

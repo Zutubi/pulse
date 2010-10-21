@@ -181,40 +181,6 @@ public class AcceptanceTestUtils
     }
 
     /**
-     * Wait for the condition to be true before returning.  If the condition does not return true with
-     * the given timeout, a runtime exception is generated with a message based on the description.  Note
-     * that the wait will last at least as long as the timeout period, and maybe a little longer.
-     *
-     * @param condition     the condition which needs to be satisfied before returning
-     * @param timeout       the amount of time given for the condition to return true before
-     * generating a runtime exception
-     * @param description   a human readable description of what the condition is waiting for which will be
-     * used in the message of the generated timeout exception
-     *
-     * @throws RuntimeException if the timeout is reached or if this thread is interrupted.
-     */
-    public static void waitForCondition(Condition condition, long timeout, String description)
-    {
-        long endTime = System.currentTimeMillis() + timeout;
-        while (!condition.satisfied())
-        {
-            if (System.currentTimeMillis() > endTime)
-            {
-                throw new RuntimeException("Timed out waiting for " + description);
-            }
-
-            try
-            {
-                Thread.sleep(200);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException("Interrupted waiting for " + description);
-            }
-        }
-    }
-
-    /**
      * Returns the location of a Pulse package, based on the pulse.package
      * system property.
      *
@@ -392,27 +358,6 @@ public class AcceptanceTestUtils
         {
             get.releaseConnection();
         }
-    }
-
-    /**
-     * Waits for the pop-down status pane to appear with the given message.
-     *
-     * @param browser browser pointing at pulse
-     * @param message message to wait for
-     */
-    public static void waitForStatus(final SeleniumBrowser browser, String message)
-    {
-        browser.waitForElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
-        waitForCondition(new Condition()
-        {
-            public boolean satisfied()
-            {
-                return StringUtils.stringSet(browser.getText(IDs.STATUS_MESSAGE));
-            }
-        }, STATUS_TIMEOUT, "status message to be set.");
-
-        String text = browser.getText(IDs.STATUS_MESSAGE);
-        assertThat(text, containsString(message));
     }
 
     /**
