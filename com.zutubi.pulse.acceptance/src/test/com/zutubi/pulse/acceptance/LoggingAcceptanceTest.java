@@ -39,6 +39,7 @@ public class LoggingAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         disableExtraLogging();
         logout();
+        logDir = null;
         super.tearDown();
     }
 
