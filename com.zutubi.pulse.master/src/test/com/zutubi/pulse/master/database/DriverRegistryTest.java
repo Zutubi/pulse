@@ -51,6 +51,7 @@ public class DriverRegistryTest extends PulseTestCase
             // By loading the classfile from the postgresql jar, we cause problems with the
             // deletion of that file, someone keeps an open file handle.
             tmp = null;
+            driverDir = null;
         }
 
         super.tearDown();
