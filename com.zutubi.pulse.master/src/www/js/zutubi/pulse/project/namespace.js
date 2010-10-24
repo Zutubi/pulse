@@ -47,6 +47,41 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         health: function(health) {
             return Zutubi.pulse.project.imageLabel('health', health);
         },
+
+        revision: function(revision) {
+            if (revision)
+            {
+                var result = '';
+                var abbreviate = revision.revisionString.length > 10;
+                if (abbreviate)
+                {
+                    result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">'
+                }
+
+                if (revision.link)
+                {
+                    result += '<a href="' + revision.link + '">';
+                }
+
+                result += Ext.util.Format.htmlEncode(abbreviate ? revision.revisionString.substring(0, 7) + '...' : revision.revisionString);
+
+                if (revision.link)
+                {
+                    result += '</a>';
+                }
+
+                if (abbreviate)
+                {
+                    result += '</span>';
+                }
+
+                return result;
+            }
+            else
+            {
+                return 'none';
+            }
+        },
                 
         PAUSE_TEMPLATE: new Ext.XTemplate(
             '<a class="unadorned" href="{[window.baseUrl]}/projectState.action?projectName={encodedProjectName}&amp;pause={pause}">' +
@@ -167,37 +202,9 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return 'personal';
             }
-            else if (revision)
-            {
-                var result = '';
-                var abbreviate = revision.revisionString.length > 10;
-                if (abbreviate)
-                {
-                    result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">'
-                }
-                
-                if (revision.link)
-                {
-                    result += '<a href="' + revision.link + '">'; 
-                }
-                
-                result += Ext.util.Format.htmlEncode(abbreviate ? revision.revisionString.substring(0, 7) + '...' : revision.revisionString);
-                
-                if (revision.link)
-                {
-                    result += '</a>';
-                }
-                
-                if (abbreviate)
-                {
-                    result += '</span>';
-                }
-                
-                return result;
-            }
             else
             {
-                return 'none';
+                return Zutubi.pulse.project.renderers.revision(revision);
             }
         },
         
@@ -271,6 +278,56 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return '<span class="understated">no stages</span>';
             }
+        },
+
+        COMMENT_TEMPLATE: new Ext.XTemplate(
+            '{abbreviated} ' +
+            '<a class="unadorned" id="comment-{id}-link" onclick="Zutubi.FloatManager.showHideFloat(\'comments\', \'comment-{id}\'); return false">' +
+                '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="comment-{id}-button" alt="full comment"/>' +
+            '</a>' +
+            '<div id="comment-{id}" style="display: none">' +
+            '<table class="content" style="margin: 0">' +
+                '<tr>' +
+                    '<th class="heading" colspan="5">' +
+                        '<span class="action">' +
+                            '<a href="#" onclick="Zutubi.FloatManager.showHideFloat(\'comments\', \'comment-{id}\'); return false;"><img alt="close" src="{[window.baseUrl]}/images/delete.gif"/>close</a>' +
+                        '</span>' +
+                        'comment ' +
+                    '</th>' +
+                '</tr>' +
+                '<tr>' +
+                    '<td><pre>{comment}</pre></td>' +
+                '</tr>' +
+            '</table>' +
+            '</div>'
+        ),
+
+        changelistComment: function(comment, changelist)
+        {
+            if (comment.comment)
+            {
+                if (comment.abbreviated)
+                {
+                    return Zutubi.pulse.project.renderers.COMMENT_TEMPLATE.apply({
+                        abbreviated: comment.abbreviated,
+                        comment: comment.comment,
+                        id: changelist.id
+                    });
+                }
+                else
+                {
+                    return comment.comment;
+                }
+            }
+            else
+            {
+                return '<span class="understated">no comment</span>';
+            }
+        },
+
+        changelistActions: function(id)
+        {
+            return '<a href="../changes/' + id + '">view</a>';
         }
     }
 };
@@ -328,6 +385,29 @@ Ext.apply(Zutubi.pulse.project, {
             stages: {
                 name: 'stages',
                 renderer: Zutubi.pulse.project.renderers.buildStages
+            }
+        },
+
+        changelist: {
+            rev: {
+                name: 'revision',
+                renderer: Zutubi.pulse.project.renderers.revision
+            },
+
+            when: {
+                name: 'when',
+                renderer: Zutubi.pulse.project.renderers.date
+            },
+
+            comment: {
+                name: 'comment',
+                renderer: Zutubi.pulse.project.renderers.changelistComment
+            },
+
+            actions: {
+                name: 'id',
+                key: 'actions',
+                renderer: Zutubi.pulse.project.renderers.changelistActions
             }
         }
     }

@@ -1,16 +1,20 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.pulse.master.xwork.actions.user.ChangelistModel;
 import com.zutubi.util.TimeStamps;
 import flexjson.JSON;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Model for JSON data used to render the project home page.
@@ -251,6 +255,15 @@ public class ProjectHomeModel
             this.revisionString = revisionString;
         }
 
+        public RevisionModel(Revision revision, ChangeViewerConfiguration changeViewerConfig)
+        {
+            this.revisionString = revision == null ? null : revision.getRevisionString();
+            if (revision != null && changeViewerConfig != null)
+            {
+                this.link = changeViewerConfig.getRevisionURL(revision);
+            }
+        }
+
         public String getRevisionString()
         {
             return revisionString;
@@ -272,10 +285,10 @@ public class ProjectHomeModel
         private String absolute;
         private String relative;
 
-        public DateModel(TimeStamps stamps)
+        public DateModel(long time)
         {
-            absolute = stamps.getPrettyStartDate();
-            relative = stamps.getPrettyStartTime();
+            absolute = TimeStamps.getPrettyDate(time, Locale.getDefault());
+            relative = TimeStamps.getPrettyTime(time);
         }
 
         public String getAbsolute()
@@ -369,16 +382,19 @@ public class ProjectHomeModel
             this.revision = revision;
         }
 
-        public BuildModel(BuildResult buildResult)
+        public BuildModel(BuildResult buildResult, ChangeViewerConfiguration changeViewerConfig)
         {
             id = buildResult.getId();
             number = buildResult.getNumber();
             status = buildResult.getState().getPrettyString();
             reason = buildResult.getReason().getSummary();
             Revision buildRevision = buildResult.getRevision();
-            revision = buildRevision == null ? null : new RevisionModel(buildRevision.getRevisionString());
+            if (buildRevision != null)
+            {
+                revision = new RevisionModel(buildRevision, changeViewerConfig);
+            }
             tests = buildResult.getTestSummary().toString();
-            when = new DateModel(buildResult.getStamps());
+            when = new DateModel(buildResult.getStamps().getStartTime());
             elapsed = new ElapsedModel(buildResult.getStamps());
             errors = buildResult.getErrorFeatureCount();
             warnings = buildResult.getWarningFeatureCount();
@@ -460,6 +476,78 @@ public class ProjectHomeModel
         public List<StageModel> getStages()
         {
             return stages;
+        }
+    }
+
+    public static class ChangelistCommentModel
+    {
+        private static final int COMMENT_LINE_LENGTH = 80;
+        private static final int COMMENT_TRIM_LIMIT = 60;
+
+        private String abbreviated;
+        private String comment;
+
+        public ChangelistCommentModel(CommitMessageSupport commitMessageSupport)
+        {
+            if (commitMessageSupport.getLength() > COMMENT_TRIM_LIMIT)
+            {
+                abbreviated = commitMessageSupport.trim(COMMENT_TRIM_LIMIT);
+            }
+
+            this.comment = commitMessageSupport.wrap(COMMENT_LINE_LENGTH);
+        }
+
+        public String getAbbreviated()
+        {
+            return abbreviated;
+        }
+
+        public String getComment()
+        {
+            return comment;
+        }
+    }
+
+    public static class ChangelistModel
+    {
+        private long id;
+        private RevisionModel revision;
+        private String who;
+        private DateModel when;
+        private ChangelistCommentModel comment;
+
+        public ChangelistModel(PersistentChangelist changelist, ProjectConfiguration projectConfig)
+        {
+            id = changelist.getId();
+            revision = new RevisionModel(changelist.getRevision(), projectConfig.getChangeViewer());
+            who = changelist.getAuthor();
+            when = new DateModel(changelist.getTime());
+            comment = new ChangelistCommentModel(new CommitMessageSupport(changelist.getComment(), projectConfig.getCommitMessageTransformers().values()));
+        }
+
+        public long getId()
+        {
+            return id;
+        }
+
+        public RevisionModel getRevision()
+        {
+            return revision;
+        }
+
+        public String getWho()
+        {
+            return who;
+        }
+
+        public DateModel getWhen()
+        {
+            return when;
+        }
+
+        public ChangelistCommentModel getComment()
+        {
+            return comment;
         }
     }
 }

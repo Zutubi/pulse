@@ -51,7 +51,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         ],
                         data: this.data.status
                     }, {
-                        xtype: 'box',
+                        xtype: 'box'
                     },
                     {
                         xtype: 'xzsummarytable',
@@ -91,7 +91,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         data: this.data.latest,
                         emptyMessage: 'no completed builds found'
                     }, {
-                        xtype: 'box',
+                        xtype: 'box'
                     }, {
                         xtype: 'xzsummarytable',
                         id: 'project-recent',
@@ -114,10 +114,11 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     title: 'latest changes',
                     cellCls: 'hpad',
                     columns: [
-                        'revision',
+                        Zutubi.pulse.project.configs.changelist.rev,
                         'who',
-                        'when',
-                        'comment'
+                        Zutubi.pulse.project.configs.changelist.when,
+                        Zutubi.pulse.project.configs.changelist.comment,
+                        Zutubi.pulse.project.configs.changelist.actions
                     ],
                     data: this.data.changes,
                     emptyMessage: 'no changes found'

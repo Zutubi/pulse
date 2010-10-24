@@ -16,25 +16,25 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.pulse.master.xwork.actions.user.ChangelistModel;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
-import static java.util.Arrays.asList;
 
 import java.io.File;
-import java.util.Collections;
+import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
+ * An action that provides the JSON data for rendering a project home page.
  */
 public class ProjectHomeDataAction extends ProjectActionBase
 {
@@ -89,9 +89,10 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
         ProjectHomeModel.StatusModel status = new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.fromLatestBuild(latest)), state, statistics); 
         model = new ProjectHomeModel(status);
-        
-        CollectionUtils.map(queued, new QueuedToBuildModelMapping(), model.getActivity());
-        BuildResultToModelMapping toModelMapping = new BuildResultToModelMapping();
+
+        final ProjectConfiguration projectConfig = project.getConfig();
+        CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getChangeViewer()), model.getActivity());
+        BuildResultToModelMapping toModelMapping = new BuildResultToModelMapping(projectConfig.getChangeViewer());
         CollectionUtils.map(inProgress, toModelMapping, model.getActivity());
 
         if (latest != null)
@@ -102,11 +103,11 @@ public class ProjectHomeDataAction extends ProjectActionBase
         CollectionUtils.map(completed, toModelMapping, model.getRecent());
         
         List<PersistentChangelist> latestChanges = buildManager.getLatestChangesForProject(project, 10);
-        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ChangelistModel>()
+        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ProjectHomeModel.ChangelistModel>()
         {
-            public ChangelistModel map(PersistentChangelist persistentChangelist)
+            public ProjectHomeModel.ChangelistModel map(PersistentChangelist persistentChangelist)
             {
-                return new ChangelistModel(persistentChangelist, null, Collections.<BuildResult>emptyList(), getCommitMessageSupport(persistentChangelist));
+                return new ProjectHomeModel.ChangelistModel(persistentChangelist, projectConfig);
             }
         }, model.getChanges());
         
@@ -117,19 +118,19 @@ public class ProjectHomeDataAction extends ProjectActionBase
         File contentRoot = systemPaths.getContentRoot();
         Messages messages = Messages.getInstance(ProjectConfiguration.class);
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        if (accessManager.hasPermission(AccessManager.ACTION_WRITE, project.getConfig()))
+        if (accessManager.hasPermission(AccessManager.ACTION_WRITE, projectConfig))
         {
             model.addLink(new ActionLink(urls.adminProject(project), messages.format(AccessManager.ACTION_WRITE + ConfigurationLinks.KEY_SUFFIX_LABEL), AccessManager.ACTION_WRITE));
         }
 
-        String url = project.getConfig().getUrl();
+        String url = projectConfig.getUrl();
         if (StringUtils.stringSet(url))
         {
             model.setUrl(url);
             model.addLink(new ActionLink(url, messages.format(LINK_HOMEPAGE + ConfigurationLinks.KEY_SUFFIX_LABEL), LINK_HOMEPAGE));
         }
 
-        List<String> availableActions = actionManager.getActions(project.getConfig(), false, true);
+        List<String> availableActions = actionManager.getActions(projectConfig, false, true);
         for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN, ACTION_TRIGGER, ACTION_REBUILD))
         {
             if (availableActions.contains(candidateAction))
@@ -186,20 +187,43 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
     private static class QueuedToBuildModelMapping implements Mapping<QueuedRequest, ProjectHomeModel.BuildModel>
     {
+        private ChangeViewerConfiguration changeViewerConfig;
+
+        private QueuedToBuildModelMapping(ChangeViewerConfiguration changeViewerConfig)
+        {
+            this.changeViewerConfig = changeViewerConfig;
+        }
+
         public ProjectHomeModel.BuildModel map(QueuedRequest queuedRequest)
         {
             BuildRequestEvent requestEvent = queuedRequest.getRequest();
             Revision revision = requestEvent.getRevision().getRevision();
-            String revisionString = revision == null ? "[floating]" : revision.getRevisionString();
-            return new ProjectHomeModel.BuildModel(requestEvent.getId(), -1, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), new ProjectHomeModel.RevisionModel(revisionString));
+            ProjectHomeModel.RevisionModel revisionModel;
+            if (revision == null)
+            {
+                revisionModel = new ProjectHomeModel.RevisionModel("[floating]");
+            }
+            else
+            {
+                revisionModel = new ProjectHomeModel.RevisionModel(revision, changeViewerConfig);
+            }
+            
+            return new ProjectHomeModel.BuildModel(requestEvent.getId(), -1, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel);
         }
     }
 
     private static class BuildResultToModelMapping implements Mapping<BuildResult, ProjectHomeModel.BuildModel>
     {
+        private ChangeViewerConfiguration changeViewerConfig;
+
+        private BuildResultToModelMapping(ChangeViewerConfiguration changeViewerConfig)
+        {
+            this.changeViewerConfig = changeViewerConfig;
+        }
+
         public ProjectHomeModel.BuildModel map(BuildResult buildResult)
         {
-            return new ProjectHomeModel.BuildModel(buildResult);
+            return new ProjectHomeModel.BuildModel(buildResult, changeViewerConfig);
         }
     }
 
