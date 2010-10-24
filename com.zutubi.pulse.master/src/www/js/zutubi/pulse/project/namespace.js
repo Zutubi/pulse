@@ -55,7 +55,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                 var abbreviate = revision.revisionString.length > 10;
                 if (abbreviate)
                 {
-                    result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">'
+                    result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">';
                 }
 
                 if (revision.link)
@@ -115,13 +115,13 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         },
 
         projectSuccessRate: function(value) {
-            return '' + value + '% (errors excluded)'
+            return '' + value + '% (errors excluded)';
         },
         
         STATISTICS_TEMPLATE: new Ext.XTemplate(
-            '<img class="centre" title="{ok} ({percentOk}%) ok" src="{[window.baseUrl]}/images/box-success.gif" height="10" width="{percentOk}"/>' +
-            '<img class="centre" title="{failed} ({percentFailed}%) failed" src="{[window.baseUrl]}/images/box-failure.gif" height="10" width="{percentFailed}"/>' +
-            '<img class="centre" title="{error} ({percentError}%) errors" src="{[window.baseUrl]}/images/box-error.gif" height="10" width="{percentError}"/>' +
+            '<tpl if="ok"><img class="centre" title="{ok} ({percentOk}%) ok" src="{[window.baseUrl]}/images/box-success.gif" height="10" width="{percentOk}"/></tpl>' +
+            '<tpl if="failed"><img class="centre" title="{failed} ({percentFailed}%) failed" src="{[window.baseUrl]}/images/box-failure.gif" height="10" width="{percentFailed}"/></tpl>' +
+            '<tpl if="error"><img class="centre" title="{error} ({percentError}%) errors" src="{[window.baseUrl]}/images/box-error.gif" height="10" width="{percentError}"/></tpl>' +
             '<br/>{total} builds (ok: {ok}, f: {failed}, e: {error})'
         ),
         
