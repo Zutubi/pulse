@@ -32,6 +32,10 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
 
         Zutubi.table.SummaryTable.superclass.initComponent.apply(this, arguments);
     },
+
+    dataExists: function() {
+        return Zutubi.table.SummaryTable.superclass.dataExists.apply(this, arguments) && this.data.length > 0;
+    },
     
     renderFixed: function() {
         var data = {};

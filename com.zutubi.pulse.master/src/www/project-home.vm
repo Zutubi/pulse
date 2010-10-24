@@ -2,36 +2,58 @@
 #authorisationTags($principle)
 #projectTags($project)
 <content tag="header.javascript">
-    yahoo/utilities.js
-    buildcolumns.js
+    zutubi/pulse/project/browse/ProjectHomePanel.js
+    projects.js
 </content>
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript">
-    //<![CDATA[
-        #set($ajaxUrl = "$base/ajax/projectHomePanel.action?projectName=$u_projectName")
-        #updater($ajaxUrl "project-home-$project.name" $principle "Ext.emptyFn")
+        #if($refreshInterval)
+        var refreshInterval = $refreshInterval;
+        #elseif($principle.preferences.refreshingEnabled)
+        var refreshInterval = $principle.preferences.refreshInterval;
+        #else
+        var refreshInterval = 0;
+        #end
+        var view;
+        var panel = null;
+        
+        function update(data)
+        {
+            if (panel)
+            {
+                panel.update(data);
+            }
+            else
+            {
+                panel = new Zutubi.pulse.project.browse.ProjectHomePanel({
+                    loadingEl: '#id("project-home-$project.name")',
+                    projectId: '$project.id',
+                    data: data
+                });
 
-        var summaryPopup;
-        var recentPopup;
-        YAHOO.util.Event.addListener(window, "load", function() {
-            summaryPopup = new BuildColumnPopup("project.summary", "$base", "$ajaxUrl", "project-home-#uce($project.name)");
-            recentPopup = new BuildColumnPopup("project.recent", "$base", "$ajaxUrl", "project-home-#uce($project.name)");
+                var nestedCenter = Ext.getCmp('nested-center');
+                nestedCenter.add(panel);
+                viewport.doLayout();
+            }
+        }
+        
+        function refresh(cb)
+        {
+            view.load(cb);
+        }
+            
+        Ext.onReady(function() {
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/projectHomeData.action?projectId=$project.id', refreshInterval, update, window, Ext.get('#id("project-home-$project.name")'), 'Unable to load project data.');
+            view.init();
         });
-    //]]>
     </script>
 </head>
 <body>
     #projectTabs("home")
 
-    #parse("/template/includes/actionerrors.vm")
-    
     <div id='#id("project-home-$project.name")'>
-        #parse("ajax/project-home-panel.vm")
     </div>
-
-    #buildColumnsPopup("project.summary" "summaryPopup")
-    #buildColumnsPopup("project.recent" "recentPopup")
 </body>
 </html>

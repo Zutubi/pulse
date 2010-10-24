@@ -36,6 +36,11 @@ public class ProjectActionBase extends ActionSupport
         this.projectName = projectName;
     }
 
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
+
     public String getu_projectName()
     {
         return uriComponentEncode(projectName);
@@ -80,20 +85,30 @@ public class ProjectActionBase extends ActionSupport
             if (StringUtils.stringSet(projectName))
             {
                 project = projectManager.getProject(projectName, true);
-                if(project == null)
-                {
-                    throw new LookupErrorException("Unknown project '" + projectName + "'");
-                }
-                if(!configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
-                {
-                    throw new LookupErrorException("Project configuration is invalid.");
-                }
-                
+                checkProject();
                 projectId = project.getId();
+            }
+            else if (projectId > 0)
+            {
+                project = projectManager.getProject(projectId, true);
+                checkProject();
+                projectName = project.getName();
             }
         }
 
         return project;
+    }
+
+    private void checkProject()
+    {
+        if (project == null)
+        {
+            throw new LookupErrorException("Unknown project '" + projectName + "'");
+        }
+        if(!configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
+        {
+            throw new LookupErrorException("Project configuration is invalid.");
+        }
     }
 
     public Project getRequiredProject()

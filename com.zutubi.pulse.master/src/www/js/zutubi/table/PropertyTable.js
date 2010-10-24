@@ -21,7 +21,7 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
         this.columnCount = 2;
         this.rowTemplate = new Ext.Template(
             '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
-                '<th class="fit-width right leftmost">{key}</th>' +
+                '<th class="fit-width top right leftmost">{key}</th>' +
                 '<td id="{id}" class="rightmost">{value}</td>' +
             '</tr>'
         );

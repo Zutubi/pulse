@@ -77,11 +77,11 @@ public class DashboardDataAction extends ActionSupport
                 }
     
                 List<Project> responsibleFor = projectManager.findByResponsible(user);
-                List<ResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<Project, ResponsibilityModel>()
+                List<UserResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<Project, UserResponsibilityModel>()
                 {
-                    public ResponsibilityModel map(Project project)
+                    public UserResponsibilityModel map(Project project)
                     {
-                        return new ResponsibilityModel(project.getName(), project.getId());
+                        return new UserResponsibilityModel(project.getName(), project.getId());
                     }
                 });
     

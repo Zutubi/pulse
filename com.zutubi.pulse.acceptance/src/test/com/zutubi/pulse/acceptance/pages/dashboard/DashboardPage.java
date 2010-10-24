@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.pulse.master.xwork.actions.user.ResponsibilityModel;
+import com.zutubi.pulse.master.xwork.actions.user.UserResponsibilityModel;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.WebUtils;
 
@@ -73,7 +73,7 @@ public class DashboardPage extends ProjectsSummaryPage
 
     public boolean hasResponsibility(String project)
     {
-        return browser.isElementIdPresent(ResponsibilityModel.getResponsibilityId(project));
+        return browser.isElementIdPresent(UserResponsibilityModel.getResponsibilityId(project));
     }
 
     public void clearResponsibility(String project)
@@ -100,7 +100,7 @@ public class DashboardPage extends ProjectsSummaryPage
     
     private String getClearResponsibilityId(String project)
     {
-        return "clear-" + ResponsibilityModel.getResponsibilityId(project);
+        return "clear-" + UserResponsibilityModel.getResponsibilityId(project);
     }
     
     public static class ProjectChange

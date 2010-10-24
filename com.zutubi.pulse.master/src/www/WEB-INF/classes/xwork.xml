@@ -405,8 +405,8 @@
             <result name="success" type="httpheader">200</result>
         </action>
 
-        <action name="projectHomePanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
-            <result name="success" type="velocity">project-home-panel.vm</result>
+        <action name="projectHomeData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeDataAction">
+            <result name="success" type="flexjson">model</result>
         </action>
 
         <action name="projectDependenciesPanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">

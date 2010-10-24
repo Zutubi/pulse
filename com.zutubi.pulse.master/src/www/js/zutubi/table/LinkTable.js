@@ -50,6 +50,10 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         Zutubi.table.LinkTable.superclass.initComponent.apply(this, arguments);
     },
 
+    dataExists: function() {
+        return Zutubi.table.LinkTable.superclass.dataExists.apply(this, arguments) && this.data.length > 0;
+    },
+
     renderData: function() {
         var previousRow = this.el.child('tr');
         for (var i = 0, l = this.data.length; i < l; i++)
