@@ -135,6 +135,16 @@ Zutubi.ConcreteProject.prototype = {
         return 'browse/projects/' + encodeURIComponent(this.data.name) + '/' + tab + '/';
     },
 
+    generateHandler: function(action, projectId, projectName, domId) {
+        var functionName = 'gen_' + action + projectId;
+        window[functionName] = function() {
+            actionPath('projects/' + projectName, action, false, false);
+            showHideFloat('actions', domId, 'tl-bl?');
+        };
+    
+        return functionName + '(); return false;';
+    },
+
     getMenuItems: function(menuType, menuArg, id) {
         var items;
 
@@ -180,7 +190,7 @@ Zutubi.ConcreteProject.prototype = {
                 }
                 else
                 {
-                    item.onclick = 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'trigger\', false, false); Zutubi.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;';
+                    item.onclick = this.generateHandler('trigger', this.data.projectId, this.data.name, id);
                 }
 
                 items.push(item);
@@ -191,7 +201,7 @@ Zutubi.ConcreteProject.prototype = {
                 items.push({
                     id: 'with dependencies',
                     image: 'lightning.gif',
-                    onclick: 'actionPath(\'projects/' + encodeString(this.data.name) + '\', \'rebuild\', false, false); Zutubi.FloatManager.showHideFloat(\'actions\', \'' + id + '\', \'tl-bl?\'); return false;'
+                    onclick: this.generateHandler('rebuild', this.data.projectId, this.data.name, id)
                 });
             }
 

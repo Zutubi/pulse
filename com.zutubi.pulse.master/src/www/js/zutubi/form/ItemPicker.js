@@ -36,6 +36,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
                 name: 'combo.' + this.name,
                 displayField: this.displayField,
                 valueField: this.valueField,
+                tpl: '<tpl for="."><div class="x-combo-list-item">{' + this.displayField + ':htmlEncode}</div></tpl>',
                 triggerAction: 'all',
                 id: this.id + '.choice'
             });
@@ -57,11 +58,11 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         {
             if(Ext.isIE || Ext.isIE7)
             {
-                this.tpl = '<tpl for="."><div unselectable="on" class="' + cls + '-item">{' + this.displayField + '}</div></tpl>';
+                this.tpl = '<tpl for="."><div unselectable="on" class="' + cls + '-item">{' + this.displayField + ':htmlEncode}</div></tpl>';
             }
             else
             {
-                this.tpl = '<tpl for="."><div class="' + cls + '-item  x-unselectable">{' + this.displayField + '}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="' + cls + '-item  x-unselectable">{' + this.displayField + ':htmlEncode}</div></tpl>';
             }
         }
 

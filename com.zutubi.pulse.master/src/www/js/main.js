@@ -40,13 +40,6 @@ function encodeURIPath(path)
     return encodedPath;
 }
 
-// Escapes quotes and backslashes in a string, allowing it to be used as
-// part of a generated JavaScript string literal.
-function encodeString(s)
-{
-    return s.replace(/["'\\]/, '\\$&');
-}
-
 // Converts the given string to a valid HTML name by replacing any invalid
 // characters with '.'.
 function toHtmlName(s)

@@ -51,11 +51,11 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
         if(!this.tpl){
             if(Ext.isIE || Ext.isIE7)
             {
-                this.tpl = '<tpl for="."><div unselectable="on" class="x-select-item" tabindex="-1">{' + this.displayField + '}</div></tpl>';
+                this.tpl = '<tpl for="."><div unselectable="on" class="x-select-item" tabindex="-1">{' + this.displayField + ':htmlEncode}</div></tpl>';
             }
             else
             {
-                this.tpl = '<tpl for="."><div class="x-select-item  x-unselectable" tabindex="-1">{' + this.displayField + '}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="x-select-item  x-unselectable" tabindex="-1">{' + this.displayField + ':htmlEncode}</div></tpl>';
             }
         }
 
