@@ -278,7 +278,7 @@ public class FileSystemUtils
         }
         else
         {
-            return new File("dummy").getParentFile();
+            return new File(".");
         }
     }
     

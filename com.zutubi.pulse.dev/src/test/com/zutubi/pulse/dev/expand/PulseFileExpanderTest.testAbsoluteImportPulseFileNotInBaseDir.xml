@@ -3,7 +3,7 @@
     <recipe name="default">
         <scope>
             <property name="command-name" value="com"/>
-            <import path="testProcessImportsPulseFileNotInBaseDir.fragment.xml"/>
+            <import path="/include/testAbsoluteImportPulseFileNotInBaseDir.fragment.xml"/>
         </scope>
     </recipe>
 </project>

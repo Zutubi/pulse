@@ -10,10 +10,7 @@ import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
-import com.zutubi.pulse.core.marshal.DefaultToveFileLoadInterceptor;
-import com.zutubi.pulse.core.marshal.LocalFileResolver;
-import com.zutubi.pulse.core.marshal.ToveFileLoadInterceptor;
-import com.zutubi.pulse.core.marshal.ToveFileStorer;
+import com.zutubi.pulse.core.marshal.*;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Element;
@@ -55,14 +52,14 @@ public class PulseFileExpander
     {
         PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
         ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
-        File pulseFile = new File(options.getPulseFile());
+        File pulseFile = new File(options.getBaseDir(), options.getPulseFile());
         String recipe = options.getRecipe();
 
         InputStream is = null;
         try
         {
             is = new FileInputStream(pulseFile);
-            pulseFileLoader.load(is, recipes, createScope(options), new LocalFileResolver(options.getBaseDir()), getLoadPredicate(recipes, recipe));
+            pulseFileLoader.load(is, recipes, createScope(options), new RelativeFileResolver(options.getPulseFile(), new LocalFileResolver(options.getBaseDir())), getLoadPredicate(recipes, recipe));
         }
         finally
         {
