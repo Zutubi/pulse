@@ -165,7 +165,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                     return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
                         number: number,
                         id: build.id,
-                        link: window.baseUrl + build.link
+                        link: window.baseUrl + '/' + build.link
                     });
                 }
                 else
@@ -251,7 +251,10 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         STAGE_TEMPLATE: new Ext.XTemplate(
             '<li>' +
                 '<img alt="{status}" src="{source}"/> ' +
-                '<a href="{link}">{name:htmlEncode}</a>' +
+                '<a href="{detailsLink}">{name:htmlEncode}</a> ' +
+                '<span class="understated">//</span> ' +
+                '<a class="unadorned" href="{logLink}"><img alt="view stage log" src="{[window.baseUrl]}/images/script.gif"/></a> ' +
+                '<a href="{logLink}">log</a>' +
             '</li>'
         ),
         
@@ -265,7 +268,8 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                     var stage = stages[i];
                     result += Zutubi.pulse.project.renderers.STAGE_TEMPLATE.apply({
                         name: stage.name,
-                        link: window.baseUrl + '/' + build.link + 'details/' + encodeURIComponent(stage.name) + '/',
+                        detailsLink: window.baseUrl + '/' + build.link + 'details/' + encodeURIComponent(stage.name) + '/',
+                        logLink: window.baseUrl + '/' + build.link + 'logs/stage/' + encodeURIComponent(stage.name) + '/',
                         status: stage.status,
                         source: Zutubi.pulse.project.imageSource('status', stage.status)
                     });
