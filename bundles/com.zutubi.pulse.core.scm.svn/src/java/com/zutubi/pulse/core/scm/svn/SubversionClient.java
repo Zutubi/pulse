@@ -57,6 +57,8 @@ public class SubversionClient implements ScmClient
     private String uid;
 
     private String url;
+    
+    private static final String SVNKIT_HTTP_METHODS_PROPERTY = "svnkit.http.methods";
 
     //=======================================================================
     // Implementation
@@ -127,7 +129,7 @@ public class SubversionClient implements ScmClient
     {
         // Workaround for CIB-1978, SvnKit bug 238:
         // http://svnkit.com/tracker/bug_view_advanced_page.php?bug_id=283
-        System.setProperty("svnkit.http.methods", "Negotiate,Digest,Basic,NTLM");
+        System.setProperty(SVNKIT_HTTP_METHODS_PROPERTY, "Negotiate,Digest,Basic,NTLM");
 
         // Initialise SVN library
         if (enableHttpSpooling)
@@ -431,11 +433,23 @@ public class SubversionClient implements ScmClient
             to = getLatestRevision(null);
         }
 
-        long fromNumber = convertRevision(from).getNumber() + 1;
-        long toNumber = convertRevision(to).getNumber();
+        SVNRevision fromRevision = convertRevision(from);
+        SVNRevision toRevision = convertRevision(to);
 
-        if (fromNumber <= toNumber)
+        if (fromRevision.getNumber() != toRevision.getNumber())
         {
+            long fromNumber;
+            long toNumber;
+            if (fromRevision.getNumber() < toRevision.getNumber())
+            {
+                fromNumber = fromRevision.getNumber() + 1;
+                toNumber = toRevision.getNumber();
+            }
+            else
+            {
+                fromNumber = fromRevision.getNumber();
+                toNumber = toRevision.getNumber() + 1;
+            }
             try
             {
                 if (log(repository, fromNumber, toNumber, handler))
@@ -510,6 +524,8 @@ public class SubversionClient implements ScmClient
      * filtering.
      * 
      * @return true if there are changes within the logs that are not filtered.
+     *
+     * @throws SVNException if there is a problem accessing the repository.
      */
     private boolean containsUnfilteredChanges(List<SVNLogEntry> logs, Predicate<String> changeFilter, SVNRepository repository) throws SVNException
     {
@@ -1087,16 +1103,8 @@ public class SubversionClient implements ScmClient
 
             ExternalDefinition that = (ExternalDefinition) o;
 
-            if (!path.equals(that.path))
-            {
-                return false;
-            }
-            if (!url.equals(that.url))
-            {
-                return false;
-            }
+            return path.equals(that.path) && url.equals(that.url);
 
-            return true;
         }
 
         @Override

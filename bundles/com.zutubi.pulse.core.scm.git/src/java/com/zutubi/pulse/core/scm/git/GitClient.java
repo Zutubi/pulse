@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -396,7 +397,6 @@ public class GitClient implements ScmClient
                 exception.setReinitialiseRequired();
                 throw exception;
             }
-
             return git;
         }
     }
@@ -413,6 +413,14 @@ public class GitClient implements ScmClient
         {
             NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
             List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
+
+            // if revision to < from, then the base log request will return no results.  So
+            // lets try it the other way around.
+            if (entries.size() == 0)
+            {
+                entries = git.log(getRevisionString(to), getRevisionString(from));
+                entries = CollectionUtils.reverse(entries);
+            }
 
             List<Revision> revisions = new LinkedList<Revision>();
             for (GitLogEntry entry : entries)
@@ -434,6 +442,14 @@ public class GitClient implements ScmClient
         {
             NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
             List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
+
+            // if revision to < from, then the base log request will return no results.  So
+            // lets try it the other way around.
+            if (entries.size() == 0)
+            {
+                entries = git.log(getRevisionString(to), getRevisionString(from));
+                entries = CollectionUtils.reverse(entries);
+            }
 
             // be aware, the log contains duplicate file entries for the edit/delete case.
 

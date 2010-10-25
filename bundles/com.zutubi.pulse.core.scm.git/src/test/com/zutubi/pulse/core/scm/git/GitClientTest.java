@@ -162,6 +162,24 @@ public class GitClientTest extends GitClientTestBase
         assertEquals(asList(new Revision(REVISION_MASTER_PREVIOUS), new Revision(REVISION_MASTER_LATEST)), client.getRevisions(scmContext, new Revision(REVISION_MASTER_TWO_PREVIOUS), null));
     }
 
+    public void testGetRevisionsInRange() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        assertEquals(
+                asList(new Revision(REVISION_MASTER_PREVIOUS), new Revision(REVISION_MASTER_LATEST)),
+                client.getRevisions(scmContext, new Revision(REVISION_MASTER_TWO_PREVIOUS), new Revision(REVISION_MASTER_LATEST))
+        );
+    }
+
+    public void testGetRevisionsInReverseRange() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        assertEquals(
+                asList(new Revision(REVISION_MASTER_LATEST), new Revision(REVISION_MASTER_PREVIOUS)),
+                client.getRevisions(scmContext, new Revision(REVISION_MASTER_LATEST), new Revision(REVISION_MASTER_TWO_PREVIOUS))
+        );
+    }
+
     public void testGetRevisionsAfterUpstreamCommit() throws ScmException, IOException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
@@ -384,6 +402,17 @@ public class GitClientTest extends GitClientTestBase
         client.init(scmContext, new ScmFeedbackAdapter());
         List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~2"), null);
         assertEquals(2, changes.size());
+        assertEquals("b.txt", changes.get(0).getChanges().get(0).getPath());
+        assertEquals("a.txt", changes.get(1).getChanges().get(0).getPath());
+    }
+
+    public void testChangesReverseRange() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST), new Revision(REVISION_MASTER_LATEST + "~2"));
+        assertEquals(2, changes.size());
+        assertEquals("a.txt", changes.get(0).getChanges().get(0).getPath());
+        assertEquals("b.txt", changes.get(1).getChanges().get(0).getPath());
     }
 
     public void testLatestChanges() throws ScmException

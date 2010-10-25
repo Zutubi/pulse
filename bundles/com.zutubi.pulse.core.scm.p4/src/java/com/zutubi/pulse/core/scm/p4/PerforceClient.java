@@ -515,12 +515,27 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                 to = getLatestRevision(workspace);
             }
 
-            long start = getChangelistForRevision(workspace, from) + 1;
-            long end = getChangelistForRevision(workspace, to);
+            long fromNumber = getChangelistForRevision(workspace, from);
+            long toNumber = getChangelistForRevision(workspace, to);
 
-            if (start <= end)
+            if (fromNumber != toNumber)
             {
-                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + workspace.getName() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                boolean increasingRevisions = fromNumber < toNumber;
+
+                String fromRevision;
+                String toRevision;
+                if (increasingRevisions)
+                {
+                    fromRevision = Long.toString(fromNumber + 1);
+                    toRevision = Long.toString(toNumber);
+                }
+                else
+                {
+                    fromRevision = Long.toString(toNumber + 1);
+                    toRevision = Long.toString(fromNumber);
+                }
+
+                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + workspace.getName() + "/...@" + fromRevision + "," + toRevision);
                 Matcher matcher = PATTERN_CHANGES.matcher(p4Result.stdout);
 
                 while (matcher.find())
@@ -529,11 +544,28 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                     Changelist list = getChangelist(workspace.getName(), Long.valueOf(revision.toString()));
                     if (list != null)
                     {
-                        result.add(0, revision);
+                        // P4 gives us the result in reverse order, so if the request revisions are
+                        // increasing, we need to reverse the order of the revisions and the changelists.
+                        
+                        if (increasingRevisions)
+                        {
+                            result.add(0, revision);
+                        }
+                        else
+                        {
+                            result.add(revision);
+                        }
 
                         if (changes != null)
                         {
-                            changes.add(0, list);
+                            if (increasingRevisions)
+                            {
+                                changes.add(0, list);
+                            }
+                            else
+                            {
+                                changes.add(list);
+                            }
                         }
                     }
                 }

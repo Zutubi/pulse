@@ -254,8 +254,20 @@ public class PerforceClientTest extends PerforceTestBase
     public void testGetChangesReverseRange() throws Exception
     {
         setupClient(TEST_WORKSPACE);
-        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(2));
-        assertTrue(changes.isEmpty());
+        List<Changelist> changes = client.getChanges(null, createRevision(7), createRevision(1));
+        assertEquals(6, changes.size());
+        Changelist list = changes.get(4);
+        assertEquals("Delete and edit files in depot2.", list.getComment());
+        assertEquals("test-user", list.getAuthor());
+        assertEquals("3", list.getRevision().getRevisionString());
+        List<FileChange> changedFiles = list.getChanges();
+        assertEquals(2, changedFiles.size());
+        FileChange file1 = changedFiles.get(0);
+        assertEquals("//depot2/file1", file1.getPath());
+        assertEquals(FileChange.Action.EDIT, file1.getAction());
+        FileChange file10 = changedFiles.get(1);
+        assertEquals("//depot2/file10", file10.getPath());
+        assertEquals(FileChange.Action.DELETE, file10.getAction());
     }
 
     public void testGetChangesRestrictedToView() throws Exception
@@ -435,6 +447,28 @@ public class PerforceClientTest extends PerforceTestBase
         setupClient(TEST_WORKSPACE);
         List<Revision> revisions = client.getRevisions(null, createRevision(7), null);
         assertEquals(0, revisions.size());
+    }
+
+    public void testGetRevisionsInRange() throws ScmException
+    {
+        setupClient(TEST_WORKSPACE);
+        List<Revision> revisions = client.getRevisions(null, createRevision(3), createRevision(7));
+        assertEquals(4, revisions.size());
+        assertEquals("4", revisions.get(0).getRevisionString());
+        assertEquals("5", revisions.get(1).getRevisionString());
+        assertEquals("6", revisions.get(2).getRevisionString());
+        assertEquals("7", revisions.get(3).getRevisionString());
+    }
+
+    public void testGetRevisionsInReverseRange() throws ScmException
+    {
+        setupClient(TEST_WORKSPACE);
+        List<Revision> revisions = client.getRevisions(null, createRevision(7), createRevision(3));
+        assertEquals(4, revisions.size());
+        assertEquals("7", revisions.get(0).getRevisionString());
+        assertEquals("6", revisions.get(1).getRevisionString());
+        assertEquals("5", revisions.get(2).getRevisionString());
+        assertEquals("4", revisions.get(3).getRevisionString());
     }
 
     public void testGetRevisionsSinceFiltered() throws ScmException

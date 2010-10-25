@@ -279,10 +279,26 @@ public class SubversionClientTest extends PulseTestCase
         assertEquals(FileChange.Action.DELETE, changelist.getChanges().get(0).getAction());
     }
 
-    public void testChangesReverseRange() throws ScmException
+    public void testChangesBetweenTwoRevisions() throws ScmException
     {
-        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(2));
-        assertTrue(changes.isEmpty());
+        List<Changelist> changes = client.getChanges(null, createRevision(2), createRevision(3));
+        assertEquals(1, changes.size());
+        Changelist changelist = changes.get(0);
+        assertEquals("3", changelist.getRevision().getRevisionString());
+        assertEquals(1, changelist.getChanges().size());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
+        assertEquals(FileChange.Action.ADD, changelist.getChanges().get(0).getAction());
+    }
+
+    public void testChangesBetweenReversedRange() throws ScmException
+    {
+        List<Changelist> changes = client.getChanges(null, createRevision(3), createRevision(2));
+        assertEquals(1, changes.size());
+        Changelist changelist = changes.get(0);
+        assertEquals("3", changelist.getRevision().getRevisionString());
+        assertEquals(1, changelist.getChanges().size());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
+        assertEquals(FileChange.Action.ADD, changelist.getChanges().get(0).getAction());
     }
 
     public void testRevisionsSince() throws ScmException
@@ -301,8 +317,30 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testRevisionsSincePastHead() throws ScmException
     {
-        List<Revision> revisions = client.getRevisions(null, createRevision(9), null);
-        assertEquals(0, revisions.size());
+        try
+        {
+            client.getRevisions(null, createRevision(9), null);
+        }
+        catch (ScmException e)
+        {
+            assertEquals("svn: No such revision 9", e.getMessage());
+        }
+    }
+
+    public void testGetRevisionsInRange() throws ScmException
+    {
+        List<Revision> revisions = client.getRevisions(null, createRevision(2), createRevision(4));
+        assertEquals(2, revisions.size());
+        assertEquals("3", revisions.get(0).getRevisionString());
+        assertEquals("4", revisions.get(1).getRevisionString());
+    }
+
+    public void testGetRevisionsInReverseRange() throws ScmException
+    {
+        List<Revision> revisions = client.getRevisions(null, createRevision(4), createRevision(2));
+        assertEquals(2, revisions.size());
+        assertEquals("4", revisions.get(1).getRevisionString());
+        assertEquals("3", revisions.get(0).getRevisionString());
     }
 
     public void testCheckout() throws ScmException, IOException
