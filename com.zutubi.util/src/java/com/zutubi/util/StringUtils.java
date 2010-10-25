@@ -896,6 +896,26 @@ public class StringUtils
     }
 
     /**
+     * Returns the given string with the given suffix stripped iff the string
+     * ends with the suffix.  Otherwise, the string is returned unchanged.
+     *
+     * @param s      the string to strip
+     * @param suffix the candidate suffix to remove if present
+     * @return the given string with the given suffix removed
+     */
+    public static String stripSuffix(String s, String suffix)
+    {
+        if (s != null && s.endsWith(suffix))
+        {
+            return s.substring(0, s.length() - suffix.length());
+        }
+        else
+        {
+            return s;
+        }
+    }
+
+    /**
      * Counts the number of occurrences of a given character in a given string.
      *
      * @param s the string to inspect

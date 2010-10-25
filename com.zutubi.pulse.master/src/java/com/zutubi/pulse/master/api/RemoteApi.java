@@ -35,6 +35,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -61,8 +62,6 @@ import org.springframework.security.AccessDeniedException;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3269,7 +3268,7 @@ public class RemoteApi
      *
      * @param token authentication token, see {@link #login(String, String)}
      * @return {@xtype array<[RemoteApi.QueuedBuild]>} all queued build
-     *         requests that youhave permission to view
+     *         requests that you have permission to view
      * @access available to all users, though the result is filtered by project
      *         view permission
      * @see #cancelQueuedBuildRequest(String, String)

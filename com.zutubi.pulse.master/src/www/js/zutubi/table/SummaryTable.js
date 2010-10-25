@@ -32,6 +32,10 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
 
         Zutubi.table.SummaryTable.superclass.initComponent.apply(this, arguments);
     },
+
+    dataExists: function() {
+        return Zutubi.table.SummaryTable.superclass.dataExists.apply(this, arguments) && this.data.length > 0;
+    },
     
     renderFixed: function() {
         var data = {};
@@ -75,6 +79,22 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         
         html += '</tr>';
         return html;
+    },
+
+    getColumnNames: function() {
+        var names = '';
+        var columnCount = this.columns.length;
+        for (var i = 0; i < columnCount; i++)
+        {
+            var column = this.columns[i];
+            if (i > 0)
+            {
+                names += ',';
+            }
+            names += column.name;
+        }
+
+        return names;
     }
 });
 

@@ -25,7 +25,7 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     rowTemplate: new Ext.XTemplate(
         '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
             '<td class="status-key {extraCls}">{key}</td>' +
-            '<td class="status-value {extraCls}">{value}</td>' +
+            '<td id="{id}" class="status-value {extraCls}">{value}</td>' +
         '</tr>'),
     
     initComponent: function() {
@@ -62,12 +62,13 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         Zutubi.pulse.project.StatusBox.superclass.onRender.apply(this, arguments);
     },
     
-    renderData: function(data) {
+    renderData: function(/*data*/) {
         this.titleTemplate.overwrite(this.titleEl, this.data);
         for (var i = 0, l = this.fields.length; i < l; i++)
         {
             var field = this.fields[i];
             var args = {
+                id: this.id + '-' + field.name,
                 key: field.key,
                 value: field.getRenderedValue(this.data),
                 extraCls: i == l - 1 ? 'status-last' : ''
@@ -86,7 +87,7 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         }
     },
     
-    clearDataRows: function(data) {
+    clearDataRows: function(/*data*/) {
          var els = this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC);
          els.remove();
     }

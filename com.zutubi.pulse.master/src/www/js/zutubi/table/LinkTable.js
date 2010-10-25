@@ -38,10 +38,10 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
                 '<td class="leftmost rightmost">' +
                     '<img alt="{label}" src="{iconSrc}"/> ' +
                     '<tpl if="client">' +
-                        '<a href="#" onclick="{onclick}">{label}</a>' +
+                        '<a href="#" id="{linkId}" onclick="{onclick}">{label}</a>' +
                     '</tpl>' +
                     '<tpl if="!client">' +
-                        '<a href="{url}">{label}</a>' +
+                        '<a href="{url}" id="{linkId}">{label}</a>' +
                     '</tpl>' +
                 '</td>' + 
             '</tr>'
@@ -50,14 +50,19 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         Zutubi.table.LinkTable.superclass.initComponent.apply(this, arguments);
     },
 
+    dataExists: function() {
+        return Zutubi.table.LinkTable.superclass.dataExists.apply(this, arguments) && this.data.length > 0;
+    },
+
     renderData: function() {
         var previousRow = this.el.child('tr');
         for (var i = 0, l = this.data.length; i < l; i++)
         {
             var args = Ext.apply({}, this.data[i]);
-            args['iconSrc'] = window.baseUrl + '/' + this.iconTemplate.apply(args);
+            args.linkId = this.id + '-' + args.icon;
+            args.iconSrc = window.baseUrl + '/' + this.iconTemplate.apply(args);
             
-            var action = args['action'];
+            var action = args.action;
             var handler;
             if (this.handlers)
             {
@@ -70,13 +75,13 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             
             if (typeof handler == 'string')
             {
-                args['url'] = handler;
-                args['client'] = false;
+                args.url = handler;
+                args.client = false;
             }
             else
             {
-                args['onclick'] = 'Ext.getCmp(\'' + this.id + '\').doAction(\'' + action + '\'); return false'; 
-                args['client'] = true;
+                args.onclick = 'Ext.getCmp(\'' + this.id + '\').doAction(\'' + action + '\'); return false';
+                args.client = true;
             }
             
             previousRow = this.rowTemplate.insertAfter(previousRow, args, true);

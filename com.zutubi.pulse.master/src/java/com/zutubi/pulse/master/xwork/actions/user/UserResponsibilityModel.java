@@ -6,12 +6,12 @@ import com.zutubi.util.WebUtils;
 /**
  * JSON-encodeable information about a project a user is responsible for.
  */
-public class ResponsibilityModel
+public class UserResponsibilityModel
 {
     private String project;
     private long projectId;
 
-    public ResponsibilityModel(String project, long projectId)
+    public UserResponsibilityModel(String project, long projectId)
     {
         this.project = project;
         this.projectId = projectId;

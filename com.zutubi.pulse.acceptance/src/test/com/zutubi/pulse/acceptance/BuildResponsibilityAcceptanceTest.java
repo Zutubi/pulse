@@ -1,19 +1,21 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.*;
-import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
-import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-
-import java.util.Hashtable;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.core.test.TestUtils;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
+import com.zutubi.util.StringUtils;
+
+import java.util.Hashtable;
 
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
@@ -25,6 +27,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     private static final String TEST_COMMENT = "a comment here";
 
     private static final int BUILD_NUMBER = 1;
+    private static final int RESPONSIBILITY_TIMEOUT = 30000;
 
     @Override
     protected void setUp() throws Exception
@@ -51,7 +54,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         // Build pages for this project should show the responsibility.
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
-        assertSelfResponsible(summaryPage);
+        awaitAndAssertSelfResponsible(summaryPage);
 
         // Responsibilities should appear on your dashboard.
         DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
@@ -73,7 +76,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     {
         assertTrue(browser.login(TEST_USER, ""));
         page.openAndWaitFor();
-        assertNobodyResponsible(page);
+        awaitAndAssertNobodyResponsible(page);
 
         page.clickAction(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY);
 
@@ -82,8 +85,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
 
-        page.waitForReload();
-        assertSelfResponsible(page);
+        awaitAndAssertSelfResponsible(page);
     }
 
     public void testClearResponsibility() throws Exception
@@ -93,11 +95,10 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertTrue(browser.login(TEST_USER, ""));
 
         // Clear on the project home tab
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
-        assertSelfResponsible(homePage);
+        final ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
+        awaitAndAssertSelfResponsible(homePage);
         homePage.clickClearResponsible();
-        homePage.waitForReload();
-        assertNobodyResponsible(homePage);
+        awaitAndAssertNobodyResponsible(homePage);
 
         // Clear on the build summary tab
         takeResponsibility(TEST_PROJECT);
@@ -106,8 +107,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertTrue(summaryPage.hasResponsibleUser());
 
         summaryPage.clickAction(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY);
-        summaryPage.waitForReload();
-        assertNobodyResponsible(summaryPage);
+        awaitAndAssertNobodyResponsible(summaryPage);
 
         takeResponsibility(TEST_PROJECT);
 
@@ -127,10 +127,10 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertTrue(browser.login(random, ""));
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
-        assertOtherResponsible(homePage);
+        awaitAndAssertOtherResponsible(homePage);
 
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
-        assertOtherResponsible(summaryPage);
+        awaitAndAssertOtherResponsible(summaryPage);
         assertFalse(summaryPage.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
 
         BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
@@ -159,8 +159,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         assertTrue(page.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
         page.clickClearResponsible();
-        page.waitForReload();
-        assertNobodyResponsible(page);
+        awaitAndAssertNobodyResponsible(page);
     }
 
     public void testAutoClearResponsibility() throws Exception
@@ -170,7 +169,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         assertTrue(browser.login(TEST_USER, ""));
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
-        assertSelfResponsible(homePage);
+        awaitAndAssertSelfResponsible(homePage);
 
         // Modify the config so the build fails.
         String antPath = PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND);
@@ -180,7 +179,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         runBuild(random, false);
 
         homePage.openAndWaitFor();
-        assertSelfResponsible(homePage);
+        awaitAndAssertSelfResponsible(homePage);
 
         // Fix the build, so responsibility should clear.
         antConfig.put(Constants.Project.AntCommand.TARGETS, "");
@@ -188,7 +187,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         runBuild(random, true);
 
         homePage.openAndWaitFor();
-        assertNobodyResponsible(homePage);
+        awaitAndAssertNobodyResponsible(homePage);
     }
 
     public void testAutoClearResponsibilityDisabled() throws Exception
@@ -203,11 +202,11 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         assertTrue(browser.login(TEST_USER, ""));
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
-        assertSelfResponsible(homePage);
+        awaitAndAssertSelfResponsible(homePage);
 
         runBuild(random, true);
 
-        assertSelfResponsible(homePage);
+        awaitAndAssertSelfResponsible(homePage);
     }
 
     public void testCanDeleteUserWithResponsibility() throws Exception
@@ -224,25 +223,19 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertEquals(expectedSuccess, build.get("succeeded"));
     }
 
-    private void assertNobodyResponsible(ResponsibilityPage page)
+    private void awaitAndAssertNobodyResponsible(ResponsibilityPage page)
     {
-        assertFalse(page.hasResponsibleUser());
-        assertTrue(page.isActionPresent(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY));
-        assertFalse(page.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
+        TestUtils.waitForCondition(new NoResponsibilityCondition(page), RESPONSIBILITY_TIMEOUT, "responsibility to clear");
     }
 
-    private void assertSelfResponsible(ResponsibilityPage page)
+    private void awaitAndAssertSelfResponsible(ResponsibilityPage page)
     {
-        assertTrue(page.hasResponsibleUser());
-        assertEquals("You are currently responsible for build issues for this project.", page.getResponsibleMessage());
-        assertEquals(TEST_COMMENT, page.getResponsibleComment());
+        TestUtils.waitForCondition(new SelfResponsibleCondition(page), RESPONSIBILITY_TIMEOUT, "responsibility to be assigned to self");
     }
 
-    private void assertOtherResponsible(ResponsibilityPage page)
+    private void awaitAndAssertOtherResponsible(ResponsibilityPage page)
     {
-        assertTrue(page.hasResponsibleUser());
-        assertEquals(TEST_USER + " is currently responsible for build issues for this project.", page.getResponsibleMessage());
-        assertFalse(page.isClearResponsibilityPresent());
+        TestUtils.waitForCondition(new OtherResponsibleCondition(page), RESPONSIBILITY_TIMEOUT, "responsibility to be assigned to other user");
     }
 
     private void takeResponsibility(String project) throws Exception
@@ -257,6 +250,66 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         finally
         {
             helper.logout();
+        }
+    }
+
+    private static class NoResponsibilityCondition implements Condition
+    {
+        private ResponsibilityPage page;
+
+        private NoResponsibilityCondition(ResponsibilityPage page)
+        {
+            this.page = page;
+        }
+
+        public boolean satisfied()
+        {
+            return !page.hasResponsibleUser() &&
+                    page.isActionPresent(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY) &&
+                    !page.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY);
+        }
+    }
+
+    private static class HasResponsibilityCondition implements Condition
+    {
+        protected ResponsibilityPage page;
+        private String message;
+        private String comment;
+
+        private HasResponsibilityCondition(ResponsibilityPage page, String message, String comment)
+        {
+            this.page = page;
+            this.message = message;
+            this.comment = comment;
+        }
+
+        public boolean satisfied()
+        {
+            return page.hasResponsibleUser() &&
+                   StringUtils.equals(message, page.getResponsibleMessage()) &&
+                   StringUtils.equals(comment, page.getResponsibleComment());
+        }
+    }
+
+    private static class SelfResponsibleCondition extends HasResponsibilityCondition
+    {
+        private SelfResponsibleCondition(ResponsibilityPage page)
+        {
+            super(page, "You are currently responsible for build issues for this project.", TEST_COMMENT);
+        }
+
+        @Override
+        public boolean satisfied()
+        {
+            return super.satisfied() && page.isClearResponsibilityPresent();
+        }
+    }
+
+    private static class OtherResponsibleCondition extends HasResponsibilityCondition
+    {
+        private OtherResponsibleCondition(ResponsibilityPage page)
+        {
+            super(page, TEST_USER + " is currently responsible for build issues for this project.", TEST_COMMENT);
         }
     }
 }

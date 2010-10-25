@@ -61,7 +61,7 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     renderDynamic: function() {
         this.clearDynamic();
         
-        if (this.data)
+        if (this.dataExists())
         {
             this.renderData();
             this.el.setDisplayed(true);
@@ -77,6 +77,15 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
                 this.el.setDisplayed(false);
             }
         }
+    },
+    
+    /**
+     * Indicates if there is data to fill the table.  This base implementation merely checks if any
+     * data is defined.  Subclasses may override with more specific existence tests.
+     */
+    dataExists: function()
+    {
+        return this.data !== undefined && this.data !== null;
     },
     
     /**

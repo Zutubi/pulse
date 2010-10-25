@@ -396,7 +396,16 @@ function handleDialogResponse(options, success, response)
         var result = Ext.util.JSON.decode(response.responseText);
         if (result.success)
         {
-            window.location.reload(true);
+            if (window.refresh)
+            {
+                refresh(function() {
+                    hideStatus();
+                });
+            }
+            else
+            {
+                window.location.reload(true);
+            }
         }
         else
         {
@@ -480,38 +489,6 @@ function deleteComment(buildId, commentId)
                      'Deleting comment...',
                      '/ajax/deleteComment.action',
                      { buildId: buildId, commentId: commentId });
-}
-
-function handleMarkForCleanResponse(options, success, response)
-{
-    if (success)
-    {
-        var result = Ext.util.JSON.decode(response.responseText);
-        if (result.success)
-        {
-            if (result.status)
-            {
-                showStatus(result.status.message, result.status.type);
-            }
-        }
-        else
-        {
-            showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
-        }
-    }
-    else
-    {
-        showStatus('Cannot contact server', 'failure');
-    }
-}
-
-function markForClean(projectName)
-{
-    showStatus('Cleaning up build directories...', 'working');
-    Ext.Ajax.request({
-        url: window.baseUrl + '/aconfig/projects/'+projectName+'?clean=clean',
-        callback: handleMarkForCleanResponse
-    });
 }
 
 function toggleStateList(e)

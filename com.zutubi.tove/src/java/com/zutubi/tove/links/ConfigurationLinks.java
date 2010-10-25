@@ -21,8 +21,9 @@ public class ConfigurationLinks
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationLinks.class);
 
+    public static final String KEY_SUFFIX_LABEL = ".link" + ConventionSupport.I18N_KEY_SUFFIX_LABEL;
+    
     private static final String METHOD_NAME = "getLinks";
-    private static final String KEY_SUFFIX_LABEL = ".link" + ConventionSupport.I18N_KEY_SUFFIX_LABEL;
 
     private Class<? extends Configuration> configurationClass;
     private Object linksInstance;

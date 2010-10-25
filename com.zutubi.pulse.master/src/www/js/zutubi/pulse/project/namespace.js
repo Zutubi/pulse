@@ -1,34 +1,86 @@
 // dependency: zutubi/pulse/namespace.js
 
 window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
+    imageSource: function(type, value) {
+        return window.baseUrl + '/images/' + type + '/' + value.replace(' ', '').toLowerCase() + '.gif';
+    },
+    
     imageLabel: function(type, value) {
-        return '<img alt="' + value + '" src="' + window.baseUrl + '/images/' + type + '/' + value.replace(' ', '').toLowerCase() + '.gif"/> ' + value;    
+        return '<img alt="' + value + '" src="' + Zutubi.pulse.project.imageSource(type, value) + '"/> ' + value;    
     },
         
     renderers: {
         link: function(value, data) {
-            return '<a href="' + data.link + '">' + Ext.util.Format.htmlEncode(value) + '</a>';
+            var result = '';
+            if (data.link)
+            {
+                result += '<a href="' + window.baseUrl + data.link + '">'; 
+            }
+            
+            result += Ext.util.Format.htmlEncode(value);
+             
+             if (data.link)
+             {
+                 result += '</a>';
+             }
+             
+             return result;
         },
 
         DATE_TEMPLATE: new Ext.XTemplate(
-            '<a href="#" class="unadorned" title="{date}" onclick="toggleDisplay(\'time-{id}\'); toggleDisplay(\'date-{id}\'); return false;">' +
+            '<a href="#" class="unadorned" title="{absolute}" onclick="toggleDisplay(\'relative-{id}\'); toggleDisplay(\'absolute-{id}\'); return false;">' +
                 '<img alt="toggle format" src="{[window.baseUrl]}/images/calendar.gif"/>' +
             '</a> ' +
-            '<span id="time-{id}">{time}</span>' +
-            '<span id="date-{id}" style="display: none">{date}</span>'
+            '<span id="relative-{id}">{relative}</span>' +
+            '<span id="absolute-{id}" style="display: none">{absolute}</span>'
         ),
         
         date: function(date) {
-            // e.g. {time: '3 hours ago', date: '12/03/2010 10:01:33pm' }
+            // e.g. {relative: '3 hours ago', absolute: '12/03/2010 10:01:33pm' }
             return Zutubi.pulse.project.renderers.DATE_TEMPLATE.apply({
                 id: Ext.id(),
-                date: date.date,
-                time: date.time
+                absolute: date.absolute,
+                relative: date.relative
             });
         },
         
         health: function(health) {
             return Zutubi.pulse.project.imageLabel('health', health);
+        },
+
+        revision: function(revision) {
+            if (revision)
+            {
+                var result = '';
+                var abbreviate = revision.revisionString.length > 10;
+                if (abbreviate)
+                {
+                    result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">';
+                }
+
+                if (revision.link)
+                {
+                    result += '<a href="' + revision.link + '">';
+                }
+
+                result += Ext.util.Format.htmlEncode(abbreviate ? revision.revisionString.substring(0, 7) + '...' : revision.revisionString);
+
+                if (revision.link)
+                {
+                    result += '</a>';
+                }
+
+                if (abbreviate)
+                {
+                    result += '</span>';
+                }
+
+                return result;
+            }
+            else
+            {
+                return 'none';
+            }
         },
                 
         PAUSE_TEMPLATE: new Ext.XTemplate(
@@ -62,51 +114,69 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             return result;
         },
 
+        projectSuccessRate: function(value) {
+            return '' + value + '% (errors excluded)';
+        },
+        
         STATISTICS_TEMPLATE: new Ext.XTemplate(
-            '<img class="centre" title="{ok} ({percentOk}%) ok" src="{[window.baseUrl]}/images/box-success.gif" height="10" width="{percentOk}"/>' +
-            '<img class="centre" title="{failed} ({percentFailed}%) failed" src="{[window.baseUrl]}/images/box-failure.gif" height="10" width="{percentFailed}"/>' +
-            '<img class="centre" title="{error} ({percentError}%) errors" src="{[window.baseUrl]}/images/box-error.gif" height="10" width="{percentError}"/>' +
+            '<tpl if="ok"><img class="centre" title="{ok} ({percentOk}%) ok" src="{[window.baseUrl]}/images/box-success.gif" height="10" width="{percentOk}"/></tpl>' +
+            '<tpl if="failed"><img class="centre" title="{failed} ({percentFailed}%) failed" src="{[window.baseUrl]}/images/box-failure.gif" height="10" width="{percentFailed}"/></tpl>' +
+            '<tpl if="error"><img class="centre" title="{error} ({percentError}%) errors" src="{[window.baseUrl]}/images/box-error.gif" height="10" width="{percentError}"/></tpl>' +
             '<br/>{total} builds (ok: {ok}, f: {failed}, e: {error})'
         ),
         
         projectStatistics: function(statistics) {
-            // e.g. { ok: 8, failed: 2, error: 1 }
-            var total = statistics.ok + statistics.failed + statistics.error;
-            if (total == 0)
+            // e.g. { total: 9, ok: 6, failed: 1 }
+            if (statistics.total == 0)
             {
                 return '<span class="understated">no builds</span>';
             }
 
             var getPercent = function(n) {
-                return (n * 100 / total).toFixed(0);
+                return (n * 100 / statistics.total).toFixed(0);
             };
             
-            return Zutubi.pulse.project.cells.STATISTICS_TEMPLATE.apply({
+            var error = statistics.total - statistics.ok - statistics.failed;
+            return Zutubi.pulse.project.renderers.STATISTICS_TEMPLATE.apply({
                 baseUrl: window.baseUrl,
                 ok: statistics.ok,
                 percentOk: getPercent(statistics.ok),
                 failed: statistics.failed,
                 percentFailed: getPercent(statistics.failed),
-                error: statistics.error,
-                percentError: getPercent(statistics.error),
-                total: total
+                error: error,
+                percentError: getPercent(error),
+                total: statistics.total
             });
         },
 
         ID_TEMPLATE: new Ext.XTemplate(
-            '<a href="{link}">build {number}</a> ' +
+            '<a href="{link}">build {number}</a>&nbsp;' +
             '<a class="unadorned" id="bactions-{id}-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
                 '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="bactions-{id}-button" alt="build menu"/>' +
             '</a>'
         ),
         
         buildId: function(number, build) {
-            Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
-            return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
-                number: number,
-                id: build.id,
-                link: build.link
-            });
+            if (number > 0)
+            {
+                if (build.link)
+                {
+                    Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
+                    return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
+                        number: number,
+                        id: build.id,
+                        link: window.baseUrl + '/' + build.link
+                    });
+                }
+                else
+                {
+                    return 'build ' + number;
+                }
+            }
+            else
+            {
+                return '[pending]';
+            }
         },
         
         buildStatus: function(status, build) {
@@ -114,6 +184,11 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return '<img alt="in progress" src="' + window.baseUrl + '/images/status/inprogress.gif"/> ' +
                        Zutubi.pulse.project.renderers.buildElapsed(build.elapsed, build);
+            }
+            else if (status == 'queued' && build.prettyQueueTime)
+            {
+                return '<img alt="queued" src="' + window.baseUrl + '/images/status/queued.gif"/> ' +
+                       'queued (' + build.prettyQueueTime + ')';
             }
             else
             {
@@ -127,37 +202,9 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return 'personal';
             }
-            else if (revision)
-            {
-                var result = '';
-                var abbreviate = revision.revisionString.length > 9;
-                if (abbreviate)
-                {
-                    result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">'
-                }
-                
-                if (revision.link)
-                {
-                    result += '<a href="' + revision.link + '">'; 
-                }
-                
-                result += Ext.util.Format.htmlEncode(abbreviate ? revision.revisionString.substring(0, 6) + '...' : revision.revisionString);
-                
-                if (revision.link)
-                {
-                    result += '</a>';
-                }
-                
-                if (abbreviate)
-                {
-                    result += '</span>';
-                }
-                
-                return result;
-            }
             else
             {
-                return 'none';
+                return Zutubi.pulse.project.renderers.revision(revision);
             }
         },
         
@@ -199,6 +246,92 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return '' + count;
             }
+        },
+        
+        STAGE_TEMPLATE: new Ext.XTemplate(
+            '<li>' +
+                '<img alt="{status}" src="{source}"/> ' +
+                '<a href="{detailsLink}">{name:htmlEncode}</a> ' +
+                '<span class="understated">//</span> ' +
+                '<a class="unadorned" href="{logLink}"><img alt="view stage log" src="{[window.baseUrl]}/images/script.gif"/></a> ' +
+                '<a href="{logLink}">log</a>' +
+            '</li>'
+        ),
+        
+        buildStages: function(stages, build)
+        {
+            if (stages && stages.length > 0)
+            {
+                var result = '<ul class="actions">';
+                for (var i = 0, l = stages.length; i < l; i++)
+                {
+                    var stage = stages[i];
+                    result += Zutubi.pulse.project.renderers.STAGE_TEMPLATE.apply({
+                        name: stage.name,
+                        detailsLink: window.baseUrl + '/' + build.link + 'details/' + encodeURIComponent(stage.name) + '/',
+                        logLink: window.baseUrl + '/' + build.link + 'logs/stage/' + encodeURIComponent(stage.name) + '/',
+                        status: stage.status,
+                        source: Zutubi.pulse.project.imageSource('status', stage.status)
+                    });
+                }
+                
+                result += '</ul>';
+                return result;
+            }
+            else
+            {
+                return '<span class="understated">no stages</span>';
+            }
+        },
+
+        COMMENT_TEMPLATE: new Ext.XTemplate(
+            '{abbreviated} ' +
+            '<a class="unadorned" id="comment-{id}-link" onclick="Zutubi.FloatManager.showHideFloat(\'comments\', \'comment-{id}\'); return false">' +
+                '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="comment-{id}-button" alt="full comment"/>' +
+            '</a>' +
+            '<div id="comment-{id}" style="display: none">' +
+            '<table class="content" style="margin: 0">' +
+                '<tr>' +
+                    '<th class="heading" colspan="5">' +
+                        '<span class="action">' +
+                            '<a href="#" onclick="Zutubi.FloatManager.showHideFloat(\'comments\', \'comment-{id}\'); return false;"><img alt="close" src="{[window.baseUrl]}/images/delete.gif"/>close</a>' +
+                        '</span>' +
+                        'comment ' +
+                    '</th>' +
+                '</tr>' +
+                '<tr>' +
+                    '<td><pre>{comment}</pre></td>' +
+                '</tr>' +
+            '</table>' +
+            '</div>'
+        ),
+
+        changelistComment: function(comment, changelist)
+        {
+            if (comment.comment)
+            {
+                if (comment.abbreviated)
+                {
+                    return Zutubi.pulse.project.renderers.COMMENT_TEMPLATE.apply({
+                        abbreviated: comment.abbreviated,
+                        comment: comment.comment,
+                        id: changelist.id
+                    });
+                }
+                else
+                {
+                    return comment.comment;
+                }
+            }
+            else
+            {
+                return '<span class="understated">no comment</span>';
+            }
+        },
+
+        changelistActions: function(id)
+        {
+            return '<a href="../changes/' + id + '">view</a>';
         }
     }
 };
@@ -251,6 +384,34 @@ Ext.apply(Zutubi.pulse.project, {
             elapsed: {
                 name: 'elapsed',
                 renderer: Zutubi.pulse.project.renderers.buildElapsed
+            },
+
+            stages: {
+                name: 'stages',
+                renderer: Zutubi.pulse.project.renderers.buildStages
+            }
+        },
+
+        changelist: {
+            rev: {
+                name: 'revision',
+                renderer: Zutubi.pulse.project.renderers.revision
+            },
+
+            when: {
+                name: 'when',
+                renderer: Zutubi.pulse.project.renderers.date
+            },
+
+            comment: {
+                name: 'comment',
+                renderer: Zutubi.pulse.project.renderers.changelistComment
+            },
+
+            actions: {
+                name: 'id',
+                key: 'actions',
+                renderer: Zutubi.pulse.project.renderers.changelistActions
             }
         }
     }

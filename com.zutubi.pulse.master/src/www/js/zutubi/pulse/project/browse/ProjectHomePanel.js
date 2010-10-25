@@ -46,12 +46,12 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         fields: [
                             {name: 'health'},
                             {name: 'state', renderer: Zutubi.pulse.project.renderers.projectState},
-                            {name: 'successRate', key: 'success rate'},
+                            {name: 'successRate', key: 'success rate', renderer: Zutubi.pulse.project.renderers.projectSuccessRate},
                             {name: 'statistics', renderer: Zutubi.pulse.project.renderers.projectStatistics}
                         ],
                         data: this.data.status
                     }, {
-                        xtype: 'box',
+                        xtype: 'box'
                     },
                     {
                         xtype: 'xzsummarytable',
@@ -85,12 +85,13 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                             Zutubi.pulse.project.configs.build.errors,
                             Zutubi.pulse.project.configs.build.warnings,
                             Zutubi.pulse.project.configs.build.when,
-                            Zutubi.pulse.project.configs.build.elapsed
+                            Zutubi.pulse.project.configs.build.elapsed,
+                            Zutubi.pulse.project.configs.build.stages
                         ],
                         data: this.data.latest,
                         emptyMessage: 'no completed builds found'
                     }, {
-                        xtype: 'box',
+                        xtype: 'box'
                     }, {
                         xtype: 'xzsummarytable',
                         id: 'project-recent',
@@ -113,10 +114,11 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     title: 'latest changes',
                     cellCls: 'hpad',
                     columns: [
-                        'revision',
+                        Zutubi.pulse.project.configs.changelist.rev,
                         'who',
-                        'when',
-                        'comment'
+                        Zutubi.pulse.project.configs.changelist.when,
+                        Zutubi.pulse.project.configs.changelist.comment,
+                        Zutubi.pulse.project.configs.changelist.actions
                     ],
                     data: this.data.changes,
                     emptyMessage: 'no changes found'
@@ -135,7 +137,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     xtype: 'xzlinktable',
                     id: 'project-actions',
                     data: this.data.actions,
-                    title: 'actions'
+                    title: 'actions',
+                    handlers: {
+                        clean: this.markForClean.createDelegate(this),
+                        clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
+                        takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),
+                        trigger: window.baseUrl + '/triggerBuild.action?projectId=' + this.projectId,
+                        viewSource: Zutubi.fs.viewWorkingCopy.createDelegate(window, [this.projectId])
+                    }
                 }, {
                     xtype: 'xzlinktable',
                     id: 'project-links',
@@ -168,5 +177,38 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
     updateRows: function() {
         Ext.getCmp('project-main').getLayout().checkRows();
         Ext.getCmp('project-right').getLayout().checkRows();
+    },
+    
+    handleMarkForCleanResponse: function(options, success, response)
+    {
+        if (success)
+        {
+            var result = Ext.util.JSON.decode(response.responseText);
+            if (result.success)
+            {
+                if (result.status)
+                {
+                    showStatus(result.status.message, result.status.type);
+                }
+            }
+            else
+            {
+                showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
+            }
+        }
+        else
+        {
+            showStatus('Cannot contact server', 'failure');
+        }
+    },
+    
+    markForClean: function()
+    {
+        showStatus('Cleaning up build directories...', 'working');
+        Ext.Ajax.request({
+            url: window.baseUrl + '/aconfig/projects/' + encodeURIComponent(this.data.status.name) + '?clean=clean',
+            callback: this.handleMarkForCleanResponse,
+            scope: this
+        });
     }
 });

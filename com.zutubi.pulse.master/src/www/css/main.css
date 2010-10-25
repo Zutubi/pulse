@@ -622,6 +622,11 @@ th.right
     text-align: right;
 }
 
+.top
+{
+    vertical-align: top;
+}
+
 /*------------------------------
 Browse view
 */

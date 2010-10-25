@@ -916,6 +916,7 @@ Zutubi.ActiveView.prototype = {
             this.runner.start({
                 run: this.load,
                 scope: this,
+                args: [],
                 interval: 1000 * this.refreshInterval
             });
         }
@@ -925,9 +926,8 @@ Zutubi.ActiveView.prototype = {
         }
     },
 
-    load: function() {
+    load: function(callback) {
         var view = this;
-
         Ext.Ajax.request({
             url: view.url,
             timeout: 120000,
@@ -936,6 +936,10 @@ Zutubi.ActiveView.prototype = {
             {
                 view.updateFn.call(view.updateScope, eval('(' + transport.responseText + ')'));
                 view.initialised = true;
+                if (callback)
+                {
+                    callback();
+                }
             },
 
             failure: function(/*transport, options*/)
@@ -950,6 +954,11 @@ Zutubi.ActiveView.prototype = {
                 if (!view.initialised)
                 {
                     view.el.update(view.failureMessage);
+                }
+
+                if (callback)
+                {
+                    callback();
                 }
             }
         });
