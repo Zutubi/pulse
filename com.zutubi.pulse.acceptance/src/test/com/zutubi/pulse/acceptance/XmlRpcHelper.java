@@ -1356,6 +1356,11 @@ public class XmlRpcHelper
         return (Boolean) call("cancelQueuedBuildRequest", id);
     }
 
+    public Hashtable<String, Object> getCustomFieldsInBuild(String projectName, int buildId) throws Exception
+    {
+        return call("getCustomFieldsInBuild", projectName, buildId);
+    }
+    
     public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception
     {
         return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);
