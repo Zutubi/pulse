@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.dev.config.DevConfig;
 import com.zutubi.pulse.dev.ui.ConsoleUI;
 import com.zutubi.pulse.dev.util.OptionUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
@@ -136,7 +137,7 @@ public abstract class AbstractClientFactory<T>
         }
         else
         {
-            base = new File(System.getProperty("user.dir"));
+            base = FileSystemUtils.getWorkingDirectory();
         }
         return base;
     }

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -21,8 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -43,7 +42,7 @@ public class LocalBuild
 
             new SynchronisePluginsClientFactory().newInstance().syncIfBare();
 
-            b.runBuild(new File(System.getProperty("user.dir")), options);
+            b.runBuild(FileSystemUtils.getWorkingDirectory(), options);
         }
         catch (UserAbortException e)
         {

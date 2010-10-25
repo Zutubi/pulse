@@ -7,10 +7,10 @@ import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.config.DevConfigSetup;
 import com.zutubi.pulse.dev.ui.ConsoleUI;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,7 +42,7 @@ public class ConfigCommand implements Command
         }
 
         ConsoleUI ui = new ConsoleUI();
-        PersonalBuildConfig config = new PersonalBuildConfig(new File(System.getProperty("user.dir")), new PropertiesConfig(), ui);
+        PersonalBuildConfig config = new PersonalBuildConfig(FileSystemUtils.getWorkingDirectory(), new PropertiesConfig(), ui);
         if(!projectOnly)
         {
             DevConfigSetup.setupPulseConfig(ui, config);

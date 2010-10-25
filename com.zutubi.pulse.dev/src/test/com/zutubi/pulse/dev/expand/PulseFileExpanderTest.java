@@ -93,7 +93,19 @@ public class PulseFileExpanderTest extends PulseTestCase
     public void testProcessImports() throws IOException, PulseException
     {
         copyInputToDirectory("fragment.xml", tempDir);
-        expandAndCompare();
+        PulseFileExpanderOptions options = new PulseFileExpanderOptions();
+        options.setBaseDir(tempDir);
+        expandAndCompare(options);
+    }
+
+    public void testProcessImportsPulseFileNotInBaseDir() throws IOException, PulseException
+    {
+        File baseDir = new File(tempDir, "base");
+        assertTrue(baseDir.mkdirs());
+        copyInputToDirectory("fragment.xml", baseDir);
+        PulseFileExpanderOptions options = new PulseFileExpanderOptions();
+        options.setBaseDir(baseDir);
+        expandAndCompare(options);
     }
     
     public void testIsolateRecipe() throws IOException, PulseException
