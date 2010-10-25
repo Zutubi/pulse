@@ -85,6 +85,11 @@ Ext.ux.tree.TreeGridSorter = Ext.extend(Ext.tree.TreeSorter, {
             }
         };
 
+        // Patch: sorter was not using the configured sort function when nodes
+        // are initially added.
+        var firstColumn = tree.columns[0];
+        this.sortType = firstColumn.sortType;
+        this.sortFn = firstColumn.sortFn || this.defaultSortFn;
         tree.on('afterrender', this.onAfterTreeRender, this, {single: true});
         tree.on('headermenuclick', this.onHeaderMenuClick, this);
     },
