@@ -59,7 +59,7 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         for (var i = 0, l = this.data.length; i < l; i++)
         {
             var args = Ext.apply({}, this.data[i]);
-            args.linkId = this.id + '-' + args.action;
+            args.linkId = this.id + '-' + args.icon;
             args.iconSrc = window.baseUrl + '/' + this.iconTemplate.apply(args);
             
             var action = args.action;

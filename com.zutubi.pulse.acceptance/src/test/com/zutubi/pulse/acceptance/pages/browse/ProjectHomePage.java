@@ -7,11 +7,19 @@ import com.zutubi.pulse.acceptance.components.StatusBox;
 import com.zutubi.pulse.acceptance.components.SummaryTable;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -24,6 +32,8 @@ public class ProjectHomePage extends ResponsibilityPage
     private static final String PROPERTY_SUCCESS_RATE = "successRate";
     private static final String PROPERTY_STATISTICS = "statistics";
 
+    private static final String COLUMN_ACTIVITY_STATUS = "status";
+
     private static final String ID_LATEST_NUMBER = "number";
     private static final String ID_LATEST_STATUS = "status";
 
@@ -34,6 +44,7 @@ public class ProjectHomePage extends ResponsibilityPage
     private SummaryTable recentTable;
     private SummaryTable changesTable;
     private LinkTable actionsTable;
+    private LinkTable linksTable;
 
     public ProjectHomePage(SeleniumBrowser browser, Urls urls, String projectName)
     {
@@ -45,6 +56,7 @@ public class ProjectHomePage extends ResponsibilityPage
         recentTable = new SummaryTable(browser, "project-recent");
         changesTable = new SummaryTable(browser, "project-changes");
         actionsTable = new LinkTable(browser, "project-actions");
+        linksTable = new LinkTable(browser, "project-links");
     }
 
     @Override
@@ -107,9 +119,57 @@ public class ProjectHomePage extends ResponsibilityPage
      */
     public boolean hasBuildActivity()
     {
-        return activityTable.getRowCount() > 0;
+        return getActivityCount() > 0;
     }
-    
+
+    /**
+     * Returns the number of entries in the current activity table (queued or
+     * running builds).
+     *
+     * @return the number of entries in the current activity table
+     */
+    public int getActivityCount()
+    {
+        return activityTable.getRowCount();
+    }
+
+    /**
+     * Returns the number of queued builds shown in the current activity table.
+     *
+     * @return the number of queued builds shown
+     */
+    public int getQueuedBuildCount()
+    {
+        return getActivityCountForState("queued");
+    }
+
+    /**
+     * Returns the number of in progress builds shown in the current activity
+     * table.
+     *
+     * @return the number of in progress builds shown
+     */
+    public int getActiveBuildCount()
+    {
+        return getActivityCountForState(ResultState.IN_PROGRESS.getPrettyString());
+    }
+
+    private int getActivityCountForState(String state)
+    {
+        int count = 0;
+        int rows = activityTable.getRowCount();
+        for (int i = 0; i < rows; i++)
+        {
+            Map<String,String> row = activityTable.getRow(i);
+            if (row.get(COLUMN_ACTIVITY_STATUS).startsWith(state))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     /**
      * Indicates if the latest completed build table is populated with a build.
      *
@@ -150,7 +210,7 @@ public class ProjectHomePage extends ResponsibilityPage
      * @param timeout maximum time to wait (in milliseconds)
      * @return the result of the build
      */
-    public ResultState waitForLatestCompletedBuild(final int id, int timeout)
+    public ResultState waitForLatestCompletedBuild(final int id, long timeout)
     {
         browser.refreshUntil(timeout, new Condition()
         {
@@ -176,6 +236,25 @@ public class ProjectHomePage extends ResponsibilityPage
     }
 
     /**
+     * Returns information about the recent builds, from the most recent (first
+     * row of the table) to least recent.  Note that the latest completed build
+     * is not included.
+     *
+     * @return information about the latest completed builds
+     */
+    public List<BuildInfo> getRecentBuilds()
+    {
+        List<BuildInfo> result = new LinkedList<BuildInfo>();
+        int count = getRecentBuildsCount();
+        for (int i = 0; i < count; i++)
+        {
+            result.add(new BuildInfo(recentTable.getRow(i)));
+        }
+
+        return result;
+    }
+
+    /**
      * Indicates how many changes are shown for the project.
      *
      * @return the number of recent changes displayed
@@ -183,6 +262,36 @@ public class ProjectHomePage extends ResponsibilityPage
     public int getChangesCount()
     {
         return changesTable.getRowCount();
+    }
+
+    /**
+     * Returns information about recent changes, from the most recent (first
+     * row of the table) to least recent.
+     *
+     * @return information about the latest changes
+     */
+    public List<Changelist> getChanges()
+    {
+        List<Changelist> result = new LinkedList<Changelist>();
+        int count = getChangesCount();
+        for (int i = 0; i < count; i++)
+        {
+            Map<String, String> row = changesTable.getRow(i);
+            result.add(new Changelist(new Revision(row.get("revision")), 0, row.get("who"), row.get("comment"), Collections.<FileChange>emptyList()));
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns a list of all action labels displayed.  Note that these labels
+     * are the text displayed to the user.
+     *
+     * @return the actions displayed on the right of the page
+     */
+    public List<String> getActions()
+    {
+        return actionsTable.getLinkLabels();
     }
 
     @Override
@@ -217,8 +326,92 @@ public class ProjectHomePage extends ResponsibilityPage
         return new PulseFileSystemBrowserWindow(browser);
     }
 
+    /**
+     * Returns a list of all links displayed.  Note that these labels are the
+     * text displayed to the user.
+     *
+     * @return the actions displayed on the right of the page
+     */
+    public List<String> getLinks()
+    {
+        return linksTable.getLinkLabels();
+    }
+
     public String getUrl()
     {
         return urls.project(uriComponentEncode(projectName));
+    }
+
+    /**
+     * Holds information about a summarised build.
+     */
+    public static class BuildInfo
+    {
+        public int number;
+        public ResultState status;
+        public String revision;
+
+        public BuildInfo(int number, ResultState status, String revision)
+        {
+            this.number = number;
+            this.status = status;
+            this.revision = revision;
+        }
+
+        public BuildInfo(Map<String, String> row)
+        {
+            number = Integer.parseInt(StringUtils.stripPrefix(row.get("number"), "build "));
+            status = ResultState.fromPrettyString(row.get("status"));
+            revision = row.get("revision");
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            BuildInfo buildInfo = (BuildInfo) o;
+
+            if (number != buildInfo.number)
+            {
+                return false;
+            }
+            if (revision != null ? !revision.equals(buildInfo.revision) : buildInfo.revision != null)
+            {
+                return false;
+            }
+            if (status != buildInfo.status)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = number;
+            result = 31 * result + (status != null ? status.hashCode() : 0);
+            result = 31 * result + (revision != null ? revision.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "BuildInfo{" +
+                    "number=" + number +
+                    ", status=" + status +
+                    ", revision='" + revision + '\'' +
+                    '}';
+        }
     }
 }
