@@ -41,14 +41,14 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
     renderData: function() {
         var rows = this.rows;
         var previousRow = this.el.child('tr');
-        for (var i = 0, l = this.rows.length; i < l; i++)
+        for (var i = 0, l = rows.length; i < l; i++)
         {
-            var row = this.rows[i];
+            var row = rows[i];
             var args = {
                 id: this.id + '-' + row.name,
                 key: row.key,
                 value: row.getRenderedValue(this.data)
-            }
+            };
             previousRow = this.rowTemplate.insertAfter(previousRow, args, true);
         }
     }

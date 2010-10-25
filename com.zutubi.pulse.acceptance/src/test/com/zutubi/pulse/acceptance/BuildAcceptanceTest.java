@@ -1,6 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -14,13 +25,14 @@ import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.BootstrapCommand;
 import com.zutubi.pulse.core.BootstrapCommandConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
-import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -32,14 +44,21 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -49,9 +68,14 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -60,31 +84,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -142,7 +141,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.loginAsAdmin();
         addProject(random, true);
 
-        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random);
 
         // Check changes page handling of no changes.
         BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, 1L);
@@ -426,7 +425,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         stageForm.applyFormElements("", agentHandle);
 
-        triggerSuccessfulBuild(random, AGENT_NAME);
+        triggerSuccessfulBuild(random);
+
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, 1);
+        @SuppressWarnings({"unchecked"})
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        assertEquals(AGENT_NAME, stages.get(0).get("agent"));
     }
     
     public void testSummaryView() throws Exception
@@ -686,7 +690,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
-        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random);
         assertEnvironment(random, 1, "pname=pvalue", "PULSE_PNAME=pvalue", "PULSE_BUILD_NUMBER=1");
     }
 
@@ -701,7 +705,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "PULSE_TEST-PROPERTY=test-value");
     }
 
@@ -718,7 +722,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(projectPath, "properties"), xmlRpcHelper.createProperty("pp", "ref ${rp}", true, true, false));
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "pp=ref rv");
     }
 
@@ -735,7 +739,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "referer=ref ee");
     }
 
@@ -747,7 +751,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "pp=ref " + MASTER_AGENT_NAME);
     }
 
@@ -762,7 +766,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "rp=ref " + MASTER_AGENT_NAME);
     }
 
@@ -776,7 +780,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName);
         goToEnv(projectName, 1);
         assertTrue(browser.isTextPresent(suppressedName));
         assertFalse(browser.isTextPresent(suppressedValue));
@@ -800,7 +804,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         addProject(random, true);
 
         browser.loginAsAdmin();
-        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random);
 
         // The logs tab, which should show us the first stage.
         BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
@@ -1008,7 +1012,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         form.triggerFormElements(asPair("status", STATUS_INTEGRATION));
 
         // next page is the project homepage.
-        waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
+        waitForBuildOnProjectHomePage(random);
     }
 
     /**
@@ -1040,7 +1044,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         form.triggerFormElements(asPair("status",STATUS_INTEGRATION), asPair("property.pname", "qvalue"));
 
         // next page is the project homepage.
-        waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
+        waitForBuildOnProjectHomePage(random);
 
         // verify that the correct property value was used in the build.
         assertEnvironment(random, 1, "pname=qvalue", "PULSE_PNAME=qvalue");
@@ -1067,7 +1071,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         triggerBuildForm.triggerFormElements(asPair("status", STATUS_RELEASE));
 
         // next page is the project homepage.
-        waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
+        waitForBuildOnProjectHomePage(random);
 
         assertEquals(STATUS_RELEASE, repository.getIvyModuleDescriptor(random, 1).getStatus());
     }
@@ -1102,7 +1106,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.loginAsAdmin();
         xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
 
-        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random);
     }
 
     public void testTestResults() throws Exception
@@ -1774,22 +1778,18 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         return requirement;
     }
 
-    private void triggerSuccessfulBuild(String projectName, String agent)
+    private void triggerSuccessfulBuild(String projectName)
     {
         ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
         home.triggerBuild();
 
-        waitForBuildOnProjectHomePage(projectName, agent);
+        waitForBuildOnProjectHomePage(projectName);
     }
 
-    private void waitForBuildOnProjectHomePage(String projectName, String agent)
+    private void waitForBuildOnProjectHomePage(String projectName)
     {
-        browser.openAndWaitFor(ProjectHomePage.class, projectName);
-
-        String statusId = IDs.buildStatusCell(projectName, 1);
-        browser.refreshUntilElement(statusId, BUILD_TIMEOUT);
-        browser.refreshUntilText(statusId, BUILD_TIMEOUT, "success");
-
-        assertEquals(agent, browser.getText(WebUtils.toValidHtmlName(IDs.stageAgentCell(projectName, 1, "default"))));
+        ProjectHomePage projectHomePage = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        ResultState state = projectHomePage.waitForLatestCompletedBuild(1, BUILD_TIMEOUT);
+        assertEquals(ResultState.SUCCESS, state);
     }
 }

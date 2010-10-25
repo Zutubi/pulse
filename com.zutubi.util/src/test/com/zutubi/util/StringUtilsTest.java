@@ -828,6 +828,31 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals("atch", StringUtils.stripPrefix("nomatch", "nom"));
     }
 
+    public void testStripSuffixEmptyEmpty()
+    {
+        assertEquals("", StringUtils.stripSuffix("", ""));
+    }
+
+    public void testStripSuffixEmptyNonEmpty()
+    {
+        assertEquals("", StringUtils.stripSuffix("", "non"));
+    }
+
+    public void testStripSuffixNonEmptyEmpty()
+    {
+        assertEquals("non", StringUtils.stripSuffix("non", ""));
+    }
+
+    public void testStripSuffixNonMatching()
+    {
+        assertEquals("nomatch", StringUtils.stripSuffix("nomatch", "ach"));
+    }
+
+    public void testStripSuffixMatching()
+    {
+        assertEquals("ma", StringUtils.stripSuffix("match", "tch"));
+    }
+
     public void testCountEmpty()
     {
         assertEquals(0, StringUtils.count("", 'x'));

@@ -21,7 +21,17 @@ public abstract class ResponsibilityPage extends SeleniumPage
 
     public boolean hasResponsibleUser()
     {
-        return browser.isElementIdPresent(ID_RESPONSIBLE_PANEL);
+        try
+        {
+            return browser.isVisible(ID_RESPONSIBLE_PANEL);
+        }
+        catch (Exception e)
+        {
+            // If the element is expected to be removed from the page, we may
+            // get a selenium error (isVisible demands the id exist, we can't
+            // be sure it will even if we check just before hand).
+            return false;
+        }
     }
 
     public String getResponsibleMessage()
@@ -51,7 +61,7 @@ public abstract class ResponsibilityPage extends SeleniumPage
         return browser.isElementIdPresent(ID_RESPONSIBLE_CLEAR);
     }
 
-    private String getActionId(String actionName)
+    protected String getActionId(String actionName)
     {
         return "action." + actionName;
     }
