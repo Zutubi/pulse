@@ -48,11 +48,11 @@
                 var choice = record.get('value');
                 if (choice == '')
                 {
-                    window.location = '$urls.buildLogs($buildResult)build/';
+                    window.location = '#jss($urls.buildLogs($buildResult))build/';
                 }
                 else
                 {
-                    window.location = '$urls.buildLogs($buildResult)stage/' + choice + '/';
+                    window.location = '#jss($urls.buildLogs($buildResult))stage/' + choice + '/';
                 }
             });
 
@@ -63,7 +63,7 @@
         {
             var popup = new ZUTUBI.TailSettingsWindow({
                 initialMaxLines: '$maxLines',
-                initialRefreshInterval: '$refreshInterval',
+                initialRefreshInterval: '$refreshInterval'
             });
             popup.show();
         }

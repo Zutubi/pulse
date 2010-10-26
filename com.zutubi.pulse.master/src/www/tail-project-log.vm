@@ -27,7 +27,7 @@
         {
             var popup = new ZUTUBI.TailSettingsWindow({
                 initialMaxLines: '$maxLines',
-                initialRefreshInterval: '$refreshInterval',
+                initialRefreshInterval: '$refreshInterval'
             });
             popup.show();
         }
