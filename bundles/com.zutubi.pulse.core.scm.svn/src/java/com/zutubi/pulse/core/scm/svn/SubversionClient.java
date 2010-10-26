@@ -698,7 +698,38 @@ public class SubversionClient implements ScmClient
 
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
-        // CIB-610: cleanup before update in case WC is locked.
+        if (rev == null)
+        {
+            rev = getLatestRevision(null);
+        }
+        
+        try
+        {
+            // CIB-610: cleanup before update in case WC is locked.
+            cleanup(context);
+
+            SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
+            if (handler != null)
+            {
+                client.setEventHandler(new ChangeEventHandler(handler));
+            }
+
+            update(context.getWorkingDir(), convertRevision(rev), client);
+            updateExternals(context.getWorkingDir(), rev, client, handler);
+        }
+        catch (ScmException e)
+        {
+            rev = handleUpdateError(context, rev, handler, e.getMessage());
+            if (rev == null)
+            {
+                throw new ScmException(e);
+            }
+        }
+        return rev;
+    }
+
+    private void cleanup(ExecutionContext context) throws ScmException
+    {
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
         try
         {
@@ -708,16 +739,6 @@ public class SubversionClient implements ScmClient
         {
             throw convertException(e);
         }
-
-        SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
-        if (handler != null)
-        {
-            client.setEventHandler(new ChangeEventHandler(handler));
-        }
-
-        update(context.getWorkingDir(), convertRevision(rev), client);
-        updateExternals(context.getWorkingDir(), rev, client, handler);
-        return rev;
     }
 
     private void update(File workDir, SVNRevision rev, SVNUpdateClient client) throws ScmException
@@ -730,6 +751,33 @@ public class SubversionClient implements ScmClient
         {
             throw convertException(e);
         }
+    }
+
+    private Revision handleUpdateError(ExecutionContext context, Revision rev, ScmFeedbackHandler handler, String errorMessage) throws ScmException
+    {
+        if (errorMessage.contains("not a working copy"))
+        {
+            File wcDir = context.getWorkingDir();
+            if (handler != null)
+            {
+                handler.status("Error updating: " + errorMessage);
+                handler.status("Attempting clean checkout");
+            }
+
+            if (!FileSystemUtils.rmdir(wcDir))
+            {
+                throw new ScmException("Unable to remove broken working copy directory '" + wcDir.getAbsolutePath() + "'");
+            }
+
+            if (!wcDir.mkdirs())
+            {
+                throw new ScmException("Unable to create new working copy directory '" + wcDir.getAbsolutePath() + "'");
+            }
+
+            return checkout(context, rev, handler);
+        }
+        
+        return null;
     }
 
     boolean pathExists(SVNURL path) throws SVNException
