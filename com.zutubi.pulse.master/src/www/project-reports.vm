@@ -25,8 +25,11 @@
 </head>
 <body>
     #projectTabs("reports")
-
+#if($model.group)
+    <div id='#id("project-reports-${projectName}-${model.group}")'>
+#else
     <div id='#id("project-reports-${projectName}")'>
+#end
     </div>
 </body>
 </html>

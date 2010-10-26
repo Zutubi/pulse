@@ -164,9 +164,8 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.restoreConfig(testTrendsPath);
 
         // No group name in the url leads to the first group
-        reportsPage.openAndWaitFor();
         reportsPage = browser.createPage(ProjectReportsPage.class, random, REPORT_GROUP_BUILD_TRENDS);
-        assertTrue(reportsPage.isPresent());
+        reportsPage.openAndWaitFor();
 
         // Go away and come back to the full url (with group), check handling of
         // no builds.

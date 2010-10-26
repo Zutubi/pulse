@@ -274,6 +274,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
     {
         ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
+        browser.waitForPageToLoad();
         home.waitFor();
         if (ignored)
         {

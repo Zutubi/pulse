@@ -9,11 +9,29 @@ import com.zutubi.pulse.master.webwork.Urls;
 public class ProjectReportsPage extends ResponsibilityPage
 {
     private String projectName;
+    private String group;
 
     public ProjectReportsPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-reports-" + projectName, projectName);
+        this(browser, urls, projectName, null);
+    }
+
+    public ProjectReportsPage(SeleniumBrowser browser, Urls urls, String projectName, String group)
+    {
+        super(browser, urls, getId(projectName, group), projectName);
         this.projectName = projectName;
+        this.group = group;
+    }
+
+    private static String getId(String projectName, String group)
+    {
+        String id = "project-reports-" + projectName;
+        if (group != null)
+        {
+            id += "-" + group;
+        }
+
+        return id;
     }
 
     @Override
@@ -25,7 +43,14 @@ public class ProjectReportsPage extends ResponsibilityPage
 
     public String getUrl()
     {
-        return urls.projectReports(projectName);
+        if (group == null)
+        {
+            return urls.projectReports(projectName);
+        }
+        else
+        {
+            return urls.projectReports(projectName, group);
+        }
     }
 
     public void clickApply()
