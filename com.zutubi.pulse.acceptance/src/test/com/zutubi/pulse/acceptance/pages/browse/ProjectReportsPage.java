@@ -9,45 +9,27 @@ import com.zutubi.pulse.master.webwork.Urls;
 public class ProjectReportsPage extends ResponsibilityPage
 {
     private String projectName;
-    private String group;
 
     public ProjectReportsPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        this(browser, urls, projectName, null);
-    }
-
-    public ProjectReportsPage(SeleniumBrowser browser, Urls urls, String projectName, String group)
-    {
-        super(browser, urls, getId(projectName, group), projectName);
+        super(browser, urls, "project-reports-" + projectName, projectName);
         this.projectName = projectName;
-        this.group = group;
     }
 
-    private static String getId(String projectName, String group)
+    @Override
+    public void waitFor()
     {
-        String id = "project-reports-" + projectName;
-        if (group != null)
-        {
-            id += "-" + group;
-        }
-
-        return id;
+        super.waitFor();
+        browser.waitForVariable("panel.loaded");
     }
 
     public String getUrl()
     {
-        if (group == null)
-        {
-            return urls.projectReports(projectName);
-        }
-        else
-        {
-            return urls.projectReports(projectName, group);
-        }
+        return urls.projectReports(projectName);
     }
 
     public void clickApply()
     {
-        browser.click("apply.button");
+        browser.click("reports-apply");
     }
 }

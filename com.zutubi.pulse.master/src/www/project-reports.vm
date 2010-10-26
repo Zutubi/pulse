@@ -1,105 +1,32 @@
 #helpTag("Projects")
 #authorisationTags($principle)
 #projectTags($project)
+<content tag="header.javascript">
+    zutubi/pulse/project/browse/ProjectReportsPanel.js
+</content>
 <html>
 <head>
     <title>$h_projectName</title>
-#if($groupNames.size() > 0)
     <script type="text/javascript">
+        var panel;
         Ext.onReady(function() {
-            var form = new Ext.form.FormPanel({
-                method: 'POST',
-                border: false,
-                hideLabels: true,
-                items: [{
-                            xtype: 'combo',
-                            name: 'timeframe',
-                            editable: true,
-                            triggerAction: 'all',
-                            store: ['15', '30', '45', '90'],
-                            value: '$timeframe',
-                            width: 100
-                        }, {
-                            xtype: 'combo',
-                            name: 'timeunit',
-                            editable: false,
-                            forceSelection: true,
-                            triggerAction: 'all',
-                            store: ['builds', 'days'],
-                            value: '$timeunit',
-                            width: 100
-                        }],
-                buttons: [{
-                            id: 'apply.button',
-                            text: 'apply',
-                            listeners: {
-                                click: function() {
-                                    form.getForm().el.dom.submit();
-                                }
-                            }
-                        }]
+            panel = new Zutubi.pulse.project.browse.ProjectReportsPanel({
+                projectId: '$project.id',
+                data: Ext.util.JSON.decode('#json($model)')
             });
 
-            form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '#jss("${urls.projectReports($u_projectName)}#uce($group)/")';
-            }, form, {single: true});
-            form.render('params-form');
+            var nestedCenter = Ext.getCmp('nested-center');
+            nestedCenter.add(panel);
+            viewport.doLayout();
+            panel.load();
         });
     </script>
-#end
+
 </head>
 <body>
     #projectTabs("reports")
 
-<div id='#id("project-reports-${projectName}")'>
-
-#if($groupNames.size() > 0)
-    <table class="twopane">
-        <tr>
-            <td class="leftpane">
-                <ul class="panenav">
-    #foreach($groupName in $groupNames)
-                    <li>
-                        <a href="$urls.projectReports($u_projectName)#uce($groupName)/" #if($groupName == $group) class="active" #end>#html($groupName)</a>
-                    </li>
-    #end
-                </ul>
-                <div class="config-panel" style="margin-right: 16px">
-                    <h3 class="config-header config-header-small">time frame</h3>
-                    <div class="config-container" id="params-form">
-                </div>
-            </div>
-            </td>
-            <td class="rightpane" id ='#id("project-reports-${projectName}-${group}")'>
-    #if($buildCount > 0)
-                <table class="chart">
-        #foreach($report in $reports)
-            #if($velocityCount % 2 == 1)
-                    <tr>
-            #end
-                        <td>
-                            ${report.imageMap}
-                            <img style="border:none" src="${base}/chart?filename=${report.location}" border="1" height="${report.height}" width="${report.width}" usemap="${report.imageMapName}"/>
-                        </td>
-            #if($velocityCount % 2 == 0)
-                    </tr>
-            #end
-        #end
-                </table>
-    #else
-                <p style="margin: 16px;">
-                    No builds found.
-                </p>
-    #end
-            </td>
-        </tr>
-    </table>
-#else
-    <p>
-        No report groups defined.
-    </p>
-#end
-
-</div>
+    <div id='#id("project-reports-${projectName}")'>
+    </div>
 </body>
 </html>

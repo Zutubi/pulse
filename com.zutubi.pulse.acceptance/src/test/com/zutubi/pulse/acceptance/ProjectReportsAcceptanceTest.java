@@ -35,7 +35,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 
     private static final String REPORT_BUILD_RESULTS = "build results";
 
-    private static final String MESSAGE_NO_BUILDS = "No builds found";
+    private static final String MESSAGE_NO_BUILDS = "No builds found in time frame";
     private static final String MESSAGE_NO_GROUPS = "No report groups defined";
 
     private static final long BUILD_TIMEOUT = 90000;

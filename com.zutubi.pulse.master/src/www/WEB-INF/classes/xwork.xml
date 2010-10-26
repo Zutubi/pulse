@@ -232,9 +232,15 @@
             </result>
         </action>
 
-        <action name="projectHome" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
-            <interceptor-ref name="ajaxReadOnlyStack"/>
+        <action name="projectHome" class="com.zutubi.pulse.master.xwork.actions.project.ProjectRequiredAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/project-home.vm</result>
+            <result name="error" type="redirect">/browse/</result>
+        </action>
+
+        <action name="projectReports" class="com.zutubi.pulse.master.xwork.actions.project.ProjectReportsAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="velocity">/project-reports.vm</result>
             <result name="error" type="redirect">/browse/</result>
         </action>
 
@@ -273,12 +279,6 @@
 
         <action name="rss" class="com.zutubi.pulse.master.xwork.actions.rss.BuildResultsRssAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-        </action>
-
-        <action name="projectReports" class="com.zutubi.pulse.master.xwork.actions.project.ViewReportsAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/project-reports.vm</result>
-            <result name="input" type="velocity">/project-reports.vm</result>
         </action>
     </package>
 
@@ -406,6 +406,10 @@
         </action>
 
         <action name="projectHomeData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeDataAction">
+            <result name="success" type="flexjson">model</result>
+        </action>
+
+        <action name="projectReportsData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectReportsDataAction">
             <result name="success" type="flexjson">model</result>
         </action>
 

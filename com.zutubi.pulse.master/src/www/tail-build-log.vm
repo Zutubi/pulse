@@ -27,7 +27,7 @@
         function refreshNow()
         {
             refreshPanel('panel', '#jss($url)', updaterCallback);
-        }        
+        }
 
         Ext.onReady(function() {
             var combo = new Ext.form.ComboBox({
