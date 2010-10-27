@@ -8,6 +8,9 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.IOAssertions;
 import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -29,6 +32,8 @@ public class SubversionClientTest extends PulseTestCase
     private static final String TRUNK_PATH = REPO + "trunk";
     private static final String BRANCH_PATH = REPO + "branches/new-branch";
     private static final String TAG_PATH = REPO + "tags/test-tag";
+    
+    private static final int REVISION_TRUNK_LATEST = 4;
 
     private SubversionClient client;
     private File tmpDir;
@@ -400,6 +405,20 @@ public class SubversionClientTest extends PulseTestCase
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         client.update(context, null, handler);
         return handler;
+    }
+
+    public void testUpdateBrokenWorkingCopy() throws Exception
+    {
+        client.checkout(context, createRevision(1), null);
+        File rootSvnDir = new File(gotDir, ".svn");
+        assertTrue(FileSystemUtils.rmdir(rootSvnDir));
+        
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        Revision revision = client.update(context, null, handler);
+        assertTrue(rootSvnDir.isDirectory());
+        assertEquals(Integer.toString(REVISION_TRUNK_LATEST), revision.getRevisionString());
+        assertRevision(gotDir, REVISION_TRUNK_LATEST);
+        assertThat(handler.getStatusMessages(), hasItem(containsString("Attempting clean checkout")));
     }
 
     public void testCheckNonExistantPathHTTP() throws Exception
