@@ -463,6 +463,23 @@ th.content-row
     white-space: nowrap;
 }
 
+table.pager
+{
+    width: 100%;
+}
+
+table.pager th, table.pager td
+{
+    border: 1px solid #bbb;
+    padding: 4px;
+    text-align: center;
+}
+
+table.pager td a
+{
+    border: none;
+}
+
 h3.heading, th.heading, th.group
 {
     background: #E0E6F0;
