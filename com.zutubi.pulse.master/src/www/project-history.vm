@@ -1,0 +1,54 @@
+#helpTag("Project+History+Tab")
+#authorisationTags($principle)
+#projectTags($project)
+<content tag="header.javascript">
+    zutubi/pulse/project/browse/ProjectHistoryPanel.js
+    projects.js
+</content>
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+    <script type="text/javascript">
+        #if($refreshInterval)
+        var refreshInterval = $refreshInterval;
+        #elseif($principle.preferences.refreshingEnabled)
+        var refreshInterval = $principle.preferences.refreshInterval;
+        #else
+        var refreshInterval = 0;
+        #end
+        var view;
+        var panel = null;
+        
+        function update(data)
+        {
+            if (panel)
+            {
+                panel.update(data);
+            }
+            else
+            {
+                panel = new Zutubi.pulse.project.browse.ProjectHistoryPanel({
+                    loadingEl: '#id("project-history-$project.name")',
+                    projectId: '$project.id',
+                    data: data
+                });
+
+                Ext.get('center').setStyle({margin: '0', padding: '0'});
+                var nestedCenter = Ext.getCmp('nested-center');
+                nestedCenter.add(panel);
+                viewport.doLayout();
+            }
+        }
+        
+        Ext.onReady(function() {
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/projectHistoryData.action?projectId=$project.id&startPage=$startPage&stateFilter=' + encodeURIComponent('$stateFilter'), refreshInterval, update, window, Ext.get('#id("project-history-$project.name")'), 'Unable to load project history.');
+            view.init();
+        });
+    </script>
+</head>
+<body>
+    #projectTabs("history")
+
+    <div id='#id("project-history-$project.name")'>
+    </div>
+</html>

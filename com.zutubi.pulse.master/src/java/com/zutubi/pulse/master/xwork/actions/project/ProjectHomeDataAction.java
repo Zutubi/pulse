@@ -26,9 +26,9 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
+import static java.util.Arrays.asList;
 
 import java.io.File;
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -185,7 +185,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         this.configurationManager = configurationManager;
     }
 
-    private static class QueuedToBuildModelMapping implements Mapping<QueuedRequest, ProjectHomeModel.BuildModel>
+    private static class QueuedToBuildModelMapping implements Mapping<QueuedRequest, BuildModel>
     {
         private ChangeViewerConfiguration changeViewerConfig;
 
@@ -194,36 +194,21 @@ public class ProjectHomeDataAction extends ProjectActionBase
             this.changeViewerConfig = changeViewerConfig;
         }
 
-        public ProjectHomeModel.BuildModel map(QueuedRequest queuedRequest)
+        public BuildModel map(QueuedRequest queuedRequest)
         {
             BuildRequestEvent requestEvent = queuedRequest.getRequest();
             Revision revision = requestEvent.getRevision().getRevision();
-            ProjectHomeModel.RevisionModel revisionModel;
+            RevisionModel revisionModel;
             if (revision == null)
             {
-                revisionModel = new ProjectHomeModel.RevisionModel("[floating]");
+                revisionModel = new RevisionModel("[floating]");
             }
             else
             {
-                revisionModel = new ProjectHomeModel.RevisionModel(revision, changeViewerConfig);
+                revisionModel = new RevisionModel(revision, changeViewerConfig);
             }
             
-            return new ProjectHomeModel.BuildModel(requestEvent.getId(), -1, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel);
-        }
-    }
-
-    private static class BuildResultToModelMapping implements Mapping<BuildResult, ProjectHomeModel.BuildModel>
-    {
-        private ChangeViewerConfiguration changeViewerConfig;
-
-        private BuildResultToModelMapping(ChangeViewerConfiguration changeViewerConfig)
-        {
-            this.changeViewerConfig = changeViewerConfig;
-        }
-
-        public ProjectHomeModel.BuildModel map(BuildResult buildResult)
-        {
-            return new ProjectHomeModel.BuildModel(buildResult, changeViewerConfig);
+            return new BuildModel(requestEvent.getId(), -1, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel);
         }
     }
 

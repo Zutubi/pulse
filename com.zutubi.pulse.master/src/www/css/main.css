@@ -470,8 +470,6 @@ table.pager
 
 table.pager th, table.pager td
 {
-    border: 1px solid #bbb;
-    padding: 4px;
     text-align: center;
 }
 

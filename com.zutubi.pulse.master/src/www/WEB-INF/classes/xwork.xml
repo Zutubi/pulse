@@ -254,9 +254,9 @@
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="history" class="com.zutubi.pulse.master.xwork.actions.project.HistoryAction">
+        <action name="projectHistory" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHistoryAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/history.vm</result>
+            <result name="success" type="velocity">/project-history.vm</result>
         </action>
 
         <action name="viewTriggers" class="com.zutubi.pulse.master.xwork.actions.scheduling.ViewTriggersAction">
@@ -413,6 +413,10 @@
             <result name="success" type="flexjson">model</result>
         </action>
 
+        <action name="projectHistoryData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHistoryDataAction">
+            <result name="success" type="flexjson">model</result>
+        </action>
+        
         <action name="projectDependenciesPanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">
             <result name="success" type="velocity">project-dependencies-panel.vm</result>
         </action>

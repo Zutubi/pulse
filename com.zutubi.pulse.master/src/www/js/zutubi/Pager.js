@@ -28,17 +28,17 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
 
     surroundingPages: 10,
 
-    template: new Ext.XTemplate('<table id="{id}" class="pager"><tbody></tbody></table>'),
+    template: new Ext.XTemplate('<table id="{id}" class="pager content-table"><tbody></tbody></table>'),
 
     countTemplate: new Ext.XTemplate(
         '<tr>' +
-            '<th colspan="5">{totalItems} {itemLabel}<tpl if="totalItems != 1">s</tpl> found</th>' +
+            '<th class="leftmost rightmost" colspan="5">{totalItems} {itemLabel}<tpl if="totalItems != 1">s</tpl> found</th>' +
         '</tr>'
     ),
 
     pagingTemplate: new Ext.XTemplate(
         '<tr>' +
-            '<td>' +
+            '<td class="leftmost">' +
                 '<tpl if="currentPage &gt; 0"><a href="{url}0/{extraParams}" id="page-first"></tpl>' +
                     '<img alt="{labelFirst}" src="{[window.baseUrl]}/images/resultset_first.gif"/> {labelFirst}' +
                 '<tpl if="currentPage &gt; 0"></a></tpl>' +
@@ -62,7 +62,7 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
                     '<img alt="{labelNext}" src="{[window.baseUrl]}/images/resultset_next.gif"/> {labelNext}' +
                 '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
             '</td>' +
-            '<td>' +
+            '<td class="rightmost">' +
                 '<tpl if="currentPage &lt; lastPage"><a href="{url}{lastPage}/{extraParams}" id="page-last"></tpl>' +
                     '<img alt="{labelLast}" src="{[window.baseUrl]}/images/resultset_last.gif"/> {labelLast}' +
                 '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
@@ -90,9 +90,10 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
     {
         this.tbodyEl.select('tr').remove();
 
-        var data = this.data;
+        var data = this.data || {totalItems: 0};
+        
         this.countTemplate.append(this.tbodyEl, {
-            totalItems: this.data.totalItems,
+            totalItems: data.totalItems,
             itemLabel: this.itemLabel
         });
 
