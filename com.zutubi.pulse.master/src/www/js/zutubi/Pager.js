@@ -52,7 +52,6 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
                 '<tpl for="pages">' +
                     ' &nbsp; ' +
                     '<tpl if="index != parent.currentPage"><a href="{parent.url}{index}/{parent.extraParams}" id="page-{index}"></tpl>' +
-                    '<tpl if="index == parent.currentPage"><strong></tpl>' +
                         '{index+1}' +
                     '<tpl if="index != parent.currentPage"></a></tpl>' +
                 '</tpl>' +
