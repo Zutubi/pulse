@@ -139,7 +139,7 @@ Zutubi.ConcreteProject.prototype = {
         var functionName = 'gen_' + action + projectId;
         window[functionName] = function() {
             actionPath('projects/' + projectName, action, false, false);
-            showHideFloat('actions', domId, 'tl-bl?');
+            Zutubi.FloatManager.showHideFloat('menus', domId);
         };
     
         return functionName + '(); return false;';
