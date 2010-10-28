@@ -3,20 +3,23 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraph;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Grid;
 import com.zutubi.util.GridCell;
 import com.zutubi.util.Point;
 import com.zutubi.util.TreeNode;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
-import static java.util.Arrays.asList;
 
 public class ProjectDependencyGraphRendererTest extends PulseTestCase
 {
-    private ProjectDependencyGraphRenderer renderer = new ProjectDependencyGraphRenderer();
+    private ProjectDependencyGraphRenderer renderer = new ProjectDependencyGraphRenderer(mock(BuildManager.class), Urls.getBaselessInstance());
 
     public void testDownstream() throws IOException
     {
@@ -105,10 +108,10 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
                 ProjectDependencyData data = cell.getData();
                 if (data != null)
                 {
-                    if (data.getProject() != null)
+                    if (data.getName() != null)
                     {
                         // Top half of a box
-                        art.getCell(artCenter).setData(data.getProject().getName().charAt(0));
+                        art.getCell(artCenter).setData(data.getName().charAt(0));
                     }
                     else if (data.isDead())
                     {

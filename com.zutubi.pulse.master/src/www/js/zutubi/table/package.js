@@ -3,3 +3,4 @@
 // dependency: ./LinkTable.js
 // dependency: ./PropertyTable.js
 // dependency: ./SummaryTable.js
+// dependency: ./GridDiagram.js

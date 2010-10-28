@@ -2,9 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +22,8 @@ public class ProjectDependencyData
     public static final String CLASS_UNDERSTATED   = "gunderstated";
 
     private Project project;
+    private ProjectHealth health;
+    private String url;
     private int rowspan = 1;
     private boolean dead = false;
     private List<String> classes = new LinkedList<String>();
@@ -38,13 +38,16 @@ public class ProjectDependencyData
      * diagram.  As boxes occupy two rows, the cells directly below them should
      * be marked as dead.
      *
-     * @param data data about the project that the cell displays
+     * @param data   data about the project that the cell displays
+     * @param health health of the project that the cell displays
      * @return data for a box cell displaying the given project
      */
-    public static ProjectDependencyData makeBox(DependencyGraphData data, boolean root)
+    public static ProjectDependencyData makeBox(DependencyGraphData data, ProjectHealth health, String url, boolean root)
     {
         ProjectDependencyData dd = new ProjectDependencyData();
         dd.project = data.getProject();
+        dd.health = health;
+        dd.url = url;
         dd.classes.add(CLASS_BOX);
         if (root)
         {
@@ -121,14 +124,59 @@ public class ProjectDependencyData
     }
 
     /**
-     * Retrieves the project for a box cell.
+     * Retrieves the project name for a box cell.
      *
-     * @return the project represented by this cell, null if this cell is not
-     *         a box
+     * @return name of the project represented by this cell, null if this cell
+     *         is not a box
      */
-    public Project getProject()
+    public String getName()
     {
-        return project;
+        return project == null ? null : project.getName();
+    }
+
+    /**
+     * Retrieves the project name for a box cell, converted as safe to use as
+     * an HTML name.
+     *
+     * @return name of the project represented by this cell, converted to a
+     *         safe HTML name, null if this cell is not a box
+     */
+    public String getHtmlName()
+    {
+        return project == null ? null : WebUtils.toValidHtmlName("a" + project.getName()).substring(1);
+    }
+    
+    /**
+     * Retrieves the health of the project for a box cell.
+     *
+     * @return health of the project represented by this cell, null if this
+     *         cell is not a box
+     */
+    public String getHealth()
+    {
+        return health == null ? null : EnumUtils.toPrettyString(health);
+    }
+
+    /**
+     * Retrieves the url the project home page for a box cell.
+     *
+     * @return url of the project represented by this cell, null if this cell
+     *         is not a box
+     */
+    public String getUrl()
+    {
+        return url;
+    }
+    
+    /**
+     * Retrieves the state of the project for a box cell.
+     *
+     * @return state of the project represented by this cell, null if this cell
+     *         is not a box
+     */
+    public String getState()
+    {
+        return project == null ? null : EnumUtils.toPrettyString(project.getState());
     }
 
     /**

@@ -3,6 +3,9 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraph;
 import com.zutubi.pulse.master.dependency.SimpleTreeLayoutAlgorithm;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 
 import java.util.List;
@@ -24,6 +27,15 @@ public class ProjectDependencyGraphRenderer
      * Accounts for the fact that boxes are two cells high.
      */
     public static final int SCALE_FACTOR_Y = 2;
+    
+    private BuildManager buildManager;
+    private Urls urls;
+
+    public ProjectDependencyGraphRenderer(BuildManager buildManager, Urls urls)
+    {
+        this.buildManager = buildManager;
+        this.urls = urls;
+    }
 
     /**
      * Renders a tree of upstream dependencies.  This tree is rendered with the
@@ -76,7 +88,9 @@ public class ProjectDependencyGraphRenderer
         Point position = getGridPosition(node);
 
         // Fill the cell at our position, and mark the one below dead.
-        grid.getCell(position).setData(ProjectDependencyData.makeBox(node.getData().first, root));
+        DependencyGraphData data = node.getData().first;
+        BuildResult latestBuild = buildManager.getLatestCompletedBuildResult(data.getProject());
+        grid.getCell(position).setData(ProjectDependencyData.makeBox(data, ProjectHealth.fromLatestBuild(latestBuild), urls.projectHome(data.getProject()), root));
         grid.getCell(position.down()).setData(ProjectDependencyData.makeDead());
 
         if (!node.isLeaf())

@@ -244,7 +244,7 @@
             <result name="error" type="redirect">/browse/</result>
         </action>
 
-        <action name="projectDependencies" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">
+        <action name="projectDependencies" class="com.zutubi.pulse.master.xwork.actions.project.ProjectRequiredAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/project-dependencies.vm</result>
             <result name="error" type="redirect">/browse/</result>
@@ -417,8 +417,11 @@
             <result name="success" type="flexjson">model</result>
         </action>
         
-        <action name="projectDependenciesPanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">
-            <result name="success" type="velocity">project-dependencies-panel.vm</result>
+        <action name="projectDependenciesData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
+            </result>
         </action>
 
         <action name="viewBuildSummaryPanel" class="com.zutubi.pulse.master.xwork.actions.project.BuildSummaryDataAction">
@@ -440,10 +443,6 @@
 
         <action name="tailProjectLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailProjectLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
-        </action>
-
-        <action name="historyPanel" class="com.zutubi.pulse.master.xwork.actions.project.HistoryAction">
-            <result name="success" type="velocity">history-panel.vm</result>
         </action>
 
         <action name="viewAgentsPanel" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentsAction">

@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.ajax.SimpleResult;
 import com.zutubi.pulse.master.xwork.actions.ajax.TrivialSuccessfulResult;
-import com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction;
+import com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesDataAction;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
@@ -43,7 +43,7 @@ public class SetDependenciesTransitiveModeAction extends ActionSupport
         if (user == null)
         {
             // For anonymous users we store this preference in the session.
-            ActionContext.getContext().getSession().put(ProjectDependenciesAction.ANONYMOUS_MODE_KEY, transitiveMode);
+            ActionContext.getContext().getSession().put(ProjectDependenciesDataAction.ANONYMOUS_MODE_KEY, transitiveMode);
         }
         else
         {

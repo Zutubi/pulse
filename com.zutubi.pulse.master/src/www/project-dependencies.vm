@@ -1,48 +1,53 @@
 #helpTag("Project+Dependencies+Tab")
 #authorisationTags($principle)
 #projectTags($project)
+<content tag="header.javascript">
+    zutubi/pulse/project/browse/ProjectDependenciesPanel.js
+    projects.js
+</content>
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript">
-        #updater("$base/ajax/projectDependenciesPanel.action?projectName=$u_projectName" "panel" $principle "Ext.emptyFn")
+        #if($refreshInterval)
+        var refreshInterval = $refreshInterval;
+        #elseif($principle.preferences.refreshingEnabled)
+        var refreshInterval = $principle.preferences.refreshInterval;
+        #else
+        var refreshInterval = 0;
+        #end
+        var view;
+        var panel = null;
+        
+        function update(data)
+        {
+            if (panel)
+            {
+                panel.update(data);
+            }
+            else
+            {
+                panel = new Zutubi.pulse.project.browse.ProjectDependenciesPanel({
+                    loadingEl: '#id("project-dependencies-$project.name")',
+                    projectId: '$project.id',
+                    data: data
+                });
 
+                Ext.get('center').setStyle({margin: '0', padding: '0'});
+                var nestedCenter = Ext.getCmp('nested-center');
+                nestedCenter.add(panel);
+                viewport.doLayout();
+            }
+        }
+
+        function refresh(cb)
+        {
+            view.load(cb);
+        }
+        
         Ext.onReady(function() {
-            var form = new Ext.form.FormPanel({
-                labelWidth: 200,
-                labelAlign: 'right',
-                method: 'POST',
-                border: false,
-                items: [{
-                    xtype: 'combo',
-                    name: 'mode',
-                    hiddenName: 'mode',
-                    id: 'zfid.mode',
-                    fieldLabel: '#wwtext("name=transitive.dependencies")',
-                    editable: false,
-                    forceSelection: true,
-                    triggerAction: 'all',
-                    store: [
-                        #foreach($pair in $modes)
-                               ['$pair.first', '$pair.second'] #if($velocityCount < $modes.size()) , #end
-                        #end
-                    ],
-                    value: '$transitiveMode',
-                    width: 230,
-                    listeners: {
-                        select: function() {
-                            form.getForm().submit({
-                                url: '$base/ajax/setDependenciesTransitiveMode.action',
-                                success: function() {
-                                    window.location.reload();
-                                }
-                            });
-                        }
-                    }
-                }]
-            });
-
-            form.render("dependencies-form");
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/projectDependenciesData.action?projectId=$project.id', refreshInterval, update, window, Ext.get('#id("project-dependencies-$project.name")'), 'Unable to load project dependencies.');
+            view.init();
         });
     </script>
 </head>
@@ -51,38 +56,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    <div id='#id("project-dependencies-$project.name")' class="config-panel">
-        <h3 class="config-header config-header-small">#wwtext("name=dependency.diagrams")</h3>
-        <table>
-            <tr>
-                <td>
-                    <table>
-                        <tr>
-                            <td class="glegend">
-                                #wwtext("name=legend"):
-                            </td>
-                            <td class="glegend">
-                                <table class="grid" style="display: inline"><tr><td class="gbox ghighlighted">#wwtext("name=legend.this")</td></tr></table>
-                            </td>
-                            <td class="glegend">
-                                <table class="grid" style="display: inline"><tr><td class="gbox">#wwtext("name=legend.normal")</td></tr></table>
-                            </td>
-                            <td class="glegend">
-                                <table class="grid" style="display: inline"><tr><td class="gunderstated">#wwtext("name=legend.trimmed")</td></tr></table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td>
-                    <div class="config-container" id="dependencies-form">
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="panel">
-        #parse("/ajax/project-dependencies-panel.vm")
+    <div id='#id("project-dependencies-$project.name")'>
     </div>
 </body>
 </html>

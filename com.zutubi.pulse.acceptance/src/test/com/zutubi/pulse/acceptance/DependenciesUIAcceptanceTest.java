@@ -1,15 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
-
-import com.zutubi.pulse.core.test.TestUtils;
-
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -184,8 +181,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectC.getName());
         if (page.getTransitiveMode() != ProjectDependencyGraphBuilder.TransitiveMode.FULL)
         {
-            ProjectDependenciesForm form = browser.createForm(ProjectDependenciesForm.class);
-            form.submitMode(ProjectDependencyGraphBuilder.TransitiveMode.FULL);
+            page.setTransitiveModeAndWait(ProjectDependencyGraphBuilder.TransitiveMode.FULL);
             browser.waitForElement(page.getUpstreamId(projectA.getName(), 0, 0));
         }
 
@@ -193,9 +189,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(page.isUpstreamPresent(projectB.getName(), 1, 0));
         
         // Filter out transients, make sure this takes effect.
-        ProjectDependenciesForm form = browser.createForm(ProjectDependenciesForm.class);
-        assertTrue(form.isFormPresent());
-        form.submitMode(ProjectDependencyGraphBuilder.TransitiveMode.NONE);
+        page.setTransitiveModeAndWait(ProjectDependencyGraphBuilder.TransitiveMode.NONE);
 
         browser.waitForElement(page.getUpstreamId(projectB.getName(), 0, 0));
         assertFalse(page.isUpstreamPresent(projectA.getName(), 0, 0));
