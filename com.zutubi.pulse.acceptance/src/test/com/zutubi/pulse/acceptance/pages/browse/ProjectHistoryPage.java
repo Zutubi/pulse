@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.components.Pager;
 import com.zutubi.pulse.acceptance.components.SummaryTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
@@ -63,7 +64,13 @@ public class ProjectHistoryPage extends SeleniumPage
     {
         // Unfortunately selecting using the combo itself fails under selenium
         // due to security restrictions (can't navigate using JS).
-        browser.open(getUrl() + pager.getCurrentPage() + "/stateFilter/" + stateFilter + "/");
+        String location = getUrl() + pager.getCurrentPage() + "/";
+        if (StringUtils.stringSet(stateFilter))
+        {
+            location += "stateFilter/" + stateFilter + "/";
+        }
+        
+        browser.open(location);
     }
 
     /**

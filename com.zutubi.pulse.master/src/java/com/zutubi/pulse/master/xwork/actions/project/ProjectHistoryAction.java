@@ -6,7 +6,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 public class ProjectHistoryAction extends ProjectActionBase
 {
     private int startPage = 0;
-    private String stateFilter = ProjectHistoryDataAction.STATE_ANY;
+    private String stateFilter = "";
 
     public int getStartPage()
     {

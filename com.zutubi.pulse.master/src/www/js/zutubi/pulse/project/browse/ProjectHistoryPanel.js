@@ -40,7 +40,14 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                         editable: false,
                         forceSelection: true,
                         triggerAction: 'all',
-                        store: ['[any]', '[any broken]', 'error', 'failure', 'terminated', 'success'],
+                        store: [
+                            ['', '[any]'],
+                            ['broken', '[any broken]'],
+                            ['error', 'error'],
+                            ['failure', 'failure'],
+                            ['terminated', 'terminated'],
+                            ['success', 'success']
+                        ],
                         value: this.data.stateFilter,
                         listeners: {
                             select: function(combo) {
@@ -83,7 +90,7 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                     xtype: 'xzpager',
                     itemLabel: 'build',
                     url: this.data.url, 
-                    extraParams: 'stateFilter/' + encodeURIComponent(this.data.stateFilter) + '/',
+                    extraParams: this.data.stateFilter == '' ? '' : 'stateFilter/' + this.data.stateFilter + '/',
                     labels: {
                         first: 'latest',
                         previous: 'newer',
@@ -100,12 +107,13 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
     
     setFilter: function(filter)
     {
-        if (!filter)
+        var location = this.data.url + this.data.pager.currentPage + '/';
+        if (filter)
         {
-            filter = '[any]';  
+            location += 'stateFilter/' + filter + '/';
         }
         
-        window.location.href = this.data.url + this.data.pager.currentPage + '/stateFilter/' + encodeURIComponent(filter) + '/';
+        window.location.href = location;
     },
         
     update: function(data) {

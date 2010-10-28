@@ -18,8 +18,8 @@ public class ProjectHistoryDataAction extends ProjectActionBase
 {
     public static final int BUILDS_PER_PAGE = 10;
     
-    public static final String STATE_ANY = "[any]";
-    public static final String STATE_BROKEN = "[any broken]";
+    public static final String STATE_ANY = "";
+    public static final String STATE_BROKEN = "broken";
     public static final String STATE_FAILURE = "failure";
     public static final String STATE_ERROR = "error";
     public static final String STATE_SUCCESS = "success";
