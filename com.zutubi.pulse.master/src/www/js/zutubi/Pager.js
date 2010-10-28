@@ -32,38 +32,38 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
 
     countTemplate: new Ext.XTemplate(
         '<tr>' +
-            '<th class="leftmost rightmost" colspan="5">{totalItems} {itemLabel}<tpl if="totalItems != 1">s</tpl> found</th>' +
+            '<th id="{id}-total" class="leftmost rightmost" colspan="5">{totalItems} {itemLabel}<tpl if="totalItems != 1">s</tpl> found</th>' +
         '</tr>'
     ),
 
     pagingTemplate: new Ext.XTemplate(
-        '<tr>' +
+        '<tr id="{id}-paging">' +
             '<td class="leftmost">' +
-                '<tpl if="currentPage &gt; 0"><a href="{url}0/{extraParams}" id="page-first"></tpl>' +
+                '<tpl if="currentPage &gt; 0"><a href="{url}0/{extraParams}" id="{id}-first"></tpl>' +
                     '<img alt="{labelFirst}" src="{[window.baseUrl]}/images/resultset_first.gif"/> {labelFirst}' +
                 '<tpl if="currentPage &gt; 0"></a></tpl>' +
             '</td>' +
             '<td>' +
-                '<tpl if="currentPage &gt; 0"><a href="{url}{currentPage-1}/{extraParams}" id="page-previous"></tpl>' +
+                '<tpl if="currentPage &gt; 0"><a href="{url}{currentPage-1}/{extraParams}" id="{id}-previous"></tpl>' +
                     '<img alt="{labelPrevious}" src="{[window.baseUrl]}/images/resultset_previous.gif"/> {labelPrevious}' +
                 '<tpl if="currentPage &gt; 0"></a></tpl>' +
             '</td>' +
             '<th>' +
                 '<tpl for="pages">' +
                     ' &nbsp; ' +
-                    '<tpl if="index != parent.currentPage"><a href="{parent.url}{index}/{parent.extraParams}" id="page-{index}"></tpl>' +
+                    '<tpl if="index != parent.currentPage"><a href="{parent.url}{index}/{parent.extraParams}" id="{id}-page-{index}"></tpl>' +
                         '{index+1}' +
                     '<tpl if="index != parent.currentPage"></a></tpl>' +
                 '</tpl>' +
                 ' &nbsp; ' +
             '</th>' +
             '<td>' +
-                '<tpl if="currentPage &lt; lastPage"><a href="{url}{currentPage+1}/{extraParams}" id="page-next"></tpl>' +
+                '<tpl if="currentPage &lt; lastPage"><a href="{url}{currentPage+1}/{extraParams}" id="{id}-next"></tpl>' +
                     '<img alt="{labelNext}" src="{[window.baseUrl]}/images/resultset_next.gif"/> {labelNext}' +
                 '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
             '</td>' +
             '<td class="rightmost">' +
-                '<tpl if="currentPage &lt; lastPage"><a href="{url}{lastPage}/{extraParams}" id="page-last"></tpl>' +
+                '<tpl if="currentPage &lt; lastPage"><a href="{url}{lastPage}/{extraParams}" id="{id}-last"></tpl>' +
                     '<img alt="{labelLast}" src="{[window.baseUrl]}/images/resultset_last.gif"/> {labelLast}' +
                 '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
             '</td>' +
@@ -93,6 +93,7 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
         var data = this.data || {totalItems: 0};
         
         this.countTemplate.append(this.tbodyEl, {
+            id: this.id,
             totalItems: data.totalItems,
             itemLabel: this.itemLabel
         });
@@ -104,6 +105,7 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
             var lastPage = this.getLastPage(data.currentPage, pageCount);
 
             var args = Ext.apply({
+                id: this.id,
                 url: this.url,
                 extraParams: this.extraParams,
                 itemLabel: this.itemLabel,

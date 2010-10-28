@@ -16,14 +16,14 @@ import java.util.TreeMap;
  */
 public class ProjectHistoryDataAction extends ProjectActionBase
 {
-    private static final int BUILDS_PER_PAGE = 10;
+    public static final int BUILDS_PER_PAGE = 10;
     
     public static final String STATE_ANY = "[any]";
-    private static final String STATE_BROKEN = "[any broken]";
-    private static final String STATE_FAILURE = "failure";
-    private static final String STATE_ERROR = "error";
-    private static final String STATE_SUCCESS = "success";
-    private static final String STATE_TERMINATED = "terminated";
+    public static final String STATE_BROKEN = "[any broken]";
+    public static final String STATE_FAILURE = "failure";
+    public static final String STATE_ERROR = "error";
+    public static final String STATE_SUCCESS = "success";
+    public static final String STATE_TERMINATED = "terminated";
 
     private static final Map<String, ResultState[]> NAME_TO_STATES;
     static
@@ -82,7 +82,7 @@ public class ProjectHistoryDataAction extends ProjectActionBase
             startPage = 0;
         }
 
-        HistoryPage page = new HistoryPage(project, startPage, BUILDS_PER_PAGE);
+        HistoryPage page = new HistoryPage(project, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
         buildManager.fillHistoryPage(page, states);
 
         List<BuildModel> builds = CollectionUtils.map(page.getResults(), new BuildResultToModelMapping(project.getConfig().getChangeViewer()));

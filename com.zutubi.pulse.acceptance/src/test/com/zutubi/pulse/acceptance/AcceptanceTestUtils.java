@@ -5,7 +5,10 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
@@ -19,9 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 public class AcceptanceTestUtils
 {
@@ -386,6 +386,19 @@ public class AcceptanceTestUtils
                 "var store = combo.getStore();" +
                 "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
         );
+    }
+
+    /**
+     * Retrieves the current value of the Ext combo box with the given
+     * component id.
+     * 
+     * @param browser selenium instance
+     * @param comboId component id of the combo
+     * @return current value of the combo
+     */
+    public static String getComboValue(SeleniumBrowser browser, String comboId)
+    {
+        return browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "').getValue()");
     }
 
     /**

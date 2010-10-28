@@ -44,7 +44,17 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                         value: this.data.stateFilter,
                         listeners: {
                             select: function(combo) {
-                                window.location = panel.data.url + panel.data.pager.currentPage + '/stateFilter/' + encodeURIComponent(combo.getValue()) + '/';
+                                panel.setFilter(combo.getValue());
+                            }
+                        }
+                    }, ' ', {
+                        xtype: 'xztblink',
+                        id: 'state-filter-clear',
+                        text: 'clear',
+                        icon: window.baseUrl + '/images/config/actions/clean.gif',
+                        listeners: {
+                            click: function() {
+                                panel.setFilter();
                             }
                         }
                     }, '->', {
@@ -73,13 +83,29 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                     xtype: 'xzpager',
                     itemLabel: 'build',
                     url: this.data.url, 
-                    extraParams: '/stateFilter/' + encodeURIComponent(this.data.stateFilter) + '/', 
+                    extraParams: 'stateFilter/' + encodeURIComponent(this.data.stateFilter) + '/',
+                    labels: {
+                        first: 'latest',
+                        previous: 'newer',
+                        next: 'older',
+                        last: 'oldest'
+                    },
                     data: this.data.pager
                 }]
             }]
         });
 
         Zutubi.pulse.project.browse.ProjectHistoryPanel.superclass.initComponent.apply(this, arguments);
+    },
+    
+    setFilter: function(filter)
+    {
+        if (!filter)
+        {
+            filter = '[any]';  
+        }
+        
+        window.location.href = this.data.url + this.data.pager.currentPage + '/stateFilter/' + encodeURIComponent(filter) + '/';
     },
         
     update: function(data) {

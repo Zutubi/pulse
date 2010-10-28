@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
@@ -11,11 +12,11 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 
 public class ProjectHomeAcceptanceTest extends SeleniumTestBase
@@ -140,8 +141,8 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
         assertEquals(ResultState.SUCCESS, homePage.getLatestCompletedBuildStatus());
 
         assertEquals(asList(
-                new ProjectHomePage.BuildInfo(brokenBuildNumber, ResultState.FAILURE, brokenRevision),
-                new ProjectHomePage.BuildInfo(initialBuildNumber, ResultState.SUCCESS, initialRevision)
+                new BuildInfo(brokenBuildNumber, ResultState.FAILURE, brokenRevision),
+                new BuildInfo(initialBuildNumber, ResultState.SUCCESS, initialRevision)
         ), homePage.getRecentBuilds());
         
         assertEquals(asList(
