@@ -21,7 +21,7 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Ext.Panel, {
         '<a id="{cellId}-{htmlName}" href="{url}">{name:htmlEncode}</a><br/> ' +
         '<img alt="health" src="{[window.baseUrl]}/images/health/{health}.gif"> {health} <span class="understated">//</span> ' +
         '<tpl if="building">' +
-            '<img alt="building" src="${base}/images/inprogress.gif"/> ' +
+            '<img alt="building" src="{[window.baseUrl]}/images/inprogress.gif"/> ' +
         '</tpl>' +
         '{state}'
     ),
