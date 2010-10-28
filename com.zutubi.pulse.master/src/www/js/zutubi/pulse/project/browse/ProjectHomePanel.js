@@ -143,6 +143,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
                         takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),
                         trigger: window.baseUrl + '/triggerBuild.action?projectId=' + this.projectId,
+                        rebuild: window.baseUrl + '/triggerBuild.action?rebuild=true&projectId=' + this.projectId,
                         viewSource: Zutubi.fs.viewWorkingCopy.createDelegate(window, [this.projectId])
                     }
                 }, {
