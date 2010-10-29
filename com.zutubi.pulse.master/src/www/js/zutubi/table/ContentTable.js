@@ -5,16 +5,24 @@
  * Base class for tables that contain dynamic content.  Applies consistent styling for the title and
  * borders.
  *
- * @cfg {String} cls          Class to use for the table (defaults to 'content-table')
- * @cfg {String} id           Id to use for the table.
- * @cfg {Mixed}  data         Data used to populate the table.
- * @cfg {String} title        Title for the table heading row.
- * @cfg {String} emptyMessage Message to show when the table has no rows to display (if not
- *                            specified, the table is hidden in this case).
+ * @cfg {String}  cls          Class to use for the table (defaults to 'content-table')
+ * @cfg {String}  id           Id to use for the table.
+ * @cfg {Mixed}   data         Data used to populate the table.
+ * @cfg {String}  title        Title for the table heading row.
+ * @cfg {String}  emptyMessage Message to show when the table has no rows to display (if not
+ *                             specified, the table is hidden in this case).
+ * @cfg {Boolean} customisable If true, the table will be customisable.  An icon will be shown in
+ *                             the header which, when clicked, will call the customise() method.
+ *                             Subclasses should override this method to allow customisation, and
+ *                             call customiseComplete when done.  During customisation updates to
+ *                             data are held aside, and applied on completion.
  */
 Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     cls: 'content-table',
     columnCount: 1,
+    customisable: false,
+    customising: false,
+    
     emptyTemplate: new Ext.XTemplate(
         '<tr>' +
             '<td colspan="{columnCount}" class="understated leftmost rightmost ' + Zutubi.table.CLASS_DYNAMIC + '">' +
@@ -26,7 +34,22 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     onRender: function(container, position) {
         if (!this.template)
         {
-            this.template = new Ext.Template('<table id="{id}" class="{cls}"><tr><th class="heading" colspan="{columnCount}">{title}</th></tr></table>');
+            this.template = new Ext.XTemplate(
+                '<table id="{id}" class="{cls}">' +
+                    '<tr>' +
+                        '<th class="heading" colspan="{columnCount}">' +
+                            '<tpl if="customisable">' +
+                                '<span style="float: right">' +
+                                    '<a href="#" class="unadorned" onclick="Ext.getCmp(\'{id}\').customise(); return false">' +
+                                        '<img alt="customise" src="{[window.baseUrl]}/images/pencil.gif"/>' +
+                                    '</a>' +
+                                '</span>' +
+                            '</tpl>' +
+                            '{title}' +
+                        '</th>' +
+                    '</tr>' +
+                '</table>'
+            );
         }
 
         if (position)
@@ -47,11 +70,39 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     },
 
     /**
+     * Called on a customisable table when customising begins.  Subclasses may
+     * override but must call this base implementation.
+     */
+    customise: function() {
+        this.customising = true;
+    },
+
+    /**
+     * Called on a customisable table when customising ends.  Subclasses may
+     * override but must call this base implementation.
+     */
+    customiseComplete: function() {
+        this.customising = false;
+        if (this.heldData)
+        {
+            this.update(this.heldData);
+        }
+    },
+
+    /**
      * Updates this table with new data.
      */
     update: function(data) {
-        this.data = data;
-        this.renderDynamic();
+        if (this.customising)
+        {
+            this.heldData = data;
+        }
+        else
+        {
+            this.heldData = null;
+            this.data = data;
+            this.renderDynamic();
+        }
     },
 
     /**

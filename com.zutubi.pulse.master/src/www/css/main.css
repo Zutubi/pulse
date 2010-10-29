@@ -695,8 +695,27 @@ td.group-header, th.two-heading, h3.two-heading, .content-table .heading
     border-left: none;
     border-right: none;
     padding: 6px 4px;
-    background-color: #f2f2ff;
+    background: #f2f2ff;
     font-weight: bold;
+}
+
+div.xz-summary-tb
+{
+    border-top: solid 1px #bbb;
+    border-bottom: none;
+    background: #f2f2ff;
+    padding: 3px;
+}
+
+.xz-summary-remove
+{
+    float: right;
+    display: none;
+}
+
+.xz-summary-customising .xz-summary-remove
+{
+    display: inline;
 }
 
 .project-row td
