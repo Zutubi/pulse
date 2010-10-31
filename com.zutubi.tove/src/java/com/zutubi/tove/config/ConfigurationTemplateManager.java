@@ -645,7 +645,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     Record createSkeletonRecord(ComplexType type, Record record)
     {
         MutableRecord result = type.createNewRecord(false);
-        for (String key : record.nestedKeySet())
+        for (String key : getOrderedNestedKeys(record, type))
         {
             Record child = (Record) record.get(key);
             ComplexType childType = (ComplexType) type.getActualPropertyType(key, child);
@@ -675,6 +675,32 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
+    /**
+     * Returns the keys for all records nested in the given record, taking
+     * collection ordering into account where required.
+     * 
+     * @param record the record to get nested keys from
+     * @param type   type of the given record
+     * @return nested record keys, with order preserved
+     */
+    Collection<String> getOrderedNestedKeys(Record record, ComplexType type)
+    {
+        Collection<String> keys;
+        boolean collection = type instanceof CollectionType;
+        if (collection)
+        {
+            CollectionType collectionType = (CollectionType) type;
+            keys = collectionType.getOrder(record);
+        }
+        else
+        {
+            keys = record.nestedKeySet();
+        }
+        
+        return keys;
+    }
+
+    
     private boolean isComposite(Object instance)
     {
         // Quicker way to get the type for existant-composites

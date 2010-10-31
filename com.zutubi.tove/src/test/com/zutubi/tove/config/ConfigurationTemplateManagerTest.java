@@ -2,10 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
-import com.zutubi.tove.annotations.ID;
-import com.zutubi.tove.annotations.ReadOnly;
-import com.zutubi.tove.annotations.Reference;
-import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
@@ -13,25 +10,21 @@ import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.*;
 import com.zutubi.tove.transaction.UserTransaction;
-import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.MapType;
-import com.zutubi.tove.type.TemplatedMapType;
-import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.FalsePredicate;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TruePredicate;
 import com.zutubi.validation.annotations.Required;
-
-import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.util.*;
 
 public class ConfigurationTemplateManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -183,6 +176,59 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("c1", itemRecord.get("name"));
     }
 
+    public void testInsertTemplatedInheritedCollectionImplicitOrderPreserved()
+    {
+        final List<String> ORDER = asList("b", "d", "c", "a", "e");
+
+        ConfigA root = new ConfigA("root");
+        for (String name: ORDER)
+        {
+            root.addC(new ConfigC(name));
+        }
+
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
+
+
+        String collectionPath = getPath(childPath, "cs");
+        Record collectionRecord = configurationTemplateManager.getRecord(collectionPath);
+        assertNotNull(collectionRecord);
+        CollectionType type = configurationTemplateManager.getType(collectionPath, CollectionType.class);
+        assertEquals(ORDER, type.getOrder(collectionRecord));
+        
+        @SuppressWarnings({"unchecked"})
+        Map<String, ConfigC> collectionInstance = (Map<String, ConfigC>) configurationTemplateManager.getInstance(collectionPath);
+        assertEquals(new HashSet<String>(ORDER), collectionInstance.keySet());
+    }
+
+    public void testInsertTemplatedInheritedCollectionExplicitOrderPreserved()
+    {
+        final List<String> INSERT_ORDER = asList("b", "d", "c", "a", "e");
+        final List<String> EXPLICIT_ORDER = asList("d", "c", "e", "b", "a");
+
+        ConfigA root = new ConfigA("root");
+        for (String name: INSERT_ORDER)
+        {
+            root.addC(new ConfigC(name));
+        }
+
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
+
+        String collectionPath = getPath(childPath, "cs");
+        configurationTemplateManager.setOrder(collectionPath, EXPLICIT_ORDER);
+
+        
+        Record collectionRecord = configurationTemplateManager.getRecord(collectionPath);
+        assertNotNull(collectionRecord);
+        CollectionType type = configurationTemplateManager.getType(collectionPath, CollectionType.class);
+        assertEquals(EXPLICIT_ORDER, type.getOrder(collectionRecord));
+        
+        @SuppressWarnings({"unchecked"})
+        Map<String, ConfigC> collectionInstance = (Map<String, ConfigC>) configurationTemplateManager.getInstance(collectionPath);
+        assertEquals(new HashSet<String>(EXPLICIT_ORDER), collectionInstance.keySet());
+    }
+    
     public void testInsertTemplatedInvalidScope()
     {
         try
@@ -2121,7 +2167,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         private String c;
 
         private ConfigB composite;
-        private Map<String, ConfigC> cs = new HashMap<String, ConfigC>();
+        @Ordered
+        private Map<String, ConfigC> cs = new LinkedHashMap<String, ConfigC>();
         private List<ConfigD> ds = new LinkedList<ConfigD>();
         private List<String> pl = new LinkedList<String>();
 
@@ -2167,6 +2214,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         public Map<String, ConfigC> getCs()
         {
             return cs;
+        }
+
+        public void addC(ConfigC c)
+        {
+            cs.put(c.getName(), c);
         }
 
         public void setCs(Map<String, ConfigC> cs)
