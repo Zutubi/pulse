@@ -19,7 +19,9 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 
@@ -329,6 +331,15 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 final List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
                 long currentTime = System.currentTimeMillis();
 
+                final List<Agent> agentPool = new LinkedList<Agent>();
+                agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
+                {
+                    public void run(List<Agent> agents)
+                    {
+                        agentPool.addAll(agents);
+                    }
+                });
+                
                 for (final RecipeAssignmentRequest request : requestQueue)
                 {
                     if(request.hasTimedOut(currentTime))
@@ -340,12 +351,18 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     {
                         agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
                         {
-                            public void run(List<Agent> agents)
+                            public void run(final List<Agent> agents)
                             {
-                                // Note that this method must be fast - we are locking agents.
-                                // The lock is require to prevent the agent state changing
-                                // before we assign the recipe to it.
-                                Iterable<Agent> agentList = agentSorter.sort(agents, request);
+                                // The agent pool can only contain agents that are currently available.  
+                                CollectionUtils.filterInPlace(agentPool, new Predicate<Agent>()
+                                {
+                                    public boolean satisfied(Agent agent)
+                                    {
+                                        return agents.contains(agent);
+                                    }
+                                });
+
+                                Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
                                 for (Agent agent : agentList)
                                 {
                                     AgentService service = agent.getService();

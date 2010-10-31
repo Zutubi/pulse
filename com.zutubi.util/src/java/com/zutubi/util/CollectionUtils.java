@@ -19,9 +19,19 @@ public class CollectionUtils
      */
     public static <T> List<T> filterInPlace(Collection<T> l, Predicate<T> p)
     {
-        List<T> filteredList = filter(l, p);
-        l.removeAll(filteredList);
-        return filteredList;
+        List<T> removedItems = new LinkedList<T>();
+        Iterator<T> it = l.iterator();
+        while (it.hasNext())
+        {
+            T value = it.next();
+            if (!p.satisfied(value))
+            {
+                it.remove();
+                removedItems.add(value);
+            }
+        }
+        
+        return removedItems;
     }
 
     public static <T> List<T> filter(Collection<T> l, Predicate<T> p)

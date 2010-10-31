@@ -136,8 +136,8 @@ public class SchedulingController implements EventListener
         CanBuildPredicate<QueuedRequest> canBuild = objectFactory.buildBean(CanBuildPredicate.class);
 
         // move the candidates that we can build from the rejected list to the accepted list.
-        List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
-        List<QueuedRequest> accepted = CollectionUtils.filterInPlace(rejected, canBuild);
+        List<QueuedRequest> accepted = new LinkedList<QueuedRequest>(candidates);
+        List<QueuedRequest> rejected = CollectionUtils.filterInPlace(accepted, canBuild);
 
         // Now we need to go through and move any requests that are in the accepted list that
         // depend on a request in the rejected list into the rejected list.  We do this until
