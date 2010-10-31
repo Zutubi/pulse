@@ -1,10 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.LinkTable;
-import com.zutubi.pulse.acceptance.components.PropertyTable;
-import com.zutubi.pulse.acceptance.components.StatusBox;
-import com.zutubi.pulse.acceptance.components.SummaryTable;
+import com.zutubi.pulse.acceptance.components.*;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -34,14 +31,14 @@ public class ProjectHomePage extends ResponsibilityPage
 
     private static final String COLUMN_ACTIVITY_STATUS = "status";
 
-    private static final String ID_LATEST_NUMBER = "number";
+    private static final String ID_LATEST_NUMBER = "id";
     private static final String ID_LATEST_STATUS = "status";
 
     private String projectName;
     private StatusBox statusBox;
     private SummaryTable activityTable;
     private PropertyTable latestCompleteTable;
-    private SummaryTable recentTable;
+    private BuildSummaryTable recentTable;
     private SummaryTable changesTable;
     private LinkTable actionsTable;
     private LinkTable linksTable;
@@ -53,7 +50,7 @@ public class ProjectHomePage extends ResponsibilityPage
         statusBox = new StatusBox(browser, "project-status");
         activityTable = new SummaryTable(browser, "project-activity");
         latestCompleteTable = new PropertyTable(browser, "project-latest");
-        recentTable = new SummaryTable(browser, "project-recent");
+        recentTable = new BuildSummaryTable(browser, "project-recent");
         changesTable = new SummaryTable(browser, "project-changes");
         actionsTable = new LinkTable(browser, "project-actions");
         linksTable = new LinkTable(browser, "project-links");
@@ -244,14 +241,7 @@ public class ProjectHomePage extends ResponsibilityPage
      */
     public List<BuildInfo> getRecentBuilds()
     {
-        List<BuildInfo> result = new LinkedList<BuildInfo>();
-        int count = getRecentBuildsCount();
-        for (int i = 0; i < count; i++)
-        {
-            result.add(new BuildInfo(recentTable.getRow(i)));
-        }
-
-        return result;
+        return recentTable.getBuilds();
     }
 
     /**

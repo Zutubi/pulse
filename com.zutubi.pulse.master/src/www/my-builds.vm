@@ -2,19 +2,48 @@
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
 <content tag="header.javascript">
-    yahoo/utilities.js
-    buildcolumns.js
+    zutubi/pulse/project/dashboard/MyBuildsPanel.js
+    projects.js
 </content>
 <html>
 <head>
     <title>#wwtext("name=my.builds")</title>
     <script type="text/javascript">
-    //<![CDATA[
-        #updater("$base/ajax/myBuildsPanel.action" "panel" $principle "Ext.emptyFn")
+        #if($refreshInterval)
+        var refreshInterval = $refreshInterval;
+        #elseif($principle.preferences.refreshingEnabled)
+        var refreshInterval = $principle.preferences.refreshInterval;
+        #else
+        var refreshInterval = 0;
+        #end
+        var view;
+        var panel = null;
+        
+        function update(data)
+        {
+            if (panel)
+            {
+                panel.update(data);
+            }
+            else
+            {
+                panel = new Zutubi.pulse.project.dashboard.MyBuildsPanel({
+                    loadingEl: 'my-builds',
+                    columns: '#jss($columns)'.split(','),
+                    version: '${version_number}',
+                    data: data
+                });
 
-        var popup;
-        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("my", "$base", "$base/ajax/myBuildsPanel.action", "panel"); });
-    //]]>
+                var nestedCenter = Ext.getCmp('nested-center');
+                nestedCenter.add(panel);
+                viewport.doLayout();
+            }
+        }
+        
+        Ext.onReady(function() {
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/myBuildsData.action', refreshInterval, update, window, Ext.get('my-builds'), 'Unable to load personal builds.');
+            view.init();
+        });
     </script>
 #if ($rssEnabled)
     <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
@@ -23,35 +52,7 @@
 <body>
     #dashboardTabs("my-builds")
 
-    <div id="panel">
-        #parse("ajax/my-builds-panel.vm")
+    <div id="my-builds">
     </div>
-
-    #buildColumnsPopup("my" "popup")
-    
-    <h2 id="personal-builds" class="section">#wwtext("name=personal.builds")</h2>
-    <table class="columns" width="98%">
-        <tr>
-            <td class="columns">
-                <p style="padding-left: 10px; padding-right: 100px">
-                    #wwtext("name=personal.builds.blurb")
-                </p>
-            </td>
-            <td class="right">
-                <table class="content" style="float: right">
-                    #headingRow("tools.downloads" 1)
-                    <tr>
-                        #actionCell("download.format.zip" "$base/packages/pulse-dev-${version_number}.zip" "compress.gif")
-                    </tr>
-                    <tr>
-                        #actionCell("download.format.tar" "$base/packages/pulse-dev-${version_number}.tar.gz" "compress.gif")
-                    </tr>
-                    <tr>
-                        #actionCell("download.format.exe" "$base/packages/pulse-dev-${version_number}.exe" "pulse.gif")
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
 </body>
 </html>

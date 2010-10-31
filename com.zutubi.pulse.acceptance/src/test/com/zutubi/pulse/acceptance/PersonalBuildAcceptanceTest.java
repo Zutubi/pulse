@@ -1,10 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -13,6 +16,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -24,6 +28,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -32,12 +38,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -498,11 +498,30 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue("Patch not accepted given status:\n" + StringUtils.join("\n", statuses), ui.isPatchAccepted());
 
         long buildNumber = ui.getBuildNumber();
-        browser.openAndWaitFor(MyBuildsPage.class);
-        browser.refreshUntilElement(MyBuildsPage.getBuildNumberId(buildNumber));
-        assertFalse(browser.isElementIdPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1)));
-        browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), BUILD_TIMEOUT, expectedStatus.getPrettyString());
+        refreshUntilBuild((int) buildNumber, expectedStatus);
         return buildNumber;
+    }
+    
+    private void refreshUntilBuild(final int buildNumber, ResultState expectedStatus)
+    {
+        final MyBuildsPage myBuildsPage = browser.openAndWaitFor(MyBuildsPage.class);
+        browser.refreshUntil(BUILD_TIMEOUT, new Condition()
+        {
+            public boolean satisfied()
+            {
+                myBuildsPage.waitFor();
+                List<BuildInfo> builds = myBuildsPage.getBuilds();
+                if (builds.isEmpty())
+                {
+                    return false;
+                }
+
+                BuildInfo latestBuild = builds.get(0);
+                return latestBuild.number == buildNumber && latestBuild.status.isCompleted(); 
+            }
+        }, "build " + buildNumber + " to complete");
+        
+        assertEquals(expectedStatus, myBuildsPage.getBuilds().get(0).status);
     }
 
     private void createConfigFile(String projectName, Pair<String, ?>... extraProperties) throws IOException

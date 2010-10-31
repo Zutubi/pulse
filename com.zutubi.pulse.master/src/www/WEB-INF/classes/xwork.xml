@@ -232,7 +232,7 @@
             </result>
         </action>
 
-        <action name="projectHome" class="com.zutubi.pulse.master.xwork.actions.project.ProjectRequiredAction">
+        <action name="projectHome" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/project-home.vm</result>
             <result name="error" type="redirect">/browse/</result>
@@ -387,9 +387,8 @@
             <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
         </global-results>
 
-        <action name="myBuildsPanel" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsAction">
-            <result name="success" type="velocity">my-builds-panel.vm</result>
-            <result name="error" type="redirect">/</result>
+        <action name="myBuildsData" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsDataAction">
+            <result name="success" type="flexjson">builds</result>
         </action>
 
         <action name="browseData" class="com.zutubi.pulse.master.xwork.actions.project.BrowseDataAction">

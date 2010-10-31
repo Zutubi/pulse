@@ -6,16 +6,17 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 
 /**
+ * Action to save a user's choice of columns in a build summary table.
  */
 public class CustomiseBuildColumnsAction extends UserActionSupport
 {
-    private String suffix;
+    private String tableId;
     private String columns;
     private ConfigurationProvider configurationProvider;
 
-    public void setSuffix(String suffix)
+    public void setTableId(String tableId)
     {
-        this.suffix = suffix;
+        this.tableId = tableId;
     }
 
     public void setColumns(String columns)
@@ -26,34 +27,26 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
     public String execute() throws Exception
     {
         User user = getUser();
-        if(user == null)
+        if (user == null)
         {
             return ERROR;
         }
 
-        if(!StringUtils.stringSet(suffix))
+        if (!StringUtils.stringSet(tableId))
         {
             return ERROR;
         }
 
         UserPreferencesConfiguration preferences = configurationProvider.deepClone(user.getPreferences());
-        if(suffix.equals("my"))
+        if (tableId.equals("my-builds-builds"))
         {
             preferences.setMyBuildsColumns(columns);
         }
-        else if(suffix.equals("my.projects"))
-        {
-            preferences.setMyProjectsColumns(columns);
-        }
-        else if(suffix.equals("project.summary"))
-        {
-            preferences.setProjectSummaryColumns(columns);
-        }
-        else if(suffix.equals("project.recent"))
+        else if (tableId.equals("project-recent"))
         {
             preferences.setProjectRecentColumns(columns);
         }
-        else if(suffix.equals("project.history"))
+        else if (tableId.equals("project-history"))
         {
             preferences.setProjectHistoryColumns(columns);
         }

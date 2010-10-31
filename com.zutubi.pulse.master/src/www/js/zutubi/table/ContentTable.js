@@ -70,23 +70,39 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     },
 
     /**
-     * Called on a customisable table when customising begins.  Subclasses may
-     * override but must call this base implementation.
+     * Called on a customisable table when customising begins.  Subclasses
+     * should override onCustomise to take necessary action at this point.
      */
     customise: function() {
         this.customising = true;
+        this.onCustomise();
     },
 
     /**
-     * Called on a customisable table when customising ends.  Subclasses may
-     * override but must call this base implementation.
+     * Called to handle the start of a customisation operation.  This default
+     * does nothing, and is intended to be overridden.
+     */
+    onCustomise: function() {
+    },
+
+    /**
+     * Called on a customisable table when customising ends.  Subclasses should
+     * override but onCustomiseComplete to take necessary action at this point.
      */
     customiseComplete: function() {
+        this.onCustomiseComplete();
         this.customising = false;
         if (this.heldData)
         {
             this.update(this.heldData);
         }
+    },
+
+    /**
+     * Called to handle the end of a customisation operation.  This default
+     * does nothing, and is intended to be overridden.
+     */
+    onCustomiseComplete: function() {
     },
 
     /**

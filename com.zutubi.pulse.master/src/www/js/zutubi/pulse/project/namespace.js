@@ -48,6 +48,12 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             return Zutubi.pulse.project.imageLabel('health', health);
         },
 
+        project: function(name) {
+            return '<a href="' + window.baseUrl + '/browse/projects/' + encodeURIComponent(name) + '">' +
+                       Ext.util.Format.htmlEncode(name) +
+                   '</a>';
+        },
+
         revision: function(revision) {
             if (revision)
             {
@@ -161,10 +167,10 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 if (build.link)
                 {
-                    Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
+                    Zutubi.MenuManager.registerMenu('bactions-' + build.uniqueId, getBuildMenuItems.createDelegate(this, [build.link]));
                     return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
                         number: number,
-                        id: build.id,
+                        id: build.uniqueId,
                         link: window.baseUrl + '/' + build.link
                     });
                 }
@@ -179,6 +185,18 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
         },
         
+        buildOwner: function(owner, build) {
+            if (build.personal)
+            {
+                return '<img alt="personal" src="' + window.baseUrl + '/images/user.gif"/> ' +
+                       Ext.util.Format.htmlEncode(owner);
+            }
+            else
+            {
+                return  Zutubi.pulse.project.renderers.project(owner);
+            }
+        },
+
         buildStatus: function(status, build) {
             if (status == 'in progress' && build.elapsed && build.elapsed.prettyEstimatedTimeRemaining)
             {
@@ -340,10 +358,20 @@ Ext.apply(Zutubi.pulse.project, {
     configs: {
         build: {
             id: {
-                name: 'number',
+                name: 'id',
                 key: 'build id',
                 cls: 'right',
                 renderer: Zutubi.pulse.project.renderers.buildId
+            },
+            
+            project: {
+                name: 'project',
+                renderer: Zutubi.pulse.project.renderers.project
+            },
+
+            owner: {
+                name: 'owner',
+                renderer: Zutubi.pulse.project.renderers.buildOwner
             },
             
             status: {
@@ -351,8 +379,14 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Zutubi.pulse.project.renderers.buildStatus
             },
             
+            reason: {
+                name: 'reason',
+                renderer: Ext.util.Format.htmlEncode
+            },
+            
             rev: {
-                name: 'revision',
+                name: 'rev',
+                key: 'revision',
                 renderer: Zutubi.pulse.project.renderers.buildRevision
             },
             

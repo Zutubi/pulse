@@ -13,6 +13,10 @@
  * @cfg {Array}   selectedColumns An array of names of columns that should be displayed (by default,
  *                                all columns are shown in the order they appear in columns).
  * @cfg {Boolean} customisable    If true, the table columns will be customisable.
+ * @cfg {String}  saveUrl         Url used to save customised columns.  The chosen columns will be
+ *                                sent as a comma-separated string in a parameter named 'columns'.
+ * @cfg {String}  saveParams      Optional extra parameters to pass on the Ajax call to save
+ *                                customised columns.
  * @cfg {String}  id              Id to use for the table.
  * @cfg {Array}   data            Array of objects used to populate the table.  Should contain an
  *                                entry for each row, with fields matching the columns.
@@ -24,7 +28,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     initComponent: function() {
         this.cellTemplate = new Ext.XTemplate('<td class="idx-{index} <tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>{cls}">{value}</td>');
         this.headerTemplate = new Ext.XTemplate(
-            '<th class="idx-{index} xz-summary-sortable<tpl if="first"> leftmost</tpl><tpl if="last"> rightmost</tpl>">' +
+            '<th class="idx-{index} xz-summary-sortable {cls}<tpl if="first"> leftmost</tpl><tpl if="last"> rightmost</tpl>">' +
                 '<span class="xz-summary-remove"><img src="{[window.baseUrl]}/images/delete.gif"/></span>' +
                 '{value}' +
             '</th>'
@@ -186,6 +190,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         {
             var column = this.activeColumns[i];
             html += this.headerTemplate.apply({
+                cls: column.cls || '',
                 first: i == 0,
                 last: i == columnCount - 1,
                 index: i,
@@ -205,7 +210,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         {
             var column = this.activeColumns[i];
             html += this.cellTemplate.apply({
-                cls: column.cls,
+                cls: column.cls || '',
                 first: i == 0,
                 last: i == columnCount - 1,
                 index: i,
@@ -217,15 +222,16 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return html;
     },
 
-    getAvailableColumnNames: function() {
+    getAvailableColumnStore: function() {
         var columnCount = this.keyValues.length;
-        var names = new Array(columnCount);
+        var store = new Array(columnCount);
         for (var i = 0; i < columnCount; i++)
         {
-            names[i] = this.keyValues[i].name;
+            var column = this.keyValues[i];
+            store[i] = [column.name, column.key];
         }
 
-        return names;
+        return store;
     },
     
     getColumnNames: function() {
@@ -244,9 +250,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return names;
     },
     
-    customise: function() {
-        Zutubi.table.SummaryTable.superclass.customise.apply(this, arguments);
-        
+    onCustomise: function() {
         this.toolbar = new Zutubi.table.SummaryTableToolbar({
             table: this
         });
@@ -257,13 +261,41 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         this.toolbar.render(this.container, this.el);
     },
     
-    customiseComplete: function()
+    onCustomiseComplete: function()
     {
         this.toolbar.destroy();
         this.el.removeClass('xz-summary-customising');
         var headerRow = this.tbodyEl.child('tr');
         headerRow.setDisplayed(true);
-        Zutubi.table.SummaryTable.superclass.customiseComplete.apply(this, arguments);
+        
+        this.saveColumns();
+    },
+    
+    saveColumns: function()
+    {
+        if (!this.saveUrl)
+        {
+            return;
+        }
+        
+        var columnsString = '';
+        for (var i = 0, l = this.activeColumns.length; i < l; i++)
+        {
+            if (columnsString.length > 0)
+            {
+                columnsString += ',';
+            }
+            
+            columnsString += this.activeColumns[i].name;
+        }
+        
+        var params = this.saveParams || {};
+        params.columns = columnsString;
+        
+        Ext.Ajax.request({
+            url: this.saveUrl,
+            params: params
+        });
     }
 });
 
@@ -284,14 +316,25 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
             }, ' ', {
                 xtype: 'combo',
                 id: table.id + '-new-column',
-                store: table.getAvailableColumnNames(),
+                store: table.getAvailableColumnStore(),
+                forceSelection: true,
+                editable: false,
                 triggerAction: 'all',
                 enableKeyEvents: true,
                 listeners: {
                     keypress: function(c, e) {
                         if (e.getKey() == e.RETURN)
                         {
-                            var name = c.getRawValue();
+                            var name;
+                            if (c.getStore().findExact('field2', c.getRawValue()) < 0)
+                            {
+                                name = c.getRawValue();
+                            }
+                            else
+                            {
+                                name = c.getValue();
+                            }
+
                             if (name)
                             {
                                 table.addColumn(name);

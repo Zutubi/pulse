@@ -91,7 +91,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         model = new ProjectHomeModel(status);
 
         final ProjectConfiguration projectConfig = project.getConfig();
-        CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getChangeViewer()), model.getActivity());
+        CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
         BuildResultToModelMapping toModelMapping = new BuildResultToModelMapping(projectConfig.getChangeViewer());
         CollectionUtils.map(inProgress, toModelMapping, model.getActivity());
 
@@ -111,10 +111,6 @@ public class ProjectHomeDataAction extends ProjectActionBase
             }
         }, model.getChanges());
         
-//        User user = getLoggedInUser();
-//        summaryColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectSummaryColumns());
-//        recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns());
-
         File contentRoot = systemPaths.getContentRoot();
         Messages messages = Messages.getInstance(ProjectConfiguration.class);
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
@@ -187,10 +183,12 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
     private static class QueuedToBuildModelMapping implements Mapping<QueuedRequest, BuildModel>
     {
+        private String projectName;
         private ChangeViewerConfiguration changeViewerConfig;
 
-        private QueuedToBuildModelMapping(ChangeViewerConfiguration changeViewerConfig)
+        private QueuedToBuildModelMapping(String projectName, ChangeViewerConfiguration changeViewerConfig)
         {
+            this.projectName = projectName;
             this.changeViewerConfig = changeViewerConfig;
         }
 
@@ -208,7 +206,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
                 revisionModel = new RevisionModel(revision, changeViewerConfig);
             }
             
-            return new BuildModel(requestEvent.getId(), -1, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel);
+            return new BuildModel(requestEvent.getId(), -1, false, projectName, projectName, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel);
         }
     }
 

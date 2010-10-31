@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 /**
- * Action to display project home page.  Just ensures the project exists, the
- * real work is done with an AJAX request to {@link ProjectHomeDataAction}.
+ * Generic project action that just ensures the project exists.
  */
 public class ProjectRequiredAction extends ProjectActionBase
 {

@@ -16,12 +16,15 @@ import java.util.List;
  */
 public class BuildModel
 {
+    private long uniqueId;
     private long id;
-    private long number;
+    private boolean personal;
+    private String project;
+    private String owner;
     private String status;
     private String prettyQueueTime;
     private String reason;
-    private RevisionModel revision;
+    private RevisionModel rev;
     private String link;
     private String tests;
     private DateModel when;
@@ -30,26 +33,37 @@ public class BuildModel
     private int warnings = -1;
     private List<StageModel> stages = new LinkedList<StageModel>();
 
-    public BuildModel(long id, long number, String status, String prettyQueueTime, String reason, RevisionModel revision)
+    public BuildModel(long uniqueId, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision)
     {
-        this.id = id;
-        this.number = number;
+        this.uniqueId = uniqueId;
+        this.id = number;
+        this.personal = personal;
+        this.project = project;
+        this.owner = owner;
         this.status = status;
         this.prettyQueueTime = prettyQueueTime;
         this.reason = reason;
-        this.revision = revision;
+        this.rev = revision;
     }
 
+    public BuildModel(BuildResult buildResult)
+    {
+        this(buildResult, buildResult.getProject().getConfig().getChangeViewer());
+    }
+    
     public BuildModel(BuildResult buildResult, ChangeViewerConfiguration changeViewerConfig)
     {
-        id = buildResult.getId();
-        number = buildResult.getNumber();
+        uniqueId = buildResult.getId();
+        id = buildResult.getNumber();
+        personal = buildResult.isPersonal();
+        project = buildResult.getProject().getName();
+        owner = buildResult.getOwner().getName();
         status = buildResult.getState().getPrettyString();
         reason = buildResult.getReason().getSummary();
         Revision buildRevision = buildResult.getRevision();
         if (buildRevision != null)
         {
-            revision = new RevisionModel(buildRevision, changeViewerConfig);
+            rev = new RevisionModel(buildRevision, changeViewerConfig);
         }
         tests = buildResult.getTestSummary().toString();
         when = new DateModel(buildResult.getStamps().getStartTime());
@@ -65,14 +79,29 @@ public class BuildModel
         link = Urls.getBaselessInstance().build(buildResult).substring(1);
     }
 
+    public long getUniqueId()
+    {
+        return uniqueId;
+    }
+
     public long getId()
     {
         return id;
     }
 
-    public long getNumber()
+    public boolean isPersonal()
     {
-        return number;
+        return personal;
+    }
+
+    public String getProject()
+    {
+        return project;
+    }
+
+    public String getOwner()
+    {
+        return owner;
     }
 
     public String getStatus()
@@ -90,9 +119,9 @@ public class BuildModel
         return reason;
     }
 
-    public RevisionModel getRevision()
+    public RevisionModel getRev()
     {
-        return revision;
+        return rev;
     }
 
     public String getLink()

@@ -1,7 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 // dependency: zutubi/Pager.js
-// dependency: zutubi/table/SummaryTable.js
+// dependency: zutubi/pulse/project/BuildSummaryTable.js
 
 /**
  * The content of the project history page.  Expects data of the form:
@@ -72,17 +72,9 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                 },
                 items: [{
                     id: 'history-builds',
-                    xtype: 'xzsummarytable',
+                    xtype: 'xzbuildsummarytable',
                     title: 'build history',
-                    columns: [
-                        Zutubi.pulse.project.configs.build.id,
-                        Zutubi.pulse.project.configs.build.rev,
-                        Zutubi.pulse.project.configs.build.status,
-                        'reason',
-                        Zutubi.pulse.project.configs.build.tests,
-                        Zutubi.pulse.project.configs.build.when,
-                        Zutubi.pulse.project.configs.build.elapsed
-                    ],
+                    selectedColumns: this.columns,
                     data: this.data.builds,
                     emptyMessage: 'no builds found'
                 }, {

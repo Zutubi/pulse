@@ -1,13 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
-import com.zutubi.pulse.master.model.BuildColumns;
-import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-
-import java.util.List;
 
 /**
  * Action to view the user's personal build results.
@@ -15,31 +10,13 @@ import java.util.List;
 public class MyBuildsAction extends ActionSupport
 {
     private User user;
-    private List<BuildResult> myBuilds;
+    private String columns;
 
-    private BuildManager buildManager;
-    private BuildColumns columns;
-
-    public boolean isPersonalBuild()
-    {
-        return true;
-    }
-
-    public User getUser()
-    {
-        return user;
-    }
-
-    public List<BuildResult> getMyBuilds()
-    {
-        return myBuilds;
-    }
-
-    public BuildColumns getColumns()
+    public String getColumns()
     {
         if (columns == null)
         {
-            columns = new BuildColumns(user.getPreferences().getMyBuildsColumns());
+            columns = user.getPreferences().getMyBuildsColumns();
         }
         return columns;
     }
@@ -58,12 +35,6 @@ public class MyBuildsAction extends ActionSupport
             return ERROR;
         }
 
-        myBuilds = buildManager.getPersonalBuilds(user);
         return SUCCESS;
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
     }
 }

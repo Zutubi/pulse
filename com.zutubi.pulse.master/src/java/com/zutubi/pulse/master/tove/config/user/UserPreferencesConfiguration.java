@@ -43,13 +43,13 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private int myBuildsCount = 5;
 
     @Internal
-    private String myBuildsColumns = defaultProjectColumns();
+    private String myBuildsColumns = defaultMyBuildsColumns();
     @Internal
     private String myProjectsColumns = defaultProjectColumns();
     @Internal
     private String projectSummaryColumns = defaultProjectColumns();
     @Internal
-    private String projectRecentColumns = defaultProjectColumns();
+    private String projectRecentColumns = defaultShortProjectColumns();
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
 
@@ -241,8 +241,18 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         this.browseView = browseView;
     }
 
+    public static String defaultShortProjectColumns()
+    {
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_REVISION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_WHEN);
+    }
+
+    public static String defaultMyBuildsColumns()
+    {
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED);
+    }
+    
     public static String defaultProjectColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_REVISION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_REVISION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED);
     }
 }

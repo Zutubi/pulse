@@ -2,14 +2,13 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.components.Pager;
-import com.zutubi.pulse.acceptance.components.SummaryTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,14 +20,14 @@ public class ProjectHistoryPage extends SeleniumPage
     private static final String ID_STATE_FILTER_CLEAR = "state-filter-clear";
     
     private String projectName;
-    private SummaryTable builds;
+    private BuildSummaryTable builds;
     private Pager pager;
 
     public ProjectHistoryPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
         super(browser, urls, "project-history-" + projectName, projectName);
         this.projectName = projectName;
-        builds = new SummaryTable(browser, "history-builds");
+        builds = new BuildSummaryTable(browser, "history-builds");
         pager = new Pager(browser, "history-pager");
     }
 
@@ -110,14 +109,7 @@ public class ProjectHistoryPage extends SeleniumPage
      */
     public List<BuildInfo> getBuilds()
     {
-        List<BuildInfo> result = new LinkedList<BuildInfo>();
-        int count = getBuildCount();
-        for (int i = 0; i < count; i++)
-        {
-            result.add(new BuildInfo(builds.getRow(i)));
-        }
-
-        return result;
+        return builds.getBuilds();
     }
 
     /**

@@ -30,6 +30,7 @@
                 panel = new Zutubi.pulse.project.browse.ProjectHistoryPanel({
                     loadingEl: '#id("project-history-$project.name")',
                     projectId: '$project.id',
+                    columns: '#jss($columns)'.split(','),
                     data: data
                 });
 

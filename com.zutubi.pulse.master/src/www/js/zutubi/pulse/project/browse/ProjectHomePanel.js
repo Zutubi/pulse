@@ -3,6 +3,7 @@
 // dependency: zutubi/table/LinkTable.js
 // dependency: zutubi/table/PropertyTable.js
 // dependency: zutubi/pulse/SectionHeading.js
+// dependency: zutubi/pulse/project/BuildSummaryTable.js
 // dependency: zutubi/pulse/project/ResponsibilityBox.js
 // dependency: zutubi/pulse/project/StatusBox.js
 
@@ -93,15 +94,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     }, {
                         xtype: 'box'
                     }, {
-                        xtype: 'xzsummarytable',
+                        xtype: 'xzbuildsummarytable',
                         id: 'project-recent',
                         title: 'recently completed builds',
-                        columns: [
-                            Zutubi.pulse.project.configs.build.id,
-                            Zutubi.pulse.project.configs.build.status,
-                            'reason',
-                            Zutubi.pulse.project.configs.build.rev
-                        ],
+                        selectedColumns: this.recentColumns,
                         data: this.data.recent,
                         emptyMessage: 'no historic builds found'
                     }]

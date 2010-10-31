@@ -23,9 +23,9 @@ public class BuildInfo
 
     public BuildInfo(Map<String, String> row)
     {
-        number = Integer.parseInt(StringUtils.stripPrefix(row.get("number"), "build "));
+        number = Integer.parseInt(StringUtils.stripPrefix(row.get("id"), "build "));
         status = ResultState.fromPrettyString(row.get("status"));
-        revision = row.get("revision");
+        revision = row.get("rev");
     }
 
     @Override
