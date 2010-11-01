@@ -4,8 +4,13 @@
 
 /**
  * Provides central management of pop-down menus.  Implements lazy, cached rendering, and allows
- * menus to be toggled from simple onclick handlers.  The FloatManager is used to hide and show the
- * menus, so its id conventions must be followed.
+ * menus to be toggled from simple onclick handlers.  To place a menu button in the dom, you must:
+ * 
+ * - create a link with id <menu id>-link
+ * - set the link's onclick handler to "Zutubi.MenuManager.toggleMenu(this); return false"
+ * - wrap that link around an empty image with id <menu id>-button and class "popdown floating-widget"
+ *
+ * This allows the menu manager to find/render the corresponding menu and place it on the page.
  */
 Zutubi.MenuManager = function() {
     var menusById = {};
