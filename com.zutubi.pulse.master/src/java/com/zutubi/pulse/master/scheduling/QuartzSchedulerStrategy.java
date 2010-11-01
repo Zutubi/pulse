@@ -6,7 +6,13 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 /**
- * <class-comment/>
+ * The QuartzSchedulerStrategy is an implementation of the SchedulerStrategy
+ * interface backed by the quartz scheduler.
+ *
+ * Any triggers scheduled with this scheduler are passed through to the underlying
+ * quartz scheduler.  When those quartz triggers fire, they call the
+ * {@link com.zutubi.pulse.master.scheduling.QuartzTaskCallbackJob} which converts
+ * the callback into a local trigger.
  */
 public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 {

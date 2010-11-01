@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.master.scheduling.quartz.TriggerAdapter;
-import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_NAME;
-import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_GROUP;
-import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+
+import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_GROUP;
+import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_NAME;
 
 public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
@@ -29,6 +29,24 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
     {
         quartzScheduler.shutdown();
         super.tearDown();
+    }
+
+    @Override
+    public void testTaskExecutedOnTrigger() throws SchedulingException
+    {
+        super.testTaskExecutedOnTrigger();
+    }
+
+    @Override
+    public void testPauseTrigger() throws SchedulingException
+    {
+        super.testPauseTrigger();
+    }
+
+    @Override
+    public void testTriggerCount() throws SchedulingException
+    {
+        super.testTriggerCount();
     }
 
     protected void activateTrigger(Trigger trigger) throws SchedulingException
@@ -73,7 +91,8 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
         }
         catch (SchedulerException e)
         {
-            // trying to activate a job that is not registered? well, thats because its not scheduled....
+            // trying to activate a job that is not registered?
+            // well, that's because its not scheduled....
             throw new SchedulingException(e);
         }
     }

@@ -7,7 +7,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * <class-comment/>
+ * All of the triggers scheduled within the Quartz scheduler
+ * trigger this job.  This job then examines the triggers
+ * job data map and uses its contents to determine which
+ * pulse trigger is associated with the callback. 
  */
 public class QuartzTaskCallbackJob implements Job
 {

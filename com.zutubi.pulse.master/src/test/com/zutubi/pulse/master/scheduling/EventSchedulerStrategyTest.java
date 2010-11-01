@@ -49,6 +49,24 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         assertEquals(1, trigger.getTriggerCount());
     }
 
+    @Override
+    public void testTaskExecutedOnTrigger() throws SchedulingException
+    {
+        super.testTaskExecutedOnTrigger();
+    }
+
+    @Override
+    public void testPauseTrigger() throws SchedulingException
+    {
+        super.testPauseTrigger();
+    }
+
+    @Override
+    public void testTriggerCount() throws SchedulingException
+    {
+        super.testTriggerCount();
+    }
+
     protected void activateTrigger(Trigger trigger)
     {
         eventManager.publish(new Event(this));
