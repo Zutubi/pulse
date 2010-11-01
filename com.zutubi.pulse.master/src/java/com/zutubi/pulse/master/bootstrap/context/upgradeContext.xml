@@ -151,6 +151,7 @@
                 <ref local="addTerminatedResultStateToBuildHooks"/>
                 <ref local="addTerminatedResultStateToConfigurations"/>
                 <ref local="addPriorityToBuildConfigurations"/>
+                <ref local="updateBuildColumnPreferences"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -773,4 +774,7 @@
         <property name="buildNumber" value="202999005"/>
     </bean>
 
+    <bean id="updateBuildColumnPreferences" class="com.zutubi.pulse.master.upgrade.tasks.UpdateBuildColumnPreferencesUpgradeTask">
+        <property name="buildNumber" value="202999006"/>
+    </bean>
 </beans>

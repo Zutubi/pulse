@@ -45,10 +45,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     @Internal
     private String myBuildsColumns = defaultMyBuildsColumns();
     @Internal
-    private String myProjectsColumns = defaultProjectColumns();
-    @Internal
-    private String projectSummaryColumns = defaultProjectColumns();
-    @Internal
     private String projectRecentColumns = defaultShortProjectColumns();
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
@@ -144,26 +140,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setMyBuildsColumns(String myBuildsColumns)
     {
         this.myBuildsColumns = myBuildsColumns;
-    }
-
-    public String getMyProjectsColumns()
-    {
-        return myProjectsColumns;
-    }
-
-    public void setMyProjectsColumns(String myProjectsColumns)
-    {
-        this.myProjectsColumns = myProjectsColumns;
-    }
-
-    public String getProjectSummaryColumns()
-    {
-        return projectSummaryColumns;
-    }
-
-    public void setProjectSummaryColumns(String projectSummaryColumns)
-    {
-        this.projectSummaryColumns = projectSummaryColumns;
     }
 
     public String getProjectRecentColumns()
