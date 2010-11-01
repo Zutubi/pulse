@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.util.StringUtils;
@@ -13,6 +14,8 @@ import java.util.Map;
  */
 public class ProjectReportsAction extends ProjectActionBase
 {
+    private static final Messages I18N = Messages.getInstance(ProjectReportsAction.class);
+    
     private static final int DEFAULT_TIME_FRAME = 45;
 
     protected ProjectReportsModel model;
@@ -58,7 +61,7 @@ public class ProjectReportsAction extends ProjectActionBase
             ReportGroupConfiguration config = reportGroups.get(group);
             if (config == null)
             {
-                throw new IllegalArgumentException("Unknown report group '" + group + "'");
+                throw new IllegalArgumentException(I18N.format("unknown.group", group));
             }
 
             if (timeUnit == null)
