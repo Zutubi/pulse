@@ -3129,7 +3129,7 @@ public class RemoteApi
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project owning the build
      * @param buildId     ID of the build to get the fields for
-     * @return {@xtype array<[RemoteApi.Feature]>} all custom fields for the given build
+     * @return {@xtype struct} all custom fields for the given build
      * @throws IllegalArgumentException if the given project or build does not exist
      * @access requires view permission for the given project
      */
@@ -3571,22 +3571,25 @@ public class RemoteApi
     }
 
     /**
-     * Triggers a build of the given project using the specified options.  The following options are supported:
+     * Triggers a build of the given project using the specified options.  All options
+     * have defaults if not provided.  The following options are supported:
      * <ul>
-     * <li>revision (optional), the revision to build, in the SCM-specific format.  If not specified,
-     * the latest revision will be used.</li>
-     * <li>version (optional), the build version to be associated with this build request.  If not
-     * specified, the project's default will be used.</li>
-     * <li>properties (optional), {@xtype struct<string>} a mapping of property names to property values</li>
-     * <li>status (optional), the dependency status associated with this build request.  If not specified,
-     * the project's default will be used.</li>
-     * <li>force (optional), indicates that a build should be triggered even if no unbuilt revision is
+     * <li><b>force</b>: indicates that a build should be triggered even if no unbuilt revision is
      * available and changelist isolation is active for this project.</li>
-     * <li>replaceable (optional), indicates that this build can be replaced by a subsequent build in the
+     * <li><b>properties</b>: {@xtype struct<string>} a mapping of property names to property values.</li>
+     * <li><b>rebuild</b>: if true do a build with all dependencies.  If not specified, dependencies
+     * will not be built.</li>
+     * <li><b>replaceable</b>: indicates that this build can be replaced by a subsequent build in the
      * build queue.  This allows multiple builds for a single project to be triggered, but ensures that only
      * the latest revision available at the start of the build is actually built.</li>
-     * <li>resolveVersion (optional), indicates whether the version string should have any property references
-     * resolved, defaults to true</li>
+     * <li><b>resolveVersion</b>: indicates whether the version string should have any property references
+     * resolved, defaults to true.</li>
+     * <li><b>revision</b>: the revision to build, in the SCM-specific format.  If not specified,
+     * the latest revision will be used.</li>
+     * <li><b>status</b>: the dependency status associated with this build request.  If not specified,
+     * the project's default will be used.</li>
+     * <li><b>version</b>: the build version to be associated with this build request.  If not
+     * specified, the project's default will be used.</li>
      * </ul>
      *
      * @param token          authentication token, see {@link #login(String, String)}
@@ -3614,11 +3617,11 @@ public class RemoteApi
             TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), "remote api");
             if (triggerOptions.containsKey("replaceable"))
             {
-                options.setReplaceable(Boolean.valueOf((String) triggerOptions.get("replaceable")));
+                options.setReplaceable(getBoolean(triggerOptions.get("replaceable")));
             }
             if (triggerOptions.containsKey("force"))
             {
-                options.setForce(Boolean.valueOf((String) triggerOptions.get("force")));
+                options.setForce(getBoolean(triggerOptions.get("force")));
             }
             if (triggerOptions.containsKey("properties"))
             {
@@ -3636,11 +3639,11 @@ public class RemoteApi
             }
             if (triggerOptions.containsKey("resolveVersion"))
             {
-                options.setResolveVersion(Boolean.valueOf((String) triggerOptions.get("resolveVersion")));
+                options.setResolveVersion(getBoolean(triggerOptions.get("resolveVersion")));
             }
             if (triggerOptions.containsKey("rebuild"))
             {
-                options.setRebuild(Boolean.valueOf((String) triggerOptions.get("rebuild")));
+                options.setRebuild(getBoolean(triggerOptions.get("rebuild")));
             }
 
             List<Long> requestIds = projectManager.triggerBuild(projectConfig, options, revision);
@@ -3655,6 +3658,26 @@ public class RemoteApi
         finally
         {
             tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Originally some boolean trigger options had to be passed as strings.  We
+     * now support actual boolean values, but still accept the strings for
+     * compatibility reasons.
+     * 
+     * @param value the raw value passed, may be a string or boolean
+     * @return a boolean corresponding to the raw value 
+     */
+    private boolean getBoolean(Object value)
+    {
+        if (value instanceof String)
+        {
+            return Boolean.valueOf((String) value);
+        }
+        else
+        {
+            return (Boolean) value;
         }
     }
 
