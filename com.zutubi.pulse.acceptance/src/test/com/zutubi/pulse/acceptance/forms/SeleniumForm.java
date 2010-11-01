@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.*;
 import junit.framework.Assert;
@@ -119,12 +118,12 @@ public abstract class SeleniumForm
 
     public String[] getComboBoxOptions(String name)
     {
-        return AcceptanceTestUtils.getComboOptions(browser, getFieldId(name));
+        return browser.getComboOptions(getFieldId(name));
     }
 
     public String[] getComboBoxDisplays(String name)
     {
-        return AcceptanceTestUtils.getComboDisplays(browser, getFieldId(name));
+        return browser.getComboDisplays(getFieldId(name));
     }
 
     public void submitNamedFormElements(String submitValue, Pair<String, String>... fieldValues)

@@ -13,7 +13,6 @@ import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
-import freemarker.template.utility.StringUtil;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -356,87 +355,6 @@ public class AcceptanceTestUtils
         {
             get.releaseConnection();
         }
-    }
-
-    /**
-     * Sets the value of an Ext combo box with a given component id.
-     *
-     * @param browser selenium instance
-     * @param comboId component id of the combo
-     * @param value   value to set the combo to
-     */
-    public static void setComboByValue(SeleniumBrowser browser, String comboId, String value)
-    {
-        String indexExpression;
-        // Annoyingly ext stores can't find the empty string value...
-        if (StringUtils.stringSet(value))
-        {
-            indexExpression = "store.find(store.fields.first().name, '" + StringUtil.javaScriptStringEnc(value) + "')";
-        }
-        else
-        {
-            indexExpression = "0";
-        }
-
-        browser.evalExpression(
-                "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "');" +
-                "combo.setValue('" + StringUtil.javaScriptStringEnc(value) + "');" +
-                "var store = combo.getStore();" +
-                "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
-        );
-    }
-
-    /**
-     * Retrieves the current value of the Ext combo box with the given
-     * component id.
-     * 
-     * @param browser selenium instance
-     * @param comboId component id of the combo
-     * @return current value of the combo
-     */
-    public static String getComboValue(SeleniumBrowser browser, String comboId)
-    {
-        return browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "').getValue()");
-    }
-
-    /**
-     * Retrieves the available options in the Ext combo box with the given
-     * component id.
-     * 
-     * @param browser selenium instance
-     * @param comboId component id of the combo
-     * @return available options in the combo
-     */
-    public static String[] getComboOptions(SeleniumBrowser browser, String comboId)
-    {
-        String js = "var result = function() { " +
-                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
-                        "var values = []; " +
-                        "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
-                        "return values; " +
-                    "}(); " +
-                    "result";
-        return browser.evalExpression(js).split(",");
-    }
-
-    /**
-     * Retrieves the displayed strings for available options in the Ext combo
-     * box with the given component id.
-     *
-     * @param browser selenium instance
-     * @param comboId component id of the combo
-     * @return displayed strings for available options in the combo
-     */
-    public static String[] getComboDisplays(SeleniumBrowser browser, String comboId)
-    {
-        String js = "var result = function() { " +
-                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
-                        "var values = []; " +
-                        "combo.store.each(function(r) { values.push(r.get(combo.displayField)); }); " +
-                        "return values; " +
-                    "}(); " +
-                    "result";
-        return browser.evalExpression(js).split(",");
     }
 
     /**

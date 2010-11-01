@@ -1,15 +1,13 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
-
-import java.util.List;
-
 import static com.zutubi.util.WebUtils.uriPathEncode;
 import static java.util.Arrays.asList;
+
+import java.util.List;
 
 /**
  * A page in the admin UI that displays a single composite.  This page
@@ -147,7 +145,7 @@ public class CompositePage extends ConfigPage
 
     public List<String> getAncestorNavigationOptions()
     {
-        return asList(AcceptanceTestUtils.getComboOptions(browser, ID_ANCESTOR_COMBO));
+        return asList(browser.getComboOptions(ID_ANCESTOR_COMBO));
     }
     
     public CompositePage navigateToAncestorAndWait(String ancestor)
@@ -162,7 +160,7 @@ public class CompositePage extends ConfigPage
 
     public List<String> getDescendantNavigationOptions()
     {
-        return asList(AcceptanceTestUtils.getComboOptions(browser, ID_DESCENDANT_COMBO));
+        return asList(browser.getComboOptions(ID_DESCENDANT_COMBO));
     }
 
     public CompositePage navigateToDescendantAndWait(String ancestor)
@@ -172,7 +170,7 @@ public class CompositePage extends ConfigPage
     
     private CompositePage navigateAndWait(String comboId, String ancestor)
     {
-        AcceptanceTestUtils.setComboByValue(browser, comboId, ancestor);
+        browser.setComboByValue(comboId, ancestor);
         String[] pathElements = PathUtils.getPathElements(path);
         pathElements[1] = ancestor;
         CompositePage page = new CompositePage(browser, urls, PathUtils.getPath(pathElements));

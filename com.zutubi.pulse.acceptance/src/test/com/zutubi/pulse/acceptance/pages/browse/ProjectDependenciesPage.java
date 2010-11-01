@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -64,7 +63,7 @@ public class ProjectDependenciesPage extends AbstractLogPage
      */
     public ProjectDependencyGraphBuilder.TransitiveMode getTransitiveMode()
     {
-        return ProjectDependencyGraphBuilder.TransitiveMode.valueOf(AcceptanceTestUtils.getComboValue(browser, ID_TRANSITIVE_MODE_COMBO));
+        return ProjectDependencyGraphBuilder.TransitiveMode.valueOf(browser.getComboValue(ID_TRANSITIVE_MODE_COMBO));
     }
 
     /**
@@ -75,7 +74,7 @@ public class ProjectDependenciesPage extends AbstractLogPage
      */
     public void setTransitiveModeAndWait(ProjectDependencyGraphBuilder.TransitiveMode mode)
     {
-        AcceptanceTestUtils.setComboByValue(browser, ID_TRANSITIVE_MODE_COMBO, mode.name());
+        browser.setComboByValue(ID_TRANSITIVE_MODE_COMBO, mode.name());
         browser.waitForVariable("panel.loading", true);
     }
 

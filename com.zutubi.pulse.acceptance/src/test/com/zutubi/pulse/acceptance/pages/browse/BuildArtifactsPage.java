@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.vfs.provider.pulse.ArtifactFileObject;
@@ -68,7 +67,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public void setFilterAndWait(String filter)
     {
-        AcceptanceTestUtils.setComboByValue(browser, ID_COMBO, filter);
+        browser.setComboByValue(ID_COMBO, filter);
         waitForLoad();
     }
 

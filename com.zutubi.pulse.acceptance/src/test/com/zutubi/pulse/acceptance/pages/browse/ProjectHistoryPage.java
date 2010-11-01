@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.components.Pager;
@@ -51,7 +50,7 @@ public class ProjectHistoryPage extends SeleniumPage
      */
     public String getStateFilter()
     {
-        return AcceptanceTestUtils.getComboValue(browser, ID_STATE_FILTER);
+        return browser.getComboValue(ID_STATE_FILTER);
     }
     
     /**

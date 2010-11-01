@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
@@ -48,7 +47,7 @@ public class TestSuitePage extends AbstractTestsPage
 
     public void setFilterAndWait(String filter)
     {
-        AcceptanceTestUtils.setComboByValue(browser, ID_COMBO, filter);
+        browser.setComboByValue(ID_COMBO, filter);
         browser.waitForCondition("selenium.browserbot.getCurrentWindow().filtering === false");
     }
 
