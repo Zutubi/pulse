@@ -26,7 +26,7 @@ public class PersonalBuildRequestHandler extends BaseBuildRequestHandler
         request.setMetaBuildId(getMetaBuildId());
 
         QueuedRequest queuedRequest = new QueuedRequest(request,
-                new OneActiveBuildPerOwnerPredicate(buildQueue),
+                new ActiveBuildsPerOwnerPredicate(buildQueue),
                 new HeadOfOwnerQueuePredicate(buildQueue)
         );
         return Arrays.asList(queuedRequest);

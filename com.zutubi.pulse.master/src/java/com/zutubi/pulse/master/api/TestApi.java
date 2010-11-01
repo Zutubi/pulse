@@ -1,22 +1,20 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginException;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
 import com.zutubi.pulse.core.plugins.repository.PluginList;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.util.TransactionContext;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -40,8 +38,6 @@ public class TestApi
     private TokenManager tokenManager;
     private PluginManager pluginManager;
     private BuildManager buildManager;
-    private ProjectManager projectManager;
-    private TransactionContext transactionContext;
 
     public TestApi()
     {
@@ -126,6 +122,24 @@ public class TestApi
         return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
 
+    /**
+     * Utility method that cancels any builds that are not in a completed
+     * state.
+     *
+     * @param token authentication token.
+     * @return true
+     */
+    public boolean cancelIncompleteBuilds(String token)
+    {
+        tokenManager.verifyAdmin(token);
+        List<BuildResult> results = buildManager.queryBuilds(null, ResultState.getIncompleteStates(), -1, -1, -1, -1, false);
+        for (BuildResult result : results)
+        {
+            buildManager.terminateBuild(result, "Terminated by batch cancel.");
+        }
+        return true;
+    }
+
     private Agent internalGetAgent(String name) throws IllegalArgumentException
     {
         Agent agent = agentManager.getAgent(name);
@@ -160,11 +174,6 @@ public class TestApi
         this.buildManager = buildManager;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-
     public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
     {
         this.synchronisationTaskFactory = synchronisationTaskFactory;
@@ -178,10 +187,5 @@ public class TestApi
     public void setPluginManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
-    }
-
-    public void setTransactionContext(TransactionContext transactionContext)
-    {
-        this.transactionContext = transactionContext;
     }
 }

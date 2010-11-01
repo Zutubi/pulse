@@ -2443,7 +2443,7 @@ td.glegend
     border: #338833 solid 1px;
 }
 
-.x-build-nav-item-failure, .x-build-nav-item-error
+.x-build-nav-item-failure, .x-build-nav-item-error, .x-build-nav-item-terminated
 {
     background-color: #f07878;
     padding: 0;

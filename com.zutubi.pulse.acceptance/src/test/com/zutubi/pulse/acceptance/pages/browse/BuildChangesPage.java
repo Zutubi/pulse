@@ -48,7 +48,7 @@ public class BuildChangesPage extends SeleniumPage
         return urls.buildChanges(WebUtils.uriComponentEncode(projectName), Long.toString(buildId));
     }
 
-    public static String formatChangesSince(long buildNumber)
+    public String formatChangesSince(long buildNumber)
     {
         return "Showing changes since: build " + (buildNumber - 1);
     }

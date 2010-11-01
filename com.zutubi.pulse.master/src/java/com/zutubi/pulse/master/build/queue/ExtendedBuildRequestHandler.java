@@ -226,7 +226,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
     private QueuedRequest newQueuedRequest(BuildRequestEvent request)
     {
         List<QueuedRequestPredicate> defaultPredicates = new LinkedList<QueuedRequestPredicate>();
-        defaultPredicates.add(new OneActiveBuildPerOwnerPredicate(buildQueue));
+        defaultPredicates.add(new ActiveBuildsPerOwnerPredicate(buildQueue));
         if (request.canJumpQueue())
         {
             defaultPredicates.add(new HeadOfOwnersCanBuildNowQueuePredicate(buildQueue));

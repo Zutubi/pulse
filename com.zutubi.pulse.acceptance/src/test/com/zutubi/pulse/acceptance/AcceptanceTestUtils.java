@@ -63,7 +63,6 @@ public class AcceptanceTestUtils
      */
     public static final String PLUGIN_ID_TEST = "com.zutubi.pulse.core.postprocessors.test";
     
-    private static final long STATUS_TIMEOUT = 30000;
     /**
      * The credentials for the admin user.
      */
@@ -335,7 +334,6 @@ public class AcceptanceTestUtils
     {
         HttpClient client = new HttpClient();
 
-
         if (credentials != null)
         {
             client.getState().setCredentials(AuthScope.ANY, credentials);
@@ -502,7 +500,6 @@ public class AcceptanceTestUtils
                 }
             }
         }
-
         javaClass.dump(configClassFile);
     }
 

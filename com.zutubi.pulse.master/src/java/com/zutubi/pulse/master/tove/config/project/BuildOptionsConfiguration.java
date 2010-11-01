@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.Undefined;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Numeric;
 
 /**
@@ -28,6 +28,13 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     private boolean logCompressionEnabled = true;
 
     private int priority = Undefined.INTEGER;
+
+    /**
+     * The number of concurrent builds that are allowed for this
+     * project.
+     */
+    @Numeric(min = 1)
+    private int concurrentBuilds = 1;
 
     public BuildOptionsConfiguration()
     {
@@ -127,5 +134,15 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setPriority(int priority)
     {
         this.priority = priority;
+    }
+
+    public void setConcurrentBuilds(int concurrentBuilds)
+    {
+        this.concurrentBuilds = concurrentBuilds;
+    }
+
+    public int getConcurrentBuilds()
+    {
+        return concurrentBuilds;
     }
 }

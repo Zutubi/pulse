@@ -152,6 +152,7 @@
                 <ref local="addTerminatedResultStateToConfigurations"/>
                 <ref local="addPriorityToBuildConfigurations"/>
                 <ref local="updateBuildColumnPreferences"/>
+                <ref local="addConcurrentBuilds"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -777,4 +778,9 @@
     <bean id="updateBuildColumnPreferences" class="com.zutubi.pulse.master.upgrade.tasks.UpdateBuildColumnPreferencesUpgradeTask">
         <property name="buildNumber" value="202999006"/>
     </bean>
+
+    <bean id="addConcurrentBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddConcurrentBuildsFieldUpgradeTask">
+        <property name="buildNumber" value="202999007"/>
+    </bean>
+
 </beans>

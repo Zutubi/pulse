@@ -1,12 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -14,7 +12,6 @@ import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -28,7 +25,6 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
@@ -40,6 +36,11 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  */
@@ -846,6 +847,22 @@ public class XmlRpcHelper
         callTest("enqueueSynchronisationMessage", agent, synchronous, description, succeed);
     }
 
+    /**
+     * A utility method that cancels all queued builds and cancels any builds that are still
+     * running.
+     *
+     * @throws Exception on error.
+     */
+    public void cancelIncompleteBuilds() throws Exception
+    {
+        for (Hashtable<String, Object> queuedRequest : getBuildQueueSnapshot())
+        {
+            cancelQueuedBuildRequest(queuedRequest.get("id").toString());
+        }
+
+        callTest("cancelIncompleteBuilds");
+    }
+
     public int getNextBuildNumber(String projectName) throws Exception
     {
         return (Integer) call("getNextBuildNumber", projectName);
@@ -1087,6 +1104,39 @@ public class XmlRpcHelper
         }
     }
 
+    /**
+     * Wait for a build for the specified project to be present in the build queue.
+     *
+     * @param projectName   the name of the project we are waiting on
+     * @throws Exception is thrown on error.
+     */
+    public void waitForBuildInQueue(final String projectName) throws Exception
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    Vector<Hashtable<String, Object>> queueSnapshot = getBuildQueueSnapshot();
+                    for (Hashtable<String, Object> queuedItem : queueSnapshot)
+                    {
+                        String owner = (String) queuedItem.get("owner");
+                        if (owner.compareTo(projectName) == 0)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, BUILD_TIMEOUT, "build for project " + projectName + " to queue");
+    }
+
     public void waitForBuildInProgress(final String projectName, final int number) throws Exception
     {
         waitForBuildInProgress(projectName, number, BUILD_TIMEOUT);
@@ -1114,7 +1164,7 @@ public class XmlRpcHelper
      * 
      * @throws Exception if the build is not yet PENDING.
      */
-    public void watiForBuildInPending(final String projectName, final int number) throws Exception
+    public void waitForBuildInPending(final String projectName, final int number) throws Exception
     {
         waitForBuildInState(projectName, number, ResultState.PENDING, BUILD_TIMEOUT);
     }

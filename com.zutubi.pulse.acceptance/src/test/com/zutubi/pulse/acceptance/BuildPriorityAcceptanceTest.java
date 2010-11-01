@@ -3,17 +3,17 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Set of acceptance tests that work on testing builds priorities.
@@ -26,8 +26,6 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private ProjectConfigurations projects;
     private BuildRunner buildRunner;
 
-    private List<String> createdProjects = new LinkedList<String>();
-    
     private File tempDir;
 
     @Override
@@ -48,27 +46,11 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
     @Override
     protected void tearDown() throws Exception
     {
+        xmlRpcHelper.cancelIncompleteBuilds();
+        xmlRpcHelper.logout();
+
         removeDirectory(tempDir);
 
-        // Cancel any builds that are still running so that they
-        // do not block subsequent builds.
-
-        for (Hashtable<String, Object> queuedRequest : xmlRpcHelper.getBuildQueueSnapshot())
-        {
-            xmlRpcHelper.cancelQueuedBuildRequest(queuedRequest.get("id").toString());
-        }
-
-        for (String projectName : createdProjects)
-        {
-            if (xmlRpcHelper.getProjectState(projectName).isBuilding())
-            {
-                xmlRpcHelper.cancelBuild(projectName, 1);
-                xmlRpcHelper.waitForProjectToBeIdle(projectName);
-            }
-        }
-
-        xmlRpcHelper.logout();
-                
         super.tearDown();
     }
 
@@ -240,9 +222,9 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildRunner.triggerBuild(projectC);
         buildRunner.triggerBuild(projectD, asPair("priority", (Object)10));
 
-        xmlRpcHelper.watiForBuildInPending(projectB.getName(), 1);
-        xmlRpcHelper.watiForBuildInPending(projectC.getName(), 1);
-        xmlRpcHelper.watiForBuildInPending(projectD.getName(), 1);
+        xmlRpcHelper.waitForBuildInPending(projectB.getName(), 1);
+        xmlRpcHelper.waitForBuildInPending(projectC.getName(), 1);
+        xmlRpcHelper.waitForBuildInPending(projectD.getName(), 1);
 
         projectA.releaseBuild();
 
@@ -256,7 +238,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // still in the build queue.
         xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
         assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
-        xmlRpcHelper.watiForBuildInPending(projectE.getName(), 1);
+        xmlRpcHelper.waitForBuildInPending(projectE.getName(), 1);
 
         projectB.releaseBuild();
 
@@ -281,7 +263,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
                 xmlRpcHelper.waitForBuildInProgress(current.getName(), 1);
                 for (WaitProject project : remaining)
                 {
-                    xmlRpcHelper.watiForBuildInPending(project.getName(), 1);
+                    xmlRpcHelper.waitForBuildInPending(project.getName(), 1);
                 }
                 current.releaseBuild();
                 xmlRpcHelper.waitForBuildToComplete(current.getName(), 1);
@@ -314,7 +296,6 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         for (WaitProject project: projects)
         {
             configurationHelper.insertProject(project.getConfig(), false);
-            createdProjects.add(project.getConfig().getName());
         }
     }
 }
