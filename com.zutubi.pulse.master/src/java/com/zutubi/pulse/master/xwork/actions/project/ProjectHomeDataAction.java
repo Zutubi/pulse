@@ -38,6 +38,8 @@ import java.util.Set;
  */
 public class ProjectHomeDataAction extends ProjectActionBase
 {
+    private static final Messages PROJECT_I18N = Messages.getInstance(ProjectConfiguration.class);
+
     private static final String LINK_HOMEPAGE = "homepage";
 
     private ProjectHomeModel model;
@@ -56,13 +58,6 @@ public class ProjectHomeDataAction extends ProjectActionBase
     public String execute()
     {
         Project project = getRequiredProject();
-
-        ProjectHomeModel.StateModel state = new ProjectHomeModel.StateModel(EnumUtils.toPrettyString(project.getState()), project.isTransitionValid(Project.Transition.PAUSE), project.isTransitionValid(Project.Transition.RESUME));
-        ProjectHomeModel.StatisticsModel statistics = new ProjectHomeModel.StatisticsModel(
-                buildManager.getBuildCount(project, ResultState.getCompletedStates()),
-                buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS}),
-                buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE})
-        ); 
         
         // Get queued builds first, so we can detect a race with a build moving
         // from queued to active.
@@ -87,62 +82,95 @@ public class ProjectHomeDataAction extends ProjectActionBase
             }
         });
 
-        ProjectHomeModel.StatusModel status = new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.fromLatestBuild(latest)), state, statistics); 
-        model = new ProjectHomeModel(status);
+        ProjectConfiguration projectConfig = project.getConfig();
+        BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(projectConfig.getChangeViewer());
 
-        final ProjectConfiguration projectConfig = project.getConfig();
-        CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
-        BuildResultToModelMapping toModelMapping = new BuildResultToModelMapping(projectConfig.getChangeViewer());
-        CollectionUtils.map(inProgress, toModelMapping, model.getActivity());
-
-        if (latest != null)
-        {
-            model.setLatest(toModelMapping.map(latest));
-        }
-
-        CollectionUtils.map(completed, toModelMapping, model.getRecent());
-        
-        List<PersistentChangelist> latestChanges = buildManager.getLatestChangesForProject(project, 10);
-        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ProjectHomeModel.ChangelistModel>()
-        {
-            public ProjectHomeModel.ChangelistModel map(PersistentChangelist persistentChangelist)
-            {
-                return new ProjectHomeModel.ChangelistModel(persistentChangelist, projectConfig);
-            }
-        }, model.getChanges());
-        
-        File contentRoot = systemPaths.getContentRoot();
-        Messages messages = Messages.getInstance(ProjectConfiguration.class);
-        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        if (accessManager.hasPermission(AccessManager.ACTION_WRITE, projectConfig))
-        {
-            model.addLink(new ActionLink(urls.adminProject(project), messages.format(AccessManager.ACTION_WRITE + ConfigurationLinks.KEY_SUFFIX_LABEL), AccessManager.ACTION_WRITE));
-        }
-
-        String url = projectConfig.getUrl();
-        if (StringUtils.stringSet(url))
-        {
-            model.setUrl(url);
-            model.addLink(new ActionLink(url, messages.format(LINK_HOMEPAGE + ConfigurationLinks.KEY_SUFFIX_LABEL), LINK_HOMEPAGE));
-        }
-
-        List<String> availableActions = actionManager.getActions(projectConfig, false, true);
-        for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN, ACTION_TRIGGER, ACTION_REBUILD))
-        {
-            if (availableActions.contains(candidateAction))
-            {
-                model.addAction(ToveUtils.getActionLink(candidateAction, messages, contentRoot));
-            }
-        }
-
-        addResponsibilityActions(project, messages, contentRoot);
-        addViewWorkingCopyAction(project, messages, contentRoot);
+        model = new ProjectHomeModel(createStatusModel(latest));
+        addActivity(queued, inProgress, buildMapping);
+        addLatest(latest, buildMapping);
+        addRecent(completed, buildMapping);
+        addChanges();
+        addLinks();
+        addActions();
 
         return SUCCESS;
     }
 
-    private void addResponsibilityActions(Project project, Messages messages, File contentRoot)
+    private ProjectHomeModel.StatusModel createStatusModel(BuildResult latest)
     {
+        Project project = getProject();
+        
+        ProjectHomeModel.StateModel state = new ProjectHomeModel.StateModel(
+                EnumUtils.toPrettyString(project.getState()),
+                project.isTransitionValid(Project.Transition.PAUSE),
+                project.isTransitionValid(Project.Transition.RESUME)
+        );
+        
+        ProjectHomeModel.StatisticsModel statistics = new ProjectHomeModel.StatisticsModel(
+                buildManager.getBuildCount(project, ResultState.getCompletedStates()),
+                buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS}),
+                buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE})
+        );
+        
+        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.fromLatestBuild(latest)), state, statistics);
+    }
+
+    private void addActivity(List<QueuedRequest> queued, List<BuildResult> inProgress, BuildResultToModelMapping buildMapping)
+    {
+        ProjectConfiguration projectConfig = getProject().getConfig();
+        CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
+        CollectionUtils.map(inProgress, buildMapping, model.getActivity());
+    }
+
+    private void addLatest(BuildResult latest, BuildResultToModelMapping buildMapping)
+    {
+        if (latest != null)
+        {
+            model.setLatest(buildMapping.map(latest));
+        }
+    }
+
+    private void addRecent(List<BuildResult> completed, BuildResultToModelMapping buildMapping)
+    {
+        CollectionUtils.map(completed, buildMapping, model.getRecent());
+    }
+
+    private void addLinks()
+    {
+        Project project = getProject();
+        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
+        if (accessManager.hasPermission(AccessManager.ACTION_WRITE, project.getConfig()))
+        {
+            model.addLink(new ActionLink(urls.adminProject(project), PROJECT_I18N.format(AccessManager.ACTION_WRITE + ConfigurationLinks.KEY_SUFFIX_LABEL), AccessManager.ACTION_WRITE));
+        }
+
+        String url = project.getConfig().getUrl();
+        if (StringUtils.stringSet(url))
+        {
+            model.setUrl(url);
+            model.addLink(new ActionLink(url, PROJECT_I18N.format(LINK_HOMEPAGE + ConfigurationLinks.KEY_SUFFIX_LABEL), LINK_HOMEPAGE));
+        }
+    }
+
+    private void addActions()
+    {
+        File contentRoot = systemPaths.getContentRoot();
+        List<String> availableActions = actionManager.getActions(getProject().getConfig(), false, true);
+        for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN, ACTION_TRIGGER, ACTION_REBUILD))
+        {
+            if (availableActions.contains(candidateAction))
+            {
+                model.addAction(ToveUtils.getActionLink(candidateAction, PROJECT_I18N, contentRoot));
+            }
+        }
+
+        addResponsibilityActions(PROJECT_I18N, contentRoot);
+        addViewWorkingCopyAction(PROJECT_I18N, contentRoot);
+    }
+
+    private void addResponsibilityActions(Messages messages, File contentRoot)
+    {
+        Project project = getProject();
         ProjectResponsibility projectResponsibility = project.getResponsibility();
         if (projectResponsibility == null && accessManager.hasPermission(ACTION_TAKE_RESPONSIBILITY, project))
         {
@@ -164,16 +192,28 @@ public class ProjectHomeDataAction extends ProjectActionBase
         }
     }
 
-    private void addViewWorkingCopyAction(Project project, Messages messages, File contentRoot)
+    private void addViewWorkingCopyAction(Messages messages, File contentRoot)
     {
-        ProjectConfiguration config = project.getConfig();
+        ProjectConfiguration config = getProject().getConfig();
         if (config.getScm().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)
         {
-            if (accessManager.hasPermission(ACTION_VIEW_SOURCE, project))
+            if (accessManager.hasPermission(ACTION_VIEW_SOURCE, getProject()))
             {
                 model.addAction(ToveUtils.getActionLink(ACTION_VIEW_SOURCE, messages, contentRoot));
             }
         }
+    }
+
+    private void addChanges()
+    {
+        List<PersistentChangelist> latestChanges = buildManager.getLatestChangesForProject(getProject(), 10);
+        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ProjectHomeModel.ChangelistModel>()
+        {
+            public ProjectHomeModel.ChangelistModel map(PersistentChangelist persistentChangelist)
+            {
+                return new ProjectHomeModel.ChangelistModel(persistentChangelist, getProject().getConfig());
+            }
+        }, model.getChanges());
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

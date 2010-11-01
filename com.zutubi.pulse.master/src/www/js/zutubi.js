@@ -21,7 +21,6 @@ function getBuildMenuItem(buildLink, itemId, image)
 
 function getBuildMenuItems(buildLink)
 {
-console.log(buildLink);
     return [
         getBuildMenuItem(buildLink, 'summary', 'information.gif'),
         getBuildMenuItem(buildLink, 'logs', 'script.gif'),
