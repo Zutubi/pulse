@@ -19,16 +19,19 @@ public class CollectionUtils
      */
     public static <T> List<T> filterInPlace(Collection<T> l, Predicate<T> p)
     {
-        final List<T> keepItems = filter(l, p);
-        List<T> removeItems = filter(l, new Predicate<T>()
+        List<T> removedItems = new LinkedList<T>();
+        Iterator<T> it = l.iterator();
+        while (it.hasNext())
         {
-            public boolean satisfied(T t)
+            T value = it.next();
+            if (!p.satisfied(value))
             {
-                return !keepItems.contains(t);
+                it.remove();
+                removedItems.add(value);
             }
-        });
-        l.removeAll(removeItems);
-        return removeItems;
+        }
+        
+        return removedItems;
     }
 
     public static <T> List<T> filter(Iterable<T> l, Predicate<T> p)

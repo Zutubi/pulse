@@ -2,9 +2,9 @@ package com.zutubi.util;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.math.IntegerAddition;
+import static java.util.Arrays.asList;
 
 import java.util.*;
-import static java.util.Arrays.asList;
 
 public class CollectionUtilsTest extends ZutubiTestCase
 {
@@ -243,7 +243,7 @@ public class CollectionUtilsTest extends ZutubiTestCase
                         new TreeNode<String>("2-3")));
     }
 
-    public void testFilterInplace()
+    public void testFilterInPlace()
     {
         List<Object> list = new LinkedList<Object>(Arrays.asList((Object)"a", 1, "b", 2));
         List<Object> filtered = CollectionUtils.filterInPlace(list, new InstanceOfPredicate(String.class));
