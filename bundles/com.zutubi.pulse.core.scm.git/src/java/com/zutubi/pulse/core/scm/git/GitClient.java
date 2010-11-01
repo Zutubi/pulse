@@ -4,16 +4,17 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
@@ -411,16 +412,7 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
-            List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
-
-            // if revision to < from, then the base log request will return no results.  So
-            // lets try it the other way around.
-            if (entries.size() == 0)
-            {
-                entries = git.log(getRevisionString(to), getRevisionString(from));
-                entries = CollectionUtils.reverse(entries);
-            }
+            List<GitLogEntry> entries = gitlog(context, from, to);
 
             List<Revision> revisions = new LinkedList<Revision>();
             for (GitLogEntry entry : entries)
@@ -440,16 +432,7 @@ public class GitClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
-            List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
-
-            // if revision to < from, then the base log request will return no results.  So
-            // lets try it the other way around.
-            if (entries.size() == 0)
-            {
-                entries = git.log(getRevisionString(to), getRevisionString(from));
-                entries = CollectionUtils.reverse(entries);
-            }
+            List<GitLogEntry> entries = gitlog(context, from, to);
 
             // be aware, the log contains duplicate file entries for the edit/delete case.
 
@@ -497,6 +480,32 @@ public class GitClient implements ScmClient
         {
             context.unlock();
         }
+    }
+
+    /**
+     * Run a native git log between the two revisions.  The order of the
+     * revisions is not important.
+     *
+     * @param context   the scm context
+     * @param from      one end of the git log range
+     * @param to        the other end of the git log range
+     * @return  list of entries between the specified revision range.
+     * 
+     * @throws ScmException on error
+     */
+    private List<GitLogEntry> gitlog(ScmContext context, Revision from, Revision to) throws ScmException
+    {
+        NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+        List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
+
+        // if revision to < from, then the base log request will return no results.  So
+        // lets try it the other way around.
+        if (entries.size() == 0)
+        {
+            entries = git.log(getRevisionString(to), getRevisionString(from));
+            entries = CollectionUtils.reverse(entries);
+        }
+        return entries;
     }
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
