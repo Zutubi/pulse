@@ -5,15 +5,15 @@
  * A heading used to delineate sections of a page.
  *
  * @cfg {String} text Heading text.
+ * @cfg {String} cls  CSS class used to style this element (defaults to xz-sectionheading).
  */
 Zutubi.pulse.SectionHeading = Ext.extend(Ext.BoxComponent, {
-    cls: 'hpad',
-    style: 'margin-top: 7px',
+    cls: 'xz-sectionheading',
     
     onRender: function(container, position) {
         if (!this.template)
         {
-            this.template = new Ext.Template('<h2>:: {text} ::</h2>');
+            this.template = new Ext.Template('<h2 class="{cls}">:: {text} ::</h2>');
         }
 
         if (position)

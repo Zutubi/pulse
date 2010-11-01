@@ -27,6 +27,11 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
         Zutubi.layout.VerticalTableLayout.superclass.onLayout.apply(this, arguments);        
     },
     
+    /**
+     * Checks for rows that include no displayed child DOM nodes and hides any
+     * that are found (otherwise spacing would still exist for rows with no
+     * content).
+     */
     checkRows: function() {
         var rows = this.table.tBodies[0].childNodes;
         for (var i = 0, l = rows.length; i < l; i++)

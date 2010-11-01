@@ -707,6 +707,12 @@ div.xz-summary-tb
     padding: 3px;
 }
 
+.xz-sectionheading
+{
+    margin-top: 7px;
+    padding: 0 17px;
+}
+
 .xz-summary-remove
 {
     float: right;

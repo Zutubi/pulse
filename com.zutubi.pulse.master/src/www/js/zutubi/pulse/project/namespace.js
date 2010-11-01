@@ -1,14 +1,36 @@
 // dependency: zutubi/pulse/namespace.js
 
+/**
+ * A namespace for functionality that relates to Pulse projects and builds.
+ */
 window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
+    /**
+     * Returns the src attribute value for an image of a given type and value.
+     *
+     * @param type  designates what type of image (which translates to where it is located)
+     * @param value the pretty form of an enumeration constant identifying the specific image
+     */
     imageSource: function(type, value) {
         return window.baseUrl + '/images/' + type + '/' + value.replace(' ', '').toLowerCase() + '.gif';
     },
     
+    /**
+     * Returns an HTML fragment with an image and label, for example a build status icon and
+     * pretty status value.
+     *
+     * @param type  designates the type of value (e.g. 'health', 'status')
+     * @param value the label in the final fragment (usually the pretty form of an enumeration
+     *              constant)
+     */
     imageLabel: function(type, value) {
         return '<img alt="' + value + '" src="' + Zutubi.pulse.project.imageSource(type, value) + '"/> ' + value;    
     },
-        
+    
+    /**
+     * A collection of renderers: functions that take a value, and perhaps some context, and
+     * render that value into an HTML fragment.  For example, renderers are supplied for various
+     * project and build properties like health and revisions.
+     */
     renderers: {
         link: function(value, data) {
             var result = '';
@@ -355,7 +377,15 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
 };
 
 Ext.apply(Zutubi.pulse.project, {
+    /**
+     * A collection of KeyValue configurations that can be used to build tables for displaying
+     * projects, builds, changelists etc.
+     */
     configs: {
+        /**
+         * Configurations for build properties.  The names correspond to custom column keys stored
+         * in user preferences.
+         */
         build: {
             id: {
                 name: 'id',
@@ -426,6 +456,9 @@ Ext.apply(Zutubi.pulse.project, {
             }
         },
 
+        /**
+         * Configurations for changelist properties.
+         */
         changelist: {
             rev: {
                 name: 'revision',
