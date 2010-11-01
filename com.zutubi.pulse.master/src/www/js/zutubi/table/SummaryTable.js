@@ -29,7 +29,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         this.cellTemplate = new Ext.XTemplate('<td class="idx-{index} <tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>{cls}">{value}</td>');
         this.headerTemplate = new Ext.XTemplate(
             '<th class="idx-{index} xz-summary-sortable {cls}<tpl if="first"> leftmost</tpl><tpl if="last"> rightmost</tpl>">' +
-                '<span class="xz-summary-remove"><img src="{[window.baseUrl]}/images/delete.gif"/></span>' +
+                '<span class="xz-summary-remove"><img ext:qtip="remove this column" src="{[window.baseUrl]}/images/delete.gif"/></span>' +
                 '{value}' +
             '</th>'
         );
@@ -203,7 +203,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     },
     
     generateRow: function(tag, data) {
-        var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">';
+        var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + ' xz-summary-data">';
         
         var columnCount = this.activeColumns.length;
         for (var i = 0; i < columnCount; i++)
@@ -343,6 +343,8 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
                     }
                 }
             }, {
+                xtype: 'button',
+                tooltip: 'add selected column',
                 icon: window.baseUrl + '/images/add.gif',
                 listeners: {
                     click: function() {
@@ -354,6 +356,10 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
                     }
                 }
             }, ' ', {
+                xtype: 'button',
+                enableToggle: true,
+                pressed: true,
+                tooltip: 'save customisations',
                 icon: window.baseUrl + '/images/pencil.gif',
                 listeners: {
                     click: function(button) {

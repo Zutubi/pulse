@@ -719,9 +719,21 @@ div.xz-summary-tb
     display: none;
 }
 
+.xz-summary-customising .xz-summary-sortable
+{
+    cursor: move;
+}
+
 .xz-summary-customising .xz-summary-remove
 {
     display: inline;
+    cursor: default;
+}
+
+.xz-summary-customising .xz-summary-data
+{
+    opacity: 0.25;
+    background: #eee;
 }
 
 .project-row td

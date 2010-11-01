@@ -41,7 +41,7 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
                             '<tpl if="customisable">' +
                                 '<span style="float: right">' +
                                     '<a href="#" class="unadorned" onclick="Ext.getCmp(\'{id}\').customise(); return false">' +
-                                        '<img alt="customise" src="{[window.baseUrl]}/images/pencil.gif"/>' +
+                                        '<img ext:qtip="customise this table" alt="customise" src="{[window.baseUrl]}/images/pencil.gif"/>' +
                                     '</a>' +
                                 '</span>' +
                             '</tpl>' +
