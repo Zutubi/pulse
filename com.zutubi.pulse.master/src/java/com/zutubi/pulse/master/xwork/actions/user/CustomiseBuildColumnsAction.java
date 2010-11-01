@@ -10,6 +10,10 @@ import com.zutubi.util.StringUtils;
  */
 public class CustomiseBuildColumnsAction extends UserActionSupport
 {
+    private static final String ID_MY_BUILDS_BUILDS = "my-builds-builds";
+    private static final String ID_PROJECT_RECENT = "project-recent";
+    private static final String ID_PROJECT_HISTORY = "project-history";
+
     private String tableId;
     private String columns;
     private ConfigurationProvider configurationProvider;
@@ -38,15 +42,15 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
         }
 
         UserPreferencesConfiguration preferences = configurationProvider.deepClone(user.getPreferences());
-        if (tableId.equals("my-builds-builds"))
+        if (tableId.equals(ID_MY_BUILDS_BUILDS))
         {
             preferences.setMyBuildsColumns(columns);
         }
-        else if (tableId.equals("project-recent"))
+        else if (tableId.equals(ID_PROJECT_RECENT))
         {
             preferences.setProjectRecentColumns(columns);
         }
-        else if (tableId.equals("project-history"))
+        else if (tableId.equals(ID_PROJECT_HISTORY))
         {
             preferences.setProjectHistoryColumns(columns);
         }
