@@ -34,6 +34,9 @@ public class SubversionClient implements ScmClient
 
     private static final Logger LOG = Logger.getLogger(ScmClient.class);
 
+    private static final String PROPERTY_HTTP_AUTH_METHODS = "svnkit.http.methods";
+    private static final String HTTP_AUTH_METHODS = "Digest,Basic,Negotiate,NTLM";
+
     private boolean useExport = false;
     /**
      * If true, we will monitor all externals by recursively scanning for
@@ -57,7 +60,7 @@ public class SubversionClient implements ScmClient
     private String uid;
 
     private String url;
-
+    
     //=======================================================================
     // Implementation
     //=======================================================================
@@ -127,7 +130,10 @@ public class SubversionClient implements ScmClient
     {
         // Workaround for CIB-1978, SvnKit bug 238:
         // http://svnkit.com/tracker/bug_view_advanced_page.php?bug_id=283
-        System.setProperty("svnkit.http.methods", "Negotiate,Digest,Basic,NTLM");
+        if (System.getProperty(PROPERTY_HTTP_AUTH_METHODS) == null)
+        {
+            System.setProperty(PROPERTY_HTTP_AUTH_METHODS, HTTP_AUTH_METHODS);
+        }
 
         // Initialise SVN library
         if (enableHttpSpooling)
