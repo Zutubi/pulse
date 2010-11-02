@@ -155,7 +155,9 @@ public class ProjectsModelsHelper
             for (Project p : projects)
             {
                 boolean prompt = p.getConfig().getOptions().getPrompt();
-                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, prompt, getAvailableActions(p)));
+                ConcreteProjectModel child = new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, prompt, getAvailableActions(p));
+                child.setHealth(ProjectHealth.getHealth(buildManager, p));
+                model.getRoot().addChild(child);
             }
         }
 
@@ -182,7 +184,9 @@ public class ProjectsModelsHelper
                             builds = getBuilds(project, configuration, buildCache);
                             prompt = project.getConfig().getOptions().getPrompt();
                         }
-                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project));
+                        ConcreteProjectModel concreteModel = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project));
+                        concreteModel.setHealth(ProjectHealth.getHealth(buildManager, project));
+                        model = concreteModel;
                     }
                     else
                     {

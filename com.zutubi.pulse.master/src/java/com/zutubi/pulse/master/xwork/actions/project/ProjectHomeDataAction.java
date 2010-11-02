@@ -15,7 +15,6 @@ import com.zutubi.pulse.master.model.BuildResultToNumberMapping;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -26,12 +25,14 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -85,7 +86,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         ProjectConfiguration projectConfig = project.getConfig();
         BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(projectConfig.getChangeViewer());
 
-        model = new ProjectHomeModel(createStatusModel(latest));
+        model = new ProjectHomeModel(createStatusModel());
         addActivity(queued, inProgress, buildMapping);
         addLatest(latest, buildMapping);
         addRecent(completed, buildMapping);
@@ -96,7 +97,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private ProjectHomeModel.StatusModel createStatusModel(BuildResult latest)
+    private ProjectHomeModel.StatusModel createStatusModel()
     {
         Project project = getProject();
         
@@ -112,7 +113,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
                 buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE})
         );
         
-        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.fromLatestBuild(latest)), state, statistics);
+        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.getHealth(buildManager, project)), state, statistics);
     }
 
     private void addActivity(List<QueuedRequest> queued, List<BuildResult> inProgress, BuildResultToModelMapping buildMapping)

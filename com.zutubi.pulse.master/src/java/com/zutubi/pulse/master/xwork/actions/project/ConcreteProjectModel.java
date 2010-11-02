@@ -26,7 +26,7 @@ public class ConcreteProjectModel extends ProjectModel
     private static final int MAX_COMMENT_LENGTH = 60;
 
     private String projectName;
-    private ProjectHealth health;
+    private ProjectHealth health = ProjectHealth.UNKNOWN;
     private String responsibleMessage;
     private String responsibleComment;
     private boolean built;
@@ -43,7 +43,6 @@ public class ConcreteProjectModel extends ProjectModel
 
         projectName = project.getName();
         projectId = project.getId();
-        health = ProjectHealth.fromLatestBuilds(latestBuilds);
 
         ProjectResponsibility responsibility = project.getResponsibility();
         if (responsibility != null)
@@ -81,6 +80,11 @@ public class ConcreteProjectModel extends ProjectModel
     public long getProjectId()
     {
         return projectId;
+    }
+
+    public void setHealth(ProjectHealth health)
+    {
+        this.health = health;
     }
 
     public ProjectHealth latestHealth()

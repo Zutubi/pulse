@@ -395,6 +395,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         
         helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 3);
+        verify(buildManager).getLatestCompletedBuildResult(p1);
         verifyNoMoreInteractions(buildManager);
     }
 
@@ -405,6 +406,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         stub(buildManager.getLatestBuildResultsForProject((Project) anyObject(), anyInt())).toReturn(Arrays.asList(createBuild(p1, 2), createBuild(p1, 1)));
         List<ProjectsModel> models = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 2);
+        verify(buildManager).getLatestCompletedBuildResult(p1);
         verifyNoMoreInteractions(buildManager);
 
         ConcreteProjectModel model = (ConcreteProjectModel) models.get(0).getRoot().getChildren().get(0);

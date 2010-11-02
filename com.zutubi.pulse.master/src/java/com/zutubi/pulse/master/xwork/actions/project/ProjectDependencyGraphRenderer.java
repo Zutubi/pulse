@@ -4,7 +4,6 @@ import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraph;
 import com.zutubi.pulse.master.dependency.SimpleTreeLayoutAlgorithm;
 import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 
@@ -89,8 +88,7 @@ public class ProjectDependencyGraphRenderer
 
         // Fill the cell at our position, and mark the one below dead.
         DependencyGraphData data = node.getData().first;
-        BuildResult latestBuild = buildManager.getLatestCompletedBuildResult(data.getProject());
-        grid.getCell(position).setData(ProjectDependencyData.makeBox(data, ProjectHealth.fromLatestBuild(latestBuild), urls.projectHome(data.getProject()), root));
+        grid.getCell(position).setData(ProjectDependencyData.makeBox(data, ProjectHealth.getHealth(buildManager, data.getProject()), urls.projectHome(data.getProject()), root));
         grid.getCell(position.down()).setData(ProjectDependencyData.makeDead());
 
         if (!node.isLeaf())
