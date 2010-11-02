@@ -10,7 +10,7 @@ This context exports:
 
     quartzScheduler: Used by the scheduler, the quartz scheduler provides access to temporal scheduling.
                      It is recommended that all scheduling be done via the scheduler interface. However,
-                     if this interface is inappropirate, the quartzScheduler is also available.
+                     if this interface is inappropriate, the quartzScheduler is also available.
 
     callbackService: a service that provides a convenient interface for registering a procedure to be
                      called at some point in the future.
@@ -31,6 +31,7 @@ This context requires:
 
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="threadFactory" ref="threadFactory"/>
+        <property name="corePoolSize" value="5"/>
     </bean>
 
     <bean id="quartzJobFactory" class="com.zutubi.pulse.master.bootstrap.quartz.SpringJobFactory" init-method="init">
