@@ -5,13 +5,6 @@ import com.zutubi.util.junit.ZutubiTestCase;
 public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
 {
     protected SchedulerStrategy scheduler = null;
-    protected TestTriggerHandler triggerHandler = null;
-
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        triggerHandler = new TestTriggerHandler();
-    }
 
     public void testTaskExecutedOnTrigger() throws SchedulingException
     {
@@ -19,18 +12,18 @@ public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
         scheduler.schedule(trigger);
 
         // test.
-        assertFalse(triggerHandler.wasTriggered());
+        assertFalse(getHandler().wasTriggered());
         activateTrigger(trigger);
-        assertTrue(triggerHandler.wasTriggered());
+        assertTrue(getHandler().wasTriggered());
 
         // unschedule
-        triggerHandler.reset();
+        getHandler().reset();
         scheduler.unschedule(trigger);
 
         // test
-        assertFalse(triggerHandler.wasTriggered());
+        assertFalse(getHandler().wasTriggered());
         activateTrigger(trigger);
-        assertFalse(triggerHandler.wasTriggered());
+        assertFalse(getHandler().wasTriggered());
     }
 
     public void testPauseTrigger() throws SchedulingException
@@ -65,4 +58,5 @@ public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
 
     protected abstract Trigger createTrigger();
     protected abstract void activateTrigger(Trigger trigger) throws SchedulingException;
+    protected abstract TestTriggerHandler getHandler();
 }

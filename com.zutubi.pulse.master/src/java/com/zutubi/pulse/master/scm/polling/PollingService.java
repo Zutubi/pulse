@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.scm.polling;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -21,7 +22,6 @@ import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.i18n.Messages;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -36,7 +36,7 @@ public class PollingService implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(PollingService.class);
     private static final Messages I18N = Messages.getInstance(PollingService.class);
-
+    private static final String CALLBACK_NAME = "Polling";
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
 
@@ -72,7 +72,7 @@ public class PollingService implements Stoppable
 
         try
         {
-            callbackService.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
             {
                 public void run()
                 {

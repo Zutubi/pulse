@@ -25,6 +25,7 @@ public class DevAcceptanceTestSuite
 
         suite.addTestSuite(RssAcceptanceTest.class);
         suite.addTestSuite(HibernateStatisticsAcceptanceTest.class);
+        suite.addTestSuite(QuartzStatisticsAcceptanceTest.class);
 
         //---( web ui acceptance tests )---
         suite.addTestSuite(AgentsSectionAcceptanceTest.class);

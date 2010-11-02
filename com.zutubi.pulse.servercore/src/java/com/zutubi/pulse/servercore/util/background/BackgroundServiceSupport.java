@@ -77,6 +77,16 @@ public class BackgroundServiceSupport implements Stoppable
     }
 
     /**
+     * Get a human readable name for this service.
+     *
+     * @return name
+     */
+    public String getServiceName()
+    {
+        return serviceName;
+    }
+
+    /**
      * Provides access to subclasses to the executor service that should be
      * used for submission of background tasks.
      *

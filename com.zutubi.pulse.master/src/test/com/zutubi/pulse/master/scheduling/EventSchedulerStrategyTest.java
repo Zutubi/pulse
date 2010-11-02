@@ -8,10 +8,13 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private EventManager eventManager;
+    private TestTriggerHandler triggerHandler;
 
     public void setUp() throws Exception
     {
         super.setUp();
+
+        triggerHandler = new TestTriggerHandler();
 
         // add setup code here.
         scheduler = new EventSchedulerStrategy();
@@ -65,6 +68,12 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
     public void testTriggerCount() throws SchedulingException
     {
         super.testTriggerCount();
+    }
+
+    @Override
+    protected TestTriggerHandler getHandler()
+    {
+        return triggerHandler;
     }
 
     protected void activateTrigger(Trigger trigger)

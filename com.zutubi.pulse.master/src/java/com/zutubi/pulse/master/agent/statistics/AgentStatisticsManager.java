@@ -24,6 +24,7 @@ public class AgentStatisticsManager implements EventListener
     private static final Logger LOG = Logger.getLogger(AgentStatisticsManager.class);
 
     private static final long TRIGGER_INTERVAL = 5 * Constants.MINUTE;
+    private static final String CALLBACK_NAME = "Agent Statistics";
 
     private Map<Long, StampedStatus> agentIdToStatus = new HashMap<Long, StampedStatus>();
     private long todayStamp;
@@ -47,7 +48,7 @@ public class AgentStatisticsManager implements EventListener
     {
         try
         {
-            callbackService.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
             {
                 public void run()
                 {

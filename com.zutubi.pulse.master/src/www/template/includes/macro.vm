@@ -1098,20 +1098,6 @@
 #end
 
 <!--- quartz trigger state -->
-#macro( renderQuartzTriggerState $state)
-    #if ($state == -1)<span style='color:black;'>none</span>#end
-    #if ($state == 0)<span style='color:blue;'>normal</span>#end
-    #if ($state == 1)<span style='color:orange;'>paused</span>#end
-    #if ($state == 2)<span style='color:green;'>complete</span>#end
-    #if ($state == 3)<span style='color:red;'>error</span>#end
-    #if ($state == 4)<span style='color:red;'>blocked</span>#end
-#end
-
-#macro( renderTriggerState $state)
-    #if ($state.ordinal() == 0)<span style='color:blue;'>active</span>#end
-    #if ($state.ordinal() == 1)<span style='color:black;'>none</span>#end
-    #if ($state.ordinal() == 2)<span style='color:orange;'>paused</span>#end
-#end
 
 ##
 ## Shows a table row with pages and previous/next etc links.  Pager should be

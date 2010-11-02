@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -19,7 +18,6 @@ public class DefaultTriggerHandler implements TriggerHandler
     private static final Logger LOG = Logger.getLogger(DefaultTriggerHandler.class);
 
     private ObjectFactory objectFactory;
-    private TriggerDao triggerDao;
 
     private final Set<String> executingTriggers = new HashSet<String>();
 
@@ -31,12 +29,6 @@ public class DefaultTriggerHandler implements TriggerHandler
 
     public void fire(Trigger trigger, TaskExecutionContext context) throws SchedulingException
     {
-        // hack: need to handle the transactional nature of the runtime environment better.
-        if (trigger.isPersistent())
-        {
-            trigger = triggerDao.findById(trigger.getId());
-        }
-
         // do we want to execute this task?
         String triggerKey = trigger.getName() + ":" + trigger.getGroup();
         synchronized(executingTriggers)
@@ -95,10 +87,5 @@ public class DefaultTriggerHandler implements TriggerHandler
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
-    }
-
-    public void setTriggerDao(TriggerDao triggerDao)
-    {
-        this.triggerDao = triggerDao;
     }
 }

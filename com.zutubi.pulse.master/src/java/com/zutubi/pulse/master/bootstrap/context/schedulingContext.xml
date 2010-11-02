@@ -27,6 +27,7 @@ This context requires:
         <property name="taskExecutor">
             <ref local="taskExecutor"/>
         </property>
+        <property name="jobFactory" ref="quartzJobFactory"/>
     </bean>
 
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
@@ -34,10 +35,7 @@ This context requires:
         <property name="corePoolSize" value="5"/> 
     </bean>
 
-    <bean id="quartzJobFactory" class="com.zutubi.pulse.master.bootstrap.quartz.SpringJobFactory" init-method="init">
-        <property name="scheduler">
-            <ref local="quartzScheduler"/>
-        </property>
+    <bean id="quartzJobFactory" class="com.zutubi.pulse.master.scheduling.QuartzTaskJobFactory">
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
@@ -66,14 +64,13 @@ This context requires:
     </bean>
 
     <bean id="cronSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.CronSchedulerStrategy">
-        <property name="quartzScheduler">
-            <ref local="quartzScheduler"/>
-        </property>
+        <property name="quartzScheduler" ref="quartzScheduler"/>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
+
     <bean id="simpleSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.SimpleSchedulerStrategy">
-        <property name="quartzScheduler">
-            <ref local="quartzScheduler"/>
-        </property>
+        <property name="quartzScheduler" ref="quartzScheduler"/>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.EventSchedulerStrategy" autowire="byName">
@@ -101,7 +98,26 @@ This context requires:
 
     <bean id="triggerHandlerTarget" class="com.zutubi.pulse.master.scheduling.DefaultTriggerHandler">
         <property name="objectFactory" ref="objectFactory"/>
-        <property name="triggerDao" ref="triggerDao"/>
+    </bean>
+
+    <!--
+    wrap the callback job in a transaction (since it reloads persistent triggers) to
+    ensure any changes to the state of the trigger are persisted.
+     -->
+    <bean id="quartzTaskCallbackJob" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target">
+            <ref local="quartzTaskCallbackJobTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="quartzTaskCallbackJobTarget" class="com.zutubi.pulse.master.scheduling.QuartzTaskCallbackJob">
+        <property name="triggerHandler" ref="triggerHandler"/>
     </bean>
 
     <bean id="callbackService" class="com.zutubi.pulse.master.scheduling.CallbackService">

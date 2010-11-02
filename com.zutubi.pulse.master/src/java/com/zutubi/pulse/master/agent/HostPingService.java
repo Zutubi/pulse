@@ -191,7 +191,7 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
                 callbackService.unregisterCallback(pingHostsCallback);
             }
             pingHostsCallback = new PingHostsCallback();
-            callbackService.registerCallback(pingHostsCallback, agentPingConfig.getPingInterval() * Constants.SECOND);
+            callbackService.registerCallback(getServiceName(), pingHostsCallback, agentPingConfig.getPingInterval() * Constants.SECOND);
         }
         catch (Exception e)
         {

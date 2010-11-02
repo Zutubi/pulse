@@ -34,7 +34,7 @@ import java.util.List;
 public class CleanupScheduler implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(CleanupScheduler.class);
-
+    private static final String CALLBACK_NAME = "Cleanup";
     private EventManager eventManager;
     private EventListener eventListener;
     private CallbackService callbackService;
@@ -52,7 +52,7 @@ public class CleanupScheduler implements Stoppable
     {
         try
         {
-            callbackService.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
             {
                 public void run()
                 {

@@ -82,13 +82,13 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         super.init();
         eventManager.register(this);
 
-        callbackService.registerCallback(new NullaryProcedure()
+        callbackService.registerCallback(getServiceName(), new NullaryProcedure()
         {
             public void run()
             {
                 checkTimeouts();
             }
-        }, TIMEOUT_CHECK_INTERVAL);
+        }, TIMEOUT_CHECK_INTERVAL * Constants.SECOND);
     }
 
     void checkTimeouts()
@@ -98,7 +98,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         try
         {
             final long now = clock.getCurrentTimeMillis();
-            final long timeoutMillis = MESSAGE_TIMEOUT_SECONDS * 1000;
+            final long timeoutMillis = MESSAGE_TIMEOUT_SECONDS * Constants.SECOND;
 
             List<AgentSynchronisationMessage> processingMessages = agentManager.getProcessingSynchronisationMessages();
             List<AgentSynchronisationMessage> timedOutMessages = CollectionUtils.filter(processingMessages, new Predicate<AgentSynchronisationMessage>()

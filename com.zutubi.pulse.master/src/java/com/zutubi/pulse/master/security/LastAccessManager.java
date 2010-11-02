@@ -25,6 +25,7 @@ public class LastAccessManager
     public static final long ACTIVE_INTERVAL = 10 * Constants.MINUTE;
 
     private static final long FLUSH_INTERVAL = 5 * Constants.MINUTE;
+    private static final String CALLBACK_NAME = "Last Access";
 
     private final Map<Long, Long> idToTime = new HashMap<Long, Long>();
     private CallbackService callbackService;
@@ -35,7 +36,7 @@ public class LastAccessManager
     {
         try
         {
-            callbackService.registerCallback(new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
             {
                 public void run()
                 {

@@ -4,10 +4,11 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static com.zutubi.pulse.master.scheduling.CallbackService.CALLBACK_TRIGGER_GROUP;
-import static org.mockito.Mockito.*;
 
 import java.util.Date;
+
+import static com.zutubi.pulse.master.scheduling.CallbackService.CALLBACK_TRIGGER_GROUP;
+import static org.mockito.Mockito.*;
 
 public class CallbackServiceTest extends ZutubiTestCase
 {
@@ -56,32 +57,26 @@ public class CallbackServiceTest extends ZutubiTestCase
 
     public void testCallbackThrowingException() throws Exception
     {
-        // register the callback
         ExceptionCallback callback = new ExceptionCallback();
         callbackService.registerCallback(callback, 1);
-        verify(scheduler, times(1)).schedule((Trigger) anyObject());
 
-        // manually execute the task (as would happen when the scheduler strategy fires)
-        CallbackService.CallbackTask task = objectFactory.buildBean(CallbackService.CallbackTask.class);
-        TaskExecutionContext context = mock(TaskExecutionContext.class);
-        stub(context.getTrigger()).toReturn(new NoopTrigger("1", CALLBACK_TRIGGER_GROUP));
-
-        task.execute(context);
+        try
+        {
+            triggerCallback("1");
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
     }
 
     public void testCallback() throws SchedulingException
     {
-        // register the callback
         CountCallback callback = new CountCallback();
         callbackService.registerCallback(callback, 1);
         verify(scheduler, times(1)).schedule((Trigger) anyObject());
 
-        // manually execute the task (as would happen when the scheduler strategy fires)
-        CallbackService.CallbackTask task = objectFactory.buildBean(CallbackService.CallbackTask.class);
-        TaskExecutionContext context = mock(TaskExecutionContext.class);
-        stub(context.getTrigger()).toReturn(new NoopTrigger("1", CALLBACK_TRIGGER_GROUP));
-
-        task.execute(context);
+        triggerCallback("1");
 
         assertEquals(1, callback.getCount());
     }
@@ -97,6 +92,47 @@ public class CallbackServiceTest extends ZutubiTestCase
 
         assertTrue(callbackService.unregisterCallback(callback));
         verify(scheduler, times(1)).unschedule((Trigger) anyObject());
+    }
+
+    public void testNamedCallback() throws SchedulingException
+    {
+        CountCallback callback = new CountCallback();
+        callbackService.registerCallback("callback", callback, 1);
+        verify(scheduler, times(1)).schedule((Trigger) anyObject());
+
+        assertEquals(callback, callbackService.getCallback("callback"));
+
+        triggerCallback("callback");
+        assertEquals(1, callback.getCount());
+        
+        assertTrue(callbackService.unregisterCallback("callback"));
+        assertNull(callbackService.getCallback("callback"));
+    }
+
+    public void testMultipleCallbacksDistinct()
+    {
+        CountCallback callbackA = new CountCallback();
+        callbackService.registerCallback("a", callbackA, 1);
+        CountCallback callbackB = new CountCallback();
+        callbackService.registerCallback("b", callbackB, 1);
+
+        assertEquals(0, callbackA.getCount());
+        assertEquals(0, callbackB.getCount());
+
+        triggerCallback("a");
+
+        assertEquals(1, callbackA.getCount());
+        assertEquals(0, callbackB.getCount());
+    }
+
+    // manually execute the task (as would happen when the scheduler strategy fires)
+    private void triggerCallback(String name)
+    {
+        CallbackService.CallbackTask task = objectFactory.buildBean(CallbackService.CallbackTask.class);
+        TaskExecutionContext context = mock(TaskExecutionContext.class);
+        stub(context.getTrigger()).toReturn(new NoopTrigger(name, CALLBACK_TRIGGER_GROUP));
+
+        task.execute(context);
     }
 
     private static class ExceptionCallback extends CountCallback

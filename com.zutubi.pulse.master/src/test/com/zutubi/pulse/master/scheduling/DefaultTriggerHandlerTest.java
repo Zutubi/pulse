@@ -2,14 +2,11 @@ package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.InMemoryTriggerDao;
-import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.WiringObjectFactory;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * <class-comment/>
- */
 public class DefaultTriggerHandlerTest extends PulseTestCase
 {
     private DefaultTriggerHandler handler;
@@ -30,11 +27,13 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
     {
         super.setUp();
 
-        handler = new DefaultTriggerHandler();
-        handler.setObjectFactory(new DefaultObjectFactory());
-        triggerDao = new InMemoryTriggerDao();
-        handler.setTriggerDao(triggerDao);
+        WiringObjectFactory objectFactory = new WiringObjectFactory();
 
+        handler = new DefaultTriggerHandler();
+        handler.setObjectFactory(objectFactory);
+        triggerDao = new InMemoryTriggerDao();
+        objectFactory.initProperties(this);
+        
         executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     }
 

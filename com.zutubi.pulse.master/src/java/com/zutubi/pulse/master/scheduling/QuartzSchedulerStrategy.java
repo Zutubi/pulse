@@ -1,9 +1,12 @@
 package com.zutubi.pulse.master.scheduling;
 
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+
+import static com.zutubi.pulse.master.scheduling.QuartzTaskCallbackJob.SOURCE_PROP;
 
 /**
  * The QuartzSchedulerStrategy is an implementation of the SchedulerStrategy
@@ -23,6 +26,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     protected static final String CALLBACK_JOB_GROUP = "cron.trigger.job.group";
 
     private Scheduler quartzScheduler;
+    private ObjectFactory objectFactory;
 
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
@@ -126,7 +130,9 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
             ensureCallbackRegistered();
             quartzTrigger.setJobName(CALLBACK_JOB_NAME);
             quartzTrigger.setJobGroup(CALLBACK_JOB_GROUP);
-            quartzTrigger.getJobDataMap().put(QuartzTaskCallbackJob.TRIGGER_PROP, trigger);
+
+            QuartzTaskCallbackTriggerSource source = objectFactory.buildBean(QuartzTaskCallbackTriggerSource.class, new Class[]{Trigger.class}, new Object[]{trigger});
+            quartzTrigger.getJobDataMap().put(SOURCE_PROP, source);
 
             getQuartzScheduler().scheduleJob(quartzTrigger);
         }
@@ -139,6 +145,11 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     public void setTriggerHandler(TriggerHandler handler)
     {
         // noop.
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 
     protected abstract org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException;

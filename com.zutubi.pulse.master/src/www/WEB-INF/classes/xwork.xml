@@ -338,6 +338,11 @@
             <result name="toggled" type="redirect">actions?hibernateStatistics=execute&amp;_dc=${random}</result>
         </action>
 
+        <action name="quartzStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.QuartzStatisticsAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="velocity">quartz-statistics.vm</result>
+        </action>
+
         <action name="triggerBackup" class="com.zutubi.pulse.master.xwork.actions.admin.debug.TriggerBackupAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="redirect">/admin/settings/</result>

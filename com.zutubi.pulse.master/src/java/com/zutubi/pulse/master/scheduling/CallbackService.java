@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.util.NullaryProcedure;
+import com.zutubi.i18n.Messages;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.i18n.Messages;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -52,9 +52,21 @@ public class CallbackService
      */
     public synchronized void registerCallback(NullaryProcedure callback, Date when)
     {
-        assertNotRegistered(callback);
+        registerCallback(String.valueOf(nextCallbackId.getAndIncrement()), callback, when);
+    }
 
-        SimpleTrigger trigger = new SimpleTrigger(String.valueOf(nextCallbackId.getAndIncrement()), CALLBACK_TRIGGER_GROUP, when);
+    /**
+     * Register the procedure to be called back at a specified time.
+     *
+     * @param name      the name to uniquely identify the procedure.
+     * @param callback  the procedure to be called.
+     * @param when      the time at which the procedure will be called.
+     */
+    public synchronized void registerCallback(String name, NullaryProcedure callback, Date when)
+    {
+        assertNotRegistered(name, callback);
+
+        SimpleTrigger trigger = new SimpleTrigger(name, CALLBACK_TRIGGER_GROUP, when);
         trigger.setTaskClass(CallbackTask.class);
         trigger.setTransient(true);
         registerCallbackTrigger(callback, trigger);
@@ -68,16 +80,32 @@ public class CallbackService
      */
     public synchronized void registerCallback(NullaryProcedure callback, long interval)
     {
-        assertNotRegistered(callback);
+        registerCallback(String.valueOf(nextCallbackId.getAndIncrement()), callback, interval);
+    }
 
-        SimpleTrigger trigger = new SimpleTrigger(String.valueOf(nextCallbackId.getAndIncrement()), CALLBACK_TRIGGER_GROUP, interval);
+    /**
+     * Register the procedure to be called back at the defined intervals.
+     *
+     * @param name      the name to uniquely identify the procedure.
+     * @param callback  the procedure to be called.
+     * @param interval  the interval in milliseconds at which the callback is made.
+     */
+    public synchronized void registerCallback(String name, NullaryProcedure callback, long interval)
+    {
+        assertNotRegistered(name, callback);
+
+        SimpleTrigger trigger = new SimpleTrigger(name, CALLBACK_TRIGGER_GROUP, interval);
         trigger.setTaskClass(CallbackTask.class);
         trigger.setTransient(true);
         registerCallbackTrigger(callback, trigger);
     }
 
-    private void assertNotRegistered(NullaryProcedure callback) throws IllegalArgumentException
+    private void assertNotRegistered(String name, NullaryProcedure callback) throws IllegalArgumentException
     {
+        if (registeredCallbacks.containsKey(name))
+        {
+            throw new IllegalArgumentException(I18N.format("callback.invalid.nameInUse", name));
+        }
         if (isRegistered(callback))
         {
             throw new IllegalArgumentException(I18N.format("callback.invalid.alreadyRegistered"));
@@ -95,7 +123,7 @@ public class CallbackService
         {
             // This error relates directly to a misconfiguration of the scheduler.  No point
             // trying to deal with it in the code.
-            throw new RuntimeException("Failed to schedule callback trigger.");
+            throw new RuntimeException(I18N.format("schedule.failed", e.getMessage()));
         }
     }
 
@@ -109,15 +137,32 @@ public class CallbackService
      */
     public synchronized boolean unregisterCallback(NullaryProcedure callback)
     {
+        Map.Entry<String, NullaryProcedure> entry = CollectionUtils.find(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback));
+        if (entry != null)
+        {
+            String triggerName = entry.getKey();
+            return unregisterCallback(triggerName);
+        }
+        return false;
+    }
+
+    /**
+     * Stop the specified callback from being triggered.
+     *
+     * @param name  the name uniquely identifying the callback.
+     *
+     * @return true if the procedure was unregistered, false otherwise (for instance
+     * if the procedure had not previously been registered)
+     */
+    public synchronized boolean unregisterCallback(String name)
+    {
         try
         {
-            Map.Entry<String, NullaryProcedure> entry = CollectionUtils.find(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback));
-            if (entry != null)
+            if (registeredCallbacks.containsKey(name))
             {
-                String triggerName = entry.getKey();
-                Trigger trigger = scheduler.getTrigger(triggerName, CALLBACK_TRIGGER_GROUP);
+                Trigger trigger = scheduler.getTrigger(name, CALLBACK_TRIGGER_GROUP);
                 scheduler.unschedule(trigger);
-                registeredCallbacks.remove(triggerName);
+                registeredCallbacks.remove(name);
                 return true;
             }
             return false;
@@ -159,7 +204,7 @@ public class CallbackService
                 }
                 catch (Exception e)
                 {
-                    LOG.warning("Uncaught exception generated by callback: " + e.getMessage(), e);
+                    LOG.warning(I18N.format("uncaught.exception", e.getMessage()), e);
                 }
             }
         }

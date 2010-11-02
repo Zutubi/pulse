@@ -1,10 +1,14 @@
 package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.master.scheduling.quartz.TriggerAdapter;
+import com.zutubi.util.bean.WiringObjectFactory;
+import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.spi.JobFactory;
+import org.quartz.spi.TriggerFiredBundle;
 
 import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_GROUP;
 import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBACK_JOB_NAME;
@@ -12,17 +16,33 @@ import static com.zutubi.pulse.master.scheduling.QuartzSchedulerStrategy.CALLBAC
 public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private org.quartz.Scheduler quartzScheduler = null;
+    private TestTriggerHandler triggerHandler = null;
 
     public void setUp() throws Exception
     {
         super.setUp();
 
+        WiringObjectFactory objectFactory = new WiringObjectFactory();
+
+        triggerHandler = new TestTriggerHandler();
+
         SchedulerFactory schedFact = new StdSchedulerFactory();
         quartzScheduler = schedFact.getScheduler();
-        quartzScheduler.setJobFactory(new QuartzTaskJobFactory(triggerHandler));
+        quartzScheduler.setJobFactory(new JobFactory()
+        {
+            public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
+            {
+                QuartzTaskCallbackJob job = new QuartzTaskCallbackJob();
+                job.setTriggerHandler(triggerHandler);
+                return job;
+            }
+        });
         quartzScheduler.start();
         scheduler = new CronSchedulerStrategy();
+        ((QuartzSchedulerStrategy)scheduler).setObjectFactory(objectFactory);
         ((QuartzSchedulerStrategy)scheduler).setQuartzScheduler(quartzScheduler);
+
+        objectFactory.initProperties(this);
     }
 
     public void tearDown() throws Exception
@@ -47,6 +67,12 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
     public void testTriggerCount() throws SchedulingException
     {
         super.testTriggerCount();
+    }
+
+    @Override
+    protected TestTriggerHandler getHandler()
+    {
+        return triggerHandler;
     }
 
     protected void activateTrigger(Trigger trigger) throws SchedulingException
