@@ -10,9 +10,7 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
@@ -26,13 +24,16 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
-import static java.util.Arrays.*;
 import java.util.concurrent.*;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.pulse.master.model.Project.State.INITIAL;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
@@ -120,7 +121,7 @@ public class PollingServiceTest extends ZutubiTestCase
     {
         serviceHandle.init();
 
-        verify(callbackService, times(1)).registerCallback((NullaryProcedure) anyObject(), anyLong());
+        verify(callbackService, times(1)).registerCallback(anyString(), (NullaryProcedure) anyObject(), anyLong());
         verify(shutdownManager, times(1)).addStoppable(service);
     }
 
