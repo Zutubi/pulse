@@ -31,6 +31,7 @@ This context requires:
 
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="threadFactory" ref="threadFactory"/>
+        <property name="corePoolSize" value="5"/>
     </bean>
 
     <bean id="quartzJobFactory" class="com.zutubi.pulse.master.bootstrap.quartz.SpringJobFactory" init-method="init">
