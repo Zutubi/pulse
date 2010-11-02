@@ -359,7 +359,7 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
                 xtype: 'button',
                 enableToggle: true,
                 pressed: true,
-                tooltip: 'save customisations',
+                tooltip: 'finish customising',
                 icon: window.baseUrl + '/images/pencil.gif',
                 listeners: {
                     click: function(button) {
