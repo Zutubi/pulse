@@ -5,25 +5,55 @@
 <body>
 
 <h3>Triggers:</h3>
-<table>
+<table class="columns">
     #foreach($groupName in $scheduler.triggerGroupNames)
-        <tr>
-            <th>Name</th>
-            <th>Next Fire Time</th>
-            <th>Previous Fire Time</th>
-            <th>State</th>
+        <tr class="columns">
+            <th class="content">Quartz ID</th>
+            <th class="content">Pulse Name</th>
+            <th class="content">Type</th>
+            <th class="content">Pulse State</th>
+            <th class="content">Quartz State</th>
+            <th class="content">Trigger Count</th>
+            <th class="content">Project ID</th>
+            <th class="content">Cron (if applicable)</th>
         </tr>
         #foreach($name in $scheduler.getTriggerNames($groupName))
             #set($trigger = $scheduler.getTrigger($name, $groupName))
-            <tr>
-                <td>$!trigger.name</td>
-                <td>$!trigger.nextFireTime</td>
-                <td>$!trigger.previousFireTime</td>
-                <td>#renderQuartzTriggerState($scheduler.getTriggerState($name, $groupName))</td>
+            <tr class="columns">
+                <td class="content">$!trigger.fullName</td>
+                <td class="content">$!trigger.jobDataMap.trigger.name</td>
+                <td class="content">$!trigger.jobDataMap.trigger.type</td>
+                <td class="content">$!trigger.jobDataMap.trigger.state</td>
+                <td class="content">#renderQuartzTriggerState($scheduler.getTriggerState($name, $groupName))</td>
+                <td class="content">$!trigger.jobDataMap.trigger.triggerCount</td>
+                <td class="content">$!trigger.jobDataMap.trigger.project</td>
+                <td class="content">$!trigger.jobDataMap.trigger.cron</td>
             </tr>
         #end
     #end
 </table>
-
+<p>&nbsp;</p>
+<h3>Trigger times:</h3>
+<table class="columns">
+    #foreach($groupName in $scheduler.triggerGroupNames)
+        <tr class="columns">
+            <th class="content">Quartz ID</th>
+            <th class="content">Pulse Name</th>
+            <th class="content">Next Fire Time</th>
+            <th class="content">Previous Fire Time</th>
+            <th class="content">Start Time</th>
+        </tr>
+        #foreach($name in $scheduler.getTriggerNames($groupName))
+            #set($trigger = $scheduler.getTrigger($name, $groupName))
+            <tr class="columns">
+                <td class="content">$!trigger.fullName</td>
+                <td class="content">$!trigger.jobDataMap.trigger.name</td>
+                <td class="content">$!trigger.nextFireTime</td>
+                <td class="content">$!trigger.previousFireTime</td>
+                <td class="content">$!trigger.startTime</td>
+            </tr>
+        #end
+    #end
+</table>
 </body>
 </html>
