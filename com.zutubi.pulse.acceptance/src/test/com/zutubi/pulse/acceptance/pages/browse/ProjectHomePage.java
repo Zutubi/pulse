@@ -31,7 +31,7 @@ public class ProjectHomePage extends ResponsibilityPage
 
     private static final String COLUMN_ACTIVITY_STATUS = "status";
 
-    private static final String ID_LATEST_NUMBER = "id";
+    private static final String ID_LATEST_NUMBER = "number";
     private static final String ID_LATEST_STATUS = "status";
 
     private String projectName;

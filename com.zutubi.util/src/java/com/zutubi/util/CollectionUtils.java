@@ -140,6 +140,11 @@ public class CollectionUtils
         return out;
     }
 
+    public static <T> T[] mapToArray(T[] in, Mapping<T, T> m)
+    {
+        return mapToArray(in, m, (T[])Array.newInstance(in.getClass().getComponentType(), in.length), 0);
+    }
+
     public static <T, U> U[] mapToArray(T[] in, Mapping<T, U> m, U[] out)
     {
         return mapToArray(in, m, out, 0);

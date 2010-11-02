@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
-import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.DefaultAction;
 import com.zutubi.tove.annotations.*;
@@ -23,6 +22,15 @@ import java.util.Map;
 @Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
 public class UserPreferencesConfiguration extends AbstractConfiguration
 {
+    public static final String COLUMN_NUMBER = "number";
+    public static final String COLUMN_PROJECT = "project";
+    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_REASON = "reason";
+    public static final String COLUMN_REVISION = "revision";
+    public static final String COLUMN_TESTS = "tests";
+    public static final String COLUMN_WHEN = "when";
+    public static final String COLUMN_ELAPSED = "elapsed";
+    
     @StringList
     private List<String> aliases = new LinkedList<String>();
     @Select(optionProvider = "DefaultActionOptionProvider")
@@ -219,16 +227,16 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
 
     public static String defaultShortProjectColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_REVISION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_WHEN);
+        return StringUtils.join(",", COLUMN_NUMBER, COLUMN_REVISION, COLUMN_STATUS, COLUMN_REASON, COLUMN_WHEN);
     }
 
     public static String defaultMyBuildsColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED);
+        return StringUtils.join(",", COLUMN_NUMBER, COLUMN_PROJECT, COLUMN_STATUS, COLUMN_REASON, COLUMN_TESTS, COLUMN_WHEN, COLUMN_ELAPSED);
     }
     
     public static String defaultProjectColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_REVISION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED);
+        return StringUtils.join(",", COLUMN_NUMBER, COLUMN_REVISION, COLUMN_STATUS, COLUMN_REASON, COLUMN_TESTS, COLUMN_WHEN, COLUMN_ELAPSED);
     }
 }

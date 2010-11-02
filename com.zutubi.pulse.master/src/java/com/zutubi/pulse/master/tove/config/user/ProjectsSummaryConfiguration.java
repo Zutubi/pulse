@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.ItemPicker;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -17,6 +16,16 @@ import java.util.List;
 @SymbolicName("zutubi.projectSummaryConfig")
 public abstract class ProjectsSummaryConfiguration extends AbstractConfiguration
 {
+    public static final String KEY_COMPLETED = "completed";
+    public static final String KEY_ELAPSED = "elapsed";
+    public static final String KEY_ERRORS = "errors";
+    public static final String KEY_REASON = "reason";
+    public static final String KEY_REVISION = "rev";
+    public static final String KEY_WHEN = "when";
+    public static final String KEY_TESTS = "tests";
+    public static final String KEY_VERSION = "version";
+    public static final String KEY_WARNINGS = "warnings";
+
     @ControllingCheckbox(checkedFields = "hiddenHierarchyLevels")
     private boolean hierarchyShown = true;
     @Numeric(min = 0)
@@ -68,6 +77,6 @@ public abstract class ProjectsSummaryConfiguration extends AbstractConfiguration
 
     public static List<String> defaultColumns()
     {
-        return new LinkedList<String>(Arrays.asList(BuildColumns.KEY_REVISION, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS));
+        return new LinkedList<String>(Arrays.asList(KEY_REVISION, KEY_WHEN, KEY_ELAPSED, KEY_REASON, KEY_TESTS));
     }
 }

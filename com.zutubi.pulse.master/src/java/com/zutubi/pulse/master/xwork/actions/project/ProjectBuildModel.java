@@ -6,11 +6,11 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
+import static com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration.*;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.variables.GenericVariable;
@@ -136,7 +136,7 @@ public class ProjectBuildModel
     {
         String label = column;
         String content;
-        if (column.equals(BuildColumns.KEY_VERSION))
+        if (column.equals(KEY_VERSION))
         {
             String version = buildResult.getVersion();
             if (!TextUtils.stringSet(version))
@@ -146,11 +146,11 @@ public class ProjectBuildModel
 
             content = htmlEncode(version);
         }
-        else if (column.equals(BuildColumns.KEY_ERRORS))
+        else if (column.equals(KEY_ERRORS))
         {
             content = Integer.toString(buildResult.getErrorFeatureCount());
         }
-        else if (column.equals(BuildColumns.KEY_REASON))
+        else if (column.equals(KEY_REASON))
         {
             BuildReason reason = buildResult.getReason();
             if (reason == null)
@@ -162,7 +162,7 @@ public class ProjectBuildModel
                 content = htmlEncode(reason.getSummary());
             }
         }
-        else if (column.equals(BuildColumns.KEY_REVISION))
+        else if (column.equals(KEY_REVISION))
         {
             if (buildResult.isPersonal())
             {
@@ -190,7 +190,7 @@ public class ProjectBuildModel
                 }
             }
         }
-        else if (column.equals(BuildColumns.KEY_ELAPSED))
+        else if (column.equals(KEY_ELAPSED))
         {
             if (buildResult.completed())
             {
@@ -203,15 +203,15 @@ public class ProjectBuildModel
                 content = buildResult.getStamps().getPrettyEstimatedTimeRemaining();
             }
         }
-        else if (column.equals(BuildColumns.KEY_WHEN))
+        else if (column.equals(KEY_WHEN))
         {
             content = renderTime(buildResult, buildResult.getStamps().getStartTime(), "start", urls);
         }
-        else if (column.equals(BuildColumns.KEY_COMPLETED))
+        else if (column.equals(KEY_COMPLETED))
         {
             content = renderTime(buildResult, buildResult.getStamps().getEndTime(), "end", urls);
         }
-        else if (column.equals(BuildColumns.KEY_TESTS))
+        else if (column.equals(KEY_TESTS))
         {
             TestResultSummary summary = buildResult.getTestSummary();
             if (summary == null || summary.getTotal() == 0)
@@ -237,7 +237,7 @@ public class ProjectBuildModel
                 content = link(content, urls.buildTests(buildResult));
             }
         }
-        else if (column.equals(BuildColumns.KEY_WARNINGS))
+        else if (column.equals(KEY_WARNINGS))
         {
             content = Integer.toString(buildResult.getWarningFeatureCount());
         }

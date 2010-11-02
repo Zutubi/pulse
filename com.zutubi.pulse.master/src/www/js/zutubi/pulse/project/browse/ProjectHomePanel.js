@@ -57,10 +57,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         id: this.id + '-activity',
                         title: 'current activity',
                         columns: [
-                            Zutubi.pulse.project.configs.build.id,
+                            Zutubi.pulse.project.configs.build.number,
                             Zutubi.pulse.project.configs.build.status,
-                            'reason',
-                            Zutubi.pulse.project.configs.build.rev
+                            Zutubi.pulse.project.configs.build.reason,
+                            Zutubi.pulse.project.configs.build.revision
                         ],
                         emptyMessage: 'no current build activity'
                     }]
@@ -75,10 +75,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         id: this.id + '-latest',
                         title: 'latest completed build',
                         rows: [
-                            Zutubi.pulse.project.configs.build.id,
+                            Zutubi.pulse.project.configs.build.number,
                             Zutubi.pulse.project.configs.build.status,
-                            'reason',
-                            Zutubi.pulse.project.configs.build.rev,
+                            Zutubi.pulse.project.configs.build.reason,
+                            Zutubi.pulse.project.configs.build.revision,
                             Zutubi.pulse.project.configs.build.tests,
                             Zutubi.pulse.project.configs.build.errors,
                             Zutubi.pulse.project.configs.build.warnings,

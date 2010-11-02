@@ -189,10 +189,10 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 if (build.link)
                 {
-                    Zutubi.MenuManager.registerMenu('bactions-' + build.uniqueId, getBuildMenuItems.createDelegate(this, [build.link]));
+                    Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
                     return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
                         number: number,
-                        id: build.uniqueId,
+                        id: build.id,
                         link: window.baseUrl + '/' + build.link
                     });
                 }
@@ -387,8 +387,8 @@ Ext.apply(Zutubi.pulse.project, {
          * in user preferences.
          */
         build: {
-            id: {
-                name: 'id',
+            number: {
+                name: 'number',
                 key: 'build id',
                 cls: 'right',
                 renderer: Zutubi.pulse.project.renderers.buildId
@@ -414,9 +414,8 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Ext.util.Format.htmlEncode
             },
             
-            rev: {
-                name: 'rev',
-                key: 'revision',
+            revision: {
+                name: 'revision',
                 renderer: Zutubi.pulse.project.renderers.buildRevision
             },
             

@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +15,10 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
     private static final String SCOPE_USERS = "users";
     private static final String PROPERTY_PREFERENCES = "preferences";
     private static final String COLUMN_ACTIONS = "actions";
+    private static final String COLUMN_NUMBER_ORIGINAL = "id";
+    private static final String COLUMN_NUMBER_NEW = "number";
+    private static final String COLUMN_REVISION_ORIGINAL = "rev";
+    private static final String COLUMN_REVISION_NEW = "revision";
 
     public boolean haltOnFailure()
     {
@@ -31,7 +32,7 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        RemoveActionsColumnFn editFn = new RemoveActionsColumnFn();
+        FixColumnsFn editFn = new FixColumnsFn();
         return Arrays.asList(RecordUpgraders.newDeleteProperty("myProjectsColumns"),
                              RecordUpgraders.newDeleteProperty("projectSummaryColumns"),
                              RecordUpgraders.newEditProperty("myBuildsColumns", editFn),
@@ -39,7 +40,7 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
                              RecordUpgraders.newEditProperty("projectHistoryColumns", editFn));
     }
 
-    private static class RemoveActionsColumnFn implements UnaryFunction<Object, Object>
+    private static class FixColumnsFn implements UnaryFunction<Object, Object>
     {
         public Object process(Object o)
         {
@@ -52,6 +53,25 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
                     public boolean satisfied(String s)
                     {
                         return !s.equals(COLUMN_ACTIONS);
+                    }
+                });
+                
+                columns = CollectionUtils.mapToArray(columns, new Mapping<String, String>()
+                {
+                    public String map(String s)
+                    {
+                        if (COLUMN_NUMBER_ORIGINAL.equals(s))
+                        {
+                            return COLUMN_NUMBER_NEW;
+                        }
+                        else if (COLUMN_REVISION_ORIGINAL.equals(s))
+                        {
+                            return COLUMN_REVISION_NEW;
+                        }
+                        else
+                        {
+                            return s;
+                        }
                     }
                 });
                 
