@@ -117,7 +117,10 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
         {
             this.heldData = null;
             this.data = data;
-            this.renderDynamic();
+            if (this.rendered)
+            {
+                this.renderDynamic();
+            }
         }
     },
 

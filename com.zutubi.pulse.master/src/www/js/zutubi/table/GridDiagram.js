@@ -57,8 +57,11 @@ Zutubi.table.GridDiagram = Ext.extend(Ext.BoxComponent, {
      */
     update: function(data) {
         this.data = data;
-        this.clear();
-        this.renderData();
+        if (this.rendered)
+        {
+            this.clear();
+            this.renderData();
+        }
     },
     
     /**

@@ -17,12 +17,12 @@
         }
         
 #if($u_stageName)
-        #set($url = "$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal")
+        #set($url = "$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&tailRefreshInterval=${tailRefreshInterval}&personal=$personal")
 #else
-        #set($url = "$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal")
+        #set($url = "$base/ajax/tailBuildLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&buildSelected=true&maxLines=${maxLines}&tailRefreshInterval=${tailRefreshInterval}&personal=$personal")
 #end
 
-        #updater($url "panel" $principle "updaterCallback")
+        #updater($url "panel" $tailRefreshInterval "updaterCallback")
         
         function refreshNow()
         {
@@ -63,7 +63,7 @@
         {
             var popup = new Zutubi.TailSettingsWindow({
                 initialMaxLines: '$maxLines',
-                initialRefreshInterval: '$refreshInterval'
+                initialRefreshInterval: '$tailRefreshInterval'
             });
             popup.show();
         }
@@ -104,7 +104,7 @@
                         <span class="understated">//</span>
                     </td>
                     <td id="current-settings">
-                        $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$refreshInterval"])
+                        $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$tailRefreshInterval"])
                         <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
                         <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
                     </td>

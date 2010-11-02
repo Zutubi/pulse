@@ -133,18 +133,12 @@
             nestedWest.setWidth(300);
             viewport.doLayout();
 
-#if($refreshInterval || $principle.preferences.refreshingEnabled)
-    #if($refreshInterval)
-            var refreshInterval = $refreshInterval;
-    #else
-            var refreshInterval = $principle.preferences.refreshInterval;
-    #end
-
+#if($refreshInterval)
             var runner = new Ext.util.TaskRunner();
             runner.start({
                 run: refreshDetails,
                 scope: this,
-                interval: 1000 * refreshInterval
+                interval: 1000 * $refreshInterval
             });
 #else
             root.expand(true);

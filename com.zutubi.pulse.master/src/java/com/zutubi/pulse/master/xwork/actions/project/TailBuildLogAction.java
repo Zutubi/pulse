@@ -34,7 +34,7 @@ public class TailBuildLogAction extends StageActionBase
     protected boolean raw = false;
     protected boolean buildSelected = false;
     protected int maxLines = DEFAULT_MAX_LINES;
-    private int refreshInterval = DEFAULT_REFRESH_INTERVAL;
+    private int tailRefreshInterval = DEFAULT_REFRESH_INTERVAL;
 
     protected String tail = "";
     protected boolean logExists;
@@ -63,9 +63,9 @@ public class TailBuildLogAction extends StageActionBase
         return maxLines;
     }
 
-    public int getRefreshInterval()
+    public int getTailRefreshInterval()
     {
-        return refreshInterval;
+        return tailRefreshInterval;
     }
 
     public boolean getLogExists()
@@ -194,7 +194,7 @@ public class TailBuildLogAction extends StageActionBase
             if (user != null)
             {
                 UserPreferencesConfiguration preferences = user.getPreferences();
-                refreshInterval = preferences.getTailRefreshInterval();
+                tailRefreshInterval = preferences.getTailRefreshInterval();
                 maxLines = preferences.getTailLines();
             }
         }

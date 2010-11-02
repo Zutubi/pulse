@@ -11,8 +11,8 @@
             Ext.get('refresh-time').update('refreshed ' + now.format('g:i:s a, D F j'));
         }
 
-        #set($url = "$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal")
-        #updater($url "panel" $principle "updaterCallback")
+        #set($url = "$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&tailRefreshInterval=${tailRefreshInterval}&personal=$personal")
+        #updater($url "panel" $tailRefreshInterval "updaterCallback")
 
         function refreshNow()
         {
@@ -27,7 +27,7 @@
         {
             var popup = new Zutubi.TailSettingsWindow({
                 initialMaxLines: '$maxLines',
-                initialRefreshInterval: '$refreshInterval'
+                initialRefreshInterval: '$tailRefreshInterval'
             });
             popup.show();
         }
@@ -49,7 +49,7 @@
                 </td>
 #end
                 <td id="current-settings">
-                    $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$refreshInterval"])
+                    $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$tailRefreshInterval"])
                     <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
                     <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
                 </td>

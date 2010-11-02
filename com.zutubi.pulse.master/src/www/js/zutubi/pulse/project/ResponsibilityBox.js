@@ -40,27 +40,29 @@ Zutubi.pulse.project.ResponsibilityBox = Ext.extend(Ext.BoxComponent, {
     
     update: function(data) {
         this.data = data;
-        
-        if (data)
+        if (this.rendered)
         {
-            this.messageEl.update(Ext.util.Format.htmlEncode(data.owner));
-            this.clearContainerEl.setDisplayed(data.canClear);
-            if (data.comment)
+            if (data)
             {
-                this.commentEl.update(Ext.util.Format.htmlEncode(data.comment));
-                this.commentContainerEl.setDisplayed(true);
+                this.messageEl.update(Ext.util.Format.htmlEncode(data.owner));
+                this.clearContainerEl.setDisplayed(data.canClear);
+                if (data.comment)
+                {
+                    this.commentEl.update(Ext.util.Format.htmlEncode(data.comment));
+                    this.commentContainerEl.setDisplayed(true);
+                }
+                else
+                {
+                    this.commentEl.update('');
+                    this.commentContainerEl.setDisplayed(false);
+                }
+                
+                this.el.setDisplayed(true);
             }
             else
             {
-                this.commentEl.update('');
-                this.commentContainerEl.setDisplayed(false);
+                this.el.setDisplayed(false);
             }
-            
-            this.el.setDisplayed(true);
-        }
-        else
-        {
-            this.el.setDisplayed(false);
         }
     }
 });

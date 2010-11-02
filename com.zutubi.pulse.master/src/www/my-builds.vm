@@ -3,46 +3,23 @@
 <content tag="selectedTab">dashboard</content>
 <content tag="header.javascript">
     zutubi/pulse/project/dashboard/MyBuildsPanel.js
-    projects.js
 </content>
 <html>
 <head>
     <title>#wwtext("name=my.builds")</title>
     <script type="text/javascript">
-        #if($refreshInterval)
-        var refreshInterval = $refreshInterval;
-        #elseif($principle.preferences.refreshingEnabled)
-        var refreshInterval = $principle.preferences.refreshInterval;
-        #else
-        var refreshInterval = 0;
-        #end
-        var view;
         var panel = null;
         
-        function update(data)
-        {
-            if (panel)
-            {
-                panel.update(data);
-            }
-            else
-            {
-                panel = new Zutubi.pulse.project.dashboard.MyBuildsPanel({
-                    loadingEl: 'my-builds',
-                    columns: '#jss($columns)'.split(','),
-                    version: '${version_number}',
-                    data: data
-                });
-
-                var nestedCenter = Ext.getCmp('nested-center');
-                nestedCenter.add(panel);
-                viewport.doLayout();
-            }
-        }
-        
         Ext.onReady(function() {
-            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/myBuildsData.action', refreshInterval, update, window, Ext.get('my-builds'), 'Unable to load personal builds.');
-            view.init();
+            panel = new Zutubi.pulse.project.dashboard.MyBuildsPanel({
+                id: 'my-builds',
+                url: window.baseUrl + '/ajax/myBuildsData.action',
+                loadingId: 'my-builds-loading',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval,
+                columns: '#jss($columns)'.split(','),
+                version: '${version_number}',
+            });
         });
     </script>
 #if ($rssEnabled)
@@ -52,7 +29,7 @@
 <body>
     #dashboardTabs("my-builds")
 
-    <div id="my-builds">
+    <div id="my-builds-loading">
     </div>
 </body>
 </html>

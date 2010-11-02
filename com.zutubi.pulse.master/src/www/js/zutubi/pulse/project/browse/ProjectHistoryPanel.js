@@ -1,18 +1,22 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
+// dependency: zutubi/ActivePanel.js
 // dependency: zutubi/Pager.js
 // dependency: zutubi/pulse/project/BuildSummaryTable.js
 
 /**
  * The content of the project history page.  Expects data of the form:
+ *
  * {
- *     url: '/browse/projects/some-project/history/',
- *     stateFilter: '[any broken]',
  *     builds: [ BuildModels ],
  *     pager: PagingModel
  * }
+ *
+ * @cfg {Array}  columns     Columns to display in the builds table.
+ * @cfg {String} pagerUrl    URL to use as the basis for links in the pager.
+ * @cfg {String} stateFilter State filter value.
  */
-Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
+Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
     autoScroll: true,
     
@@ -24,7 +28,7 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
             items: [{
                 xtype: 'panel',
                 border: false,
-                id: 'history-inner',
+                id: this.id + '-inner',
                 style: 'padding: 17px',
                 layout: 'vtable',
                 contentEl: 'center',
@@ -48,7 +52,7 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                             ['terminated', 'terminated'],
                             ['success', 'success']
                         ],
-                        value: this.data.stateFilter,
+                        value: this.stateFilter,
                         listeners: {
                             select: function(combo) {
                                 panel.setFilter(combo.getValue());
@@ -71,25 +75,23 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
                     }]
                 },
                 items: [{
-                    id: 'history-builds',
+                    id: this.id + '-builds',
                     xtype: 'xzbuildsummarytable',
                     title: 'build history',
                     selectedColumns: this.columns,
-                    data: this.data.builds,
                     emptyMessage: 'no builds found'
                 }, {
-                    id: 'history-pager',
+                    id: this.id + '-pager',
                     xtype: 'xzpager',
                     itemLabel: 'build',
-                    url: this.data.url, 
-                    extraParams: this.data.stateFilter == '' ? '' : 'stateFilter/' + this.data.stateFilter + '/',
+                    url: this.pagerUrl, 
+                    extraParams: this.stateFilter == '' ? '' : 'stateFilter/' + this.stateFilter + '/',
                     labels: {
                         first: 'latest',
                         previous: 'newer',
                         next: 'older',
                         last: 'oldest'
-                    },
-                    data: this.data.pager
+                    }
                 }]
             }]
         });
@@ -99,21 +101,12 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Ext.Panel, {
     
     setFilter: function(filter)
     {
-        var location = this.data.url + this.data.pager.currentPage + '/';
+        var location = this.pagerUrl + this.data.pager.currentPage + '/';
         if (filter)
         {
             location += 'stateFilter/' + filter + '/';
         }
         
         window.location.href = location;
-    },
-        
-    update: function(data) {
-        this.data = data;
-        for (var i = 0, l = this.dataKeys.length; i < l; i++)
-        {
-            var key = this.dataKeys[i];
-            Ext.getCmp('history-' + key).update(data[key]);    
-        }
     }
 });

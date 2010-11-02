@@ -10,27 +10,13 @@ import java.util.List;
  */
 public class ProjectHistoryModel
 {
-    private String url;
-    private String stateFilter;
     private List<BuildModel> builds = new LinkedList<BuildModel>();
     private PagerModel pager;
 
-    public ProjectHistoryModel(String url, String stateFilter, List<BuildModel> builds, PagerModel pager)
+    public ProjectHistoryModel(List<BuildModel> builds, PagerModel pager)
     {
-        this.url = url;
-        this.stateFilter = stateFilter;
         this.builds = builds;
         this.pager = pager;
-    }
-
-    public String getUrl()
-    {
-        return url;
-    }
-
-    public String getStateFilter()
-    {
-        return stateFilter;
     }
 
     @JSON

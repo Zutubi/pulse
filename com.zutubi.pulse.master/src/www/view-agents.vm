@@ -5,7 +5,7 @@
 <head>
     <title>#wwtext("name=agents")</title>
     <script type="text/javascript">
-        #updater("$base/ajax/viewAgentsPanel.action" "panel" $principle "Ext.emptyFn")
+        #updater("$base/ajax/viewAgentsPanel.action" "panel" $refreshInterval "Ext.emptyFn")
     </script>
 </head>
 <body>

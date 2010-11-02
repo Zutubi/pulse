@@ -25,7 +25,7 @@ public class MyBuildsPage extends SeleniumPage
     public void waitFor()
     {
         super.waitFor();
-        browser.waitForVariable("view.initialised");
+        browser.waitForVariable("panel.initialised");
     }
 
     public String getUrl()

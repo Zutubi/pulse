@@ -127,10 +127,10 @@
             nestedCenter.add(buildPanel);
             viewport.doLayout();
 
-    #if($refreshInterval || $principle.preferences.refreshingEnabled)
+    #if($refreshInterval)
             var task = {
                 run: updateContent,
-                interval: 1000 * #if($refreshInterval) $refreshInterval #else $principle.preferences.refreshInterval #end
+                interval: 1000 * $refreshInterval
             };
             
             runner = new Ext.util.TaskRunner();

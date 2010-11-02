@@ -1,5 +1,6 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
+// dependency: zutubi/ActivePanel.js
 // dependency: zutubi/table/LinkTable.js
 // dependency: zutubi/table/PropertyTable.js
 // dependency: zutubi/pulse/SectionHeading.js
@@ -10,7 +11,7 @@
 /**
  * The content of the project home page.
  */
-Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
+Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     layout: 'border',
     border: false,
     
@@ -27,14 +28,12 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
             contentEl: 'center',
             items: [{
                 region: 'center',
-                id: 'project-main',
+                id: this.id + '-main',
                 split: false,
-                contentEl: this.loadingEl,
                 layout: 'vtable',
                 items: [{
                     xtype: 'xzresponsibilitybox',
-                    id: 'project-responsibility',
-                    data: this.data.responsibility,
+                    id: this.id + '-responsibility',
                     projectId: this.projectId,
                     style: 'margin: 0 17px'
                 }, {
@@ -42,21 +41,20 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     layout: 'htable',
                     items: [{
                         xtype: 'xzstatusbox',
-                        id: 'project-status',
+                        id: this.id + '-status',
                         titleTemplate: '{name:htmlEncode}',
                         fields: [
                             {name: 'health'},
                             {name: 'state', renderer: Zutubi.pulse.project.renderers.projectState},
                             {name: 'successRate', key: 'success rate', renderer: Zutubi.pulse.project.renderers.projectSuccessRate},
                             {name: 'statistics', renderer: Zutubi.pulse.project.renderers.projectStatistics}
-                        ],
-                        data: this.data.status
+                        ]
                     }, {
                         xtype: 'box'
                     },
                     {
                         xtype: 'xzsummarytable',
-                        id: 'project-activity',
+                        id: this.id + '-activity',
                         title: 'current activity',
                         columns: [
                             Zutubi.pulse.project.configs.build.id,
@@ -64,7 +62,6 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                             'reason',
                             Zutubi.pulse.project.configs.build.rev
                         ],
-                        data: this.data.activity,
                         emptyMessage: 'no current build activity'
                     }]
                 }, {
@@ -75,7 +72,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     layout: 'htable',
                     items: [{
                         xtype: 'xzpropertytable',
-                        id: 'project-latest',
+                        id: this.id + '-latest',
                         title: 'latest completed build',
                         rows: [
                             Zutubi.pulse.project.configs.build.id,
@@ -89,16 +86,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                             Zutubi.pulse.project.configs.build.elapsed,
                             Zutubi.pulse.project.configs.build.stages
                         ],
-                        data: this.data.latest,
                         emptyMessage: 'no completed builds found'
                     }, {
                         xtype: 'box'
                     }, {
                         xtype: 'xzbuildsummarytable',
-                        id: 'project-recent',
+                        id: this.id + '-recent',
                         title: 'recently completed builds',
                         selectedColumns: this.recentColumns,
-                        data: this.data.recent,
                         emptyMessage: 'no historic builds found'
                     }]
                 }, {
@@ -106,7 +101,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     text: 'changes'
                 }, {
                     xtype: 'xzsummarytable',
-                    id: 'project-changes',
+                    id: this.id + '-changes',
                     title: 'latest changes',
                     cellCls: 'hpad',
                     columns: [
@@ -116,12 +111,11 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                         Zutubi.pulse.project.configs.changelist.comment,
                         Zutubi.pulse.project.configs.changelist.actions
                     ],
-                    data: this.data.changes,
                     emptyMessage: 'no changes found'
                 }]
             }, {
                 region: 'east',
-                id: 'project-right',
+                id: this.id + '-right',
                 bodyStyle: 'padding: 0 17px',
                 split: true,
                 collapsible: true,
@@ -131,8 +125,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                 layout: 'vtable',
                 items: [{
                     xtype: 'xzlinktable',
-                    id: 'project-actions',
-                    data: this.data.actions,
+                    id: this.id + '-actions',
                     title: 'actions',
                     handlers: {
                         clean: this.markForClean.createDelegate(this),
@@ -144,10 +137,9 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
                     }
                 }, {
                     xtype: 'xzlinktable',
-                    id: 'project-links',
+                    id: this.id + '-links',
                     title: 'links',
                     iconTemplate: 'images/config/links/{icon}.gif',
-                    data: this.data.links,
                     listeners: {
                         afterrender: function() {
                             panel.updateRows();
@@ -161,19 +153,16 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Ext.Panel, {
     },
         
     update: function(data) {
-        this.data = data;
-        for (var i = 0, l = this.dataKeys.length; i < l; i++)
+        Zutubi.pulse.project.browse.ProjectHomePanel.superclass.update.apply(this, arguments);
+        if (this.rendered)
         {
-            var key = this.dataKeys[i];
-            Ext.getCmp('project-' + key).update(data[key]);    
+            this.updateRows();
         }
-        
-        this.updateRows();
     },
 
     updateRows: function() {
-        Ext.getCmp('project-main').getLayout().checkRows();
-        Ext.getCmp('project-right').getLayout().checkRows();
+        Ext.getCmp('project-home-main').getLayout().checkRows();
+        Ext.getCmp('project-home-right').getLayout().checkRows();
     },
     
     handleMarkForCleanResponse: function(options, success, response)

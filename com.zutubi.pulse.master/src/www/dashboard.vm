@@ -9,14 +9,6 @@
         projects.js
     #end
     <script type="text/javascript">
-        #if($refreshInterval)
-            var refreshInterval = $refreshInterval;
-        #elseif($principle.preferences.refreshingEnabled)
-            var refreshInterval = $principle.preferences.refreshInterval;
-        #else
-            var refreshInterval = 0;
-        #end
-
         var view;
         var projectsTable;
         var myChangesTable;
@@ -62,7 +54,7 @@
 #if($dashboardConfig.showProjectChanges)
             myProjectsChangesTable = new Zutubi.ChangesTable(Ext.get('project.changes'), 'project', '#wwtext("name=my.project.changes")', true);
 #end
-            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/dashboardData.action', refreshInterval, update, window, Ext.get('dashboard-content'), 'Unable to load data.');
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/dashboardData.action', $refreshInterval, update, window, Ext.get('dashboard-content'), 'Unable to load data.');
             view.init();
         });
     </script>

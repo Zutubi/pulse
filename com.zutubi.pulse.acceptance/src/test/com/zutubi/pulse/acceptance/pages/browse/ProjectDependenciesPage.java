@@ -33,7 +33,7 @@ public class ProjectDependenciesPage extends AbstractLogPage
     public void waitFor()
     {
         super.waitFor();
-        browser.waitForVariable("view.initialised");
+        browser.waitForVariable("panel.initialised");
     }
 
     public boolean isUpstreamPresent(String project, int x, int y)
@@ -85,6 +85,6 @@ public class ProjectDependenciesPage extends AbstractLogPage
 
     private String getDependencyId(String section, String project, int x, int y)
     {
-        return "dependencies-" + section + "-" + (x * ProjectDependencyGraphRenderer.SCALE_FACTOR_X) + "-" + (y * ProjectDependencyGraphRenderer.SCALE_FACTOR_Y) + "-" + project;
+        return "project-dependencies-" + section + "-" + (x * ProjectDependencyGraphRenderer.SCALE_FACTOR_X) + "-" + (y * ProjectDependencyGraphRenderer.SCALE_FACTOR_Y) + "-" + project;
     }
 }

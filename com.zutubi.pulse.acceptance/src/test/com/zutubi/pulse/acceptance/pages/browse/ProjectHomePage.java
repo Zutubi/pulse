@@ -47,20 +47,20 @@ public class ProjectHomePage extends ResponsibilityPage
     {
         super(browser, urls, "project-home-" + projectName, projectName);
         this.projectName = projectName;
-        statusBox = new StatusBox(browser, "project-status");
-        activityTable = new SummaryTable(browser, "project-activity");
-        latestCompleteTable = new PropertyTable(browser, "project-latest");
-        recentTable = new BuildSummaryTable(browser, "project-recent");
-        changesTable = new SummaryTable(browser, "project-changes");
-        actionsTable = new LinkTable(browser, "project-actions");
-        linksTable = new LinkTable(browser, "project-links");
+        statusBox = new StatusBox(browser, "project-home-status");
+        activityTable = new SummaryTable(browser, "project-home-activity");
+        latestCompleteTable = new PropertyTable(browser, "project-home-latest");
+        recentTable = new BuildSummaryTable(browser, "project-home-recent");
+        changesTable = new SummaryTable(browser, "project-home-changes");
+        actionsTable = new LinkTable(browser, "project-home-actions");
+        linksTable = new LinkTable(browser, "project-home-links");
     }
 
     @Override
     public void waitFor()
     {
         super.waitFor();
-        browser.waitForVariable("view.initialised");
+        browser.waitForVariable("panel.initialised");
     }
 
     /**

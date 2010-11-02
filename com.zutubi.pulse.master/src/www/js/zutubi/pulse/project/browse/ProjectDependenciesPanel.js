@@ -1,17 +1,20 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
+// dependency: zutubi/ActivePanel.js
 // dependency: zutubi/table/GridDiagram.js
 // dependency: zutubi/pulse/SectionHeading.js
 
 /**
  * The content of the project dependencies page.  Expects data of the form:
+ *
  * {
- *     transitiveMode: 'TRIM_DUPLICATES',
  *     upstream: [grid data],
  *     downstream: [grid data],
  * }
+ *
+ * @cfg {String} transitiveMode Initial transitive mode value.
  */
-Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Ext.Panel, {
+Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
     autoScroll: true,
     
@@ -44,7 +47,7 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Ext.Panel, {
             items: [{
                 xtype: 'panel',
                 border: false,
-                id: 'dependencies-inner',
+                id: this.id + '-inner',
                 layout: 'vtable',
                 contentEl: 'center',
                 tbar: {
@@ -66,7 +69,7 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Ext.Panel, {
                             ['REMOVE_DUPLICATES', 'remove duplicate subtrees'],
                             ['NONE', 'show direct dependencies only']
                         ],
-                        value: this.data.transitiveMode,
+                        value: this.transitiveMode,
                         listeners: {
                             select: function(combo) {
                                 panel.loading = true;
@@ -123,11 +126,10 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Ext.Panel, {
                         html: 'Projects that this project depends on:'
                     }
                 }, {
-                    id: 'dependencies-upstream',
+                    id: this.id + '-upstream',
                     xtype: 'xzgriddiagram',
                     style: 'margin-left: 17px',
-                    cellRenderer: this.cellRenderer,
-                    data: this.data.upstream
+                    cellRenderer: this.cellRenderer
                 }, {
                     xtype: 'xzsectionheading',
                     text: 'downstream'
@@ -139,24 +141,14 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Ext.Panel, {
                         html: 'Projects that depend on this project:'
                     }
                 }, {
-                    id: 'dependencies-downstream',
+                    id: this.id + '-downstream',
                     xtype: 'xzgriddiagram',
                     style: 'margin-left: 17px',
-                    cellRenderer: this.cellRenderer,
-                    data: this.data.downstream
+                    cellRenderer: this.cellRenderer
                 }]
             }]
         });
 
         Zutubi.pulse.project.browse.ProjectDependenciesPanel.superclass.initComponent.apply(this, arguments);
-    },
-    
-    update: function(data) {
-        this.data = data;
-        for (var i = 0, l = this.dataKeys.length; i < l; i++)
-        {
-            var key = this.dataKeys[i];
-            Ext.getCmp('dependencies-' + key).update(data[key]);    
-        }
     }
 });

@@ -9,13 +9,6 @@
 <head>
     <title>#wwtext("name=projects")</title>
     <script type="text/javascript">
-        #if($refreshInterval)
-        var refreshInterval = $refreshInterval;
-        #elseif($principle.preferences.refreshingEnabled)
-        var refreshInterval = $principle.preferences.refreshInterval;
-        #else
-        var refreshInterval = 0;
-        #end
         var invalidEl;
         var projectsTable;
         var view;
@@ -56,7 +49,7 @@
             invalidEl = Ext.get('invalid-projects');
             invalidEl.setVisibilityMode(Ext.Element.DISPLAY);
             projectsTable = new Zutubi.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $columnCount, $rssEnabled, false);
-            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/browseData.action', refreshInterval, update, window, Ext.get('projects'), 'Unable to load projects.');
+            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/browseData.action', $refreshInterval, update, window, Ext.get('projects'), 'Unable to load projects.');
             view.init();
         });
     </script>

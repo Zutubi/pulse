@@ -13,9 +13,10 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import org.apache.velocity.context.Context;
 
@@ -28,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CustomVelocityManager extends VelocityManager
 {
+    private static final int DEFAULT_REFRESH_INTERVAL = 60;
+
     private ProjectManager projectManager;
     private AgentManager agentManager;
     private UserManager userManager;
@@ -68,7 +71,7 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
-        if(systemStarted)
+        if (systemStarted)
         {
             GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.class);
             if (config != null)
@@ -78,10 +81,17 @@ public class CustomVelocityManager extends VelocityManager
                 context.put("config", config);
             }
 
+            context.put("refreshInterval", DEFAULT_REFRESH_INTERVAL);
             String login = AcegiUtils.getLoggedInUsername();
             if (login != null)
             {
                 User user = userManager.getUser(login);
+                if (user != null)
+                {
+                    UserPreferencesConfiguration preferences = user.getPreferences();
+                    context.put("refreshInterval", preferences.isRefreshingEnabled() ? preferences.getRefreshInterval() : 0);
+                }
+                
                 context.put("principle", user);
                 context.put("canLogout", AcegiUtils.canLogout());
             }

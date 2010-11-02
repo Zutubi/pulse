@@ -1,15 +1,19 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
+// dependency: zutubi/ActivePanel.js
 // dependency: zutubi/table/LinkTable.js
 // dependency: zutubi/pulse/SectionHeading.js
 // dependency: zutubi/pulse/project/BuildSummaryTable.js
 
 /**
  * The content of the my builds page.
+ *
+ * @cfg {Array} columns Array of names for columns to show in the table. 
  */
-Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Ext.Panel, {
+Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
     layout: 'border',
     border: false,
+    dataKeys: ['builds'],
     
     initComponent: function(container, position) {
         var panel = this;
@@ -23,21 +27,19 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Ext.Panel, {
             items: [{
                 region: 'center',
                 bodyStyle: 'padding: 0 17px',
-                id: 'my-builds-main',
+                id: this.id + '-main',
                 split: false,
-                contentEl: this.loadingEl,
                 layout: 'vtable',
                 items: [{
                     xtype: 'xzbuildsummarytable',
-                    id: 'my-builds-builds',
+                    id: this.id + '-builds',
                     title: 'my builds',
                     selectedColumns: this.columns,
-                    data: this.data,
                     emptyMessage: 'no personal builds found',
                 }]
             }, {
                 region: 'east',
-                id: 'my-builds-right',
+                id: this.id + '-right',
                 bodyStyle: 'padding: 0 17px',
                 split: true,
                 collapsible: true,
@@ -47,7 +49,7 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Ext.Panel, {
                 layout: 'vtable',
                 items: [{
                     xtype: 'xzlinktable',
-                    id: 'my-builds-tools',
+                    id: this.id + '-tools',
                     title: 'tools downloads',
                     iconTemplate: 'images/{icon}.gif',
                     data: [{
@@ -74,10 +76,5 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Ext.Panel, {
         });
         
         Zutubi.pulse.project.dashboard.MyBuildsPanel.superclass.initComponent.apply(this, arguments);
-    },
-        
-    update: function(data) {
-        this.data = data;
-        Ext.getCmp('my-builds-builds').update(data);    
     }
 });

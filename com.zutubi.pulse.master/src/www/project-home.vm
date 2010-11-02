@@ -3,51 +3,28 @@
 #projectTags($project)
 <content tag="header.javascript">
     zutubi/pulse/project/browse/ProjectHomePanel.js
-    projects.js
 </content>
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript">
-        #if($refreshInterval)
-        var refreshInterval = $refreshInterval;
-        #elseif($principle.preferences.refreshingEnabled)
-        var refreshInterval = $principle.preferences.refreshInterval;
-        #else
-        var refreshInterval = 0;
-        #end
-        var view;
         var panel = null;
-        
-        function update(data)
-        {
-            if (panel)
-            {
-                panel.update(data);
-            }
-            else
-            {
-                panel = new Zutubi.pulse.project.browse.ProjectHomePanel({
-                    loadingEl: '#id("project-home-$project.name")',
-                    projectId: '$project.id',
-                    recentColumns: '#jss($projectRecentColumns)'.split(','),
-                    data: data
-                });
-
-                var nestedCenter = Ext.getCmp('nested-center');
-                nestedCenter.add(panel);
-                viewport.doLayout();
-            }
-        }
         
         function refresh(cb)
         {
-            view.load(cb);
+            panel.load(cb);
         }
             
         Ext.onReady(function() {
-            view = new Zutubi.ActiveView(window.baseUrl + '/ajax/projectHomeData.action?projectId=$project.id', refreshInterval, update, window, Ext.get('#id("project-home-$project.name")'), 'Unable to load project data.');
-            view.init();
+            panel = new Zutubi.pulse.project.browse.ProjectHomePanel({
+                id: 'project-home',
+                url: window.baseUrl + '/ajax/projectHomeData.action?projectId=$project.id',
+                loadingId: '#id("project-home-$project.name")',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval,
+                projectId: '$project.id',
+                recentColumns: '#jss($projectRecentColumns)'.split(',')
+            });
         });
     </script>
 </head>

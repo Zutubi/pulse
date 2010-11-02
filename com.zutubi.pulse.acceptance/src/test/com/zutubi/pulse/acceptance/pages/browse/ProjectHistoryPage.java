@@ -26,15 +26,15 @@ public class ProjectHistoryPage extends SeleniumPage
     {
         super(browser, urls, "project-history-" + projectName, projectName);
         this.projectName = projectName;
-        builds = new BuildSummaryTable(browser, "history-builds");
-        pager = new Pager(browser, "history-pager");
+        builds = new BuildSummaryTable(browser, "project-history-builds");
+        pager = new Pager(browser, "project-history-pager");
     }
 
     @Override
     public void waitFor()
     {
         super.waitFor();
-        browser.waitForVariable("view.initialised");
+        browser.waitForVariable("panel.initialised");
     }
 
     @Override

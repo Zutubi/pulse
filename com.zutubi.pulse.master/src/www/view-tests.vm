@@ -10,7 +10,7 @@
 #else
     #set($ownerArg = "projectName=$u_projectName")
 #end
-        #updater("$base/ajax/viewTestsPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle "Ext.emptyFn")
+        #updater("$base/ajax/viewTestsPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $refreshInterval "Ext.emptyFn")
     </script>
 </head>
 <body>

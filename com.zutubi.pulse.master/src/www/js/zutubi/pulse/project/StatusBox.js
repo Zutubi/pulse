@@ -79,11 +79,14 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     },
     
     update: function(data) {
-        this.clearDataRows();
         this.data = data;
-        if (data)
+        if (this.rendered)
         {
-            this.renderData();
+            this.clearDataRows();
+            if (data)
+            {
+                this.renderData();
+            }
         }
     },
     

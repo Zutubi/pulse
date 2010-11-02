@@ -1297,10 +1297,10 @@
 ## Inserts javascript for an auto-updating panel.  Assumes we don't care
 ## about errors.
 ##
-#macro(updater $url $panelId $user $callback)
+#macro(updater $url $panelId $interval $callback)
     ## We should be able to use Updater.setAutoRefresh but for some reason it
     ## gives aborted transactions after a few refreshes (no idea why as yet).
-    #if($refreshInterval || $user.preferences.refreshingEnabled)
+    #if($interval)
         Ext.onReady(function() {
             var task = {
                 run: function(){
@@ -1312,7 +1312,7 @@
                         callback: $callback
                     });
                 },
-                interval: 1000 * #if($refreshInterval) $refreshInterval #else $user.preferences.refreshInterval #end
+                interval: 1000 * $interval
             }
             var runner = new Ext.util.TaskRunner();
             ## Tasks run immediately on start, so delay starting by one interval.

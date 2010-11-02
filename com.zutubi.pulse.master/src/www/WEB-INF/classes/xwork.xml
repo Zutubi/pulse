@@ -244,7 +244,7 @@
             <result name="error" type="redirect">/browse/</result>
         </action>
 
-        <action name="projectDependencies" class="com.zutubi.pulse.master.xwork.actions.project.ProjectRequiredAction">
+        <action name="projectDependencies" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/project-dependencies.vm</result>
             <result name="error" type="redirect">/browse/</result>

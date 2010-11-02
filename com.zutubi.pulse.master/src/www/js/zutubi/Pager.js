@@ -151,7 +151,10 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
     update: function(data)
     {
         this.data = data;
-        this.renderRows();
+        if (this.rendered)
+        {
+            this.renderRows();
+        }
     }
 });
 
