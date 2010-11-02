@@ -1,13 +1,15 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.Pair;
-import static com.zutubi.util.CollectionUtils.asPair;
 
-import java.util.Hashtable;
 import java.lang.reflect.Array;
+import java.util.Hashtable;
+import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The build runner is an acceptance test support class that caters specifically
@@ -55,20 +57,6 @@ public class BuildRunner
     {
         int buildNumber = triggerAndWaitForBuild(project, options);
 
-        ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
-        if (!ResultState.SUCCESS.equals(buildStatus))
-        {
-            throw new RuntimeException("Expected success, had " + buildStatus + " instead.");
-        }
-        return buildNumber;
-    }
-
-    public int triggerSuccessfulBuild(WaitProject project, Pair<String, Object>... options) throws Exception
-    {
-        int buildNumber = triggerBuild(project, options);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
-        project.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
         ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
         if (!ResultState.SUCCESS.equals(buildStatus))
         {
@@ -137,9 +125,13 @@ public class BuildRunner
      */
     public int triggerAndWaitForBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
-        int number = triggerBuild(project, options);
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), number);
-        return number;
+        List<String> requestIds = triggerBuild(project, options);
+        int buildNumber = 0;
+        for (String requestId : requestIds)
+        {
+            buildNumber = Math.max(xmlRpcHelper.waitForBuildToComplete(project.getName(), requestId), buildNumber);
+        }
+        return buildNumber;
     }
 
     /**
@@ -147,11 +139,12 @@ public class BuildRunner
      *
      * @param project   the project for which the build is being triggered.
      * @param options   the build options.
-     * @return  the build number
+     *
+     * @return  the request ids of the triggered builds.
      *
      * @throws Exception on error.
      */
-    public int triggerBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    public List<String> triggerBuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
     {
         return triggerBuild(project.getConfig(), options);
     }
@@ -161,11 +154,12 @@ public class BuildRunner
      *
      * @param project   the project for which the build is being triggered.
      * @param options   the build options.
-     * @return  the build number
+     * 
+     * @return  the request ids of the triggered builds.
      * 
      * @throws Exception on error.
      */
-    public int triggerBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
+    public List<String> triggerBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
         // projects that are not initialised will 'drop' the trigger request. 
         xmlRpcHelper.waitForProjectToInitialise(project.getName());
@@ -179,9 +173,7 @@ public class BuildRunner
             }
         }
 
-        int number = xmlRpcHelper.getNextBuildNumber(project.getName());
-        xmlRpcHelper.call("triggerBuild", project.getName(), triggerOptions);
-        return number;
+        return xmlRpcHelper.call("triggerBuild", project.getName(), triggerOptions);
     }
 
     /**
@@ -190,10 +182,12 @@ public class BuildRunner
      *
      * @param project   the project to be built.
      * @param options   the build options.
-     * @return  the build number.
+     *
+     * @return  the request ids of the triggered builds.
+     *
      * @throws Exception on error.
      */
-    public int triggerRebuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
+    public List<String> triggerRebuild(ProjectConfigurationHelper project, Pair<String, Object>... options) throws Exception
     {
         return triggerRebuild(project.getConfig(), options);
     }
@@ -204,11 +198,13 @@ public class BuildRunner
      *
      * @param project   the project to be built.
      * @param options   the build options.
-     * @return  the build number.
+     *
+     * @return  the request ids of the triggered builds.
+     *
      * @throws Exception on error.
      */
     @SuppressWarnings({"unchecked"})
-    public int triggerRebuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
+    public List<String> triggerRebuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
         Pair<String, Object>[] args = (Pair<String, Object>[]) Array.newInstance(Pair.class, options.length + 1);
         System.arraycopy(options, 0, args, 0, options.length);

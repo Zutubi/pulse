@@ -35,11 +35,9 @@ public class ActiveBuildsPerOwnerPredicate implements QueuedRequestPredicate
     {
         List<ActivatedRequest> activatedRequests = buildQueue.getActivatedRequests();
         NamedEntity owner = request.getRequest().getOwner();
-        List<ActivatedRequest> ownerRequests = CollectionUtils.filter(
-                activatedRequests,
-                new HasOwnerPredicate<ActivatedRequest>(owner)
-        );
 
+        int ownerRequests = CollectionUtils.count(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner));
+        
         int allowedActiveBuilds = 1;
         if (owner instanceof Project)
         {
@@ -47,6 +45,6 @@ public class ActiveBuildsPerOwnerPredicate implements QueuedRequestPredicate
             allowedActiveBuilds = project.getConfig().getOptions().getConcurrentBuilds();
         }
 
-        return ownerRequests.size() < allowedActiveBuilds;
+        return ownerRequests < allowedActiveBuilds;
     }
 }

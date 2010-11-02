@@ -10,6 +10,7 @@ import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -119,8 +120,9 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         WaitProject project = projects.createWaitAntProject(random, tempDir);
         configurationHelper.insertProject(project.getConfig(), false);
 
-        int buildNumber = buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), buildNumber);
+        List<String> requestIds = buildRunner.triggerBuild(project);
+        Hashtable<String, Object> request = xmlRpcHelper.waitForBuildRequestToBeActivated(requestIds.get(0));
+        int buildNumber = Integer.valueOf(request.get("buildId").toString());
 
         BuildSummaryPage page = addCommentToBuild(random, buildNumber);
 

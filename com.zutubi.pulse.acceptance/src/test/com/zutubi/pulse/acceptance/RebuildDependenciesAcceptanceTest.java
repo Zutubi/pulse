@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
@@ -13,7 +14,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
-import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -198,7 +198,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildUsesTransitiveProperty() throws Exception
     {
-        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir);
+        final ProjectConfigurationHelper projectA = projects.createTrivialAntProject(projectName + "A");
         insertProject(projectA);
         // even though project a is not rebuilt as part of the rebuild, project b does depend on it
         // so we require it to have been built at least once for project b to be successful.
@@ -235,7 +235,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRebuildUsesStatusProperty() throws Exception
     {
-        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir);
+        final ProjectConfigurationHelper projectA = projects.createTrivialAntProject(projectName + "A");
         projectA.getConfig().getDependencies().setStatus(IvyStatus.STATUS_RELEASE);
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA);

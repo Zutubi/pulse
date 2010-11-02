@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
+import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -48,7 +49,7 @@ public class XmlRpcHelper
 {
     public static final String SYMBOLIC_NAME_KEY = "meta.symbolicName";
 
-    private static final int INTIALISATION_TIMEOUT = 90000;
+    private static final int INITIALISATION_TIMEOUT = 90000;
 
     protected XmlRpcClient xmlRpcClient;
     protected String token = null;
@@ -542,7 +543,7 @@ public class XmlRpcHelper
                     throw new RuntimeException(e);
                 }
             }
-        }, INTIALISATION_TIMEOUT, "project '" + projectName + "' to become 'initialised'");
+        }, INITIALISATION_TIMEOUT, "project '" + projectName + "' to become 'initialised'");
     }
 
     /**
@@ -893,9 +894,19 @@ public class XmlRpcHelper
         return call("triggerBuild", projectName, triggerOptions);
     }
 
+    public Hashtable<String, Object> waitForBuildRequestToBeHandled(String requestId) throws Exception
+    {
+        return waitForBuildRequestToBeHandled(requestId, (int)BUILD_TIMEOUT);
+    }
+
     public Hashtable<String, Object> waitForBuildRequestToBeHandled(String requestId, int timeoutMillis) throws Exception
     {
         return call("waitForBuildRequestToBeHandled", requestId, timeoutMillis);
+    }
+
+    public Hashtable<String, Object> waitForBuildRequestToBeActivated(String requestId) throws Exception
+    {
+        return waitForBuildRequestToBeActivated(requestId, (int)BUILD_TIMEOUT);
     }
 
     public Hashtable<String, Object> waitForBuildRequestToBeActivated(String requestId, int timeoutMillis) throws Exception
@@ -1294,6 +1305,20 @@ public class XmlRpcHelper
             });
         }
         return null;
+    }
+
+    public int waitForBuildToComplete(final String projectName, final String requestId) throws Exception
+    {
+        Hashtable<String, Object> requestDetails = waitForBuildRequestToBeActivated(requestId, (int)BUILD_TIMEOUT);
+
+        BuildRequestRegistry.RequestStatus status = EnumUtils.fromPrettyString(BuildRequestRegistry.RequestStatus.class, (String) requestDetails.get("status"));
+        if (status == BuildRequestRegistry.RequestStatus.ACTIVATED)
+        {
+            int number = Integer.valueOf(requestDetails.get("buildId").toString());
+            waitForBuildToComplete(projectName, number);
+            return number;
+        }
+        return -1;
     }
 
     public void waitForBuildToComplete(final String projectName, final int number) throws Exception

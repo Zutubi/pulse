@@ -806,8 +806,10 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // double the timeout to give pulse enough time to capture and upload the large file.
 
-        int buildNumber = buildRunner.triggerBuild(projectA);
-
+        List<String> requestIds = buildRunner.triggerBuild(projectA);
+        Hashtable<String, Object> request = xmlRpcHelper.waitForBuildRequestToBeActivated(requestIds.get(0));
+        int buildNumber = Integer.valueOf(request.get("buildId").toString());
+        
         xmlRpcHelper.waitForBuildToComplete(projectA.getName(), buildNumber, XmlRpcHelper.BUILD_TIMEOUT * 2);
         ResultState buildStatus = xmlRpcHelper.getBuildStatus(projectA.getName(), buildNumber);
         assertEquals(ResultState.SUCCESS, buildStatus);

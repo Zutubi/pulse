@@ -11,6 +11,7 @@ import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -59,9 +60,8 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildRunner.triggerBuild(project);
         xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
 
-        buildRunner.triggerBuild(project);
-
-        xmlRpcHelper.waitForBuildInQueue(project.getName());
+        List<String> requestIds = buildRunner.triggerBuild(project);
+        xmlRpcHelper.waitForBuildRequestToBeHandled(requestIds.get(0));
 
         project.releaseBuild();
         xmlRpcHelper.waitForProjectToBeIdle(project.getName());
@@ -81,8 +81,8 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
          // pending means active, we only have one agent active atm.
         xmlRpcHelper.waitForBuildInPending(project.getName(), 2);
 
-        buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInQueue(project.getName());
+        List<String> requestIds = buildRunner.triggerBuild(project);
+        xmlRpcHelper.waitForBuildRequestToBeHandled(requestIds.get(0));
 
         project.releaseBuild();
         xmlRpcHelper.waitForProjectToBeIdle(project.getName());
