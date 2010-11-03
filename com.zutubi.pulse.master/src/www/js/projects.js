@@ -21,7 +21,7 @@ Zutubi.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</
                        '</td>';
 
 Zutubi.BUILD_CELLS = '<td class="build-id fit-width">' +
-                         '<a href="{buildLink}">build {buildNumber}</a>' +
+                         '<a id="{buildId}-link" href="{buildLink}">build {buildNumber}</a>' +
                      '</td>' +
                      '<td class="actions-menu">' +
                          '<a class="unadorned" id="{buildId}-bactions-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -232,7 +233,14 @@ public class ProjectsModelsHelper
         List<BuildResult> result = cache.get(project);
         if (result == null)
         {
-            result = buildManager.getLatestBuildResultsForProject(project, Math.max(2, configuration.getBuildsPerProject()));
+            int count = configuration.getBuildsPerProject();
+            result = new LinkedList<BuildResult>();
+            result.addAll(buildManager.queryBuilds(project, ResultState.getIncompleteStates(), -1, -1, -1, count, true, false));
+            if (result.size() < count)
+            {
+                result.addAll(buildManager.getLatestBuildResultsForProject(project, count - result.size()));
+            }
+            
             cache.put(project, result);
         }
 

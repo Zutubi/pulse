@@ -1,10 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
+import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNException;
@@ -13,10 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
-import static com.zutubi.util.CollectionUtils.asPair;
-
-public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class BuildConcurrentAcceptanceTest extends SeleniumTestBase
 {
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -90,18 +90,25 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testProjectConcurrentlyBuildingOnTwoAgents() throws Exception
     {
-        xmlRpcHelper.ensureAgent(SeleniumTestBase.AGENT_NAME);
+        WaitProject project = setUpConcurrentBuildsOnTwoAgents();
+        project.releaseBuild();
+        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+    }
 
-        WaitProject project = createProject("A");
-        bindStagesToAny(project);
-        project.getConfig().getOptions().setConcurrentBuilds(2);
-        insertProjects(project);
+    public void testActiveBuildThatIsNotLatest() throws Exception
+    {
+        WaitProject project = setUpConcurrentBuildsOnTwoAgents();
 
-        buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        browser.loginAsAdmin();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
+        assertEquals("build 2", browser.getText(buildLinkId));
 
-        buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 2);
+        xmlRpcHelper.cancelBuild(project.getName(), 2);
+        
+        browser.refresh();
+        browsePage.waitFor();
+        assertEquals("build 1", browser.getText(buildLinkId));
 
         project.releaseBuild();
         xmlRpcHelper.waitForProjectToBeIdle(project.getName());
@@ -129,7 +136,7 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // update scm to change the revision.
         makeChangeToSvn();
-        
+
         project.releaseBuild();
         xmlRpcHelper.waitForProjectToBeIdle(project.getName());
 
@@ -171,6 +178,23 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
             IOUtils.close(workspace);
             removeDirectory(wcDir);
         }
+    }
+
+    private WaitProject setUpConcurrentBuildsOnTwoAgents() throws Exception
+    {
+        xmlRpcHelper.ensureAgent(SeleniumTestBase.AGENT_NAME);
+
+        WaitProject project = createProject("A");
+        bindStagesToAny(project);
+        project.getConfig().getOptions().setConcurrentBuilds(2);
+        insertProjects(project);
+
+        buildRunner.triggerBuild(project);
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+
+        buildRunner.triggerBuild(project);
+        xmlRpcHelper.waitForBuildInProgress(project.getName(), 2);
+        return project;
     }
 
     private WaitProject createProject(String suffix) throws Exception

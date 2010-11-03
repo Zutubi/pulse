@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -13,12 +14,11 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.mockito.Matchers;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
-
-import static org.mockito.Mockito.*;
 
 public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 {
@@ -100,6 +100,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         });
 
         // We don't care about the builds, they can be tested elsewhere.
+        stub(buildManager.queryBuilds((Project) anyObject(), eq(ResultState.getIncompleteStates()), eq(-1), eq(-1), eq(-1), anyInt(), eq(true), eq(false))).toReturn(Collections.<BuildResult>emptyList());
         stub(buildManager.getLatestBuildResultsForProject((Project) anyObject(), anyInt())).toReturn(Collections.<BuildResult>emptyList());
 
         AccessManager accessManager = mock(AccessManager.class);
@@ -392,25 +393,12 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
     public void testBuildCountApplied()
     {
         config.setBuildsPerProject(3);
-        
+
         helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
+        verify(buildManager).queryBuilds(p1, ResultState.getIncompleteStates(), -1, -1, -1, 3, true, false);
         verify(buildManager).getLatestBuildResultsForProject(p1, 3);
         verify(buildManager).getLatestCompletedBuildResult(p1);
         verifyNoMoreInteractions(buildManager);
-    }
-
-    public void testTwoBuildsRetrievedButOnlyOneShown()
-    {
-        config.setBuildsPerProject(1);
-
-        stub(buildManager.getLatestBuildResultsForProject((Project) anyObject(), anyInt())).toReturn(Arrays.asList(createBuild(p1, 2), createBuild(p1, 1)));
-        List<ProjectsModel> models = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
-        verify(buildManager).getLatestBuildResultsForProject(p1, 2);
-        verify(buildManager).getLatestCompletedBuildResult(p1);
-        verifyNoMoreInteractions(buildManager);
-
-        ConcreteProjectModel model = (ConcreteProjectModel) models.get(0).getRoot().getChildren().get(0);
-        assertEquals(1, model.getBuildRows().size());
     }
 
     public void testLabellingOfUngroupedSomeGroups()

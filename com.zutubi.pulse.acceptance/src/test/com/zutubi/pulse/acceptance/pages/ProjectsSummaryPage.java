@@ -96,6 +96,11 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
         return browser.getText(id);
     }
 
+    public String getBuildLinkId(String group, String projectName, int buildIndex)
+    {
+        return "b" + (buildIndex + 1) + "." + getProjectRowId(group, projectName) + "-link";
+    }
+
     public boolean isResponsibilityPresent(String group, String project)
     {
         return browser.isElementIdPresent(getProjectRowId(group, project) + "_fixing");
