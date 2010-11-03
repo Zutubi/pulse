@@ -419,14 +419,6 @@
 #end
 
 ##
-## Outputs a cell for a content table with the given static content, which
-## is be allowed to wrap.
-##
-#macro(staticWrapCell $key)
-    <td class="content-wrap">#wwtext("name=$key")</td>
-#end
-
-##
 ## Outputs a cell for a content table with the given dynamic content, which
 ## should be escaped, with a row span.
 ##
@@ -456,18 +448,6 @@
 ##
 #macro(dynamicRightLinkCell $content $url)
     <td class="content-right">
-    #if($url)
-        <a href="$url">
-    #end
-            $!webwork.htmlEncode($content)
-    #if($url)
-        </a>
-    #end
-     </td>
-#end
-
-#macro(dynamicRightLinkClassCell $content $url)
-    <td class="${cssClass}-right">
     #if($url)
         <a href="$url">
     #end
@@ -515,27 +495,6 @@
 #end
 
 ##
-## Outputs a content row with two-keyed values, the second allowed to wrap
-##
-#macro(docRow $nameKey $descKey)
-    <tr>
-        #contentRowHeading($nameKey)
-        #staticWrapCell($descKey)
-    </tr>
-#end
-
-##
-## Outputs a name:value pair row from a property; both name and value need to
-## be escaped.
-##
-#macro(propertyRow $property)
-    <tr>
-        #dynamicHeading($property.key)
-        #dynamicCell($property.value)
-    </tr>
-#end
-
-##
 ## Outputs an action cell with an id
 ##
 #macro(actionCellId $actionKey $url $image $id $span)
@@ -560,15 +519,6 @@
 ##
 #macro(actionCell $actionKey $url $image)
     #actionCellId($actionKey $url $image false false)
-#end
-
-##
-## Outputs an action cell with an image, and link title but no text
-##
-#macro(actionCellTitle $id $titleKey $url $image)
-    <td class="content">
-        <a id="$id" class="unadorned" href="$url" title="$action.getText($titleKey)"><img alt="$action.getText($titleKey)" src="$base/images/$image"/></a>
-    </td>
 #end
 
 ##
@@ -602,13 +552,6 @@
 #end
 
 ##
-## Outputs a right aligned table cell with class based on $cssClass
-##
-#macro(rightClassCell $content)
-    <td class="${cssClass}-right">$!webwork.htmlEncode($content)</td>
-#end
-
-##
 ## Shared by date cell macros
 ##
 #macro(dateCellContent $entity $type $date $time)
@@ -626,19 +569,6 @@
     <td class="$cssClass">
     #if($result.commenced())
         #dateCellContent($result "start" $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
-    #else
-        n/a
-    #end
-    </td>
-#end
-
-##
-## Outputs an end timestamp cell with class based on $cssClass
-##
-#macro(endDateClassCell $result)
-    <td class="$cssClass">
-    #if($result.completed())
-        #dateCellContent($result "end" $result.stamps.getPrettyEndDate($locale) $result.stamps.prettyEndTime)
     #else
         n/a
     #end
@@ -724,85 +654,11 @@
     #end
 #end
 
-##
-##
-##
-#macro(assignGlobalResultCssClass $result)
-    #if($result.succeeded() && $result.warningFeatureCount > 0)
-        #set($cssClass = "warning")
-    #else
-        #set($cssClass = $result.state.string)
-    #end
-#end
 
 #macro(showHideButton $category $id $align)
     <a href="#" class="unadorned" id="${id}-link" onclick="Zutubi.FloatManager.showHideFloat('$category', '$id', '$align'); return false"><img alt="actions" id="${id}-button" class="popdown floating-widget" src="$base/images/default/s.gif"/></a>
 #end
 
-##
-##
-##
-#macro(commitCommentCell $changelist $id_suffix)
-    #set($changeId = "${changelist.id}_comment_${id_suffix}")
-    <td class="content" id="${changeId}_cell">
-
-    #set($commitMessageSupport = $action.getCommitMessageSupport($changelist))
-
-    #if ($commitMessageSupport.length > 60)
-        $commitMessageSupport.trim(60)
-        #showHideButton("comments" "${changeId}" "tr-br?")
-        <div id="$changeId" style="display: none">
-            <table class="content" style="margin: 0">
-                <tr>
-                    <th class="heading" colspan="5">
-                        <span class="action">
-                            <a href="#" onclick="Zutubi.FloatManager.showHideFloat('comments', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
-                        </span>
-                        #wwtext("name=change.comment")
-                    </th>
-                </tr>
-                <tr>
-                    <td><pre>$commitMessageSupport.wrap(80)</pre></td>
-                </tr>
-            </table>
-        </div>
-    #else
-        $commitMessageSupport.wrap(80)
-    #end
-    </td>
-#end
-
-##
-## Outputs a result test summary cell
-##
-#macro(testResultsCell $build $recipe $result)
-    #if($result.succeeded() && $result.warningFeatureCount > 0)
-        <td #if(!$recipe)id='#id("${build.project.name}.build.${build.number}.test")'#end class="warning">
-    #else
-        <td #if(!$recipe)id='#id("${build.project.name}.build.${build.number}.test")'#end class="$result.state.string">
-    #end
-    
-    #set($summary = $result.testSummary)
-    #if($summary.total == 0)
-        #wwtext("name=tests.none")
-    #else
-        #if($recipe)
-            <a href="$urls.stageTests($build, $recipe)">
-        #else
-            <a href="$urls.buildTests($build)">
-        #end
-        #if($summary.hasBroken())
-            $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
-        #else
-            $action.getText("tests.all.passed", ["$summary.total"])
-        #end
-        #if($summary.hasSkipped())
-            $action.getText("tests.some.skipped", ["$summary.skipped"])
-        #end
-        </a>
-    #end
-    </td>
-#end
 
 ##
 ## Outputs an owner cell for a build request or result
@@ -836,52 +692,6 @@
     #else
         #classCell($result.stamps.prettyElapsed)
     #end
-#end
-
-##
-## Outputs an action cell for viewing a build result
-##
-#macro(viewCell $project $result)
-    <td class="content">
-        <a id="summary-#uce($project.name)-${result.number}" href="$urls.build($result)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
-    </td>
-#end
-
-##
-## Outputs an action cell for viewing the log for a build
-##
-#macro(buildLogCell $project $result)
-    <td class="content">
-        <a id="log-#uce($project.name)-${result.number}" href="$urls.buildLog($result)" class="unadorned" title="view log"><img alt="view log" src="$base/images/script.gif"/></a>
-    </td>
-#end
-
-##
-## Outputs an action cell for viewing the details for a build
-##
-#macro(detailsCell $project $result)
-    <td class="content">
-        <a id="details-#uce($project.name)-${result.number}" href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
-    </td>
-#end
-
-##
-## Outputs an action cell for viewing changes for a build
-##
-#macro(changesCell $project $result)
-    #set($url = "$urls.buildChanges($result)")
-    <td class="content">
-        <a id="changes-#uce($project.name)-${result.number}" href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
-    </td>
-#end
-
-##
-## Outputs an action cell for viewing artifacts for a build
-##
-#macro(artifactsCell $project $result)
-    <td class="content">
-        <a id="artifacts-#uce($project.name)-${result.number}" href="$urls.buildArtifacts($result)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
-    </td>
 #end
 
 
@@ -1096,8 +906,6 @@
     </table>
     #end
 #end
-
-<!--- quartz trigger state -->
 
 ##
 ## Shows a table row with pages and previous/next etc links.  Pager should be
@@ -1376,224 +1184,6 @@
     </table>
 #end
 
-#macro(buildTableColumns $buildColumns $idSuffix)
-    <div style="display: none">
-        <table>
-            <tr id="build-table-${idSuffix}">
-    #foreach($key in $buildColumns.columns)
-                <th class="content" id="build-header-${key}-${idSuffix}"></th>
-    #end
-            </tr>
-        </table>
-    </div>
-#end
-
-##
-## Outputs the table headers a build results table (but not the row tags).
-##
-#macro(buildTableHeaders $buildColumns)
-    #foreach($key in $buildColumns.columns)
-        #set($colspan = $buildColumns.getSpan($key))
-        <th class="content" #if($colspan > 1) colspan="$colspan" #end>#wwtext("name=build.$key")</th>
-    #end
-#end
-
-##
-## Outputs the heading row for a build results table
-##
-#macro(buildTableHeading $buildColumns)
-    <tr>
-        #buildTableHeaders($buildColumns)
-    </tr>
-#end
-
-##
-## Outputs cells for a build result in a table of results, based on the given
-## column configuration, but without the row tags.
-##
-#macro(buildTableCells $buildResult $columns $multiProject)
-    #assignGlobalResultCssClass($buildResult)
-    #foreach($key in $columns.columns)
-        #buildTableCell($buildResult $columns $key $multiProject)
-    #end
-#end
-
-##
-## Outputs a row for a build result in a table of results, based on the given
-## column configuration.
-##
-#macro(buildTableRow $buildResult $columns $multiProject)
-    <tr>
-        #buildTableCells($buildResult $columns $multiProject)
-    </tr>
-#end
-
-##
-## Outputs a project cell for a build result table.
-##
-#macro(projectCell $project)
-    <td class="content">
-        <a href="$urls.projectHome($project)" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
-    </td>
-#end
-
-#macro(projectClassCell $project)
-    <td class="$cssClass">
-        <a href="$urls.projectHome($project)" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
-    </td>
-#end
-
-##
-## Outputs a single build result cell, based on the given column key
-##
-#macro(buildTableCell $buildResult $columns $key $multiProject)
-    #set($project = $buildResult.project)
-    #if($key == "id")
-        <td class="content-right" id='#id("${buildResult.ownerName}.build.${buildResult.number}.id")'>
-            <a href="$urls.build($buildResult)">$buildResult.number</a>
-        </td>
-    #elseif($key == "project")
-        #projectClassCell($project)
-    #elseif($key == "status")
-        #statusCell($buildResult true)
-    #elseif($key == "reason")
-        #classCell($buildResult.reason.summary)
-    #elseif($key == "tests")
-        #testResultsCell($buildResult false $buildResult)
-    #elseif($key == "owner")
-        #ownerCell($buildResult $cssClass)
-    #elseif($key == "rev")
-        #if($buildResult.personal)
-            #staticClassCell("personal")
-        #elseif($buildResult.revision)
-            $action.updateChangeUrl($project, $buildResult.revision)
-            #if($buildResult.revision.numeric)
-            <td class="${cssClass}-right">
-            #else
-            <td class="${cssClass}">
-            #end
-            #if($buildResult.revision.abbreviated)
-                <span title="$!webwork.htmlEncode($buildResult.revision.revisionString)">
-            #end
-            #if($action.getChangeUrl())
-                <a href="$action.getChangeUrl()">
-            #end
-                $!webwork.htmlEncode($buildResult.revision.abbreviatedRevisionString)
-            #if($action.getChangeUrl())
-                </a>
-            #end
-            #if($buildResult.revision.abbreviated)
-                </span>
-            #end
-             </td>
-        #else
-            #contentClassCell("revision.none")
-        #end
-    #elseif($key == "version")
-        #if($buildResult.version)
-            #classCell($buildResult.version)
-        #else
-            #classCell("none")
-        #end
-    #elseif($key == "when")
-        #dateClassCell($buildResult)
-    #elseif($key == "completed")
-        #endDateClassCell($buildResult)
-    #elseif($key == "elapsed")
-        #elapsedCell($buildResult)
-    #elseif($key == "actions")
-        #viewCell($project $buildResult)
-        #buildLogCell($project $buildResult)
-        #detailsCell($project $buildResult)
-        #changesCell($project $buildResult)
-        #artifactsCell($project $buildResult)
-    #elseif($key == "warnings")
-        #rightClassCell($buildResult.warningFeatureCount)
-    #elseif($key == "errors")
-        #rightClassCell($buildResult.errorFeatureCount)
-    #else
-        <td class="content">unknown column '$key'</td>
-    #end
-#end
-
-##
-## Outputs a checkbox for configuring a build table column
-##
-#macro(buildColumnCheckbox $key $idSuffix $popupName)
-    <td>
-        <input type="checkbox" id="build-column-${key}-${idSuffix}" onclick="${popupName}.addRemoveBuildColumn('$key', '$idSuffix');"/>
-    </td>
-    <td>
-        <label for="build-column-${key}-${idSuffix}">#wwtext("name=build.$key")</label>
-    </td>
-#end
-
-##
-## Outputs HTML for a build columns popup window
-##
-#macro(buildColumnsPopup $idSuffix $popupName)
-    <div id="column-arrow-$idSuffix" style="z-index: 102; display: none; position: absolute">
-        <img src="$base/images/arrow_down_small.gif"/>
-    </div>
-
-    <div id="columns-popup-$idSuffix" class="floating" style="display: none;">
-        <table class="content" style="margin: 0">
-            <tr id="columns-popup-handle-$idSuffix">
-                <th class="heading" colspan="1">
-                    #wwtext("name=build.columns.configure")
-                </th>
-            </tr>
-            <tr>
-                <td style="padding-top: 0">
-                    <h3 class="popup">#wwtext("name=build.columns.order")</h3>
-                    <table>
-                        <tr id="build-header-row-$idSuffix">
-                        </tr>
-                    </table>
-
-                    <h3 class="popup">#wwtext("name=build.columns.select")</h3>
-                    <table class="build-columns">
-                        <tr>
-                            #buildColumnCheckbox("id" $idSuffix $popupName)
-                            #buildColumnCheckbox("project" $idSuffix $popupName)
-                            #buildColumnCheckbox("status" $idSuffix $popupName)
-                            #buildColumnCheckbox("rev" $idSuffix $popupName)
-                            #buildColumnCheckbox("reason" $idSuffix $popupName)
-                        </tr>
-                        <tr>
-                            #buildColumnCheckbox("tests" $idSuffix $popupName)
-                            #buildColumnCheckbox("when" $idSuffix $popupName)
-                            #buildColumnCheckbox("elapsed" $idSuffix $popupName)
-                            #buildColumnCheckbox("completed" $idSuffix $popupName)
-                            #buildColumnCheckbox("owner" $idSuffix $popupName)
-                        </tr>
-                        <tr>
-                            #buildColumnCheckbox("version" $idSuffix $popupName)
-                            #buildColumnCheckbox("warnings" $idSuffix $popupName)
-                            #buildColumnCheckbox("errors" $idSuffix $popupName)
-                            #buildColumnCheckbox("actions" $idSuffix $popupName)
-                        </tr>
-                    </table>
-
-                    <div class="popup-actions">
-                        <a href="#" class="unadorned" onclick="${popupName}.applyBuildColumns(); return false;">
-                            <img alt="accept" src="$base/images/accept.gif"/>
-                            #wwtext("name=build.columns.apply")
-                        </a>
-                        &nbsp;
-                        <a href="#" class="unadorned" onclick="${popupName}.cancelBuildColumns(); return false;">
-                            <img alt="cancel" src="$base/images/cancel.gif"/>
-                            #wwtext("name=build.columns.cancel")
-                        </a>
-                    </div>
-
-                    <div id="columns-popup-error-$idSuffix" style="display: none; color: #e33;">
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-#end
 
 #macro(pluginStateImage $plugin)
     #if($plugin.disabled || $plugin.disabling)
