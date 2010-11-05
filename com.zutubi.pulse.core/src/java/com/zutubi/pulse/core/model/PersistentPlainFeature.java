@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A PlainFeature is a feture discovered by analysing an artifact as plain
+ * A PlainFeature is a feature discovered by analysing an artifact as plain
  * text, line by line.  In addition to the summary, these features contain
  * location information.
  */

@@ -702,7 +702,7 @@
     #if($result.hasDirectMessages($level))
         #foreach($feature in $result.getFeatures($level))
     <li class="$level.toString().toLowerCase()">
-        $action.plainToHtml($feature.summary)</pre>
+        $action.plainToHtml($feature.summary)
     </li>
         #end
     #end
