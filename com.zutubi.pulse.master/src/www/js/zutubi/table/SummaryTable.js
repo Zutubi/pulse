@@ -47,7 +47,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         if (this.selectedColumns)
         {
             this.activeColumns = new Array(this.selectedColumns.length);
-            for (var i = 0; i < this.selectedColumns.length; i++)
+            for (i = 0; i < this.selectedColumns.length; i++)
             {
                 this.activeColumns[i] = this.getKeyValueByName(this.selectedColumns[i]);
             }
@@ -55,7 +55,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         else
         {
             this.activeColumns = new Array(this.keyValues.length);
-            for (var i = 0; i < this.keyValues.length; i++)
+            for (i = 0; i < this.keyValues.length; i++)
             {
                 this.activeColumns[i] = this.keyValues[i];
             }
@@ -75,16 +75,17 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     },
     
     getKeyValueByName: function(name) {
+        var kv;
         for (var i = 0; i < this.keyValues.length; i++)
         {
-            var kv = this.keyValues[i];
+            kv = this.keyValues[i];
             if (kv.name == name)
             {
                 return kv;
             }
         }
         
-        var kv = new Zutubi.KeyValue(name);
+        kv = new Zutubi.KeyValue(name);
         kv.component = this;
         this.keyValues.push(kv);
         return kv;
@@ -177,7 +178,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
             this.removeColumn(this.getColumnIndex(th));
          }, this);
 
-        for (var i = 0, l = this.data.length; i < l; i++)
+        for (i = 0, l = this.data.length; i < l; i++)
         {
             this.tbodyEl.insertHtml('beforeEnd', this.generateRow('td', this.data[i]), true);
         };
@@ -362,7 +363,7 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
                 tooltip: 'finish customising',
                 icon: window.baseUrl + '/images/pencil.gif',
                 listeners: {
-                    click: function(button) {
+                    click: function() {
                         table.customiseComplete();
                     }
                 }
@@ -394,7 +395,7 @@ Zutubi.table.SummaryTableDragZone = Ext.extend(Ext.dd.DragZone, {
                     ddel: d,
                     header: target,
                     repairXY: Ext.fly(target).getXY()
-                }
+                };
             }
         }
     },

@@ -528,7 +528,7 @@ td.content, td.content-nowrap, .nowrap
     white-space: nowrap;
 }
 
-td.content-wrap
+td.content-wrap, .wrap
 {
     white-space: normal;
 }

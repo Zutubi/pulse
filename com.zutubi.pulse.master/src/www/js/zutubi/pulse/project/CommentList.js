@@ -24,7 +24,7 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     commentTemplate: new Ext.XTemplate(
         '<li>' +
             '<div class="comment-body">' +
-                + '{message:htmlEncode:nl2br}' +
+                + '{message:plainToHtml}' +
             '</div>' +
             '<div class="comment-author">' +
                 'by {author:htmlEncode}, {date.relativeTime} ({date.absoluteTime})' +
@@ -71,4 +71,4 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     }
 });
 
-Ext.reg('xzcommentlist')
+Ext.reg('xzcommentlist');

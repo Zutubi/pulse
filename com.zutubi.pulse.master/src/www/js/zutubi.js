@@ -1069,3 +1069,8 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         }
     }
 });
+
+Ext.utl.Format.plainToHtml = function(s)
+{
+    return Ext.util.Format.htmlEncode(s).replace(/ /g, '&nbsp;').replace(/\r?\n/g, '<br/>');
+};

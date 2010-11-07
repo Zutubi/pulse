@@ -13,13 +13,14 @@
  *         isComplete: true,
  *         features: FeatureModel[],
  *         commands: [{
- *             name: 'build',
+ *             name: 'test',
  *             features: FeatureModel[],
+ *             artifactsUrl: '/browse/my-project/build/2/artifacts/my-stage/test/',
  *             artifacts: [{
  *                 name: 'test-reports',
  *                 files: [{
  *                     path: 'path/to/file.txt',
- *                     featureCount: 130,  (may be more than features included)
+ *                     featuresTrimmed: false,
  *                     features: FeatureModel[],
  *                 }, ... ]
  *             }, ... ]
@@ -32,7 +33,7 @@
  */
 Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     template: new Ext.XTemplate(
-        '<table id="features-${level.prettyString}" class="content-table">' +
+        '<table id="{id}" class="content-table">' +
             '<tr><th class="two-heading">{level} features</th></tr>' +
             '<tr>' +    
                 '<td class="leftmost rightmost">' +
@@ -45,7 +46,7 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
 
     featureTemplate: new Ext.XTemplate(
         '<li class="{level}">' +
-            '{summary:htmlEncode:nl2br}' +
+            '{summary:plainToHtml}' +
         '</li>'
     ),
     
@@ -114,7 +115,7 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     stageFeatures: function(stage)
     {
         var recipe = stage.recipeName ? Ext.util.Format.htmlEncode(stage.recipeName) : '[default]';
-        var agent = stage.agentName ? Ext.util.Format.htmlEncode(stage.agentName) : '[pending]'
+        var agent = stage.agentName ? Ext.util.Format.htmlEncode(stage.agentName) : '[pending]';
         var html = '<li class="header">build stage :: ' + Ext.util.Format.htmlEncode(stage.name) + ' :: ' + recipe + '@' + agent + '<ul>';
         html += this.simpleFeatures(stage.features);
         
@@ -127,34 +128,34 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         return html;
     },
     
-    commandFeatures: function(command, complete)
+    commandFeatures: function(command, stageComplete)
     {
         var html = '<li class="header">command :: ' + Ext.util.Format.htmlEncode(command.name) + '<ul>';
         html += this.simpleFeatures(command.features);
         
         for (var i = 0, l = command.artifacts.length; i < l; i++)
         {
-            html += this.artifactFeatures(command.artifacts[i], command.artifactsUrl, complete);
+            html += this.artifactFeatures(command.artifacts[i], command.artifactsUrl, stageComplete);
         }
         
         html += '</ul></li>';
         return html;
     },
     
-    artifactFeatures: function(artifact, artifactsUrl, complete)
+    artifactFeatures: function(artifact, artifactsUrl, stageComplete)
     {
         var html = '';
         for (var i = 0, l = artifact.files.length; i < l; i++)
         {
-            html += this.fileFeatures(artifact.files[i], artifactsUrl, complete);
+            html += this.fileFeatures(artifact.files[i], artifactsUrl, stageComplete);
         }
         
         return html;
     },
     
-    fileFeatures: function(file, artifactsUrl, complete)
+    fileFeatures: function(file, artifactsUrl, stageComplete)
     {
-        var fileUrl = artifactsUrl + this.pathToUrl(file.path);
+        var fileUrl = artifactsUrl + encodeURIPath(file.path);
         var html = '<li class="header">artifact :: ' + Ext.util.Format.htmlEncode(file.path) + '<ul>';
         for (var i = 0, l = file.features.length; i < l; i++)
         {
@@ -162,8 +163,8 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
             if (feature.summaryLines)
             {
                 html += '<span class="context">';
-                var lines = faeture.summaryLines;
-                for (var lineIndex = 0, lineCount = lines.length; lineIndex < lineLength; lineIndex++)
+                var lines = feature.summaryLines;
+                for (var lineIndex = 0, lineCount = lines.length; lineIndex < lineCount; lineIndex++)
                 {
                     var line = lines[lineIndex];
                     if (lineIndex == feature.lineOffset)
@@ -171,7 +172,7 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
                         html += '</span><span class="feature">';
                     }
                     
-                    html += Ext.util.Format.htmlEncode(line) + '<br/>';
+                    html += Ext.util.Format.plainToHtml(line) + '<br/>';
                     
                     if (lineIndex == feature.lineOffset)
                     {
@@ -183,10 +184,10 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
             }
             else
             {
-                html += Ext.util.Format.htmlEncode(feature.summary) + '<br/>';
+                html += Ext.util.Format.plainToHtml(feature.summary) + '<br/>';
             }
             
-            if (complete)
+            if (stageComplete)
             {
                 html += '<a class="unadorned" href="' + fileUrl + '#' + feature.lineNumber;
                 html += '<span class="small">jump to</span> <img src="' + window.baseUrl + '/images/go_small.gif"/></a>';
@@ -197,7 +198,7 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
 
         if (file.featuresTrimmed)
         {
-            html += '<li>...[trimmed] To see the full list of features';
+            html += '<li>...[trimmed] To see the full list of features ';
             html += '<a class="unadorned" href="' + fileUrl + '"><span class="small">jump to</span> ';
             html += '<img src="$base/images/go_small.gif"/></a></li>';
         }
@@ -207,4 +208,4 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     }
 });
 
-Ext.reg('xzfeaturelist')
+Ext.reg('xzfeaturelist');
