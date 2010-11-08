@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
@@ -19,7 +19,7 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.*;
 
@@ -56,7 +56,7 @@ public class DashboardDataAction extends ActionSupport
         {
             public String process()
             {
-                String login = AcegiUtils.getLoggedInUsername();
+                String login = SecurityUtils.getLoggedInUsername();
                 if (login == null)
                 {
                     return "guest";

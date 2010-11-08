@@ -9,12 +9,12 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.providers.dao.DaoAuthenticationProvider;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * A custom implementation of {@link DaoAuthenticationProvider}.
@@ -36,7 +36,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     private LdapManager ldapManager;
 
     /**
-     * Implementation of the {@link org.springframework.security.providers.AuthenticationProvider#authenticate(org.springframework.security.Authentication)}
+     * Implementation of the {@link org.springframework.security.authentication.AuthenticationProvider#authenticate(org.springframework.security.core.Authentication)}
      * method.
      *
      * This implementation will attempt to add an unknown user to the system if they are
@@ -69,7 +69,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
                     token = new UsernamePasswordAuthenticationToken(login, token.getCredentials());
 
                     final String password = (String) token.getCredentials();
-                    AcegiUtils.runAsSystem(new Runnable()
+                    SecurityUtils.runAsSystem(new Runnable()
                     {
                         public void run()
                         {
@@ -88,7 +88,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
             if (user != null && user.isAuthenticatedViaLdap())
             {
-                AcegiUtils.runAsSystem(new Runnable()
+                SecurityUtils.runAsSystem(new Runnable()
                 {
                     public void run()
                     {
@@ -138,7 +138,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException
     {
-        AcegiUser user = (AcegiUser) userDetails;
+        Principle user = (Principle) userDetails;
         if (user.getLdapAuthentication())
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via LDAP");

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.security.ldap;
 
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import java.util.List;
@@ -28,14 +28,14 @@ public interface LdapManager
     public UserConfiguration authenticate(String username, String password, boolean addContact);
 
     /**
-     * This method will add the {@link GroupConfiguration} instances to the user via {@link AcegiUser#addGroup(GroupConfiguration)}
+     * This method will add the {@link GroupConfiguration} instances to the user via {@link com.zutubi.pulse.master.security.Principle#addGroup(GroupConfiguration)}
      * for any of the users ldap group memberships where there exists a corresponding group within Pulse.  
      *
      * This requires ldap group integration to be configured.
      *
      * @param user  the user whose groups will be queried.
      */
-    public void addLdapRoles(AcegiUser user);
+    public void addLdapRoles(Principle user);
 
     /**
      * Returns true if ldap users are allowed to be automatically added to Pulse.

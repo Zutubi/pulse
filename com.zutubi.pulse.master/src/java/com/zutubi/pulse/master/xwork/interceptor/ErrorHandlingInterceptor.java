@@ -7,8 +7,8 @@ import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.interceptor.Interceptor;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.AccessDeniedException;
 import org.mortbay.http.EOFException;
+import org.springframework.security.access.AccessDeniedException;
 
 import javax.servlet.http.HttpServletResponse;
 

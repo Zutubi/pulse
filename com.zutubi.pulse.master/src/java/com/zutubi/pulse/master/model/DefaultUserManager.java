@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.master.model.persistence.UserDao;
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -24,9 +24,9 @@ import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.providers.encoding.PasswordEncoder;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.*;
 
@@ -285,15 +285,15 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return projects;
     }
 
-    public AcegiUser getPrinciple(UserConfiguration userConfig)
+    public Principle getPrinciple(UserConfiguration userConfig)
     {
         User user = getUser(userConfig.getUserId());
         return getPrinciple(user);
     }
 
-    public AcegiUser getPrinciple(User user)
+    public Principle getPrinciple(User user)
     {
-        AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));
+        Principle principle = new Principle(user, groupsByUser.get(user.getConfig()));
         principle.addGroup(allUsersGroup);
         ldapManager.addLdapRoles(principle);
         return principle;

@@ -1,0 +1,17 @@
+#set($config = $action.configuration)
+
+<h2 id='#id("map:path:$config.path")'>#html($config.displayName)</h2>
+<p class="introduction">
+    #i18n("key=introduction")
+</p>
+<p>
+    #if ($config.displayFields.size() > 0)
+        #renderState($config)
+    #end
+
+    #table("path=$config.path")
+</p>
+
+<script type="text/javascript">
+    detailPanel.setHelp('#jss(${path})', 'type');
+</script>

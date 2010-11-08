@@ -1,12 +1,10 @@
 package com.zutubi.pulse.master.security.ldap;
 
 import com.zutubi.pulse.master.model.UserManager;
-import static com.zutubi.pulse.master.security.ldap.AcegiLdapManager.EMAIL_CONTACT_NAME;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.util.io.IOUtils;
-import static junit.framework.Assert.*;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
 import org.apache.directory.server.core.annotations.CreateDS;
@@ -17,11 +15,14 @@ import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Map;
+
+import static com.zutubi.pulse.master.security.ldap.AcegiLdapManager.EMAIL_CONTACT_NAME;
+import static junit.framework.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
-import java.util.Map;
 
 
 @RunWith(FrameworkRunner.class)
@@ -89,7 +90,7 @@ public class AcegiLdapManagerTest extends AbstractLdapTestUnit
     }
 
     @Test
-    // authenitcate a user that exists in the local configuration.
+    // authenticate a user that exists in the local configuration.
     public void testAuthenticateLocalUser()
     {
         manager.init(config);

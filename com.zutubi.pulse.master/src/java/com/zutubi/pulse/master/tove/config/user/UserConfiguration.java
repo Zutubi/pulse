@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.Extendable;
@@ -40,7 +40,7 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
     public UserConfiguration()
     {
         directAuthorities = new LinkedList<String>();
-        directAuthorities.add(GrantedAuthority.USER);
+        directAuthorities.add(Role.USER);
     }
 
     public UserConfiguration(String login, String name)

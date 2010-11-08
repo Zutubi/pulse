@@ -1,0 +1,228 @@
+#set($config = $action.configuration)
+#set($path = $config.path)
+
+#macro(renderform)
+    <div class="config-panel">
+        <h3 class="config-header">
+            ${config.formHeading}
+            #set($onclick = "showHelp('#jss($path)', 'type'); return false")
+            <a href="#" class="unadorned" onclick="#html($onclick)"><img alt="show help" src="$base/images/help.gif"/></a>
+        </h3>
+        ##<!-- add some space around the form so that it does not sit directly on the border. -->
+        <div class="config-container">
+            #pform("path=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=ajax/config")
+        </div>
+        #standardFormEvents("mainform")
+    #if($config.configurationCheckAvailable && $config.writable)
+       #checkForm($path $config.type "mainform" "ajax/config")
+    #end
+    </div>
+    #if($config.embedded && !$config.writable)
+        <p>
+            <a class="unadorned" href="#" onclick="selectPath('$config.parentPath'); return false">
+                <img src="$base/images/resultset_previous.gif"/>
+            </a>
+            <a href="#" onclick="selectPath('$config.parentPath'); return false">back</a>
+        </p>
+    #end
+#end
+
+#macro(navcombo $name $options)
+    #if($options.size() > 0)
+            <div id="${name}-nav" class="template-nav"></div>
+            <script type="text/javascript">
+                new Ext.form.ComboBox({
+                    renderTo: '${name}-nav',
+                    id: '${name}-combo',
+                    emptyText: 'to same path in ${name}',
+                    width: 260,
+                    mode: 'local',
+                    triggerAction: 'all',
+                    editable: false,
+                    store: [
+        #foreach($option in $options)
+            #if($velocityCount > 1),#end ['#jss($option.second)', indentImage($option.first) + Ext.util.Format.htmlEncode('#jss($option.second)')]
+        #end
+                    ],
+                    listeners: {
+                        select: function(combo, record) {
+                            // This should not be necessary, but it stops the ugliness of Ext
+                            // showing HTML in the input field (e.g. indent image, escaped chars).
+                            combo.setValue('');
+                            navigateToOwner(record.get(record.fields.first().name), '#jss($path)');
+                        }
+                    }
+                });
+            </script>
+    
+    #end
+#end
+
+<h2 id='#id($path)'>$!webwork.htmlEncode($config.displayName)</h2>
+<p class="introduction">
+    #i18n("key=introduction")
+</p>
+<table width="100%">
+    <tr>
+#if($config.record || !$config.type.extendable)
+        <td id="left-column">
+    #if($config.nestedPropertyErrors.size() > 0)
+            <div id="nested-errors" class="config-panel">
+            <h3 class="config-error-header">nested errors</h3>
+            <div class="config-container">
+            <ul class="config-errors">
+        #foreach($error in $config.nestedPropertyErrors)
+                <li>#displayname("path=${path}/${error.first}") : #html($error.second)</li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+    #if ($config.displayFields.size() > 0)
+                #renderState($config)
+    #end
+    #if( $config.simpleProperties.size() > 0)
+                #renderform()
+    #end
+    #if ($config.collapsedCollection)
+        #table("path=$config.path/$config.collapsedCollection")
+    #end
+        </td>
+        
+        <td id="right-column">
+    #if ($config.links.size() > 0)
+            <div id="config.links" class="config-panel">
+            <h3 class="config-header">links</h3>
+            <div class="config-container">
+            <ul class="config-actions">
+        #foreach($link in $config.links)
+                    <li>
+                        <a href="${base}/${link.url}" id='#id("link.${link.name}")' class="unadorned">
+                            <img src='${base}/$config.getIconPath("links", ${link.name})'/> ${link.label}
+                        </a>
+                    </li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+
+    #if ($config.actions.size() > 0)
+            <div class="config-panel">
+            <h3 class="config-header">actions</h3>
+            <div class="config-container">
+            <ul class="config-actions">
+        #foreach($action in $config.actions)
+            #if($action.action == "delete")
+                #set($onclick = "deletePath('#jss(${path})'); return false;")
+            #else
+                #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, false); return false;")
+            #end
+                    <li>
+                        <a href="#" id='#id("action.${action.action}")' class="unadorned" onclick="#html($onclick)">
+                            <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
+                        </a>
+                    </li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+
+    #if ($config.descendantActions.size() > 0)
+            <div class="config-panel" id="descendant.actions">
+            <h3 class="config-header">descendant actions</h3>
+            <div class="config-container">
+            <ul class="config-actions">
+        #foreach($action in $config.descendantActions)
+            #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, true); return false;")
+                <li>
+                    <a href="#" id='#id("descendant.action.${action.action}")' class="unadorned" onclick="#html($onclick)">
+                        <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
+                    </a>
+                </li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+
+    #if($config.configuredAncestors.size() > 0 || $config.configuredDescendants.size() > 0 || $config.nestedProperties.size() > 0)
+            <div id="config-links" class="config-panel">
+            <h3 class="config-header">navigate</h3>
+            <div class="config-container">
+                #navcombo("ancestor" $config.configuredAncestors)
+                #navcombo("descendant" $config.configuredDescendants)
+        #if($config.nestedProperties.size() > 0)
+                <div class="template-nav">to nested configuration:</div>
+                <ul class="config-links">
+            #foreach($prop in $config.nestedProperties)
+                #set($onclick = "selectPath('#jss(${path})/${prop}'); return false;")
+                    <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="#html($onclick)">#displayname("path=${path}/${prop}")</a></li>
+            #end
+                </ul>
+        #end
+            </div>
+            </div>
+    #end
+        </td>
+#else
+    ## We don't know what type we are dealing with, it needs to be configured
+    ## by a wizard.
+    #if($config.extensions.size() > 0)
+        #if($config.writable)
+            #if($config.configuredDescendantCount == 0)
+                #set($onclick = "addToPath('#jss(${path})'); return false;")
+    <table class="template-actions" cellspacing="5px">
+        <tr>
+            <th><a href="#" class="unadorned" onclick="#html($onclick)"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="#html($onclick)">configure</a></th>
+            <td>configure a #i18n("key=label") using the wizard</td>
+        </tr>
+    </table>
+            #else
+    <p>
+        This path has been configured in $config.configuredDescendantCount descendant(s) (and thus cannot be configured at this level).
+    </p>
+                #if($config.configuredDescendants.size() > 0)
+    <p>
+        These descendants include:
+    </p>
+    <ul class="points">
+                    #set($lastDepth = 0)
+                    #foreach($descendant in $config.configuredDescendants)
+                        #if($descendant.first > $lastDepth)
+                            #set($upper = $descendant.first - 1)
+                            #foreach($item in [$lastDepth..$upper])
+    <ul>
+                            #end
+                        #end
+                        #if($descendant.first < $lastDepth)
+                            #set($upper = $lastDepth - 1)
+                            #foreach($item in [$descendant.first..$upper])
+    </ul>
+                            #end
+                        #end
+                        #set($lastDepth = $descendant.first)
+                        #if($velocityCount > 1)
+        </li>
+                        #end
+        <li id='#id("cd-$descendant.second")'><a href="#" onclick="navigateToOwner('#jss($action.htmlEncode($descendant.second))', '#jss($action.htmlEncode($path))'); return false;">#html($descendant.second)</a>
+                    #end
+    </ul>
+                #end
+            #end
+        #else
+    <p>
+        No #i18n("key=label") configured.
+    </p>
+        #end
+    #else
+        No extensions registered.
+    #end
+#end
+    </tr>
+</table>
+
+<script type="text/javascript">
+    detailPanel.setHelp('#jss(${path})', 'type');
+</script>

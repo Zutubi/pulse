@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 The cache subsystem context contains the cache manager and related event configurations.
 
@@ -8,6 +7,11 @@ This context exports:
     cacheManager: the systems cache manager.
 
 -->
-<beans default-autowire="byName">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-autowire="byName">
+
     <bean id="cacheManager" class="com.zutubi.pulse.master.util.cache.ehcache.EhCacheManager" init-method="init"/>
+    
 </beans>

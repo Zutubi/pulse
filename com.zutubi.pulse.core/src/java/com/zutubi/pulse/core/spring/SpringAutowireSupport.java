@@ -100,7 +100,6 @@ class SpringAutowireSupport implements ApplicationContextAware
      *
      * @param autowireStrategy identifier
      *
-     * @see AutowireCapableBeanFactory#AUTOWIRE_AUTODETECT
      * @see AutowireCapableBeanFactory#AUTOWIRE_BY_NAME
      * @see AutowireCapableBeanFactory#AUTOWIRE_BY_TYPE
      * @see AutowireCapableBeanFactory#AUTOWIRE_CONSTRUCTOR
@@ -109,10 +108,6 @@ class SpringAutowireSupport implements ApplicationContextAware
     {
         switch (autowireStrategy)
         {
-            case AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT:
-                LOG.info("Setting autowire strategy to autodetect");
-                this.autowireStrategy = autowireStrategy;
-                break;
             case AutowireCapableBeanFactory.AUTOWIRE_BY_NAME:
                 LOG.info("Setting autowire strategy to name");
                 this.autowireStrategy = autowireStrategy;

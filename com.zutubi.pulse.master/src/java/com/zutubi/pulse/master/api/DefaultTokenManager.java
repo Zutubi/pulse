@@ -1,17 +1,18 @@
 package com.zutubi.pulse.master.api;
 
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.security.AcegiUser;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.Principle;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.servercore.api.APIAuthenticationToken;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.util.Constants;
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -85,7 +86,7 @@ public class DefaultTokenManager implements TokenManager
 
     public void verifyUser(String token) throws AuthenticationException
     {
-        verifyRoleIn(token, GrantedAuthority.USER);
+        verifyRoleIn(token, Role.USER);
     }
 
     public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
@@ -97,8 +98,8 @@ public class DefaultTokenManager implements TokenManager
         }
 
         User user = verifyToken(token);
-        AcegiUser principle = userManager.getPrinciple(user);
-        for (org.springframework.security.GrantedAuthority authority : principle.getAuthorities())
+        Principle principle = userManager.getPrinciple(user);
+        for (GrantedAuthority authority : principle.getAuthorities())
         {
             for (String allowedAuthority : allowedAuthorities)
             {
@@ -121,7 +122,7 @@ public class DefaultTokenManager implements TokenManager
     {
         if (checkAdminToken(token))
         {
-            AcegiUtils.loginAsSystem();
+            SecurityUtils.loginAsSystem();
         }
         else
         {
@@ -132,14 +133,14 @@ public class DefaultTokenManager implements TokenManager
     public User loginAndReturnUser(String token) throws AuthenticationException
     {
         User user = verifyToken(token);
-        AcegiUser principle = userManager.getPrinciple(user);
-        AcegiUtils.loginAs(principle);
+        Principle principle = userManager.getPrinciple(user);
+        SecurityUtils.loginAs(principle);
         return user;
     }
 
     public void logoutUser()
     {
-        AcegiUtils.logout();
+        SecurityUtils.logout();
     }
 
     private synchronized User verifyToken(String token) throws AuthenticationException

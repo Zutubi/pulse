@@ -3,11 +3,11 @@ package com.zutubi.pulse.master.security;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
 
@@ -33,9 +33,9 @@ public class GlobalAuthorityProvider implements AuthorityProvider<Object>, Event
             GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
             if(config.isAnonymousSignupEnabled())
             {
-                result.add(GrantedAuthority.ANONYMOUS);
-                result.add(GrantedAuthority.GUEST);
-                result.add(GrantedAuthority.USER);
+                result.add(Role.ANONYMOUS);
+                result.add(Role.GUEST);
+                result.add(Role.USER);
             }
         }
 

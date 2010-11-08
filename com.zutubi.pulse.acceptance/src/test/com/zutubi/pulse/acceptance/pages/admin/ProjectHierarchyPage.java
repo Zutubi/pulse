@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.webwork.Urls;
 
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+
 /**
- * The page shown when looking at a project in the heirarchy view.
+ * The page shown when looking at a project in the hierarchy view.
  */
 public class ProjectHierarchyPage extends HierarchyPage
 {

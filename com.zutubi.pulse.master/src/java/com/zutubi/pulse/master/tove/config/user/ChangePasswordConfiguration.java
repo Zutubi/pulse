@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.security.AccessManager;
@@ -63,7 +63,7 @@ public class ChangePasswordConfiguration extends AbstractConfiguration implement
 
     public void validate(ValidationContext context)
     {
-        String username = AcegiUtils.getLoggedInUsername();
+        String username = SecurityUtils.getLoggedInUsername();
         if (username == null)
         {
             context.addActionError(I18N.format("user.none"));

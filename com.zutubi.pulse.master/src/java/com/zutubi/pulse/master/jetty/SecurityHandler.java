@@ -9,15 +9,15 @@ import org.mortbay.http.HttpResponse;
 import org.mortbay.http.handler.AbstractHttpHandler;
 import org.mortbay.jetty.servlet.ServletHttpRequest;
 import org.mortbay.jetty.servlet.ServletHttpResponse;
-import org.springframework.security.ui.AuthenticationEntryPoint;
-import org.springframework.security.AuthenticationException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
  * An implementation of the {@link org.mortbay.http.HttpHandler} interface
- * that delegates a security check to the acess manager.  If the request is
+ * that delegates a security check to the access manager.  If the request is
  * denied and the user is anonymous, then a basic authentication  response
  * will be sent out.  If the user is authenticated but denied, then the
  * resource will be forbidden.

@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
-import org.springframework.security.acl.basic.AclObjectIdentity;
-import org.springframework.security.acl.basic.AclObjectIdentityAware;
 
 import java.util.Map;
 
@@ -16,7 +14,7 @@ import java.util.Map;
  *
  * @see com.zutubi.pulse.master.tove.config.project.ProjectConfiguration#getProjectId()
  */
-public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
+public class Project extends Entity implements NamedEntity
 {
     /**
      * A labelling for all project state transitions.
@@ -669,11 +667,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setSuccessCount(int successCount)
     {
         this.successCount = successCount;
-    }
-
-    public AclObjectIdentity getAclObjectIdentity()
-    {
-        return this;
     }
 
     public ProjectConfiguration getConfig()

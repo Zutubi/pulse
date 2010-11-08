@@ -192,7 +192,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     {
         showStatus('Cleaning up build directories...', 'working');
         Ext.Ajax.request({
-            url: window.baseUrl + '/aconfig/projects/' + encodeURIComponent(this.data.status.name) + '?clean=clean',
+            url: window.baseUrl + '/ajax/config/projects/' + encodeURIComponent(this.data.status.name) + '?clean=clean',
             callback: this.handleMarkForCleanResponse,
             scope: this
         });

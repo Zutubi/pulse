@@ -83,7 +83,7 @@ public class GenericAction extends ToveActionSupport
 
     protected void prepare()
     {
-        newPanel = new ConfigurationPanel("aconfig/action.vm");
+        newPanel = new ConfigurationPanel("ajax/config/action.vm");
     }
 
     public void doCancel()

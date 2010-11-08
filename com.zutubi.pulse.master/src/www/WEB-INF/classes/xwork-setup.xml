@@ -204,7 +204,7 @@
 
     </package>
 
-    <package name="aconfig" namespace="/aconfig" extends="webwork-default-package">
+    <package name="aconfig" namespace="/ajax/config" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 
         <default-action-ref name="default"/>
@@ -214,7 +214,7 @@
         </action>
     </package>
 
-    <package name="ahelp" namespace="/ahelp" extends="webwork-default-package">
+    <package name="ahelp" namespace="/ajax/help" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 
         <default-action-ref name="default"/>
@@ -224,7 +224,7 @@
         </action>
     </package>
 
-    <package name="aaction" namespace="/aaction" extends="webwork-default-package">
+    <package name="aaction" namespace="/ajax/action" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 
         <default-action-ref name="default"/>
@@ -234,7 +234,7 @@
         </action>
     </package>
 
-    <package name="atemplate" namespace="/atemplate" extends="webwork-default-package">
+    <package name="atemplate" namespace="/ajax/template" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 
         <default-action-ref name="default"/>
@@ -243,5 +243,5 @@
             <result name="success" type="startupajax"/>
         </action>
     </package>
-    
+
 </xwork>

@@ -15,6 +15,7 @@ import com.zutubi.validation.ValidationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class BackupManagerTest extends PulseTestCase
 {
@@ -41,7 +42,7 @@ public class BackupManagerTest extends PulseTestCase
 
         scheduler = new DefaultScheduler();
         scheduler.setTriggerDao(new InMemoryTriggerDao());
-        scheduler.setStrategies(new TestSchedulerStrategy());
+        scheduler.setStrategies(Arrays.<SchedulerStrategy>asList(new TestSchedulerStrategy()));
         scheduler.start();
 
         configurationProvider = new FakeConfigurationProvider();

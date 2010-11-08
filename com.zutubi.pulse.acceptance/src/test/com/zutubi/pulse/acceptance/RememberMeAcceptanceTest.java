@@ -1,8 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
-import static org.springframework.security.ui.rememberme.AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
 
 public class RememberMeAcceptanceTest extends SeleniumTestBase
 {
@@ -48,7 +49,7 @@ public class RememberMeAcceptanceTest extends SeleniumTestBase
     {
         assertFalse(isRememberMeCookieSet());
 
-        // login to get outselves a valid remember me cookie.
+        // login to get ourselves a valid remember me cookie.
         LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
         assertTrue(loginPage.login(USERNAME, PASSWORD, true));
         assertTrue(isRememberMeCookieSet());

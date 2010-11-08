@@ -1,7 +1,7 @@
 package com.zutubi.tove.security;
 
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.HashMap;
 import java.util.HashSet;

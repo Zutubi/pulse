@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-autowire="byName">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-autowire="byName">
+
     <!-- Validation system -->
     <bean id="validationManager" class="com.zutubi.validation.DefaultValidationManager">
         <property name="providers">
@@ -53,7 +56,7 @@
     <!-- Security system -->
     <bean id="configurationSecurityManager" class="com.zutubi.tove.config.ConfigurationSecurityManager" autowire="byName"/>
     <bean id="accessManager" class="com.zutubi.tove.security.DefaultAccessManager" autowire="byName"/>
-    <bean id="actorProvider" class="com.zutubi.pulse.master.security.AcegiActorProvider" autowire="byName"/>
+    <bean id="actorProvider" class="com.zutubi.pulse.master.security.SpringSecurityActorProvider" autowire="byName"/>
     <bean id="globalAuthorityProvider" class="com.zutubi.pulse.master.security.GlobalAuthorityProvider" autowire="byName"/>
     <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectConfigurationAuthorityProvider" autowire="byName"/>
     <bean id="projectAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectAuthorityProvider" autowire="byName"/>
@@ -65,6 +68,7 @@
     <bean id="groupConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.GroupConfigurationAuthorityProvider" autowire="byName"/>
     <bean id="userConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.UserConfigurationAuthorityProvider" autowire="byName"/>
     <bean id="userAuthorityProvider" class="com.zutubi.pulse.master.security.UserAuthorityProvider" autowire="byName"/>
+    <bean id="repositoryAuthorityProvider" class="com.zutubi.pulse.master.security.RepositoryAuthorityProvider" autowire="byName"/>
 
     <bean id="securityInterceptor" class="com.zutubi.pulse.master.security.SecurityInterceptor" autowire="byName"/>
 

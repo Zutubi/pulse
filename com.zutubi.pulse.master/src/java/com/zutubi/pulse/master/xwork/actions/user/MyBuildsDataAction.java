@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.user;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.BuildModel;
 import com.zutubi.util.CollectionUtils;
@@ -27,7 +27,7 @@ public class MyBuildsDataAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUsername();
+        String login = SecurityUtils.getLoggedInUsername();
         if (login == null)
         {
             return ERROR;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -118,7 +118,7 @@ public class DisplayScopeAction extends ActionSupport
     {
         if(prefixPath.contains("${principle}"))
         {
-            String principle = AcegiUtils.getLoggedInUsername();
+            String principle = SecurityUtils.getLoggedInUsername();
             if (principle == null)
             {
                 return "guest";

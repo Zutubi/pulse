@@ -1,19 +1,20 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.util.Constants;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
@@ -25,9 +26,9 @@ public class TokenManagerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        User jason = newUser("jason", "Jason Sankey", "password", GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
+        User jason = newUser("jason", "Jason Sankey", "password", Role.USER, ServerPermission.ADMINISTER.toString());
         jason.setId(1);
-        User dan = newUser("dan", "Daniel Ostermeier", "insecure", GrantedAuthority.USER);
+        User dan = newUser("dan", "Daniel Ostermeier", "insecure", Role.USER);
         dan.setId(2);
         User anon = newUser("anon", "A. Nonymous", "none");
         anon.setId(3);
@@ -37,15 +38,15 @@ public class TokenManagerTest extends PulseTestCase
         stub(userManager.getUser("dan")).toReturn(dan);
         stub(userManager.getUser("anon")).toReturn(anon);
         stub(userManager.getUser("nosuchuser")).toReturn(null);
-        stub(userManager.getPrinciple(jason)).toReturn(new AcegiUser(jason, null));
-        stub(userManager.getPrinciple(dan)).toReturn(new AcegiUser(dan, null));
-        stub(userManager.getPrinciple(anon)).toReturn(new AcegiUser(anon, null));
+        stub(userManager.getPrinciple(jason)).toReturn(new Principle(jason, null));
+        stub(userManager.getPrinciple(dan)).toReturn(new Principle(dan, null));
+        stub(userManager.getPrinciple(anon)).toReturn(new Principle(anon, null));
 
         tokenManager = new DefaultTokenManager();
         tokenManager.setUserManager(userManager);
         tokenManager.setAuthenticationManager(new AuthenticationManager()
         {
-            public Authentication authenticate(Authentication authentication) throws org.springframework.security.AuthenticationException
+            public Authentication authenticate(Authentication authentication) throws AuthenticationException
             {
                 UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
                 User u = userManager.getUser(token.getName());
@@ -167,15 +168,15 @@ public class TokenManagerTest extends PulseTestCase
     public void testUserOrAdminAccess() throws Exception
     {
         String token = tokenManager.login("jason", "password");
-        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
+        tokenManager.verifyRoleIn(token, Role.USER, ServerPermission.ADMINISTER.toString());
 
         token = tokenManager.login("dan", "insecure");
-        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
+        tokenManager.verifyRoleIn(token, Role.USER, ServerPermission.ADMINISTER.toString());
 
         token = tokenManager.login("anon", "none");
         try
         {
-            tokenManager.verifyRoleIn(token, GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
+            tokenManager.verifyRoleIn(token, Role.USER, ServerPermission.ADMINISTER.toString());
         }
         catch (AuthenticationException e)
         {

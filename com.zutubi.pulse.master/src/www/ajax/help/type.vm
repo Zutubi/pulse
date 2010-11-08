@@ -1,0 +1,58 @@
+<div id="config-help">
+    <h1 id="help-title">$typeDocs.title</h1>
+#if($typeDocs.verbose)
+    <div class="type-details">
+        $typeDocs.verbose
+    </div>
+#elseif($typeDocs.brief)
+    <div class="type-details">
+        $typeDocs.brief
+    </div>
+#end
+#if($formProperties.size() > 0)
+    <table class="help-fields">
+        <tr><th>fields</th></tr>
+    #foreach($property in $formProperties)
+        #set($docs = $typeDocs.getPropertyDocs($property))
+        <tr id="field-row-$docs.name" class="field-row #if($action.isExpandable($docs)) field-expandable #end ">
+            <td>
+                <div id="field-title-$docs.name" class="field-header">
+                    <strong>$docs.label</strong>
+                </div>
+                <div class="field-details">
+                    <div class="field-brief">
+                        $action.safeDetails($docs.brief)
+                    </div>
+            #if($action.isExpandable($docs))
+                    <div class="field-rest">
+                #if($docs.verbose)
+                        <div class="field-verbose">
+                            $docs.verbose
+                        </div>
+                #end
+                #if($action.hasExamples($docs))
+                        <div class="field-examples">
+                            <h3>examples</h3>
+                            <ul>
+                    #foreach($example in $docs.examples)
+                                <li>
+                        #if($example.blurb)
+                                    ${example.blurb}:
+                        #end
+                                    <div class="example-value">
+                                        $example.value
+                                    </div>
+                                </li>
+                    #end
+                            </ul>
+                        </div>
+                #end
+                    </div>
+            #end
+                </div>
+            </td>
+        </tr>
+    #end
+    </table>
+#end
+</div>

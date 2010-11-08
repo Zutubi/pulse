@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
 import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SubscriptionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -115,7 +115,7 @@ public class ResultNotifier implements EventListener
 
     private boolean canView(UserConfiguration userConfig, BuildResult buildResult)
     {
-        AcegiUser user = userManager.getPrinciple(userConfig);
+        Principle user = userManager.getPrinciple(userConfig);
         return accessManager.hasPermission(user, AccessManager.ACTION_VIEW, buildResult);
     }
 

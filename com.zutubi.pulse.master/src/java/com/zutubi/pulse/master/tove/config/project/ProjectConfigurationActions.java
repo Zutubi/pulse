@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.annotations.Permission;
@@ -168,7 +168,7 @@ public class ProjectConfigurationActions
     @Permission(ACTION_TRIGGER)
     public void doTrigger(ProjectConfiguration projectConfig)
     {
-        String user = AcegiUtils.getLoggedInUsername();
+        String user = SecurityUtils.getLoggedInUsername();
         if (user != null)
         {
             TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
@@ -179,7 +179,7 @@ public class ProjectConfigurationActions
     @Permission(ACTION_TRIGGER)
     public void doRebuild(ProjectConfiguration projectConfig)
     {
-        String user = AcegiUtils.getLoggedInUsername();
+        String user = SecurityUtils.getLoggedInUsername();
         if (user != null)
         {
             TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);

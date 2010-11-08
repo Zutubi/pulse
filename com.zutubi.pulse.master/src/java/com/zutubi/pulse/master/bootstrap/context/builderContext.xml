@@ -2,8 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-2.0.xsd
-                           http://www.springframework.org/schema/util classpath:/org/springframework/beans/factory/xml/spring-util-2.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
        default-autowire="byName">
 
     <util:map id="defaultTransactionAttributes">
@@ -33,6 +33,31 @@
     <bean id="transactionContext" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target" ref="transactionContextTarget"/>
         <property name="interceptorNames" ref="transactionInterceptors"/>
+    </bean>
+
+    <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="appConfig"/>
+    </bean>
+
+    <bean id="systemConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemConfig"/>
+    </bean>
+
+    <bean id="userPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="userPaths"/>
+    </bean>
+
+    <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="userPaths"/>
+        <property name="propertyPath" value="userConfigRoot"/>
+    </bean>
+
+    <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemPaths.configRoot"/>
     </bean>
 
     <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -116,26 +141,6 @@
 
     <bean id="renderService" class="com.zutubi.pulse.master.notifications.renderer.DefaultRenderService"/>
 
-    <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName" value="configurationManager"/>
-        <property name="propertyPath" value="appConfig"/>
-    </bean>
-
-    <bean id="systemConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName" value="configurationManager"/>
-        <property name="propertyPath" value="systemConfig"/>
-    </bean>
-
-    <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName" value="configurationManager"/>
-        <property name="propertyPath" value="userPaths.userConfigRoot"/>
-    </bean>
-
-    <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName" value="configurationManager"/>
-        <property name="propertyPath" value="systemPaths.configRoot"/>
-    </bean>
-
     <bean id="slaveProxyFactory" class="com.zutubi.pulse.master.agent.SlaveProxyFactory"/>
 
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory"/>
@@ -173,9 +178,7 @@
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager"/>
 
-    <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory">
-        <property name="objectFactory" ref="objectFactory"/>
-    </bean>
+    <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory"/>
 
     <bean id="jabberManager" class="com.zutubi.pulse.master.notifications.jabber.JabberManager"/>
 
@@ -188,9 +191,7 @@
     <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" init-method="init"/>
 
     <!-- re create the file system manager now that the slave details are available. -->
-    <bean id="fileSystemManager" class="com.zutubi.pulse.master.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
-        <property name="objectFactory" ref="objectFactory"/>
-    </bean>
+    <bean id="fileSystemManager" class="com.zutubi.pulse.master.vfs.VfsManagerFactoryBean" destroy-method="shutdown"/>
 
     <bean id="cleanupManager" class="com.zutubi.pulse.master.cleanup.CleanupManager" init-method="init"/>
     <bean id="cleanupScheduler" class="com.zutubi.pulse.master.cleanup.CleanupScheduler" init-method="init"/>
@@ -204,9 +205,7 @@
     <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
-        <property name="projectsDir">
-            <util:property-path path="configurationManager.userPaths.projectRoot"/>
-        </property>
+        <property name="projectsDir" value="#{userPaths.projectRoot}"/>
     </bean>
 
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
@@ -216,16 +215,12 @@
     <bean id="toveFileDocManager" class="com.zutubi.pulse.core.marshal.doc.ToveFileDocManager"/>
 
     <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">
-        <property name="dataDir">
-            <util:property-path path="configurationManager.userPaths.data"/>
-        </property>
+        <property name="dataDir" value="#{userPaths.data}"/>
     </bean>
     <alias name="dependencyManager" alias="ivyManager"/>
 
     <bean id="repositoryAttributes" class="com.zutubi.pulse.core.dependency.RepositoryAttributes" init-method="init">
-        <constructor-arg index="0">
-            <util:property-path path="configurationManager.userPaths.repositoryRoot"/>
-        </constructor-arg>
+        <constructor-arg index="0" value="#{userPaths.repositoryRoot}"/>
     </bean>
 
     <bean id="projectDependencyGraphBuilder" class="com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder"/>

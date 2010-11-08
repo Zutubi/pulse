@@ -10,6 +10,7 @@ import org.springframework.context.*;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,6 +40,26 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
     public ApplicationContext getDelegate()
     {
         return delegate;
+    }
+
+    public void setId(String id)
+    {
+        delegate.setId(id);
+    }
+
+    public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException
+    {
+        return delegate.getBeansWithAnnotation(annotationType);
+    }
+
+    public <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType)
+    {
+        return delegate.findAnnotationOnBean(beanName, annotationType);
+    }
+
+    public <T> T getBean(Class<T> requiredType) throws BeansException
+    {
+        return delegate.getBean(requiredType);
     }
 
     public String getDisplayName()

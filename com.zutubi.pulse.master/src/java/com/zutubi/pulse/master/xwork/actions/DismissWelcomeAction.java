@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions;
 
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 
@@ -15,7 +15,7 @@ public class DismissWelcomeAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUsername();
+        String login = SecurityUtils.getLoggedInUsername();
         User user = userManager.getUser(login);
         UserPreferencesConfiguration preferences = configurationProvider.deepClone(user.getPreferences());
         preferences.setDefaultAction(DefaultAction.DASHBOARD_ACTION);

@@ -1,19 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
-import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.acceptance.pages.admin.GroupsPage;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import org.apache.xmlrpc.XmlRpcException;
 
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
-import java.util.Vector;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Acceptance test for the ldap integration.
@@ -97,7 +92,6 @@ public class LdapAcceptanceTest extends SeleniumTestBase
         assertTrue(page.isPresent());
     }
 
-    
 /* CIB-2556
     public void testFollowReferrals() throws Exception
     {
@@ -174,6 +168,4 @@ public class LdapAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
     }
-
-
 }

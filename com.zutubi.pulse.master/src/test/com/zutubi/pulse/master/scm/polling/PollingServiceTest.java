@@ -1057,7 +1057,7 @@ public class PollingServiceTest extends ZutubiTestCase
                             return wasInactive;
                         }
                     }
-                }, TIMEOUT, "");
+                }, TIMEOUT, 20, "waiting for polling to be inactive");
 
                 return true;
             }
@@ -1082,7 +1082,7 @@ public class PollingServiceTest extends ZutubiTestCase
                     {
                         return isInProgress();
                     }
-                }, timeout, "");
+                }, timeout, 20, "waiting for polling to be active");
 
                 synchronized (this)
                 {

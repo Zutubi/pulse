@@ -14,7 +14,7 @@ import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.restore.ArchiveException;
 import com.zutubi.pulse.master.restore.RestoreManager;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
@@ -478,7 +478,7 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestUpgradeComplete(final boolean changes)
     {
-        AcegiUtils.runAsSystem(new Runnable()
+        SecurityUtils.runAsSystem(new Runnable()
         {
             public void run()
             {

@@ -15,6 +15,7 @@ import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.*;
 
@@ -28,7 +29,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import org.springframework.security.AccessDeniedException;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {

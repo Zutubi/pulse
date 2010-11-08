@@ -3,9 +3,8 @@ package com.zutubi.pulse.master.security.ldap;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.license.LicenseHolder;
-import static com.zutubi.pulse.master.license.LicenseHolder.AUTH_ADD_USER;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -23,25 +22,26 @@ import com.zutubi.util.logging.Logger;
 import org.springframework.ldap.core.AuthenticationSource;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.ldap.core.support.DirContextAuthenticationStrategy;
 import org.springframework.ldap.core.support.DefaultTlsDirContextAuthenticationStrategy;
-import org.springframework.security.Authentication;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.GrantedAuthority;
+import org.springframework.ldap.core.support.DirContextAuthenticationStrategy;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.ldap.LdapAuthoritiesPopulator;
-import org.springframework.security.ldap.LdapUserSearch;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.ldap.populator.DefaultLdapAuthoritiesPopulator;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.providers.ldap.LdapAuthenticationProvider;
-import org.springframework.security.providers.ldap.authenticator.BindAuthenticator;
-import org.springframework.security.userdetails.ldap.LdapUserDetailsMapper;
+import org.springframework.security.ldap.search.LdapUserSearch;
+import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import static javax.naming.Context.REFERRAL;
 import java.util.*;
+
+import static com.zutubi.pulse.master.license.LicenseHolder.AUTH_ADD_USER;
 
 /**
  * LDAP integration.
@@ -57,7 +57,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     protected static final String EMAIL_CONTACT_NAME = "LDAP email";
 
     /**
-     * The configuration settings for the managed ldap connenction
+     * The configuration settings for the managed ldap connection
      */
     private LDAPConfiguration configuration;
     private LdapAuthenticationProvider authenticationProvider;
@@ -203,7 +203,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
      * @param user the user instance to be updated.
      */
     // this helps to track the group associations defined within LDAP.
-    public synchronized void addLdapRoles(AcegiUser user)
+    public synchronized void addLdapRoles(Principle user)
     {
         String username = user.getUsername();
 
@@ -246,7 +246,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     {
         List<UserGroupConfiguration> groups = new LinkedList<UserGroupConfiguration>();
 
-        GrantedAuthority[] ldapAuthorities = authentication.getAuthorities();
+        Collection<GrantedAuthority> ldapAuthorities = authentication.getAuthorities();
         for (GrantedAuthority authority : ldapAuthorities)
         {
             UserGroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
@@ -320,9 +320,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
         if (configuration.getFollowReferrals())
         {
-            Map<String, String> vars = new HashMap<String, String>();
-            vars.put(REFERRAL, "follow");
-            context.setBaseEnvironmentProperties(vars);
+            context.setReferral("follow");
         }
 
         if (Boolean.getBoolean(PROPERTY_START_TLS))
@@ -330,7 +328,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             DirContextAuthenticationStrategy authenticationStrategy = new DefaultTlsDirContextAuthenticationStrategy();
             context.setAuthenticationStrategy(authenticationStrategy);
         }
-        
+
         // this is what happens when we manually set up spring objects.
         context.afterPropertiesSet();
         return context;
@@ -441,9 +439,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     private class NullAuthoritiesPopulator implements LdapAuthoritiesPopulator
     {
-        public GrantedAuthority[] getGrantedAuthorities(DirContextOperations userDetails, String username)
+        public Collection<GrantedAuthority> getGrantedAuthorities(DirContextOperations userDetails, String username)
         {
-            return new GrantedAuthority[0];
+            return new LinkedList<GrantedAuthority>();
         }
     }
 
@@ -456,18 +454,15 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             this.populators = populators;
         }
 
-        public GrantedAuthority[] getGrantedAuthorities(DirContextOperations userData, String username)
+        public Collection<GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username)
         {
             Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
 
             for (LdapAuthoritiesPopulator populator : populators)
             {
-                grantedAuthorities.addAll(Arrays.asList(
-                        populator.getGrantedAuthorities(userData, username))
-                );
+                grantedAuthorities.addAll(populator.getGrantedAuthorities(userData, username));
             }
-
-            return grantedAuthorities.toArray(new GrantedAuthority[grantedAuthorities.size()]);
+            return grantedAuthorities;
         }
     }
 }

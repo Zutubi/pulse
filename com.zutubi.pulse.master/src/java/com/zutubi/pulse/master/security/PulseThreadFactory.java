@@ -29,7 +29,7 @@ public class PulseThreadFactory implements ThreadFactory
 
         public void run()
         {
-            AcegiUtils.loginAsSystem();
+            SecurityUtils.loginAsSystem();
             delegate.run();
         }
     }

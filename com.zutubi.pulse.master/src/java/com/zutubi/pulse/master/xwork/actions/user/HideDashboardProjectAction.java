@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.user;
 
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 
@@ -21,7 +21,7 @@ public class HideDashboardProjectAction extends UserActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUsername();
+        String login = SecurityUtils.getLoggedInUsername();
         if (login == null)
         {
             return ERROR;

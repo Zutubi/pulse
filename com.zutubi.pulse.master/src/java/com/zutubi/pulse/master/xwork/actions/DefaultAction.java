@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions;
 
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 
 /**
  * The default action controls the page presented to the user when they first arrive at the
@@ -40,7 +40,7 @@ public class DefaultAction extends ActionSupport
             return SETUP_ADMIN;
         }
 
-        String login = AcegiUtils.getLoggedInUsername();
+        String login = SecurityUtils.getLoggedInUsername();
         if(login == null)
         {
             return BROWSE_ACTION;

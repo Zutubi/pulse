@@ -13,7 +13,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.xwork.TextProviderSupport;
@@ -21,17 +21,18 @@ import com.zutubi.pulse.master.xwork.interceptor.Cancelable;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.Constants;
-import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
+
+import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Base for all actions.  Includes standard i18n, encoding, security and other
@@ -82,7 +83,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         // note, need to be careful - the returned user is likely to be
         // hopelessly out of sync if any changes have been made to the user during the
         // latest session...
-        return AcegiUtils.getLoggedInUsername();
+        return SecurityUtils.getLoggedInUsername();
     }
 
     public String trimmedString(String s, int length)

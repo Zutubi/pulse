@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="licenseManager" class="com.zutubi.pulse.master.license.LicenseManager" autowire="byName" init-method="init">
-        <property name="licenseKeyStore">
-            <ref local="licenseKeyStore"/>
-        </property>
+        <property name="licenseKeyStore"><ref local="licenseKeyStore"/></property>
         <property name="authorisations">
             <list>
                 <ref local="canRunPulseAuthorisation"/>
@@ -16,7 +15,6 @@
     <!-- the current key store is the Data object. -->
     <bean id="licenseKeyStore" class="com.zutubi.pulse.master.license.config.ConfigLicenseKeyStore" init-method="init" autowire="byName"/>
 
-    <!-- CHECK IF THIS IS STILL USED. -->
     <bean id="canRunPulseAuthorisation" class="com.zutubi.pulse.master.license.authorisation.CanRunPulseAuthorisation" autowire="byName"/>
 
 </beans>

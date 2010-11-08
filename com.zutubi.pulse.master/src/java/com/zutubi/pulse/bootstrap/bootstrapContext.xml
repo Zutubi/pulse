@@ -26,6 +26,11 @@
 
     <bean id="configurationManager" class="com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager"/>
 
+    <bean id="systemPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemPaths"/>
+    </bean>
+
     <bean id="pluginPaths" class="com.zutubi.pulse.servercore.bootstrap.ServerPluginPaths" init-method="init">
         <property name="configurationManager" ref="configurationManager"/>
     </bean>

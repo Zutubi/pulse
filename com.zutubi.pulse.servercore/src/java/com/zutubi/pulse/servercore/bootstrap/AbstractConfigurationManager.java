@@ -92,7 +92,7 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
         return homeDir;
     }
 
-    public void setSystemPaths(SystemPaths paths)
+    public void setDevelopmentSystemPaths(SystemPaths paths)
     {
         this.systemPaths = paths;
     }

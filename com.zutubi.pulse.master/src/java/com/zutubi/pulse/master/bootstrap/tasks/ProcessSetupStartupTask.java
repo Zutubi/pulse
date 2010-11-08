@@ -26,7 +26,8 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
 
     public void execute()
     {
-        // load the setup context. we do not expect this to take long, so we dont worry about a holding page here.
+        // load the setup context. we do not expect this to take long, so we don't
+        // worry about a holding page here.
         SpringComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
 
         // Deploy the setup xwork configuration.
@@ -45,7 +46,7 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
         }
 
         // handle the initialisation of the security manager, since this can not be done within the spring context file.
-//        AcegiSecurityManager securityManager = (AcegiSecurityManager) ComponentContext.getBean("securityManager");
+//        PulseSecurityManager securityManager = (PulseSecurityManager) ComponentContext.getBean("securityManager");
 //        securityManager.secure();
     }
 

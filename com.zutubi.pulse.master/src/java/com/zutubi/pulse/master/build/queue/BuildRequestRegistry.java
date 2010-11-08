@@ -5,14 +5,15 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.StringUtils.capitalise;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.util.StringUtils.capitalise;
 
 /**
  * A registry of all build requests that have been published recently.  This

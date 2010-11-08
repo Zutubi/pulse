@@ -1,13 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 
 import java.util.Hashtable;
 import java.util.Vector;
-import static java.util.Arrays.asList;
 
-import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
+import static java.util.Arrays.asList;
 
 public class EnableLdapTestSetup extends TestSetup
 {
@@ -31,12 +31,12 @@ public class EnableLdapTestSetup extends TestSetup
         Hashtable<String, Object> ldapConfig = xmlRpcHelper.createDefaultConfig(LDAPConfiguration.class);
         ldapConfig.put("enabled", Boolean.TRUE);
         ldapConfig.put("ldapUrl", "ldap://localhost:10389/");
-        ldapConfig.put("baseDn", "dc=ldap-test,dc=zutubi,dc=com");
+        ldapConfig.put("baseDn", "dc=zutubi,dc=com");
         ldapConfig.put("managerDn", "uid=admin,ou=system");
         ldapConfig.put("managerPassword", "secret");
+        ldapConfig.put("userBaseDn", "ou=users");
         ldapConfig.put("userFilter", "(uid=${login})");
-        ldapConfig.put("userBaseDn", "ou=Users");
-        ldapConfig.put("groupBaseDns", new Vector<String>(asList("ou=Groups")));
+        ldapConfig.put("groupBaseDns", new Vector<String>(asList("ou=groups")));
 
         xmlRpcHelper.saveConfig(LDAP_CONFIG_PATH, ldapConfig, false);
     }

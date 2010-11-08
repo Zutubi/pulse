@@ -304,17 +304,17 @@ function selectPath(path)
 
 function editPath(path)
 {
-    detailPanel.load({url: window.baseUrl + '/aconfig/' + encodeURIPath(path), scripts:true});
+    detailPanel.load({url: window.baseUrl + '/ajax/config/' + encodeURIPath(path), scripts:true});
 }
 
 function addToPath(path, template)
 {
-    runAjaxRequest(window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?wizard' + (template ? '=template' : ''));
+    runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?wizard' + (template ? '=template' : ''));
 }
 
 function actionPath(path, action, fromParent, onDescendants)
 {
-    var url = window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?' + action + '=input';
+    var url = window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?' + action + '=input';
     if (fromParent)
     {
         url += '&newPath=' + getParentPath(path);
@@ -328,7 +328,7 @@ function actionPath(path, action, fromParent, onDescendants)
 
 function deletePath(path)
 {
-    runAjaxRequest(window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?delete=confirm');
+    runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?delete=confirm');
 }
 
 function showHelp(path, type)

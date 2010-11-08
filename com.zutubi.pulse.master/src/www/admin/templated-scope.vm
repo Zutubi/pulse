@@ -117,7 +117,7 @@
             }
 
             tabPanel.el.createChild({tag: 'div', id: 'config-tree'});
-            var loader = new Zutubi.tree.ConfigTreeLoader('$base/aconfig');
+            var loader = new Zutubi.tree.ConfigTreeLoader('$base/ajax/config');
 
             configTree = new Zutubi.tree.ConfigTree({
                 el: 'config-tree',
@@ -157,7 +157,7 @@
             if(treesInitialised && node)
             {
                 detailPanel.load({
-                    url: '$base/atemplate/$scope/' + encodeURIComponent(node.attributes.baseName),
+                    url: '$base/ajax/template/$scope/' + encodeURIComponent(node.attributes.baseName),
                     scripts: true,
                     callback: function(element, success, response) {
                         if(!success)
@@ -198,7 +198,7 @@
                     var center = Ext.getCmp('nested-center');
                     center.add(detailPanel);
 
-                    var templateLoader = new Zutubi.tree.ConfigTreeLoader('$base/atemplate/$scope');
+                    var templateLoader = new Zutubi.tree.ConfigTreeLoader('$base/ajax/template/$scope');
 
                     templateTree = new Zutubi.tree.TemplateTree('$scope', {
                         el: 'template-tree',

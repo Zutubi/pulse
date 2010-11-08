@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="setupManager" class="com.zutubi.pulse.master.bootstrap.DefaultSetupManager" autowire="byName">
         <property name="configContexts">
@@ -42,7 +43,6 @@
         <property name="setupContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/userContext.xml</value>
-                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/emailContext.xml</value>
             </list>
         </property>
         <property name="startupContexts">

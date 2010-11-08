@@ -1,14 +1,13 @@
 package com.zutubi.pulse.master.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.providers.AuthenticationProvider;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 
 /**
  * An authentication provider implementation that uses a token (a shared token
@@ -43,7 +42,7 @@ public class RepositoryAuthenticationProvider implements AuthenticationProvider
 
     private Authentication getRepositoryAuthentication()
     {
-        AcegiUser repositoryUser = AcegiUtils.getRepositoryUser();
+        Principle repositoryUser = SecurityUtils.getRepositoryUser();
         return new UsernamePasswordAuthenticationToken(repositoryUser, null, repositoryUser.getAuthorities());
     }
 

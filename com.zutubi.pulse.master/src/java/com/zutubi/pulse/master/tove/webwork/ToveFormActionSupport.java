@@ -27,11 +27,11 @@ import java.util.Map;
  *     appropriate {@link ConfigurationResponse} in the response field.
  *   </li>
  *   <li>
- *     Add a new template to the aconfig/ directory named &lt;action&gt;.vm.
+ *     Add a new template to the ajax/config/ directory named &lt;action&gt;.vm.
  *     This template should render a form in a panel, using $formSource.
  *   </li>
  *   <li>
- *     Add a new action mapping to the aconfig namespace in xwork.xml.
+ *     Add a new action mapping to the ajax/config namespace in xwork.xml.
  *   </li>
  *   <li>
  *     (Optional) Override {@link #doPreview()} to insert a confirmation step
@@ -75,7 +75,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
     public ToveFormActionSupport(String actionName, String submitLabel, String submitValue)
     {
         this.actionName = actionName;
-        newPanel = new ConfigurationPanel("aconfig/" + actionName + ".vm");
+        newPanel = new ConfigurationPanel("ajax/config/" + actionName + ".vm");
         this.submitLabel = submitLabel;
         this.submitValue = submitValue;
     }
@@ -121,7 +121,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
 
     private void renderForm() throws IOException, TemplateException
     {
-        Form form = new Form(FORM_NAME, actionName, ToveUtils.getConfigURL(path, getFormAction(), null, "aconfig"), submitValue);
+        Form form = new Form(FORM_NAME, actionName, ToveUtils.getConfigURL(path, getFormAction(), null, "ajax/config"), submitValue);
         addFormFields(form);
         addSubmit(form, submitLabel, submitValue, true);
         addSubmit(form, SUBMIT_CANCEL, SUBMIT_CANCEL, false);

@@ -29,7 +29,7 @@
                     var center = Ext.getCmp('nested-center');
                     center.add(detailPanel);
 
-                    var loader = new Zutubi.tree.ConfigTreeLoader('#jss($base)/aconfig');
+                    var loader = new Zutubi.tree.ConfigTreeLoader('#jss($base)/ajax/config');
 
                     configTree = new Zutubi.tree.ConfigTree({
 #if($prefixPath)

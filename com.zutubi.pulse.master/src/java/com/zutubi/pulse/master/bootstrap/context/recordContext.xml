@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-autowire="byName">
-
-    <bean id="recordRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName" value="configurationManager"/>
-        <property name="propertyPath" value="userPaths.recordRoot"/>
-    </bean>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-autowire="byName">
 
     <bean id="recordManager" class="com.zutubi.tove.type.record.RecordManager">
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
 
     <bean id="recordStore" class="com.zutubi.tove.type.record.store.FileSystemRecordStore" init-method="initAndStartAutoCompaction" destroy-method="stopAutoCompaction">
-        <property name="persistenceDirectory">
-            <ref local="recordRoot"/>
-        </property>
+        <property name="persistenceDirectory" value="#{configurationManager.userPaths.recordRoot}"/>
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>    
 </beans>

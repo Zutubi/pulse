@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import org.springframework.security.providers.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
 public class Md5PasswordEncoderTest extends PulseTestCase
 {
@@ -15,7 +15,7 @@ public class Md5PasswordEncoderTest extends PulseTestCase
     }
 
     /**
-     * CIB-548: ensure that password varification behaves as expected when dealing with I18N characters.
+     * CIB-548: ensure that password verification behaves as expected when dealing with I18N characters.
      */
     public void testI18NPasswordEncoding()
     {

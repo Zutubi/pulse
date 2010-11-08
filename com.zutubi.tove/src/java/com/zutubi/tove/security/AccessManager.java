@@ -58,7 +58,7 @@ public interface AccessManager
      * @param action   the action the actor wants to perform
      * @param resource the resource being acted on, may be null for a
      *                 "global" action
-     * @throws org.acegisecurity.AccessDeniedException if permission is
+     * @throws org.springframework.security.access.AccessDeniedException if permission is
      *         denied
      */
     void ensurePermission(Actor actor, String action, Object resource);
@@ -73,7 +73,7 @@ public interface AccessManager
      * @param action   the action the actor wants to perform
      * @param resource the resource being acted on, may be null for a
      *                 "global" action
-     * @throws org.acegisecurity.AccessDeniedException if permission is
+     * @throws org.springframework.security.access.AccessDeniedException if permission is
      *         denied
      */
     void ensurePermission(String action, Object resource);

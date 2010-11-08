@@ -1,12 +1,11 @@
 package com.caucho.hessian.client;
 
-
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

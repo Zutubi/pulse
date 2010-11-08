@@ -4,9 +4,10 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import static org.mockito.Mockito.*;
 
 public class CustomAuthenticationProviderTest extends PulseTestCase
@@ -55,7 +56,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
         stub(userManager.getUserConfig(user.getLogin())).toReturn(null);
         stub(userManager.insert(same(user))).toReturn(user);
-        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(1, "user", "pass"));
+        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new Principle(1, "user", "pass"));
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
         authenticationProvider.authenticate(token);
@@ -73,7 +74,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         stub(ldapManager.canAutoAdd()).toReturn(true);
         stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
         stub(userManager.getUserConfig(user.getLogin())).toReturn(user);
-        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(1, user.getLogin(), "pass"));
+        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new Principle(1, user.getLogin(), "pass"));
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
         authenticationProvider.authenticate(token);

@@ -60,7 +60,7 @@ public class DeleteAction extends ToveActionSupport
         if (isConfirmSelected())
         {
             task = configurationTemplateManager.getCleanupTasks(getPath());
-            newPanel = new ConfigurationPanel("aconfig/confirm.vm");
+            newPanel = new ConfigurationPanel("ajax/config/confirm.vm");
             return "confirm";
         }
         else

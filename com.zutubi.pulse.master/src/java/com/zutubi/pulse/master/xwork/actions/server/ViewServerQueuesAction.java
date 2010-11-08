@@ -5,15 +5,16 @@ import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 /**
  * Action to show the build and recipe queues.
@@ -67,7 +68,7 @@ public class ViewServerQueuesAction extends ActionSupport
 
     private void snapshotQueuesAsSystem()
     {
-        AcegiUtils.runAsSystem(new Runnable()
+        SecurityUtils.runAsSystem(new Runnable()
         {
             public void run()
             {

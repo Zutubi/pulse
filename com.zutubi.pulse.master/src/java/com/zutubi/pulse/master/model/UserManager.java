@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,9 +54,9 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     Set<Project> getUserProjects(User user, ProjectManager projectManager);
 
-    AcegiUser getPrinciple(UserConfiguration user);
+    Principle getPrinciple(UserConfiguration user);
     
-    AcegiUser getPrinciple(User user);
+    Principle getPrinciple(User user);
 
     /**
      * Checks if the given password matches the current password of the given

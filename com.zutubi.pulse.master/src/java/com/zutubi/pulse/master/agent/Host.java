@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 
 /**
- * A host is a machine that is capabale of hosting agents.  Multiple agents
+ * A host is a machine that is capable of hosting agents.  Multiple agents
  * that have the same location will share a single host.
  */
 public interface Host

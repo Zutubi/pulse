@@ -3,11 +3,7 @@
 <decorators defaultdir="/decorators">
     <!-- No decorator -->
     <excludes>
-        <pattern>/aaction/*</pattern>
-        <pattern>/aconfig/*</pattern>
-        <pattern>/ahelp/*</pattern>
         <pattern>/ajax/*</pattern>
-        <pattern>/atemplate/*</pattern>
         <pattern>/personal/*</pattern>
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>

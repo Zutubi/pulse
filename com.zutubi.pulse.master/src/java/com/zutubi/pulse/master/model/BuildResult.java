@@ -7,8 +7,6 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import org.springframework.security.acl.basic.AclObjectIdentity;
-import org.springframework.security.acl.basic.AclObjectIdentityAware;
 
 import java.io.File;
 import java.util.Iterator;
@@ -17,7 +15,7 @@ import java.util.List;
 
 /**
  */
-public class BuildResult extends Result implements AclObjectIdentityAware, Iterable<RecipeResultNode>
+public class BuildResult extends Result implements Iterable<RecipeResultNode>
 {
     public static final String ACTION_ADD_COMMENT = "addComment";
     public static final String ACTION_CANCEL = "cancel";
@@ -292,11 +290,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         }
     }
     
-    public AclObjectIdentity getAclObjectIdentity()
-    {
-        return project;
-    }
-
     public RecipeResultNode findResultNode(final long id)
     {
         return root.findNode(new Predicate<RecipeResultNode>()

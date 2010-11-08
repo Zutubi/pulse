@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 The scheduling subsystem is responsible for configuring the scheduler and any default
 triggers.
@@ -20,13 +19,14 @@ This context requires:
     objectFactory: the systems object factory.
 
 -->
-<beans> <!-- do not autowire, quartz scheduler attempts lookup tables in the database that do not exist. -->
+<!-- do not autowire, quartz scheduler attempts lookup tables in the database that do not exist. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="configLocation" value="classpath:com/zutubi/pulse/master/bootstrap/quartz/quartz.properties"/>
-        <property name="taskExecutor">
-            <ref local="taskExecutor"/>
-        </property>
+        <property name="taskExecutor"><ref local="taskExecutor"/></property>
         <property name="jobFactory" ref="quartzJobFactory"/>
     </bean>
 
@@ -121,9 +121,7 @@ This context requires:
     </bean>
 
     <bean id="callbackService" class="com.zutubi.pulse.master.scheduling.CallbackService">
-        <property name="scheduler">
-            <ref local="scheduler"/>
-        </property>
+        <property name="scheduler"><ref local="scheduler"/></property>
     </bean>
 
 </beans>

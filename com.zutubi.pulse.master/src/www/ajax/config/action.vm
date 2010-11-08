@@ -1,0 +1,7 @@
+<div class="config-panel">
+    <h3 class="config-header">#i18n("key=${actionName}.label" "context=$configurationType.symbolicName")</h3>
+    <div class="config-container">
+        #actionform("path=$path" "formName=actionform" "namespace=ajax/config")
+    </div>
+    #standardFormEvents("actionform")
+</div>

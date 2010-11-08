@@ -61,18 +61,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         this.upgradeableComponents = components;
     }
 
-    /**
-     * Set an array of upgradeable components known by the upgrade manager.  This replaces
-     * any previously registered upgradeable components.
-     *
-     * @param components    the new definitive array of upgradeable components.
-     */
-    public void setUpgradeableComponents(UpgradeableComponent... components)
-    {
-        this.upgradeableComponents = Arrays.asList(components);
-    }
-
-    public void add(UpgradeableComponentSource componentSource) 
+    public void add(UpgradeableComponentSource componentSource)
     {
         upgradeableSources.add(componentSource);
     }
@@ -80,11 +69,6 @@ public class DefaultUpgradeManager implements UpgradeManager
     public void setUpgradeableComponentSources(List<UpgradeableComponentSource> componentSources)
     {
         this.upgradeableSources = componentSources;
-    }
-
-    public void setUpgradeableComponentSources(UpgradeableComponentSource... componentSources)
-    {
-        this.upgradeableSources = Arrays.asList(componentSources);
     }
 
     public List<UpgradeTaskGroup> prepareUpgrade()

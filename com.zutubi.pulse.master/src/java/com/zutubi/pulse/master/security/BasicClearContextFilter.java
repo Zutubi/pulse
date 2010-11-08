@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.security;
 
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.*;
 import java.io.IOException;
 
 /**
- * A cut down version of the HttpSessionContextIntegrationFilter that retains
+ * A cut down version of the SecurityContextPersistenceFilter that retains
  * the functionality to clear the security context holder when the filter chain
  * processing is complete.
  */

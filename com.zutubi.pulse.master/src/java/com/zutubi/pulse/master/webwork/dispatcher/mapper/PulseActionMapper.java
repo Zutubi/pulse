@@ -50,9 +50,9 @@ public class PulseActionMapper implements ActionMapper
     static
     {
         configNamespaces.add("/setupconfig");
-        configNamespaces.add("/aconfig");
-        configNamespaces.add("/ahelp");
-        configNamespaces.add("/atemplate");
+        configNamespaces.add("/ajax/config");
+        configNamespaces.add("/ajax/help");
+        configNamespaces.add("/ajax/template");
     }
 
     // Setup paths are only available during the setup.

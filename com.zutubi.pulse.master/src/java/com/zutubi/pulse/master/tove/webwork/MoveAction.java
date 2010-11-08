@@ -98,7 +98,7 @@ public class MoveAction extends ToveFormActionSupport
         {
             deletedPaths = new LinkedList<String>(moveResult.getDeletedPaths());
             Collections.sort(deletedPaths, new Sort.StringComparator());
-            newPanel = new ConfigurationPanel("aconfig/confirmMove.vm");
+            newPanel = new ConfigurationPanel("ajax/config/confirmMove.vm");
             return false;
         }
         else

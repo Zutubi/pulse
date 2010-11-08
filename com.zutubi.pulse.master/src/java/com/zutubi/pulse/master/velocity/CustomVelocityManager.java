@@ -11,7 +11,7 @@ import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -82,7 +82,7 @@ public class CustomVelocityManager extends VelocityManager
             }
 
             context.put("refreshInterval", DEFAULT_REFRESH_INTERVAL);
-            String login = AcegiUtils.getLoggedInUsername();
+            String login = SecurityUtils.getLoggedInUsername();
             if (login != null)
             {
                 User user = userManager.getUser(login);
@@ -93,7 +93,7 @@ public class CustomVelocityManager extends VelocityManager
                 }
                 
                 context.put("principle", user);
-                context.put("canLogout", AcegiUtils.canLogout());
+                context.put("canLogout", SecurityUtils.canLogout());
             }
 
             License license = LicenseHolder.getLicense();

@@ -1,22 +1,28 @@
 package com.zutubi.pulse.master.jetty;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.GrantedAuthority;
-import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.security.AnonymousActor;
+import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
-import org.springframework.security.ui.AuthenticationEntryPoint;
-import static org.mockito.Mockito.*;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 public class SecurityHandlerTest extends PulseTestCase
 {
@@ -49,12 +55,12 @@ public class SecurityHandlerTest extends PulseTestCase
         handler.handle("path", "params", request, response);
 
         verify(request, times(0)).setHandled(anyBoolean());
-        verify(basicEndPoint, times(0)).commence((ServletRequest)anyObject(), (ServletResponse)anyObject(), (AuthenticationException)anyObject());
+        verify(basicEndPoint, times(0)).commence((HttpServletRequest)anyObject(), (HttpServletResponse)anyObject(), (AuthenticationException)anyObject());
     }
 
     public void testForbidden() throws IOException, ServletException
     {
-        Actor user = new AcegiUser(1, "name", "pass");
+        Actor user = new Principle(1, "name", "pass");
         stub(accessManager.getActor()).toReturn(user);
         stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(false);
 
@@ -62,12 +68,13 @@ public class SecurityHandlerTest extends PulseTestCase
 
         verify(request, times(1)).setHandled(true);
         verify(response, times(1)).sendError(HttpResponse.__403_Forbidden);
-        verify(basicEndPoint, times(0)).commence((ServletRequest)anyObject(), (ServletResponse)anyObject(), (AuthenticationException)anyObject());
+        verify(basicEndPoint, times(0)).commence((HttpServletRequest)anyObject(), (HttpServletResponse)anyObject(), (AuthenticationException)anyObject());
     }
 
     public void testUnauthorised() throws IOException, ServletException
     {
-        Actor anonymous = new AnonymousActor(new AnonymousAuthenticationToken("key", "principal", new GrantedAuthority[]{new GrantedAuthority(GrantedAuthority.ANONYMOUS)}));
+        List<GrantedAuthority> list = new LinkedList(Arrays.asList(new GrantedAuthorityImpl(Role.ANONYMOUS)));
+        Actor anonymous = new AnonymousActor(new AnonymousAuthenticationToken("key", "principal", list));
         stub(accessManager.getActor()).toReturn(anonymous);
         stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(false);
 
@@ -75,6 +82,6 @@ public class SecurityHandlerTest extends PulseTestCase
 
         verify(request, times(1)).setHandled(true);
         // verify(response, times(1)).sendError(HttpResponse.__401_Unauthorized); - this will be handled by the end point, so will not appear here.
-        verify(basicEndPoint, times(1)).commence((ServletRequest)anyObject(), (ServletResponse)anyObject(), (AuthenticationException)anyObject());
+        verify(basicEndPoint, times(1)).commence((HttpServletRequest)anyObject(), (HttpServletResponse)anyObject(), (AuthenticationException)anyObject());
     }
 }

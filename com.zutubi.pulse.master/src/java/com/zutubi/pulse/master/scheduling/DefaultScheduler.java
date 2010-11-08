@@ -7,7 +7,10 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The implementation of the scheduler interface.  It provides persistence of
@@ -41,18 +44,6 @@ public class DefaultScheduler implements Scheduler
         {
             strategies.put(key, strategy);
         }
-    }
-
-    /**
-     * Update the list of registered strategies to be the list of strategies specified.
-     * Any strategies previously registered will be dropped.
-     *
-     * @param strategies the new list of strategies to be registered.
-     * @see #register(SchedulerStrategy)
-     */
-    public void setStrategies(SchedulerStrategy... strategies)
-    {
-        setStrategies(Arrays.asList(strategies));
     }
 
     /**

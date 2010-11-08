@@ -66,7 +66,7 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         updater.setPingInterval(10);
 
         SimpleMasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
-        configurationManager.setSystemPaths(systemPaths);
+        configurationManager.setDevelopmentSystemPaths(systemPaths);
         updater.setConfigurationManager(configurationManager);
         updater.setEventManager(eventManager);
         MasterLocationProvider masterLocationProvider = mock(MasterLocationProvider.class);

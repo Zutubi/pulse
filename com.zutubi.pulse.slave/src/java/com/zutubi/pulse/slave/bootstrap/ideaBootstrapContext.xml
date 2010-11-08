@@ -19,15 +19,15 @@
     </bean>
 
     <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init">
-        <property name="systemPaths">
-            <bean id="paths" class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
-                <property name="systemRootString" value="com.zutubi.pulse.slave/system"/>
-                <property name="tmpRootString" value="com.zutubi.pulse.slave/system/tmp"/>
-                <property name="contentRootString" value="com.zutubi.pulse.slave/src/www"/>
-                <property name="configRootString" value="com.zutubi.pulse.slave/etc"/>
-                <property name="logRootString" value="com.zutubi.pulse.slave/system/logs"/>
-            </bean>
-        </property>
+        <property name="developmentSystemPaths"><ref local="systemPaths"/></property>
+    </bean>
+
+    <bean id="systemPaths" class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
+        <property name="systemRootString" value="com.zutubi.pulse.slave/system"/>
+        <property name="tmpRootString" value="com.zutubi.pulse.slave/system/tmp"/>
+        <property name="contentRootString" value="com.zutubi.pulse.slave/src/www"/>
+        <property name="configRootString" value="com.zutubi.pulse.slave/etc"/>
+        <property name="logRootString" value="com.zutubi.pulse.slave/system/logs"/>
     </bean>
 
     <bean id="pluginPaths" class="com.zutubi.pulse.core.plugins.ConfigurablePluginPaths">

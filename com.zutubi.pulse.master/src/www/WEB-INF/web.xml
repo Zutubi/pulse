@@ -6,7 +6,7 @@
    version="2.4">
 
     <display-name>Pulse</display-name>
-    <description>Continuous Integration Web UI</description>
+    <description>Pulse Web UI</description>
 
     <!--
     This filter must be placed before any filter that replies upon knowing the security/user related information.
@@ -16,8 +16,21 @@
     ends (ready for use with the next web request).
     -->
     <filter>
-        <filter-name>Acegi Session Filter</filter-name>
-        <filter-class>com.zutubi.pulse.master.security.HttpSessionContextIntegrationFilter</filter-class>
+        <filter-name>securityContext</filter-name>
+        <filter-class>org.springframework.security.web.context.SecurityContextPersistenceFilter</filter-class>
+        <init-param>
+            <param-name>forceEagerSessionCreation</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>security</filter-name>
+        <filter-class>com.zutubi.pulse.master.spring.web.context.SpringSecurityFilter</filter-class>
+        <init-param>
+            <param-name>filterChainBeanName</param-name>
+            <param-value>filterChainProxy</param-value>
+        </init-param>
     </filter>
 
     <filter>
@@ -44,7 +57,12 @@
     </filter>
 
     <filter-mapping>
-        <filter-name>Acegi Session Filter</filter-name>
+        <filter-name>securityContext</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>security</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
@@ -191,7 +209,7 @@
     </servlet>
 
     <!--
-     This servlet is reponsible for writing a temporary image file to the response stream.
+     This servlet is responsible for writing a temporary image file to the response stream.
      When creating charts, the chart must first be rendered to a temporary file and then referenced within the
      template using:
 
@@ -238,22 +256,22 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/aconfig/*</url-pattern>
+        <url-pattern>/ajax/config/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/ahelp/*</url-pattern>
+        <url-pattern>/ajax/help/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/aaction/*.action</url-pattern>
+        <url-pattern>/ajax/action/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/atemplate/*</url-pattern>
+        <url-pattern>/ajax/template/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

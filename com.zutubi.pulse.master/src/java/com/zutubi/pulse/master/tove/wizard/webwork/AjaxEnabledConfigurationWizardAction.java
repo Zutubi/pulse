@@ -14,7 +14,7 @@ import com.zutubi.tove.type.record.PathUtils;
  */
 public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAction
 {
-    private static final String TEMPLATE = "aconfig/wizard.vm";
+    private static final String TEMPLATE = "ajax/config/wizard.vm";
 
     private ConfigurationPanel configurationPanel;
     private ConfigurationResponse configurationResponse;

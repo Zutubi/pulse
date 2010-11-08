@@ -2,11 +2,11 @@ package com.zutubi.pulse.master.tove.config.setup;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.security.AcegiUser;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.Principle;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
@@ -25,7 +25,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.providers.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -84,11 +84,11 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         {
             UserConfiguration adminUser = saveConfiguration();
 
-            // login as the admin user.  safe to directly create AcegiUser as
+            // login as the admin user.  safe to directly create Principle as
             // we know the user has no external authorities
             User user = new User();
             user.setConfig(adminUser);
-            AcegiUtils.loginAs(new AcegiUser(user, Collections.<UserGroupConfiguration>emptyList()));
+            SecurityUtils.loginAs(new Principle(user, Collections.<UserGroupConfiguration>emptyList()));
 
             try
             {
@@ -116,7 +116,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
     private UserConfiguration saveConfiguration() throws TypeException
     {
-        AcegiUtils.loginAsSystem();
+        SecurityUtils.loginAsSystem();
         
         try
         {
@@ -140,12 +140,12 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.insert(MasterConfigurationRegistry.USERS_SCOPE, adminUser);
 
             // Special all-users group.
-            BuiltinGroupConfiguration allUsersGroup = new BuiltinGroupConfiguration(UserManager.ALL_USERS_GROUP_NAME, GrantedAuthority.USER);
+            BuiltinGroupConfiguration allUsersGroup = new BuiltinGroupConfiguration(UserManager.ALL_USERS_GROUP_NAME, Role.USER);
             allUsersGroup.setPermanent(true);
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
 
             // Special anonymous users group.
-            BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, GrantedAuthority.GUEST);
+            BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, Role.GUEST);
             anonymousUsersGroup.setPermanent(true);
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
             
@@ -181,7 +181,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         }
         finally
         {
-            AcegiUtils.logout();
+            SecurityUtils.logout();
         }
     }
 

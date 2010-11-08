@@ -34,6 +34,11 @@ public class TestUtils
      */
     public static void waitForCondition(Condition condition, long timeout, String description)
     {
+        waitForCondition(condition, timeout, 200, description);
+    }
+
+    public static void waitForCondition(Condition condition, long timeout, long checkFrequency, String description)
+    {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + timeout;
         
@@ -51,7 +56,7 @@ public class TestUtils
             }
             try
             {
-                Thread.sleep(20);
+                Thread.sleep(checkFrequency);
             }
             catch (InterruptedException e)
             {
@@ -62,7 +67,7 @@ public class TestUtils
 
     public static File getPulseRoot()
     {
-        // Allow the root to be expllicitly specified using a system property.
+        // Allow the root to be explicitly specified using a system property.
         String pulseRoot = System.getProperty(PROPERTY_PULSE_ROOT);
         if (StringUtils.stringSet(pulseRoot))
         {

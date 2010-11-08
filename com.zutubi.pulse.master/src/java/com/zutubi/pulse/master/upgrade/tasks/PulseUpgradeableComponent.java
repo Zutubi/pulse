@@ -3,13 +3,12 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.util.monitor.JobListener;
-import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.master.upgrade.ConfigurationAware;
 import com.zutubi.pulse.master.upgrade.UpgradeTask;
 import com.zutubi.pulse.master.upgrade.UpgradeableComponent;
+import com.zutubi.pulse.master.util.monitor.JobListener;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,17 +52,6 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, JobListe
     }
 
     /**
-     * Set the full list of upgrade tasks. This new set of tasks will override any existing
-     * registered tasks.
-     *
-     * @param tasks a list of upgrade task instances
-     */
-    public void setTasks(PulseUpgradeTask... tasks)
-    {
-        setTasks(Arrays.asList(tasks));
-    }
-
-    /**
      * Set the full list of system upgrade tasks. These tasks are run during every upgrade.
      *
      * @param tasks a list of upgrade task instances
@@ -77,7 +65,7 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, JobListe
      * Determine if an upgrade is required between the specified build numbers.
      *
      * @param fromBuildNumber specifies the lower build number and is not included in the determination.
-     * @param toBuildNumber   specifiea the upper build number and is included in the determination.
+     * @param toBuildNumber   specifies the upper build number and is included in the determination.
      * @return true if an upgrade is required, false otherwise.
      */
     public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)

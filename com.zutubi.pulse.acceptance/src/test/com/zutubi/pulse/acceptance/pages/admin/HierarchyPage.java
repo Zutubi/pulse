@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 
 /**
- * The page shown when looking at the heirarchy view of a templated scope.
+ * The page shown when looking at the hierarchy view of a templated scope.
  */
 public class HierarchyPage extends ConfigurationPanePage
 {
@@ -34,7 +34,7 @@ public class HierarchyPage extends ConfigurationPanePage
         return isLinkPresent(LINK_ADD);
     }
 
-    public boolean isAddTempalteLinkPresent()
+    public boolean isAddTemplateLinkPresent()
     {
         return isLinkPresent(LINK_ADD_TEMPLATE);
     }

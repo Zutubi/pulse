@@ -168,7 +168,7 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
             {
                 var panel = this;
                 this.body.load({
-                    url: window.baseUrl + '/ahelp/' + encodeURIPath(path) + '?' + type + '=',
+                    url: window.baseUrl + '/ajax/help/' + encodeURIPath(path) + '?' + type + '=',
                     scripts: true,
                     callback: function() {
                         panel.shownPath = path;
@@ -887,7 +887,7 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
             if (this.userCanLogout)
             {
                 this.addItem({xtype: 'tbtext', html: '|', tag: 'span', cls: 'userToolbar'});
-                this.addItem({xtype: 'xztblink', id: 'logout', text: "logout", url: window.baseUrl + '/logout.action', cls: 'userToolbar'});
+                this.addItem({xtype: 'xztblink', id: 'logout', text: "logout", url: window.baseUrl + '/j_spring_security_logout', cls: 'userToolbar'});
             }
             this.addItem({xtype: 'tbtext', html: ']', tag: 'span', cls: 'userToolbar'});
         }

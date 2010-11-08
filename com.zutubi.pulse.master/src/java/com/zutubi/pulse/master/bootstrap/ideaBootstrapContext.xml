@@ -28,20 +28,20 @@
     </bean>
 
     <bean id="configurationManager" class="com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager">
-        <property name="systemPaths">
-            <bean class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
-                <property name="systemRootString" value="com.zutubi.pulse.master/system"/>
-                <property name="contentRootString" value="com.zutubi.pulse.master/src/www"/>
-                <property name="configRootString" value="com.zutubi.pulse.master/etc"/>
-                <property name="logRootString" value="com.zutubi.pulse.master/system/logs"/>
-                <property name="tmpRootString" value="com.zutubi.pulse.master/system/tmp"/>
-                <property name="templateRootStrings">
-                    <list>
-                        <value>com.zutubi.pulse.master/src/templates</value>
-                        <value>com.zutubi.pulse.master/src/www</value>
-                    </list>
-                </property>
-            </bean>
+        <property name="developmentSystemPaths"><ref local="systemPaths"/></property>
+    </bean>
+
+    <bean id="systemPaths" class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
+        <property name="systemRootString" value="com.zutubi.pulse.master/system"/>
+        <property name="contentRootString" value="com.zutubi.pulse.master/src/www"/>
+        <property name="configRootString" value="com.zutubi.pulse.master/etc"/>
+        <property name="logRootString" value="com.zutubi.pulse.master/system/logs"/>
+        <property name="tmpRootString" value="com.zutubi.pulse.master/system/tmp"/>
+        <property name="templateRootStrings">
+            <list>
+                <value>com.zutubi.pulse.master/src/templates</value>
+                <value>com.zutubi.pulse.master/src/www</value>
+            </list>
         </property>
     </bean>
 

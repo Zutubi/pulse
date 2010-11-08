@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 The security subsystem contains the configuration of the authentication and authorization system,
-based upon the Acegi-Security system.
-For details on the individual components configured here, see http://acegisecurity.org/docbook/acegi.html
+based upon the Spring Security system.
 
-This file is split into two regions.
-a) the upper half deals with authentication.
-b) the lower half deals with authorization.
-
-The beans defined within the security subsystem need not be accessed by other contexts.
 -->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.4.xsd">
 
     <!-- do not trigger an init from here. We need the spring context to be completely loaded before
-     doing so else the FilterToBeanProxy will be unable to locate the defined beans.
+     doing so otherwise the DelegatingFilterProxy will be unable to locate the defined beans.
      -->
-    <bean id="securityManager" class="com.zutubi.pulse.master.security.AcegiSecurityManager">
+    <bean id="securityManager" class="com.zutubi.pulse.master.security.PulseSecurityManager">
         <property name="jettyServerManager" ref="jettyServerManager"/>
         <property name="configurationManager" ref="configurationManager"/>
     </bean>
@@ -29,46 +26,213 @@ The beans defined within the security subsystem need not be accessed by other co
     <!-- ============================================================= -->
     <!-- The first half of this context is dedicated to authentication -->
 
-    <bean id="authenticationManager" class="org.springframework.security.providers.ProviderManager">
-        <property name="providers">
-            <list>
-                <ref local="customAuthenticationProvider"/>
-                <ref local="rememberMeAuthenticationProvider"/>
-                <ref local="repositoryAuthenticationProvider"/>
-            </list>
-        </property>
-    </bean>
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="customAuthenticationProvider"/>
+        <security:authentication-provider ref="rememberMeAuthenticationProvider"/>
+        <security:authentication-provider ref="repositoryAuthenticationProvider"/>
+    </security:authentication-manager>
 
     <bean id="customAuthenticationProvider" class="com.zutubi.pulse.master.security.CustomAuthenticationProvider">
         <property name="userManager" ref="userManager"/>
         <property name="passwordEncoder" ref="passwordEncoder"/>
-        <property name="ldapManager">
-            <ref local="ldapManager"/>
-        </property>
+        <property name="ldapManager"><ref local="ldapManager"/></property>
     </bean>
 
     <bean id="repositoryAuthenticationProvider" class="com.zutubi.pulse.master.security.RepositoryAuthenticationProvider"/>
 
-    <!--
-    this filter chain proxy is referenced in web.xml
-    -->
-    <bean id="filterChainProxy" class="org.springframework.security.util.FilterChainProxy">
-        <property name="filterInvocationDefinitionSource">
-            <value>
-                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-                PATTERN_TYPE_APACHE_ANT
-                /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
-                /aaction/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
-                /aconfig/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
-                /ahelp/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
-                /atemplate/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
-                /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
-            </value>
-        </property>
+    <bean id="filterChainProxy" class="org.springframework.security.web.FilterChainProxy">
+        <security:filter-chain-map path-type="ant">
+            <security:filter-chain pattern="/js/**"         filters="none" />
+            <security:filter-chain pattern="/css/**"        filters="none" />
+            <security:filter-chain pattern="/images/**"     filters="none" />
+            <security:filter-chain pattern="/favicon.*"     filters="none" />
+            <security:filter-chain pattern="/ajax/**"       filters="securityContextFilter, anonymousAuthenticationFilter, ajaxExceptionTranslationFilter, filterInvocationInterceptor"/>
+            <security:filter-chain pattern="/**"            filters="securityContextFilter, logoutFilter, formLoginAuthenticationFilter, basicAuthenticationFilter, rememberMeProcessingFilter, requestCacheFilter, anonymousAuthenticationFilter, sessionManagementFilter, exceptionTranslationFilter, filterInvocationInterceptor"/>
+        </security:filter-chain-map>
     </bean>
 
     <!--
-    The security handler for access to the artifact repository.
+    This filter must be included in any filter chain. It is responsible for storing authentication information
+    (a SecurityContext instance) between requests. It also for sets up the thread-local variable in which it is
+    stored during a request and clears it when the request completes. Its default strategy is to store the
+    SecurityContext in the HTTP session, hence the use of the HttpSessionSecurityContextRepository bean.     
+    -->
+    <bean id="securityContextFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter" >
+        <property name="securityContextRepository"><ref local="securityContextRepository"/></property>
+    </bean>
+    <bean id="securityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
+
+    <bean id="sessionManagementFilter" class="org.springframework.security.web.session.SessionManagementFilter" >
+        <constructor-arg ref="securityContextRepository" />
+    </bean>
+
+    <!--
+    The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
+    sent to 'filterProcessesUrl', and uses the 'authenticationManager' to handle the actual authentication.
+    -->
+    <bean id="formLoginAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="authenticationSuccessHandler">
+            <bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+                <property name="defaultTargetUrl" value="/"/>
+            </bean>
+        </property>
+        <property name="authenticationFailureHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <property name="defaultFailureUrl" value="/login!input.action?error=true"/>
+            </bean>
+        </property>
+        <property name="rememberMeServices"><ref local="rememberMeServices"/></property>
+    </bean>
+
+    <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg value="/" />
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+                <ref local="rememberMeServices"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="requestCacheFilter" class="org.springframework.security.web.savedrequest.RequestCacheAwareFilter" />
+    
+    <!--
+    This filter provides support for processing basic authentication credentials presented in HTTP headers.
+    -->
+    <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+        <!-- We override the default details class to aid in detecting HTTP basic authentication. -->
+        <property name="authenticationDetailsSource"><ref local="basicProcessingAuthenticationDetailsSource"/></property>
+    </bean>
+
+    <bean id="basicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+        <property name="realmName" value="Pulse"/>
+    </bean>
+
+    <bean id="basicProcessingAuthenticationDetailsSource" class="org.springframework.security.authentication.AuthenticationDetailsSourceImpl">
+        <property name="clazz" value="com.zutubi.pulse.master.security.BasicAuthenticationDetails"/>
+    </bean>
+
+    <!--
+    The remember me processing filter allows for automatic 'remember me' cookie login.
+    With the remember me services, we need to ensure that the following links are configured:
+    a) AuthenticationProcessingFilter.setRememberMeServices()
+    b) AuthenticationManager.setProviders()
+    c) FilterChainProxy
+    -->
+    <bean id="rememberMeProcessingFilter" class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="rememberMeServices"><ref local="rememberMeServices"/></property>
+    </bean>
+
+    <bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+        <property name="userDetailsService" ref="userManager"/>
+        <property name="key" value="pulse"/>
+    </bean>
+
+    <bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+        <property name="key" value="pulse"/>
+    </bean>
+
+    <!--
+    AnonymousAuthenticationFilter, which is chained after the normal authentication mechanisms and automatically
+    add an AnonymousAuthenticationToken to the SecurityContextHolder if there is no existing Authentication
+    held there.
+    -->
+    <bean id="anonymousAuthenticationFilter" class="org.springframework.security.web.authentication.AnonymousAuthenticationFilter">
+        <property name="key" value="foobar"/>
+        <property name="userAttribute" value="anonymous,ROLE_ANONYMOUS"/>
+    </bean>
+
+    <bean id="anonymousAuthenticationProvider" class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
+        <property name="key" value="foobar"/>
+    </bean>
+
+    <!--
+    If the request is not authorized (either because the user isn't authenticated, or because they
+    don't have the required authorities) it will raise an exception. This will be handled by the
+    ExceptionTranslationFilter
+    -->
+    <bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <!-- This endpoint defines where a user is directed when authentication is required. -->
+        <property name="authenticationEntryPoint"><ref local="loginUrlAuthenticationEntryPoint"/></property>
+    </bean>
+
+    <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <property name="loginFormUrl" value="/login!input.action"/>
+        <property name="portResolver"><ref local="portResolver"/></property>
+    </bean>
+
+    <bean id="portResolver" class="org.springframework.security.web.PortResolverImpl">
+        <property name="portMapper">
+            <bean id="portMapper" class="org.springframework.security.web.PortMapperImpl">
+                <property name="portMappings"><map><entry key="80" value="80"/></map></property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="ajaxExceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <property name="authenticationEntryPoint">
+            <bean class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+        </property>
+        <!-- TODO: what do we do about this?
+        <property name="createSessionAllowed" value="false"/> 
+        -->
+    </bean>
+
+    <!--
+    The order that entries are placed against the objectDefinitionSource is critical.
+    The FilterSecurityInterceptor will work from the top of the list down to the FIRST pattern that
+    matches the request URL. Accordingly, you should place MOST SPECIFIC (ie a/b/c/d.*) expressions
+    first, with LEAST SPECIFIC (ie a/.*) expressions last
+    -->
+    <bean id="filterInvocationInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="accessDecisionManager"><ref local="httpRequestAccessDecisionManager"/></property>
+        <property name="securityMetadataSource">
+            <security:filter-security-metadata-source path-type="ant" lowercase-comparisons="true">
+                <security:intercept-url pattern="/login*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/signup*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/logout.action" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/" access="ROLE_USER,ROLE_GUEST" />
+                <security:intercept-url pattern="/default.action" access="ROLE_GUEST,ROLE_USER" />
+                <security:intercept-url pattern="/xmlrpc/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/hessian/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/packages/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/pluginrepository/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/patch*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/rss.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/view/**/*" access="ROLE_GUEST,ROLE_USER" />
+                <security:intercept-url pattern="/file/**/*" access="ROLE_GUEST,ROLE_USER" />
+                <security:intercept-url pattern="/admin/actions/**" access="ADMINISTER" />
+                <security:intercept-url pattern="/admin/settings/**" access="ADMINISTER" />
+                <security:intercept-url pattern="/admin/users/**" access="ADMINISTER" />
+                <security:intercept-url pattern="/admin/groups/**" access="ADMINISTER" />
+                <security:intercept-url pattern="/admin/plugins/**" access="ADMINISTER" />
+                <security:intercept-url pattern="/**" access="ROLE_GUEST,ROLE_USER" />
+            </security:filter-security-metadata-source>
+        </property>
+    </bean>
+
+    <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions" value="false"/>
+        <property name="decisionVoters">
+            <list>
+                <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
+                    <property name="rolePrefix" value=""/>
+                </bean>
+                <bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- ===================================================================================== -->
+    <!--
+    The security configuration for the artifact repository.  This should be reviewed so that it uses a
+    more standard approach to configuration.  NOTE: just because it is not using the default web app does
+    not mean it should not use the same support.
     -->
     <bean name="artifactRepositorySecurityHandler" class="com.zutubi.pulse.servercore.jetty.FilteringHandler">
         <property name="filters">
@@ -80,8 +244,8 @@ The beans defined within the security subsystem need not be accessed by other co
                  This is usually handled by the httpSessionContextIntegrationFilter.
                  -->
                 <ref local="clearContextFilter"/>
-                <ref local="basicProcessingFilter"/>
-                <ref local="anonymousProcessingFilter"/>
+                <ref local="basicAuthenticationFilter"/>
+                <ref local="anonymousAuthenticationFilter"/>
             </list>
         </property>
         <property name="delegate" ref="securityDelegateHandler"/>
@@ -89,203 +253,12 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean name="securityDelegateHandler" class="com.zutubi.pulse.master.jetty.SecurityHandler">
         <property name="accessManager" ref="accessManager"/>
-        <property name="basicEntryPoint" ref="basicProcessingFilterEntryPoint"/>
-    </bean>
-
-    <bean name="repositoryAuthorityProvider" class="com.zutubi.pulse.master.security.RepositoryAuthorityProvider">
-        <property name="accessManager" ref="accessManager"/>
-        <property name="eventManager" ref="eventManager"/>
+        <property name="basicEntryPoint" ref="basicAuthenticationEntryPoint"/>
     </bean>
 
     <!-- This filter is responsible for clearing the security context when each request is complete. -->
     <bean id="clearContextFilter" class="com.zutubi.pulse.master.security.BasicClearContextFilter"/>
 
-    <!--
-    The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
-    sent to 'filterProcessesUrl', and uses the 'authenticationManager' to handle the actual authentication.
-    -->
-    <bean id="authenticationProcessingFilter" class="org.springframework.security.ui.webapp.AuthenticationProcessingFilter">
-        <property name="authenticationManager">
-            <ref local="authenticationManager"/>
-        </property>
-        <property name="authenticationFailureUrl" value="/login!input.action?error=true"/>
-        <!-- this default is only used when the target url is not available via the session.-->
-        <property name="defaultTargetUrl" value="/"/>
-        <property name="filterProcessesUrl" value="/j_acegi_security_check"/>
-        <property name="rememberMeServices">
-            <ref local="rememberMeServices"/>
-        </property>
-    </bean>
 
-    <!--
-    This filter provides support for processing basic authentication credentials presented in HTTP headers.
-    -->
-    <bean id="basicProcessingFilter" class="org.springframework.security.ui.basicauth.BasicProcessingFilter">
-        <property name="authenticationManager">
-            <ref local="authenticationManager"/>
-        </property>
-        <property name="authenticationEntryPoint">
-            <ref local="basicProcessingFilterEntryPoint"/>
-        </property>
-        <property name="authenticationDetailsSource">
-            <ref local="basicProcessingAuthenticationDetailsSource"/>
-        </property>
-    </bean>
 
-    <bean id="basicProcessingFilterEntryPoint" class="org.springframework.security.ui.basicauth.BasicProcessingFilterEntryPoint">
-        <property name="realmName" value="Pulse"/>
-    </bean>
-
-    <!--
-    We override the default details class to aid in detecting HTTP basic authentication.
-    -->
-    <bean id="basicProcessingAuthenticationDetailsSource" class="org.springframework.security.ui.AuthenticationDetailsSourceImpl">
-        <property name="clazz" value="com.zutubi.pulse.master.security.BasicAuthenticationDetails"/>
-    </bean>
-
-    <!--
-    This endpoint defines where a user is directed when authentication is required.
-    -->
-    <bean id="authenticationProcessingFilterEntryPoint"
-          class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
-        <property name="loginFormUrl" value="/login!input.action"/>
-        <property name="forceHttps" value="false"/>
-        <property name="portResolver">
-            <ref local="portResolver"/>
-        </property>
-    </bean>
-
-    <bean id="portResolver" class="org.springframework.security.util.PortResolverImpl">
-        <property name="portMapper">
-            <ref local="portMapper"/>
-        </property>
-    </bean>
-
-    <bean id="portMapper" class="org.springframework.security.util.PortMapperImpl">
-        <property name="portMappings">
-            <map>
-                <entry key="80" value="80"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="ajaxEntryPoint" class="com.zutubi.pulse.master.security.AjaxAuthenticationEntryPoint"/>
-
-    <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.vote.AffirmativeBased">
-        <property name="allowIfAllAbstainDecisions" value="false"/>
-        <property name="decisionVoters">
-            <list>
-                <ref local="roleVoter"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="roleVoter" class="org.springframework.security.vote.RoleVoter">
-        <property name="rolePrefix" value=""/>
-    </bean>
-
-    <!--
-    The remember me processing filter allows for automatic 'remember me' cookie login.
-    With the remember me services, we need to ensure that the following links are configured:
-    a) AuthenticationProcessingFilter.setRememberMeServices()
-    b) AuthenticationManager.setProviders()
-    c) FilterChainProxy
-    -->
-    <bean id="rememberMeProcessingFilter" class="org.springframework.security.ui.rememberme.RememberMeProcessingFilter">
-        <property name="authenticationManager">
-            <ref local="authenticationManager"/>
-        </property>
-        <property name="rememberMeServices">
-            <ref local="rememberMeServices"/>
-        </property>
-    </bean>
-
-    <bean id="rememberMeServices" class="org.springframework.security.ui.rememberme.TokenBasedRememberMeServices">
-        <property name="userDetailsService" ref="userManager"/>
-        <property name="key" value="pulse"/>
-    </bean>
-
-    <bean id="rememberMeAuthenticationProvider"
-          class="org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider">
-        <property name="key" value="pulse"/>
-    </bean>
-
-    <!--
-    AnonymousProcessingFilter, which is chained after the normal authentication mechanisms and automatically
-    add an AnonymousAuthenticationToken to the SecurityContextHolder if there is no existing Authentication
-    held there.
-    -->
-    <bean id="anonymousProcessingFilter" class="org.springframework.security.providers.anonymous.AnonymousProcessingFilter">
-        <property name="key" value="foobar"/>
-        <property name="userAttribute" value="anonymous,ROLE_ANONYMOUS"/>
-    </bean>
-
-    <bean id="anonymousAuthenticationProvider"
-          class="org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider">
-        <property name="key" value="foobar"/>
-    </bean>
-
-    <!--
-    Not exactly sure what this one does.... other than redirecting a user to the login endpoint
-    if they do not comply with the authorization requirements?
-    -->
-    <bean id="exceptionTranslationFilter" class="org.springframework.security.ui.ExceptionTranslationFilter">
-        <property name="authenticationEntryPoint">
-            <ref local="authenticationProcessingFilterEntryPoint"/>
-        </property>
-        <property name="portResolver">
-            <ref local="portResolver"/>
-        </property>
-    </bean>
-
-    <bean id="ajaxExceptionTranslationFilter" class="org.springframework.security.ui.ExceptionTranslationFilter">
-        <property name="authenticationEntryPoint">
-            <ref local="ajaxEntryPoint"/>
-        </property>
-        <property name="createSessionAllowed" value="false"/>
-    </bean>
-
-    <!--
-    The order that entries are placed against the objectDefinitionSource is critical.
-    The FilterSecurityInterceptor will work from the top of the list down to the FIRST pattern that
-    matches the request URL. Accordingly, you should place MOST SPECIFIC (ie a/b/c/d.*) expressions
-    first, with LEAST SPECIFIC (ie a/.*) expressions last
-    -->
-    <bean id="filterInvocationInterceptor" class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
-        <property name="authenticationManager">
-            <ref local="authenticationManager"/>
-        </property>
-        <property name="accessDecisionManager">
-            <ref local="httpRequestAccessDecisionManager"/>
-        </property>
-        <property name="objectDefinitionSource">
-            <value>
-                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-                PATTERN_TYPE_APACHE_ANT
-                /login*.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /signup*.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /js/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /css/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /images/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /favicon.*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /=ROLE_USER,ROLE_GUEST
-                /default.action=ROLE_GUEST,ROLE_USER
-                /xmlrpc/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /hessian/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /packages/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /pluginrepository/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /patch*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /rss.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
-                /view/**/*=ROLE_GUEST,ROLE_USER
-                /file/**/*=ROLE_GUEST,ROLE_USER
-                /admin/actions/**=ADMINISTER
-                /admin/settings/**=ADMINISTER
-                /admin/users/**=ADMINISTER
-                /admin/groups/**=ADMINISTER
-                /admin/plugins/**=ADMINISTER
-                /**=ROLE_GUEST,ROLE_USER
-            </value>
-        </property>
-    </bean>
 </beans>

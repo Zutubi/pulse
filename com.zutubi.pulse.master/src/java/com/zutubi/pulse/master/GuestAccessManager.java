@@ -3,12 +3,10 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.master.model.GrantedAuthority;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
@@ -17,9 +15,12 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.providers.anonymous.AnonymousProcessingFilter;
-import org.springframework.security.userdetails.memory.UserAttribute;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.memory.UserAttribute;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 
 /**
  */
@@ -27,16 +28,16 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
 {
     private static final Logger LOG = Logger.getLogger(GuestAccessManager.class);
 
-    private AnonymousProcessingFilter anonymousProcessingFilter;
+    private AnonymousAuthenticationFilter anonymousAuthenticationFilter;
     private ConfigurationProvider configurationProvider;
 
     public synchronized void init()
     {
-        UserAttribute userAttribute = anonymousProcessingFilter.getUserAttribute();
+        UserAttribute userAttribute = anonymousAuthenticationFilter.getUserAttribute();
         UserAttribute newAttribute = new UserAttribute();
 
         newAttribute.setPassword(userAttribute.getPassword());
-        newAttribute.addAuthority(new GrantedAuthorityImpl(GrantedAuthority.ANONYMOUS));
+        newAttribute.addAuthority(new GrantedAuthorityImpl(Role.ANONYMOUS));
         if(configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
         {
             BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
@@ -49,7 +50,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
             }
         }
 
-        anonymousProcessingFilter.setUserAttribute(newAttribute);
+        anonymousAuthenticationFilter.setUserAttribute(newAttribute);
     }
 
     public void handleConfigurationEvent(ConfigurationEvent event)
@@ -80,9 +81,9 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
         return new Class[]{ ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
-    public void setAnonymousProcessingFilter(AnonymousProcessingFilter anonymousProcessingFilter)
+    public void setAnonymousAuthenticationFilter(AnonymousAuthenticationFilter anonymousAuthenticationFilter)
     {
-        this.anonymousProcessingFilter = anonymousProcessingFilter;
+        this.anonymousAuthenticationFilter = anonymousAuthenticationFilter;
     }
 
     public void setEventManager(EventManager eventManager)

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.AuthorityProvider;
@@ -19,7 +19,7 @@ public class GroupConfigurationAuthorityProvider implements AuthorityProvider<Gr
         Set<String> result = new HashSet<String>(1);
         if (AccessManager.ACTION_VIEW.equals(action))
         {
-            result.add(GrantedAuthority.USER);
+            result.add(Role.USER);
         }
         return result;
     }

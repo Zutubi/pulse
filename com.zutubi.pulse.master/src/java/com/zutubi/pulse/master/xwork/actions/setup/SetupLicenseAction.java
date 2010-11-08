@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.setup;
 
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.license.LicenseManager;
-import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.setup.SetupLicenseConfiguration;
 import com.zutubi.pulse.master.tove.webwork.TransientAction;
 
@@ -36,7 +36,7 @@ public class SetupLicenseAction extends TransientAction<SetupLicenseConfiguratio
 
     protected String complete(SetupLicenseConfiguration instance)
     {
-        AcegiUtils.loginAsSystem();
+        SecurityUtils.loginAsSystem();
         try
         {
             String licenseKey = instance.getLicense().replaceAll("\n", "");
@@ -45,7 +45,7 @@ public class SetupLicenseAction extends TransientAction<SetupLicenseConfiguratio
         }
         finally
         {
-            AcegiUtils.logout();
+            SecurityUtils.logout();
         }
         return SUCCESS;
     }

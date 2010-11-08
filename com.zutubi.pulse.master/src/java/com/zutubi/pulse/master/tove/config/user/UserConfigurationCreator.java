@@ -10,7 +10,7 @@ import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
-import org.springframework.security.providers.encoding.PasswordEncoder;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 
 /**
  * Used when creating new users.  Handles the confirmation of the user's
