@@ -59,11 +59,18 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         date: function(date) {
             // e.g. {relative: '3 hours ago', absolute: '12/03/2010 10:01:33pm' }
-            return Zutubi.pulse.project.renderers.DATE_TEMPLATE.apply({
-                id: Ext.id(),
-                absolute: date.absolute,
-                relative: date.relative
-            });
+            if (date)
+            {
+                return Zutubi.pulse.project.renderers.DATE_TEMPLATE.apply({
+                    id: Ext.id(),
+                    absolute: date.absolute,
+                    relative: date.relative
+                });
+            }
+            else
+            {
+                return 'n/a';
+            }
         },
         
         health: function(health) {
@@ -276,6 +283,11 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
         },
         
+        buildElapsedStatic: function(stamps)
+        {
+            return stamps.prettyElapsed;
+        },
+        
         buildFeatureCount: function(count)
         {
             if (count < -0)
@@ -447,6 +459,11 @@ Ext.apply(Zutubi.pulse.project, {
             elapsed: {
                 name: 'elapsed',
                 renderer: Zutubi.pulse.project.renderers.buildElapsed
+            },
+
+            elapsedStatic: {
+                name: 'elapsed',
+                renderer: Zutubi.pulse.project.renderers.buildElapsedStatic
             },
 
             stages: {

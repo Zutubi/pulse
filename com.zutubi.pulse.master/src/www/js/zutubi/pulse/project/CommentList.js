@@ -71,4 +71,4 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     }
 });
 
-Ext.reg('xzcommentlist');
+Ext.reg('xzcommentlist', Zutubi.pulse.project.CommentList);

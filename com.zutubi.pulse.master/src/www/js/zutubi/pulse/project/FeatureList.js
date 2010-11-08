@@ -208,4 +208,4 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     }
 });
 
-Ext.reg('xzfeaturelist');
+Ext.reg('xzfeaturelist', Zutubi.pulse.project.FeatureList);

@@ -63,7 +63,7 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
             '</td>' +
             '<td class="test-failure">' +
                 '{status}' +
-                '<tpl if="brokenNumber &gt; 0>' +
+                '<tpl if="brokenNumber &gt; 0">' +
                     '<br/>(<a href="{buildsUrl}{brokenNumber}/">since build {brokenNumber}</a>)' +
                 '</tpl>' +
             '</td>' +
@@ -152,4 +152,4 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
     }
 });
 
-Ext.reg('xztestfailuresbox');
+Ext.reg('xztestfailurestable', Zutubi.pulse.project.TestFailuresTable);
