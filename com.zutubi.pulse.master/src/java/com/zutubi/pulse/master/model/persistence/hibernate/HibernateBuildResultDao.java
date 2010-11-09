@@ -427,7 +427,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public int getCompletedResultCount(final User user)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -437,7 +437,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();
             }
-        });
+        }));
     }
 
     public List<BuildResult> getOldestCompletedBuilds(final User user, final int offset)

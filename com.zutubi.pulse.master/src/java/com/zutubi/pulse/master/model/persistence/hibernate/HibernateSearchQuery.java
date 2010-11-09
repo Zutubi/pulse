@@ -192,7 +192,7 @@ public class HibernateSearchQuery<T> implements Serializable
      */
     public long count()
     {
-        return (Long)getHibernateTemplate().execute(new HibernateCallback()
+        return (Integer)getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
