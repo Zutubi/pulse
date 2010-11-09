@@ -17,7 +17,6 @@
     <publications>
         <artifact name="com.zutubi.pulse.master.hook.tag" type="jar" conf="bundle,build"/>
         <artifact name="com.zutubi.pulse.master.hook.tag-src" type="jar" conf="src"/>
-        <!--<artifact name="com.zutubi.pulse.master.hook.tag-test" type="jar" conf="build"/>-->
     </publications>
 
     <dependencies>

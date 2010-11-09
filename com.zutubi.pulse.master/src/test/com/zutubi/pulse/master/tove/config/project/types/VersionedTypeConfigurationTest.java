@@ -2,11 +2,13 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import org.hibernate.engine.jdbc.ReaderInputStream;
+import org.hibernate.lob.ReaderInputStream;
+
+import java.io.InputStream;
+import java.io.StringReader;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
-
-import java.io.StringReader;
 
 public class VersionedTypeConfigurationTest extends PulseTestCase
 {
@@ -24,7 +26,7 @@ public class VersionedTypeConfigurationTest extends PulseTestCase
         configuration.setPulseFileName(VERSIONED_PULSE_FILE_PATH);
 
         mockResolver = mock(FileResolver.class);
-        ReaderInputStream inputStream = new ReaderInputStream(new StringReader(VERSIONED_PULSE_FILE_CONTENT));
+        InputStream inputStream = new ReaderInputStream(new StringReader(VERSIONED_PULSE_FILE_CONTENT));
         stub(mockResolver.resolve(VERSIONED_PULSE_FILE_PATH)).toReturn(inputStream);
     }
 

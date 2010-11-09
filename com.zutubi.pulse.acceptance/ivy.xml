@@ -49,12 +49,12 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.gcc" rev="latest.integration" conf="*->@"/>
 
         <!-- Test dependencies -->
-        <dependency org="openqa" name="selenium" rev="2.0.a5" conf="external,build->default"/>
-        <dependency org="quintanasoft" name="dumbster" rev="20090217" conf="external,build->default"/>
-        <dependency org="svnkit" name="svnkit" rev="1.2.0" conf="external,build->default"/>
+        <dependency org="com.thoughtworks.selenium" name="com.thoughtworks.selenium" rev="2.0.a5" conf="external,build->default"/>
+        <dependency org="com.dumbster" name="com.springsource.com.dumbster.smtp" rev="1.6.0" conf="external,build->default"/>
+        <dependency org="com.svnkit" name="com.svnkit" rev="1.2.0" conf="external,build->default"/>
 
-        <dependency org="jython" name="jython" rev="20080715" conf="external,build->default"/>
-        <dependency org="javax" name="script-api" rev="1.0" conf="external,build->default"/>
+        <dependency org="org.python" name="org.jython" rev="20080715" conf="external,build->default"/>
+        <dependency org="javax.script" name="javax.script.api" rev="1.0.0" conf="external,build->default"/>
 
     </dependencies>
 </ivy-module>

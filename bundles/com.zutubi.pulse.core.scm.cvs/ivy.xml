@@ -25,6 +25,6 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,src->@"/>
 
         <!-- External dependencies -->
-        <dependency org="netbeans" name="javacvs" rev="5.5" conf="external,build,bundled_3rd_party->default;src->src"/>
+        <dependency org="org.netbeans" name="org.netbeans.lib.cvsclient" rev="5.5" conf="external,build,bundled_3rd_party->default;src->src"/>
     </dependencies>
 </ivy-module>

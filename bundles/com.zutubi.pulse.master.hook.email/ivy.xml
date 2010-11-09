@@ -17,7 +17,6 @@
     <publications>
         <artifact name="com.zutubi.pulse.master.hook.email" type="jar" conf="bundle,build"/>
         <artifact name="com.zutubi.pulse.master.hook.email-src" type="jar" conf="src"/>
-        <!--<artifact name="com.zutubi.pulse.master.hook.email-test" type="jar" conf="build"/>-->
     </publications>
 
     <dependencies>

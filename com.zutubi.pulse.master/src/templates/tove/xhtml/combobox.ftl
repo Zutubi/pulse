@@ -5,7 +5,7 @@
 <#if parameters.lazy>
     fc.mode = 'remote';
     fc.store = new Ext.data.SimpleStore({
-        url: '${base}/aconfig/?options',
+        url: '${base}/ajax/config/?options',
         baseParams: {
         <#if parameters.baseName?exists>
             baseName: '${parameters.baseName?js_string}',

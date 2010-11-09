@@ -30,25 +30,25 @@
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
 
         <!-- External dependencies -->
-        <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default;src->src"/>
-        <dependency org="apache" name="commons-fileupload" rev="1.1.1" conf="external,build,release->default;src->src"/>
-        <dependency org="apache" name="commons-io" rev="1.1" conf="external,build,release->default;src->src"/>
-        <dependency org="apache" name="commons-pool" rev="1.2" conf="external,build,release->default;src->src"/>
-        <dependency org="apache" name="velocity" rev="1.3.1" conf="external,build,release->default;src->src"/>
-        <dependency org="ehcache" name="ehcache" rev="1.5.0" conf="external,build,release->default;src->src"/>
-        <dependency org="slf4j" name="slf4j" rev="1.5.8" conf="external,build,release->jdk14;src->src"/>
-        <dependency org="hibernate" name="hibernate" rev="3.5.3" conf="external,build,release->default;src->src"/>
-        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default;src->src"/>
-        <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default;src->src"/>
-        <dependency org="quartz" name="quartz" rev="1.6.6" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.commons" name="com.springsource.org.apache.commons.dbcp" rev="1.2.2.osgi" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.commons" name="com.springsource.org.apache.commons.fileupload" rev="1.2.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.commons" name="com.springsource.org.apache.commons.io" rev="1.4.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.velocity" name="com.springsource.org.apache.velocity" rev="1.5.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.velocity" name="com.springsource.org.apache.velocity.tools.view" rev="1.4.0" conf="external,build,release->default;src->src"/>
+        <dependency org="net.sourceforge.ehcache" name="com.springsource.net.sf.ehcache" rev="1.6.2" conf="external,build,release->default;src->src"/>
+        <dependency org="org.hibernate" name="com.springsource.org.hibernate" rev="3.3.1.GA" conf="external,build,release->default;src->src"/>
+        <dependency org="org.slf4j" name="com.springsource.slf4j.juli" rev="1.5.3" conf="external,build,release->default;src->src"/>
+        <dependency org="org.hsqldb" name="com.springsource.org.hsqldb" rev="1.8.0.9" conf="external,build,release->default;src->src"/>
+        <dependency org="org.igniterealtime" name="org.jivesoftware.smackx" rev="2.2.1" conf="external,build,release->default;src->src"/>
+        <dependency org="com.opensymphony.quartz" name="com.springsource.org.quartz" rev="1.6.2" conf="external,build,release->default;src->src"/>
 
-        <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default;src->src"/>
-        <dependency org="opensymphony" name="webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
+        <dependency org="com.opensymphony.sitemesh" name="com.springsource.com.opensymphony.sitemesh" rev="2.3.0" conf="external,build,release->default;src->src"/>
+        <dependency org="com.opensymphony.webwork" name="com.springsource.com.opensymphony.webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
 
         <!-- we need the portlet api at the moment since the IBM JDK on the power pc does not include it. -->
-        <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="javax.portlet" name="com.springsource.javax.portlet" rev="2.0.0" conf="external,build,release->default;src->src"/>
 
-        <dependency org="rife" name="jhighlight" rev="1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="com.uwyn" name="com.uwyn.jhighlight" rev="1.0.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.aop" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.jdbc" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.orm" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
@@ -59,12 +59,12 @@
         <dependency org="org.springframework.security" name="org.springframework.security.ldap" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework.security" name="org.springframework.security.web" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework.security" name="org.springframework.security.config" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="sun" name="rome" rev="0.8" conf="external,build,release->default;src->src"/>
-        <dependency org="sun" name="rome-content" rev="20060508" conf="external,build,release->default;src->src"/>
-        <dependency org="sun" name="transaction" rev="1.1" conf="external,build,release->default;src->src"/>
-        <dependency org="json" name="json" rev="1.0" conf="external,build,release->default;src->src"/>
-        <dependency org="flexjson" name="flexjson" rev="1.6" conf="external,build,release->default;src->src"/>
-        <dependency org="jfree" name="jfreechart" rev="1.0.0-rc1" conf="external,build,release->default;src->src"/>
+        <dependency org="com.sun.syndication" name="com.springsource.com.sun.syndication" rev="1.0.0" conf="external,build,release->default;src->src"/>
+        <dependency org="com.sun.syndication" name="com.sun.syndication.content" rev="20060508" conf="external,build,release->default;src->src"/>
+        <dependency org="javax.transaction" name="com.springsource.javax.transaction" rev="1.1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.json" name="com.springsource.org.json" rev="1.0.0" conf="external,build,release->default;src->src"/>
+        <dependency org="net.sourceforge.flexjson" name="net.sf.flexjson" rev="1.6.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.jfree.chart" name="com.springsource.org.jfree.chart" rev="1.0.9" conf="external,build,release->default;src->src"/>
         <dependency org="zutubi" name="jsdeps" rev="0.2" conf="external,build,release->default;src->src"/>
 
         <!-- Test dependencies-->

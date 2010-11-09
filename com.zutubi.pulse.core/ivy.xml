@@ -34,28 +34,28 @@
         <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default;src->src"/>
 
         <!-- External dependencies -->
-        <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner;src->src"/>
-        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default;src->src"/>
-        <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default;src->src"/>
-        <dependency org="apache" name="ivy" rev="2.0.0" conf="external,build,release->core;src->src"/>
-        <dependency org="apache" name="commons-httpclient" rev="3.1" conf="external,build,release->default;src->src"/>
-        <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default;src->src"/>
-        <dependency org="opensymphony" name="xwork" rev="1.2.3" conf="build,release->minimal;src->src"/>
-        <dependency org="sun" name="javamail" rev="1.3.2" conf="build,release->default;src->src"/>
+        <dependency org="org.apache.ant" name="org.apache.ant" rev="1.6.5" conf="external,build,release->directoryscanner;src->src"/>
+        <dependency org="org.apache.commons" name="org.apache.commons.cli" rev="1.0.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.xmlrpc" name="org.apache.xmlrpc" rev="2.0.1" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.ant" name="com.springsource.org.apache.ivy" rev="2.0.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.apache.commons" name="com.springsource.org.apache.commons.httpclient" rev="3.1.0" conf="external,build,release->default;src->src"/>
+        <dependency org="com.sshtools" name="com.sshtools.j2ssh" rev="0.2.7" conf="external,build,release->default;src->src"/>
+        <dependency org="com.opensymphony.xwork" name="com.springsource.com.opensymphony.xwork" rev="1.2.3" conf="build,release->default;src->src"/>
+        <dependency org="javax.mail" name="com.springsource.javax.mail" rev="1.4.0" conf="build,release->default;src->src"/>
         <dependency org="sun" name="sjsxp" rev="1.0.1" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.core" rev="3.0.5.RELEASE"  conf="external,build,release->aspectj;src->src"/>
         <dependency org="org.springframework" name="org.springframework.beans" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.context" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.context.support" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
-        <dependency org="cglib" name="cglib" rev="2.1.3"  conf="external,build,release->default;src->src"/>
-        <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default;src->src"/>
-        <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default;src->src"/>
+        <dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.1.3"  conf="external,build,release->default;src->src"/>
+        <dependency org="nu.xom" name="nu.xom" rev="20080314" conf="external,build,release->default;src->src"/>
+        <dependency org="com.thoughtworks.xstream" name="com.springsource.com.thoughtworks.xstream" rev="1.3.1" conf="external,build,release->default;src->src"/>
         <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default;src->src"/>
         <dependency org="eclipse" name="equinox-bundles" rev="3.3_2" conf="build->default;src->src"/>
 
         <!-- Test dependencies -->
         <dependency org="junit" name="junit" rev="4.8.2"  conf="external,build->default;src->src"/>
-        <dependency org="mockito" name="mockito" rev="1.5" conf="external,build->default;src->src"/>
+        <dependency org="mockito" name="mockito" rev="1.5.0" conf="external,build->default;src->src"/>
         
     </dependencies>
 </ivy-module>

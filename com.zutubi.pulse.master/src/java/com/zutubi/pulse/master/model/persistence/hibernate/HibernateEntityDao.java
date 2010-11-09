@@ -77,7 +77,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public int count()
     {
-        return toInt((Long) getHibernateTemplate().execute(new HibernateCallback()
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -86,7 +86,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                 SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
                 return criteria.uniqueResult();
             }
-        }));
+        });
     }
 
     public Object findFirstByNamedQuery(final String queryName)

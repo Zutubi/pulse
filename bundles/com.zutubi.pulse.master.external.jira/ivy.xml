@@ -17,7 +17,6 @@
     <publications>
         <artifact name="com.zutubi.pulse.master.external.jira" type="jar" conf="bundle,build"/>
         <artifact name="com.zutubi.pulse.master.external.jira-src" type="jar" conf="src"/>
-        <!--<artifact name="com.zutubi.pulse.master.external.jira-test" type="jar" conf="build"/>-->
     </publications>
 
     <dependencies>

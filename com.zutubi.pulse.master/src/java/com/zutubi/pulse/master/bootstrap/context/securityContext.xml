@@ -49,6 +49,7 @@ based upon the Spring Security system.
             <security:filter-chain pattern="/ajax/**"       filters="securityContextFilter, anonymousAuthenticationFilter, ajaxExceptionTranslationFilter, filterInvocationInterceptor"/>
             <security:filter-chain pattern="/**"            filters="securityContextFilter, logoutFilter, formLoginAuthenticationFilter, basicAuthenticationFilter, rememberMeProcessingFilter, requestCacheFilter, anonymousAuthenticationFilter, sessionManagementFilter, exceptionTranslationFilter, filterInvocationInterceptor"/>
         </security:filter-chain-map>
+        <property name="firewall"><bean class="com.zutubi.pulse.master.spring.web.context.OpenFirewall"/></property>
     </bean>
 
     <!--

@@ -26,7 +26,7 @@
         <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="release,build,src->@"/>
 
         <!-- external libraries -->
-        <dependency org="xom" name="xom" rev="20080314" conf="build,release->default;src->src"/>
+        <dependency org="nu.xom" name="nu.xom" rev="20080314" conf="build,release->default;src->src"/>
         <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.0.4.RELEASE" conf="build,release->default;src->src"/>
         <dependency org="org.springframework.security" name="org.springframework.security.acls" rev="3.0.4.RELEASE" conf="build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.ldap" rev="1.3.0.RELEASE" conf="build,release->default;src->src"/>
