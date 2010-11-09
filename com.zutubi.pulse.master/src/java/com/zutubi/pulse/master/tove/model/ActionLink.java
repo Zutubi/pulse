@@ -7,12 +7,21 @@ public class ActionLink
     private String action;
     private String label;
     private String icon;
+    private String argument;
 
     public ActionLink(String action, String label, String icon)
     {
         this.action = action;
         this.label = label;
         this.icon = icon;
+    }
+
+    public ActionLink(String action, String label, String icon, String argument)
+    {
+        this.action = action;
+        this.label = label;
+        this.icon = icon;
+        this.argument = argument;
     }
 
     public String getAction()
@@ -43,5 +52,15 @@ public class ActionLink
     public void setIcon(String icon)
     {
         this.icon = icon;
+    }
+
+    public String getArgument()
+    {
+        return argument;
+    }
+
+    public void setArgument(String argument)
+    {
+        this.argument = argument;
     }
 }

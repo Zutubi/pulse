@@ -17,19 +17,19 @@
  */
 Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     template: new Ext.XTemplate(
-        '<ul id="{id}" class="comments spaced">' +
+        '<ul id="{id}" class="comments">' +
         '</ul>'
     ),
 
     commentTemplate: new Ext.XTemplate(
         '<li>' +
             '<div class="comment-body">' +
-                + '{message:plainToHtml}' +
+                '{message:plainToHtml}' +
             '</div>' +
             '<div class="comment-author">' +
-                'by {author:htmlEncode}, {date.relativeTime} ({date.absoluteTime})' +
+                'by {author:htmlEncode}, {relativeDate} ({absoluteDate})' +
                 '<tpl if="canDelete">' +
-                    '[<a id="delete-comment-{#}" href="#" onclick="deleteComment({buildId}, {id}); return false;">delete</a>]' +
+                    ' [<a id="delete-comment-{#}" href="#" onclick="deleteComment({buildId}, {id}); return false;">delete</a>]' +
                 '</tpl>' +
             '</div>' +
         '</li>'
@@ -63,10 +63,27 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     
     renderComments: function()
     {
-        for (var i = 0, l = this.data.length; i < l; i++)
+        if (this.data && this.data.length > 0)
         {
-            var comment = this.data[i];
-            this.commentTemplate.append(this.el, Ext.apply({}, comment, {id: this.id, buildId: this.buildId}));
+            for (var i = 0, l = this.data.length; i < l; i++)
+            {
+                var comment = this.data[i];
+                this.commentTemplate.append(this.el, {
+                    id: comment.id,
+                    buildId: this.buildId,
+                    message: comment.message,
+                    author: comment.author,
+                    relativeDate: comment.date.relative,
+                    absoluteDate: comment.date.absolute,
+                    canDelete: comment.canDelete
+                });
+            }
+            
+            this.el.setDisplayed(true);
+        }
+        else
+        {
+            this.el.setDisplayed(false);
         }
     }
 });

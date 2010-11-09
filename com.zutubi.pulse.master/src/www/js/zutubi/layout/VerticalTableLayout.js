@@ -33,23 +33,26 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
      * content).
      */
     checkRows: function() {
-        var rows = this.table.tBodies[0].childNodes;
-        for (var i = 0, l = rows.length; i < l; i++)
+        if (this.table)
         {
-            var display = false;
-            var row = rows[i];
-            var cells = row.childNodes;
-            for (var j = 0, m = cells.length; j < m; j++)
+            var rows = this.table.tBodies[0].childNodes;
+            for (var i = 0, l = rows.length; i < l; i++)
             {
-                var cell = cells[j];
-                if (this.hasDisplayedChild(cell))
+                var display = false;
+                var row = rows[i];
+                var cells = row.childNodes;
+                for (var j = 0, m = cells.length; j < m; j++)
                 {
-                    display = true;
-                    break;
+                    var cell = cells[j];
+                    if (this.hasDisplayedChild(cell))
+                    {
+                        display = true;
+                        break;
+                    }
                 }
+                
+                row.style.display = display ? '' : 'none';
             }
-            
-            row.style.display = display ? '' : 'none';
         }
     },
     

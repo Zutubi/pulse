@@ -17,7 +17,11 @@
   *                               when it is ready to render.
   * @cfg {Number} refreshInterval Interval at which to reload an update data.  May be set to zero
   *                               to only load once (default is zero).
-  * @cfg {String} dataKeys        keys for child components to update with new data
+  * @cfg {Array}  dataKeys        Array of keys for child components to update with new data, may be
+  *                               omitted if dataMapping is present.
+  * @cfg {Object} dataMapping     An object that maps from a component id suffix to the data key
+  *                               used to update that component, may be omitted if dataKeys is
+  *                               present.
   */
 Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
     loadingMessage: 'Loading data...',
@@ -49,10 +53,29 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
     update: function(data)
     {
         this.data = data;
-        for (var i = 0, l = this.dataKeys.length; i < l; i++)
+        
+        if (this.dataKeys)
         {
-            var key = this.dataKeys[i];
-            Ext.getCmp(this.id + '-' + key).update(l == 1 ? data : data[key]);    
+            for (var i = 0, l = this.dataKeys.length; i < l; i++)
+            {
+                var key = this.dataKeys[i];
+                Ext.getCmp(this.id + '-' + key).update(l == 1 ? data : data[key]);    
+            }
+        }
+        else
+        {
+            for (var key in this.dataMapping)
+            {
+                var path = this.dataMapping[key];
+                var properties = path.split('.');
+                var componentData = data;
+                for (var i = 0, l = properties.length; componentData && i < l; i++)
+                {
+                    componentData = componentData[properties[i]];
+                }
+                
+                Ext.getCmp(this.id + '-' + key).update(componentData);
+            }
         }
     },
 
@@ -105,5 +128,48 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
                 }
             }
         });
+    },
+    
+    /**
+     * Checks a child panel for content.  If it has none, the panel is
+     * collapsed automatically.
+     *
+     * @param idSuffix suffix of the id for the child panel
+     * @param fn       a function that should accept a child item from the
+     *                 panel and return true if that item has content, false
+     *                 otherwise
+     */
+    checkPanelForContent: function(idSuffix, fn)
+    {
+        var panel = Ext.getCmp(this.id + '-' + idSuffix);
+        var childWithContent = panel.items.find(fn);
+        
+        if (childWithContent)
+        {
+            if (!panel.hasHadContent && panel.collapsed)
+            {
+                if (this.rendered)
+                {
+                    panel.expand();
+                }
+                else
+                {
+                    panel.collapsed = false;
+                }
+            }
+
+            panel.hasHadContent = true;
+        }
+        else
+        {
+            if (this.rendered)
+            {
+                panel.collapse();
+            }
+            else
+            {
+                panel.collapsed = true;
+            }
+        }
     }
 });

@@ -36,7 +36,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             var result = '';
             if (data.link)
             {
-                result += '<a href="' + window.baseUrl + data.link + '">'; 
+                result += '<a href="' + window.baseUrl + '/' + data.link + '">'; 
             }
             
             result += Ext.util.Format.htmlEncode(value);
@@ -184,6 +184,67 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             });
         },
 
+        resultStatus: function(status, result) {
+            if (status == 'in progress' && result.elapsed && result.elapsed.prettyEstimatedTimeRemaining)
+            {
+                return '<img alt="in progress" src="' + window.baseUrl + '/images/status/inprogress.gif"/> ' +
+                       Zutubi.pulse.project.renderers.resultElapsed(result.elapsed, result);
+            }
+            else if (status == 'success' && result.warnings && result.warnings > 0)
+            {
+                return '<img alt="success with warnings" src="' + window.baseUrl + '/images/status/warnings.gif"/> success';
+            }
+            else if (status == 'queued' && result.prettyQueueTime)
+            {
+                return '<img alt="queued" src="' + window.baseUrl + '/images/status/queued.gif"/> ' +
+                       'queued (' + result.prettyQueueTime + ')';
+            }
+            else
+            {
+                return Zutubi.pulse.project.imageLabel('status', status);
+            }
+        },
+        
+        ELAPSED_TEMPLATE: new Ext.XTemplate(
+            '<tpl if="percentComplete &gt; 0"><img class="centre" title="{prettyElapsed} ({percentComplete}%) elapsed" src="{[window.baseUrl]}/images/box-elapsed.gif" height="10" width="{percentComplete}"/></tpl>' +
+            '<tpl if="percentRemaining &gt; 0"><img class="centre" title="{prettyEstimatedTimeRemaining} ({percentRemaining}%) remaining" src="{[window.baseUrl]}/images/box-remaining.gif" height="10" width="{percentRemaining}"/></tpl>'
+        ),
+        
+        resultElapsed: function(stamps)
+        {
+            // e.g. { prettyElapsed: '3 mins 32 secs' [, estimatedPercentComplete: 90, prettyEstimatedTimeRemaining: '21 secs']}
+            if (stamps.prettyEstimatedTimeRemaining)
+            {
+                return Zutubi.pulse.project.renderers.ELAPSED_TEMPLATE.apply({
+                    prettyElapsed: stamps.prettyElapsed,
+                    prettyEstimatedTimeRemaining: stamps.prettyEstimatedTimeRemaining,
+                    percentComplete: stamps.estimatedPercentComplete,
+                    percentRemaining: 100 - stamps.estimatedPercentComplete
+                });
+            }
+            else
+            {
+                return stamps.prettyElapsed;
+            }
+        },
+        
+        resultElapsedStatic: function(stamps)
+        {
+            return stamps.prettyElapsed;
+        },
+        
+        resultFeatureCount: function(count)
+        {
+            if (count < -0)
+            {
+                return 'n/a';
+            }
+            else
+            {
+                return '' + count;
+            }
+        },
+        
         ID_TEMPLATE: new Ext.XTemplate(
             '<a href="{link}">build {number}</a>&nbsp;' +
             '<a class="unadorned" id="bactions-{id}-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
@@ -226,23 +287,6 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
         },
 
-        buildStatus: function(status, build) {
-            if (status == 'in progress' && build.elapsed && build.elapsed.prettyEstimatedTimeRemaining)
-            {
-                return '<img alt="in progress" src="' + window.baseUrl + '/images/status/inprogress.gif"/> ' +
-                       Zutubi.pulse.project.renderers.buildElapsed(build.elapsed, build);
-            }
-            else if (status == 'queued' && build.prettyQueueTime)
-            {
-                return '<img alt="queued" src="' + window.baseUrl + '/images/status/queued.gif"/> ' +
-                       'queued (' + build.prettyQueueTime + ')';
-            }
-            else
-            {
-                return Zutubi.pulse.project.imageLabel('status', status);
-            }
-        },
-        
         buildRevision: function(revision, build) {
             // e.g. { revisionString: '1234' [, link: 'link to change viewer'] }
             if (build.personal)
@@ -258,46 +302,6 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         buildTests: function(testSummary, build)
         {
             return Zutubi.pulse.project.renderers.link(testSummary, {link: build.link + 'tests/'});
-        },
-        
-        ELAPSED_TEMPLATE: new Ext.XTemplate(
-            '<tpl if="percentComplete &gt; 0"><img class="centre" title="{prettyElapsed} ({percentComplete}%) elapsed" src="{[window.baseUrl]}/images/box-elapsed.gif" height="10" width="{percentComplete}"/></tpl>' +
-            '<tpl if="percentRemaining &gt; 0"><img class="centre" title="{prettyEstimatedTimeRemaining} ({percentRemaining}%) remaining" src="{[window.baseUrl]}/images/box-remaining.gif" height="10" width="{percentRemaining}"/></tpl>'
-        ),
-        
-        buildElapsed: function(stamps)
-        {
-            // e.g. { prettyElapsed: '3 mins 32 secs' [, estimatedPercentComplete: 90, prettyEstimatedTimeRemaining: '21 secs']}
-            if (stamps.prettyEstimatedTimeRemaining)
-            {
-                return Zutubi.pulse.project.renderers.ELAPSED_TEMPLATE.apply({
-                    prettyElapsed: stamps.prettyElapsed,
-                    prettyEstimatedTimeRemaining: stamps.prettyEstimatedTimeRemaining,
-                    percentComplete: stamps.estimatedPercentComplete,
-                    percentRemaining: 100 - stamps.estimatedPercentComplete
-                });
-            }
-            else
-            {
-                return stamps.prettyElapsed;
-            }
-        },
-        
-        buildElapsedStatic: function(stamps)
-        {
-            return stamps.prettyElapsed;
-        },
-        
-        buildFeatureCount: function(count)
-        {
-            if (count < -0)
-            {
-                return 'n/a';
-            }
-            else
-            {
-                return '' + count;
-            }
         },
         
         STAGE_TEMPLATE: new Ext.XTemplate(
@@ -335,7 +339,33 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                 return '<span class="understated">no stages</span>';
             }
         },
+        
+        stageName: function(name, stage)
+        {
+            return Zutubi.pulse.project.renderers.link(name, {link: stage.buildLink + 'details/' + encodeURIComponent(stage.name) + '/'});
+        },
+        
+        stageRecipe: function(recipe)
+        {
+            return recipe ? Ext.util.Format.htmlEncode(recipe) : '[default]';
+        },
 
+        stageAgent: function(agent)
+        {
+            return agent ? Ext.util.Format.htmlEncode(agent) : '[pending]';
+        },
+
+        stageTests: function(testSummary, stage)
+        {
+            return Zutubi.pulse.project.renderers.link(testSummary, {link: stage.buildLink + 'tests/' + encodeURIComponent(stage.name) + '/'});
+        },
+        
+        stageLogs: function(dummy, stage)
+        {
+            var url = window.baseUrl + '/' + stage.buildLink + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
+            return '<a title="view log" class="unadorned" href="' + url + '"><img src="' + window.baseUrl + '/images/script.gif" alt="view log"> log</a>';
+        },
+        
         COMMENT_TEMPLATE: new Ext.XTemplate(
             '{abbreviated} ' +
             '<a class="unadorned" id="comment-{id}-link" onclick="Zutubi.FloatManager.showHideFloat(\'comments\', \'comment-{id}\'); return false">' +
@@ -395,6 +425,46 @@ Ext.apply(Zutubi.pulse.project, {
      */
     configs: {
         /**
+         * Configurations for generic result (e.g. build, stage) properties.
+         */
+         result: {
+            status: {
+                name: 'status',
+                renderer: Zutubi.pulse.project.renderers.resultStatus
+            },
+         
+            errors: {
+                name: 'errors',
+                renderer: Zutubi.pulse.project.renderers.resultFeatureCount
+            },
+
+            warnings: {
+                name: 'warnings',
+                renderer: Zutubi.pulse.project.renderers.resultFeatureCount
+            },
+
+            when: {
+                name: 'when',
+                renderer: Zutubi.pulse.project.renderers.date
+            },
+
+            completed: {
+                name: 'completed',
+                renderer: Zutubi.pulse.project.renderers.date
+            },
+
+            elapsed: {
+                name: 'elapsed',
+                renderer: Zutubi.pulse.project.renderers.resultElapsed
+            },
+
+            elapsedStatic: {
+                name: 'elapsed',
+                renderer: Zutubi.pulse.project.renderers.resultElapsedStatic
+            }
+         },
+         
+        /**
          * Configurations for build properties.  The names correspond to custom column keys stored
          * in user preferences.
          */
@@ -416,11 +486,6 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Zutubi.pulse.project.renderers.buildOwner
             },
             
-            status: {
-                name: 'status',
-                renderer: Zutubi.pulse.project.renderers.buildStatus
-            },
-            
             reason: {
                 name: 'reason',
                 renderer: Ext.util.Format.htmlEncode
@@ -436,39 +501,39 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Zutubi.pulse.project.renderers.buildTests
             },
 
-            errors: {
-                name: 'errors',
-                renderer: Zutubi.pulse.project.renderers.buildFeatureCount
-            },
-
-            warnings: {
-                name: 'warnings',
-                renderer: Zutubi.pulse.project.renderers.buildFeatureCount
-            },
-
-            when: {
-                name: 'when',
-                renderer: Zutubi.pulse.project.renderers.date
-            },
-
-            completed: {
-                name: 'completed',
-                renderer: Zutubi.pulse.project.renderers.date
-            },
-
-            elapsed: {
-                name: 'elapsed',
-                renderer: Zutubi.pulse.project.renderers.buildElapsed
-            },
-
-            elapsedStatic: {
-                name: 'elapsed',
-                renderer: Zutubi.pulse.project.renderers.buildElapsedStatic
-            },
-
             stages: {
                 name: 'stages',
                 renderer: Zutubi.pulse.project.renderers.buildStages
+            }
+        },
+        
+        /**
+         * Configurations for build stage properties.
+         */
+        stage: {
+            name: {
+                name: 'name',
+                renderer: Zutubi.pulse.project.renderers.stageName
+            },
+
+            recipe: {
+                name: 'recipe',
+                renderer: Zutubi.pulse.project.renderers.stageRecipe
+            },
+
+            agent: {
+                name: 'agent',
+                renderer: Zutubi.pulse.project.renderers.stageAgent
+            },
+            
+            tests: {
+                name: 'tests',
+                renderer: Zutubi.pulse.project.renderers.stageTests
+            },
+
+            logs: {
+                name: 'logs',
+                renderer: Zutubi.pulse.project.renderers.stageLogs
             }
         },
 

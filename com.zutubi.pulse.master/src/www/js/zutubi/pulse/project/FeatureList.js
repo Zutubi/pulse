@@ -20,7 +20,7 @@
  *                 name: 'test-reports',
  *                 files: [{
  *                     path: 'path/to/file.txt',
- *                     featuresTrimmed: false,
+ *                     featureCount: 14,  (may be greater than features.length if trimmed)
  *                     features: FeatureModel[],
  *                 }, ... ]
  *             }, ... ]
@@ -84,9 +84,12 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
             var html = '';
             html += this.simpleFeatures(this.data.features);
             var stages = this.data.stages;
-            for (var i = 0, l = stages.length; i < l; i++)
+            if (stages)
             {
-                html += this.stageFeatures(stages[i]);
+                for (var i = 0, l = stages.length; i < l; i++)
+                {
+                    html += this.stageFeatures(stages[i]);
+                }
             }
             
             this.listEl.update(html);
@@ -119,9 +122,12 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         var html = '<li class="header">build stage :: ' + Ext.util.Format.htmlEncode(stage.name) + ' :: ' + recipe + '@' + agent + '<ul>';
         html += this.simpleFeatures(stage.features);
         
-        for (var i = 0, l = stage.commands.length; i < l; i++)
+        if (stage.commands)
         {
-            html += this.commandFeatures(stage.commands[i], stage.isComplete);
+            for (var i = 0, l = stage.commands.length; i < l; i++)
+            {
+                html += this.commandFeatures(stage.commands[i], stage.complete);
+            }
         }
         
         html += '</ul></li>';
@@ -133,9 +139,12 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         var html = '<li class="header">command :: ' + Ext.util.Format.htmlEncode(command.name) + '<ul>';
         html += this.simpleFeatures(command.features);
         
-        for (var i = 0, l = command.artifacts.length; i < l; i++)
+        if (command.artifacts)
         {
-            html += this.artifactFeatures(command.artifacts[i], command.artifactsUrl, stageComplete);
+            for (var i = 0, l = command.artifacts.length; i < l; i++)
+            {
+                html += this.artifactFeatures(command.artifacts[i], command.artifactsUrl, stageComplete);
+            }
         }
         
         html += '</ul></li>';
@@ -160,6 +169,7 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         for (var i = 0, l = file.features.length; i < l; i++)
         {
             html += '<li class="' + this.level + '">';
+            var feature = file.features[i];
             if (feature.summaryLines)
             {
                 html += '<span class="context">';
@@ -167,14 +177,14 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
                 for (var lineIndex = 0, lineCount = lines.length; lineIndex < lineCount; lineIndex++)
                 {
                     var line = lines[lineIndex];
-                    if (lineIndex == feature.lineOffset)
+                    if (lineIndex == feature.lineOffset - 1)
                     {
                         html += '</span><span class="feature">';
                     }
                     
                     html += Ext.util.Format.plainToHtml(line) + '<br/>';
                     
-                    if (lineIndex == feature.lineOffset)
+                    if (lineIndex == feature.lineOffset - 1)
                     {
                         html += '</span><span class="context">';
                     }
@@ -189,14 +199,14 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
             
             if (stageComplete)
             {
-                html += '<a class="unadorned" href="' + fileUrl + '#' + feature.lineNumber;
+                html += '<a class="unadorned" href="' + fileUrl + '#' + feature.lineNumber + '">';
                 html += '<span class="small">jump to</span> <img src="' + window.baseUrl + '/images/go_small.gif"/></a>';
             }
             
             html += '</li>';
         }
 
-        if (file.featuresTrimmed)
+        if (file.featureCount > file.features.length)
         {
             html += '<li>...[trimmed] To see the full list of features ';
             html += '<a class="unadorned" href="' + fileUrl + '"><span class="small">jump to</span> ';

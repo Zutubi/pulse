@@ -74,7 +74,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
         // We expect the summary page to report that 1 test passed.
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
-        assertEquals("1 passed", summaryPage.getSummaryTestsColumnText());
+        assertEquals("1 passed", summaryPage.getTestsSummary());
 
         // We expect the artifacts page to contain an artifact called test reports.
         BuildArtifactsPage artifactsPage = browser.openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);

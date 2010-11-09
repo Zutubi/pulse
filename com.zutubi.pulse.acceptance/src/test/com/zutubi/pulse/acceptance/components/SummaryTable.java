@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Corresponds to the Zutubi.table.SummaryTable JS component.
  */
-public class SummaryTable extends Component
+public class SummaryTable extends ContentTable
 {
     public SummaryTable(SeleniumBrowser browser, String id)
     {

@@ -4,17 +4,18 @@ import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.acceptance.pages.browse.AddCommentDialog;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for displaying/adding/removing comments on builds.
@@ -110,8 +111,13 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         ConfirmDialog confirmDialog = page.clickDeleteComment(1);
         confirmDialog.waitFor();
         confirmDialog.clickOk();
-        page.waitForReload();
-        assertFalse(browser.isTextPresent(TEST_COMMENT));
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !browser.isTextPresent(TEST_COMMENT); 
+            }
+        }, SeleniumBrowser.WAITFOR_TIMEOUT, "comment to disappear");
     }
 
     // Checks that the build controller updating a build does not result in comments being lost.
@@ -234,8 +240,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
 
-        page.waitForReload();
-        assertTrue(page.isCommentsPresent());
+        page.waitForComments(SeleniumBrowser.WAITFOR_TIMEOUT);
         assertTrue(browser.isTextPresent(TEST_COMMENT));
         assertTrue(browser.isTextPresent("by " + TEST_USER));
         return page;

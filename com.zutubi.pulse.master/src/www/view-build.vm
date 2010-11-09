@@ -1,152 +1,40 @@
 #helpTag("Build+Summary+Tab")
 #authorisationTags($principle)
 #buildTags($project $buildResult "summary")
-
-#if($personal)
-    #set($ownerArg = "personal=true")
-#else
-    #set($ownerArg = "projectName=$u_projectName")
-#end
-
+<content tag="header.javascript">
+    zutubi/pulse/project/browse/BuildSummaryPanel.js
+</content>
 <html>
 <head>
-    <title>#wwtext("name=build") $result.number</title>
+    <title>#wwtext("name=build") $buildResult.number</title>
     <script type="text/javascript">
-        var buildPanel;
-        var eastPanelHasHadContent = false;
-        var initialised = false;
-        var runner = null;
+        var panel = null;
         
-        function updateContent()
+        function refresh(cb)
         {
-            Ext.Ajax.request({
-                url: '#jss("$base/ajax/viewBuildSummaryPanel.action?${ownerArg}&buildVID=$buildResult.number")',
-                success: function(transport, options)
-                {
-                    var response = eval("(" + transport.responseText + ")");
-                    buildPanel.layout.center.panel.update(response.mainPanel);
-                    
-                    var eastPanel = buildPanel.layout.east.panel;
-                    if (response.rightPanel)
-                    {
-                        eastPanel.update(response.rightPanel);
-                        if (!eastPanelHasHadContent && eastPanel.collapsed)
-                        {
-                            eastPanel.expand();
-                        }
-
-                        eastPanelHasHadContent = true;
-                    }
-                    else
-                    {
-                        eastPanel.collapse();
-                    }
-
-                    initialised = true;
-                },
-                
-                failure: function(transport, options)
-                {
-                    if (runner)
-                    {
-                        runner.stopAll();
-                    }
-
-                    if (!initialised)
-                    {
-                        Ext.get('build-loading').update('#wwtext("name=loading.failed")');
-                    }
-                }
-            });
+            panel.load(cb);
         }
-                
-        function triggerHook(hookHandle)
-        {
-            hideStatus(false);
             
-            Ext.Ajax.request({
-                url: '${base}/ajax/triggerBuildHook.action',
-                params: {
-#if($personal)
-                    personal: 'true',
-#else
-                    projectName: '#jss($h_projectName)',
-#end
-                    buildVID: '$buildResult.number',
-                    hook: hookHandle
-                },
-
-                success: function(transport, options)
-                {
-                    var response = eval("(" + transport.responseText + ")");
-                    if(response.success)
-                    {
-                        showStatus(response.detail, 'success');
-                    }
-                    else
-                    {
-                        showStatus('Unable to trigger hook: ' + response.detail, 'failure');
-                    }
-                },
-
-                failure: function(transport, options)
-                {
-                    showStatus.update('Hook trigger failed.', 'failure');
-                }
-            });
-        };
-
         Ext.onReady(function() {
-            buildPanel = new Ext.Panel({
-                layout: 'border',
-                border: false,
-                contentEl: 'center',
-                defaults: {
-                    layout: 'fit',
-                    border: false,
-                    autoScroll: true,
-                    bodyStyle: "padding: 15px"
-                },
-                items: [{
-                    region: 'center',
-                    id: 'build-center',
-                    split: false,
-                    contentEl: 'nested-content'
-                }, {
-                    region: 'east',
-                    id: 'build-east',
-                    split: true,
-                    collapsible: true,
-                    collapseMode: 'mini',
-                    hideCollapseTool: true,
-                    width: 300
-                }]
+            panel = new Zutubi.pulse.project.browse.BuildSummaryPanel({
+                id: 'build-summary',
+                url: window.baseUrl + '/ajax/buildSummaryData.action?personal=$buildResult.personal&projectId=$project.id&buildVID=$buildResult.number',
+                loadingId: '#id("${buildResult.ownerName}-build-${buildResult.number}-summary")',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval,
+                projectId: '$project.id',
+                projectName: '#jss($project.name)',
+                buildsUrl: '#jss($urls.projectBuilds($project))',
+                buildId: '$buildResult.id',
+                buildNumber: '$buildResult.number',
+                personal: $buildResult.personal
             });
-        
-            var nestedCenter = Ext.getCmp('nested-center');
-            nestedCenter.add(buildPanel);
-            viewport.doLayout();
-
-    #if($refreshInterval)
-            var task = {
-                run: updateContent,
-                interval: 1000 * $refreshInterval
-            };
-            
-            runner = new Ext.util.TaskRunner();
-            runner.start(task);
-    #else
-            updateContent();
-    #end
         });
-    </script>
+    </script>                
 </head>
 <body>
     #buildTabs($buildResult "summary")
 
-    <div id="nested-content">
-        <div id="build-loading">
-            <img alt="loading" src="$base/images/inprogress.gif"/> #wwtext("name=loading.data")
-        </div>
+    <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-summary")'>
     </div>
 </html>

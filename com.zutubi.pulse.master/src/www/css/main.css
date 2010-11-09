@@ -1377,10 +1377,11 @@ li.header
 
 ul.comments
 {
+    margin: 0;
     padding: 4px 0 0 6px;
     background: #f8f8ff;
     border: 1px solid #dde;
-    width: 97%;
+    width: 99%;
 }
 
 ul.comments li

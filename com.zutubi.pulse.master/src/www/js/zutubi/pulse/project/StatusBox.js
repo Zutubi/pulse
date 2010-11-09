@@ -42,7 +42,7 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     onRender: function(container, position) {
         var args = {
             id: this.id,
-            health: this.data.health
+            health: this.getHealth()
         };
         
         if (position)
@@ -62,6 +62,40 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         Zutubi.pulse.project.StatusBox.superclass.onRender.apply(this, arguments);
     },
     
+    getHealth: function()
+    {
+        if (this.data.health)
+        {
+            return this.data.health;
+        }
+        else if (this.data.status)
+        {
+            switch (this.data.status)
+            {
+                case 'pending':
+                case 'in progress':
+                    return 'inprogress';
+                case 'success':
+                    if (this.data.warnings && this.data.warnings > 0)
+                    {
+                        return 'warnings';
+                    }
+                    else
+                    {
+                        return 'ok'; 
+                    }
+                case 'skipped':
+                    return 'unknown';
+                default:
+                    return 'broken'
+            }
+        }
+        else
+        {
+            return 'unknown';
+        }
+    },
+    
     renderData: function(/*data*/) {
         this.titleTemplate.overwrite(this.titleEl, this.data);
         for (var i = 0, l = this.fields.length; i < l; i++)
@@ -79,9 +113,16 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     },
     
     update: function(data) {
+        var originalHealth = this.data ? this.getHealth() : '';
         this.data = data;
         if (this.rendered)
         {
+            var newHealth = this.getHealth();
+            if (newHealth != originalHealth)
+            {
+                this.el.replaceClass(originalHealth + '-box', newHealth + '-box');
+            }
+            
             this.clearDataRows();
             if (data)
             {

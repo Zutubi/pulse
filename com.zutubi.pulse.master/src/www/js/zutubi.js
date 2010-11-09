@@ -1072,5 +1072,5 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
 Ext.util.Format.plainToHtml = function(s)
 {
-    return Ext.util.Format.htmlEncode(s).replace(/ /g, '&nbsp;').replace(/\r?\n/g, '<br/>');
+    return Ext.util.Format.htmlEncode(s).replace(/(\s) /g, '$1&nbsp;').replace(/\r?\n/g, '<br/>');
 };

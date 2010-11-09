@@ -462,17 +462,6 @@ function clearResponsibility(projectId)
     });
 }
 
-function addComment(buildId)
-{
-    showPromptDialog('Add Comment',
-                     'Comment:',
-                     true,
-                     true,
-                     'Adding comment...',
-                     '/ajax/addComment.action',
-                     { buildId: buildId });
-}
-
 function deleteComment(buildId, commentId)
 {
     showPromptDialog('Delete Comment',

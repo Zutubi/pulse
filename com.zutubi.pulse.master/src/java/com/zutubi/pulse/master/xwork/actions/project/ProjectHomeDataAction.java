@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.model.BuildResultToNumberMapping;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -25,14 +26,12 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
-import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -183,7 +182,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
             String responsibleOwner = projectResponsibility.getMessage(getLoggedInUser());
             String responsibleComment = projectResponsibility.getComment();
 
-            ProjectHomeModel.ProjectResponsibilityModel responsibilityModel = new ProjectHomeModel.ProjectResponsibilityModel(responsibleOwner, responsibleComment);
+            ProjectResponsibilityModel responsibilityModel = new ProjectResponsibilityModel(responsibleOwner, responsibleComment);
             model.setResponsibility(responsibilityModel);
             if (accessManager.hasPermission(ACTION_CLEAR_RESPONSIBILITY, project))
             {

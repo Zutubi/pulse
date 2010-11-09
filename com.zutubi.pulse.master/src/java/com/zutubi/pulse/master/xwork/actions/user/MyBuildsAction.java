@@ -21,6 +21,16 @@ public class MyBuildsAction extends ActionSupport
         return columns;
     }
 
+    /**
+     * Note that this is required by the main decorator for toolbar rendering.
+     * 
+     * @return true to indicate the user is looking at personal builds
+     */
+    public boolean isPersonalBuild()
+    {
+        return true;
+    }
+
     public String execute() throws Exception
     {
         String login = SecurityUtils.getLoggedInUsername();

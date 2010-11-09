@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.components;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 /**
  * Corresponds to the Zutubi.table.LinkTable JS component.
  */
-public class LinkTable extends Component
+public class LinkTable extends ContentTable
 {
     public LinkTable(SeleniumBrowser browser, String id)
     {
@@ -23,19 +24,45 @@ public class LinkTable extends Component
      */
     public boolean isLinkPresent(String linkName)
     {
-        return browser.isElementPresent(getLinkId(linkName));
+        return isLinkPresent(linkName, null);
+    }
+
+    /**
+     * Indicates if a link with the given name in the given category is present
+     * in the table.
+     *
+     * @param linkName name of the link to check for
+     * @param category category the link belongs to (null if not categorised)
+     * @return true if the given link is present, false otherwise
+     */
+    public boolean isLinkPresent(String linkName, String category)
+    {
+        return browser.isElementPresent(getLinkId(linkName, category));
     }
 
     /**
      * Clicks on the link with the given name.  The link must be present.  This
-     * method returns immediately on clicking the link (i.e. it oes not wait
+     * method returns immediately on clicking the link (i.e. it does not wait
      * for any effect).
      *
      * @param linkName name of the link to click on
      */
     public void clickLink(String linkName)
     {
-        browser.click(getLinkId(linkName));
+        clickLink(linkName, null);
+    }
+
+    /**
+     * Clicks on the link with the given name in the given category.  The link
+     * must be present.  This method returns immediately on clicking the link
+     * (i.e. it does not wait for any effect).
+     *
+     * @param linkName name of the link to click on
+     * @param category category the link belongs to (null if not categorised)
+     */
+    public void clickLink(String linkName, String category)
+    {
+        browser.click(getLinkId(linkName, category));
     }
 
     /**
@@ -46,7 +73,20 @@ public class LinkTable extends Component
      */
     public String getLinkId(String linkName)
     {
-        return id + "-" + linkName;
+        return getLinkId(linkName, null);
+    }
+
+    /**
+     * Returns the DOM id that will be used for a link with the given name in
+     * the given category.
+     *
+     * @param linkName name of the link to get the id for
+     * @param category category the link belongs to (null if not categorised)
+     * @return the DOM is that will be applied to the given link
+     */
+    public String getLinkId(String linkName, String category)
+    {
+        return id + "-" + (category == null ? "" : WebUtils.toValidHtmlName(category) + "-") + WebUtils.toValidHtmlName(linkName);
     }
 
     /**

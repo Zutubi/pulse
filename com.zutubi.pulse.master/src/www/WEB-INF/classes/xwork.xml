@@ -424,8 +424,11 @@
             </result>
         </action>
 
-        <action name="viewBuildSummaryPanel" class="com.zutubi.pulse.master.xwork.actions.project.BuildSummaryDataAction">
-            <result name="success" type="flexjson">data</result>
+        <action name="buildSummaryData" class="com.zutubi.pulse.master.xwork.actions.project.BuildSummaryDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
+            </result>
             <result name="error" type="httpheader">500</result>
         </action>
 

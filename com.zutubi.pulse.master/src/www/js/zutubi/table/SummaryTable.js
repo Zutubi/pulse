@@ -18,8 +18,6 @@
  * @cfg {String}  saveParams      Optional extra parameters to pass on the Ajax call to save
  *                                customised columns.
  * @cfg {String}  id              Id to use for the table.
- * @cfg {Array}   data            Array of objects used to populate the table.  Should contain an
- *                                entry for each row, with fields matching the columns.
  * @cfg {String}  title           Title for the table heading row.
  * @cfg {String}  emptyMessage    Message to show when the table has no rows to display (if not
  *                               specified, the table is hidden in this case).

@@ -179,7 +179,7 @@ public class Urls
         return projectReports(project) + groupName + "/";
     }
 
-    private String projectBuilds(Object project)
+    public String projectBuilds(Object project)
     {
         return project(project) + "builds/";
     }

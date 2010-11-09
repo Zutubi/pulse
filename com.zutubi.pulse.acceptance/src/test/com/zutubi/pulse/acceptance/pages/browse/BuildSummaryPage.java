@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.*;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.master.webwork.Urls;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
@@ -8,16 +9,41 @@ import static com.zutubi.util.WebUtils.uriComponentEncode;
 /**
  * The summary tab for a build result.
  */
-public class BuildSummaryPage extends AbstractBuildStatusPage
+public class BuildSummaryPage extends ResponsibilityPage
 {
-    private static final String ID_COMMENTS_LIST = "build-comments";
-    private static final String ID_TEST_FAILURES = "failed-tests";
-    private static final String ID_RELATED_LINKS = "related-links";
-    private static final String ID_FEATURED_ARTIFACTS = "featured-artifacts";
+    private static final String PROPERTY_STATUS = "status";
+    private static final String PROPERTY_TESTS = "tests";
+
+    private String projectName;
+    private long buildId;
+
+    private StatusBox statusBox;
+    private PropertyTable detailsTable;
+    private CommentList commentList;
+    private FeatureList errors;
+    private FeatureList warnings;
+    private TestFailuresTable testFailuresTable;
+    private LinkTable actionsTable;
+    private LinkTable linksTable;
+    private LinkTable artifactsTable;
+    private LinkTable hooksTable;
 
     public BuildSummaryPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId, projectName, buildId);
+        super(browser, urls, projectName + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
+        this.projectName = projectName;
+        this.buildId = buildId;
+        
+        statusBox = new StatusBox(browser, "build-summary-status");
+        detailsTable = new PropertyTable(browser, "build-summary-details");
+        commentList = new CommentList(browser, "build-summary-comments");
+        errors = new FeatureList(browser, "build-summary-errors");
+        warnings = new FeatureList(browser, "build-summary-warnings");
+        testFailuresTable = new TestFailuresTable(browser, "build-summary-failures");
+        actionsTable = new LinkTable(browser, "build-summary-actions");
+        linksTable = new LinkTable(browser, "build-summary-links");
+        artifactsTable = new LinkTable(browser, "build-summary-artifacts");
+        hooksTable = new LinkTable(browser, "build-summary-hooks");
     }
 
     public String getUrl()
@@ -25,74 +51,109 @@ public class BuildSummaryPage extends AbstractBuildStatusPage
         return urls.buildSummary(uriComponentEncode(projectName), Long.toString(buildId));
     }
 
+    @Override
+    public void waitFor()
+    {
+        super.waitFor();
+        browser.waitForVariable("panel.initialised");
+    }
+
     public boolean isRightPaneVisible()
     {
-        return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().buildPanel.layout.east.panel.isVisible()"));
+        return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().panel.layout.east.panel.isVisible()"));
     }
-
-    private String getHookId(String hookName)
+    
+    public String getBuildStatus()
     {
-        return "hook." + hookName;
+        return statusBox.getValue(PROPERTY_STATUS);
     }
 
-    public boolean isHookPresent(String hookName)
+    public String getTestsSummary()
     {
-        return browser.isElementIdPresent(getHookId(hookName));
+        return statusBox.getValue(PROPERTY_TESTS);
     }
 
-    public void clickHook(String hookName)
+    public void waitForComments(long timeout)
     {
-        browser.click(getHookId(hookName));
+        commentList.waitFor(timeout);
     }
-
-    public String getSummaryTestsColumnText()
-    {
-        return browser.getCellContents(ID_BUILD_BASICS, 4, 1);
-    }
-
+    
     public boolean isCommentsPresent()
     {
-        return browser.isElementPresent(ID_COMMENTS_LIST);
+        return commentList.isPresent();
     }
 
     public boolean isDeleteCommentLinkPresent(int commentNumber)
     {
-        return browser.isElementPresent(getDeleteCommentLinkId(commentNumber));
+        return commentList.isDeleteLinkPresent(commentNumber);
     }
 
     public ConfirmDialog clickDeleteComment(int commentNumber)
     {
-        browser.click(getDeleteCommentLinkId(commentNumber));
+        commentList.clickDeleteLink(commentNumber);
         return new ConfirmDialog(browser);
+    }
+
+    public boolean isErrorListPresent()
+    {
+        return errors.isPresent();
+    }
+
+    public boolean isWarningListPresent()
+    {
+        return warnings.isPresent();
     }
 
     public boolean isTestFailuresTablePresent()
     {
-        return browser.isElementPresent(ID_TEST_FAILURES);
+        return testFailuresTable.isPresent();
     }
 
-    private String getDeleteCommentLinkId(int commentNumber)
+    @Override
+    protected String getActionId(String actionName)
     {
-        return "delete.comment." + commentNumber;
+        return actionsTable.getLinkId(actionName);
+    }
+
+    @Override
+    public boolean isActionPresent(String actionName)
+    {
+        return actionsTable.isLinkPresent(actionName);
+    }
+
+    @Override
+    public void clickAction(String actionName)
+    {
+        actionsTable.clickLink(actionName);
     }
 
     public boolean isRelatedLinksTablePresent()
     {
-        return browser.isElementPresent(ID_RELATED_LINKS);
+        return linksTable.isPresent();
     }
     
     public String getRelatedLinkText(int index)
     {
-        return browser.getCellContents(ID_RELATED_LINKS, index + 1, 0);
+        return linksTable.getLinkLabel(index);
     }
 
     public boolean isFeaturedArtifactsTablePresent()
     {
-        return browser.isElementPresent(ID_FEATURED_ARTIFACTS);
+        return artifactsTable.isPresent();
     }
 
     public String getFeaturedArtifactsRow(int index)
     {
-        return browser.getCellContents(ID_FEATURED_ARTIFACTS, index + 1, 0);
+        return artifactsTable.getLinkLabel(index);
+    }
+
+    public boolean isHookPresent(String hookName)
+    {
+        return hooksTable.isLinkPresent(hookName);
+    }
+
+    public void clickHook(String hookName)
+    {
+        hooksTable.clickLink(hookName);
     }
 }

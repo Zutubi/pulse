@@ -58,7 +58,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         title: 'current activity',
                         columns: [
                             Zutubi.pulse.project.configs.build.number,
-                            Zutubi.pulse.project.configs.build.status,
+                            Zutubi.pulse.project.configs.result.status,
                             Zutubi.pulse.project.configs.build.reason,
                             Zutubi.pulse.project.configs.build.revision
                         ],
@@ -76,14 +76,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         title: 'latest completed build',
                         rows: [
                             Zutubi.pulse.project.configs.build.number,
-                            Zutubi.pulse.project.configs.build.status,
+                            Zutubi.pulse.project.configs.result.status,
                             Zutubi.pulse.project.configs.build.reason,
                             Zutubi.pulse.project.configs.build.revision,
                             Zutubi.pulse.project.configs.build.tests,
-                            Zutubi.pulse.project.configs.build.errors,
-                            Zutubi.pulse.project.configs.build.warnings,
-                            Zutubi.pulse.project.configs.build.when,
-                            Zutubi.pulse.project.configs.build.elapsed,
+                            Zutubi.pulse.project.configs.result.errors,
+                            Zutubi.pulse.project.configs.result.warnings,
+                            Zutubi.pulse.project.configs.result.when,
+                            Zutubi.pulse.project.configs.result.elapsed,
                             Zutubi.pulse.project.configs.build.stages
                         ],
                         emptyMessage: 'no completed builds found'
@@ -111,7 +111,12 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         Zutubi.pulse.project.configs.changelist.comment,
                         Zutubi.pulse.project.configs.changelist.actions
                     ],
-                    emptyMessage: 'no changes found'
+                    emptyMessage: 'no changes found',
+                    listeners: {
+                        afterrender: function() {
+                            panel.updateRows();
+                        }
+                    }
                 }]
             }, {
                 region: 'east',
@@ -154,6 +159,11 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         
     update: function(data) {
         Zutubi.pulse.project.browse.ProjectHomePanel.superclass.update.apply(this, arguments);
+
+        this.checkPanelForContent('right', function(table) {
+            return table.dataExists();
+        });
+
         if (this.rendered)
         {
             this.updateRows();
@@ -161,8 +171,8 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     },
 
     updateRows: function() {
-        Ext.getCmp('project-home-main').getLayout().checkRows();
-        Ext.getCmp('project-home-right').getLayout().checkRows();
+        Ext.getCmp(this.id + '-main').getLayout().checkRows();
+        Ext.getCmp(this.id + '-right').getLayout().checkRows();
     },
     
     handleMarkForCleanResponse: function(options, success, response)

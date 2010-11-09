@@ -15,6 +15,11 @@
 Zutubi.pulse.project.BuildSummaryTable = Ext.extend(Zutubi.table.SummaryTable, {
     initComponent: function() {
         var columns = [];
+        for (var key in Zutubi.pulse.project.configs.result)
+        {
+            columns.push(Zutubi.pulse.project.configs.result[key]);
+        }
+        
         for (var key in Zutubi.pulse.project.configs.build)
         {
             columns.push(Zutubi.pulse.project.configs.build[key]);
