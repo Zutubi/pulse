@@ -266,7 +266,7 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
         return delegate.getId();
     }
 
-    public Object getBean(String s, Object[] objects) throws BeansException
+    public Object getBean(String s, Object... objects) throws BeansException
     {
         return delegate.getBean(s, objects);
     }

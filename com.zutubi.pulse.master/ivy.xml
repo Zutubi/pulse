@@ -62,7 +62,7 @@
         <dependency org="com.sun.syndication" name="com.springsource.com.sun.syndication" rev="1.0.0" conf="external,build,release->default;src->src"/>
         <dependency org="com.sun.syndication" name="com.sun.syndication.content" rev="20060508" conf="external,build,release->default;src->src"/>
         <dependency org="javax.transaction" name="com.springsource.javax.transaction" rev="1.1.0" conf="external,build,release->default;src->src"/>
-        <dependency org="org.json" name="com.springsource.org.json" rev="1.0.0" conf="external,build,release->default;src->src"/>
+        <dependency org="org.json" name="org.json" rev="1.0.0" conf="external,build,release->default;src->src"/>
         <dependency org="net.sourceforge.flexjson" name="net.sf.flexjson" rev="1.6.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.jfree.chart" name="com.springsource.org.jfree.chart" rev="1.0.9" conf="external,build,release->default;src->src"/>
         <dependency org="zutubi" name="jsdeps" rev="0.2" conf="external,build,release->default;src->src"/>
