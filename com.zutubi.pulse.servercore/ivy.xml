@@ -35,7 +35,6 @@
         <dependency org="org.apache.ant" name="com.springsource.org.apache.ivy" rev="2.0.0" conf="external,build,release->default;src->src"/>
         <dependency org="com.caucho" name="com.caucho" rev="3.0.13" conf="external,build,release->default;src->src"/>
         <dependency org="org.mortbay.jetty" name="com.springsource.org.mortbay.jetty" rev="5.1.14" conf="external,build,release->default;src->src"/>
-        <dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.4.0" conf="external,build,release->default;src->src"/>
-
+        <dependency org="javax.servlet" name="javax.servlet" rev="2.4.0" conf="external,build,release->default;src->src"/>
     </dependencies>
 </ivy-module>

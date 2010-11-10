@@ -28,7 +28,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
     
     TRIMMED_TEMPLATE: new Ext.XTemplate(
         '<span title="{full:htmlEncode}">' +
-            '{short:htmlEncode} ' +
+            '{trimmed:htmlEncode} ' +
         '</span>'
     ),
     
@@ -36,7 +36,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         if (s.length > limit)
         {
             return Zutubi.pulse.project.TRIMMED_TEMPLATE.apply({
-                short: s.substring(0, limit - 3) + '...',
+                trimmed: s.substring(0, limit - 3) + '...',
                 full: s
             });
         }
