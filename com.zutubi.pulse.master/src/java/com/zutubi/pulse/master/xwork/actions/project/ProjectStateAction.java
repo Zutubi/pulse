@@ -1,28 +1,42 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.util.EnumUtils;
 
 /**
  * An action to change the state of a project (e.g. to pause it);
  */
 public class ProjectStateAction extends ProjectActionBase
 {
-    private boolean pause;
+    private String transition;
 
-    public boolean isPause()
+    public void setTransition(String transition)
     {
-        return pause;
-    }
-
-    public void setPause(boolean pause)
-    {
-        this.pause = pause;
+        this.transition = transition;
     }
 
     public String execute() throws Exception
     {
         Project project = getRequiredProject();
-        projectManager.makeStateTransition(project.getId(), pause ? Project.Transition.PAUSE : Project.Transition.RESUME);
+        Project.Transition transition = EnumUtils.fromPrettyString(Project.Transition.class, this.transition);
+        if (isTransitionAllowed(transition))
+        {
+            projectManager.makeStateTransition(project.getId(), transition);
+        }
+        
         return SUCCESS;
+    }
+
+    private boolean isTransitionAllowed(Project.Transition transition)
+    {
+        switch (transition)
+        {
+            case INITIALISE:
+            case PAUSE:
+            case RESUME:
+                return true;
+            default:
+                return false;
+        }
     }
 }

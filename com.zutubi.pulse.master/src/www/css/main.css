@@ -798,6 +798,23 @@ th.fit-width, td.fit-width
     color: #999;
 }
 
+span.obvious, span.error
+{
+    font-size: 1.2em;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+span.obvious
+{
+    color: #333;
+}
+
+span.error
+{
+    color: #b22;
+}
+
 .unspacer
 {
     margin-left: 15px;

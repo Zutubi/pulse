@@ -90,6 +90,7 @@ public class ProjectHomePage extends ResponsibilityPage
         // Remove trailing actions.
         state = StringUtils.stripSuffix(state, "pause");
         state = StringUtils.stripSuffix(state, "resume");
+        state = StringUtils.stripSuffix(state, "reinitialise");
         state = state.trim();
         return state;
     }

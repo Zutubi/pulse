@@ -91,6 +91,17 @@ public interface ProjectManager extends EntityManager<Project>
     void runUnderProjectLocks(Runnable fn, long... projectIds);
 
     /**
+     * Indicates if the logged in user has permission to perform the given
+     * transition on the given project.
+     * 
+     * @param project    the project to check against
+     * @param transition the transition to test permission for
+     * @return true if the user is allowed to make the given state transition
+     *         for the given project
+     */
+    boolean hasStateTransitionPermission(Project project, Project.Transition transition);
+    
+    /**
      * Performs a state transition on a project if possible.  This is the only
      * way that a project state should be updated, to avoid race conditions.
      * This operation is atomic via use of the state lock: the implementation

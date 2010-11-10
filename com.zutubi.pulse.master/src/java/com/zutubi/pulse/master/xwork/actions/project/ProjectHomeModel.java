@@ -150,14 +150,12 @@ public class ProjectHomeModel
     public static class StateModel
     {
         private String pretty;
-        private boolean canPause;
-        private boolean canResume;
+        private String keyTransition;
 
-        public StateModel(String pretty, boolean canPause, boolean canResume)
+        public StateModel(String pretty, String keyTransition)
         {
             this.pretty = pretty;
-            this.canPause = canPause;
-            this.canResume = canResume;
+            this.keyTransition = keyTransition;
         }
 
         public String getPretty()
@@ -165,14 +163,9 @@ public class ProjectHomeModel
             return pretty;
         }
 
-        public boolean isCanPause()
+        public String getKeyTransition()
         {
-            return canPause;
-        }
-
-        public boolean isCanResume()
-        {
-            return canResume;
+            return keyTransition;
         }
     }
 

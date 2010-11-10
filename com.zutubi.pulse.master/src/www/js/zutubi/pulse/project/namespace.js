@@ -118,34 +118,36 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
         },
                 
-        PAUSE_TEMPLATE: new Ext.XTemplate(
-            '<a class="unadorned" href="{[window.baseUrl]}/projectState.action?projectName={encodedProjectName}&amp;pause={pause}">' +
-                '<img src="{[window.baseUrl]}/images/{icon}.gif"/> ' +
+        TRANSITION_TEMPLATE: new Ext.XTemplate(
+            '<a class="unadorned" href="{[window.baseUrl]}/projectState.action?projectName={encodedProjectName}&amp;transition={transition}">' +
+                '<img src="{[window.baseUrl]}/images/project/{transition}.gif"/> ' +
                 '{label}' +
             '</a>'
         ),
 
         projectState: function(state, project) {
-            // e.g. { pretty: 'idle', canPause: true, canResume: false }
+            // e.g. { pretty: 'idle', keyTransition: 'pause' }
             var result = state.pretty;
-            if (state.canPause)
+            var label = state.keyTransition;
+            if (result == 'paused')
             {
-                result += '&nbsp;&nbsp;' + Zutubi.pulse.project.renderers.PAUSE_TEMPLATE.apply({
+                result = '<span class="obvious">' + result + '</span>';
+            }
+            else if (result == 'initialisation failed')
+            {
+                label = 'reinitialise';
+                result = '<span class="error">' + result + '</span>';
+            }
+            
+            if (state.keyTransition)
+            {
+                result += '&nbsp;&nbsp;' + Zutubi.pulse.project.renderers.TRANSITION_TEMPLATE.apply({
                     encodedProjectName: encodeURIComponent(project.name),
-                    pause: true,
-                    label: 'pause',
-                    icon: 'control_pause_blue'
+                    transition: state.keyTransition,
+                    label: label
                 });
             }
-            else if (state.canResume)
-            {
-                result += '&nbsp;&nbsp;' + Zutubi.pulse.project.renderers.PAUSE_TEMPLATE.apply({
-                    encodedProjectName: encodeURIComponent(project.name),
-                    pause: false,
-                    label: 'resume',
-                    icon: 'control_play_blue'
-                });
-            }
+
             return result;
         },
 

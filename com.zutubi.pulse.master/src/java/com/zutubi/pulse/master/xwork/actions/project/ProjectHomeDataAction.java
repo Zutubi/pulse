@@ -100,11 +100,13 @@ public class ProjectHomeDataAction extends ProjectActionBase
     private ProjectHomeModel.StatusModel createStatusModel()
     {
         Project project = getProject();
+
+        Project.State projectState = project.getState();
+        Project.Transition keyTransition = getKeyTransition(project, projectState);
         
         ProjectHomeModel.StateModel state = new ProjectHomeModel.StateModel(
-                EnumUtils.toPrettyString(project.getState()),
-                project.isTransitionValid(Project.Transition.PAUSE),
-                project.isTransitionValid(Project.Transition.RESUME)
+                EnumUtils.toPrettyString(projectState),
+                keyTransition == null ? null : EnumUtils.toPrettyString(keyTransition)
         );
         
         ProjectHomeModel.StatisticsModel statistics = new ProjectHomeModel.StatisticsModel(
@@ -114,6 +116,29 @@ public class ProjectHomeDataAction extends ProjectActionBase
         );
         
         return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.getHealth(buildManager, project)), state, statistics);
+    }
+
+    private Project.Transition getKeyTransition(Project project, Project.State projectState)
+    {
+        Project.Transition transition = null;
+        if (project.isTransitionValid(Project.Transition.PAUSE))
+        {
+            transition = Project.Transition.PAUSE;
+        }
+        else if (project.isTransitionValid(Project.Transition.RESUME))
+        {
+            transition = Project.Transition.RESUME;
+        }
+        else if (projectState == Project.State.INITIALISATION_FAILED)
+        {
+            transition = Project.Transition.INITIALISE;
+        }
+
+        if (transition != null && !projectManager.hasStateTransitionPermission(project, transition))
+        {
+            transition = null;
+        }
+        return transition;
     }
 
     private void addActivity(List<QueuedRequest> queued, List<BuildResult> inProgress, BuildResultToModelMapping buildMapping)
