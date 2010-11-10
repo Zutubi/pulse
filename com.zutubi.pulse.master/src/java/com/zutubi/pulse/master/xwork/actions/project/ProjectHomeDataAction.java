@@ -91,6 +91,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         addLatest(latest, urls);
         addRecent(completed, buildMapping);
         addChanges();
+        addDescription(projectConfig);
         addLinks(urls);
         addActions();
 
@@ -159,6 +160,15 @@ public class ProjectHomeDataAction extends ProjectActionBase
     private void addRecent(List<BuildResult> completed, BuildResultToModelMapping buildMapping)
     {
         CollectionUtils.map(completed, buildMapping, model.getRecent());
+    }
+
+    private void addDescription(ProjectConfiguration projectConfig)
+    {
+        String description = projectConfig.getDescription();
+        if (StringUtils.stringSet(description))
+        {
+            model.setDescription(description);
+        }
     }
 
     private void addLinks(Urls urls)

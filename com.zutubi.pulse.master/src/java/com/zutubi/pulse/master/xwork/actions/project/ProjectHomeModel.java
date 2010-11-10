@@ -20,6 +20,7 @@ public class ProjectHomeModel
     private BuildModel latest;
     private List<BuildModel> recent = new LinkedList<BuildModel>();
     private List<ChangelistModel> changes = new LinkedList<ChangelistModel>();
+    private String description;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
     private List<ActionLink> links = new LinkedList<ActionLink>();
     private String url;
@@ -70,6 +71,16 @@ public class ProjectHomeModel
     public List<ChangelistModel> getChanges()
     {
         return changes;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     @JSON

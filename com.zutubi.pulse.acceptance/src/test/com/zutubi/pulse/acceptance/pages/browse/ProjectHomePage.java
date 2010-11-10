@@ -44,6 +44,7 @@ public class ProjectHomePage extends ResponsibilityPage
     private PropertyTable latestCompleteTable;
     private BuildSummaryTable recentTable;
     private SummaryTable changesTable;
+    private TextBox descriptionBox;
     private LinkTable actionsTable;
     private LinkTable linksTable;
     private LinkTable artifactsTable;
@@ -57,6 +58,7 @@ public class ProjectHomePage extends ResponsibilityPage
         latestCompleteTable = new PropertyTable(browser, "project-home-latest");
         recentTable = new BuildSummaryTable(browser, "project-home-recent");
         changesTable = new SummaryTable(browser, "project-home-changes");
+        descriptionBox = new TextBox(browser, "project-home-description");
         actionsTable = new LinkTable(browser, "project-home-actions");
         linksTable = new LinkTable(browser, "project-home-links");
         artifactsTable = new LinkTable(browser, "project-home-artifacts");
@@ -280,6 +282,26 @@ public class ProjectHomePage extends ResponsibilityPage
         return result;
     }
 
+    /**
+     * Indicates if a description is displayed.
+     * 
+     * @return true if a description is present for this project
+     */
+    public boolean hasDescription()
+    {
+        return descriptionBox.isPresent();
+    }
+
+    /**
+     * Retrieves the project's description.
+     * 
+     * @return the project description
+     */
+    public String getDescription()
+    {
+        return descriptionBox.getText();
+    }
+    
     /**
      * Returns a list of all action labels displayed.  Note that these labels
      * are the text displayed to the user.

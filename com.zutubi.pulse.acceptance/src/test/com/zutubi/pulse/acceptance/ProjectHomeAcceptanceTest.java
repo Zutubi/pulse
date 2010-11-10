@@ -84,7 +84,9 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
 
     public void testNewProject() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        final String TEST_DESCRIPTION = "This is a test description.";
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         browser.loginAsAdmin();
 
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
@@ -96,8 +98,17 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
         assertFalse(homePage.hasLatestCompletedBuild());
         assertEquals(0, homePage.getRecentBuildsCount());
         assertEquals(0, homePage.getChangesCount());
+        assertFalse(homePage.hasDescription());
         assertEquals(asList("clean up build directories", "trigger", "take responsibility"), homePage.getActions());
         assertEquals(asList("configure"), homePage.getLinks());
+        
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        project.put("description", TEST_DESCRIPTION);
+        xmlRpcHelper.saveConfig(projectPath, project, false);
+        
+        homePage.openAndWaitFor();
+        assertTrue(homePage.hasDescription());
+        assertEquals(TEST_DESCRIPTION, homePage.getDescription());
     }
 
     public void testBuildActivity() throws Exception

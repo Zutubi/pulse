@@ -26,6 +26,26 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         return '<img alt="' + value + '" src="' + Zutubi.pulse.project.imageSource(type, value) + '"/> ' + value;    
     },
     
+    TRIMMED_TEMPLATE: new Ext.XTemplate(
+        '<span title="{full:htmlEncode}">' +
+            '{short:htmlEncode} ' +
+        '</span>'
+    ),
+    
+    trimmed: function(s, limit) {
+        if (s.length > limit)
+        {
+            return Zutubi.pulse.project.TRIMMED_TEMPLATE.apply({
+                short: s.substring(0, limit - 3) + '...',
+                full: s
+            });
+        }
+        else
+        {
+            return Ext.util.Format.htmlEncode(s);
+        }
+    },
+    
     /**
      * A collection of renderers: functions that take a value, and perhaps some context, and
      * render that value into an HTML fragment.  For example, renderers are supplied for various

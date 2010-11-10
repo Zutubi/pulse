@@ -101,14 +101,17 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         for (var i = 0, l = this.fields.length; i < l; i++)
         {
             var field = this.fields[i];
-            var args = {
-                id: this.id + '-' + field.name,
-                key: field.key,
-                value: field.getRenderedValue(this.data),
-                extraCls: i == l - 1 ? 'status-last' : ''
-            };
-            
-            this.rowTemplate.append(this.tbodyEl, args);
+            if (this.data.hasOwnProperty(field.name) && this.data[field.name] != null)
+            {
+                var args = {
+                    id: this.id + '-' + field.name,
+                    key: field.key,
+                    value: field.getRenderedValue(this.data),
+                    extraCls: i == l - 1 ? 'status-last' : ''
+                };
+                
+                this.rowTemplate.append(this.tbodyEl, args);
+            }
         }
     },
     

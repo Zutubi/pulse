@@ -663,6 +663,17 @@ Browse view
     padding: 4px;
 }
 
+h3.content-heading
+{
+    font-size: 1em;
+}
+
+.content-box
+{
+    padding: 6px;
+    border-bottom: dotted 1px #bbb;
+}
+
 table.spaced, ul.spaced
 {
     margin-top: 20px;
@@ -688,7 +699,7 @@ table.spaced, ul.spaced
     padding: 4px;
 }
 
-td.group-header, th.two-heading, h3.two-heading, .content-table .heading
+td.group-header, th.two-heading, h3.two-heading, .content-table .heading, .content-heading
 {
     border-top: solid 1px #bbb;
     border-bottom: dotted 1px #bbb;

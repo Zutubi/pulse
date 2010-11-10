@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 // dependency: zutubi/ActivePanel.js
+// dependency: zutubi/TextBox.js
 // dependency: zutubi/table/LinkTable.js
 // dependency: zutubi/table/PropertyTable.js
 // dependency: zutubi/pulse/SectionHeading.js
@@ -22,6 +23,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         latest: 'latest',
         recent: 'recent',
         changes: 'changes',
+        description: 'description',
         actions: 'actions',
         links: 'links',
         artifacts: 'latest.stages'
@@ -139,6 +141,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                 width: 300,
                 layout: 'vtable',
                 items: [{
+                    xtype: 'xztextbox',
+                    id: this.id + '-description',
+                    title: 'description'
+                }, {
                     xtype: 'xzlinktable',
                     id: this.id + '-actions',
                     title: 'actions',
