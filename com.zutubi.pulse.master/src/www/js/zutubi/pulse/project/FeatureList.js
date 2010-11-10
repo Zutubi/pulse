@@ -210,7 +210,7 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         {
             html += '<li>...[trimmed] To see the full list of features ';
             html += '<a class="unadorned" href="' + fileUrl + '"><span class="small">jump to</span> ';
-            html += '<img src="$base/images/go_small.gif"/></a></li>';
+            html += '<img src="' + window.baseUrl + '/images/go_small.gif"/></a></li>';
         }
         
         html += '</ul></li>';

@@ -29,7 +29,7 @@ public class BuildSummaryModel
 
     public BuildSummaryModel(BuildResult buildResult, Urls urls)
     {
-        build = new BuildModel(buildResult);
+        build = new BuildModel(buildResult, urls, true);
         if (buildResult.hasMessages(Feature.Level.ERROR))
         {
             errors = new BuildFeaturesModel(buildResult, Feature.Level.ERROR, urls);

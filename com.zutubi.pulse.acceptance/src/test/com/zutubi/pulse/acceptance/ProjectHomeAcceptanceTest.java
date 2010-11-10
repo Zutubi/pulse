@@ -1,14 +1,25 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -18,6 +29,7 @@ import org.tmatesoft.svn.core.SVNException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Hashtable;
 
 public class ProjectHomeAcceptanceTest extends SeleniumTestBase
 {
@@ -151,6 +163,34 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
         ), homePage.getChanges());
     }
 
+    public void testFeaturedArtifacts() throws Exception
+    {
+        String projectPath = addProject(random, true);
+
+        browser.loginAsAdmin();
+        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        assertFalse(homePage.hasLatestCompletedBuild());
+        assertFalse(homePage.hasFeaturedArtifacts());
+
+        xmlRpcHelper.runBuild(random);
+        homePage.openAndWaitFor();
+        assertTrue(homePage.hasLatestCompletedBuild());
+        assertFalse(homePage.hasFeaturedArtifacts());
+        
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        artifactConfig.put(NAME, "buildfile");
+        artifactConfig.put(FILE, "build.xml");
+        artifactConfig.put(FEATURED, true);
+        xmlRpcHelper.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+
+        int buildNumber = xmlRpcHelper.runBuild(random);
+        homePage.openAndWaitFor();
+        assertTrue(homePage.hasLatestCompletedBuild());
+        assertTrue(homePage.hasFeaturedArtifacts());
+        assertEquals(buildNumber, homePage.getFeaturedArtifactsBuild());
+        assertEquals(asList("stage :: default", "buildfile"), homePage.getFeaturedArtifactsRows());
+    }
+    
     private String editAndCommitBuildFile(String comment, String newContent) throws IOException, SVNException
     {
         File wcDir = new File(tempDir, "wc");

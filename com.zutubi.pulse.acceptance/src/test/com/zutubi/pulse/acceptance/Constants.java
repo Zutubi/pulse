@@ -140,6 +140,7 @@ public class Constants
                 public static final String NAME = "name";
                 public static final String POSTPROCESSORS = "postProcessors";
                 public static final String PUBLISH = "publish";
+                public static final String FEATURED = "featured";
             }
 
             /**

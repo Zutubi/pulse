@@ -1,33 +1,26 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
 import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
-import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Comment;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -39,8 +32,6 @@ import java.util.regex.Pattern;
 public class BuildSummaryDataAction extends BuildStatusActionBase
 {
     private static final Logger LOG = Logger.getLogger(BuildSummaryDataAction.class);
-
-    private static final Sort.StringComparator COMPARATOR = new Sort.StringComparator();
     
     private BuildSummaryModel model;
     
@@ -64,7 +55,6 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         addComments(buildResult);
         addActions(buildResult, canWrite);
         addRelatedLinks(buildResult);
-        addFeaturedArtifacts(buildResult);
         addHooks(buildResult, canWrite);
 
         return SUCCESS;
@@ -168,83 +158,6 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         }
 
         return result;
-    }
-
-    private void addFeaturedArtifacts(final BuildResult result)
-    {
-        for (final RecipeResultNode node: result.getRoot().getChildren())
-        {
-            if (node.getResult().completed())
-            {
-                List<ActionLink> stageFeaturedArtifacts = new LinkedList<ActionLink>();
-                for (final CommandResult commandResult: node.getResult().getCommandResults())
-                {
-                    List<StoredArtifact> commandFeaturedArtifacts = CollectionUtils.filter(commandResult.getArtifacts(), new Predicate<StoredArtifact>()
-                    {
-                        public boolean satisfied(StoredArtifact storedArtifact)
-                        {
-                            return storedArtifact.isFeatured();
-                        }
-                    });
-
-                    final String baseUrl = configurationManager.getSystemConfig().getContextPathNormalised();
-                    final Urls urls = new Urls(baseUrl);
-                    CollectionUtils.map(commandFeaturedArtifacts, new Mapping<StoredArtifact, ActionLink>()
-                    {
-                        public ActionLink map(StoredArtifact artifact)
-                        {
-                            String icon;
-                            String url;
-
-                            if (artifact.isLink())
-                            {
-                                icon = FileAction.TYPE_LINK;
-                                url = artifact.getUrl();
-                            }
-                            else if (artifact.isSingleFile())
-                            {
-                                StoredFileArtifact file = artifact.getFile();
-                                if (file.canDecorate())
-                                {
-                                    icon = FileAction.TYPE_DECORATE;
-                                    url = urls.commandArtifacts(result, commandResult) + file.getPathUrl();
-                                }
-                                else
-                                {
-                                    icon = FileAction.TYPE_DOWNLOAD;
-                                    url = urls.commandDownload(result, commandResult, file.getPath());
-                                }
-                            }
-                            else if (artifact.hasIndexFile())
-                            {
-                                icon = FileAction.TYPE_VIEW;
-                                url = urls.fileFileArtifact(artifact, artifact.findFileBase(artifact.findIndexFile()));
-                            }
-                            else
-                            {
-                                icon = FileAction.TYPE_ARCHIVE;
-                                url = baseUrl + "/zip.action?path=pulse:///projects/" + result.getProject().getId() + "/builds/" + result.getId() + "/artifacts/" + node.getResult().getId() + "/" + commandResult.getId() + "/" + artifact.getId() + "/";
-                            }
-
-                            return new ActionLink(url, artifact.getName(), icon);
-                        }
-                    }, stageFeaturedArtifacts);
-                }
-
-                if (stageFeaturedArtifacts.size() > 0)
-                {
-                    Collections.sort(stageFeaturedArtifacts, new Comparator<ActionLink>()
-                    {
-                        public int compare(ActionLink l1, ActionLink l2)
-                        {
-                            return COMPARATOR.compare(l1.getLabel(), l2.getLabel());
-                        }
-                    });
-                    
-                    model.getStage(node.getStageName()).setFeaturedArtifacts(stageFeaturedArtifacts);
-                }
-            }
-        }
     }
 
     private void addHooks(BuildResult buildResult, boolean canWrite)

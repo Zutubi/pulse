@@ -15,7 +15,17 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     layout: 'border',
     border: false,
     
-    dataKeys: ['responsibility', 'status', 'activity', 'latest', 'recent', 'changes', 'actions', 'links'],
+    dataMapping: {
+        responsibility: 'responsibility',
+        status: 'status',
+        activity: 'activity',
+        latest: 'latest',
+        recent: 'recent',
+        changes: 'changes',
+        actions: 'actions',
+        links: 'links',
+        artifacts: 'latest.stages'
+    },
     
     initComponent: function(container, position) {
         var panel = this;
@@ -144,7 +154,16 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                     xtype: 'xzlinktable',
                     id: this.id + '-links',
                     title: 'links',
-                    iconTemplate: 'images/config/links/{icon}.gif',
+                    iconTemplate: 'images/config/links/{icon}.gif'
+                }, {
+                    xtype: 'xzlinktable',
+                    id: this.id + '-artifacts',
+                    title: 'latest featured artifacts',
+                    iconTemplate: 'images/artifacts/{icon}.gif',
+                    categorised: true,
+                    categoryPrefix: 'stage :: ',
+                    linksProperty: 'featuredArtifacts',
+                    idProperty: 'label',
                     listeners: {
                         afterrender: function() {
                             panel.updateRows();
@@ -164,8 +183,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
             return table.dataExists();
         });
 
-        if (this.rendered)
+        if (data.latest)
         {
+            var title = 'latest featured artifacts :: <a href="' + window.baseUrl + '/' + data.latest.link + '">build ' + data.latest.number + '</a>';
+            Ext.getCmp(this.id + '-artifacts').setTitle(title);
+        }
+        
+        if (this.rendered)
+        {            
             this.updateRows();
         }
     },

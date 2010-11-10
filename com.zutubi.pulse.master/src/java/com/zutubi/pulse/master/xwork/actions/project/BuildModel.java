@@ -38,12 +38,12 @@ public class BuildModel extends ResultModel
         this.revision = revision;
     }
 
-    public BuildModel(BuildResult buildResult)
+    public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts)
     {
-        this(buildResult, buildResult.getProject().getConfig().getChangeViewer());
+        this(buildResult, urls, collectArtifacts, buildResult.getProject().getConfig().getChangeViewer());
     }
     
-    public BuildModel(BuildResult buildResult, ChangeViewerConfiguration changeViewerConfig)
+    public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts, ChangeViewerConfiguration changeViewerConfig)
     {
         super(buildResult);
         number = buildResult.getNumber();
@@ -60,7 +60,7 @@ public class BuildModel extends ResultModel
         
         for (RecipeResultNode node: buildResult.getRoot().getChildren())
         {
-            stages.add(new BuildStageModel(buildResult, node));
+            stages.add(new BuildStageModel(buildResult, node, urls, collectArtifacts));
         }
         
         link = Urls.getBaselessInstance().build(buildResult).substring(1);
@@ -121,5 +121,4 @@ public class BuildModel extends ResultModel
     {
         return stages;
     }
-
 }

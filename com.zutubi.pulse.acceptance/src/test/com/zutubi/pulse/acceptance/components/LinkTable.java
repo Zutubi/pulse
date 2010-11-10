@@ -96,7 +96,7 @@ public class LinkTable extends ContentTable
      */
     public int getLinkCount()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data.length"));
+        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".getDynamicCount()"));
     }
 
     /**

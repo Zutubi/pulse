@@ -82,15 +82,16 @@ public class ProjectHomeDataAction extends ProjectActionBase
             }
         });
 
+        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         ProjectConfiguration projectConfig = project.getConfig();
-        BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(projectConfig.getChangeViewer());
+        BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(urls, projectConfig.getChangeViewer());
 
         model = new ProjectHomeModel(createStatusModel());
         addActivity(queued, inProgress, buildMapping);
-        addLatest(latest, buildMapping);
+        addLatest(latest, urls);
         addRecent(completed, buildMapping);
         addChanges();
-        addLinks();
+        addLinks(urls);
         addActions();
 
         return SUCCESS;
@@ -122,11 +123,11 @@ public class ProjectHomeDataAction extends ProjectActionBase
         CollectionUtils.map(inProgress, buildMapping, model.getActivity());
     }
 
-    private void addLatest(BuildResult latest, BuildResultToModelMapping buildMapping)
+    private void addLatest(BuildResult latest, Urls urls)
     {
         if (latest != null)
         {
-            model.setLatest(buildMapping.map(latest));
+            model.setLatest(new BuildModel(latest, urls, true));
         }
     }
 
@@ -135,10 +136,9 @@ public class ProjectHomeDataAction extends ProjectActionBase
         CollectionUtils.map(completed, buildMapping, model.getRecent());
     }
 
-    private void addLinks()
+    private void addLinks(Urls urls)
     {
         Project project = getProject();
-        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         if (accessManager.hasPermission(AccessManager.ACTION_WRITE, project.getConfig()))
         {
             model.addLink(new ActionLink(urls.adminProject(project), PROJECT_I18N.format(AccessManager.ACTION_WRITE + ConfigurationLinks.KEY_SUFFIX_LABEL), AccessManager.ACTION_WRITE));

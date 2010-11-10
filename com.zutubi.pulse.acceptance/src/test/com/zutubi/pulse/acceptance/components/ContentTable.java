@@ -16,4 +16,14 @@ public class ContentTable extends Component
     {
         return getComponentJS() + ".dataExists()";
     }
+
+    /**
+     * Returns the HTML fragment that is the title of this table.
+     * 
+     * @return the title of this table
+     */
+    public String getTitle()
+    {
+        return browser.evalExpression(getComponentJS() + ".title");
+    }
 }

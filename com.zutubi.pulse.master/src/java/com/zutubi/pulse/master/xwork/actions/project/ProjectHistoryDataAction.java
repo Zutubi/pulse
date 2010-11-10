@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.HistoryPage;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
@@ -38,6 +40,8 @@ public class ProjectHistoryDataAction extends ProjectActionBase
     private int startPage;
     private String stateFilter = STATE_ANY;
     private ProjectHistoryModel model;
+    
+    private ConfigurationManager configurationManager;
 
     public void setStartPage(int page)
     {
@@ -81,10 +85,16 @@ public class ProjectHistoryDataAction extends ProjectActionBase
         HistoryPage page = new HistoryPage(project, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
         buildManager.fillHistoryPage(page, states);
 
-        List<BuildModel> builds = CollectionUtils.map(page.getResults(), new BuildResultToModelMapping(project.getConfig().getChangeViewer()));
+        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
+        List<BuildModel> builds = CollectionUtils.map(page.getResults(), new BuildResultToModelMapping(urls, project.getConfig().getChangeViewer()));
         
         model = new ProjectHistoryModel(builds, new PagerModel(page.getTotalBuilds(), BUILDS_PER_PAGE, startPage));
 
         return SUCCESS;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

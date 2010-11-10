@@ -44,8 +44,9 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
                                         '<img ext:qtip="customise this table" alt="customise" src="{[window.baseUrl]}/images/pencil.gif"/>' +
                                     '</a>' +
                                 '</span>' +
+                                '<span class="clear"/>' +
                             '</tpl>' +
-                            '{title}' +
+                            '<span id="{id}-title">{title}</span>' +
                         '</th>' +
                     '</tr>' +
                 '</table>'
@@ -159,6 +160,13 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     },
     
     /**
+     * Indicates how many dynamic rows are shown in this table.
+     */
+    getDynamicCount: function() {
+        return this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC).getCount();
+    },
+    
+    /**
      * Clears any rows added by the renderDynamic function.  This includes data rows and empty
      * message rows.  Rows are identified using the Zutubi.table.CLASS_DYNAMIC class.
      */
@@ -189,5 +197,18 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      */
     renderEmptyMessage: function() {
         this.emptyTemplate.append(this.tbodyEl, this, false);
+    },
+    
+    /**
+     * Updates the title of this table.
+     *
+     * @param title HTML fragment to use as the new title.
+     */
+    setTitle: function(title) {
+        this.title = title;
+        if (this.rendered)
+        {
+            Ext.get(this.id + '-title').update(title);
+        }
     }
 });

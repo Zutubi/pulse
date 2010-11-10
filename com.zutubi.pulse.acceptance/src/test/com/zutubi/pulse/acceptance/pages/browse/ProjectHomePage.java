@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -34,6 +36,8 @@ public class ProjectHomePage extends ResponsibilityPage
     private static final String ID_LATEST_NUMBER = "number";
     private static final String ID_LATEST_STATUS = "status";
 
+    private static final Pattern BUILD_NUMBER_PATTERN = Pattern.compile("build (\\d+)");
+    
     private String projectName;
     private StatusBox statusBox;
     private SummaryTable activityTable;
@@ -42,6 +46,7 @@ public class ProjectHomePage extends ResponsibilityPage
     private SummaryTable changesTable;
     private LinkTable actionsTable;
     private LinkTable linksTable;
+    private LinkTable artifactsTable;
 
     public ProjectHomePage(SeleniumBrowser browser, Urls urls, String projectName)
     {
@@ -54,6 +59,7 @@ public class ProjectHomePage extends ResponsibilityPage
         changesTable = new SummaryTable(browser, "project-home-changes");
         actionsTable = new LinkTable(browser, "project-home-actions");
         linksTable = new LinkTable(browser, "project-home-links");
+        artifactsTable = new LinkTable(browser, "project-home-artifacts");
     }
 
     @Override
@@ -325,6 +331,41 @@ public class ProjectHomePage extends ResponsibilityPage
     public List<String> getLinks()
     {
         return linksTable.getLinkLabels();
+    }
+
+    /**
+     * Indicates if the latest featured artifacts table is present.
+     * 
+     * @return true if the latest featured artifacts table is present
+     */
+    public boolean hasFeaturedArtifacts()
+    {
+        return artifactsTable.isPresent();
+    }
+
+    /**
+     * Returns the number of the build that featured artifacts are displayed
+     * for.
+     * 
+     * @return build number for the build that the featured artifacts are from
+     */
+    public int getFeaturedArtifactsBuild()
+    {
+        String title = artifactsTable.getTitle();
+        Matcher matcher = BUILD_NUMBER_PATTERN.matcher(title);
+        matcher.find();
+        return Integer.parseInt(matcher.group(1));
+    }
+
+    /**
+     * Returns the text in the content rows of the featured artifacts table.
+     * This includes both the categories (stages) and the links (artifacts).
+     * 
+     * @return text content of the rows of the featured artifacts table
+     */
+    public List<String> getFeaturedArtifactsRows()
+    {
+        return artifactsTable.getLinkLabels();
     }
 
     public String getUrl()
