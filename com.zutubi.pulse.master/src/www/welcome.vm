@@ -88,7 +88,84 @@
             <th class="category" colspan="2">new in 2.3</th>
         </tr>
         <tr>
-            <td>....</td>
+            #actionHeader("concurrent" "concurrent project builds" "accept" false)
+            <td>
+                Pulse can now run multiple builds of the same project in parallel.  The maximum
+                number of concurrent builds for a project is controlled by a new build option.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("priorities" "project and stage priorities" "accept" false)
+            <td>
+                Projects (or individual build stages) may now be assigned priorities, controlling
+                how they are scheduled.  Higher priority stages take precedence in the queue.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("home" "project home tab" "accept" false)
+            <td>
+                The project home tab has been overhauled to show key information about project
+                health and activity more prominently.  Featured artifacts from the latest build are
+                now shown in the right column.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("history" "project history tab" "accept" false)
+            <td>
+                The project history tab has been reworked, with a new build summary table that
+                shows more information.  The table is also more easily customised than before.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("summary" "build summary tab" "accept" false)
+            <td>
+                Building on changes in Pulse 2.2, the build summary tab has been further improved.
+                As with the project home tab, key build status is now more obvious.  More
+                information is also displayed for each build stage.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("mybuilds" "my builds tab" "accept" false)
+            <td>
+                The my builds tab, which displays personal builds, has been restyled.  Similar to
+                the history tab, a new build summary table is used with superior customisability. 
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("sync" "plugin synchronisation" "accept" false)
+            <td>
+                Plugins are now automatically synchronised among all of your Pulse installations.
+                When a plugin is installed on the master, it is automatically deployed to agents,
+                and even to tool installs on developer machines.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("disable" "stage/command disabling" "accept" false)
+            <td>
+                All build stages and commands now have an "enabled" flag.  You can toggle this flag
+                to temporarily disable the stage or command without losing its configuration.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("term" "terminated status" "accept" false)
+            <td>
+                Builds that are explicitly killed by a user or timeout now finish in a distinct
+                "terminated" state.  This allows them to be differentiated from other build errors.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("uiperf" "ui performance" "accept" false)
+            <td>
+                The most important live views in the Pulse web UI have been updated to use less
+                bandwidth when refreshing.  Pulse JavaScript has also been repackaged to save space.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("more" "and more..." "accept" false)
+            <td>
+                This release also includes numerous smaller improvements and fixes.  Notably,
+                significant libraries in the Pulse server have also been updated in this release.
+            </td>
         </tr>
     </table>
 </body>
