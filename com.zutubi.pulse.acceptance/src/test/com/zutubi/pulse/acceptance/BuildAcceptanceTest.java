@@ -1702,6 +1702,26 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPulsePropertyPresentWithValue("env", "newvalue"));
         assertTrue(envPage.isPulsePropertyPresentWithValue("notenv", "value"));
     }
+
+    public void testTriggerBuildWithBooleanProperty() throws Exception
+    {
+        AntProjectHelper project = projects.createTrivialAntProject(random);
+        project.getConfig().getOptions().setIsolateChangelists(true);
+        configurationHelper.insertProject(project.getConfig(), false);
+
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        
+        Hashtable<String, Object> options = new Hashtable<String, Object>();
+        options.put("force", false);
+        Vector<String> requests = xmlRpcHelper.triggerBuild(random, options);
+        assertEquals(0, requests.size());
+        
+        options.put("force", true);
+        requests = xmlRpcHelper.triggerBuild(random, options);
+        assertEquals(1, requests.size());
+        Hashtable<String, Object> build = xmlRpcHelper.waitForBuildRequestToBeActivated(requests.get(0), BUILD_TIMEOUT);
+        xmlRpcHelper.waitForBuildToComplete(random, Integer.parseInt((String) build.get("buildId")));
+    }
     
     private String createProjectWithTwoAntStages(String projectName, String buildFile, String secondStageName) throws Exception
     {

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
@@ -33,6 +34,10 @@ public class SubversionClient implements ScmClient
     public static final String TYPE = "svn";
 
     private static final Logger LOG = Logger.getLogger(ScmClient.class);
+    private static final Messages I18N = Messages.getInstance(SubversionClient.class);
+    
+    private static final String PROPERTY_HTTP_AUTH_METHODS = "svnkit.http.methods";
+    private static final String HTTP_AUTH_METHODS = "Digest,Basic,Negotiate,NTLM";
 
     private boolean useExport = false;
     /**
@@ -58,8 +63,6 @@ public class SubversionClient implements ScmClient
 
     private String url;
     
-    private static final String SVNKIT_HTTP_METHODS_PROPERTY = "svnkit.http.methods";
-
     //=======================================================================
     // Implementation
     //=======================================================================
@@ -129,7 +132,10 @@ public class SubversionClient implements ScmClient
     {
         // Workaround for CIB-1978, SvnKit bug 238:
         // http://svnkit.com/tracker/bug_view_advanced_page.php?bug_id=283
-        System.setProperty(SVNKIT_HTTP_METHODS_PROPERTY, "Negotiate,Digest,Basic,NTLM");
+        if (System.getProperty(PROPERTY_HTTP_AUTH_METHODS) == null)
+        {
+            System.setProperty(PROPERTY_HTTP_AUTH_METHODS, HTTP_AUTH_METHODS);
+        }
 
         // Initialise SVN library
         if (enableHttpSpooling)
@@ -768,6 +774,19 @@ public class SubversionClient implements ScmClient
         }
     }
 
+    /**
+     * Checks for a known class of unrecoverable errors on update, and
+     * automatically tries a clean checkout in this case (to save the user the
+     * effort of doing this manually).
+     * 
+     * @param context      context in which the update is running
+     * @param rev          revision to update to
+     * @param handler      used to capture feedback from the update/checkout
+     * @param errorMessage error message returned from the update attempt
+     * @return the revision checked out, if an automatic fix was attempted, or
+     *         null if the original error should just propagate
+     * @throws ScmException on error cleaning up or checking out
+     */
     private Revision handleUpdateError(ExecutionContext context, Revision rev, ScmFeedbackHandler handler, String errorMessage) throws ScmException
     {
         if (errorMessage.contains("not a working copy"))
@@ -775,18 +794,18 @@ public class SubversionClient implements ScmClient
             File wcDir = context.getWorkingDir();
             if (handler != null)
             {
-                handler.status("Error updating: " + errorMessage);
-                handler.status("Attempting clean checkout");
+                handler.status(I18N.format("update.error", errorMessage));
+                handler.status(I18N.format("update.error.attempting.clean"));
             }
 
             if (!FileSystemUtils.rmdir(wcDir))
             {
-                throw new ScmException("Unable to remove broken working copy directory '" + wcDir.getAbsolutePath() + "'");
+                throw new ScmException(I18N.format("update.error.cannot.remove.dir", wcDir.getAbsolutePath()));
             }
 
             if (!wcDir.mkdirs())
             {
-                throw new ScmException("Unable to create new working copy directory '" + wcDir.getAbsolutePath() + "'");
+                throw new ScmException(I18N.format("update.error.cannot.create.dir", wcDir.getAbsolutePath()));
             }
 
             return checkout(context, rev, handler);
