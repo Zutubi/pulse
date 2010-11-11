@@ -280,6 +280,12 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
 
     public void testHookReferencesStageInheritedStage()
     {
+        // Create a subscription that references the project.  If the
+        // subscription scope is instantiated first, this triggers CIB-2622.
+        Subscription subscription = new Subscription(getName());
+        subscription.getProjectRefs().add(configurationTemplateManager.getInstance(PATH_TEMPLATE_CHILD, Project.class));
+        configurationTemplateManager.insert(SCOPE_SUBSCRIPTION, subscription);
+
         hookReferencesStageHelper(PATH_TEMPLATE_CHILD, "default");
     }
 

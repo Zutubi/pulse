@@ -40,7 +40,7 @@ public class PersistentInstantiator implements Instantiator
         Object instance = cache.get(propertyPath, true);
         if (instance == null)
         {
-            PersistentInstantiator childInstantiator = new PersistentInstantiator(templateOwnerPath, propertyPath, cache, referenceResolver, configurationTemplateManager);
+            PersistentInstantiator childInstantiator = new PersistentInstantiator(configurationTemplateManager.getTemplateOwnerPath(propertyPath), propertyPath, cache, referenceResolver, configurationTemplateManager);
             instance = type.instantiate(data, childInstantiator);
 
             if (instance != null)
