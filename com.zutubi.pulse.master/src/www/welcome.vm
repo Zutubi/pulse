@@ -80,8 +80,8 @@
 
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.3 is packed with new features, with a major focus on the user interface and usability
-        in general.  Among the most important updates are:
+        Pulse 2.3 is packed with new features, with a major focus on both build throughput and the
+        user interface.  Among the most important updates are:
     </p>
     <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
         <tr>
