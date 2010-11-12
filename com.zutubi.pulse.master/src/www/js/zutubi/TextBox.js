@@ -8,12 +8,19 @@
  * @cfg {String} title title for the box
  */
 Zutubi.TextBox = Ext.extend(Ext.BoxComponent, {
-    template: new Ext.XTemplate(
-        '<div id="{id}">' +
-            '<h3 class="content-heading">{title}</h3>' +
-            '<div id="{id}-text" class="content-box"></div>' +
-        '</div>'
-    ),
+    initComponent: function()
+    {
+        Ext.applyIf(this, {
+            template: new Ext.XTemplate(
+                '<div id="{id}">' +
+                    '<h3 class="content-heading">{title}</h3>' +
+                    '<div id="{id}-text" class="content-box"></div>' +
+                '</div>'
+            )
+        });
+        
+        Zutubi.TextBox.superclass.initComponent.apply(this, arguments);
+    },
 
     onRender: function(container, position)
     {

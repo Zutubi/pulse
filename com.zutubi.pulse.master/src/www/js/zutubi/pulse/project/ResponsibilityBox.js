@@ -17,7 +17,8 @@ Zutubi.pulse.project.ResponsibilityBox = Ext.extend(Ext.BoxComponent, {
             '</span>' +
         '</div>'),
     
-    onRender: function(container, position) {
+    onRender: function(container, position)
+    {
         if (position)
         {
             this.el = this.template.insertBefore(position, this, true);    
@@ -38,7 +39,8 @@ Zutubi.pulse.project.ResponsibilityBox = Ext.extend(Ext.BoxComponent, {
         Zutubi.pulse.project.ResponsibilityBox.superclass.onRender.apply(this, arguments);
     },
     
-    update: function(data) {
+    update: function(data)
+    {
         this.data = data;
         if (this.rendered)
         {

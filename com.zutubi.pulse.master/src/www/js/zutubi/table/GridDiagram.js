@@ -18,24 +18,33 @@
  *                            data, and should return an HTML snippet.
  */
 Zutubi.table.GridDiagram = Ext.extend(Ext.BoxComponent, {
-    cls: 'grid',
+    initComponent: function()
+    {
+        Ext.applyIf(this, {
+            cls: 'grid',
+            
+            template: new Ext.XTemplate(
+                '<table id="{id}" class="{cls}">' +
+                    '<tbody></tbody>' +
+                '</table>'
+            ),
+            
+            cellTemplate: new Ext.XTemplate(
+                '<td id="{cellId}" class="{cls}" ' +
+                    '<tpl if="rowspan &gt; 1">' +
+                        'rowspan="{rowspan}"' +
+                    '</tpl>' +
+                '>' +
+                    '{content}' +
+                '</td>'
+            )
+        });
     
-    cellTemplate: new Ext.XTemplate(
-        '<td id="{cellId}" class="{cls}" ' +
-            '<tpl if="rowspan &gt; 1">' +
-                'rowspan="{rowspan}"' +
-            '</tpl>' +
-        '>' +
-            '{content}' +
-        '</td>'
-    ),
-
-    onRender: function(container, position) {
-        if (!this.template)
-        {
-            this.template = new Ext.Template('<table id="{id}" class="{cls}"><tbody></tbody></table>');
-        }
-
+        Zutubi.table.GridDiagram.superclass.initComponent.apply(this, arguments);        
+    },
+    
+    onRender: function(container, position)
+    {
         if (position)
         {
             this.el = this.template.insertBefore(position, this, true);    
@@ -49,13 +58,14 @@ Zutubi.table.GridDiagram = Ext.extend(Ext.BoxComponent, {
         
         this.renderData();
         
-        Zutubi.table.ContentTable.superclass.onRender.apply(this, arguments);        
+        Zutubi.table.GridDiagram.superclass.onRender.apply(this, arguments);        
     },
 
     /**
      * Updates this grid with new data.
      */
-    update: function(data) {
+    update: function(data)
+    {
         this.data = data;
         if (this.rendered)
         {
@@ -67,14 +77,16 @@ Zutubi.table.GridDiagram = Ext.extend(Ext.BoxComponent, {
     /**
      * Removes all rows from the grid.
      */
-    clear: function() {
+    clear: function()
+    {
         this.tbodyEl.select('tr').remove();
     },
 
     /**
      * Renders the contents of the grid.
      */
-    renderData: function() {
+    renderData: function()
+    {
         if (this.data)
         {
             for (var rowIndex = 0, rowCount = this.data.length; rowIndex < rowCount; rowIndex++)

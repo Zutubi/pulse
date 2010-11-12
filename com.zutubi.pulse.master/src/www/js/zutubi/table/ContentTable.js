@@ -18,23 +18,16 @@
  *                             data are held aside, and applied on completion.
  */
 Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
-    cls: 'content-table',
-    columnCount: 1,
-    customisable: false,
     customising: false,
     
-    emptyTemplate: new Ext.XTemplate(
-        '<tr>' +
-            '<td colspan="{columnCount}" class="understated leftmost rightmost ' + Zutubi.table.CLASS_DYNAMIC + '">' +
-                '{emptyMessage:htmlEncode}' +
-            '</td>' +
-        '</tr>'
-    ),
-
-    onRender: function(container, position) {
-        if (!this.template)
-        {
-            this.template = new Ext.XTemplate(
+    initComponent: function()
+    {
+        Ext.applyIf(this, {
+            cls: 'content-table',
+            columnCount: 1,
+            customisable: false,
+            
+            template: new Ext.XTemplate(
                 '<table id="{id}" class="{cls}">' +
                     '<tr>' +
                         '<th class="heading" colspan="{columnCount}">' +
@@ -50,9 +43,22 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
                         '</th>' +
                     '</tr>' +
                 '</table>'
-            );
-        }
-
+            ),
+            
+            emptyTemplate: new Ext.XTemplate(
+                '<tr>' +
+                    '<td colspan="{columnCount}" class="understated leftmost rightmost ' + Zutubi.table.CLASS_DYNAMIC + '">' +
+                        '{emptyMessage:htmlEncode}' +
+                    '</td>' +
+                '</tr>'
+            )
+        });
+        
+        Zutubi.table.ContentTable.superclass.initComponent.apply(this, arguments);
+    },
+    
+    onRender: function(container, position)
+    {
         if (position)
         {
             this.el = this.template.insertBefore(position, this, true);    
@@ -67,14 +73,15 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
         this.renderFixed();
         this.renderDynamic();
         
-        Zutubi.table.ContentTable.superclass.onRender.apply(this, arguments);        
+        Zutubi.table.ContentTable.superclass.onRender.apply(this, arguments);
     },
 
     /**
      * Called on a customisable table when customising begins.  Subclasses
      * should override onCustomise to take necessary action at this point.
      */
-    customise: function() {
+    customise: function()
+    {
         this.customising = true;
         this.onCustomise();
     },
@@ -83,14 +90,16 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      * Called to handle the start of a customisation operation.  This default
      * does nothing, and is intended to be overridden.
      */
-    onCustomise: function() {
+    onCustomise: function()
+    {
     },
 
     /**
      * Called on a customisable table when customising ends.  Subclasses should
      * override but onCustomiseComplete to take necessary action at this point.
      */
-    customiseComplete: function() {
+    customiseComplete: function()
+    {
         this.onCustomiseComplete();
         this.customising = false;
         if (this.heldData)
@@ -103,13 +112,15 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      * Called to handle the end of a customisation operation.  This default
      * does nothing, and is intended to be overridden.
      */
-    onCustomiseComplete: function() {
+    onCustomiseComplete: function()
+    {
     },
 
     /**
      * Updates this table with new data.
      */
-    update: function(data) {
+    update: function(data)
+    {
         if (this.customising)
         {
             this.heldData = data;
@@ -129,7 +140,8 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      * Renders the dynamic parts of the table, i.e. those that depend on the data.  All rows
      * rendered by this method should be tagged with the Zutubi.table.CLASS_DYNAMIC class.
      */
-    renderDynamic: function() {
+    renderDynamic: function()
+    {
         this.clearDynamic();
         
         if (this.dataExists())
@@ -162,7 +174,8 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
     /**
      * Indicates how many dynamic rows are shown in this table.
      */
-    getDynamicCount: function() {
+    getDynamicCount: function()
+    {
         return this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC).getCount();
     },
     
@@ -170,7 +183,8 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      * Clears any rows added by the renderDynamic function.  This includes data rows and empty
      * message rows.  Rows are identified using the Zutubi.table.CLASS_DYNAMIC class.
      */
-     clearDynamic: function() {
+     clearDynamic: function()
+     {
          var els = this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC);
          els.remove();
      },
@@ -181,7 +195,8 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      *
      * This default implementation does nothing.  It may be overridden as required.
      */
-    renderFixed: function() {
+    renderFixed: function()
+    {
     },
 
     /**
@@ -189,13 +204,15 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      *
      * This default implementation does nothing.  It may be overridden as required.
      */
-    renderData: function() {
+    renderData: function()
+    {
     },
     
     /**
      * Renders a row with a message indicating the data for this table is empty.
      */
-    renderEmptyMessage: function() {
+    renderEmptyMessage: function()
+    {
         this.emptyTemplate.append(this.tbodyEl, this, false);
     },
     
@@ -204,7 +221,8 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      *
      * @param title HTML fragment to use as the new title.
      */
-    setTitle: function(title) {
+    setTitle: function(title)
+    {
         this.title = title;
         if (this.rendered)
         {

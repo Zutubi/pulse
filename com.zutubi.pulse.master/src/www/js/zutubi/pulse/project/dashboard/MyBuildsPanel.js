@@ -16,7 +16,8 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
     dataKeys: ['builds'],
     
-    initComponent: function(container, position) {
+    initComponent: function(container, position)
+    {
         var panel = this;
         Ext.apply(this, {
             defaults: {

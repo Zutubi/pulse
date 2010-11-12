@@ -1,6 +1,7 @@
-package com.zutubi.pulse.acceptance.components;
+package com.zutubi.pulse.acceptance.components.table;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.Component;
 
 /**
  * Corresponds to the Zutubi.table.ContentTable JS component base.

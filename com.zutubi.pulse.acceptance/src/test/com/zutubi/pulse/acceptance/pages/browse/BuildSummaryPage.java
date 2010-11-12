@@ -1,7 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.*;
+import com.zutubi.pulse.acceptance.components.pulse.project.CommentList;
+import com.zutubi.pulse.acceptance.components.pulse.project.FeatureList;
+import com.zutubi.pulse.acceptance.components.pulse.project.StatusBox;
+import com.zutubi.pulse.acceptance.components.pulse.project.TestFailuresTable;
+import com.zutubi.pulse.acceptance.components.table.LinkTable;
+import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.master.webwork.Urls;
 import static com.zutubi.util.WebUtils.uriComponentEncode;

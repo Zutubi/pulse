@@ -1,7 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.*;
+import com.zutubi.pulse.acceptance.components.BuildSummaryTable;
+import com.zutubi.pulse.acceptance.components.TextBox;
+import com.zutubi.pulse.acceptance.components.pulse.project.StatusBox;
+import com.zutubi.pulse.acceptance.components.table.LinkTable;
+import com.zutubi.pulse.acceptance.components.table.PropertyTable;
+import com.zutubi.pulse.acceptance.components.table.SummaryTable;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;

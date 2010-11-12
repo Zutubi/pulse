@@ -24,12 +24,14 @@
   *                               present.
   */
 Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
-    loadingMessage: 'Loading data...',
-    failureMessage: 'Unable to load data.',
-    refreshInterval: 0,
-    
     initComponent: function()
     {
+        Ext.applyIf(this, {
+            loadingMessage: 'Loading data...',
+            failureMessage: 'Unable to load data.',
+            refreshInterval: 0
+        });
+        
         Ext.fly(this.loadingId).update('<img alt="loading" src="' + window.baseUrl + '/images/inprogress.gif"/> ' + this.loadingMessage);
         
         if (this.refreshInterval > 0)

@@ -50,7 +50,8 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         '</li>'
     ),
     
-    onRender: function(container, position) {
+    onRender: function(container, position)
+    {
         if (position)
         {
             this.el = this.template.insertBefore(position, this, true);    

@@ -8,14 +8,18 @@
  * @cfg {String} cls  CSS class used to style this element (defaults to xz-sectionheading).
  */
 Zutubi.pulse.SectionHeading = Ext.extend(Ext.BoxComponent, {
-    cls: 'xz-sectionheading',
+    initComponent: function()
+    {
+        Ext.applyIf(this, {
+            cls: 'xz-sectionheading',
+            template: new Ext.Template('<h2 class="{cls}">:: {text} ::</h2>')        
+        });
+        
+        Zutubi.pulse.SectionHeading.superclass.initComponent.apply(this, arguments);
+    },
     
-    onRender: function(container, position) {
-        if (!this.template)
-        {
-            this.template = new Ext.Template('<h2 class="{cls}">:: {text} ::</h2>');
-        }
-
+    onRender: function(container, position)
+    {
         if (position)
         {
             this.el = this.template.insertBefore(position, this, true);    

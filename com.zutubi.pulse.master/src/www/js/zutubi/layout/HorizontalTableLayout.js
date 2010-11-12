@@ -10,7 +10,8 @@ Zutubi.layout.HorizontalTableLayout = Ext.extend(Ext.layout.TableLayout, {
     width: '100%',
     spacing: 17,
     
-    onLayout: function(container, target) {
+    onLayout: function(container, target)
+    {
         this.columns = container.items.length;
         
         if (!this.tableAttrs)

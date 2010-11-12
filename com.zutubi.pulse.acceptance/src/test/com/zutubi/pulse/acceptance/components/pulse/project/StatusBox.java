@@ -1,6 +1,7 @@
-package com.zutubi.pulse.acceptance.components;
+package com.zutubi.pulse.acceptance.components.pulse.project;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.Component;
 
 /**
  * Corresponds to the Zutubi.pulse.project.StatusBox component.

@@ -23,16 +23,26 @@
  *                               specified, the table is hidden in this case).
  */
 Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
-    initComponent: function() {
-        this.cellTemplate = new Ext.XTemplate('<td class="idx-{index} <tpl if="first">leftmost </tpl><tpl if="last">rightmost </tpl>{cls}">{value}</td>');
-        this.headerTemplate = new Ext.XTemplate(
-            '<th class="idx-{index} xz-summary-sortable {cls}<tpl if="first"> leftmost</tpl><tpl if="last"> rightmost</tpl>">' +
-                '<span class="xz-summary-remove"><img ext:qtip="remove this column" src="{[window.baseUrl]}/images/delete.gif"/></span>' +
-                '{value}' +
-            '</th>'
-        );
+    indexRegex: new RegExp('idx-(\\d+)', ''),
+    
+    initComponent: function()
+    {
+        Ext.applyIf(this, {
+            cellTemplate: new Ext.XTemplate(
+                '<td class="idx-{index} ' +
+                '<tpl if="first">leftmost </tpl>' +
+                '<tpl if="last">rightmost </tpl>' +
+                '{cls}">{value}</td>'
+            ),
+            
+            headerTemplate: new Ext.XTemplate(
+                '<th class="idx-{index} xz-summary-sortable {cls}<tpl if="first"> leftmost</tpl><tpl if="last"> rightmost</tpl>">' +
+                    '<span class="xz-summary-remove"><img ext:qtip="remove this column" src="{[window.baseUrl]}/images/delete.gif"/></span>' +
+                    '{value}' +
+                '</th>'
+            )
+        });
         
-        this.indexRegex = new RegExp('idx-(\\d+)', '');
         
         this.keyValues = new Array(this.columns.length);
         for (var i = 0; i < this.columns.length; i++)
@@ -72,7 +82,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         }
     },
     
-    getKeyValueByName: function(name) {
+    getKeyValueByName: function(name)
+    {
         var kv;
         for (var i = 0; i < this.keyValues.length; i++)
         {
@@ -89,7 +100,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return kv;
     },
     
-    getColumnIndex: function(cellDom) {
+    getColumnIndex: function(cellDom)
+    {
         var match = cellDom.className.match(this.indexRegex);
         if (match && match[1]){
             return parseInt(match[1]);
@@ -158,11 +170,13 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         heading.dom.colSpan = this.columnCount;
     },
     
-    dataExists: function() {
+    dataExists: function()
+    {
         return Zutubi.table.SummaryTable.superclass.dataExists.apply(this, arguments) && this.data.length > 0;
     },
     
-    renderData: function() {
+    renderData: function()
+    {
         var data = {};
         for (var i = 0; i < this.activeColumns.length; i++)
         {
@@ -182,7 +196,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         };
     },
     
-    generateHeader: function() {
+    generateHeader: function()
+    {
         var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">';
         var columnCount = this.activeColumns.length;
         for (var i = 0; i < columnCount; i++)
@@ -201,7 +216,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return html;
     },
     
-    generateRow: function(tag, data) {
+    generateRow: function(tag, data)
+    {
         var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + ' xz-summary-data">';
         
         var columnCount = this.activeColumns.length;
@@ -221,7 +237,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return html;
     },
 
-    getAvailableColumnStore: function() {
+    getAvailableColumnStore: function()
+    {
         var columnCount = this.keyValues.length;
         var store = new Array(columnCount);
         for (var i = 0; i < columnCount; i++)
@@ -247,7 +264,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return store;
     },
     
-    getColumnNames: function() {
+    getColumnNames: function()
+    {
         var names = '';
         var columnCount = this.activeColumns.length;
         for (var i = 0; i < columnCount; i++)
@@ -263,7 +281,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return names;
     },
     
-    onCustomise: function() {
+    onCustomise: function()
+    {
         this.toolbar = new Zutubi.table.SummaryTableToolbar({
             table: this
         });
@@ -316,7 +335,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
  * A toolbar for customising the table columns.
  */
 Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
-    initComponent: function(container, position) {
+    initComponent: function(container, position)
+    {
         var table = this.table;
         Ext.apply(this, {
             cls: 'xz-summary-tb',
@@ -390,12 +410,14 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
  * A drag zone for sortable column headers.
  */
 Zutubi.table.SummaryTableDragZone = Ext.extend(Ext.dd.DragZone, {
-    constructor: function(table) {
+    constructor: function(table)
+    {
         this.table = table;
         Zutubi.table.SummaryTableDragZone.superclass.constructor.apply(this, [table.getEl()]);
     },
     
-    getDragData: function(e) {
+    getDragData: function(e)
+    {
         if (!e.getTarget('.xz-summary-remove'))
         {
             var target = e.getTarget('.xz-summary-sortable');
@@ -412,7 +434,8 @@ Zutubi.table.SummaryTableDragZone = Ext.extend(Ext.dd.DragZone, {
         }
     },
     
-    getRepairXY: function() {
+    getRepairXY: function()
+    {
         return this.dragData.repairXY;
     }
 });
@@ -421,7 +444,8 @@ Zutubi.table.SummaryTableDragZone = Ext.extend(Ext.dd.DragZone, {
  * A drop zone for sortable column headers.
  */
 Zutubi.table.SummaryTableDropZone = Ext.extend(Ext.dd.DropZone, {
-    constructor: function(table) {
+    constructor: function(table)
+    {
         this.table = table;
         
         // The arrows showing where we will drop are based on lightweight code
@@ -444,7 +468,8 @@ Zutubi.table.SummaryTableDropZone = Ext.extend(Ext.dd.DropZone, {
         Zutubi.table.SummaryTableDropZone.superclass.constructor.apply(this, [table.getEl()]);
     },
     
-    getTargetFromEvent: function(e) {
+    getTargetFromEvent: function(e)
+    {
         var x = e.getPageX();
         var sortables = this.table.getEl().select('.xz-summary-sortable');
         var dom = null;
@@ -458,13 +483,15 @@ Zutubi.table.SummaryTableDropZone = Ext.extend(Ext.dd.DropZone, {
         return dom;
     },
     
-    isLeft: function(node, event) {
+    isLeft: function(node, event)
+    {
         var el = Ext.get(node);
         var middle = el.getLeft() + el.getWidth() / 2;
         return event.getPageX() < middle;
     },
     
-    showPosition: function(node, event) {
+    showPosition: function(node, event)
+    {
         var side = this.isLeft(node, event) ? 'l' : 'r';
         this.proxyTop.alignTo(node, 'b-t' + side);
         this.proxyTop.show();
@@ -472,21 +499,25 @@ Zutubi.table.SummaryTableDropZone = Ext.extend(Ext.dd.DropZone, {
         this.proxyBottom.show();
     },
     
-    onNodeEnter: function(node, source, event, data) {
+    onNodeEnter: function(node, source, event, data)
+    {
         this.showPosition(node, event);
     },
     
-    onNodeOver: function(node, source, event, data) {
+    onNodeOver: function(node, source, event, data)
+    {
         this.showPosition(node, event);
         return Ext.dd.DropZone.prototype.dropAllowed;
     },
     
-    onNodeOut: function(node, source, event, data) {
+    onNodeOut: function(node, source, event, data)
+    {
         this.proxyTop.hide();
         this.proxyBottom.hide();
     },
 
-    onNodeDrop: function(node, source, event, data) {
+    onNodeDrop: function(node, source, event, data)
+    {
         var initialIndex = this.table.getColumnIndex(data.header);
         var newIndex = this.table.getColumnIndex(node);
         if (initialIndex >= 0 && newIndex >= 0)

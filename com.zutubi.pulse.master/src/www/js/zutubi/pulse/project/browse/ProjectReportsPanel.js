@@ -10,7 +10,8 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
     border: false,
     loaded: false,
     
-    initComponent: function(container, position) {
+    initComponent: function(container, position)
+    {
         var panel = this;
         Ext.apply(this, {
             defaults: {

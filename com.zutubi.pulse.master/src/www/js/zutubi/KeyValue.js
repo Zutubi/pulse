@@ -28,7 +28,8 @@ Zutubi.KeyValue = function(config) {
 };
 
 Zutubi.KeyValue.prototype = {
-    getRenderedValue: function(data) {
+    getRenderedValue: function(data)
+    {
         return this.renderer(data[this.name], data, this.component);
     }
 };

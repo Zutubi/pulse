@@ -17,15 +17,16 @@
  *                            specified, the table is hidden in this case).
  */
 Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
-    initComponent: function() {
-        this.columnCount = 2;
-        this.rowTemplate = new Ext.Template(
-            '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
-                '<th class="fit-width top right leftmost">{key}</th>' +
-                '<td id="{id}" class="rightmost">{value}</td>' +
-            '</tr>'
-        );
-        
+    columnCount: 2,
+    rowTemplate: new Ext.XTemplate(
+        '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
+            '<th class="fit-width top right leftmost">{key}</th>' +
+            '<td id="{id}" class="rightmost">{value}</td>' +
+        '</tr>'
+    ),
+
+    initComponent: function()
+    {
         var rowConfigs = this.rows;
         this.rows = [];
         for (var i = 0; i < rowConfigs.length; i++)
@@ -38,7 +39,8 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
         Zutubi.table.PropertyTable.superclass.initComponent.apply(this, arguments);
     },
      
-    renderData: function() {
+    renderData: function()
+    {
         var rows = this.rows;
         var previousRow = this.el.child('tr');
         for (var i = 0, l = rows.length; i < l; i++)

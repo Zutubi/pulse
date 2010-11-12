@@ -41,7 +41,8 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         hooks: 'hooks'
     },
     
-    initComponent: function(container, position) {
+    initComponent: function(container, position)
+    {
         var panel = this;
         Ext.apply(this, {
             defaults: {
@@ -189,7 +190,8 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         Zutubi.pulse.project.browse.BuildSummaryPanel.superclass.initComponent.apply(this, arguments);
     },
         
-    update: function(data) {
+    update: function(data)
+    {
         Zutubi.pulse.project.browse.BuildSummaryPanel.superclass.update.apply(this, arguments);
 
         this.checkPanelForContent('right', function(table) {
@@ -202,7 +204,8 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         }
     },
 
-    updateRows: function() {
+    updateRows: function()
+    {
         Ext.getCmp(this.id + '-main').getLayout().checkRows();
         Ext.getCmp(this.id + '-right').getLayout().checkRows();
     },

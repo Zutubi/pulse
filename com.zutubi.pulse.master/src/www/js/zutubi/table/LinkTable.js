@@ -31,13 +31,10 @@
  *                            specified, the table is hidden in this case).
  */
 Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
-    idProperty: 'icon',
-    categorised: false,
-    categoryPrefix: '',
-    linksProperty: 'links',
-    
-    initComponent: function() {
+    initComponent: function()
+    {
         this.columnCount = 1;
+        
         if (this.iconTemplate)
         {
             this.iconTemplate = new Ext.XTemplate(this.iconTemplate);
@@ -47,33 +44,41 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             this.iconTemplate = new Ext.XTemplate('images/config/actions/{icon}.gif');
         }
         
-        this.categoryRowTemplate = new Ext.XTemplate(
-            '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
-                '<th class="leftmost rightmost">' +
-                    '{prefix}{name:htmlEncode}' +
-                '</th>' +
-            '</tr>'
-        );
+        Ext.applyIf(this, {
+            idProperty: 'icon',
+            categorised: false,
+            categoryPrefix: '',
+            linksProperty: 'links',
+            
+            categoryRowTemplate: new Ext.XTemplate(
+                '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
+                    '<th class="leftmost rightmost">' +
+                        '{prefix}{name:htmlEncode}' +
+                    '</th>' +
+                '</tr>'
+            ),
         
-        this.rowTemplate = new Ext.XTemplate(
-            '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
-                '<td class="leftmost rightmost">' +
-                    '{indent}' +
-                    '<img alt="{label}" src="{iconSrc}"/> ' +
-                    '<tpl if="client">' +
-                        '<a href="#" id="{linkId}" onclick="{onclick}">{label}</a>' +
-                    '</tpl>' +
-                    '<tpl if="!client">' +
-                        '<a href="{url}" id="{linkId}">{label}</a>' +
-                    '</tpl>' +
-                '</td>' + 
-            '</tr>'
-        );
-        
+            rowTemplate: new Ext.XTemplate(
+                '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
+                    '<td class="leftmost rightmost">' +
+                        '{indent}' +
+                        '<img alt="{label}" src="{iconSrc}"/> ' +
+                        '<tpl if="client">' +
+                            '<a href="#" id="{linkId}" onclick="{onclick}">{label}</a>' +
+                        '</tpl>' +
+                        '<tpl if="!client">' +
+                            '<a href="{url}" id="{linkId}">{label}</a>' +
+                        '</tpl>' +
+                    '</td>' + 
+                '</tr>'
+            )
+        });
+                
         Zutubi.table.LinkTable.superclass.initComponent.apply(this, arguments);
     },
 
-    dataExists: function() {
+    dataExists: function()
+    {
         if (this.data && this.data.length)
         {
             if (this.categorised)
@@ -96,7 +101,8 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         return false;
     },
 
-    renderData: function() {
+    renderData: function()
+    {
         if (this.categorised)
         {
             for (var i = 0, l = this.data.length; i < l; i++)
@@ -120,7 +126,8 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         }
     },
     
-    renderLinks: function(links, categoryName) {
+    renderLinks: function(links, categoryName)
+    {
         for (var i = 0, l = links.length; i < l; i++)
         {
             var args = Ext.apply({}, links[i]);
@@ -165,7 +172,8 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
         };
     },
     
-    doAction: function(action, arg) {
+    doAction: function(action, arg)
+    {
         this.handlers[action](arg);
     }
 });

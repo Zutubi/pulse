@@ -13,7 +13,8 @@
  *                                specified, the table is hidden in this case).
  */
 Zutubi.pulse.project.BuildSummaryTable = Ext.extend(Zutubi.table.SummaryTable, {
-    initComponent: function() {
+    initComponent: function()
+    {
         var columns = [];
         for (var key in Zutubi.pulse.project.configs.result)
         {

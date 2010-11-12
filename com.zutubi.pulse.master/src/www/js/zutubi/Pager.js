@@ -19,57 +19,64 @@
  *                           currentPage
  */
 Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
-    labels: {
-        first: 'first',
-        previous: 'previous',
-        next: 'next',
-        last: 'last'
+    initComponent: function()
+    {
+        Ext.applyIf(this, {
+            surroundingPages: 10,
+
+            labels: {
+                first: 'first',
+                previous: 'previous',
+                next: 'next',
+                last: 'last'
+            },
+        
+            template: new Ext.XTemplate('<table id="{id}" class="pager content-table"><tbody></tbody></table>'),
+        
+            countTemplate: new Ext.XTemplate(
+                '<tr>' +
+                    '<th id="{id}-total" class="leftmost rightmost" colspan="5">{totalItems} {itemLabel}<tpl if="totalItems != 1">s</tpl> found</th>' +
+                '</tr>'
+            ),
+        
+            pagingTemplate: new Ext.XTemplate(
+                '<tr id="{id}-paging">' +
+                    '<td class="leftmost">' +
+                        '<tpl if="currentPage &gt; 0"><a href="{url}0/{extraParams}" id="{id}-first"></tpl>' +
+                            '<img alt="{labelFirst}" src="{[window.baseUrl]}/images/resultset_first.gif"/> {labelFirst}' +
+                        '<tpl if="currentPage &gt; 0"></a></tpl>' +
+                    '</td>' +
+                    '<td>' +
+                        '<tpl if="currentPage &gt; 0"><a href="{url}{currentPage-1}/{extraParams}" id="{id}-previous"></tpl>' +
+                            '<img alt="{labelPrevious}" src="{[window.baseUrl]}/images/resultset_previous.gif"/> {labelPrevious}' +
+                        '<tpl if="currentPage &gt; 0"></a></tpl>' +
+                    '</td>' +
+                    '<th>' +
+                        '<tpl for="pages">' +
+                            ' &nbsp; ' +
+                            '<tpl if="index != parent.currentPage"><a href="{parent.url}{index}/{parent.extraParams}" id="{id}-page-{index}"></tpl>' +
+                                '{index+1}' +
+                            '<tpl if="index != parent.currentPage"></a></tpl>' +
+                        '</tpl>' +
+                        ' &nbsp; ' +
+                    '</th>' +
+                    '<td>' +
+                        '<tpl if="currentPage &lt; lastPage"><a href="{url}{currentPage+1}/{extraParams}" id="{id}-next"></tpl>' +
+                            '<img alt="{labelNext}" src="{[window.baseUrl]}/images/resultset_next.gif"/> {labelNext}' +
+                        '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
+                    '</td>' +
+                    '<td class="rightmost">' +
+                        '<tpl if="currentPage &lt; lastPage"><a href="{url}{lastPage}/{extraParams}" id="{id}-last"></tpl>' +
+                            '<img alt="{labelLast}" src="{[window.baseUrl]}/images/resultset_last.gif"/> {labelLast}' +
+                        '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
+                    '</td>' +
+                '</tr>'
+            )
+        });
+
+        Zutubi.Pager.superclass.initComponent.apply(this, arguments);
     },
-
-    surroundingPages: 10,
-
-    template: new Ext.XTemplate('<table id="{id}" class="pager content-table"><tbody></tbody></table>'),
-
-    countTemplate: new Ext.XTemplate(
-        '<tr>' +
-            '<th id="{id}-total" class="leftmost rightmost" colspan="5">{totalItems} {itemLabel}<tpl if="totalItems != 1">s</tpl> found</th>' +
-        '</tr>'
-    ),
-
-    pagingTemplate: new Ext.XTemplate(
-        '<tr id="{id}-paging">' +
-            '<td class="leftmost">' +
-                '<tpl if="currentPage &gt; 0"><a href="{url}0/{extraParams}" id="{id}-first"></tpl>' +
-                    '<img alt="{labelFirst}" src="{[window.baseUrl]}/images/resultset_first.gif"/> {labelFirst}' +
-                '<tpl if="currentPage &gt; 0"></a></tpl>' +
-            '</td>' +
-            '<td>' +
-                '<tpl if="currentPage &gt; 0"><a href="{url}{currentPage-1}/{extraParams}" id="{id}-previous"></tpl>' +
-                    '<img alt="{labelPrevious}" src="{[window.baseUrl]}/images/resultset_previous.gif"/> {labelPrevious}' +
-                '<tpl if="currentPage &gt; 0"></a></tpl>' +
-            '</td>' +
-            '<th>' +
-                '<tpl for="pages">' +
-                    ' &nbsp; ' +
-                    '<tpl if="index != parent.currentPage"><a href="{parent.url}{index}/{parent.extraParams}" id="{id}-page-{index}"></tpl>' +
-                        '{index+1}' +
-                    '<tpl if="index != parent.currentPage"></a></tpl>' +
-                '</tpl>' +
-                ' &nbsp; ' +
-            '</th>' +
-            '<td>' +
-                '<tpl if="currentPage &lt; lastPage"><a href="{url}{currentPage+1}/{extraParams}" id="{id}-next"></tpl>' +
-                    '<img alt="{labelNext}" src="{[window.baseUrl]}/images/resultset_next.gif"/> {labelNext}' +
-                '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
-            '</td>' +
-            '<td class="rightmost">' +
-                '<tpl if="currentPage &lt; lastPage"><a href="{url}{lastPage}/{extraParams}" id="{id}-last"></tpl>' +
-                    '<img alt="{labelLast}" src="{[window.baseUrl]}/images/resultset_last.gif"/> {labelLast}' +
-                '<tpl if="currentPage &lt; lastPage"></a></tpl>' +
-            '</td>' +
-        '</tr>'
-    ),
-
+    
     onRender: function(container, position) {
         if (position)
         {

@@ -28,7 +28,8 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
             '<td id="{id}" class="status-value {extraCls}">{value}</td>' +
         '</tr>'),
     
-    initComponent: function() {
+    initComponent: function()
+    {
         this.titleTemplate = new Ext.XTemplate(this.titleTemplate);
 
         var fieldConfigs = this.fields;
@@ -39,7 +40,8 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         }
     },
     
-    onRender: function(container, position) {
+    onRender: function(container, position)
+    {
         var args = {
             id: this.id,
             health: this.getHealth()
@@ -96,7 +98,8 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         }
     },
     
-    renderData: function(/*data*/) {
+    renderData: function(/*data*/)
+    {
         this.titleTemplate.overwrite(this.titleEl, this.data);
         for (var i = 0, l = this.fields.length; i < l; i++)
         {
@@ -115,7 +118,8 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         }
     },
     
-    update: function(data) {
+    update: function(data)
+    {
         var originalHealth = this.data ? this.getHealth() : '';
         this.data = data;
         if (this.rendered)

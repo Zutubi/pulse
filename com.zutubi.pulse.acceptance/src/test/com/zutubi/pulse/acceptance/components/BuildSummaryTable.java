@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.components;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.table.SummaryTable;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 
 import java.util.LinkedList;

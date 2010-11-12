@@ -10,7 +10,8 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
     width: '100%',
     spacing: 17,
     
-    onLayout: function(container, target) {
+    onLayout: function(container, target)
+    {
         this.columns = 1;
 
         if (!this.tableAttrs)
@@ -32,7 +33,8 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
      * that are found (otherwise spacing would still exist for rows with no
      * content).
      */
-    checkRows: function() {
+    checkRows: function()
+    {
         if (this.table)
         {
             var rows = this.table.tBodies[0].childNodes;

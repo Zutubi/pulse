@@ -99,7 +99,8 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
 
     indent: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
 
-    renderFixed: function() {
+    renderFixed: function()
+    {
         this.tbodyEl.insertHtml('beforeEnd', '<tr><th class="leftmost">name</th><th colspan="2">status</th><th>details</th><th class="rightmost">time</th></tr>');
     },
 

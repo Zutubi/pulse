@@ -22,7 +22,8 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Zutubi.ActivePanel,
     
     dataKeys: ['builds', 'pager'],
     
-    initComponent: function(container, position) {
+    initComponent: function(container, position)
+    {
         var panel = this;
         Ext.apply(this, {
             items: [{
