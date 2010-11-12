@@ -182,9 +182,10 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         buildRunner.triggerBuild(projectB);
 
-        SeleniumBrowser browser = new SeleniumBrowser();
+        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
         try
         {
+            SeleniumBrowser browser = factory.newBrowser();
             browser.start();
             browser.loginAsAdmin();
 
@@ -197,7 +198,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         finally
         {
-            browser.stop();
+            factory.stop();
         }
 
         assertBuildOrder(projectA, projectC, projectB);
@@ -248,6 +249,7 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
         projectC.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
     }
 
     private void assertBuildOrder(WaitProject... projects) throws Exception

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -21,6 +22,8 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 @Wire
 public class UserConfigurationCreator extends AbstractConfiguration implements ConfigurationCreator<UserConfiguration>, Validateable
 {
+    private static final Messages I18N = Messages.getInstance(UserConfiguration.class);
+
     public static final String CONTACT_NAME = "primary email";
 
     @ID
@@ -128,7 +131,7 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
             {
                 if(!password.equals(confirmPassword))
                 {
-                    context.addFieldError("password", "passwords do not match");
+                    context.addFieldError("password", I18N.format("passwords.differ"));
                 }
             }
         }

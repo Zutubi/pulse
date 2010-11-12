@@ -20,21 +20,16 @@ import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Helper base class for web UI acceptance tests that use Selenium.
  */
 public class SeleniumTestBase extends PulseTestCase
 {
-    /**
-     * If a test fails during setup, after starting a browser, tearDown never
-     * runs and the browser is never stopped.  This leads to an unholy build
-     * up of zombie browsers.  To avoid this, we keep track of all started
-     * browsers and make sure to stop them before we start another.
-     */
-    private static final Set<SeleniumBrowser> runningBrowsers = new HashSet<SeleniumBrowser>();
-
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to
      * run these tests in development environments (just manually run one
@@ -48,6 +43,7 @@ public class SeleniumTestBase extends PulseTestCase
     protected XmlRpcHelper xmlRpcHelper;
 
     protected SeleniumBrowser browser;
+    private SeleniumBrowserFactory browserFactory;
 
     protected void setUp() throws Exception
     {
@@ -56,28 +52,21 @@ public class SeleniumTestBase extends PulseTestCase
         xmlRpcHelper = new XmlRpcHelper();
         random = randomName();
 
-        cleanupRunningBrowsers();
-        browser = new SeleniumBrowser();
-        browser.start();
-        runningBrowsers.add(browser);
+        browserFactory = new DefaultSeleniumBrowserFactory();
+        browserFactory.cleanup();
+        browser = browserFactory.newBrowser();
 
         urls = browser.getUrls();
     }
 
-    private void cleanupRunningBrowsers()
-    {
-        Iterator<SeleniumBrowser> it = runningBrowsers.iterator();
-        while (it.hasNext())
-        {
-            it.next().stop();
-            it.remove();
-        }
-    }
-
     protected void tearDown() throws Exception
     {
-        browser.stop();
-        runningBrowsers.remove(browser);
+        browserFactory.cleanup();
+        if (xmlRpcHelper.isLoggedIn())
+        {
+            xmlRpcHelper.logout();
+        }
+
         super.tearDown();
     }
 

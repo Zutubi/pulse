@@ -1,27 +1,44 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.acceptance.pages.SignupPage;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.admin.*;
+import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
+import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
+import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
+import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
-import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 {
-    private static final String ANONYMOUS_GROUP_PATH = "groups/anonymous users";
+    private static final Messages SIGNUP_MESSAGES = Messages.getInstance(SignupUserConfiguration.class);
+    private static final String ANONYMOUS_GROUP_PATH =  getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME);
 
-    private static final String SIGNUP_INPUT_ACTION = "signup!input.action";
     private ConfigurationHelper configurationHelper;
 
     protected void setUp() throws Exception
@@ -43,12 +60,18 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     {
         setAnonymousAccess(false);
         setAnonymousSignup(false);
-        browser.open(BrowsePage.class);
 
-        // We should be denied access and redirected to the login page.
-        LoginPage loginPage = browser.createPage(LoginPage.class);
-        loginPage.waitFor();
-        assertTitle(loginPage);
+        // user access.
+        assertRedirectionToLogin(WelcomePage.class);
+        assertRedirectionToLogin(BrowsePage.class);
+        assertRedirectionToLogin(ServerActivityPage.class);
+        assertRedirectionToLogin(AgentsPage.class);
+        assertRedirectionToLogin(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
+
+        // admin access
+        assertRedirectionToLogin(UsersPage.class);
+        assertRedirectionToLogin(PluginsPage.class);
+        assertRedirectionToLogin(QuartzStatisticsPage.class);
     }
 
     public void testAnonymousSignup() throws Exception
@@ -56,24 +79,26 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         setAnonymousAccess(false);
         setAnonymousSignup(true);
 
-        LoginPage loginPage = browser.open(LoginPage.class);
+        browser.open(BrowsePage.class);
+        browser.waitForPageToLoad();
+        
+        LoginPage loginPage = browser.createPage(LoginPage.class);
         loginPage.waitForSignup();
 
         String login = "login_" + random;
+        String name = "name_" + random;
         String password = "password";
 
-        SignupForm form = loginPage.clickSignup();
+        SignupForm form = loginPage.clickSignup().getForm();
         form.waitFor();
-        form.saveFormElements(login, "name_" + random, password, password);
+        form.saveFormElements(login, name, password, password);
 
         WelcomePage welcomePage = browser.createPage(WelcomePage.class);
         welcomePage.waitFor();
-        assertTitle(welcomePage);
-        assertTrue(browser.isTextPresent("name_" + random));
-        assertTrue(welcomePage.isElementIdPresent(IDs.ID_DASHBOARD_TAB));
-        assertTrue(welcomePage.isElementIdPresent(IDs.ID_PREFERENCES));
-        assertTrue(welcomePage.isElementIdPresent(IDs.ID_LOGOUT));
-        assertFalse(welcomePage.isElementIdPresent(IDs.ID_LOGIN));
+        assertTrue(welcomePage.isPresent());
+        assertTrue(browser.isTextPresent(name));
+        assertTrue(welcomePage.isLogoutLinkPresent());
+        assertFalse(welcomePage.isLoginLinkPresent());
 
         // logout and log back in again.
         browser.logout();
@@ -82,7 +107,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         assertTrue(loginPage.login(login, password));
 
         welcomePage.waitFor();
-        assertTitle(welcomePage);
+        assertTrue(welcomePage.isPresent());
     }
 
     public void testAnonymousSignupDisabled() throws Exception
@@ -90,38 +115,41 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         setAnonymousAccess(false);
         setAnonymousSignup(false);
         LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
-        assertFalse(loginPage.isSignupPresent());
+        assertFalse(loginPage.isSignupLinkPresent());
 
         // go directly to the action and verify that it is disabled.
-        browser.open(urls.base() + SIGNUP_INPUT_ACTION);
-        SignupForm form = browser.createForm(SignupForm.class);
-        assertTrue(form.isFormPresent());
+        SignupPage signupPage = browser.openAndWaitFor(SignupPage.class);
+        SignupForm form = signupPage.getForm();
         form.saveFormElements(random, random, "", "");
         assertTrue(browser.isTextPresent("Anonymous signup is not enabled"));
     }
 
-    public void testAnonymousSingupPasswordMismatch() throws Exception
+    public void testAnonymousSignupPasswordMismatch() throws Exception
     {
         setAnonymousAccess(false);
         setAnonymousSignup(true);
-        browser.open(urls.base() + SIGNUP_INPUT_ACTION);
-        SignupForm form = browser.createForm(SignupForm.class);
+
+        LoginPage login = browser.openAndWaitFor(LoginPage.class);
+        SignupForm form = login.clickSignup().getForm();
         form.waitFor();
         form.saveFormElements(random, random, "p1", "p2");
         assertTrue(form.isFormPresent());
-        assertTrue(browser.isTextPresent("passwords do not match"));
+        assertTrue(browser.isTextPresent(SIGNUP_MESSAGES.format("passwords.differ")));
     }
 
-    public void testAnonymousSingupExistingUser() throws Exception
+    public void testAnonymousSignupExistingUser() throws Exception
     {
         setAnonymousAccess(false);
         setAnonymousSignup(true);
-        browser.open(urls.base() + SIGNUP_INPUT_ACTION);
-        SignupForm form = browser.createForm(SignupForm.class);
+
+        String adminUsername = ADMIN_CREDENTIALS.getUserName();
+
+        LoginPage login = browser.openAndWaitFor(LoginPage.class);
+        SignupForm form = login.clickSignup().getForm();
         form.waitFor();
-        form.saveFormElements(ADMIN_CREDENTIALS.getUserName(), "name", "p", "p");
+        form.saveFormElements(adminUsername, "name", "p", "p");
         assertTrue(form.isFormPresent());
-        assertTrue(browser.isTextPresent("login 'admin' is already in use"));
+        assertTrue(browser.isTextPresent("login '"+adminUsername+"' is already in use"));
     }
 
     public void testAnonymousAccess() throws Exception
@@ -137,28 +165,60 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         assertFalse(browsePage.isElementIdPresent(IDs.ID_DASHBOARD_TAB));
         assertFalse(browsePage.isElementIdPresent(IDs.ID_PREFERENCES));
         assertFalse(browsePage.isElementIdPresent(IDs.ID_LOGOUT));
+
+        // user access
+        assertRedirectionToLogin(DashboardPage.class);
+        assertRedirectionToLogin(MyBuildsPage.class);
+        assertRedirectionToLogin(MyPreferencesPage.class);
+
+        // admin access
+        assertRedirectionToLogin(UsersPage.class);
+        assertRedirectionToLogin(PluginsPage.class);
+        assertRedirectionToLogin(QuartzStatisticsPage.class);
+
+        // can see configured projects and agents.
+        assertNoRedirectionToLogin(urls.adminAgents());
+        assertNoRedirectionToLogin(urls.adminProjects());
     }
 
     public void testAssignServerPermissionToAnonymousUsers() throws Exception
     {
         setAnonymousAccess(true);
         setAnonymousSignup(false);
-        Hashtable<String, Object> group = xmlRpcHelper.getConfig(ANONYMOUS_GROUP_PATH);
-        group.put("serverPermissions", new Vector(0));
-        xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
 
-        browser.newSession();
+        setAnonymousServerPermissions();
 
-        ProjectHierarchyPage hierarchyPage = browser.open(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage hierarchyPage = browser.open(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
         browser.waitForPageToLoad();
         assertFalse(hierarchyPage.isAddPresent());
 
-        group.put("serverPermissions", new Vector<String>(Arrays.asList(ServerPermission.CREATE_PROJECT.toString())));
-        xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
-
-        browser.newSession();
+        setAnonymousServerPermissions(CREATE_PROJECT);
         hierarchyPage.openAndWaitFor();
-        browser.waitForElement(ProjectHierarchyPage.LINK_ADD);
+        assertTrue(hierarchyPage.isAddPresent());
+
+        assertRedirectionToLogin(GroupsPage.class);
+        assertRedirectionToLogin(UsersPage.class);
+
+        setAnonymousServerPermissions(ADMINISTER);
+        hierarchyPage.openAndWaitFor();
+        assertTrue(hierarchyPage.isAddPresent());
+
+        assertPageVisible(GroupsPage.class);
+        assertPageVisible(UsersPage.class);
+    }
+
+    private void setAnonymousServerPermissions(ServerPermission... permissions) throws Exception
+    {
+        Hashtable<String, Object> group = xmlRpcHelper.getConfig(ANONYMOUS_GROUP_PATH);
+        List<String> permissionStrings = CollectionUtils.map(permissions, new Mapping<ServerPermission, String>()
+        {
+            public String map(ServerPermission permission)
+            {
+                return permission.toString();
+            }
+        });
+        group.put("serverPermissions", new Vector(permissionStrings));
+        xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
     }
 
     private void setAnonymousAccess(boolean enabled) throws Exception
@@ -181,5 +241,37 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
             configurationHelper.update(globalConfig, false);
             browser.newSession();
         }
+    }
+
+    private <T extends SeleniumPage> void assertRedirectionToLogin(Class<T> pageType, Object... extraArgs)
+    {
+        SeleniumPage page = browser.createPage(pageType, extraArgs);
+        assertRedirectionToLogin(page.getUrl());
+    }
+
+    private <T extends SeleniumPage> void assertPageVisible(Class<T> pageType, Object... extraArgs)
+    {
+        SeleniumPage page = browser.openAndWaitFor(pageType, extraArgs);
+        assertTrue(page.isPresent());
+    }
+
+    private void assertRedirectionToLogin(String url)
+    {
+        browser.open(url);
+        browser.waitForPageToLoad();
+
+        // We should be denied access and redirected to the login page.
+        LoginPage loginPage = browser.createPage(LoginPage.class);
+        loginPage.waitFor();
+        assertTrue(loginPage.isPresent());
+    }
+
+    private void assertNoRedirectionToLogin(String url)
+    {
+        browser.open(url);
+        browser.waitForPageToLoad();
+
+        LoginPage loginPage = browser.createPage(LoginPage.class);
+        assertFalse(loginPage.isPresent());
     }
 }

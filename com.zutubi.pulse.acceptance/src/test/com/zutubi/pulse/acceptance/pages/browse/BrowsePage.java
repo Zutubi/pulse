@@ -17,7 +17,7 @@ public class BrowsePage extends ProjectsSummaryPage
 
     public String getUrl()
     {
-        return urls.projects();
+        return urls.browse();
     }
 
     @Override

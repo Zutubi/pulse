@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
+
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -17,6 +18,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private BuildRunner buildRunner;
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
+    private SeleniumBrowserFactory browserFactory;
 
     protected void setUp() throws Exception
     {
@@ -29,8 +31,8 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         repository = new Repository();
         repository.clean();
 
-        browser = new SeleniumBrowser();
-        browser.start();
+        browserFactory = new DefaultSeleniumBrowserFactory();
+        browser = browserFactory.newBrowser();
 
         buildRunner = new BuildRunner(xmlRpcHelper);
 
@@ -43,7 +45,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     @Override
     protected void tearDown() throws Exception
     {
-        browser.stop();
+        browserFactory.stop();
         
         logout();
 

@@ -1,18 +1,19 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * A set of acceptance tests for the build version functionality.  This includes
@@ -93,9 +94,10 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // edit the build options, setting prompt to true.
         xmlRpcHelper.enableBuildPrompting(projectName);
 
-        SeleniumBrowser browser = new SeleniumBrowser();
+        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
         try
         {
+            SeleniumBrowser browser = factory.newBrowser();
             browser.start();
             browser.loginAsAdmin();
 
@@ -110,12 +112,10 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
             // leave the revision blank
             form.triggerFormElements(asPair("version", "OH_HAI"));
-
-            browser.logout();
         }
         finally
         {
-            browser.stop();
+            factory.stop();
         }
 
         xmlRpcHelper.waitForBuildToComplete(projectName, 1);

@@ -312,6 +312,11 @@ public class SeleniumBrowser
         waitForPageToLoad();
     }
 
+    public boolean isLoggedIn()
+    {
+        return isElementIdPresent(IDs.ID_LOGOUT);
+    }
+
     /**
      * Open the selenium browser to the requested location.
      *

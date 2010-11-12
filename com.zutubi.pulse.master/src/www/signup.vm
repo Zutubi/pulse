@@ -4,10 +4,7 @@
 </head>
 
 <body>
-    <h1>:: signup ::</h1>
-
+    <h1 id="signup">:: signup ::</h1>
     #pform("path=$path" "action=signup.action")
 </body>
 </html>
-
-<html>

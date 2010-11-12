@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -14,6 +15,8 @@ import com.zutubi.validation.ValidationContext;
 @Form(fieldOrder = {"password", "confirmPassword"})
 public class SetPasswordConfiguration extends AbstractConfiguration implements Validateable
 {
+    private static final Messages I18N = Messages.getInstance(SetPasswordConfiguration.class);
+
     @Password
     private String password;
     @Password
@@ -45,7 +48,7 @@ public class SetPasswordConfiguration extends AbstractConfiguration implements V
         {
             if(!password.equals(confirmPassword))
             {
-                context.addFieldError("password", "passwords do not match");
+                context.addFieldError("password", I18N.format("passwords.differ"));
             }
         }
     }

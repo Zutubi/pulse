@@ -3,11 +3,10 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.tove.type.record.PathUtils;
 
 import java.io.File;
 import java.io.IOException;

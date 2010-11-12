@@ -44,10 +44,6 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
         {
             // Ignore
         }
-
-        // handle the initialisation of the security manager, since this can not be done within the spring context file.
-//        PulseSecurityManager securityManager = (PulseSecurityManager) ComponentContext.getBean("securityManager");
-//        securityManager.secure();
     }
 
     public boolean haltOnFailure()

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -15,6 +16,8 @@ import com.zutubi.validation.annotations.Required;
 @Wire
 public class SignupUserConfiguration extends AbstractConfiguration implements Validateable
 {
+    private static final Messages I18N = Messages.getInstance(SignupUserConfiguration.class);
+
     @Required
     private String login;
     @Required
@@ -78,7 +81,7 @@ public class SignupUserConfiguration extends AbstractConfiguration implements Va
         {
             if(!password.equals(confirmPassword))
             {
-                context.addFieldError("password", "passwords do not match");
+                context.addFieldError("password", I18N.format("passwords.differ"));
             }
         }
     }

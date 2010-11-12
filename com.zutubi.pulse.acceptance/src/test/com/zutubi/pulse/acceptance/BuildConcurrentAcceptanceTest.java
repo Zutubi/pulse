@@ -1,13 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNException;
@@ -16,7 +14,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class BuildConcurrentAcceptanceTest extends SeleniumTestBase
+import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
+import static com.zutubi.util.CollectionUtils.asPair;
+
+public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -99,19 +100,28 @@ public class BuildConcurrentAcceptanceTest extends SeleniumTestBase
     {
         WaitProject project = setUpConcurrentBuildsOnTwoAgents();
 
-        browser.loginAsAdmin();
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
-        String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
-        assertEquals("build 2", browser.getText(buildLinkId));
+        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
+        try
+        {
+            SeleniumBrowser browser = factory.newBrowser();
+            browser.loginAsAdmin();
+            BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+            String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
+            assertEquals("build 2", browser.getText(buildLinkId));
 
-        xmlRpcHelper.cancelBuild(project.getName(), 2);
-        
-        browser.refresh();
-        browsePage.waitFor();
-        assertEquals("build 1", browser.getText(buildLinkId));
+            xmlRpcHelper.cancelBuild(project.getName(), 2);
 
-        project.releaseBuild();
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+            browser.refresh();
+            browsePage.waitFor();
+            assertEquals("build 1", browser.getText(buildLinkId));
+
+            project.releaseBuild();
+            xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+        }
+        finally
+        {
+            factory.stop();
+        }
     }
 
     public void testReorderingWithinQueueCausingBackwardRevisions() throws Exception
@@ -144,9 +154,10 @@ public class BuildConcurrentAcceptanceTest extends SeleniumTestBase
         // is not as accurate as would be liked, but further changes to the
         // changelist handling are required before we can resolve this.
 
-        SeleniumBrowser browser = new SeleniumBrowser();
+        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
         try
         {
+            SeleniumBrowser browser = factory.newBrowser();
             browser.start();
             browser.loginAsAdmin();
 
@@ -155,7 +166,7 @@ public class BuildConcurrentAcceptanceTest extends SeleniumTestBase
         }
         finally
         {
-            browser.stop();
+            factory.stop();
         }
     }
 

@@ -403,6 +403,11 @@ public class PulseActionMapper implements ActionMapper
 
             return new ActionMapping(pathElements[0], ADMIN_NAMESPACE, null, params);
         }
+        else if (path.equals(""))
+        {
+            // if no scope is specified, go to the projects tab.
+            return getConfigMapping(ADMIN_NAMESPACE, "projects", request.getQueryString());
+        }
         else
         {
             // All other admin paths are config views.

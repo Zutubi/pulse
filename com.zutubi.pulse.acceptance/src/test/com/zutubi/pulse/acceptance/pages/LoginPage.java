@@ -3,12 +3,12 @@ package com.zutubi.pulse.acceptance.pages;
 import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
-import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 import java.io.File;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class LoginPage extends SeleniumPage
 {
@@ -54,7 +54,7 @@ public class LoginPage extends SeleniumPage
         }
     }
 
-    public boolean isSignupPresent()
+    public boolean isSignupLinkPresent()
     {
         return browser.isElementIdPresent(SIGNUP_ID);
     }
@@ -64,10 +64,10 @@ public class LoginPage extends SeleniumPage
         browser.waitForElement(SIGNUP_ID);
     }
 
-    public SignupForm clickSignup()
+    public SignupPage clickSignup()
     {
         browser.click(SIGNUP_ID);
         browser.waitForPageToLoad();
-        return browser.createForm(SignupForm.class);
+        return browser.createPage(SignupPage.class);
     }
 }

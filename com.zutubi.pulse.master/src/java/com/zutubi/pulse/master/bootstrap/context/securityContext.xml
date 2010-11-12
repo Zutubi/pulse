@@ -178,9 +178,6 @@ based upon the Spring Security system.
         <property name="authenticationEntryPoint">
             <bean class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
         </property>
-        <!-- TODO: what do we do about this?
-        <property name="createSessionAllowed" value="false"/> 
-        -->
     </bean>
 
     <!--
@@ -207,6 +204,7 @@ based upon the Spring Security system.
                 <security:intercept-url pattern="/rss.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/view/**/*" access="ROLE_GUEST,ROLE_USER" />
                 <security:intercept-url pattern="/file/**/*" access="ROLE_GUEST,ROLE_USER" />
+                <security:intercept-url pattern="/dashboard/**" access="ROLE_USER" />
                 <security:intercept-url pattern="/admin/actions/**" access="ADMINISTER" />
                 <security:intercept-url pattern="/admin/settings/**" access="ADMINISTER" />
                 <security:intercept-url pattern="/admin/users/**" access="ADMINISTER" />

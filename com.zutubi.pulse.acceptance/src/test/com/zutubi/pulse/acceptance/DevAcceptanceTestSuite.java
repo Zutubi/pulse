@@ -43,6 +43,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);
         suite.addTestSuite(ProjectPermissionsAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
+        suite.addTestSuite(UserAccessAcceptanceTest.class);
         suite.addTestSuite(LicenseAcceptanceTest.class);
         suite.addTestSuite(DashboardAcceptanceTest.class);
         suite.addTestSuite(ProjectHomeAcceptanceTest.class);

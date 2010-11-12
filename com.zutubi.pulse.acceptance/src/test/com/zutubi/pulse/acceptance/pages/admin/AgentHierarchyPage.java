@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import com.zutubi.pulse.master.webwork.Urls;
 
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+
 /**
- * The page shown when looking at an agent in the heirarchy view.
+ * The page shown when looking at an agent in the hierarchy view.
  */
 public class AgentHierarchyPage extends HierarchyPage
 {
