@@ -79,7 +79,8 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Zutubi.ActivePanel,
                     xtype: 'xzbuildsummarytable',
                     title: 'build history',
                     selectedColumns: this.columns,
-                    emptyMessage: 'no builds found'
+                    emptyMessage: 'no builds found',
+                    customisable: !this.anonymous
                 }, {
                     id: this.id + '-pager',
                     xtype: 'xzpager',

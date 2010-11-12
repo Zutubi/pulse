@@ -23,7 +23,8 @@
                 containerId: 'nested-center',
                 refreshInterval: $refreshInterval,
                 projectId: '$project.id',
-                recentColumns: '#jss($projectRecentColumns)'.split(',')
+                recentColumns: '#jss($projectRecentColumns)'.split(','),
+                anonymous: #if($principle) false #else true #end
             });
         });
     </script>

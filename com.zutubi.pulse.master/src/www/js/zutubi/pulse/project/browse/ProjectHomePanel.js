@@ -106,7 +106,8 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         id: this.id + '-recent',
                         title: 'recently completed builds',
                         selectedColumns: this.recentColumns,
-                        emptyMessage: 'no historic builds found'
+                        emptyMessage: 'no historic builds found',
+                        customisable: !this.anonymous
                     }]
                 }, {
                     xtype: 'xzsectionheading',

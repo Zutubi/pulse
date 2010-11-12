@@ -25,7 +25,7 @@ Zutubi.pulse.project.BuildSummaryTable = Ext.extend(Zutubi.table.SummaryTable, {
             columns.push(Zutubi.pulse.project.configs.build[key]);
         }
         
-        Ext.apply(this, {
+        Ext.applyIf(this, {
             customisable: true,
             columns: columns,
             saveUrl: window.baseUrl + '/ajax/customiseBuildColumns.action',

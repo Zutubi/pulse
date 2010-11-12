@@ -20,7 +20,8 @@
                 projectId: '$project.id',
                 columns: '#jss($columns)'.split(','),
                 pagerUrl: '#jss($urls.projectHistory($project))',
-                stateFilter: '#jss($stateFilter)'
+                stateFilter: '#jss($stateFilter)',
+                anonymous: #if($principle) false #else true #end
             });
         });
     </script>
