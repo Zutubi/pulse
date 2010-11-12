@@ -8,7 +8,7 @@ public class QuartzStatisticsPage extends SeleniumPage
 {
     public QuartzStatisticsPage(SeleniumBrowser browser, Urls urls)
     {
-        super(browser, urls, "quartz.statistics.heading");
+        super(browser, urls, "quartz-statistics-heading");
     }
 
     @Override
@@ -16,6 +16,4 @@ public class QuartzStatisticsPage extends SeleniumPage
     {
         return urls.admin() + "actions?quartzStatistics=execute";
     }
-
-    // verify that certain triggers are present.
 }

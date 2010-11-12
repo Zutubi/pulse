@@ -14,7 +14,7 @@
 <body>
     #parse("/template/includes/actionerrors.vm")
 
-    <h1 id="hibernate.statistics.heading">:: hibernate statistics ::</h1>
+    <h1 id="hibernate-statistics-heading">:: hibernate statistics ::</h1>
     <p>
         Hibernate statistics are #if($on) enabled. #else disabled. #end
     </p>

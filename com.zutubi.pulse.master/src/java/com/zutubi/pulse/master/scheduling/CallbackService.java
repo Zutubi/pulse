@@ -204,7 +204,7 @@ public class CallbackService
                 }
                 catch (Exception e)
                 {
-                    LOG.warning(I18N.format("uncaught.exception", e.getMessage()), e);
+                    LOG.error(I18N.format("uncaught.exception", e.getMessage()), e);
                 }
             }
         }

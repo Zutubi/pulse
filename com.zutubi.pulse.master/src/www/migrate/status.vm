@@ -7,7 +7,7 @@
 
 
 <div id="leftcolumn">
-    <h1 id="restore.progress">Migrate Progress</h1>
+    <h1 id="migrate-progress">Migrate Progress</h1>
 
     #taskProgressUI($monitor)
     

@@ -8,7 +8,7 @@ public class HibernateStatisticsPage extends SeleniumPage
 {
     public HibernateStatisticsPage(SeleniumBrowser browser, Urls urls)
     {
-        super(browser, urls, "hibernate.statistics.heading", "hibernate statistics");
+        super(browser, urls, "hibernate-statistics-heading", "hibernate statistics");
     }
 
     public String getUrl()

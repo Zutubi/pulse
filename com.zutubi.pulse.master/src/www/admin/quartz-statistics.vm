@@ -22,7 +22,7 @@
 <body>
     #parse("/template/includes/actionerrors.vm")
     
-<h1 id="quartz.statistics.heading">Quartz Statistics</h1>
+<h1 id="quartz-statistics-heading">Quartz Statistics</h1>
     
 <h2>Quartz Scheduler</h2>
 <h3>Triggers:</h3>

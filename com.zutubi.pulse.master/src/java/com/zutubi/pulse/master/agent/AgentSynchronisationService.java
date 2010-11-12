@@ -82,7 +82,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         super.init();
         eventManager.register(this);
 
-        callbackService.registerCallback(getServiceName(), new NullaryProcedure()
+        callbackService.registerCallback("Agent Synchronisation Timeout Check", new NullaryProcedure()
         {
             public void run()
             {
