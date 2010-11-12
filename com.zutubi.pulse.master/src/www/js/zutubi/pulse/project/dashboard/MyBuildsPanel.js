@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 // dependency: zutubi/ActivePanel.js
+// dependency: zutubi/TextBox.js
 // dependency: zutubi/table/LinkTable.js
 // dependency: zutubi/pulse/SectionHeading.js
 // dependency: zutubi/pulse/project/BuildSummaryTable.js
@@ -66,11 +67,9 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
                         action: window.baseUrl + '/packages/pulse-dev-' + this.version + '.exe'
                     }]
                 }, {
-                    xtype: 'box',
-                    autoEl: {
-                        tag: 'p',
-                        html: 'Personal builds allow you to test your changes before committing them to your SCM. To submit personal build requests, you must install the developer tools on your local machine. Use the links provided to download a tools package that is compatible with this server.'
-                    }
+                    xtype: 'xztextbox',
+                    title: 'personal builds',
+                    data: 'Personal builds allow you to test your changes before committing them to your SCM. To submit personal build requests, you must install the developer tools on your local machine. Use the links provided to download a tools package that is compatible with this server.'
                 }]
             }]
         });

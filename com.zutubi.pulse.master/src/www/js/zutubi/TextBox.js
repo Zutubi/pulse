@@ -57,7 +57,7 @@ Zutubi.TextBox = Ext.extend(Ext.BoxComponent, {
     
     dataExists: function()
     {
-        return this.data !== undefined;
+        return this.data != null;
     }    
 });
 
