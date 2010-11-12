@@ -23,10 +23,10 @@
         <dependency org="zutubi" name="com.zutubi.i18n" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.validation.annotations" rev="latest.integration" conf="*->@"/>
         
-        <dependency org="com.opensymphony.xwork" name="com.springsource.com.opensymphony.xwork" rev="1.2.3" conf="build,release->default;src->src"/>
-        <dependency org="javax.mail" name="com.springsource.javax.mail" rev="1.4.0" conf="build,release->default;src->src"/>
+        <dependency org="com.opensymphony.xwork" name="com.opensymphony.xwork" rev="1.2.3" conf="build,release->default;src->src"/>
+        <dependency org="javax.mail" name="javax.mail" rev="1.4.0" conf="build,release->default;src->src"/>
 
         <!-- Test dependencies-->
-        <dependency org="org.junit" name="com.springsource.org.junit" rev="4.7"  conf="build->default;src->src"/>
+        <dependency org="org.junit" name="org.junit" rev="4.8.2"  conf="build->default;src->src"/>
     </dependencies>
 </ivy-module>
