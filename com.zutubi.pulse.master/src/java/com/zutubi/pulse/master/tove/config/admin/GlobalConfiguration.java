@@ -22,7 +22,7 @@ public class GlobalConfiguration extends AbstractConfiguration
 
     private String baseUrl;
     private String masterHost;
-    private String baseHelpUrl = "http://confluence.zutubi.com/display/pulse0201";
+    private String baseHelpUrl = "http://confluence.zutubi.com/display/pulse0203";
     private boolean rssEnabled = true;
     private boolean anonymousAccessEnabled = false;
     private boolean anonymousSignupEnabled = false;
