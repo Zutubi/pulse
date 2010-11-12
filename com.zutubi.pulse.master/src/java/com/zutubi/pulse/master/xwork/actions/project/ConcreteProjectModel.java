@@ -37,7 +37,7 @@ public class ConcreteProjectModel extends ProjectModel
     private boolean canViewSource;
     private long projectId;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean prompt, Set<String> availableActions)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean prompt, Set<String> availableActions, ProjectHealth projectHealth)
     {
         super(group, project.getName());
 
@@ -69,7 +69,9 @@ public class ConcreteProjectModel extends ProjectModel
         this.prompt = prompt;
         canTrigger = availableActions.contains(ACTION_TRIGGER);
         canRebuild = availableActions.contains(ACTION_REBUILD);
-        canViewSource = availableActions.contains(ACTION_VIEW_SOURCE); 
+        canViewSource = availableActions.contains(ACTION_VIEW_SOURCE);
+
+        this.health = projectHealth;
     }
 
     public String getName()
@@ -80,11 +82,6 @@ public class ConcreteProjectModel extends ProjectModel
     public long getProjectId()
     {
         return projectId;
-    }
-
-    public void setHealth(ProjectHealth health)
-    {
-        this.health = health;
     }
 
     public ProjectHealth latestHealth()

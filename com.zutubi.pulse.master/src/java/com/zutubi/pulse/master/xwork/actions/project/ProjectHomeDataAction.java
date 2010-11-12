@@ -15,7 +15,6 @@ import com.zutubi.pulse.master.model.BuildResultToNumberMapping;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -26,12 +25,14 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -65,7 +66,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         List<QueuedRequest> queued = snapshot.getQueuedRequestsByOwner(project);
         List<BuildResult> inProgress = buildManager.queryBuilds(project, ResultState.getIncompleteStates(), -1, -1, -1, -1, true, false);
         List<BuildResult> completed = buildManager.getLatestCompletedBuildResults(project, 11);
-        BuildResult latest = completed.isEmpty() ? null : completed.remove(0);
+        BuildResult latestCompleted = completed.isEmpty() ? null : completed.remove(0);
         
         // Race detection: anything in our queue snapshot that corresponds to a
         // build number (in progress or even completed) should be filtered out,
@@ -86,9 +87,9 @@ public class ProjectHomeDataAction extends ProjectActionBase
         ProjectConfiguration projectConfig = project.getConfig();
         BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(urls, projectConfig.getChangeViewer());
 
-        model = new ProjectHomeModel(createStatusModel());
+        model = new ProjectHomeModel(createStatusModel(latestCompleted));
         addActivity(queued, inProgress, buildMapping);
-        addLatest(latest, urls);
+        addLatest(latestCompleted, urls);
         addRecent(completed, buildMapping);
         addChanges();
         addDescription(projectConfig);
@@ -98,7 +99,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private ProjectHomeModel.StatusModel createStatusModel()
+    private ProjectHomeModel.StatusModel createStatusModel(BuildResult latestCompleted)
     {
         Project project = getProject();
 
@@ -116,7 +117,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
                 buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE})
         );
         
-        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.getHealth(buildManager, project)), state, statistics);
+        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.getHealth(latestCompleted)), state, statistics);
     }
 
     private Project.Transition getKeyTransition(Project project, Project.State projectState)

@@ -44,6 +44,19 @@ public enum ProjectHealth
     public static ProjectHealth getHealth(BuildManager buildManager, Project project)
     {
         BuildResult latestCompleted = buildManager.getLatestCompletedBuildResult(project);
+        return getHealth(latestCompleted);
+    }
+
+    /**
+     * Determine the health of a project based on its latest completed build.
+     *
+     * @param latestCompleted   the latest completed build for the project whose
+     * health is being determined.
+     * 
+     * @return  the projects health.
+     */
+    public static ProjectHealth getHealth(BuildResult latestCompleted)
+    {
         if (latestCompleted == null)
         {
             return UNKNOWN;

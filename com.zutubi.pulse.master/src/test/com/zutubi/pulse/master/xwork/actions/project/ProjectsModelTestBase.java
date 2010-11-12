@@ -86,7 +86,7 @@ public abstract class ProjectsModelTestBase extends PulseTestCase
 
     protected ConcreteProjectModel createConcrete(ProjectsModel group, Project project)
     {
-        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, true, Collections.<String>emptySet());
+        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, true, Collections.<String>emptySet(), ProjectHealth.UNKNOWN);
     }
 
     protected TemplateProjectModel createTemplates(String label, String projectName, Object... members)
