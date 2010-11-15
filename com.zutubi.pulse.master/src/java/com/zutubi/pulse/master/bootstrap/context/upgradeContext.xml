@@ -146,6 +146,7 @@
                 <ref local="renameCancelBuildPermission"/>
                 <ref local="cleanIvyCache"/>
                 <ref local="fixNullPostProcessors"/>
+                <ref local="testCaseIndexProjectIdIndex"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -741,5 +742,9 @@
 
     <bean id="fixNullPostProcessors" class="com.zutubi.pulse.master.upgrade.tasks.FixNullPostProcessorReferencesUpgradeTask">
         <property name="buildNumber" value="202008001"/>
+    </bean>
+
+    <bean id="testCaseIndexProjectIdIndex" class="com.zutubi.pulse.master.upgrade.tasks.TestCaseIndexIndicesUpgradeTask">
+        <property name="buildNumber" value="202013001"/>
     </bean>
 </beans>

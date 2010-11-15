@@ -6,8 +6,14 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="projectId" type="long" column="PROJECT_ID"/>
-        <property name="stageNameId" type="long" column="NODE_ID"/>
+        <property name="projectId" type="long">
+            <column name="PROJECT_ID" not-null="true" index="idx_testcaseindex_projectid"/>
+        </property>
+
+        <property name="stageNameId" type="long">
+             <column name="NODE_ID" not-null="true" index="idx_testcaseindex_nodeid"/>
+        </property>
+        
         <property name="name" type="text" column="NAME"/>
         <property name="totalCount" type="int" column="TOTAL_COUNT"/>
         <property name="expectedFailureCount" type="int" column="EXPECTED_FAILURE_COUNT"/>

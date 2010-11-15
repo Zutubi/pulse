@@ -6,7 +6,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -1074,17 +1073,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         buildManager.deleteAllBuilds(project);
         cleanupWorkDirs(project.getConfig(), null);
         
-        // Remove test case index
-        List<TestCaseIndex> tests;
-        do
-        {
-            tests = testCaseIndexDao.findByProject(project.getId(), 100);
-            for(TestCaseIndex index: tests)
-            {
-                testCaseIndexDao.delete(index);
-            }
-        }
-        while(tests.size() > 0);
+        testCaseIndexDao.deleteByProject(project.getId());
         
         projectDao.delete(project);
     }
